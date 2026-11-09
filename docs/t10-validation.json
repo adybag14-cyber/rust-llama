@@ -1,0 +1,43 @@
+{
+  "track": "T10",
+  "implementation_commit": "ed27c493ff38c71039fa24d9f46662648a9b250e",
+  "baseline_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "recorded_at_utc": "2026-11-08T17:48:42.319006+00:00",
+  "target": "x86_64-unknown-linux-gnu",
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "checks": [
+    {
+      "command": "cargo test --offline -p llama-behavior",
+      "exit_code": 0,
+      "unit_tests_passed": 31,
+      "cli_process_tests_passed": 4,
+      "reference_integration_tests_passed": 5,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "command": "cargo clippy --offline -p llama-behavior --all-targets -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo fmt -p llama-behavior --check",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo build --offline -p llama-behavior --release",
+      "exit_code": 0
+    }
+  ],
+  "oracle_cases": {
+    "chat_exact": 540,
+    "sampler_steps": 256,
+    "grammar_exact": 232
+  },
+  "float_acceptance": "absolute difference <= max(3e-6, abs(reference) * 3e-6)",
+  "full_track_complete": false,
+  "unsafe_blocks": 0,
+  "external_cargo_dependencies": 0,
+  "model_generation_tested": false,
+  "device_sampling_tested": false,
+  "performance_tested": false
+}

@@ -1,0 +1,13 @@
+boundary	kind	linkage_or_use	status
+Rust1.99.1	build_toolchain	Pinned host compiler Cargo standard library rustfmt Clippy	Required; platform linker and installed target libraries are external
+Workspace crates	Rust_dependencies	Local Cargo path dependencies only	Cargo audit rejects registry/git dependencies and custom build scripts
+Operating system	platform_runtime	Rust standard library native system imports and C math/runtime selected by toolchain	External system boundary; not rewritten project code
+CUDA driver	optional_device_service	Rust platform-loader dynamically resolves installed NVIDIA driver APIs; generated PTX is Rust-authored IR output	Selected actual RTX4090 kernels validated; model offload remains open
+HIP and MUSA services	optional_device_service	Declared dynamic vendor host interfaces	Discovery/foundations do not establish hardware execution parity
+OpenCL ICD	optional_device_service	Rust dynamically resolves installed OpenCL API; kernel text generated from typed Rust IR	Selected NVIDIA and AMD kernels validated
+Other GPU APIs	optional_device_service	Vulkan Metal WebGPU platform/driver boundaries	Incomplete host/kernel/device coverage; no full support claim
+CBLAS provider	optional_vendor_math	Separately installed LP64 CBLAS dynamic service	Explicit optional tests; not a default CPU dependency
+Specialty vendor APIs	optional_vendor_service	CANN ET SYCL zDNN Hexagon ZenDNN OpenVINO RPC VirtGPU external interfaces as applicable	Incomplete backend scope; see crate capability reports
+Frozen llama/ggml C/C++	reference_only	Separate external oracle build used to produce independent test data	Absent from product build and runtime linkage
+Pretrained GGUF weights	external_model_data	User-provided separately downloaded weights with hashes for conformance	Not distributed; supported files loaded by Rust
+Original vocabulary GGUF	test_data	Committed tokenizer-only fixture under explicit provenance and license	No pretrained weight payload; audit and fixture integrity required

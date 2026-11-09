@@ -1,0 +1,19 @@
+capability	source	status	scope	remaining
+PNG noninterlaced	vendor/stb/stb_image.h	implemented-selected-fixtures-validated	all legal color/depth combinations; filters 0-4; standard zlib/DEFLATE	16 oracle inputs; full profiles/corpus still open
+PNG Adam7/CgBI	vendor/stb/stb_image.h	planned	interlacing and Apple-specific PNG	explicit unsupported error
+PNM	vendor/stb/stb_image.h	partial	P5/P6 maxval255	other maxvals and 16-bit open
+BMP	vendor/stb/stb_image.h	partial	uncompressed 24/32-bit modern DIB	palettes/bitfields/other variants open
+JPEG	vendor/stb/stb_image.h	planned	baseline/progressive	decoder missing
+TGA	vendor/stb/stb_image.h	planned	source-accepted profile audit open	decoder missing
+PSD	vendor/stb/stb_image.h	planned	source composited-view subset	decoder missing
+GIF	vendor/stb/stb_image.h	planned	source first-frame behavior and optional animation behavior	decoder missing
+HDR RGBE	vendor/stb/stb_image.h	planned	source accepted Radiance RGBE profiles	decoder missing
+Softimage PIC	vendor/stb/stb_image.h	planned	source accepted PIC profiles	decoder missing
+WAV RIFF PCM/float	vendor/miniaudio/miniaudio.h;tools/mtmd/mtmd-helper.cpp	implemented-selected-fixtures-validated	PCM8/16/24/32 and float32/64; matching extensible subformats	six original decoder fixtures; extended corpus open
+Compressed WAV	vendor/miniaudio/miniaudio.h	planned	ADPCM/IMA/ALaw/muLaw and source accepted profiles	decoder missing
+W64/RF64	vendor/miniaudio/miniaudio.h	planned	decoder functionality and helper recognition need separate audit	decoder missing
+MP3	vendor/miniaudio/miniaudio.h;tools/mtmd/mtmd-helper.cpp	planned	source built-in dr_mp3	decoder missing
+FLAC	vendor/miniaudio/miniaudio.h;tools/mtmd/mtmd-helper.cpp	planned	source built-in dr_flac	decoder missing
+Audio resampler	vendor/miniaudio/miniaudio.h	partial-no-reference-parity	own rational linear stream with no low-pass filter	source filtered-resampling parity missing
+WebP	tools/mtmd/mtmd-helper.cpp	blocked	external ffmpeg single-frame path	pin source codec/profile scope; Rust decoder missing
+Video/container/soundtrack	tools/mtmd/mtmd-helper.cpp	blocked	external ffmpeg/ffprobe configured build	accepted codec/profile matrix undefined; Rust decoders/demuxers missing

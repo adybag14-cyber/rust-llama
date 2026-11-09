@@ -1,0 +1,73 @@
+command: ['target/release/track-runner', 'probe']
+started_utc: 2026-11-08T17:59:03.663828+00:00
+exit_code: 0
+expected_exit: 0
+
+PROBE ONLY: availability is not backend parity or device execution proof.
+CUDA | Unavailable | None | devices=0 | driver unavailable: libcuda.so.1: libcuda.so.1: cannot open shared object file: No such file or directory; libcuda.so: libcuda.so: cannot open shared object file: No such file or directory
+HIP | Unavailable | None | devices=0 | driver unavailable: libamdhip64.so: libamdhip64.so: cannot open shared object file: No such file or directory; libamdhip64.so.7: libamdhip64.so.7: cannot open shared object file: No such file or directory; libamdhip64.so.6: libamdhip64.so.6: cannot open shared object file: No such file or directory
+MUSA | Unavailable | None | devices=0 | driver unavailable: libmusa.so.1: libmusa.so.1: cannot open shared object file: No such file or directory; libmusa.so: libmusa.so: cannot open shared object file: No such file or directory
+OpenCL | Unavailable | None | devices=0 | clGetPlatformIDs returned CL_PLATFORM_NOT_FOUND_KHR (-1001); loader exists but no OpenCL platform is installed
+Vulkan | Unavailable | Some("libvulkan.so.1") | devices=0 | Vulkan loader 1.4.309; vkCreateInstance returned -9 (VK_ERROR_INCOMPATIBLE_DRIVER; no compatible ICD/device)
+Metal | NotImplemented | None | devices=0 | MSL source generation implemented. Objective-C/Metal resource and execution adapter pending; this host is not a Metal execution runner.
+WebGPU | NotImplemented | None | devices=0 | WGSL source generation implemented. Native/browser adapter, async mapping and device-loss lifecycle pending; no WebGPU execution claimed.
+ProbeReport {
+    family: "BLAS",
+    status: ExternalSymbolsPresent,
+    detail: "libblas.so.3 loaded; 1 required symbol(s) present. No device execution claimed.",
+    remaining_gate: "F32 adapter available; quant conversions, batch scheduling, vendor/thread matrix and T02 integration remain",
+}
+ProbeReport {
+    family: "CANN",
+    status: ExternalUnavailable,
+    detail: "libascendcl.so: libascendcl.so: cannot open shared object file: No such file or directory",
+    remaining_gate: "Ascend hardware, ACLNN operation lowerings and workspace/resource integration",
+}
+ProbeReport {
+    family: "SYCL",
+    status: ExternalUnavailable,
+    detail: "libze_loader.so.1 loaded; zeInit(0) returned 0x78000001; no driver/device execution established",
+    remaining_gate: "Level Zero discovery is only a feasibility probe; SYCL/XMX/DPAS kernels, graph dispatch and hardware execution remain",
+}
+ProbeReport {
+    family: "zDNN",
+    status: ExternalUnavailable,
+    detail: "libzdnn.so: libzdnn.so: cannot open shared object file: No such file or directory",
+    remaining_gate: "IBM Z/NNPA execution, tensor transforms and dtype/operation lowering",
+}
+ProbeReport {
+    family: "OpenVINO",
+    status: ExternalUnavailable,
+    detail: "libopenvino_c.so: libopenvino_c.so: cannot open shared object file: No such file or directory",
+    remaining_gate: "GGML-to-vendor graph construction, state/quantization and real CPU/GPU/NPU inference",
+}
+ProbeReport {
+    family: "Hexagon",
+    status: ExternalUnavailable,
+    detail: "libcdsprpc.so: libcdsprpc.so: cannot open shared object file: No such file or directory",
+    remaining_gate: "FastRPC generated IDL ABI, DSP kernels, HVX/HMX and physical load/execute; Rust ELF/SWIV utility is implemented",
+}
+ProbeReport {
+    family: "ET",
+    status: AbiGateOpen,
+    detail: "ET platform directory present: false. Snapshot imports C++ rt::IRuntime and deviceLayer::IDeviceLayer; no verified C ABI.",
+    remaining_gate: "Vendor runtime C++ ABI/source, custom RISC-V toolchain/startup, firmware or sysemu and physical execution; Rust forbidden-instruction text guard is implemented",
+}
+ProbeReport {
+    family: "ZenDNN",
+    status: AbiGateOpen,
+    detail: "libzendnnl.so: libzendnnl.so: cannot open shared object file: No such file or directory; libzendnn.so: libzendnn.so: cannot open shared object file: No such file or directory; pinned source uses C++ zendnnl.hpp matmul_direct",
+    remaining_gate: "Snapshot pin 1f399a75cc0993778374a51bea49b64a57879595; establish audited ABI or Rust behavior without a project C++ shim",
+}
+ProbeReport {
+    family: "RPC",
+    status: RustSubsetAvailable,
+    detail: "Rust TCP 8.0.1 memory and bounded F32 graph subset compiled. Run self_check for live loopback evidence.",
+    remaining_gate: "Complete graph op/dtype integration, persistent tensor caching, async scheduler, Linux/Apple RDMA and collectives",
+}
+ProbeReport {
+    family: "VirtGPU",
+    status: ExternalSymbolsPresent,
+    detail: "libdrm.so.2 loaded; 3 required symbol(s) present. No device execution claimed. /dev/dri present: false. Rust APIR handshake codecs are implemented.",
+    remaining_gate: "APIR guest/host transport, shared memory and synchronization; real virtio GPU + virglrenderer required",
+}

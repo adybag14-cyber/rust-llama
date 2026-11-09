@@ -1,0 +1,82 @@
+{
+  "checked_at_utc": "2026-11-08T17:56:43.492874+00:00",
+  "frozen_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "builder": "crates/vendor-remote/examples/t08_build_reference.rs",
+  "driver": "crates/vendor-remote/examples/t08_reference_driver.rs",
+  "input_manifest": "crates/vendor-remote/examples/reference/inputs.sha256",
+  "pinned_input_files": 124,
+  "original_translation_units": 28,
+  "build_command": [
+    "target/debug/examples/t08_build_reference",
+    "/workspace/scratch/4678ec077e2a/reference/llama.cpp-master",
+    "/workspace/scratch/4678ec077e2a/t08-rust-reference-build"
+  ],
+  "build_exit_code": 0,
+  "native_output_directory_outside_product": "/workspace/scratch/4678ec077e2a/t08-rust-reference-build",
+  "compiler_first_lines": [
+    "gcc (Debian 14.2.0-19) 14.2.0",
+    "g++ (Debian 14.2.0-19) 14.2.0"
+  ],
+  "existing_native_integration_tests_unchanged": true,
+  "native_algorithms_in_generated_probe": false,
+  "native_objects_shipped": false,
+  "results": [
+    {
+      "name": "reference-rebuild-clippy.txt",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "-p",
+        "llama-vendor-remote",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "sha256": "23b9a21bbaf189889e08dc27ed8eba521021280c5852db22205f721db08b2c7c"
+    },
+    {
+      "name": "reference-rebuild-format.txt",
+      "command": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-vendor-remote",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "rebuilt-reference-tests.txt",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "-p",
+        "llama-vendor-remote",
+        "--",
+        "--include-ignored",
+        "--nocapture"
+      ],
+      "environment": {
+        "T08_NATIVE_RPC_ORACLE": "/workspace/scratch/4678ec077e2a/t08-rust-reference-build/rpc-oracle"
+      },
+      "exit_code": 0,
+      "sha256": "533348524dfa68990a8e6cd38b55ee09c453ee5258a37cd2904387539f3e34f9",
+      "passed": 39,
+      "failed": 0,
+      "capture_normalization": "Final blank lines removed; diagnostic content unchanged."
+    }
+  ],
+  "artifact_hashes": {
+    "libggml-reference-rpc.so": "a9ebbf63914e63e89b6398e2c482bb0f768b39a857e642f3e819ce6f4debd554",
+    "rpc-layout": "ade972b7001a026c3498e3e07823cac2f62d688db026b8e0d3c22f84110a1016",
+    "rpc-layout.cpp": "b49c0bc02e86ef517f42f8975f36802b30549e149472429676a494ba622c8e1a",
+    "rpc-oracle": "10fdd978c3662846a6db3120ce8bb41b4b4a06a49bc940d5849324fcf47916bb",
+    "inputs.sha256": "2f26b3af676e9552e4609016a78e0f0da0cfc0464ee7fc7f785b978f796de9ab"
+  }
+}

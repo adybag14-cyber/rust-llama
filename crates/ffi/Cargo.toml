@@ -1,0 +1,18 @@
+[package]
+name = "llama-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+llama-inference = { path = "../inference" }
+llama-model-runtime = { path = "../model-runtime" }
+llama-gguf = { path = "../gguf" }
+llama-tokenizer = { path = "../tokenizer" }
+
+[lints]
+workspace = true

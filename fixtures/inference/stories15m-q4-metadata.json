@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "reference": "frozen-llama.cpp-master-c-api",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "vocab_only": false,
+  "n_vocab": 32000,
+  "n_ctx": 128,
+  "max_tokens": 16,
+  "threads": 1,
+  "kv_type": "F32",
+  "flash_attention": false,
+  "mmap": false,
+  "detokenize_remove_special": true,
+  "detokenize_unparse_special": false,
+  "binary": "stories15m-q4-logits.f32le.bin",
+  "binary_sha256": "579a521b36d682c9b26cac4d533b00beb4803e3bf5bfe2f86a29a07a4959fd21",
+  "binary_bytes": 2560000,
+  "format": "raw little-endian IEEE 754 binary32; no header; contiguous full-vocabulary rows",
+  "row_count": 20,
+  "float_count": 640000,
+  "row_layout": "prompt_logits followed by greedy_logits[1:]; the first greedy row equals the final prompt row bit-for-bit",
+  "model_name": "stories15M-q4_0.gguf",
+  "model_sha256": "66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739",
+  "model_bytes": 19077344,
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05,
+    "rule": "abs(actual-reference) <= absolute + relative * abs(reference)",
+    "token_ids_and_generated_bytes": "exact",
+    "bitwise_equality": "reported only; not a portable gate"
+  },
+  "cases": [
+    {
+      "name": "story_q4",
+      "prompt": "Once upon a time",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        1,
+        9038,
+        2501,
+        263,
+        931
+      ],
+      "pieces_hex": [
+        "",
+        "204f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "pieces_special_hex": [
+        "3c733e",
+        "204f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+      "greedy_tokens": [
+        29892,
+        727,
+        471,
+        263,
+        2217,
+        7826,
+        4257,
+        365,
+        2354,
+        29889,
+        2296,
+        18012,
+        304,
+        1708,
+        5377,
+        322
+      ],
+      "greedy_pieces_hex": [
+        "2c",
+        "207468657265",
+        "20776173",
+        "2061",
+        "206c6974746c65",
+        "206769726c",
+        "206e616d6564",
+        "204c",
+        "696c79",
+        "2e",
+        "20536865",
+        "206c6f766564",
+        "20746f",
+        "20706c6179",
+        "206f757473696465",
+        "20616e64"
+      ],
+      "finished_eog": false,
+      "generated_hex": "2c207468657265207761732061206c6974746c65206769726c206e616d6564204c696c792e20536865206c6f76656420746f20706c6179206f75747369646520616e64",
+      "first_row": 0,
+      "row_count": 20
+    }
+  ]
+}

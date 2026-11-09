@@ -1,0 +1,43 @@
+[
+  {
+    "name": "debug-final",
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--all-targets",
+      "--offline",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 5.635056090999569,
+    "passed": 288,
+    "failed": 0,
+    "ignored": 9,
+    "stdout_tail": "s::unknown_command_closes_session_and_frees_allocations ... ok\n\ntest result: ok. 32 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.10s\n\n\nrunning 3 tests\ntest native_rpc_layout_matches_explicit_codec ... ignored, requires separately compiled frozen C++ RPC oracle\ntest native_rpc_server_accepts_rust_client ... ignored, requires separately compiled frozen C++ RPC oracle\ntest rust_rpc_server_accepts_native_client ... ignored, requires separately compiled frozen C++ RPC oracle\n\ntest result: ok. 0 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 2 tests\ntest elf32_swiv_matches_original_bytes_including_two_bss_tails ... ok\ntest elf64_swiv_matches_original_bytes_when_header_is_in_load_segment ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 2 tests\ntest cuda_and_portable_ir_agree_on_broadcast_strides_and_launch_tails ... ok\ntest cuda_and_portable_q4_ir_agree_on_frozen_blocks_and_padded_rows ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr_tail": "reference_interop.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/reference_interop-e67b8fd141703f44)\n     Running tests/swiv_reference.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/swiv_reference-ce3bc12a6e1c1e33)\n     Running unittests examples/t08_build_reference.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/examples/t08_build_reference-1d03cc1fdb723740)\n     Running unittests examples/t08_check.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/examples/t08_check-4c7facf4802c907d)\n     Running unittests examples/t08_reference_driver.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/examples/t08_reference_driver-e99e7ec3b0c51261)\n     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/rust_llama-2042c23f0a1862e5)\n     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/track_runner-83e6e69f91bae701)\n     Running tests/cross_track_kernels.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/cross_track_kernels-c13b25f5c1bcabcf)\n     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/xtask-b0472c59e24bd42d)\n"
+  },
+  {
+    "name": "pretrained-debug",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "llama-inference",
+      "--test",
+      "native_reference",
+      "--offline",
+      "--locked",
+      "--",
+      "--ignored",
+      "--nocapture"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 21.791856812999868,
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "stdout_tail": "\nrunning 2 tests\ntest trained_stories260k_full_logits_greedy_ids_and_text ... ok\ntest trained_stories15m_q4_full_logits_greedy_ids_and_text ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 21.27s\n\n",
+    "stderr_tail": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.47s\n     Running tests/native_reference.rs (/home/tdamre/.cache/rust-llama-20261109-target/debug/deps/native_reference-77fa1d25e9eaa111)\nnative trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=1.764297485e-5 max_fraction_of_tolerance=7.180018213e-2\nnative trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)\n"
+  }
+]

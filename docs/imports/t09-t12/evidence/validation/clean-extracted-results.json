@@ -1,0 +1,45 @@
+{
+  "checked_utc": "2026-11-08T17:56:16.568464+00:00",
+  "candidate_zip_sha256": "b50d0c9efc71542a9674a5c4b77f263f28c9d74d752044b2a328c4066ca8979a",
+  "zip_entries": 158,
+  "zip_crc": "all passed",
+  "manifest": "all file hashes sizes and paths matched",
+  "clean_cache": "/workspace/scratch/be832a7b719c/build/clean-extracted",
+  "implementation_set_sha256": "b51a1845af7dba4df7eef19b6bf2b8e267eaf9d1fbb13db7831f504199c0cc02",
+  "results": [
+    {
+      "name": "clean-extracted-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "passed": 123
+    },
+    {
+      "name": "clean-extracted-release",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clean-extracted-integrity",
+      "command": [
+        "cargo",
+        "xtask",
+        "verify-package"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "scope": "Fresh build from independently extracted candidate archive; final snapshot adds reports only and must preserve this implementation identity."
+}

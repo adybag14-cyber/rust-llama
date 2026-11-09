@@ -1,0 +1,240 @@
+COMMAND: cargo test --workspace --offline --locked
+   Compiling llama-behavior v0.1.0 (/workspace/scratch/be832a7b719c/verification/candidate/crates/llama-behavior)
+   Compiling llama-media v0.1.0 (/workspace/scratch/be832a7b719c/verification/candidate/crates/llama-media)
+   Compiling llama-conformance v0.1.0 (/workspace/scratch/be832a7b719c/verification/candidate/crates/llama-conformance)
+   Compiling llama-server v0.1.0 (/workspace/scratch/be832a7b719c/verification/candidate/crates/llama-server)
+   Compiling xtask v0.1.0 (/workspace/scratch/be832a7b719c/verification/candidate/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.46s
+     Running unittests src/lib.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_behavior-e465e646f3fe730d)
+
+running 31 tests
+test chat::tests::chatml_exact_bytes ... ok
+test chat::tests::gemma_merges_system_only_into_non_model_turn ... ok
+test chat::tests::llama2_history_and_ascii_whitespace_contract ... ok
+test chat::tests::malformed_roles_nuls_and_output_limits_are_rejected ... ok
+test chat::tests::every_registered_native_name_has_implementation ... ok
+test chat::tests::native_detection_order_and_unknown_jinja_are_explicit ... ok
+test grammar::tests::token_piece_filter_uses_bytes_and_end_state ... ok
+test grammar::tests::state_budget_failure_is_transactional ... ok
+test json::tests::deterministic_key_order ... ok
+test grammar::tests::rejects_invalid_grammars_and_unimplemented_token_terminals ... ok
+test grammar::tests::nullable_rules_and_repeated_groups ... ok
+test json::tests::integers_preserve_identity_beyond_binary64_precision ... ok
+test grammar::tests::recursive_nested_json_and_prefix_status ... ok
+test grammar::tests::full_gbnf_character_syntax_and_bounds ... ok
+test json::tests::enforces_limits_and_handles_negative_zero ... ok
+test grammar::tests::split_utf8_checks_partial_ranges_and_rolls_back ... ok
+test json::tests::rejects_malformed_ambiguous_or_non_finite_input ... ok
+test json::tests::unicode_surrogates_and_escape_roundtrip ... ok
+test sampling::tests::mt19937_standard_seed_reference_vector ... ok
+test sampling::tests::chain_order_is_observable ... ok
+test sampling::tests::distribution_clone_reset_singleton_consumption ... ok
+test sampling::tests::dry_source_cases_and_breakers ... ok
+test sampling::tests::adaptive_accept_only_commits_matching_pending_token ... ok
+test sampling::tests::errors_do_not_consume_rng_or_mutate_candidates ... ok
+test speculative::tests::partial_commit_restores_rng_and_history_exactly ... ok
+test sampling::tests::reference_sampling_probability_cases ... ok
+test sampling::tests::penalty_window_positive_negative_and_reset ... ok
+test sampling::tests::xtc_source_case ... ok
+test speculative::tests::greedy_rejection_and_bonus ... ok
+test speculative::tests::dropping_or_invalid_commit_leaves_live_state_untouched ... ok
+test speculative::tests::snapshot_budget_rejects_before_unbounded_chain_copying ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/llama-behavior.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_behavior-159b9684e7aa53d9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/cli-4faf8d9b28a9d069)
+
+running 4 tests
+test chat_cli_preserves_exact_template_bytes ... ok
+test json_cli_preserves_large_integer_and_speculative_cli_bonus ... ok
+test sampler_cli_uses_real_logits_and_rejects_invalid_config ... ok
+test grammar_cli_distinguishes_match_mismatch_and_bad_input ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/reference.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/reference-2af3caa791fcdeb2)
+
+running 5 tests
+test all_eight_bundled_grammar_data_files_compile ... ok
+test original_bundled_json_and_arithmetic_grammar_membership ... ok
+test sampler_256_original_apply_and_accept_steps ... ok
+test native_chat_540_original_output_transcripts ... ok
+test grammar_232_original_prefix_and_completion_decisions ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_conformance-ffbd18fb1f597fe4)
+
+running 18 tests
+test compare::tests::numeric_budget_edges ... ok
+test compare::tests::detects_mutation_and_truncation ... ok
+test benchmark::tests::statistics_use_sorted_samples_and_population_variance ... ok
+test benchmark::tests::warmups_are_excluded ... ok
+test digest::tests::crc_reference ... ok
+test digest::tests::published_sha_vectors ... ok
+test inventory::tests::cmake_test_names_and_multiline_overrides_survive ... ok
+test inventory::tests::hidden_executable_paths_are_rewrite_obligations ... ok
+test inventory::tests::ownership_specific_over_general ... ok
+test inventory::tests::removed_enum_comments_are_ignored ... ok
+test package::tests::source_audit_rejects_foreign_code ... ok
+test inventory::tests::drift_detection_catches_added_removed_changed_bytes ... ok
+test package::tests::manifest_detects_same_length_corruption_and_extra_files ... ok
+test process::tests::missing_program_and_invalid_budget_are_errors ... ok
+test package::tests::archive_reproducible_and_no_caches ... ok
+test process::tests::binary_stdin_and_bounded_capture_do_not_deadlock ... ok
+test process::tests::timeout_terminates_single_process ... ok
+test digest::tests::million_a_vector_and_chunk_boundaries ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/cross_track.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/cross_track-ceacbc15353b4532)
+
+running 3 tests
+test unicode_chat_survives_json_and_incremental_grammar ... ok
+test accepted_speculative_prefix_preserves_future_sampling ... ok
+test bounded_malformed_corpus_never_panics_across_media_and_json ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_media-b98920c49746f65a)
+
+running 4 tests
+test png::tests::corrupt_huffman_tables_are_rejected ... ok
+test png::tests::standard_checksums ... ok
+test png::tests::stored_blocks_checksum_and_expansion_bound ... ok
+test png::tests::bounded_malformed_deflate_corpus_has_no_panics ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/png.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/png-f90c8109689e22c0)
+
+running 2 tests
+test png_truncation_crc_and_limits_are_enforced ... ok
+test png_color_depths_filters_and_original_fixture_match_stb_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/reference.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/reference-56f0c45f5d59c2dc)
+
+running 7 tests
+test normalization_and_smart_size_match_original ... ok
+test image_decoders_match_original_stb ... ok
+test streaming_synthesis_matches_original ... ok
+test wav_samples_match_original_miniaudio ... ok
+test image_resampling_matches_original_bytes ... ok
+test filterbanks_and_log_mel_match_original ... ok
+test real_fft_and_windows_match_original ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/robustness.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/robustness-9a1872f8ce16c4da)
+
+running 18 tests
+test invalid_resampler_input_does_not_change_next_output ... ok
+test fixed_count_video_selection_retains_reference_ties_and_repetition ... ok
+test crop_composite_and_tile_positions_are_checked ... ok
+test every_codec_fixture_prefix_is_rejected_without_panicking ... ok
+test istft_reset_and_flush_have_explicit_lifecycle ... ok
+test malformed_headers_and_resource_limits_fail_before_large_allocations ... ok
+test malformed_wav_alignment_compression_and_nonfinite_samples ... ok
+test resize_bounds_and_normalization_are_explicit ... ok
+test sequence_cancellation_and_timestamp_order_are_isolated ... ok
+test smart_resize_handles_ties_and_conflicting_bounds ... ok
+test stft_frame_count_and_spectrogram_layout_are_consistent ... ok
+test wav_roundtrip_and_stereo_downmix_preserve_samples ... ok
+test waveform_padding_and_embedding_shape_do_not_fabricate_values ... ok
+test constant_images_and_identity_are_preserved_by_every_resize_filter ... ok
+test spectral_validation_and_zero_energy_are_finite ... ok
+test linear_resampler_output_is_chunk_invariant_and_resettable ... ok
+test fft_matches_independent_direct_dft_and_roundtrip ... ok
+test rejected_stream_work_preserves_next_successful_output ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/lib.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_server-1c117a4436b33949)
+
+running 14 tests
+test client::tests::html_text_is_escaped ... ok
+test http::tests::arbitrary_public_limits_cannot_overflow_and_bad_headers_write_nothing ... ok
+test http::tests::enforces_limits_before_body_allocation ... ok
+test http::tests::duplicate_query_and_bad_percent_are_errors ... ok
+test http::tests::rejects_smuggling_and_malformed_headers ... ok
+test stream::tests::blocked_sender_observes_cancel_and_disconnect ... ok
+test stream::tests::completed_replay_expires_but_active_does_not ... ok
+test stream::tests::queue_timeout_and_oversize_are_explicit ... ok
+test stream::tests::replay_overflow_preserves_raw_suffix_and_absolute_offsets ... ok
+test http::tests::request_at_every_split_boundary ... ok
+test stream::tests::replay_replacement_lookup_cancel_and_future_offset ... ok
+test stream::tests::sse_multiline_framing ... ok
+test stream::tests::utf8_decoder_handles_every_byte_boundary ... ok
+test stream::tests::concurrent_queue_never_exceeds_byte_budget ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/llama_server-a757c12088ce416e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/tcp.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/tcp-39032da43ed02453)
+
+running 17 tests
+test malformed_framing_is_rejected_on_the_wire ... ok
+test disconnect_cancels_ordinary_stream_and_releases_admission ... ok
+test native_and_openai_completion_shapes_and_usage ... ok
+test completed_replay_returns_exact_byte_suffix_and_lookup_metadata ... ok
+test connection_admission_limit_rejects_excess_socket ... ok
+test auth_cors_preflight_and_typed_failures ... ok
+test simultaneous_generation_admission_is_bounded ... ok
+test provider_error_and_panic_are_typed_without_a_second_status_line ... ok
+test replay_survives_disconnect_then_resumes_and_explicit_delete_cancels ... ok
+test replay_overflow_is_explicit_and_delete_is_idempotent ... ok
+test streaming_chat_emits_role_deltas_finish_and_done ... ok
+test invalid_json_unsupported_features_and_tokens_are_explicit ... ok
+test unavailable_binary_contract_over_tcp ... ok
+test shutdown_interrupts_incomplete_request_without_waiting_full_timeout ... ok
+test disconnected_replay_generation_still_has_an_absolute_deadline ... ok
+test slow_drip_cannot_extend_absolute_request_deadline ... ok
+test slow_network_reader_applies_backpressure_with_a_bounded_wait ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+
+     Running unittests src/main.rs (/workspace/scratch/be832a7b719c/build/clean-extracted/debug/deps/xtask-b0472c59e24bd42d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_behavior
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_conformance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_media
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+EXIT_CODE: 0

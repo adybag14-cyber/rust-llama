@@ -1,0 +1,86 @@
+{
+  "input_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "rust_distribution_sha256": "231fcae47ee950621374725b5fc3b5441d2fbda2955ac45dd7dc816d8876cfe7",
+  "source_files": [
+    {
+      "path": "src/llama-arch.h",
+      "sha256": "186224d2b6fba0e3224f4d99ca20c2b04ba7876d3d0bf8038553d7507d17c5bb"
+    },
+    {
+      "path": "src/llama-arch.cpp",
+      "sha256": "d7a123dc2e146d09a3d17bc751020e0e669e72534867d18da8eb3afbb454dc57"
+    },
+    {
+      "path": "src/llama-model.cpp",
+      "sha256": "9956da154d2a34fdb2ae627a4c70ef34f046b86c145039de754a7ad7a4b67667"
+    },
+    {
+      "path": "src/models/llama.cpp",
+      "sha256": "dbd44e2d9bb2539c8da524aede4433c24578da590737d872f7552e66b0f39c58"
+    },
+    {
+      "path": "src/models/bert.cpp",
+      "sha256": "9173dc75465a3a86f3ca5c5983d9496dcfd9512a3b913d7613581aa1c5b86300"
+    },
+    {
+      "path": "src/models/mamba.cpp",
+      "sha256": "55d3fae08078502e86817638808d870627924e3f404e546243364a3e7123ecfc"
+    },
+    {
+      "path": "src/models/mamba-base.cpp",
+      "sha256": "8dca4f31edd69d92adfe48c09742528ab7f0ca4e45e1b66bc4cc4ff7d96211df"
+    },
+    {
+      "path": "src/llama-adapter.h",
+      "sha256": "b63d8654358d6141fac1f45b1b56247d7c8360e609a55323d30e7dcb6a6ffc00"
+    },
+    {
+      "path": "src/llama-adapter.cpp",
+      "sha256": "1b8c87dabcdfdb1f8f663ac8802e943c581e984259a0154506c068902d544498"
+    },
+    {
+      "path": "ggml/src/ggml-cpu/vec.h",
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    {
+      "path": "ggml/src/ggml-cpu/vec.cpp",
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    {
+      "path": "ggml/src/ggml-cpu/ops.cpp",
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    }
+  ],
+  "reference_compiler": "gcc/g++ (Debian 14.2.0-19) 14.2.0",
+  "reference_host": "x86_64-unknown-linux-gnu",
+  "reference_configuration": [
+    "-O1",
+    "-fPIC",
+    "-std=c11 / -std=c++17",
+    "-D_GNU_SOURCE",
+    "-DGGML_USE_CPU",
+    "-DGGML_SCHED_MAX_COPIES=4",
+    "-shared -Wl,--no-undefined",
+    "no -march/-mavx flags; host x86-64 baseline SIMD remains compiler default"
+  ],
+  "reference_output": "crates/model-runtime/tests/data/ggml_reference.tsv",
+  "reference_output_sha256": "ebe853a5a2b480f29243600b2a4b0ed0d68093f2d9690bcce442456937eee8b2",
+  "reference_values": 104,
+  "reference_vectors": 20,
+  "maximum_absolute_difference": 1.788139343e-07,
+  "acceptance": "abs(actual-reference) <= 3e-6 + 3e-6*abs(reference)",
+  "scope": "Synthetic dense F32 two-layer Llama/GQA, two-layer Mamba-1, two-layer BERT operator graphs; not real-weight/full-family acceptance",
+  "reference_source_outside_product": true,
+  "runtime_native_dependencies": [],
+  "unsafe_runtime_code": false,
+  "python_registration_inventory": {
+    "text": 312,
+    "projector": 92,
+    "total": 404,
+    "method": "Python AST literal decorator arguments with inherited model_arch and TextModel/MmprojModel bases; Rust audit rechecks exact source/alias registrations"
+  },
+  "original_plan_registration_counts": {
+    "text": 314,
+    "projector": 91
+  }
+}

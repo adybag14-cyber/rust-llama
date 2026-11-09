@@ -1,0 +1,12 @@
+component	class	role	status
+Rust standard library 1.99.1	external-toolchain	Host language standard runtime and OS bindings	executed-linux-x86_64
+Cargo rustfmt Clippy 1.99.1	external-toolchain	Host build formatting and static checks	executed-linux-x86_64
+Linux libc and system loader	external-platform	Networking threads allocator process filesystem	host-boundary
+GCC 14.2 libstdc++	oracle-only	Compile frozen original components for independent fixtures; not product runtime	executed-linux-x86_64
+/bin/cat and /bin/sleep	test-only-platform-utilities	Conformance probe binary IO and cancellation tests	executed-linux-x86_64
+Original llama.cpp source	oracle-only	Supplied immutable reference snapshot	outside-product-build-and-package
+Registry and Git Cargo dependencies	third-party-crates	None in this checkpoint	verified-offline-cargo-metadata
+FFmpeg Python Node	foreign-application-runtime	No production dependency introduced	verified-host-source-and-link-audit
+GPU vendor SDKs	external-platform	Future backend integration from T06-T08	unavailable-and-unvalidated
+libgcc_s.so.1	external-platform-runtime	Rust host unwind/runtime boundary	observed-ELF-NEEDED-all-three-executables
+libm.so.6	external-platform-runtime	System math used by behavior executable	observed-ELF-NEEDED-llama-behavior

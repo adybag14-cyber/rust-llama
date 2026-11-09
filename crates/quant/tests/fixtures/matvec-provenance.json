@@ -1,0 +1,64 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "records": 162,
+  "rows_per_record": 3,
+  "case_selection": "9 weight dtypes, widths32/64/96/256/512/1536, random/zero/tie-pattern activations",
+  "generic_oracle": "Five legacy packed types use unmodified ggml_vec_dot_*_generic C functions and native reference Q8_0/Q8_1 activation encoders. F32/F16/BF16/F8 records store the native output in both fields.",
+  "native_oracle": "Actual ggml_mul_mat CPU graph in frozen DLLs; AVX disabled, SSE42 enabled; one CPU thread.",
+  "file": {
+    "name": "matvec-reference.bin",
+    "bytes": 561072,
+    "sha256": "a556025bdb90641c354e0fd0d2a0f7934e48cfec097eddd4f3ed5fcfca2cdc53"
+  },
+  "sources": {
+    "dot-oracle.c": {
+      "bytes": 5885,
+      "sha256": "4f91b7bc2fed37b6c31152004b3b39bb705dfc71c6d04de001af3bff1c221bff"
+    },
+    "dot_oracle.dll": {
+      "bytes": 116736,
+      "sha256": "6808f6b61d9d7fd25dfefa61b88f31239f92db421a4a237bbff207e8eb65b755"
+    },
+    "quants.c": {
+      "bytes": 46998,
+      "sha256": "6447ac34938660c396c63ea06e840f3ee714d606c36e1674fd09c9e56c3f9945"
+    },
+    "ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "oracle.c": {
+      "bytes": 39296,
+      "sha256": "6c632e0c2e5c40967ca8a2a46ec26102512e93bedc53d16cc7fcf5bb3e7ac5ca"
+    },
+    "generate_matvec.py": {
+      "bytes": 4703,
+      "sha256": "cf2a9b9dcd7300c20db3f4e7b462aff6bf2b233594a092cb463d2d1ecf861541"
+    },
+    "ggml-cpu.c": {
+      "bytes": 133995,
+      "sha256": "aeae3376375667dd84fd35f5d4d413015b3f3c24985eef5399b94c337bdf84bd"
+    },
+    "vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    }
+  },
+  "compiler": "MSVC 19.51.36260.0 /fp:strict for standalone dot oracle; separately built frozen GGML CPU DLLs",
+  "validation": "Five packed dtype outputs compare exact bits with generic C. All nine dtypes compare against native CPU graph using absolute tolerance 2e-5 * (1 + abs(expected)); this accommodates scalar versus SSE reduction ordering.",
+  "activation_types": {
+    "Q4_0": "Q8_0",
+    "Q4_1": "Q8_1",
+    "Q5_0": "Q8_0",
+    "Q5_1": "Q8_1",
+    "Q8_0": "Q8_0",
+    "F32": "F32",
+    "F16": "F32",
+    "BF16": "BF16",
+    "F8_E4M3": "F32"
+  }
+}

@@ -1,0 +1,254 @@
+command: ['cargo', 'test', '--workspace', '--release', '--offline', '--locked', '--', '--include-ignored']
+started_utc: 2026-11-08T17:58:31.431021+00:00
+exit_code: 0
+expected_exit: 0
+
+   Compiling llama-platform-loader v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/platform-loader)
+   Compiling llama-kernel-ir v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/kernel-ir)
+   Compiling llama-model-runtime v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/model-runtime)
+   Compiling llama-vendor-remote v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/vendor-remote)
+   Compiling llama-device-family v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/device-family)
+   Compiling llama-portable-gpu v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/crates/portable-gpu)
+   Compiling track-runner v0.1.0 (/workspace/scratch/4678ec077e2a/llama-rust-t05-t08/tools/track-runner)
+    Finished `release` profile [optimized] target(s) in 30.99s
+     Running unittests src/lib.rs (target/release/deps/llama_device_family-961321d1a9164cfd)
+
+running 19 tests
+test driver::tests::zero_and_oversize_allocations_are_rejected ... ok
+test planning::tests::graph_replay_invalidates_each_relevant_change ... ok
+test planning::tests::bounded_partition_property_grid ... ok
+test planning::tests::row_partition_handles_boundaries_without_u64_overflow ... ok
+test planning::tests::peer_matrix_is_directional_and_staging_explicit ... ok
+test planning::tests::row_partition_has_no_gaps_and_preserves_weights ... ok
+test planning::tests::waves_are_not_interchanged ... ok
+test ptx::tests::malformed_typed_program_cannot_be_emitted ... ok
+test ptx::tests::bad_buffers_and_instruction_budget_fail_explicitly ... ok
+test ptx::tests::noncontiguous_add_preserves_padding_and_handles_tail ... ok
+test ptx::tests::noncontiguous_q4_matvec_matches_independent_dense_dot ... ok
+test ptx::tests::q4_zero_negative_and_subnormal_scales_decode ... ok
+test ptx::tests::rejects_invalid_shapes_overflow_and_aliasing ... ok
+test ptx::tests::sum_runs_generated_loop_with_strided_input ... ok
+test ptx::tests::target_version_is_not_inferred_from_device_family ... ok
+test tests::ranges_cannot_wrap_or_escape ... ok
+test ptx::tests::scale_emits_exact_float_bits_and_crosses_block_boundary ... ok
+test runtime::tests::cuda_is_not_disguised_as_hip_or_musa ... ok
+test ptx::tests::q4_nibbles_match_frozen_c_oracle_exactly ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/release/deps/llama_kernel_ir-197321b0c6d6fcee)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/semantics.rs (target/release/deps/semantics-75ccaacb15ecef5c)
+
+running 15 tests
+test empty_kernel_cannot_bypass_dispatch_budget ... ok
+test changing_outer_loop_bound_is_snapshotted_in_every_emitter ... ok
+test failures_roll_back_buffers_and_bound_work ... ok
+test half_conversion_exhaustive_matches_integer_normalization ... ok
+test loop_iteration_budget_cannot_underflow_after_body_exhaustion ... ok
+test strided_pointwise_preserves_gaps_and_tail ... ok
+test softmax_stable_at_large_finite_logits ... ok
+test matmul_transposed_strides_match_scalar_dot_products ... ok
+test q4_exact_nibble_order_unaligned_scale_and_vector_stride ... ok
+test nonlinear_and_scale_kernels_match_direct_formulas ... ok
+test strided_row_sum_and_rms_match_f64_oracle ... ok
+test all_four_emitters_are_deterministic_and_include_tail_guards ... ok
+test validation_rejects_shape_overflow_type_confusion_and_writes_to_inputs ... ok
+test nested_select_validation_visits_each_branch_once ... ok
+test digest_and_cache_keys_have_known_and_distinct_results ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/release/deps/llama_model_runtime-7e87f97d7ef368a1)
+
+running 3 tests
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test state::tests::known_crc32_vector ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/numerical_reference.rs (target/release/deps/numerical_reference-2fb05b72f1e49449)
+
+running 3 tests
+test llama_outputs_match_frozen_ggml_graph ... ok
+test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/runtime.rs (target/release/deps/runtime-487ed6beb62b977e)
+
+running 29 tests
+test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+test bad_adapters_leave_configuration_and_state_unchanged ... ok
+test batching_and_microbatch_boundaries_preserve_decode ... ok
+test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+test context_limit_failure_preserves_prior_state ... ok
+test copied_prefix_diverges_without_mutating_original_sequence ... ok
+test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+test interleaved_sequences_remain_independent ... ok
+test kv_suffix_truncation_matches_recomputed_prefix ... ok
+test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+test malformed_model_shapes_and_norms_fail_before_execution ... ok
+test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+test requested_outputs_are_selected_without_dropping_state_updates ... ok
+test smoke_demo_is_real_execution_with_reproducible_state ... ok
+test state_rejects_different_model_weights_or_adapters ... ok
+test supplied_embeddings_match_tokens_and_validate_shape ... ok
+test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+test valid_control_vector_resets_cache_and_changes_model_output ... ok
+test truncated_or_corrupted_state_never_mutates_context ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/llama_platform_loader-3d98a7270dd1871e)
+
+running 2 tests
+test tests::loads_a_real_system_symbol_and_rejects_missing ... ok
+test tests::missing_library_is_an_error ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/llama_portable_gpu-2d1419e2b4c23007)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/compiler_validation.rs (target/release/deps/compiler_validation-e47f16a642340ae6)
+
+running 2 tests
+test non_glsl_input_is_rejected_before_compilation_when_compiler_present ... ok
+test glsl_corpus_compiles_to_real_spirv ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+
+     Running tests/frozen_quant_oracle.rs (target/release/deps/frozen_quant_oracle-7902a454d04aed2a)
+
+running 1 test
+test q4_and_half_match_frozen_ggml_symbols ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/release/deps/llama_vendor_remote-40ef2c40bcc6a3db)
+
+running 34 tests
+test blas::tests::view_checks_bounds_and_overflow ... ok
+test dsp::tests::et_guard_matches_exact_mnemonics ... ok
+test blas::tests::snapshot_dispatch_threshold_and_hint_are_preserved ... ok
+test blas::tests::external_blas_matmul_and_strides ... ok
+test dsp::tests::malformed_elf_rejected ... ok
+test dsp::tests::elf_bss_and_swiv_roundtrip ... ok
+test blas::tests::external_blas_outer_product_reduction ... ok
+test rpc::codec::tests::exact_command_ids ... ok
+test rpc::codec::tests::malformed_tensors_are_rejected ... ok
+test rpc::codec::tests::little_endian_frame_fixture ... ok
+test rpc::tests::buffers_are_session_local_and_double_free_fails ... ok
+test rpc::tests::allocation_limit_and_device_validation ... ok
+test rpc::codec::tests::fixed_wire_offsets ... ok
+test rpc::codec::tests::malformed_frames_are_bounded ... ok
+test rpc::tests::compute_flag_is_required_like_frozen_ggml ... ok
+test rpc::codec::tests::graph_decode_checks_counts_and_tail ... ok
+test probe::tests::all_ten_families_are_accounted ... ok
+test probe::tests::missing_vendor_is_never_success ... ok
+test rpc::tests::graph_broadcast_and_affine_scale ... ok
+test rpc::tests::graph_error_rolls_back_prior_computed_nodes ... ok
+test dsp::tests::crc_standard_vector_and_incremental ... ok
+test rpc::tests::division_by_zero_uses_ieee_values ... ok
+test rpc::tests::graph_rejects_cycles_missing_nodes_and_aliases ... ok
+test rpc::tests::handshake_required_and_no_repeat ... ok
+test rpc::tests::freeing_buffers_invalidates_graphs ... ok
+test rpc::tests::malformed_transfer_does_not_write ... ok
+test rpc::tests::graph_aliases_cannot_multiply_workspace_without_bound ... ok
+test rpc::tests::out_of_allocation_and_overflow_are_rejected ... ok
+test rpc::tests::unsupported_collectives_are_errors ... ok
+test virtgpu::tests::all_dispatch_ids_fixed ... ok
+test virtgpu::tests::handshake_fixture_and_version_diagnostics ... ok
+test rpc::tests::tcp_round_trip_and_real_scalar_graph ... ok
+test rpc::tests::disconnect_without_free_releases_session_memory ... ok
+test rpc::tests::unknown_command_closes_session_and_frees_allocations ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/reference_interop.rs (target/release/deps/reference_interop-c7a86109a52831d3)
+
+running 3 tests
+test native_rpc_layout_matches_explicit_codec ... ok
+test rust_rpc_server_accepts_native_client ... ok
+test native_rpc_server_accepts_rust_client ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/swiv_reference.rs (target/release/deps/swiv_reference-23355305535f57d7)
+
+running 2 tests
+test elf32_swiv_matches_original_bytes_including_two_bss_tails ... ok
+test elf64_swiv_matches_original_bytes_when_header_is_in_load_segment ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/track_runner-484cad69b7f60ec8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cross_track_kernels.rs (target/release/deps/cross_track_kernels-5f4f053b377e4f21)
+
+running 2 tests
+test cuda_and_portable_ir_agree_on_broadcast_strides_and_launch_tails ... ok
+test cuda_and_portable_q4_ir_agree_on_frozen_blocks_and_padded_rows ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_device_family
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_kernel_ir
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_model_runtime
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_platform_loader
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_portable_gpu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_vendor_remote
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

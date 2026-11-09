@@ -1,0 +1,66 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/llama_vendor_remote-55edfc777dae2342)
+
+running 34 tests
+test blas::tests::external_blas_matmul_and_strides ... ok
+test blas::tests::external_blas_outer_product_reduction ... ok
+test dsp::tests::crc_standard_vector_and_incremental ... ok
+test blas::tests::snapshot_dispatch_threshold_and_hint_are_preserved ... ok
+test blas::tests::view_checks_bounds_and_overflow ... ok
+test dsp::tests::elf_bss_and_swiv_roundtrip ... ok
+test dsp::tests::et_guard_matches_exact_mnemonics ... ok
+test dsp::tests::malformed_elf_rejected ... ok
+test probe::tests::missing_vendor_is_never_success ... ok
+test rpc::codec::tests::malformed_frames_are_bounded ... ok
+test rpc::codec::tests::exact_command_ids ... ok
+test rpc::codec::tests::malformed_tensors_are_rejected ... ok
+test rpc::tests::allocation_limit_and_device_validation ... ok
+test rpc::codec::tests::fixed_wire_offsets ... ok
+test rpc::codec::tests::graph_decode_checks_counts_and_tail ... ok
+test rpc::codec::tests::little_endian_frame_fixture ... ok
+test rpc::tests::freeing_buffers_invalidates_graphs ... ok
+test rpc::tests::graph_broadcast_and_affine_scale ... ok
+test rpc::tests::compute_flag_is_required_like_frozen_ggml ... ok
+test probe::tests::all_ten_families_are_accounted ... ok
+test rpc::tests::buffers_are_session_local_and_double_free_fails ... ok
+test rpc::tests::graph_aliases_cannot_multiply_workspace_without_bound ... ok
+test rpc::tests::division_by_zero_uses_ieee_values ... ok
+test rpc::tests::graph_error_rolls_back_prior_computed_nodes ... ok
+test rpc::tests::graph_rejects_cycles_missing_nodes_and_aliases ... ok
+test rpc::tests::handshake_required_and_no_repeat ... ok
+test rpc::tests::malformed_transfer_does_not_write ... ok
+test rpc::tests::out_of_allocation_and_overflow_are_rejected ... ok
+test virtgpu::tests::handshake_fixture_and_version_diagnostics ... ok
+test rpc::tests::unsupported_collectives_are_errors ... ok
+test virtgpu::tests::all_dispatch_ids_fixed ... ok
+test rpc::tests::tcp_round_trip_and_real_scalar_graph ... ok
+test rpc::tests::unknown_command_closes_session_and_frees_allocations ... ok
+test rpc::tests::disconnect_without_free_releases_session_memory ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/reference_interop.rs (target/debug/deps/reference_interop-685aea6efb93dde6)
+
+running 3 tests
+Frozen C++ layout: {"tensor_size":296,"offset_data":220,"offset_name":228,"offset_use_count":292,"hello_request_size":24,"hello_response_size":28,"command_count":24,"init_params_size":24,"offset_init_no_alloc":16}
+test native_rpc_layout_matches_explicit_codec ... ok
+original C++ RPC client via Rust public-ABI driver -> Rust server: HELLO, DEVICE_COUNT, alignment/max, ALLOC_BUFFER, BUFFER_GET_BASE, INIT_TENSOR, BUFFER_CLEAR, SET_TENSOR, GET_TENSOR, FREE_BUFFER, GET_DEVICE_MEMORY barrier: PASS
+test rust_rpc_server_accepts_native_client ... ok
+Rust client -> frozen native CPU/RPC server: PASS: TCP RPC 8.0.1, alignment 32, allocation/transfer/2D/copy/memset/F32 matmul/replay/free
+test native_rpc_server_accepts_rust_client ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/swiv_reference.rs (target/debug/deps/swiv_reference-6ac781095082629a)
+
+running 2 tests
+test elf32_swiv_matches_original_bytes_including_two_bss_tails ... ok
+test elf64_swiv_matches_original_bytes_when_header_is_in_load_segment ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_vendor_remote
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

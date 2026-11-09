@@ -1,0 +1,109 @@
+   Compiling llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama\crates\platform-loader)
+   Compiling llama-kernel-ir v0.1.0 (C:\Users\adyba\rust-llama\crates\kernel-ir)
+   Compiling llama-device-family v0.1.0 (C:\Users\adyba\rust-llama\crates\device-family)
+   Compiling llama-portable-gpu v0.1.0 (C:\Users\adyba\rust-llama\crates\portable-gpu)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.71s
+     Running unittests src\lib.rs (target\debug\deps\llama_device_family-8f617bf6b80350e2.exe)
+
+running 19 tests
+test driver::tests::zero_and_oversize_allocations_are_rejected ... ok
+test planning::tests::row_partition_handles_boundaries_without_u64_overflow ... ok
+test planning::tests::waves_are_not_interchanged ... ok
+test planning::tests::graph_replay_invalidates_each_relevant_change ... ok
+test ptx::tests::q4_zero_negative_and_subnormal_scales_decode ... ok
+test ptx::tests::target_version_is_not_inferred_from_device_family ... ok
+test ptx::tests::malformed_typed_program_cannot_be_emitted ... ok
+test runtime::tests::cuda_is_not_disguised_as_hip_or_musa ... ok
+test planning::tests::row_partition_has_no_gaps_and_preserves_weights ... ok
+test planning::tests::peer_matrix_is_directional_and_staging_explicit ... ok
+test ptx::tests::rejects_invalid_shapes_overflow_and_aliasing ... ok
+test planning::tests::bounded_partition_property_grid ... ok
+test ptx::tests::noncontiguous_q4_matvec_matches_independent_dense_dot ... ok
+test tests::ranges_cannot_wrap_or_escape ... ok
+test ptx::tests::sum_runs_generated_loop_with_strided_input ... ok
+test ptx::tests::noncontiguous_add_preserves_padding_and_handles_tail ... ok
+test ptx::tests::bad_buffers_and_instruction_budget_fail_explicitly ... ok
+test ptx::tests::scale_emits_exact_float_bits_and_crosses_block_boundary ... ok
+test ptx::tests::q4_nibbles_match_frozen_c_oracle_exactly ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\llama_kernel_ir-9adfe0c27a6c98d1.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\semantics.rs (target\debug\deps\semantics-c3c08128fc4d38b2.exe)
+
+running 15 tests
+test empty_kernel_cannot_bypass_dispatch_budget ... ok
+test failures_roll_back_buffers_and_bound_work ... ok
+test softmax_stable_at_large_finite_logits ... ok
+test strided_pointwise_preserves_gaps_and_tail ... ok
+test loop_iteration_budget_cannot_underflow_after_body_exhaustion ... ok
+test validation_rejects_shape_overflow_type_confusion_and_writes_to_inputs ... ok
+test nonlinear_and_scale_kernels_match_direct_formulas ... ok
+test strided_row_sum_and_rms_match_f64_oracle ... ok
+test q4_exact_nibble_order_unaligned_scale_and_vector_stride ... ok
+test matmul_transposed_strides_match_scalar_dot_products ... ok
+test half_conversion_exhaustive_matches_integer_normalization ... ok
+test changing_outer_loop_bound_is_snapshotted_in_every_emitter ... ok
+test nested_select_validation_visits_each_branch_once ... ok
+test all_four_emitters_are_deterministic_and_include_tail_guards ... ok
+test digest_and_cache_keys_have_known_and_distinct_results ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src\lib.rs (target\debug\deps\llama_platform_loader-c3ec1c169a6f97fa.exe)
+
+running 1 test
+test tests::missing_library_is_an_error ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\llama_portable_gpu-e88e97a3e8e284f0.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\compiler_validation.rs (target\debug\deps\compiler_validation-ffc29b100cf80066.exe)
+
+running 2 tests
+test glsl_corpus_compiles_to_real_spirv ... ignored, requires a separately installed shaderc compiler; run explicitly for compiler evidence
+test non_glsl_input_is_rejected_before_compilation_when_compiler_present ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\frozen_quant_oracle.rs (target\debug\deps\frozen_quant_oracle-83d5f6b4b6365294.exe)
+
+running 1 test
+test q4_and_half_match_frozen_ggml_symbols ... ignored, requires LLAMA_REFERENCE_LIBRARY pointing at an isolated frozen GGML reference build
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_device_family
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_kernel_ir
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_platform_loader
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_portable_gpu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

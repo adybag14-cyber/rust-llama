@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "packed_at_utc": "2026-11-09T11:23:54.191828+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "native_json": {
+    "file": "stories15m-q4-reference.json",
+    "bytes": 12955285,
+    "sha256": "af9f8dc24edf7b30289a61c4a69f01f72d61ea293e886917f36e8287fb77e6de"
+  },
+  "native_request": {
+    "n_ctx": 128,
+    "max_tokens": 16,
+    "cases": [
+      {
+        "name": "story_q4",
+        "prompt": "Once upon a time",
+        "add_special": true,
+        "parse_special": true
+      }
+    ]
+  },
+  "compiler": "MSVC 19.51.36260.0",
+  "cmake_generator": "Visual Studio 18 2026 x64",
+  "oracle_source": {
+    "path": "C:/Users/adyba/rust-llama-reference/inference-oracle/oracle.cpp",
+    "sha256": "bf6aa1da45e5b7d2d928d8595e4c5c92238ec3e77225906bcf2f54b5d7d808be",
+    "bytes": 10978
+  },
+  "oracle_executable": {
+    "sha256": "80f68315c21b4e85f1195537f1bcb75a08d72c00ad3a68045e97a7d47a800a0d",
+    "bytes": 164352
+  },
+  "reference_libraries": {
+    "llama.dll": {
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3",
+      "bytes": 3211264
+    },
+    "ggml.dll": {
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7",
+      "bytes": 62464
+    },
+    "ggml-base.dll": {
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756",
+      "bytes": 718336
+    },
+    "ggml-cpu.dll": {
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f",
+      "bytes": 878592
+    }
+  },
+  "configuration": {
+    "schema": 1,
+    "reference": "frozen-llama.cpp-master-c-api",
+    "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+    "vocab_only": false,
+    "n_vocab": 32000,
+    "n_ctx": 128,
+    "max_tokens": 16,
+    "threads": 1,
+    "kv_type": "F32",
+    "flash_attention": false,
+    "mmap": false,
+    "detokenize_remove_special": true,
+    "detokenize_unparse_special": false
+  },
+  "compact_conversion": "Parse only independently captured native JSON; encode each expected logit as IEEE 754 binary32 little endian; verify shared row bit equality and store it once. No Rust result is read or used.",
+  "binary": {
+    "file": "stories15m-q4-logits.f32le.bin",
+    "bytes": 2560000,
+    "sha256": "579a521b36d682c9b26cac4d533b00beb4803e3bf5bfe2f86a29a07a4959fd21"
+  },
+  "model": {
+    "file": "stories15M-q4_0.gguf",
+    "bytes": 19077344,
+    "sha256": "66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739",
+    "bundled": false
+  },
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05,
+    "rule": "abs(actual-reference) <= absolute + relative * abs(reference)",
+    "token_ids_and_generated_bytes": "exact",
+    "bitwise_equality": "reported only; not a portable gate"
+  },
+  "qualification": "One actual pretrained Q4_0 model, one prompt, twenty full logit rows and sixteen greedy predictions. Does not establish all architecture, dtype, ISA or backend parity."
+}

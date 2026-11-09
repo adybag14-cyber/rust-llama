@@ -1,0 +1,41 @@
+command: ['target/release/track-runner', 'smoke']
+started_utc: 2026-11-08T17:59:03.660247+00:00
+exit_code: 0
+expected_exit: 0
+
+T05 scalar model validation slices: SmokeReport {
+    architecture_slots: 173,
+    executable_f32_slices: 3,
+    llama_logits: [
+        0.020086616,
+        -0.22636136,
+        -0.4377569,
+        -0.12763177,
+        0.41992158,
+        0.055319212,
+        -0.19112876,
+    ],
+    mamba_logits: [
+        0.005734898,
+        -0.2705242,
+        -0.4522186,
+        -0.07115044,
+        0.45023838,
+        0.0360173,
+        -0.2402418,
+    ],
+    bert_mean_embedding: [
+        0.40203053,
+        -1.0318034,
+        1.1718187,
+        -0.6217387,
+    ],
+    llama_state_bytes: 169,
+    mamba_state_bytes: 393,
+    state_roundtrips_match: true,
+}
+T08 real loopback TCP and external CBLAS: SelfCheckReport {
+    rpc: "PASS: TCP RPC 8.0.1, alignment 64, allocation/transfer/2D/copy/memset/F32 matmul/replay/free; 36 commands; 0 bytes retained",
+    blas: "PASS: libblas.so.3 cblas_sgemm, output [58.0, 64.0, 139.0, 154.0]",
+}
+T07 scalar IR validation (not GPU execution): ExecutionReport { invocations: 4, statements: 32, writes: 4 }; output=F32([58.0, 64.0, 139.0, 154.0])

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "date": "2026-11-09",
+  "scope": "First integrated Rust implementation checkpoint; full port incomplete.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_regular_files": 4082,
+  "toolchain": "Rust 1.99.1",
+  "windows": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "debug_passed": 285,
+    "release_passed": 285,
+    "ordinary_ignored": 9,
+    "format": true,
+    "strict_clippy": true,
+    "release_build": true,
+    "source_audit": true,
+    "fixture_integrity": true,
+    "details": "windows/results.json"
+  },
+  "linux": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "debug_passed": 288,
+    "release_passed": 288,
+    "ordinary_ignored": 9,
+    "strict_clippy": true,
+    "release_build": true,
+    "source_audit": true,
+    "fixture_integrity": true,
+    "explicit_model_tests": 2,
+    "details": [
+      "linux/debug-results.json",
+      "linux/release-results.json"
+    ]
+  },
+  "test_count_difference": "Three Unix-only process capture/timeout tests account for the platform count difference. Each platform also tests its own dynamic library loader.",
+  "f32_pretrained": {
+    "model_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+    "logits": 62976,
+    "greedy_tokens": 96,
+    "max_absolute_error": 1.764297485e-05,
+    "tolerance": {
+      "absolute": 0.0002,
+      "relative": 2e-05
+    }
+  },
+  "q4_pretrained": {
+    "model_sha256": "66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739",
+    "logits": 640000,
+    "greedy_tokens": 16,
+    "max_absolute_error": 0,
+    "bitwise_equal_observed_on": [
+      "Windows x64",
+      "Linux x64"
+    ],
+    "portable_gate": "same predefined absolute/relative tolerance; exact bits informational"
+  },
+  "ffi": {
+    "source_exports": 255,
+    "implemented_exports": 107,
+    "remaining_exports": 148,
+    "layout_values": 69,
+    "model_default_fields": 17,
+    "context_default_fields": 39,
+    "vocabulary_entries": 512,
+    "piece_forms": 1024,
+    "compared_model_values": 93248,
+    "maximum_absolute_error": 1.7642974853515625e-05,
+    "reference_harness": "ffi/native-release.json",
+    "full_abi_parity": false
+  },
+  "server": {
+    "ordinary_tests": 38,
+    "additional_real_model_http_requests": 37,
+    "details": "server/README.md"
+  },
+  "gpu": {
+    "cuda_dispatches": 138,
+    "devices": [
+      "NVIDIA RTX4090 CUDA/OpenCL",
+      "AMD gfx1036 OpenCL"
+    ],
+    "details": "gpu/verification.json",
+    "full_backend_or_model_offload_parity": false
+  },
+  "fixture_inventory": {
+    "files": 86,
+    "declarations": 86,
+    "manifests": 4
+  },
+  "full_release_gate": {
+    "expected_exit_code": 1,
+    "complete": false,
+    "gates": "../../release/gates.tsv"
+  },
+  "limitations": "These results apply to the exercised inputs and configurations. Full architectures, tokenizers, conversion, backends, operators, multimodal models, tools, UI, platform and performance gates remain open."
+}

@@ -1,0 +1,102 @@
+{
+  "captured_at_utc": "2026-11-09T11:00:57.854140+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "compiler": "MSVC 19.51.36260.0",
+  "cmake_generator": "Visual Studio 18 2026 x64",
+  "language": "C++17; independent comparison input, outside Rust product",
+  "oracle_source": {
+    "path": "C:/Users/adyba/rust-llama-reference/inference-oracle/oracle.cpp",
+    "sha256": "bf6aa1da45e5b7d2d928d8595e4c5c92238ec3e77225906bcf2f54b5d7d808be",
+    "bytes": 10978
+  },
+  "oracle_executable": {
+    "sha256": "80f68315c21b4e85f1195537f1bcb75a08d72c00ad3a68045e97a7d47a800a0d",
+    "bytes": 164352
+  },
+  "oracle_cmake": {
+    "sha256": "e1b59b4f92eaa40d9179ff07c205b521fa93c36d339adc19c4fbf3a78c261150",
+    "bytes": 654
+  },
+  "reference_libraries": {
+    "llama.dll": {
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3",
+      "bytes": 3211264
+    },
+    "ggml.dll": {
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7",
+      "bytes": 62464
+    },
+    "ggml-base.dll": {
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756",
+      "bytes": 718336
+    },
+    "ggml-cpu.dll": {
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f",
+      "bytes": 878592
+    }
+  },
+  "model_files": {
+    "stories260K.gguf": {
+      "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+      "bytes": 1185376
+    },
+    "ggml-vocab-llama-spm.gguf": {
+      "sha256": "16c3724582d59aa8bf84711894e833f916ee46a31d80e21312759c48bf8d0e69",
+      "bytes": 723869
+    }
+  },
+  "fixtures": {
+    "stories260k-reference.json": {
+      "sha256": "3d3ea303bfdcd99f9987e1dee026fb715635ebad00ce7f564ec2f88777dd4711",
+      "bytes": 1216459
+    },
+    "llama-spm-reference.json": {
+      "sha256": "0bdebffebc72641ad083693a45e99fe8b4bb7d153adece3cac670d286d7372a4",
+      "bytes": 18663
+    },
+    "stories260k-requests.json": {
+      "sha256": "22c9c24b7e5c3e0023b645c32709b6ada32cd85e137f88045a396dde24d06030",
+      "bytes": 810
+    },
+    "llama-spm-requests.json": {
+      "sha256": "2ab5a4167b2edb66baf3191958d3534ea6f521d3c795ccfd456e6d52aa1df5a0",
+      "bytes": 9169
+    },
+    "ggml-vocab-llama-spm.gguf": {
+      "sha256": "16c3724582d59aa8bf84711894e833f916ee46a31d80e21312759c48bf8d0e69",
+      "bytes": 723869,
+      "source_path": "models/ggml-vocab-llama-spm.gguf in frozen source ZIP",
+      "role": "vocabulary-only original test input; zero model tensors",
+      "notice": "Retained upstream fixture; original source notice preserved in LICENSE-UPSTREAM"
+    }
+  },
+  "configuration": {
+    "gpu_layers": 0,
+    "load_mode": "NONE",
+    "extra_weight_buffer_types": false,
+    "threads": 1,
+    "n_ctx": 512,
+    "type_k": "F32",
+    "type_v": "F32",
+    "flash_attention": false,
+    "offload_kqv": false,
+    "op_offload": false,
+    "decode_batch": 1,
+    "comparison_boundary": "token IDs/bytes exact; all f32 logits emitted through exact representable JSON numbers; tolerances to be fixed before evaluation"
+  },
+  "results": {
+    "stories_cases": 6,
+    "greedy_predictions": 96,
+    "spm_vocab_cases": 68,
+    "stories_exit": 0,
+    "vocab_exit": 0
+  },
+  "qualification": "Reference outcomes are independent original C API results. No Rust implementation was executed to produce these expected values. External model binaries and original C++ sources/libraries are excluded from the Rust product.",
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05,
+    "rule": "abs(actual-reference) <= absolute + relative * abs(reference)",
+    "scope": "stories260K full logits, f32 Rust scalar vs original CPU",
+    "token_and_byte_policy": "exact"
+  }
+}

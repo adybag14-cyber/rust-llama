@@ -1,0 +1,250 @@
+{
+  "implementation_commit": "e5a6e57b38d0ba05bb174fd82e8e760467b30cd9",
+  "reference_environment": {
+    "LLAMA_REFERENCE_LIBRARY": "/workspace/scratch/4678ec077e2a/t05-oracle-build/libggml-reference.so",
+    "T08_NATIVE_RPC_ORACLE": "/workspace/scratch/4678ec077e2a/t08-rust-reference-build/rpc-oracle"
+  },
+  "checks": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-11-08T17:58:29.529945+00:00",
+      "seconds": 0.319,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/format.log",
+      "log_sha256": "ba4e8244c4de96d2d6207632a596b5dc3c8286bbf117868c6d1afe7a5b3bdc9a"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-11-08T17:58:29.849509+00:00",
+      "seconds": 0.374,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/clippy.log",
+      "log_sha256": "56d5e3b351d8b3f182cec22720278089eaf7997e91eaa9dec75f7a350eefc99a"
+    },
+    {
+      "name": "tests-debug-all",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--offline",
+        "--locked",
+        "--",
+        "--include-ignored",
+        "--nocapture"
+      ],
+      "start_utc": "2026-11-08T17:58:30.223692+00:00",
+      "seconds": 1.207,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/tests-debug-all.log",
+      "log_sha256": "40b8aab4b80c9ad1d71f9e24f987ed8668c612696fe2ec240cdb64423d0635d7",
+      "test_totals": {
+        "passed": 115,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "tests-release-all",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--include-ignored"
+      ],
+      "start_utc": "2026-11-08T17:58:31.431021+00:00",
+      "seconds": 32.158,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/tests-release-all.log",
+      "log_sha256": "9e5a6da343bd43824ed728518e7c0228421fdc708293cc18fc791e5e3e843c6e",
+      "test_totals": {
+        "passed": 115,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "start_utc": "2026-11-08T17:59:03.590203+00:00",
+      "seconds": 0.013,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/build-release.log",
+      "log_sha256": "4eb972792f90d0b30031edc01c734ac9c2583e3dc213054bfa20e5109b1c301d"
+    },
+    {
+      "name": "model-registry-audit",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime",
+        "--example",
+        "registry_audit",
+        "--",
+        "/workspace/scratch/4678ec077e2a/reference/llama.cpp-master"
+      ],
+      "start_utc": "2026-11-08T17:59:03.603602+00:00",
+      "seconds": 0.041,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/model-registry-audit.log",
+      "log_sha256": "16280b8f66114e3383be86e66086a95a67b0c05d8ee871520f0c2c29cedb0f2c"
+    },
+    {
+      "name": "model-reference-rerun",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime",
+        "--example",
+        "reference_oracle",
+        "--",
+        "/workspace/scratch/4678ec077e2a/t05-oracle-build/libggml-reference.so"
+      ],
+      "start_utc": "2026-11-08T17:59:03.645260+00:00",
+      "seconds": 0.015,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/model-reference-rerun.log",
+      "log_sha256": "9309bf7d0046e8c4d94e2f25bc30fa23df3b5fac5cd6e7189cd6554e965c006a"
+    },
+    {
+      "name": "integration-smoke",
+      "command": [
+        "target/release/track-runner",
+        "smoke"
+      ],
+      "start_utc": "2026-11-08T17:59:03.660247+00:00",
+      "seconds": 0.003,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/integration-smoke.log",
+      "log_sha256": "a34172d93a09d1afd9a751c2604fe2654999006436b2f4b1628ec04d81bc898f"
+    },
+    {
+      "name": "device-probes",
+      "command": [
+        "target/release/track-runner",
+        "probe"
+      ],
+      "start_utc": "2026-11-08T17:59:03.663828+00:00",
+      "seconds": 0.004,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/device-probes.log",
+      "log_sha256": "8bc769fa3ea688f01dce82f97b8c13709a4a5abe5e611ae02c7e8278b452ce96"
+    },
+    {
+      "name": "opencl-execution-attempt",
+      "command": [
+        "target/release/track-runner",
+        "opencl-smoke"
+      ],
+      "start_utc": "2026-11-08T17:59:03.668569+00:00",
+      "seconds": 0.001,
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expectation_met": true,
+      "log": "evidence/opencl-execution-attempt.log",
+      "log_sha256": "dd2040c381e859014cc7275f674272541004c9c2eba7723ec3451cebd8462cfa"
+    },
+    {
+      "name": "cuda-execution-attempt",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-device-family",
+        "--example",
+        "cuda_smoke"
+      ],
+      "start_utc": "2026-11-08T17:59:03.670219+00:00",
+      "seconds": 0.01,
+      "exit_code": 77,
+      "expected_exit": 77,
+      "expectation_met": true,
+      "log": "evidence/cuda-execution-attempt.log",
+      "log_sha256": "fc53f0e1e56043ec1e5769e9b071653a7678739e5240f9515509575f1823a487"
+    },
+    {
+      "name": "source-policy-audit",
+      "command": [
+        "target/release/track-runner",
+        "audit-product",
+        "."
+      ],
+      "start_utc": "2026-11-08T17:59:03.680787+00:00",
+      "seconds": 0.006,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/source-policy-audit.log",
+      "log_sha256": "277ab6f9acb18802beadbfd6660c8919e025ab46e24c0b21b2867770de9932a6"
+    },
+    {
+      "name": "binary-linkage",
+      "command": [
+        "ldd",
+        "target/release/track-runner"
+      ],
+      "start_utc": "2026-11-08T17:59:03.687074+00:00",
+      "seconds": 0.006,
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expectation_met": true,
+      "log": "evidence/binary-linkage.log",
+      "log_sha256": "5236d80281942424475a3fecd206438a4caec2136addf49fc40498c32f8d5193"
+    }
+  ]
+}

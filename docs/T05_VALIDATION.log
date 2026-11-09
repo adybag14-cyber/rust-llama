@@ -1,0 +1,167 @@
+checked_at=2026-11-08T17:53:36.452326+00:00
+COMMAND: cargo fmt -p llama-model-runtime -- --check
+exit_code=0
+
+
+COMMAND: cargo clippy -p llama-model-runtime --all-targets --offline --locked -- -D warnings
+exit_code=0
+
+    Checking llama-model-runtime v0.1.0 (/workspace/scratch/4678ec077e2a/worktree-t05/crates/model-runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.22s
+
+COMMAND: cargo test -p llama-model-runtime --all-targets --offline --locked
+exit_code=0
+
+running 3 tests
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+test state::tests::known_crc32_vector ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+test llama_outputs_match_frozen_ggml_graph ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 29 tests
+test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+test bad_adapters_leave_configuration_and_state_unchanged ... ok
+test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+test context_limit_failure_preserves_prior_state ... ok
+test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+test copied_prefix_diverges_without_mutating_original_sequence ... ok
+test malformed_model_shapes_and_norms_fail_before_execution ... ok
+test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+test kv_suffix_truncation_matches_recomputed_prefix ... ok
+test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+test interleaved_sequences_remain_independent ... ok
+test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+test requested_outputs_are_selected_without_dropping_state_updates ... ok
+test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+test state_rejects_different_model_weights_or_adapters ... ok
+test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+test supplied_embeddings_match_tokens_and_validate_shape ... ok
+test smoke_demo_is_real_execution_with_reproducible_state ... ok
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+test valid_control_vector_resets_cache_and_changes_model_output ... ok
+test batching_and_microbatch_boundaries_preserve_decode ... ok
+test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+test truncated_or_corrupted_state_never_mutates_context ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+   Compiling llama-model-runtime v0.1.0 (/workspace/scratch/4678ec077e2a/worktree-t05/crates/model-runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s
+     Running unittests src/lib.rs (target/debug/deps/llama_model_runtime-1158552662dbd40a)
+     Running tests/numerical_reference.rs (target/debug/deps/numerical_reference-74cfb6f01dc2d608)
+     Running tests/runtime.rs (target/debug/deps/runtime-4b0975f0fee158b5)
+     Running unittests examples/build_reference.rs (target/debug/examples/build_reference-c328ad6abcc263fc)
+     Running unittests examples/reference_oracle.rs (target/debug/examples/reference_oracle-ca7b5c0b4c83d598)
+     Running unittests examples/registry_audit.rs (target/debug/examples/registry_audit-177cea02b74f7346)
+     Running unittests examples/smoke.rs (target/debug/examples/smoke-7d72ced5566d6d33)
+
+COMMAND: cargo run -p llama-model-runtime --example registry_audit --offline --locked -- /workspace/scratch/4678ec077e2a/reference/llama.cpp-master
+exit_code=0
+RegistryAudit {
+    architecture_slots: 173,
+    named_architectures: 172,
+    source_factory_cases: 171,
+    model_source_files: 176,
+    text_conversion_registrations: 312,
+    projector_conversion_registrations: 92,
+}
+
+   Compiling llama-model-runtime v0.1.0 (/workspace/scratch/4678ec077e2a/worktree-t05/crates/model-runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running `target/debug/examples/registry_audit /workspace/scratch/4678ec077e2a/reference/llama.cpp-master`
+
+COMMAND: cargo run -p llama-model-runtime --example reference_oracle --offline --locked -- /workspace/scratch/4678ec077e2a/t05-oracle-reproduced/libggml-reference.so
+exit_code=0
+llama.embedding.0	8.160734773e-1	-9.892926216e-1	1.030180573e0	-1.082823157e0
+llama.logits.0	-1.779364422e-2	4.402204454e-1	4.190458953e-1	-1.011223495e-1	-5.175824761e-1	-1.426453702e-2	4.437495172e-1
+llama.embedding.1	1.093716860e0	-5.356154442e-1	1.423864365e0	-4.632881582e-1
+llama.logits.1	-6.708957255e-2	3.347252011e-1	4.771012068e-1	-7.020707428e-2	-4.576001167e-1	-9.081891179e-2	3.109958470e-1
+llama.embedding.2	-1.566862226e0	7.236620784e-2	-1.076687932e0	3.162978590e-1
+llama.logits.2	2.008661628e-2	-2.263613343e-1	-4.377569258e-1	-1.276317537e-1	4.199215472e-1	5.531921610e-2	-1.911287308e-1
+llama.embedding.3	-1.167497873e0	9.393546581e-1	-2.885396779e-1	1.264226437e0
+llama.logits.3	-1.633923128e-2	-4.012569487e-1	-3.311747313e-1	-1.213311255e-1	5.142578483e-1	-2.801959589e-2	-4.129373133e-1
+mamba.embedding.0	5.604979396e-1	-1.387785792e0	8.725230098e-1	-9.782720208e-1
+mamba.logits.0	-1.158544719e-1	4.688820541e-1	3.814098537e-1	-1.286906898e-1	-4.876540899e-1	-1.012757942e-1	4.834607542e-1
+mamba.embedding.1	1.159208059e0	-4.611226618e-1	1.455358624e0	-1.679762006e-1
+mamba.logits.1	-1.184636652e-1	2.910302281e-1	4.771678448e-1	-4.163389653e-2	-4.169876873e-1	-1.494866014e-1	2.600072920e-1
+mamba.embedding.2	-1.451526642e0	1.952303648e-1	-1.161832333e0	4.800550938e-1
+mamba.logits.2	5.734901875e-3	-2.705242038e-1	-4.522185922e-1	-7.115043700e-2	4.502383769e-1	3.601729870e-2	-2.402417958e-1
+mamba.embedding.3	-1.011753440e0	9.588783383e-1	-6.722704172e-1	1.232146978e0
+mamba.logits.3	-1.235157251e-2	-4.292768836e-1	-3.817454875e-1	-8.583131246e-3	5.290163755e-1	-2.027346008e-2	-4.371987879e-1
+bert.embedding.0	2.910629809e-1	-1.507798076e0	1.262111664e0	-1.331278086e-1
+bert.embedding.1	6.179822087e-1	-7.408929616e-2	9.974992275e-1	-1.604995012e0
+bert.embedding.2	2.910629809e-1	-1.507798076e0	1.262111664e0	-1.331278086e-1
+bert.embedding.3	2.910629809e-1	-1.507798076e0	1.262111664e0	-1.331278086e-1
+
+   Compiling llama-model-runtime v0.1.0 (/workspace/scratch/4678ec077e2a/worktree-t05/crates/model-runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.26s
+     Running `target/debug/examples/reference_oracle /workspace/scratch/4678ec077e2a/t05-oracle-reproduced/libggml-reference.so`
+verified llama.embedding.0: 4 values, maximum_abs_error=1.192092896e-7
+verified llama.logits.0: 7 values, maximum_abs_error=5.960464478e-8
+verified llama.embedding.1: 4 values, maximum_abs_error=1.192092896e-7
+verified llama.logits.1: 7 values, maximum_abs_error=2.980232239e-8
+verified llama.embedding.2: 4 values, maximum_abs_error=1.192092896e-7
+verified llama.logits.2: 7 values, maximum_abs_error=2.980232239e-8
+verified llama.embedding.3: 4 values, maximum_abs_error=1.788139343e-7
+verified llama.logits.3: 7 values, maximum_abs_error=5.960464478e-8
+verified mamba.embedding.0: 4 values, maximum_abs_error=0.000000000e0
+verified mamba.logits.0: 7 values, maximum_abs_error=2.980232239e-8
+verified mamba.embedding.1: 4 values, maximum_abs_error=0.000000000e0
+verified mamba.logits.1: 7 values, maximum_abs_error=7.450580597e-9
+verified mamba.embedding.2: 4 values, maximum_abs_error=0.000000000e0
+verified mamba.logits.2: 7 values, maximum_abs_error=3.725290298e-9
+verified mamba.embedding.3: 4 values, maximum_abs_error=5.960464478e-8
+verified mamba.logits.3: 7 values, maximum_abs_error=1.676380634e-8
+verified bert.embedding.0: 4 values, maximum_abs_error=1.192092896e-7
+verified bert.embedding.1: 4 values, maximum_abs_error=1.490116119e-8
+verified bert.embedding.2: 4 values, maximum_abs_error=1.192092896e-7
+verified bert.embedding.3: 4 values, maximum_abs_error=1.192092896e-7
+
+COMMAND: cargo test -p llama-model-runtime --release --test runtime --offline --locked public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes
+exit_code=0
+
+running 1 test
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.00s
+
+
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running tests/runtime.rs (target/release/deps/runtime-487ed6beb62b977e)

@@ -1,0 +1,50 @@
+{
+  "checked_at_utc": "2026-11-09T11:06:49.869220+00:00",
+  "command": [
+    "C:\\Users\\adyba\\rust-llama\\target\\release\\llama-server.exe",
+    "--model",
+    "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+    "--bind",
+    "127.0.0.1:0"
+  ],
+  "binary_sha256": "fce743fe4e09a7e68565d2379a2492360b922ce23e6c5142209b9a8552ff4bc8",
+  "model_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok"
+    }
+  },
+  "completion": {
+    "status": 200,
+    "body": {
+      "choices": [
+        {
+          "finish_reason": "length",
+          "index": 0,
+          "logprobs": null,
+          "text": ", there was a little girl named Lily. She loved to play"
+        }
+      ],
+      "created": 1794222409,
+      "id": "cmpl-rust-1",
+      "model": "llama",
+      "object": "text_completion",
+      "usage": {
+        "completion_tokens": 16,
+        "prompt_tokens": 5,
+        "total_tokens": 21
+      }
+    }
+  },
+  "expected_text": ", there was a little girl named Lily. She loved to play",
+  "stdout": "Listening on http://127.0.0.1:55362; Rust model runtime ready\n",
+  "stderr": "Loaded Rust model: llama\n",
+  "exit_code": 0,
+  "missing_model_startup": {
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "llama-server: Model IO failed: The system cannot find the file specified. (os error 2)\n"
+  },
+  "result": "passed"
+}

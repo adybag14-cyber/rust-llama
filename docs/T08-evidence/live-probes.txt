@@ -1,0 +1,17 @@
+$ cargo run --offline -p llama-vendor-remote --example t08_check
+RPC PASS: TCP RPC 8.0.1, alignment 64, allocation/transfer/2D/copy/memset/F32 matmul/replay/free; 36 commands; 0 bytes retained
+BLAS PASS: libblas.so.3 cblas_sgemm, output [58.0, 64.0, 139.0, 154.0]
+BLAS	ExternalSymbolsPresent	libblas.so.3 loaded; 1 required symbol(s) present. No device execution claimed.	PENDING: F32 adapter available; quant conversions, batch scheduling, vendor/thread matrix and T02 integration remain
+CANN	ExternalUnavailable	libascendcl.so: libascendcl.so: cannot open shared object file: No such file or directory	PENDING: Ascend hardware, ACLNN operation lowerings and workspace/resource integration
+SYCL	ExternalUnavailable	libze_loader.so.1 loaded; zeInit(0) returned 0x78000001; no driver/device execution established	PENDING: Level Zero discovery is only a feasibility probe; SYCL/XMX/DPAS kernels, graph dispatch and hardware execution remain
+zDNN	ExternalUnavailable	libzdnn.so: libzdnn.so: cannot open shared object file: No such file or directory	PENDING: IBM Z/NNPA execution, tensor transforms and dtype/operation lowering
+OpenVINO	ExternalUnavailable	libopenvino_c.so: libopenvino_c.so: cannot open shared object file: No such file or directory	PENDING: GGML-to-vendor graph construction, state/quantization and real CPU/GPU/NPU inference
+Hexagon	ExternalUnavailable	libcdsprpc.so: libcdsprpc.so: cannot open shared object file: No such file or directory	PENDING: FastRPC generated IDL ABI, DSP kernels, HVX/HMX and physical load/execute; Rust ELF/SWIV utility is implemented
+ET	AbiGateOpen	ET platform directory present: false. Snapshot imports C++ rt::IRuntime and deviceLayer::IDeviceLayer; no verified C ABI.	PENDING: Vendor runtime C++ ABI/source, custom RISC-V toolchain/startup, firmware or sysemu and physical execution; Rust forbidden-instruction text guard is implemented
+ZenDNN	AbiGateOpen	libzendnnl.so: libzendnnl.so: cannot open shared object file: No such file or directory; libzendnn.so: libzendnn.so: cannot open shared object file: No such file or directory; pinned source uses C++ zendnnl.hpp matmul_direct	PENDING: Snapshot pin 1f399a75cc0993778374a51bea49b64a57879595; establish audited ABI or Rust behavior without a project C++ shim
+RPC	RustSubsetAvailable	Rust TCP 8.0.1 memory and bounded F32 graph subset compiled. Run self_check for live loopback evidence.	PENDING: Complete graph op/dtype integration, persistent tensor caching, async scheduler, Linux/Apple RDMA and collectives
+VirtGPU	ExternalSymbolsPresent	libdrm.so.2 loaded; 3 required symbol(s) present. No device execution claimed. /dev/dri present: false. Rust APIR handshake codecs are implemented.	PENDING: APIR guest/host transport, shared memory and synchronization; real virtio GPU + virglrenderer required
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running `target/debug/examples/t08_check`
+
+EXIT 0

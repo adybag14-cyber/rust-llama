@@ -1,0 +1,49 @@
+{
+  "checked_utc": "2026-11-08T17:53:11.526123+00:00",
+  "binary": "/workspace/scratch/be832a7b719c/build/integration/release/llama-server",
+  "server_exit_code": 0,
+  "stderr": "",
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "http_status": 503,
+      "expected_status": 503,
+      "bytes": 130,
+      "content_type": "application/json; charset=utf-8",
+      "body_preview": "{\"reason\":\"No Rust model runtime is connected; T01–T08 integration is pending\",\"runtime_connected\":false,\"status\":\"unavailable\"}",
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/v1/models",
+      "http_status": 200,
+      "expected_status": 200,
+      "bytes": 27,
+      "content_type": "application/json; charset=utf-8",
+      "body_preview": "{\"data\":[],\"object\":\"list\"}",
+      "passed": true
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "http_status": 200,
+      "expected_status": 200,
+      "bytes": 980,
+      "content_type": "text/html; charset=utf-8",
+      "body_preview": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Rust llama server</title><style>body{font:18px system-ui;max-width:52rem;margin:3rem auto;padding:0 1rem;background:#f6f5ef;color:#19271e}main{background:white;padding:2rem;border-radius:1rem}code{overflow-wrap:anywhere}a{color:#216044}</style><main><h1>Rust llama server</h1><p role=\"status\">No Rust model runtime is connected; T01–T08 integration is pending</p><p>Available models: 0</p><h2>Transport checkpoint</h2><p>This Rust-authored diagnostics page exposes server",
+      "passed": true
+    },
+    {
+      "method": "POST",
+      "path": "/v1/chat/completions",
+      "http_status": 503,
+      "expected_status": 503,
+      "bytes": 130,
+      "content_type": "application/json; charset=utf-8",
+      "body_preview": "{\"error\":{\"code\":503,\"message\":\"No Rust model runtime is connected; T01–T08 integration is pending\",\"type\":\"model_unavailable\"}}",
+      "passed": true
+    }
+  ],
+  "interpretation": "Real default executable verified over loopback. No model provider is connected; HTTP503 is the correct inference result. Test-only providers in Rust integration tests cover successful generation transport."
+}

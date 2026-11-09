@@ -1,0 +1,40 @@
+name: Rust workspace
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    name: CPU / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned compiler and review tools
+        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt,clippy
+      - name: Formatting
+        run: cargo fmt --all -- --check
+      - name: Debug tests
+        run: cargo test --workspace --all-targets --offline --locked
+      - name: Release tests
+        run: cargo test --workspace --all-targets --release --offline --locked
+      - name: Strict Clippy
+        run: cargo clippy --workspace --all-targets --offline --locked -- -D warnings
+      - name: Source and dependency audit
+        run: cargo run --offline --locked -p xtask -- audit
+      - name: Independent fixture integrity
+        run: cargo run --offline --locked -p xtask -- fixtures
+      - name: Release build
+        run: cargo build --workspace --release --offline --locked

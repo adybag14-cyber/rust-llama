@@ -1,0 +1,22 @@
+gate	owner	status	evidence_or_blocker
+baseline-ownership	T12	validated	ledger/baseline-files.tsv covers 4082 files and plan owner counts; classifications are proposals awaiting semantic review
+baseline-registry-discovery	T12	validated	ledger/baseline-registries.tsv; semantic closure and dynamic registrations remain separate
+host-rust-build	T12	validated	evidence/validation/results.json: 123 workspace tests, release/check/fmt/strict Clippy exit 0 on Linux x86_64
+file-disposition-closure	ALL	planned	Every baseline path needs capability-linked implementation and review
+runtime-foundation	T01-T05	blocked	Rust implementations from other tracks are not present in these supplied inputs
+all-eighteen-backends	T03,T06-T08	blocked	No Rust backend/device executions are supplied in this checkpoint
+model-tokenizer-conversion-parity	T04,T05	blocked	Real inference/tokenizer/conversion contracts and weights not available here
+multimodal-model-embeddings	T09	blocked	All 58 modality graph builders need T02-T05 execution and model fixtures
+media-codec-completeness	T09	implementing	Preprocessing and selected native formats; full stb/miniaudio/FFmpeg capability set remains open
+speech-generation	T09	blocked	Acoustic model execution and real waveform quality need runtime and weights
+sampler-grammar-chat-completeness	T10	implementing	Independent sampler/native-template corpus plus implemented GBNF subset; Jinja/PEG/remaining methods remain open
+all-cli-tools-and-updater	T10	blocked	Runtime-dependent tools and separately downloaded installer contract remain open
+server-protocol-parity	T11	implementing	Bounded HTTP/SSE subset with trait integration; other protocols and production scheduler remain open
+browser-feature-and-migration-parity	T11	implementing	Rust diagnostics renderer only; real browser/WASM/storage end-to-end proof remains open
+native-clients-and-connect	T11	blocked	Android/Apple target SDKs and pinned llama-connect implementation remain unavailable
+independent-conformance-suite	T12	implementing	Selected original fixtures/tests available; full model/device/server/UI suites remain open
+platform-isa-ci	T12	blocked	Only Linux x86_64 host toolchain installed and exercised
+performance-quality-memory-gates	ALL	planned	No end-to-end model throughput, memory, quality or hardware parity evidence
+language-and-dependency-audit	T12	validated	evidence/validation/source-audit.log plus native-link reports: local Cargo packages only; checkpoint host configurations audited
+reproducible-checkpoint-package	T12	validated	evidence/validation/clean-extracted-results.json: archive CRC, complete manifest and 123 tests plus release build passed from independent extraction and a fresh build cache
+complete-release	ALL	blocked	This is an explicitly incomplete progress checkpoint, not an M7 release

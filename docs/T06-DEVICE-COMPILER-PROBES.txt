@@ -1,0 +1,42 @@
+UTC: 2026-11-08T17:38:29.747817+00:00
+
+Command: /workspace/scratch/4678ec077e2a/rust/bin/rustc -vV
+Exit: 0
+
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+binary: rustc
+commit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67
+commit-date: 2026-10-13
+host: x86_64-unknown-linux-gnu
+release: 1.99.1
+LLVM version: 23.1.1
+
+Command: /workspace/scratch/4678ec077e2a/rust/bin/rustc --print target-list
+Exit: 0
+
+amdgcn-amd-amdhsa
+nvptx64-nvidia-cuda
+
+Command: /workspace/scratch/4678ec077e2a/rust/bin/rustc --edition=2024 --crate-type=lib --target nvptx64-nvidia-cuda --emit=asm /workspace/scratch/4678ec077e2a/t06-oracle-build/minimal_device.rs -o /workspace/scratch/4678ec077e2a/t06-oracle-build/nvptx64-nvidia-cuda.asm
+Exit: 1
+
+error[E0463]: can't find crate for `core`
+  |
+  = note: the `nvptx64-nvidia-cuda` target may not be installed
+  = help: consider downloading the target with `rustup target add nvptx64-nvidia-cuda`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0463`.
+
+Command: /workspace/scratch/4678ec077e2a/rust/bin/rustc --edition=2024 --crate-type=lib --target amdgcn-amd-amdhsa --emit=asm /workspace/scratch/4678ec077e2a/t06-oracle-build/minimal_device.rs -o /workspace/scratch/4678ec077e2a/t06-oracle-build/amdgcn-amd-amdhsa.asm
+Exit: 1
+
+error[E0463]: can't find crate for `core`
+  |
+  = note: the `amdgcn-amd-amdhsa` target may not be installed
+  = help: consider building the standard library from source with `cargo build -Zbuild-std`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0463`.

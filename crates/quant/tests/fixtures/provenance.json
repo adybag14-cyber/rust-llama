@@ -1,0 +1,49 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Unmodified dequantize_row_* and quantize_row_*_ref functions extracted from frozen ggml/src/ggml-quants.c; frozen ggml-common.h and ggml-impl.h included directly.",
+  "oracle_exceptions": [
+    "Q8_1 has no upstream dequantize function: checked against independent C layout-based d*qs loop.",
+    "Integer/F32/F64 reference conversion is an explicit C cast or memcpy.",
+    "F16/BF16 reference calls upstream GGML conversion macros."
+  ],
+  "compiler": "MSVC 19.51.36260.0, Visual Studio 18 2026, Windows SDK 10.0.26100.0; Release /fp:strict; scalar conversion helpers",
+  "seed": "0x20261109 (Python random.Random); fixture inputs are stored verbatim",
+  "decoder_records": 36,
+  "encoder_records": 122,
+  "checks": {
+    "decoder": "All 36 active dtype layouts; 19 arbitrary packed blocks each except all 65536 F16/BF16 encodings and all 256 F8_E4M3 encodings.",
+    "encoder": "12 supported encoders, 10 structured/random cases each; extra 20021 raw F32 patterns each for F16/BF16."
+  },
+  "sources": {
+    "oracle.c": {
+      "sha256": "6c632e0c2e5c40967ca8a2a46ec26102512e93bedc53d16cc7fcf5bb3e7ac5ca",
+      "bytes": 39296
+    },
+    "oracle.dll": {
+      "sha256": "85a57577e49d4186423c0e1390563e0e7614810f4c2f9fd10863b815b9fd1e34",
+      "bytes": 109056
+    },
+    "ggml-common.h": {
+      "sha256": "0061131b615c5721fc88a78feeb22c1f8c450f1c2646a317d80796a653bf595c",
+      "bytes": 135161
+    },
+    "ggml-quants.c": {
+      "sha256": "bcda33625707fdfcb1367cdd2bb1a2f017430162ec9623abc84ad17459698f73",
+      "bytes": 228271
+    },
+    "ggml-impl.h": {
+      "sha256": "75465b01eba2b1ecae8634898508e71294fbff0f7f96ee9ad2caf5bae5b6c5fd",
+      "bytes": 28187
+    }
+  },
+  "files": {
+    "dequant-reference.bin": {
+      "sha256": "fa82642f3a67d8bd3e68e97e1940a8bde2145cfab109771f92a6175845c86f45",
+      "bytes": 1178644
+    },
+    "quant-reference.bin": {
+      "sha256": "b18c46217e4cb7b10833b3d8f6b44d12cc448c187de4a7e50bdab62ad224f8fd",
+      "bytes": 437608
+    }
+  }
+}

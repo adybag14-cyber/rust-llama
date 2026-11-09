@@ -1,0 +1,121 @@
+T09 isolated worktree validation; Linux x86_64; supplied Rust 1.99.1
+
+$ cargo fmt -p llama-media --check
+exit_code=0
+
+$ cargo test -p llama-media --offline -- --nocapture
+   Compiling llama-media v0.1.0 (/workspace/scratch/be832a7b719c/worktree-t09/crates/llama-media)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running unittests src/lib.rs (/workspace/scratch/be832a7b719c/build/t09/debug/deps/llama_media-b98920c49746f65a)
+
+running 4 tests
+test png::tests::corrupt_huffman_tables_are_rejected ... ok
+test png::tests::standard_checksums ... ok
+test png::tests::stored_blocks_checksum_and_expansion_bound ... ok
+test png::tests::bounded_malformed_deflate_corpus_has_no_panics ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/png.rs (/workspace/scratch/be832a7b719c/build/t09/debug/deps/png-f90c8109689e22c0)
+
+running 2 tests
+test png_truncation_crc_and_limits_are_enforced ... ok
+oracle PNG: 16 input fixtures, 1039347 exact RGB bytes
+test png_color_depths_filters_and_original_fixture_match_stb_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/reference.rs (/workspace/scratch/be832a7b719c/build/t09/debug/deps/reference-56f0c45f5d59c2dc)
+
+running 7 tests
+oracle normalize_clip: 6 values, max_abs=0.000000000e0
+oracle resize_bilinear: 36 exact RGB bytes
+oracle mel_slaney: 1608 values, max_abs=0.000000000e0
+oracle resize_bicubic: 36 exact RGB bytes
+oracle fft_7: 14 values, max_abs=0.000000000e0
+oracle hann_7: 7 values, max_abs=0.000000000e0
+test image_decoders_match_original_stb ... ok
+test normalization_and_smart_size_match_original ... oracle okfft_8
+: 16 values, max_abs=0.000000000e0
+oracle resize_lanczos: 36 exact RGB bytes
+oracle hann_8: 8 values, max_abs=0.000000000e0
+oracle fft_10: 20 values, max_abs=0.000000000e0
+oracle resize_torch_bilinear: 36 exact RGB bytes
+oracle hann_10: 10 values, max_abs=0.000000000e0
+oracle fft_16: 32 values, max_abs=0.000000000e0
+oracle resize_torch_bicubic: 36 exact RGB bytes
+oracle hann_16: 16 values, max_abs=0.000000000e0
+oracle upscale_bicubic: 120 exact RGB bytes
+oracle upscale_lanczos: 120 exact RGB bytes
+oracle pcm8.wav: 7 values, max_abs=0.000000000e0
+oracle pcm16-stereo.wav: 8 values, max_abs=0.000000000e0
+oracle pcm24.wav: 5 values, max_abs=0.000000000e0
+oracle pcm32-ext.wav: 5 values, max_abs=0.000000000e0
+oracle letterbox_ceil: 192 exact RGB bytes
+oracle float32.wav: 5 values, max_abs=0.000000000e0
+oracle float64.wav: 5 values, max_abs=0.000000000e0
+oracle letterbox_nearest: 192 exact RGB bytes
+oracle resize_one_row: 9 exact RGB bytes
+oracle resize_one_column: 9 exact RGB bytes
+test wav_samples_match_original_miniaudio ... ok
+test image_resampling_matches_original_bytes ... ok
+oracle log_mel_frame: 8 values, max_abs=0.000000000e0
+oracle mel_htk: 54 values, max_abs=0.000000000e0
+test filterbanks_and_log_mel_match_original ... ok
+oracle istft_stream: 9 values, max_abs=0.000000000e0
+test streaming_synthesis_matches_original ... ok
+oracle fft_400: 800 values, max_abs=0.000000000e0
+oracle hann_400: 400 values, max_abs=0.000000000e0
+test real_fft_and_windows_match_original ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/robustness.rs (/workspace/scratch/be832a7b719c/build/t09/debug/deps/robustness-9a1872f8ce16c4da)
+
+running 17 tests
+test crop_composite_and_tile_positions_are_checked ... ok
+test fixed_count_video_selection_retains_reference_ties_and_repetition ... ok
+test invalid_resampler_input_does_not_change_next_output ... ok
+test malformed_headers_and_resource_limits_fail_before_large_allocations ... ok
+test istft_reset_and_flush_have_explicit_lifecycle ... ok
+test every_codec_fixture_prefix_is_rejected_without_panicking ... ok
+test linear_resampler_output_is_chunk_invariant_and_resettable ... ok
+test malformed_wav_alignment_compression_and_nonfinite_samples ... ok
+test resize_bounds_and_normalization_are_explicit ... ok
+test sequence_cancellation_and_timestamp_order_are_isolated ... ok
+test constant_images_and_identity_are_preserved_by_every_resize_filter ... ok
+test smart_resize_handles_ties_and_conflicting_bounds ... ok
+test waveform_padding_and_embedding_shape_do_not_fabricate_values ... ok
+test wav_roundtrip_and_stereo_downmix_preserve_samples ... ok
+test stft_frame_count_and_spectrogram_layout_are_consistent ... ok
+test spectral_validation_and_zero_energy_are_finite ... ok
+test fft_matches_independent_direct_dft_and_roundtrip ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests llama_media
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit_code=0
+
+$ cargo clippy -p llama-media --offline --all-targets -- -D warnings
+    Checking llama-media v0.1.0 (/workspace/scratch/be832a7b719c/worktree-t09/crates/llama-media)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+exit_code=0
+
+$ cargo build -p llama-media --release --offline
+   Compiling llama-media v0.1.0 (/workspace/scratch/be832a7b719c/worktree-t09/crates/llama-media)
+    Finished `release` profile [optimized] target(s) in 0.85s
+exit_code=0
+
+Post-integration targeted state review 2026-11-08T17:45:32.384742+00:00
+Moved streaming output allocation/counter validation before state changes. Added rejection-preserves-state test.
+Executed: cargo test -p llama-media --offline; exit_code=0; 31 tests passed (4+2+7+18), zero failures.
+Executed: cargo clippy -p llama-media --offline --all-targets -- -D warnings; exit_code=0.
+$ cargo build -p llama-media --release --offline
+   Compiling llama-media v0.1.0 (/workspace/scratch/be832a7b719c/worktree-t09/crates/llama-media)
+    Finished `release` profile [optimized] target(s) in 1.25s
+exit_code=0

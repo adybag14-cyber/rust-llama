@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "toolchain": "1.99.1",
+  "results": [
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 77.86097584300023,
+      "passed": 288,
+      "failed": 0,
+      "ignored": 9,
+      "stdout_sha256": "3d28be0cd99cfc09b177dd15694b425ad2cfba0a2d5bf9f1fbae96ccc484ff00",
+      "stderr_sha256": "5e30d60e598ce3234d7e74d5b704cf93a28fc9fe52b65c7262e72d9a60db3c7f"
+    },
+    {
+      "name": "pretrained-release",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "--test",
+        "native_reference",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 15.125641257999632,
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "stdout_sha256": "9bfafed1ad3b81d7c24877a4d84b5d18d6710b5d47dbbd12dfd648a1f8eb9724",
+      "stderr_sha256": "ed11dc19d64435ed3ff6681f4c81b0ff661a89af33519492534d7820728b8f19"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.7272018730000127,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d568efa6053c2f0f5719c0a88ae60988f59382d951dcc82a8000fb72e5a9c500"
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.137210093999784,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3f17e44329d9516a2f4b3aa9f00e529af1df6f95373b37dcb2cd36ab3245ffe1"
+    },
+    {
+      "name": "source-audit",
+      "command": [
+        "cargo",
+        "xtask",
+        "audit"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.6262856639996244,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "stdout_sha256": "51a22bff1a304a71114c05d959902276a7240d18598ccfa771d0cf4bddeffb11",
+      "stderr_sha256": "5976e0daf21e00ea5c407e17b333abadd6046c2a5e192bc5392c0db86a7677d6"
+    },
+    {
+      "name": "fixture-integrity",
+      "command": [
+        "cargo",
+        "xtask",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.976527826000165,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "stdout_sha256": "23b65eeb4ee8073af4102cc47a40f6f360d355c7c077dad63c2314c8c47b5a75",
+      "stderr_sha256": "3688b6cba2e32cbf509405e9e97e06dc4f63538ad6b4cbc0f545fc2cd164c8a6"
+    }
+  ]
+}

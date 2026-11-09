@@ -1,0 +1,85 @@
+{
+  "checked_at_utc": "2026-11-08T17:40:20.298142+00:00",
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_file_counts": {
+    "blas": 3,
+    "cann": 8,
+    "et": 79,
+    "sycl": 179,
+    "zdnn": 17,
+    "hexagon": 132,
+    "zendnn": 3,
+    "openvino": 95,
+    "rpc": 12,
+    "virtgpu": 43
+  },
+  "source_file_total": 571,
+  "native_oracle_sha256": "cfe11cd8b9dc90960a8c357a76691d0d491b18a72531ad8b3ac233e6da97360d",
+  "native_harness_sha256": "435f4b560aa47ecb1acee0d3ae7f2f39df90c9f2932c879f722d5ae27d5bd013",
+  "native_harness_isolated": true,
+  "results": [
+    {
+      "name": "rustc.txt",
+      "command": [
+        "rustc",
+        "-Vv"
+      ],
+      "exit_code": 0,
+      "sha256": "996c941448a5f0f6185fa5162ab1730f64ccbef880cf99f368fe81212071f7be"
+    },
+    {
+      "name": "clippy.txt",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "-p",
+        "llama-vendor-remote",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "sha256": "99108464ba1a5e09526395efbbadfeb402711f66e06541263728c7182a6ab0cd"
+    },
+    {
+      "name": "tests-including-external.txt",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "-p",
+        "llama-vendor-remote",
+        "--",
+        "--include-ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "sha256": "b4a3945a2d3fe9960f2e7bacc9a3dd9c223ba0a6d73ef47f9aa6ffd4c119ca32"
+    },
+    {
+      "name": "live-probes.txt",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "-p",
+        "llama-vendor-remote",
+        "--example",
+        "t08_check"
+      ],
+      "exit_code": 0,
+      "sha256": "05005b381dd6c8cd1a1e9fef22bea84788c185cb9e5a5f2bfc64634e4b382eaa"
+    },
+    {
+      "name": "native-layout.txt",
+      "command": [
+        "/workspace/scratch/4678ec077e2a/t08-reference-build/rpc-oracle",
+        "--layout"
+      ],
+      "exit_code": 0,
+      "sha256": "b08cbbaa4698f05559bd9b4c72332afe69f81d83231839d42b5c50e21343e335"
+    }
+  ]
+}

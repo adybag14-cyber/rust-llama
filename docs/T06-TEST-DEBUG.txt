@@ -1,0 +1,37 @@
+UTC start: 2026-11-08T17:37:43.264107+00:00
+Command: cargo test --offline -p llama-device-family
+Exit: 0
+
+   Compiling llama-device-family v0.1.0 (/workspace/scratch/4678ec077e2a/worktree-t06/crates/device-family)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running unittests src/lib.rs (target/debug/deps/llama_device_family-481fe9eb316c0c25)
+
+running 19 tests
+test driver::tests::zero_and_oversize_allocations_are_rejected ... ok
+test planning::tests::row_partition_has_no_gaps_and_preserves_weights ... ok
+test planning::tests::row_partition_handles_boundaries_without_u64_overflow ... ok
+test planning::tests::graph_replay_invalidates_each_relevant_change ... ok
+test planning::tests::peer_matrix_is_directional_and_staging_explicit ... ok
+test planning::tests::waves_are_not_interchanged ... ok
+test planning::tests::bounded_partition_property_grid ... ok
+test ptx::tests::bad_buffers_and_instruction_budget_fail_explicitly ... ok
+test ptx::tests::malformed_typed_program_cannot_be_emitted ... ok
+test ptx::tests::q4_zero_negative_and_subnormal_scales_decode ... ok
+test ptx::tests::rejects_invalid_shapes_overflow_and_aliasing ... ok
+test ptx::tests::noncontiguous_add_preserves_padding_and_handles_tail ... ok
+test ptx::tests::target_version_is_not_inferred_from_device_family ... ok
+test ptx::tests::scale_emits_exact_float_bits_and_crosses_block_boundary ... ok
+test ptx::tests::noncontiguous_q4_matvec_matches_independent_dense_dot ... ok
+test runtime::tests::cuda_is_not_disguised_as_hip_or_musa ... ok
+test tests::ranges_cannot_wrap_or_escape ... ok
+test ptx::tests::sum_runs_generated_loop_with_strided_input ... ok
+test ptx::tests::q4_nibbles_match_frozen_c_oracle_exactly ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+   Doc-tests llama_device_family
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
