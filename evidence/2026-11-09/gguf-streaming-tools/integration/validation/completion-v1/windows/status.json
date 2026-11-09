@@ -1,0 +1,91 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T19:53:13.850522+00:00",
+  "base_commit": "1890f03291299ca3dca591f90d8b88ba6d29f1d5",
+  "qualification": "Bounded GGUF ordered streaming writer and original split/merge executable semantics integrated with published dense Qwen3/F16 caches, owned shards and shared CPU mathematics. UTF-8/NUL reader limits remain explicit. Flash, microbatch scheduling and Safetensors are separate unmerged work.",
+  "fingerprint_scope": "All Rust, Cargo/compiler/CI inputs and JSON/bin/GGUF data outside historical evidence; canonical POSIX relative paths, same ordering on both hosts.",
+  "execution_inputs_before": {
+    "files": 648,
+    "sha256": "abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c"
+  },
+  "external_driver_sha256": {
+    "verify-embedding-cli.py": "53e527997439f2e074f20890878cf6fd904d828bdd8e47ea4b74ff235ab16b60",
+    "verify-decoder-cli.py": "427ea2883733264d59001bc3df78ea502b6f0e0d80f6de9103be6bb02627c918",
+    "verify-qwen2-http.py": "3e23333d01c5e945278d63508a145f41627c2637c46998ef511c58790693f6d1",
+    "verify-qwen3-http.py": "aa2a4be3430266e383acaff59bc4c47bab7ff9e5b96b93ab2c5bf99d571bab68",
+    "verify-sharded-apps-v2.py": "8569523308cb7ca4412ab89c4dd3c2d760484670c9f60f7dc7044b60349633f2",
+    "validate-full-v1.py": "f2c6a2ac6b5ce29361f202cc801ce42ba7e345463fd8f4b903bc8d0cf5fca1fb",
+    "validate-completion-v1.py": "d035b2c77db89ea0781658e37a3d64839ea3e47b7a179362c9ee2ef54575d62e"
+  },
+  "steps": [
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 13.090754099997866,
+      "log_sha256": "5fbf2d1c4a2134a2eece38748f40dee2f15150ecff0275b17c0917117e632575"
+    },
+    {
+      "name": "release-gate",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.08269770000333665,
+      "log_sha256": "d0d3ca8da9ccc51237e35d6af6a9ff42a8071a31bff13af13f964c73f0b34820"
+    }
+  ],
+  "continuation_of": {
+    "path": "validation/full-v1/windows/status.json",
+    "sha256": "8c592b6cdaea277f42ae7fc499bd020f4dbd79191e625c69523849b0ac26e0a5",
+    "completed_steps": 15,
+    "preserved_failed_step": {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "seconds": 12.005137899999681,
+      "log_sha256": "60cd38cd2b96a9d59cf68aa1deaae3bbf090fa03b08540f0153be768c56f7d53"
+    },
+    "correction": "validation/source-cleanup-v1/status.json",
+    "qualification": "All numerical/application checks passed on this exact source. Only source verification and release-gate checks run after relocating two generated Python bytecode cache files outside the frozen original tree."
+  },
+  "execution_inputs_after": {
+    "files": 648,
+    "sha256": "abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c"
+  },
+  "finished_utc": "2026-11-09T19:53:29.243674+00:00"
+}

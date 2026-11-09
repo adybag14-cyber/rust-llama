@@ -1,0 +1,52 @@
+from pathlib import Path
+import hashlib,json,subprocess,os
+BASE=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port')
+ROOT=BASE/'rust-draft'
+def sha(b): return hashlib.sha256(b).hexdigest()
+payload=json.loads((BASE/'ordered-lib-payload.json').read_text(encoding='utf-8'))
+print('payload keys',list(payload))
+target=ROOT/'crates/gguf/src/lib.rs'
+assert sha(target.read_bytes())=='7bf88e7c2322abc55c141ec218c18f235ce05e95ab2aca12dd2e3bd318d2e81d'
+content=payload.get('content',payload.get('text'))
+assert isinstance(content,str)
+target.write_bytes(content.encode('utf-8'))
+writer=ROOT/'crates/gguf/src/writer.rs'
+text=writer.read_text(encoding='utf-8')
+assert 'use std::io::{self, Write};' in text and 'use std::io::Cursor;' in text
+text=text.replace('use std::io::{self, Write};','use std::io::Write;').replace('use std::io::Cursor;','use std::io::{self, Cursor};')
+writer.write_bytes(text.encode('utf-8'))
+split=ROOT/'crates/gguf/src/split.rs'
+text=split.read_text(encoding='utf-8')
+text=text.replace('use std::collections::BTreeSet;\n','')
+old='    let file = Gguf::read_header(File::open(path)?, limits)?;'
+new='''    let mut open = OpenOptions::new();
+    open.read(true);
+    // Deny write/delete while the input handle is retained on Windows. This
+    // prevents truncation through hard-link aliases without unsafe file-ID APIs.
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::OpenOptionsExt;
+        open.share_mode(1); // FILE_SHARE_READ
+    }
+    let file = Gguf::read_header(open.open(path)?, limits)?;'''
+assert text.count(old)==1
+text=text.replace(old,new)
+split.write_bytes(text.encode('utf-8'))
+cargo=ROOT/'crates/cli/Cargo.toml'
+text=cargo.read_text(encoding='utf-8')
+assert 'default-run' not in text and '[dev-dependencies]' not in text
+text=text.replace('name = "rust-llama-cli"\n','name = "rust-llama-cli"\ndefault-run = "rust-llama"\n')
+text=text.replace('[dependencies]\n','[[bin]]\nname = "llama-gguf-split"\npath = "src/gguf_split.rs"\n\n[dependencies]\n')
+text+='\n[dev-dependencies]\nllama-conformance = { path = "../llama-conformance" }\n'
+cargo.write_bytes(text.encode('utf-8'))
+logs=BASE/'first-build-v1';logs.mkdir(exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(BASE/'target-windows')
+steps=[('fmt',['cargo','+1.99.1','fmt','--all']),('check',['cargo','+1.99.1','check','--offline','-p','llama-gguf','-p','rust-llama-cli','--all-targets'])]
+records=[]
+for name,args in steps:
+    p=subprocess.run(args,cwd=ROOT,env=env,capture_output=True)
+    (logs/(name+'.stdout.txt')).write_bytes(p.stdout);(logs/(name+'.stderr.txt')).write_bytes(p.stderr)
+    records.append({'step':name,'exit_code':p.returncode})
+    (logs/'status.json').write_bytes((json.dumps(records,indent=2)+'\n').encode('utf-8'))
+    print(json.dumps(records[-1]),flush=True)
+    if p.returncode: raise SystemExit(p.returncode)

@@ -1,0 +1,15 @@
+
+usage: C:\Users\adyba\rust-llama-reference\sharded-gguf-port\native-build\Release\native-gguf-split.exe [options] GGUF_IN GGUF_OUT
+
+Apply a GGUF operation on IN to OUT.
+options:
+  -h, --help              show this help message and exit
+  --version               show version and build info
+  --split                 split GGUF to multiple GGUF (enabled by default)
+  --merge                 merge multiple GGUF to a single GGUF
+  --split-max-tensors     max tensors in each split (default: 128)
+  --split-max-size N(M|G) max size per split
+  --no-tensor-first-split do not add tensors to the first split (disabled by default)
+  --dry-run               only print out a split plan and exit, without writing any new files
+  --delete-splits         delete the split files during merge to free up disk space WARNING: this option is unsafe and will leave you in an unrecoverable state if something fails during the merge
+

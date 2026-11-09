@@ -1,0 +1,40 @@
+{
+  "name": "merge-secondary-split-count-4-2",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "native-secondary-validation",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "c60d4e80cbec1587cd9d2e0c8a71ea3cc158d7b67f2757ea46c8a2360da7db35"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "c60d4e80cbec1587cd9d2e0c8a71ea3cc158d7b67f2757ea46c8a2360da7db35",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 3221226505,
+  "timed_out": false,
+  "seconds": 0.06826960000034887,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\gguf.cpp:196: GGML_ASSERT(type_to_gguf_type<T>::value == type) failed\n"
+}

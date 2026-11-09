@@ -1,0 +1,53 @@
+from pathlib import Path
+import json,hashlib,datetime,re
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-streaming-integration-v1');repo=base/'rust-draft'
+reports={p:json.loads((base/'validation/combined-v1'/p/'status.json').read_text(encoding='utf-8')) for p in ['windows','linux']}
+assert all(r['status']=='succeeded' and len(r['steps'])==17 for r in reports.values())
+for platform,r in reports.items():
+ pre=next(s for s in r['steps'] if s['name']=='pretrained');log=(base/pre['log_path']).read_text(encoding='utf-8',errors='replace')
+ measures=re.findall(r'(?:max_abs|maximum_absolute)=([0-9.eE+-]+)',log);assert measures and all(float(v)==0 for v in measures),(platform,measures)
+ assert r['execution_inputs_before']==r['execution_inputs_after']=={'files':648,'sha256':'abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c'}
+record={'updated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'changes':[],'numeric_fixtures_unchanged':True}
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def change(name,before_hash,edits):
+ p=repo/name;before=p.read_bytes();assert sha(before)==before_hash
+ text=before.decode('utf-8')
+ for old,new in edits:
+  assert text.count(old)==1,(name,old[:160],text.count(old));text=text.replace(old,new)
+ after=text.encode('utf-8');p.write_bytes(after)
+ record['changes'].append({'path':name,'before':{'bytes':len(before),'sha256':sha(before)},'after':{'bytes':len(after),'sha256':sha(after)}})
+change('crates/gguf/README.md','9827e15999c5f985681408d305e8fdce15636a469856ba4f6dd99a0761410a42',[
+ ('The metadata representation currently requires UTF-8 strings and rejects NUL\nkeys/names. Full arbitrary-byte metadata compatibility remains open.','The metadata representation currently requires UTF-8 strings and rejects NUL\nkeys/names. The current reader also rejects boolean bytes outside 0 and 1,\nwhile the frozen source normalizes every nonzero byte to true. Arbitrary-byte\nmetadata and this boolean-encoding difference remain open in this checkpoint.\nSeparate original-only byte-string and exhaustive boolean captures are retained\nfor the next reader slice; they are not included in the implemented scope here.')
+])
+change('docs/PORT_STATUS.md','15fa6e83d0b634092c6f1424a3810bc06f271c93e8ef3a4e9c472b6aac110936',[
+ ('arbitrary-byte/NUL GGUF keys and names; remaining metadata tools','arbitrary-byte GGUF strings, NUL keys/names and noncanonical boolean bytes; remaining metadata tools'),
+ ('native byte-string/NUL alias behavior for subsequent work. This checkpoint\ndoes not claim full arbitrary-byte GGUF or T04 completion.','native byte-string/NUL alias behavior for subsequent work. An additional 512-case\noriginal corpus per host confirms every nonzero boolean byte is true; the current\nreader still admits only 0/1 boolean encodings. This checkpoint does not claim\nfull arbitrary-byte GGUF or T04 completion.'),
+ ('The source audit checks implementation roles and dependency metadata;', '''The combined GGUF streaming checkpoint passes 460 ordinary Windows tests and
+464 ordinary GNU tests in both debug and release, with 19 prerequisite tests
+ignored in ordinary runs and nine explicit pretrained tests passing per host.
+Every measured pretrained numeric comparison records zero error. All 17 checks
+cover the same 648 execution inputs, SHA-256
+abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c,
+including strict Clippy, 465 fixture declarations, release builds, CLI,
+HTTP/SSE and verification of all 4,082 frozen source files. The required release
+check still fails because all twelve global gates remain open.
+
+Windows source verification first reported two generated Python cache files
+from an independent reference import. Those files were archived outside the
+frozen source tree, utility.py was compared to the authoritative ZIP, and
+source/release checks then completed. GNU ordinary checks passed before a
+deliberate resource pause during its release build; its remaining checks ran
+under a separate continuation with identical inputs. Original failed/interrupted
+status and logs remain preserved. No numerical expected data or source was
+changed to complete either run. Full evidence is under
+evidence/2026-11-09/gguf-streaming-tools.
+
+The preceding exact published commit 1890f032 passed GitHub Actions run
+42683437723 on its first attempt: Windows 451 and Ubuntu 454 ordinary tests per
+profile, plus nine explicit pretrained comparisons on each host. Its complete
+raw logs and run/job identities are retained with the next checkpoint.
+
+The source audit checks implementation roles and dependency metadata;''')
+])
+out=base/'final-documentation-update-v1.json';assert not out.exists();out.write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+print(json.dumps(record,indent=2))

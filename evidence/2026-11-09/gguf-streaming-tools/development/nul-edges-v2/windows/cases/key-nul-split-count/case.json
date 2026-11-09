@@ -1,0 +1,84 @@
+{
+  "name": "key-nul-split-count",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 160,
+      "sha256": "291197727a08ee6dfb089e507b4da010c3ec277f7090986a7b148d6f015728bb",
+      "hex": "474755460300000001000000000000000200000000000000120000000000000073706c69742e636f756e740073756666697802000000090004000000000000007461696c08000000050000000000000076616c756503000000000000006f6e6501000000010000000000000000000000000000000000000000000000000000000000a03f00000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 0.0425658999956795,
+  "stdout": "n_split: 1\nsplit 00001: n_tensors = 1, total_size = 0M\nWriting file result-00001-of-00001.gguf ... done\n",
+  "stderr": "gguf_split: 1 gguf split written with a total of 1 tensors.\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 160,
+      "sha256": "291197727a08ee6dfb089e507b4da010c3ec277f7090986a7b148d6f015728bb",
+      "existed_before": true
+    },
+    {
+      "name": "result-00001-of-00001.gguf",
+      "bytes": 224,
+      "sha256": "da3bda6ad0b2843cc09a29b3b7a1a3b77eed7fd33e0316c170c9f780dcf3f226",
+      "existed_before": false,
+      "inspection_exit_code": 0,
+      "inspection_file": {
+        "bytes": 695,
+        "sha256": "349ec360a503ac51b6227c0dfc3a8353c63084d7a4ac3c0822f5fd4da5275fb4"
+      },
+      "inspection": {
+        "accepted": true,
+        "version": 3,
+        "alignment": 32,
+        "data_offset": 192,
+        "metadata": [
+          {
+            "key": "tail",
+            "type": 8,
+            "value": "value"
+          },
+          {
+            "key": "split.no",
+            "type": 2,
+            "value": 0
+          },
+          {
+            "key": "split.tensors.count",
+            "type": 5,
+            "value": 1
+          },
+          {
+            "key": "split.count",
+            "type": 2,
+            "value": 1
+          }
+        ],
+        "tensors": [
+          {
+            "name": "one",
+            "dimensions": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "dtype": 0,
+            "offset": 0,
+            "byte_len": 4,
+            "payload_offset": 0,
+            "payload_complete": true,
+            "payload_bytes": 4
+          }
+        ],
+        "payload_bytes": 4
+      }
+    }
+  ]
+}

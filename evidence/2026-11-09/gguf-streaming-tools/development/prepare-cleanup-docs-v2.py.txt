@@ -1,0 +1,73 @@
+"""Narrow docs-only cleanup-contract supplement; preserve the entire v1."""
+from pathlib import Path
+import datetime,difflib,hashlib,json
+BASE=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port')
+SOURCE=BASE/'corpus-adapter-v1'
+OUT=BASE/'corpus-adapter-docs-v2'
+OUT.mkdir(exist_ok=False)
+preimages={
+ 'fixtures/gguf-split/README.md':'cc6f788e114eb98f15412a9832f7873d55d309221f448e8473cad0eedbc1d765',
+ 'fixtures/gguf-split/provenance.json':'ac884c2a75447dac0300b78072ef0977b2f00250c39d63c802e8a60185e8267e',
+}
+sha=lambda data:hashlib.sha256(data).hexdigest()
+before={}
+for relative,expected in preimages.items():
+ data=(SOURCE/'candidate'/relative).read_bytes()
+ assert sha(data)==expected,(relative,sha(data))
+ before[relative]=data
+addition=(
+ 'The no-deletion guarantee applies to failures before that complete output has been flushed and synced. '
+ 'Once cleanup starts, removal or logging can fail after some shards have already been deleted; the completed output remains. '
+ 'Destructive cleanup requires stable, exclusively managed input and output paths. Safe standard Rust does not provide an atomic file-identity-check-and-unlink operation, so arbitrary concurrent path replacement is outside this cleanup guarantee. '
+ 'The truncated-secondary regression exercises only failure before cleanup, not a rollback guarantee for cleanup errors.'
+)
+readme=before['fixtures/gguf-split/README.md'].decode('utf-8')
+anchor='This safety test is distinguished from the 103-case native corpus; the original incremental deletion behavior is not claimed as an input-preservation oracle.\n'
+assert readme.count(anchor)==1
+readme=readme.replace(anchor,anchor+'\n'+addition+'\n')
+provenance=json.loads(before['fixtures/gguf-split/provenance.json'])
+provenance['qualification'].append(addition)
+provenance['contract_supplement']['cleanup_guarantee_scope']={
+ 'before_completion':'Failures before the complete output is flushed and synced preserve every input shard.',
+ 'after_completion':'Removal or logging can fail after partial input deletion; the completed output remains. No cleanup rollback is promised.',
+ 'filesystem_concurrency':'Destructive cleanup requires stable, exclusively managed input/output paths; no atomic identity-check-and-unlink is available in safe standard Rust.',
+ 'measured_safety_case':'The unchanged truncated-secondary regression fails before cleanup; it does not exercise cleanup rollback.',
+}
+provenance['documentation_supplement']={
+ 'revision':'corpus-adapter-docs-v2',
+ 'purpose':'Clarify the existing stronger Rust delete contract, without changing native expected bytes, original reports, adapter assertions or initial inputs.',
+ 'preimages':preimages,
+ 'preserved_v1':'corpus-adapter-v1 remains unchanged.',
+}
+after={
+ 'fixtures/gguf-split/README.md':readme.encode('utf-8'),
+ 'fixtures/gguf-split/provenance.json':(json.dumps(provenance,indent=2)+'\n').encode('utf-8'),
+}
+records=[]
+patch=[]
+rows=(SOURCE/'fixture-manifest-additions.tsv').read_text(encoding='utf-8').splitlines()
+replacements=[rows[0]]
+for relative,data in after.items():
+ dest=OUT/'candidate'/relative
+ dest.parent.mkdir(parents=True,exist_ok=True)
+ dest.write_bytes(data)
+ record={'path':relative,'bytes':len(data),'sha256':sha(data),'preimage_bytes':len(before[relative]),'preimage_sha256':sha(before[relative])}
+ records.append(record)
+ patch.extend(difflib.unified_diff(before[relative].decode('utf-8').splitlines(True),data.decode('utf-8').splitlines(True),fromfile='a/'+relative,tofile='b/'+relative))
+ row=next(row for row in rows[1:] if row.split('\t')[0]==relative).split('\t')
+ assert row[1]==preimages[relative]
+ row[1]=sha(data)
+ replacements.append('\t'.join(row))
+(OUT/'documentation.patch').write_text(''.join(patch),encoding='utf-8',newline='\n')
+(OUT/'fixture-manifest-replacements.tsv').write_text('\n'.join(replacements)+'\n',encoding='utf-8',newline='\n')
+unchanged=[]
+native_paths=['native-data.bin','native-reference.json','native-msvc-report.json','native-gnu-report.json','original-input-index.json']
+for name in native_paths:
+ relative='fixtures/gguf-split/'+name
+ data=(SOURCE/'candidate'/relative).read_bytes()
+ unchanged.append({'path':relative,'bytes':len(data),'sha256':sha(data)})
+manifest={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Two documentation/provenance files only; no native data or Rust adapter changes. Apply replacements only after exact preimage checks.','files':records,'unchanged_native_data':unchanged,'v1_preserved':True}
+(OUT/'records.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
+for relative,data in before.items():
+ assert (SOURCE/'candidate'/relative).read_bytes()==data
+print(json.dumps(manifest,indent=2))

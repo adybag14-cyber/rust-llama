@@ -1,0 +1,208 @@
+from pathlib import Path
+import os,sys,json,hashlib,struct,subprocess,time,datetime,math,shutil
+windows=os.name=='nt';platform='windows' if windows else 'linux'
+ref=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+root=ref/'gguf-split-port';out=root/'original-v1'/platform
+out.mkdir(parents=True,exist_ok=False)
+if not windows:
+ import resource
+ resource.setrlimit(resource.RLIMIT_CORE,(0,0))
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def identity(p):return {'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+env=os.environ.copy()
+if windows:
+ native=ref/'sharded-gguf-port/native-build/Release/native-gguf-split.exe'
+ inspect=ref/'sharded-gguf-port/native-build/Release/gguf-inspect-oracle.exe'
+ env['PATH']=str(ref/'build/bin/Release')+os.pathsep+env['PATH']
+else:
+ bindir=root/'native-bin-linux';bindir.mkdir(exist_ok=True)
+ native=bindir/'original-gguf-split'
+ inspect=ref/'sharded-gguf-port/native-build-linux/gguf-inspect-oracle'
+ build=['g++','-std=c++17','-O2','-I'+str(ref/'llama.cpp-master/include'),'-I'+str(ref/'llama.cpp-master/ggml/include'),'-I'+str(ref/'llama.cpp-master/common'),'-I'+str(ref/'llama.cpp-master/vendor'),
+ str(ref/'llama.cpp-master/tools/gguf-split/gguf-split.cpp'),str(ref/'build-ggml-linux-llama/common/build-info.cpp'),
+ '-L'+str(ref/'build-ggml-linux-llama/bin'),'-Wl,-rpath,'+str(ref/'build-ggml-linux-llama/bin'),'-lllama','-lggml','-lggml-base','-o',str(native)]
+ p=subprocess.run(build,capture_output=True,timeout=180)
+ (out/'build.stdout.log').write_bytes(p.stdout);(out/'build.stderr.log').write_bytes(p.stderr)
+ (out/'build.json').write_bytes((json.dumps({'argv':build,'exit_code':p.returncode},indent=2)+'\n').encode('utf-8'))
+ if p.returncode:raise RuntimeError('Original GNU splitter build failed')
+assert native.is_file() and inspect.is_file()
+sources=[ref/'llama.cpp-master/tools/gguf-split/gguf-split.cpp',ref/'llama.cpp-master/ggml/src/gguf.cpp',ref/'llama.cpp-master/ggml/src/ggml.c',ref/'llama.cpp-master/src/llama.cpp',Path(__file__).resolve(),native,inspect]
+report={'schema':1,'status':'running','platform':platform,'source_archive_sha256':'2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122','independence':'Inputs constructed from GGUF wire types; all expected files, decisions and transcripts captured only from the frozen original C++ tool before Rust split/merge implementation. Original binary and sources stay external.','sources':[identity(p) for p in sources],'cases':[]}
+def save():(out/'report.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+def u32(x,e='<'):return struct.pack(e+'I',x)
+def u64(x,e='<'):return struct.pack(e+'Q',x)
+def st(s,e='<'):
+ b=s.encode('utf-8') if isinstance(s,str) else s
+ return u64(len(b),e)+b
+def val(t,v,e='<'):
+ if t==8:return st(v,e)
+ if t==9:
+  et,vs=v
+  return u32(et,e)+u64(len(vs),e)+b''.join(val(et,x,e) for x in vs)
+ if isinstance(v,bytes):return v
+ return struct.pack(e+{0:'B',1:'b',2:'H',3:'h',4:'I',5:'i',6:'f',7:'B',10:'Q',11:'q',12:'d'}[t],v)
+def gguf(metadata,tensors,version=3,alignment=32,endian='<'):
+ header=b'GGUF'+u32(version,endian)+u64(len(tensors),endian)+u64(len(metadata),endian)
+ for key,t,v in metadata:header+=st(key,endian)+u32(t,endian)+val(t,v,endian)
+ offset=0
+ for name,dims,dtype,data in tensors:
+  header+=st(name,endian)+u32(len(dims),endian)+b''.join(u64(x,endian) for x in dims)+u32(dtype,endian)+u64(offset,endian)
+  offset+=(len(data)+alignment-1)//alignment*alignment
+ header+=bytes((-len(header))%alignment)
+ return header+b''.join(data+bytes((-len(data))%alignment) for _,_,_,data in tensors)
+def tensor(name,dims,dtype=0,size=None):
+ count=math.prod(dims)
+ if size is None:size=count*4
+ data=bytes(((i*37+len(name)*13)%256 for i in range(min(size,4096))))
+ data=(data*((size+len(data)-1)//len(data)))[:size] if size else b''
+ return name,dims,dtype,data
+metadata=[('z.name',8,'opaque tool fixture'),('a.first',0,251),('m.array',9,(8,['','naive','界','a\nb'])),
+ ('scalar.i8',1,-123),('scalar.u16',2,65001),('scalar.i16',3,-32001),('scalar.u32',4,4294967001),('scalar.i32',5,-2147483001),
+ ('scalar.f32',6,bytes.fromhex('4523c17f')),('scalar.bool',7,1),('scalar.u64',10,18446744073709551001),('scalar.i64',11,-9223372036854775001),('scalar.f64',12,bytes.fromhex('341200000000f87f'))]
+for t,v in [(0,[0,255]),(1,[-128,127]),(2,[0,65535]),(3,[-32768,32767]),(4,[0,4294967295]),(5,[-2147483648,2147483647]),(6,[0.0,-1.25]),(7,[0,1]),(8,['x','界']),(10,[0,18446744073709551615]),(11,[-9223372036854775808,9223372036854775807]),(12,[0.0,-2.5])]:
+ metadata.append(('array.'+str(t),9,(t,v)))
+metadata += [('array.empty',9,(8,[])),('last.key',8,'end')]
+small=[tensor('t'+str(i),[i+1]) for i in range(7)]
+base=gguf(metadata,small)
+def normal_log(data):return data.decode('utf-8','replace').replace(str(native),'$EXE').replace('\r\n','\n')
+def case(name,args,files,scope='defined',inspect_outputs=True):
+ directory=out/'cases'/name;directory.mkdir(parents=True)
+ for filename,data in files.items():
+  path=directory/filename;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
+ initial=[{'name':n,'bytes':len(b),'sha256':sha(b)} for n,b in sorted(files.items())]
+ start=time.monotonic();timed=False
+ try:
+  p=subprocess.run([str(native),*args],cwd=directory,env=env,capture_output=True,timeout=15)
+  code=p.returncode;stdout=p.stdout;stderr=p.stderr
+ except subprocess.TimeoutExpired as e:
+  timed=True;code=None;stdout=e.stdout or b'';stderr=e.stderr or b''
+ (directory/'stdout.log').write_bytes(stdout);(directory/'stderr.log').write_bytes(stderr)
+ post=[]
+ for path in sorted(directory.rglob('*.gguf')):
+  data=path.read_bytes();filename=path.relative_to(directory).as_posix()
+  item={'name':filename,'bytes':len(data),'sha256':sha(data),'existed_before':filename in files}
+  if inspect_outputs and (filename not in files or data!=files[filename]):
+   dest=directory/(filename.replace('/','_')+'.inspect.json')
+   try:
+    q=subprocess.run([str(inspect),str(path),str(dest)],env=env,capture_output=True,timeout=10)
+    (dest.with_suffix('.stdout.log')).write_bytes(q.stdout);(dest.with_suffix('.stderr.log')).write_bytes(q.stderr)
+    item['inspection_exit_code']=q.returncode
+    if dest.exists():item['inspection']=json.loads(dest.read_text(encoding='utf-8'))
+   except subprocess.TimeoutExpired:item['inspection_timed_out']=True
+  post.append(item)
+ entry={'name':name,'args':args,'scope':scope,'input_files':initial,'after_files':post,'exit_code':code,'timed_out':timed,'seconds':time.monotonic()-start,'stdout':normal_log(stdout),'stderr':normal_log(stderr)}
+ (directory/'case.json').write_bytes((json.dumps(entry,indent=2)+'\n').encode('utf-8'))
+ report['cases'].append(entry);save()
+ print(platform,name,code,flush=True)
+for n in [1,2,3,6,7,8,128]:
+ case('tensor-'+str(n),['--split-max-tensors',str(n),'input.gguf','result'],{'input.gguf':base})
+case('default',['input.gguf','result'],{'input.gguf':base})
+case('no-tensor-first',['--no-tensor-first-split','--split-max-tensors','3','input.gguf','result'],{'input.gguf':base})
+case('dry-split',['--dry-run','--split-max-tensors','2','input.gguf','result'],{'input.gguf':base})
+case('overwrite-split',['--split-max-tensors','128','input.gguf','result'],{'input.gguf':base,'result-00001-of-00001.gguf':b'existing output'})
+case('underscore-flags',['--split_max_tensors','2','--no_tensor_first_split','input.gguf','result'],{'input.gguf':base})
+case('repeat-same-flags',['--split','--split','--split-max-tensors','3','--split-max-tensors','2','input.gguf','result'],{'input.gguf':base})
+for text in ['-2','+2','2tail',' 2']:
+ case('atoi-'+text.replace(' ','space').replace('+','plus').replace('-','minus'),['--split-max-tensors',text,'input.gguf','result'],{'input.gguf':base})
+for count in [0,1]:
+ empty=gguf(metadata,small[:count])
+ for first in [False,True]:
+  args=['--no-tensor-first-split'] if first else []
+  case('empty-'+str(count)+'-'+str(int(first)),args+['input.gguf','result'],{'input.gguf':empty})
+  case('zero-limit-'+str(count)+'-'+str(int(first)),args+['--split-max-tensors','0','input.gguf','result'],{'input.gguf':empty},'native-defined-short-circuit')
+case('zero-limit-many',['--split-max-tensors','0','input.gguf','result'],{'input.gguf':base},'native-undefined-integer-division')
+case('junk-limit-many',['--split-max-tensors','junk','input.gguf','result'],{'input.gguf':base},'native-undefined-integer-division')
+case('delete-ignored-on-split',['--delete-splits','input.gguf','result'],{'input.gguf':base})
+case('input-version2',['input.gguf','result'],{'input.gguf':gguf(metadata,small,version=2)})
+for alignment in [1,8,16,32,64,256]:
+ m=[('general.alignment',4,alignment),*metadata]
+ ts=[tensor('a',[1],24,1),tensor('b',[3],24,3),tensor('c',[5],24,5)]
+ case('alignment-'+str(alignment),['--split-max-tensors','2','input.gguf','result'],{'input.gguf':gguf(m,ts,alignment=alignment)},'native-custom-alignment-output')
+for dims in [[],[1],[2,1],[2,3,1,1],[2,1,1,2],[0],[2,0],[2,1,0,1]]:
+ ts=[tensor('shape',dims),tensor('other',[1])]
+ case('shape-'+('-'.join(map(str,dims)) or 'scalar0'),['input.gguf','result'],{'input.gguf':gguf(metadata,ts)},'native-shape-canonicalization')
+types=[(0,1,4),(1,1,2),(2,32,18),(3,32,20),(6,32,22),(7,32,24),(8,32,34),(9,32,36),(10,256,84),(11,256,110),(12,256,144),(13,256,176),(14,256,210),(15,256,292),(16,256,66),(17,256,74),(18,256,98),(19,256,50),(20,32,18),(21,256,110),(22,256,82),(23,256,136),(24,1,1),(25,1,2),(26,1,4),(27,1,8),(28,1,8),(29,256,56),(30,1,2),(34,256,54),(35,256,66),(39,32,17),(40,64,36),(41,128,18),(42,64,18),(43,1,1)]
+typed=[tensor('type.'+str(t),[block,2],t,size*2) for t,block,size in types]
+case('all-storage-types',['--split-max-tensors','5','input.gguf','result'],{'input.gguf':gguf(metadata,typed)})
+large=[tensor('a',[600000],24,600000),tensor('b',[400000],24,400000),tensor('c',[128],24,128)]
+large_bytes=gguf(metadata,large)
+for size in ['1M','1.5M','1junkM','+1M',' 1M','1G']:
+ case('size-'+size.replace(' ','space').replace('+','plus').replace('.','dot'),['--split-max-size',size,'input.gguf','result'],{'input.gguf':large_bytes})
+case('size-first-too-large',['--split-max-size','1M','input.gguf','result'],{'input.gguf':gguf(metadata,[tensor('large',[1000032],24,1000032)])})
+case('size-first-too-large-empty-first',['--no-tensor-first-split','--split-max-size','1M','input.gguf','result'],{'input.gguf':gguf(metadata,[tensor('large',[1000032],24,1000032)])})
+existing=[('split.count',2,7),('first',8,'v'),('split.no',2,6),('other',4,12),('split.tensors.count',5,19),*metadata]
+case('existing-split-key-order',['--split-max-tensors','2','input.gguf','result'],{'input.gguf':gguf(existing,small)})
+# Parser decisions and native aborts are evidence, never a requirement to crash Rust.
+for name,args in [
+ ('help',['--help']),('short-help',['-h']),('version',['--version']),('no-args',[]),('unknown',['--unknown']),
+ ('missing-tensors',['--split-max-tensors']),('missing-size',['--split-max-size']),
+ ('conflicting-operations',['--merge','--split','input.gguf','result']),
+ ('conflicting-modes',['--split-max-tensors','2','--split-max-size','1M','input.gguf','result']),
+ ('options-after-positionals',['input.gguf','result','--dry-run']),
+ ('empty-size',['--split-max-size','','input.gguf','result']),
+ ('zero-size',['--split-max-size','0M','input.gguf','result']),
+ ('negative-size',['--split-max-size','-1G','input.gguf','result']),
+ ('lowercase-size',['--split-max-size','1m','input.gguf','result']),
+ ('no-size-unit',['--split-max-size','1000','input.gguf','result']),
+ ('junk-size',['--split-max-size','junkM','input.gguf','result'])]:
+ case('parse-'+name,args,{'input.gguf':base},'native-build-banner' if name=='version' else 'native-parser-or-undefined-input')
+case('missing-input',['missing.gguf','result'],{})
+case('truncated-input',['input.gguf','result'],{'input.gguf':base[:-33]},'truncated-payload')
+case('truncated-dry',['--dry-run','input.gguf','result'],{'input.gguf':base[:-33]},'truncated-payload')
+case('big-endian-header',['input.gguf','result'],{'input.gguf':gguf([('test',4,7)],[tensor('one',[1])],endian='>')},'native-endian-domain')
+case('string-with-nul',['input.gguf','result'],{'input.gguf':gguf([('string',8,b'a\0b'),('array',9,(8,[b'c\0d','e']))],small[:1])},'native-c-string-truncation')
+def shard_set(count=2,first_extra=None,second_extra=None,tensors=None):
+ ts=small if tensors is None else tensors
+ groups=[ts[:3],ts[3:]] if count==2 else [ts]
+ files={}
+ for i,group in enumerate(groups):
+  m=[*metadata] if i==0 else []
+  m+=[('split.no',2,i),('split.tensors.count',5,len(ts)),('split.count',2,count)]
+  edits=first_extra if i==0 else second_extra
+  if edits:
+   for key,replacement in edits.items():
+    m=[entry for entry in m if entry[0]!=key]
+    if replacement is not None:m.append((key,*replacement))
+  files[f'in-{i+1:05}-of-{count:05}.gguf']=gguf(m,group)
+ return files
+def merge_case(name,files,flags=None,scope='defined'):
+ count=2 if 'in-00001-of-00002.gguf' in files else 1
+ case('merge-'+name,['--merge',*(flags or []),f'in-00001-of-{count:05}.gguf','merged.gguf'],files,scope)
+merge_case('ordinary',shard_set())
+merge_case('dry',shard_set(),['--dry-run'])
+merge_case('delete',shard_set(),['--delete-splits'])
+merge_case('dry-delete',shard_set(),['--dry-run','--delete-splits'])
+merge_case('single',shard_set(1))
+merge_case('primary-no-missing',shard_set(first_extra={'split.no':None}))
+merge_case('primary-no-wrong',shard_set(first_extra={'split.no':(2,17)}))
+merge_case('primary-no-wrong-type',shard_set(first_extra={'split.no':(8,'ignored')}))
+merge_case('primary-count-missing',shard_set(first_extra={'split.count':None}))
+merge_case('primary-count-zero',shard_set(first_extra={'split.count':(2,0)}))
+merge_case('primary-count-type',shard_set(first_extra={'split.count':(4,2)}),scope='native-assert-to-checked-error')
+merge_case('primary-total-missing',shard_set(first_extra={'split.tensors.count':None}))
+merge_case('primary-total-wrong',shard_set(first_extra={'split.tensors.count':(5,999)}))
+merge_case('primary-total-type',shard_set(first_extra={'split.tensors.count':(4,7)}),scope='native-assert-to-checked-error')
+for key,value in [('split.no',None),('split.no',(2,0)),('split.no',(4,1)),('split.count',None),('split.count',(2,1)),('split.count',(4,2))]:
+ label=key.replace('.','-')+('-missing' if value is None else '-'+str(value[0])+'-'+str(value[1]))
+ merge_case('secondary-'+label,shard_set(second_extra={key:value}),scope='native-secondary-validation')
+merge_case('secondary-other-metadata',shard_set(second_extra={'split.tensors.count':(8,'ignored'),'general.architecture':(8,'also ignored')}))
+missing=shard_set();del missing['in-00002-of-00002.gguf'];merge_case('missing-secondary',missing)
+duplicate=shard_set(tensors=[*small[:3],small[0],*small[4:]])
+merge_case('duplicate-name',duplicate,scope='native-assert-to-checked-error')
+existing=shard_set();existing['merged.gguf']=b'pre-existing output must survive'
+merge_case('existing-output',existing)
+merge_case('existing-output-dry',existing,['--dry-run'])
+merge_case('ignored-split-options',shard_set(),['--split-max-tensors','0','--no-tensor-first-split'])
+wrong=shard_set();wrong['wrong.gguf']=wrong.pop('in-00001-of-00002.gguf')
+case('merge-wrong-name',['--merge','wrong.gguf','merged.gguf'],wrong)
+truncated=shard_set();truncated['in-00002-of-00002.gguf']=truncated['in-00002-of-00002.gguf'][:-33]
+merge_case('truncated-secondary',truncated,scope='truncated-payload')
+merge_case('truncated-secondary-dry',truncated,['--dry-run'],scope='truncated-payload')
+report['status']='succeeded'
+report['case_count']=len(report['cases'])
+report['successful_processes']=sum(c['exit_code']==0 for c in report['cases'])
+report['native_nonzero_processes']=sum(c['exit_code'] not in (0,None) for c in report['cases'])
+report['timed_out_processes']=sum(c['timed_out'] for c in report['cases'])
+report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps({k:v for k,v in report.items() if k not in ('cases','sources')},indent=2),flush=True)

@@ -48,6 +48,23 @@ cargo run --release --offline --locked -p rust-llama-cli -- inspect --model /pat
 cargo run --release --offline --locked -p rust-llama-cli -- tokenize --model /path/to/model.gguf --prompt "Hello"
 ```
 
+## Split and merge GGUF files
+
+The native Rust llama-gguf-split executable streams tensor payloads through a
+bounded buffer and preserves the frozen tool's defined metadata order and file
+layout:
+
+~~~sh
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split-max-size 4G model.gguf output/model
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --merge output/model-00001-of-00003.gguf merged.gguf
+~~~
+
+Tensor-count limits, metadata-only first splits, dry runs and deletion after a
+complete merge are supported. Destructive cleanup requires stable paths under
+the caller's control. See [the precise format and tool contract](crates/gguf/README.md)
+for resource limits, original producer quirks and remaining arbitrary-byte
+metadata compatibility.
+
 ## Encode a BERT sequence
 
 ```sh
@@ -88,7 +105,7 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | --- | --- |
 | Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
 | Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 75 executable operation IDs plus NONE input leaves, all scalar unary/GLU formulas for supported typed families, and 3,240 distinct native graph cases, including convolution, pooling and resize families. |
-| Formats and vocabulary | Bounded GGUF v2/v3 reader and owned shard sets, little-endian writer, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
+| Formats and vocabulary | Bounded GGUF v2/v3 reader and owned shard sets, ordered little-endian streaming writer, bounded split/merge executable, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
 | Model runtime | Llama, Qwen2, Qwen3, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independently selected F32/F16 K/V for explicit nonflash, single-worker execution. Strict contexts account for owned state and retained checkpoints before mutation. |
 | Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 184 implemented frozen C API exports. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
@@ -110,7 +127,8 @@ The recorded 9 November 2026 evidence includes:
 - **Pretrained Qwen3 inference:** 5,469,696 unique Q8_0 logits and 24 greedy IDs match each original profile. The ordinary dense/split/vector corpus compares 294,912 logits and 400 IDs per profile, including independent head widths, learned Q/K normalization and fused-bias selection. Active low-precision vector cases rejected by the original CPU graph return checked errors. See [the precise Qwen3 scope](docs/QWEN3_IMPLEMENTATION.md).
 - **F16 native caches:** independent F32/F16 key and value storage preserves raw half words in memory, sequence state and sessions. The ordinary original-C corpus compares 258,048 exact logits and 1,048 state/session buffers per profile across all four type pairs; a separate external trained/tiny C cohort checks 491,520 exact logits. Flash, AUTO resolution and multiple workers remain separate work; original default parameters are unchanged and still rejected.
 - **BERT embeddings:** 13,056 token/pooled values match the corresponding original profiles. The GNU correction preserves the source's four-lane variance reduction. All 122 captured stages of the Windows diagnostic sequence match exactly; 46,080 independent attention outputs remain in the ordinary suite.
-- **Sharded loading:** 90 native model/index configurations, including 65 admitted sets and 25 rejections; 64 model configurations compare 464,272 logits/embedding values and 590 greedy IDs per native profile. First-file metadata, per-file tensor origins, cumulative resource limits and retained file handles are checked independently. Ordered streaming split/merge and checkpoint converters remain open.
+- **Sharded loading:** 90 native model/index configurations, including 65 admitted sets and 25 rejections; 64 model configurations compare 464,272 logits/embedding values and 590 greedy IDs per native profile. First-file metadata, per-file tensor origins, cumulative resource limits and retained file handles are checked independently. Architecture-specific checkpoint converters and remaining format boundaries stay open.
+- **GGUF streaming tools:** all 103 independent original CLI cases per compiler profile pass, with 63 defined successes and 40 checked errors. Complete post-operation comparisons cover 12,179,168 exact file bytes. Cumulative budgets, one-byte copy buffers, retained-handle alias protection and pre-completion input preservation are checked separately. Arbitrary-byte/NUL keys and names remain an inherited reader limitation; source UB produces checked errors.
 - **Vocabulary behavior:** the preserved SPM/WordPiece corpora plus 1,499,449 complete BPE vocabulary records across all 14 original BPE models; 5,096 real-model token/piece/detokenization cases; 18,018 GPT-2 alias cases; 23,754 synthetic configuration cases; 22,518 raw-byte cases; 126,896 regex splits. All 64 reachable profiles and 99 aliases are covered on Windows and Linux. Source-inferred special IDs preserve the measured platform container ordering.
 - **Remaining tokenizer families:** Unigram, RWKV and PLaMo2/PLaMo3 have 91,476 synthetic family cases, 346,112 original vocabulary records, 10,412 real-vocabulary tokenization cases and 4,067,668 exact normalizer outputs. Invalid source assertion/nonprogress inputs return bounded errors. The no-vocabulary mode is explicit.
 - **Unicode behavior:** all 1,114,112 codepoints, 15,957 normalization sequences and 65,809 valid/malformed UTF-8 cases checked against the original source.

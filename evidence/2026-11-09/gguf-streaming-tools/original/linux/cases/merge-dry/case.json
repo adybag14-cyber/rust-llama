@@ -1,0 +1,41 @@
+{
+  "name": "merge-dry",
+  "args": [
+    "--merge",
+    "--dry-run",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "defined",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "seconds": 0.10567971500131534,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: merged.gguf merged from 2 split with 7 tensors.\n"
+}

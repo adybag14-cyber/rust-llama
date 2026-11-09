@@ -1,0 +1,139 @@
+{
+  "status": "succeeded",
+  "platform": "linux",
+  "base_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "execution_inputs_before": {
+    "files": 617,
+    "sha256": "2b90e10d264a322529723ca3cb7f2bdf1bdd3f334f9f6e9caf12b00703638d05"
+  },
+  "started_utc": "2026-11-09T19:15:12.729560+00:00",
+  "scope": "Ordered GGUF header writing, private frozen-tool layout, bounded split/merge CLI, original 103-case corpus, cumulative resources and retained-handle alias protection. Arbitrary-byte/NUL keys/names remain the inherited reader boundary. This is not full T04 completion.",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 5.334676471000421,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_metrics": []
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 48.35374982700159,
+      "log_sha256": "f4cc15e58e946443e2d390500e7d479792e43b69829b5ec70156cb3e0663f7b0",
+      "tests": {
+        "passed": 67,
+        "failed": 0,
+        "ignored": 10,
+        "suites": 16
+      },
+      "native_metrics": [
+        "gguf-split-native: cases=103 success=63 checked_errors=40 exact_after_file_bytes=12179168"
+      ]
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 101.76527431800059,
+      "log_sha256": "c6ed647fd27f028652f31645d15917b1310d574585e87e34ef56ec23831d5e5f",
+      "tests": {
+        "passed": 67,
+        "failed": 0,
+        "ignored": 10,
+        "suites": 16
+      },
+      "native_metrics": [
+        "gguf-split-native: cases=103 success=63 checked_errors=40 exact_after_file_bytes=12179168"
+      ]
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 5.63677337399713,
+      "log_sha256": "179fb0c04180a828290100de052fde07da72eac59912cba1e789bff1dad8171c",
+      "native_metrics": []
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 32.4080030680052,
+      "log_sha256": "e773eb772de981be22a9613fcf3b3cc53571b8359a748c6e5ff5f44b3d1a1b42",
+      "native_metrics": []
+    }
+  ],
+  "execution_inputs_after": {
+    "files": 617,
+    "sha256": "2b90e10d264a322529723ca3cb7f2bdf1bdd3f334f9f6e9caf12b00703638d05"
+  },
+  "finished_utc": "2026-11-09T19:20:32.750873+00:00"
+}

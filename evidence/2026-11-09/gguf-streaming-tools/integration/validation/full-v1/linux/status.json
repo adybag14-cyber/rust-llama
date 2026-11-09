@@ -1,0 +1,149 @@
+{
+  "status": "running",
+  "platform": "linux",
+  "started_utc": "2026-11-09T19:33:11.087300+00:00",
+  "base_commit": "1890f03291299ca3dca591f90d8b88ba6d29f1d5",
+  "qualification": "Bounded GGUF ordered streaming writer and original split/merge executable semantics integrated with published dense Qwen3/F16 caches, owned shards and shared CPU mathematics. UTF-8/NUL reader limits remain explicit. Flash, microbatch scheduling and Safetensors are separate unmerged work.",
+  "fingerprint_scope": "All Rust, Cargo/compiler/CI inputs and JSON/bin/GGUF data outside historical evidence; canonical POSIX relative paths, same ordering on both hosts.",
+  "execution_inputs_before": {
+    "files": 648,
+    "sha256": "abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c"
+  },
+  "external_driver_sha256": {
+    "verify-embedding-cli.py": "53e527997439f2e074f20890878cf6fd904d828bdd8e47ea4b74ff235ab16b60",
+    "verify-decoder-cli.py": "427ea2883733264d59001bc3df78ea502b6f0e0d80f6de9103be6bb02627c918",
+    "verify-qwen2-http.py": "3e23333d01c5e945278d63508a145f41627c2637c46998ef511c58790693f6d1",
+    "verify-qwen3-http.py": "aa2a4be3430266e383acaff59bc4c47bab7ff9e5b96b93ab2c5bf99d571bab68",
+    "verify-sharded-apps-v2.py": "8569523308cb7ca4412ab89c4dd3c2d760484670c9f60f7dc7044b60349633f2",
+    "validate-full-v1.py": "f2c6a2ac6b5ce29361f202cc801ce42ba7e345463fd8f4b903bc8d0cf5fca1fb"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 5.938374743993336,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 83.78130468300515,
+      "log_sha256": "01646145c2e8d9182110ddf911481249c0b7fb626a25fbdf3297b024d447c2ab",
+      "tests": {
+        "passed": 464,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 318.9271392919982,
+      "log_sha256": "355173b841d576b05268ddea22bf6fb060be9cbea07b71ac35618921a5ce289b",
+      "tests": {
+        "passed": 464,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 12.802302789998066,
+      "log_sha256": "6474b4ec3f826206225a22d01d7510a15b39b995bd8902aa9eb6cc5b3e1dcf0b"
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 34.25086010799714,
+      "log_sha256": "4e763f5f1e604fde800da51ebc23ac3483138fa9b0fa7c8ac856a920b89cc77f"
+    },
+    {
+      "name": "math-provider",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "hash",
+        "/lib/x86_64-linux-gnu/libm.so.6"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.47123456800181884,
+      "log_sha256": "fc060a4656c2a43606c63743e52a33435f59409fd7309a8006ba18b6f4bbbb6e"
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 33.952542657003505,
+      "log_sha256": "c919f558119d110453aeea8cc01d4cda8dd11dd08529bbe25735d39af24856f5"
+    }
+  ]
+}

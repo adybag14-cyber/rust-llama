@@ -1,0 +1,40 @@
+{
+  "name": "merge-primary-count-type",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "native-assert-to-checked-error",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "c72a8d1f1a4a7f6f119806491a7309e481f47ed0cc58da826c48cf7296f21451"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "c72a8d1f1a4a7f6f119806491a7309e481f47ed0cc58da826c48cf7296f21451",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 3221226505,
+  "timed_out": false,
+  "seconds": 0.10399680000409717,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\gguf.cpp:196: GGML_ASSERT(type_to_gguf_type<T>::value == type) failed\n"
+}

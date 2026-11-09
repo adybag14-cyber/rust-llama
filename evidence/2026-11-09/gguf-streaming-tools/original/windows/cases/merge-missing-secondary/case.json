@@ -1,0 +1,29 @@
+{
+  "name": "merge-missing-secondary",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "defined",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.012570399994729087,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...gguf_init_from_file: failed to open GGUF file 'in-00002-of-00002.gguf' (No such file or directory)\n\ngguf_merge:  failed to load input GGUF from in-00001-of-00002.gguf\n"
+}

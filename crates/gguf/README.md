@@ -1,4 +1,4 @@
-# Bounded GGUF files and model shards
+# Bounded GGUF files, model shards and streaming tools
 
 The crate reads seekable GGUF v2/v3 files, validates their metadata and tensor
 directories, and reads tensor payloads on demand. It also owns complete GGUF
@@ -6,9 +6,9 @@ shard sets using the frozen original model loader's rules. All maintained
 implementation is Rust; no original llama/ggml binary or foreign executable is
 called at runtime.
 
-This is a formats and loading slice of T04. It does not implement the frozen
-checkpoint converters, the ordered streaming split/merge applications, or every
-format compatibility edge.
+This is a formats, loading and streaming-tool slice of T04. It includes the
+native Rust `llama-gguf-split` executable and checked ordered header writing.
+Checkpoint converters and arbitrary-byte metadata compatibility remain open.
 
 ## Single files and shard sets
 
@@ -99,8 +99,11 @@ tensor directory uses the aligned data-section offset.
 
 The raw original no_alloc GGUF reader can accept a truncated tensor payload
 because it only parses the header. The original model loader rejects that file.
-The Rust parser checks payload bounds during opening and rejects it earlier;
-the native test corpus records this distinction explicitly.
+The public Rust parser checks payload bounds during opening and rejects it
+earlier. The private split/merge tool path deliberately validates headers first,
+then checks payload reads when the operation requires them. This preserves the
+original distinction between split and merge dry-run without weakening model
+loading. Bounded header read-ahead can still prefetch a payload prefix.
 
 The existing Rust reader also supports opposite-endian scalar GGUF decoding.
 The frozen original C reader rejects the opposite-endian file, so that extension
@@ -108,7 +111,11 @@ is not described as native reader acceptance. Packed matrix endian support
 remains limited to the forms explicitly handled by the inference loader.
 
 The metadata representation currently requires UTF-8 strings and rejects NUL
-keys/names. Full arbitrary-byte metadata compatibility remains open.
+keys/names. The current reader also rejects boolean bytes outside 0 and 1,
+while the frozen source normalizes every nonzero byte to true. Arbitrary-byte
+metadata and this boolean-encoding difference remain open in this checkpoint.
+Separate original-only byte-string and exhaustive boolean captures are retained
+for the next reader slice; they are not included in the implemented scope here.
 
 ## Resource limits
 
@@ -254,13 +261,84 @@ and injected-I/O-error tests establish the implementation behavior separately
 from timing. Existing decoder CLI evidence preserves the original 90-95 second
 Qwen loads; native numerical references remain unchanged.
 
-## Remaining format and conversion work
+## Ordered writing and the split/merge executable
 
-The existing writer emits little-endian GGUF from a sorted metadata map and
-borrowed tensor payloads. It is not an ordered streaming source-equivalent
-split/merge writer. An ordered metadata representation and a bounded streaming
-payload writer are needed before those tools can preserve original output
-ordering and handle large transformations faithfully.
+`Gguf::metadata_order()` exposes the original serialized order of keys still
+present in the public map. Newly inserted map keys have no original position;
+callers constructing a modified header supply their chosen order explicitly.
+The existing `write` API retains sorted-map ordering. `write_ordered` accepts a
+borrowed ordered key/value list and borrowed payloads. `write_header` accepts
+borrowed `TensorDescriptor` values and explicit `Limits`, writes a little-endian
+v3 header, and returns `WriteLayout` with checked payload offsets and padding.
+It validates the entire header and tensor layout before its first output byte.
+An I/O failure can still leave partial output. The caller writes the header at
+the beginning of its output and then streams the payloads using those offsets.
+No header-sized temporary buffer or copied metadata-value tree is required.
+
+The executable is built with the normal workspace:
+
+~~~sh
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split --split-max-tensors 128 model.gguf output/model
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split-max-size 4G model.gguf output/model
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --merge output/model-00001-of-00003.gguf merged.gguf
+~~~
+
+The source defaults to split mode with 128 tensors per output. The Rust
+`split::{split, merge}` APIs take explicit options and `ShardLimits`. Numbered
+paths retain native OS path representations. Split overwrites existing output
+files, except aliases of its retained input; merge refuses an existing output.
+`--no-tensor-first-split` emits a metadata-only primary file. Split dry-run plans
+without requiring complete payloads; merge dry-run still validates every payload
+read. `--delete-splits` applies only to a real merge.
+
+The port preserves defined original parser behavior, including repeated flags,
+leading option underscore normalization, stopping options at the first
+positional argument and signed decimal-prefix limits. Size units are decimal
+M/G, and the original integer prefix means `1.5M` is treated as 1M. The frozen
+parser advertises `-h` but only admits `--help`; the regression retains that
+observable behavior. Missing size integers, empty size strings, integer
+overflow, division by zero and native assertions produce checked Rust errors.
+The version banner identifies the Rust implementation.
+
+Output metadata order, tensor order, padding and bytes match the frozen tool's
+measured producer contract. A private compatibility policy preserves three
+source quirks: copied `general.alignment` metadata does not change its fresh
+32-byte physical output alignment; GGML rank canonicalization removes trailing
+ones and trailing zero dimensions; scalar/array string values pass through
+C-string truncation at NUL. Certain custom-alignment and zero-dimension inputs
+therefore produce the same original-invalid output files. The normal public
+writer uses valid metadata-selected alignment and preserves supplied dimensions
+and string lengths. The inherited parser boundary for NUL keys/names and
+non-UTF-8 metadata remains explicit.
+
+Payload copies use a fallibly allocated buffer of at most 64 KiB, further
+bounded by `max_tensor_read_bytes`. Split plans and validates all headers before
+opening any output. Merge keeps the parsed input handles, charges header usage
+cumulatively and uses create-new output semantics. On Unix, a split output is
+opened without truncation and compared by retained handle identity before it
+is shortened. On Windows, retained input handles deny write/delete sharing.
+Both paths prevent output aliases from truncating the retained input.
+
+With `--delete-splits`, input deletion begins only after the complete merged
+output has been flushed and synced. Read/write/validation failures before that
+point preserve every input. A cleanup error can occur after some splits were
+removed; the complete merged output remains available. Destructive cleanup
+requires stable, exclusively managed paths: safe standard Rust has no atomic
+identity-check-and-unlink operation against concurrent directory replacement.
+This safety improvement changes deletion log timing and the help line, while
+successful file bytes and eventual deletions retain the original contract.
+
+The independent CLI corpus has 103 cases per original compiler profile. It
+requires 63 defined successes and 40 checked errors, exact successful files and
+transcripts, and 12,179,168 bytes of complete post-operation file comparisons.
+Original UB observations, assertions and platform-specific failed partial files
+remain raw evidence; they are not silently promoted to portable requirements.
+The derived truncated-payload deletion test uses unchanged original inputs and
+checks the stronger pre-completion preservation guarantee. Additional resource
+and alias tests cover cumulative limits, one-byte copy buffers and path changes
+after preflight. See [the corpus provenance](../../fixtures/gguf-split/README.md).
+
+## Remaining format and conversion work
 
 Local Safetensors/index loading, architecture-specific checkpoint conversion,
 tokenizer/config translation, quantization application policy, PyTorch inputs,

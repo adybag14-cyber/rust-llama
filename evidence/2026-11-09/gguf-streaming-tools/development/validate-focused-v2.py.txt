@@ -1,0 +1,56 @@
+from pathlib import Path
+import os,sys,json,hashlib,subprocess,time,datetime,re
+windows=os.name=='nt';platform='windows' if windows else 'linux'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+base=reference/'gguf-split-port';repo=base/'rust-draft'
+ready=json.loads((base/'prepare-focused-v2/status.json').read_text(encoding='utf-8'));assert ready['source_ready']
+out=base/'validation/focused-v2'/platform;out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_BUILD_JOBS']='2'
+if windows:env['CARGO_TARGET_DIR']=str(base/'target-windows')
+else:
+ rustbin=Path('/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin')
+ env['PATH']=str(rustbin)+':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+ env['RUSTC']=str(rustbin/'rustc');env['RUSTDOC']=str(rustbin/'rustdoc')
+ env['CARGO_TARGET_DIR']='/home/tdamre/.cache/rust-llama-gguf-split-port-v2'
+def inputs():
+ result=[]
+ for path in repo.rglob('*'):
+  rel=path.relative_to(repo)
+  if path.is_file() and 'evidence' not in rel.parts and (path.suffix in ('.rs','.json','.bin','.gguf') or path.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or rel.as_posix() in ('.cargo/config.toml','.github/workflows/ci.yml')):
+   result.append({'path':rel.as_posix(),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+ return sorted(result,key=lambda r:r['path'])
+def fingerprint(rows=None):
+ rows=inputs() if rows is None else rows
+ return {'files':len(rows),'sha256':hashlib.sha256('\n'.join(r['path']+'\0'+r['sha256'] for r in rows).encode('utf-8')).hexdigest()}
+rows=inputs();before=fingerprint(rows)
+(out/'execution-inputs.json').write_bytes((json.dumps(rows,indent=2)+'\n').encode('utf-8'))
+report={'status':'running','platform':platform,'base_commit':'e0af03a97ca7077c6f2aee680fb84b3fa688f82a','execution_inputs_before':before,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Ordered GGUF header writing, private frozen-tool layout, bounded split/merge CLI, original 103-case corpus, cumulative resources and retained-handle alias protection. Arbitrary-byte/NUL keys/names remain the inherited reader boundary. This is not full T04 completion.','steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+cargo=['cargo']+(['+1.99.1'] if windows else [])
+packages=['-p','llama-gguf','-p','rust-llama-cli','-p','llama-inference','-p','llama-tokenizer']
+steps=[
+ ('fmt',cargo+['fmt','--all','--','--check']),
+ ('debug',cargo+['test','--offline','--locked',*packages,'--all-targets','--','--nocapture']),
+ ('release',cargo+['test','--offline','--locked','--release',*packages,'--all-targets','--','--nocapture']),
+ ('clippy',cargo+['clippy','--offline','--locked',*packages,'--all-targets','--','-D','warnings']),
+ ('fixtures',cargo+['run','--offline','--locked','-p','xtask','--','fixtures']),
+]
+try:
+ for name,args in steps:
+  assert fingerprint()==before,('changed execution input',name)
+  started=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:p=subprocess.run(args,cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1800)
+  log=(out/(name+'.log')).read_bytes();text=log.decode('utf-8','replace')
+  matches=[tuple(map(int,m)) for m in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored',text)]
+  row={'name':name,'argv':args,'exit_code':p.returncode,'seconds':time.monotonic()-started,'log_sha256':hashlib.sha256(log).hexdigest()}
+  if matches:row['tests']={'passed':sum(m[0] for m in matches),'failed':sum(m[1] for m in matches),'ignored':sum(m[2] for m in matches),'suites':len(matches)}
+  row['native_metrics']=[line for line in text.splitlines() if 'gguf-split-native:' in line]
+  report['steps'].append(row);save();print(platform,name,p.returncode,flush=True)
+  if p.returncode:print(text[-16000:],flush=True);raise RuntimeError(name+' failed')
+ report['execution_inputs_after']=fingerprint();assert report['execution_inputs_after']==before
+ report['status']='succeeded'
+except BaseException as error:
+ report['status']='failed';report['error']=repr(error);report['execution_inputs_at_failure']=fingerprint();save();raise
+report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2),flush=True)

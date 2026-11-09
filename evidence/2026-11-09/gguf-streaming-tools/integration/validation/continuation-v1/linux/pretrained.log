@@ -1,0 +1,97 @@
+    Finished `release` profile [optimized] target(s) in 1.03s
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/llama_inference-8e6ff779837bc5a1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/bert_defaults.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/bert_defaults-dd26563529ff80be)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/bert_reference.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/bert_reference-b848953fa2bcad4d)
+
+running 2 tests
+BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0
+test trained_bert_full_sequence_and_all_pooling_modes ... ok
+BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0
+test big_endian_bert_preserves_the_same_native_model_outputs ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.98s
+
+     Running tests/mamba_loader.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/mamba_loader-f242aa4e46aedb5e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/native_reference.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/native_reference-75f156d52f5bc351)
+
+running 5 tests
+native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0
+test trained_stories260k_full_logits_greedy_ids_and_text ... ok
+native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ok
+native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ok
+native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)
+test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ok
+native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 38.30s
+
+     Running tests/qwen2_loader.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/qwen2_loader-5b91bcca57f41d60)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/qwen3.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/qwen3-dbe4a254a034411a)
+
+running 1 test
+qwen3-native: official Qwen3-0.6B Q8_0 host=gnu rows=36 floats=5469696 bitwise_equal=5469696 greedy_ids=24 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0
+test official_qwen3_q8_matches_original_native_profile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 18.77s
+
+     Running tests/shards.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/shards-60d5746253aba8db)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/llama_server-2da1152b61cbb7c8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/llama_server-3326e97d304b2c09)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/embedding_http.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/embedding_http-80e03a8dade08596)
+
+running 1 test
+Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0
+test pretrained_bert_matches_original_embedding_http_transcripts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 24.07s
+
+     Running tests/embedding_lifecycle.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/embedding_lifecycle-3573b4e33e04856b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/tcp.rs (/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1/release/deps/tcp-e9cdc1bc2ee8e831)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+

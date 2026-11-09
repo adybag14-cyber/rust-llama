@@ -1,0 +1,13 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x0000774d13cea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x0000774d13cea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000774d143266cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#2  0x0000774d14326862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#3  0x0000774d143b1ff0 in gguf_kv::gguf_kv<unsigned int>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#4  0x0000774d143b2763 in void std::vector<gguf_kv, std::allocator<gguf_kv> >::_M_realloc_insert<char const*&, unsigned int&>(__gnu_cxx::__normal_iterator<gguf_kv*, std::vector<gguf_kv, std::allocator<gguf_kv> > >, char const*&, unsigned int&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#5  0x0000774d143a6516 in gguf_set_val_u32 () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#6  0x0000774d143a7507 in gguf_set_kv () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#7  0x000056ce73170049 in split_strategy::split_strategy(split_params const&, std::basic_ifstream<char, std::char_traits<char> >&, gguf_context*, ggml_context*) ()
+#8  0x000056ce7316e259 in main ()
+[Inferior 1 (process 347508) detached]

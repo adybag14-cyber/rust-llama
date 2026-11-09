@@ -1,0 +1,141 @@
+from pathlib import Path
+import hashlib,json,datetime,shutil
+ref=Path(r'C:\Users\adyba\rust-llama-reference');base=ref/'gguf-streaming-integration-v1';repo=base/'rust-draft';development=ref/'gguf-split-port'
+expected={'files':648,'sha256':'abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c'}
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def fingerprint():
+ rows=[]
+ for p in repo.rglob('*'):
+  rel=p.relative_to(repo)
+  if p.is_file() and 'evidence' not in rel.parts and (p.suffix in ('.rs','.json','.bin','.gguf') or p.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or rel.as_posix() in ('.cargo/config.toml','.github/workflows/ci.yml')):
+   rows.append((rel.as_posix(),sha(p.read_bytes())))
+ rows.sort();return {'files':len(rows),'sha256':sha('\n'.join(n+'\0'+h for n,h in rows).encode('utf-8'))}
+assert fingerprint()==expected
+validation={}
+for platform in ['windows','linux']:
+ report=json.loads((base/'validation/combined-v1'/platform/'status.json').read_text(encoding='utf-8'))
+ assert report['status']=='succeeded'
+ assert report['execution_inputs_before']==report['execution_inputs_after']==expected
+ assert len(report['steps'])==17 and all(s['exit_code']==s['expected_exit_code'] for s in report['steps'])
+ for segment in report['segments']:
+  p=base/segment['path'];assert sha(p.read_bytes())==segment['sha256']
+ for row in report['steps']:assert sha((base/row['log_path']).read_bytes())==row['log_sha256']
+ validation[platform]=report
+handoff=development/'handoff-v1';manifest_bytes=(handoff/'manifest.json').read_bytes()
+assert sha(manifest_bytes)=='722ddfa27953210698f9129cc80bee1aa52b48746d32a3d83f6af77464283cea'
+manifest=json.loads(manifest_bytes)
+for row in manifest['fixtures']:
+ p=repo/row['path'];assert p.stat().st_size==row['bytes'] and sha(p.read_bytes())==row['sha256']
+ci=ref/'ci-1890f032';ci_run=json.loads((ci/'run.json').read_text(encoding='utf-8'))
+assert ci_run['head_sha']=='1890f03291299ca3dca591f90d8b88ba6d29f1d5' and ci_run['conclusion']=='success'
+stage=base/'evidence-stage-v1';stage.mkdir(exist_ok=False);origins=[];external_only=[]
+allowed={'.md','.json','.txt','.tsv','.csv','.log','.bin','.gguf','.toml','.yml','.yaml','.png','.svg'}
+def put(p,relative):
+ data=p.read_bytes();rel=Path(relative);original=rel.as_posix()
+ if p.suffix=='.pyc':
+  external_only.append({'source_path':str(p),'bytes':len(data),'sha256':sha(data),'reason':'Generated reference-only bytecode remains archived outside the Rust product; the audit failure and relocation record are included.'});return
+ if rel.suffix not in allowed:rel=Path(str(rel)+'.txt')
+ if rel.suffix=='.json':
+  try:json.loads(data.decode('utf-8'))
+  except (UnicodeError,json.JSONDecodeError):rel=Path(str(rel)+'.bin')
+ dest=stage/rel;assert not dest.exists(),str(dest);dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+ origins.append({'path':rel.as_posix(),'source_path':str(p),'bytes':len(data),'sha256':sha(data),'archival_name_changed':rel.as_posix()!=original})
+for p in sorted(handoff.rglob('*')):
+ if p.is_file() and 'candidate' not in p.relative_to(handoff).parts:put(p,'handoff/'+p.relative_to(handoff).as_posix())
+for name in ['corpus-adapter-docs-v2','corpus-first-comparison-v1','first-build-v1','first-build-v2','prepare-focused-v2','resource-tests-v1','validation','retained-development-snapshots','nul-edges-v1','nul-edges-v2']:
+ folder=development/name
+ if folder.exists():
+  for p in sorted(folder.rglob('*')):
+   if p.is_file():put(p,'development/'+p.relative_to(development).as_posix())
+folder=development/'corpus-adapter-v1'
+for p in sorted(folder.rglob('*')):
+ if not p.is_file():continue
+ rel=p.relative_to(folder)
+ if rel.parts[0]=='candidate' and p.suffix not in ('.md','.rs') and p.name!='provenance.json':continue
+ put(p,'development/corpus-adapter-v1/'+rel.as_posix())
+put(development/'original-inputs-v1/index.json','development/original-inputs-v1/index.json')
+for p in sorted(development.iterdir()):
+ if p.is_file():put(p,'development/'+p.name)
+for platform in ['windows','linux']:
+ folder=development/'original-v1'/platform
+ raw_report=json.loads((folder/'report.json').read_text(encoding='utf-8'))
+ failed={c['name'] for c in raw_report['cases'] if c['exit_code']!=0}
+ for p in sorted(folder.rglob('*')):
+  if not p.is_file():continue
+  rel=p.relative_to(folder)
+  keep=p.suffix in ('.json','.log')
+  if len(rel.parts)>=2 and rel.parts[0]=='cases' and rel.parts[1] in failed:keep=True
+  if keep:put(p,'original/'+platform+'/'+rel.as_posix())
+for p in sorted((base/'validation').rglob('*')):
+ if p.is_file():put(p,'integration/'+p.relative_to(base).as_posix())
+for name in ['merge-v1','prepare-v2']:
+ for p in sorted((base/name).rglob('*')):
+  if p.is_file():put(p,'integration/'+p.relative_to(base).as_posix())
+for p in sorted(base.iterdir()):
+ if p.is_file() and p.suffix in ('.py','.json') and p.name not in ('evidence-stage-inventory-v1.json',):
+  put(p,'integration/'+p.name)
+boolean_source=ref/'gguf-byte-strings'
+boolean_review=json.loads((boolean_source/'original-booleans-v1/sealed-review.json').read_text(encoding='utf-8'));assert boolean_review['status']=='succeeded'
+for record in boolean_review['files']:
+ p=boolean_source/record['path'];assert sha(p.read_bytes())==record['sha256']
+ put(p,'original-only-booleans/'+p.relative_to(boolean_source/'original-booleans-v1').as_posix())
+put(boolean_source/'original-booleans-v1/sealed-review.json','original-only-booleans/sealed-review.json')
+for name in ['capture-original-booleans-v1.py','seal-original-booleans-v1.py']:
+ put(boolean_source/name,'original-only-booleans/'+name)
+for p in sorted(ci.iterdir()):
+ if p.is_file():put(p,'previous-checkpoint-ci/'+p.name)
+summary={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':'1890f03291299ca3dca591f90d8b88ba6d29f1d5','execution_inputs':expected,'scope':'Ordered GGUF streaming writing and bounded split/merge CLI in the existing Rust runtime. Arbitrary-byte/NUL key/name and noncanonical boolean compatibility remain open in this checkpoint; all 12 global gates remain open.','fixture_declarations':465,'new_fixture_files':7,'ordinary_tests':{p:{s['name']:s['tests'] for s in r['steps'] if s['name'] in ['debug','release']} for p,r in validation.items()},'pretrained_tests':{p:next(s['tests'] for s in r['steps'] if s['name']=='pretrained') for p,r in validation.items()},'native_tool_per_profile':{'cases':103,'defined_successes':63,'checked_errors':40,'exact_post_operation_file_bytes':12179168},'original_only_open_boundary':{'cases_per_profile':22,'successes':17,'failures':5,'no_rust_parity_claim':True,'additional_boolean_cases_per_profile':512,'boolean_native_admissions':512},'qualifications':[
+ 'Original file/header/input/output data and expected strings are unchanged; successful native bytes remain exact. The Rust version banner, one deletion-help line and deletion log timing are qualified separately.',
+ 'Missing integers, overflow, division by zero and native assertions return checked errors. Platform-specific failed partial files and raw UB observations remain preserved.',
+ 'Deletion starts only after complete output flush/sync. Pre-completion failures preserve inputs; later cleanup failures may leave partial deletion and a complete output. Caller-managed stable paths are required for destructive cleanup.',
+ 'The first root merge stopped on a stale documentation assertion after a clean README three-way merge. Continuation verified all 19 after-hashes; no source or expected data changed for that correction.',
+ 'Windows all 15 numerical/application/build checks passed before source verification found two generated Python caches. Their creator confirmed the side effect, enabled -B for future original imports, and both caches were archived outside the original tree. utility.py was checked against the pinned ZIP. Only source/release checks were rerun.',
+ 'GNU ordinary debug/release/Clippy/audit/fixtures checks passed before a deliberate resource cancellation during release build. A continuation with unchanged inputs ran only the interrupted/unstarted steps; raw cancellation and partial build output remain retained.',
+ 'The preceding exact published Qwen3/F16 commit passed Windows and Ubuntu CI with 451/454 ordinary tests per profile and 9 explicit pretrained tests each.',
+ 'Original successful file bytes are present in the committed packed fixtures; original JSON/log records and failed partial files are archived here. Independent constructor replay retained every original input before first Rust comparison.',
+ 'Source/driver/patch history is archived as text, with exact original byte hashes. Native binaries and generated Python bytecode remain outside the product.'
+]}
+(stage/'summary.json').write_bytes((json.dumps(summary,indent=2)+'\n').encode('utf-8'))
+(stage/'source-provenance.json').write_bytes((json.dumps({'schema':1,'files':origins,'external_only':external_only},indent=2)+'\n').encode('utf-8'))
+readme='''# Native Rust GGUF streaming split and merge
+
+This checkpoint adds ordered borrowed-header writing and a bounded native Rust
+llama-gguf-split executable. It is part of the incomplete full port.
+
+Both integrated platform proofs cover all 17 checks against the same 648 source,
+compiler/configuration and data inputs:
+abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c.
+Windows passes 460 ordinary tests in both profiles; GNU passes 464. Nineteen
+prerequisite tests remain ignored in ordinary execution. All 9 explicitly run
+pretrained comparisons pass per host, with exact measured native model values.
+CLI, HTTP/SSE, source integrity,465 fixture declarations and strict Clippy pass.
+The release check still fails because all 12 full-port gates remain open.
+
+The original CLI corpus has 103 cases per host: 63 defined successes and 40 checked
+errors. It verifies 12,179,168 complete post-operation file bytes, source parser
+rules and successful transcripts, while retaining explicit safety/UB differences.
+Resource and alias regressions exercise pre-allocation header budgets,
+cumulative merge budgets, one-byte copy buffers and output replacement after
+planning. Raw original-only NUL/invalid-UTF8 cases remain an open boundary;
+they are not described as implemented parity. A separate 512-case original-only
+boolean corpus documents nonzero-byte normalization for subsequent work.
+
+Windows source verification initially caught two generated reference Python
+cache files. Only those files were relocated after the source module was checked
+against the authoritative ZIP, and source/release checks then completed.
+GNU completed its ordinary checks before an intentional resource pause; its
+remaining checks run under a separate same-input continuation. Original status,
+logs, failures, partial build output and correction identities are preserved.
+
+Source-native output quirks, valid public writer semantics, destructive cleanup
+requirements and remaining conversion work are documented in crates/gguf/README.md.
+summary.json and source-provenance.json map the evidence to complete original
+records. The previous published commit 1890f032 has independent successful
+Windows/Ubuntu hosted CI logs below.
+'''
+(stage/'README.md').write_bytes(readme.encode('utf-8'))
+inventory=[{'path':p.relative_to(stage).as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(stage.rglob('*')) if p.is_file()]
+(base/'evidence-stage-inventory-v1.json').write_bytes((json.dumps(inventory,indent=2)+'\n').encode('utf-8'))
+destination=repo/'evidence/2026-11-09/gguf-streaming-tools';assert not destination.exists();shutil.copytree(stage,destination)
+assert fingerprint()==expected
+print(json.dumps({'status':'succeeded','files':len(inventory),'bytes':sum(r['bytes'] for r in inventory),'execution_inputs':expected,'destination':str(destination)},indent=2))

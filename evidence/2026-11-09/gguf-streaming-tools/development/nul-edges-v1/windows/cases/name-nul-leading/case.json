@@ -1,0 +1,80 @@
+{
+  "name": "name-nul-leading",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "6f0a0dd5c3eb02fad62796f54e96a5c31b1268032e1033898237f6649ba8ca3c",
+      "hex": "4747554603000000010000000000000001000000000000000400000000000000746573740400000001000000070000000000000000737566666978010000000100000000000000000000000000000000000000000000000000000000000000000000a03f00000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 0.04546680000203196,
+  "stdout": "n_split: 1\nsplit 00001: n_tensors = 1, total_size = 0M\nWriting file result-00001-of-00001.gguf ... done\n",
+  "stderr": "gguf_split: 1 gguf split written with a total of 1 tensors.\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "6f0a0dd5c3eb02fad62796f54e96a5c31b1268032e1033898237f6649ba8ca3c",
+      "existed_before": true
+    },
+    {
+      "name": "result-00001-of-00001.gguf",
+      "bytes": 192,
+      "sha256": "70c9867e3ae0eb4be62a1abcd9b73e686dab58a8b6db874241ccd0941004ca49",
+      "existed_before": false,
+      "inspection_exit_code": 0,
+      "inspection": {
+        "accepted": true,
+        "version": 3,
+        "alignment": 32,
+        "data_offset": 160,
+        "metadata": [
+          {
+            "key": "test",
+            "type": 4,
+            "value": 1
+          },
+          {
+            "key": "split.no",
+            "type": 2,
+            "value": 0
+          },
+          {
+            "key": "split.tensors.count",
+            "type": 5,
+            "value": 1
+          },
+          {
+            "key": "split.count",
+            "type": 2,
+            "value": 1
+          }
+        ],
+        "tensors": [
+          {
+            "name": "",
+            "dimensions": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "dtype": 0,
+            "offset": 0,
+            "byte_len": 4,
+            "payload_offset": 0,
+            "payload_complete": true,
+            "payload_bytes": 4
+          }
+        ],
+        "payload_bytes": 4
+      }
+    }
+  ]
+}

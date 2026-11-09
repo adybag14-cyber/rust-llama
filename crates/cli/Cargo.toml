@@ -1,5 +1,6 @@
 [package]
 name = "rust-llama-cli"
+default-run = "rust-llama"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,8 +10,15 @@ license.workspace = true
 name = "rust-llama"
 path = "src/main.rs"
 
+[[bin]]
+name = "llama-gguf-split"
+path = "src/gguf_split.rs"
+
 [dependencies]
 llama-inference = { path = "../inference" }
 llama-gguf = { path = "../gguf" }
 llama-tokenizer = { path = "../tokenizer" }
 llama-behavior = { path = "../llama-behavior" }
+
+[dev-dependencies]
+llama-conformance = { path = "../llama-conformance" }

@@ -1,0 +1,72 @@
+from pathlib import Path
+import hashlib,json,struct
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port')
+sha=lambda b:hashlib.sha256(b).hexdigest()
+reports={}
+verified_files=0
+preserved_v1=0
+for profile in ['windows','linux']:
+ root=base/'nul-edges-v2'/profile
+ report=json.loads((root/'report.json').read_text(encoding='utf-8'))
+ assert report['status']=='succeeded' and report['case_count']==22
+ for case in report['cases']:
+  directory=root/'cases'/case['name']
+  for initial in case['input_files']:
+   raw=bytes.fromhex(initial['hex'])
+   assert len(raw)==initial['bytes'] and sha(raw)==initial['sha256']
+   assert (directory/initial['name']).read_bytes()==raw
+  for after in case['after_files']:
+   raw=(directory/after['name']).read_bytes()
+   assert len(raw)==after['bytes'] and sha(raw)==after['sha256']
+   verified_files+=1
+  old=base/'nul-edges-v1'/profile/'cases'/case['name']/'case.json'
+  if old.exists():
+   previous=json.loads(old.read_text(encoding='utf-8'))
+   assert previous['input_files']==case['input_files']
+   assert previous['exit_code']==case['exit_code']
+   assert [(a['name'],a['bytes'],a['sha256']) for a in previous['after_files']]==[(a['name'],a['bytes'],a['sha256']) for a in case['after_files']]
+   assert previous['stdout']==case['stdout'] and previous['stderr']==case['stderr']
+   preserved_v1+=1
+ reports[profile]=report
+w={case['name']:case for case in reports['windows']['cases']}
+g={case['name']:case for case in reports['linux']['cases']}
+assert w.keys()==g.keys()
+rows=[]
+for name,a in w.items():
+ b=g[name]
+ assert a['input_files']==b['input_files']
+ assert (a['exit_code']==0)==(b['exit_code']==0)
+ aa=[(f['name'],f['bytes'],f['sha256']) for f in a['after_files']]
+ bb=[(f['name'],f['bytes'],f['sha256']) for f in b['after_files']]
+ assert aa==bb,(name,aa,bb)
+ outputs=[]
+ for after in a['after_files']:
+  if after['existed_before']:continue
+  raw=(base/'nul-edges-v2/windows/cases'/name/after['name']).read_bytes()
+  inspection=after.get('inspection')
+  description={'name':after['name'],'bytes':len(raw),'sha256':sha(raw)}
+  if inspection:
+   description['accepted_by_inspector']=inspection.get('accepted')
+   description['metadata']=inspection.get('metadata')
+   description['tensors']=inspection.get('tensors')
+   if inspection.get('accepted') and inspection.get('data_offset') is not None:
+    payload_start=inspection['data_offset']
+    description['payload_prefix_hex']=raw[payload_start:payload_start+16].hex()
+  else:
+   description['inspection_exit_code']=after.get('inspection_exit_code')
+   description['inspection_adapter_error']=after.get('inspection_adapter_error')
+   stderr=base/'nul-edges-v2/windows/cases'/name/(after['name']+'.inspect.stderr.log')
+   if stderr.exists():description['inspection_stderr']=stderr.read_bytes().decode('utf-8','replace')
+  outputs.append(description)
+ rows.append({'case':name,'windows_exit':a['exit_code'],'gnu_exit':b['exit_code'],'output_files':outputs})
+result={'schema':1,'independence':'Only original C++ programs executed before this analysis. No Rust comparison or expected-output generation occurred. This addon retains the pre-existing strict reader-domain gaps separately from new streaming-tool behavior.',
+ 'native_source':'source ZIP 2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122',
+ 'counts':{'cases_per_profile':22,'successes_per_profile':17,'failures_per_profile':5,'verified_after_file_records':verified_files,'prior_complete_case_records_identical':preserved_v1,'all_after_file_bytes_equal_across_profiles':True},
+ 'reports':[{ 'path':str(base/'nul-edges-v2'/profile/'report.json'),'bytes':(base/'nul-edges-v2'/profile/'report.json').stat().st_size,'sha256':sha((base/'nul-edges-v2'/profile/'report.json').read_bytes())} for profile in ['windows','linux']],
+ 'adapter_failure_retained':{'windows_job':'job-1794250511749-af36b72c-8d2','gnu_job':'job-1794250512122-e4169fb5-c01','reason':'v1 attempted to JSON-decode the original inspector empty output on invalid-UTF8 strings. Both stopped after 15 complete cases. v2 preserves the inspector exit, raw bytes and decode failure, and reruns in new directories; every prior complete case matches.'},
+ 'reader_boundary':'The current Rust public GGUF reader rejects empty/NUL metadata keys, NUL tensor names and non-UTF8 strings. Empty key rejection agrees with source; the other accepted addon cases document a stricter existing domain, not complete byte-string compatibility. No source or fixture assertion was changed for this report.',
+ 'cases':rows}
+out=base/'nul-edges-v2'/'review.json'
+assert not out.exists()
+out.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
+print(json.dumps({'path':str(out),'bytes':out.stat().st_size,'sha256':sha(out.read_bytes()),'counts':result['counts'],'reports':result['reports'],'cases':[{'name':x['case'],'windows':x['windows_exit'],'gnu':x['gnu_exit'],'out':[{k:v for k,v in y.items() if k in ['name','sha256','payload_prefix_hex','inspection_stderr']} for y in x['output_files']]} for x in rows]},indent=2))

@@ -1,0 +1,38 @@
+"""Finish candidate metadata; original output/report/data bytes remain immutable."""
+from pathlib import Path
+import csv,hashlib,io,json,shutil
+BASE=Path(__file__).resolve().parent
+OUT=BASE/'corpus-adapter-v1';FIX=OUT/'candidate/fixtures/gguf-split'
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def save(path,value):path.write_text(json.dumps(value,indent=2,ensure_ascii=True)+'\n',encoding='utf-8',newline='\n')
+expected={'native-data.bin':'f34d665678bb6dce9a87b9ff5f30c63e925715f36be59eb2846356049d693d58','native-reference.json':'8e215c082250d335dd38ec5256f61484d8a0f9f6473c9bbfb54357336863ec0c','native-msvc-report.json':'fc59723ff92d5a358533ad6736fcb3b6ac37c63c77c6e611eec0db6f9c207be1','native-gnu-report.json':'47dbdd19f6f96cd10d23cd1d4f5cccf0c160ac4bc43c4c3984dcecc18ce136a8','original-input-index.json':'dcfce851b54b8fefb3db53346953051cdcac41e55da5c9c734783acf3d44b565'}
+for filename,digest in expected.items():assert sha((FIX/filename).read_bytes())==digest
+provenance=json.loads((FIX/'provenance.json').read_text(encoding='utf-8'))
+assert 'contract_supplement' not in provenance
+shutil.copyfile(FIX/'provenance.json',OUT/'initial-pack-provenance.json')
+all_rejected=provenance['original_success_outputs_rejected_by_original_inspector']
+provenance['original_success_outputs_rejected_by_original_inspector']=[r for r in all_rejected if r['case']!='merge-truncated-secondary']
+provenance['original_failed_output_inspections']=[r for r in all_rejected if r['case']=='merge-truncated-secondary']
+assert len(provenance['original_success_outputs_rejected_by_original_inspector'])==14 and len(provenance['original_failed_output_inspections'])==2
+provenance['contract_supplement']={
+ 'writer':{'path':Path(__file__).name,'sha256':sha(Path(__file__).read_bytes())},
+ 'source_data_unchanged':expected,
+ 'successful_transcripts':'Exact normalized stdout/stderr after only executable-path and CRLF normalization, except the truthful Rust version banner, the single safe-delete help line, and the movement of deletion log lines after output flush/sync. Non-deletion log content/order and deletion line content/relative order remain exact.',
+ 'safe_delete_help_original':'  --delete-splits         delete the split files during merge to free up disk space WARNING: this option is unsafe and will leave you in an unrecoverable state if something fails during the merge',
+ 'safe_delete_help_rust':'  --delete-splits         delete split files only after the complete merge is flushed and synced',
+ 'derived_safety_regression':'Add --delete-splits to unchanged original merge-truncated-secondary arguments and require every initial file to survive a normal failure. This is an explicit stronger Rust contract, not an additional original output capture.',
+ 'metadata_correction':'The initial pack listed every rejected output inspection under a success-labelled field. Split the two failed merge-truncated-secondary records into original_failed_output_inspections; all original records and bytes are unchanged.'
+}
+save(FIX/'provenance.json',provenance)
+records=[]
+for path in sorted(FIX.iterdir()):
+ assert path.is_file()
+ records.append({'path':path.relative_to(OUT/'candidate').as_posix(),'bytes':path.stat().st_size,'sha256':sha(path.read_bytes())})
+save(OUT/'fixture-records.json',records)
+buf=io.StringIO();writer=csv.DictWriter(buf,['path','sha256','origin','source_identity'],delimiter='\t',lineterminator='\n');writer.writeheader()
+for row in records:
+ writer.writerow({'path':row['path'],'sha256':row['sha256'],'origin':'independent frozen original GGUF split/merge input/output and process corpus; exact profiles with explicit UB/safety qualifications','source_identity':provenance['source_archive_sha256']+';fixtures/gguf-split/provenance.json'})
+(OUT/'fixture-manifest-additions.tsv').write_text(buf.getvalue(),encoding='utf-8',newline='\n')
+test=OUT/'candidate/crates/cli/tests/gguf_split_native.rs'
+save(OUT/'candidate-records.json',[{'path':test.relative_to(OUT/'candidate').as_posix(),'preimage_sha256':'missing','bytes':test.stat().st_size,'sha256':sha(test.read_bytes())}])
+print(json.dumps({'fixture_files':len(records),'fixture_bytes':sum(r['bytes'] for r in records),'fixture_records_sha256':sha((OUT/'fixture-records.json').read_bytes()),'test_sha256':sha(test.read_bytes())},indent=2))

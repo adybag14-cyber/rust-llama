@@ -1,0 +1,16 @@
+from pathlib import Path
+import os,subprocess,json
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port');root=base/'rust-draft'
+out=base/'resource-tests-v1/windows';out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'target-windows');env['CARGO_BUILD_JOBS']='2'
+records=[]
+for name,args in [
+ ('fmt',['fmt','--all']),
+ ('resources',['test','--offline','--locked','-p','llama-gguf','--test','split_limits','--','--nocapture']),
+ ('clippy',['clippy','--offline','--locked','-p','llama-gguf','-p','rust-llama-cli','--all-targets','--','-D','warnings'])
+]:
+ p=subprocess.run(['cargo','+1.99.1']+args,cwd=root,env=env,capture_output=True)
+ (out/(name+'.stdout.txt')).write_bytes(p.stdout);(out/(name+'.stderr.txt')).write_bytes(p.stderr)
+ records.append({'name':name,'exit_code':p.returncode});(out/'status.json').write_bytes((json.dumps(records,indent=2)+'\n').encode('utf-8'))
+ print(json.dumps(records[-1]),flush=True)
+ if p.returncode:raise SystemExit(p.returncode)

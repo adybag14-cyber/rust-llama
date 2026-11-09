@@ -1,0 +1,27 @@
+{
+  "name": "key-nul-alignment-type-collision",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 256,
+      "sha256": "c9a67c3af8ea884175f440d7d1d5076307157712bda4d871403fec540076062a",
+      "hex": "474755460300000001000000000000000300000000000000170000000000000067656e6572616c2e616c69676e6d656e74006669727374040000004000000006000000000000006d6964646c650400000009000000160000000000000067656e6572616c2e616c69676e6d656e74006c61737402000000200003000000000000006f6e650100000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a03f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": -6,
+  "seconds": 0.3167253819992766,
+  "stdout": "[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/lib/x86_64-linux-gnu/libthread_db.so.1\".\n0x0000727a0f0ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6\n#0  0x0000727a0f0ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6\n#1  0x0000727a0f7326cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#2  0x0000727a0f732862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#3  0x0000727a0f7b21c0 in gguf_set_val_u16 () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#4  0x0000727a0f7b3598 in gguf_set_kv () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#5  0x0000608099daf049 in split_strategy::split_strategy(split_params const&, std::basic_ifstream<char, std::char_traits<char> >&, gguf_context*, ggml_context*) ()\n#6  0x0000608099dad259 in main ()\n[Inferior 1 (process 347581) detached]\n",
+  "stderr": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/gguf.cpp:1253: general.alignment must be type u32\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 256,
+      "sha256": "c9a67c3af8ea884175f440d7d1d5076307157712bda4d871403fec540076062a",
+      "existed_before": true
+    }
+  ]
+}

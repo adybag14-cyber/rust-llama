@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T20:08:22.811623+00:00",
+  "base_commit": "1890f03291299ca3dca591f90d8b88ba6d29f1d5",
+  "execution_inputs": {
+    "files": 648,
+    "sha256": "abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c"
+  },
+  "scope": "Ordered GGUF streaming writing and bounded split/merge CLI in the existing Rust runtime. Arbitrary-byte/NUL key/name and noncanonical boolean compatibility remain open in this checkpoint; all 12 global gates remain open.",
+  "fixture_declarations": 465,
+  "new_fixture_files": 7,
+  "ordinary_tests": {
+    "windows": {
+      "debug": {
+        "passed": 460,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      },
+      "release": {
+        "passed": 460,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      }
+    },
+    "linux": {
+      "debug": {
+        "passed": 464,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      },
+      "release": {
+        "passed": 464,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 88
+      }
+    }
+  },
+  "pretrained_tests": {
+    "windows": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 13
+    },
+    "linux": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 13
+    }
+  },
+  "native_tool_per_profile": {
+    "cases": 103,
+    "defined_successes": 63,
+    "checked_errors": 40,
+    "exact_post_operation_file_bytes": 12179168
+  },
+  "original_only_open_boundary": {
+    "cases_per_profile": 22,
+    "successes": 17,
+    "failures": 5,
+    "no_rust_parity_claim": true,
+    "additional_boolean_cases_per_profile": 512,
+    "boolean_native_admissions": 512
+  },
+  "qualifications": [
+    "Original file/header/input/output data and expected strings are unchanged; successful native bytes remain exact. The Rust version banner, one deletion-help line and deletion log timing are qualified separately.",
+    "Missing integers, overflow, division by zero and native assertions return checked errors. Platform-specific failed partial files and raw UB observations remain preserved.",
+    "Deletion starts only after complete output flush/sync. Pre-completion failures preserve inputs; later cleanup failures may leave partial deletion and a complete output. Caller-managed stable paths are required for destructive cleanup.",
+    "The first root merge stopped on a stale documentation assertion after a clean README three-way merge. Continuation verified all 19 after-hashes; no source or expected data changed for that correction.",
+    "Windows all 15 numerical/application/build checks passed before source verification found two generated Python caches. Their creator confirmed the side effect, enabled -B for future original imports, and both caches were archived outside the original tree. utility.py was checked against the pinned ZIP. Only source/release checks were rerun.",
+    "GNU ordinary debug/release/Clippy/audit/fixtures checks passed before a deliberate resource cancellation during release build. A continuation with unchanged inputs ran only the interrupted/unstarted steps; raw cancellation and partial build output remain retained.",
+    "The preceding exact published Qwen3/F16 commit passed Windows and Ubuntu CI with 451/454 ordinary tests per profile and 9 explicit pretrained tests each.",
+    "Original successful file bytes are present in the committed packed fixtures; original JSON/log records and failed partial files are archived here. Independent constructor replay retained every original input before first Rust comparison.",
+    "Source/driver/patch history is archived as text, with exact original byte hashes. Native binaries and generated Python bytecode remain outside the product."
+  ]
+}

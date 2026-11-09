@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,hashlib,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-streaming-integration-v1')
+repo=base/'rust-draft';evidence=repo/'evidence/2026-11-09/gguf-streaming-tools';out=base/'evidence-paths-v3';out.mkdir(exist_ok=False)
+sha=lambda data:hashlib.sha256(data).hexdigest()
+inventory=json.loads((base/'evidence-stage-inventory-v2.json').read_text(encoding='utf-8'))
+for row in inventory:
+ p=evidence/row['path'];assert p.stat().st_size==row['bytes'] and sha(p.read_bytes())==row['sha256']
+failed=base/'validation/final-integrity-v2';status=json.loads((failed/'status.json').read_text(encoding='utf-8'))
+assert status['status']=='failed' and status['steps'][-1]['name']=='fixtures'
+paths=[p for p in evidence.rglob('*') if p.is_file() and 'fixtures' in p.relative_to(evidence).parts]
+assert len(paths)==4
+records=[]
+for p in paths:
+ rel=p.relative_to(evidence);assert p.name in ['README.md','provenance.json']
+ target=evidence/Path(*['fixture-snapshots' if x=='fixtures' else x for x in rel.parts])
+ assert not target.exists();target.parent.mkdir(parents=True,exist_ok=True);data=p.read_bytes();p.rename(target)
+ assert target.read_bytes()==data
+ records.append({'before_path':rel.as_posix(),'after_path':target.relative_to(evidence).as_posix(),'bytes':len(data),'sha256':sha(data)})
+record={'schema':1,'status':'succeeded','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+'purpose':'Four archived development README/provenance snapshots were under a directory literally named fixtures, so the fixture verifier treated historical documentation as additional executable fixtures. Their archive paths now say fixture-snapshots; contents and product fixture declarations are unchanged.',
+'prior_inventory_sha256':sha((base/'evidence-stage-inventory-v2.json').read_bytes()),'files':records}
+(out/'record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+dest=evidence/'integration/evidence-paths-v3';dest.mkdir(parents=True,exist_ok=False)
+for p in [out/'record.json',Path(__file__)]:
+ (dest/(p.name+('.txt' if p.suffix=='.py' else ''))).write_bytes(p.read_bytes())
+for p in sorted(failed.iterdir()):
+ if p.is_file():
+  target=evidence/'integration/validation/final-integrity-v2'/p.name
+  assert not target.exists();target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(p.read_bytes())
+readme=evidence/'README.md';readme.write_bytes(readme.read_bytes()+b'\nA second final fixture audit identified four archived development documentation\nsnapshots under a directory named fixtures. Their archive directory is now\nfixture-snapshots; integration/evidence-paths-v3/record.json preserves exact\nbefore/after paths and unchanged hashes. This changes no fixture declaration.\n')
+new=[{'path':p.relative_to(evidence).as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(evidence.rglob('*')) if p.is_file()]
+(base/'evidence-stage-inventory-v3.json').write_bytes((json.dumps(new,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'status':'succeeded','relocated_documentation':len(records),'evidence_files':len(new),'record_sha256':sha((out/'record.json').read_bytes())},indent=2))

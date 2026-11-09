@@ -3,7 +3,10 @@
 #![forbid(unsafe_code)]
 
 mod shards;
+pub mod split;
+mod writer;
 pub use shards::{GgufSet, ShardInfo, ShardLimits};
+pub use writer::{TensorDescriptor, WriteLayout, write_header, write_ordered};
 
 use llama_quant::DType;
 use std::{
@@ -186,6 +189,7 @@ pub struct Gguf<R: Read + Seek> {
     pub endian: Endian,
     pub alignment: u32,
     pub metadata: BTreeMap<String, Value>,
+    metadata_order: Vec<String>,
     pub tensors: Vec<TensorInfo>,
     pub data_offset: u64,
     pub file_len: u64,
@@ -201,7 +205,17 @@ impl Gguf<File> {
     }
 }
 impl<R: Read + Seek> Gguf<R> {
-    pub fn read(mut reader: R, limits: Limits) -> Result<Self> {
+    pub fn read(reader: R, limits: Limits) -> Result<Self> {
+        Self::read_with_payload_validation(reader, limits, true)
+    }
+    pub(crate) fn read_header(reader: R, limits: Limits) -> Result<Self> {
+        Self::read_with_payload_validation(reader, limits, false)
+    }
+    fn read_with_payload_validation(
+        mut reader: R,
+        limits: Limits,
+        validate_payload: bool,
+    ) -> Result<Self> {
         let file_len = reader.seek(SeekFrom::End(0))?;
         reader.seek(SeekFrom::Start(0))?;
         let mut magic = [0; 4];
@@ -239,6 +253,11 @@ impl<R: Read + Seek> Gguf<R> {
             };
             let nt = p.count(limits.max_tensors, "tensor count")?;
             let nk = p.count(limits.max_metadata_entries, "metadata count")?;
+            p.minimum_encoded(nk, 14, "metadata entries")?;
+            let mut metadata_order = Vec::new();
+            metadata_order
+                .try_reserve_exact(nk)
+                .map_err(|_| Error::Limit("metadata order allocation".into()))?;
             let mut metadata = BTreeMap::new();
             for _ in 0..nk {
                 let key = p.string()?;
@@ -247,6 +266,12 @@ impl<R: Read + Seek> Gguf<R> {
                 }
                 let ty = p.u32()?;
                 let value = p.value(ty, false)?;
+                let mut ordered_key = String::new();
+                ordered_key
+                    .try_reserve_exact(key.len())
+                    .map_err(|_| Error::Limit("metadata order key allocation".into()))?;
+                ordered_key.push_str(&key);
+                metadata_order.push(ordered_key);
                 if metadata.insert(key.clone(), value).is_some() {
                     return Err(invalid(format!("duplicate metadata key {key}")));
                 }
@@ -347,16 +372,24 @@ impl<R: Read + Seek> Gguf<R> {
                 let end = start
                     .checked_add(t.byte_len)
                     .ok_or_else(|| invalid("tensor end overflow"))?;
-                if end > file_len {
+                if validate_payload && end > file_len {
                     return Err(invalid(format!("tensor {} exceeds file length", t.name)));
                 }
             }
-            Ok((metadata, tensors, alignment, data_offset, header_usage))
+            Ok((
+                metadata,
+                metadata_order,
+                tensors,
+                alignment,
+                data_offset,
+                header_usage,
+            ))
         })();
         // Rewind bounded read-ahead on success and failure. Preserve the
         // original parse error if synchronization also fails.
         let synchronized = header_reader.finish();
-        let (metadata, tensors, alignment, data_offset, header_usage) = parsed_header?;
+        let (metadata, metadata_order, tensors, alignment, data_offset, header_usage) =
+            parsed_header?;
         synchronized?;
         Ok(Self {
             reader,
@@ -364,12 +397,21 @@ impl<R: Read + Seek> Gguf<R> {
             endian,
             alignment,
             metadata,
+            metadata_order,
             tensors,
             data_offset,
             file_len,
             limits,
             header_usage,
         })
+    }
+    /// Original on-disk metadata key order. The public map remains available for lookup.
+    /// Keys removed from that map are omitted; new map entries have no on-disk position.
+    pub fn metadata_order(&self) -> impl Iterator<Item = &str> {
+        self.metadata_order
+            .iter()
+            .filter(|key| self.metadata.contains_key(*key))
+            .map(String::as_str)
     }
     pub fn header_usage(&self) -> HeaderUsage {
         self.header_usage
@@ -728,118 +770,11 @@ pub struct TensorData<'a> {
     pub data: &'a [u8],
 }
 pub fn write<W: Write>(
-    mut out: W,
+    out: W,
     metadata: &BTreeMap<String, Value>,
     tensors: &[TensorData<'_>],
 ) -> Result<()> {
-    let alignment = match metadata.get("general.alignment") {
-        None => 32,
-        Some(Value::U32(v)) => *v,
-        _ => return Err(invalid("general.alignment must be UINT32")),
-    };
-    if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
-        return Err(invalid("invalid alignment"));
-    }
-    let mut header = Vec::new();
-    header.extend_from_slice(b"GGUF");
-    header.extend_from_slice(&3u32.to_le_bytes());
-    header.extend_from_slice(&(tensors.len() as u64).to_le_bytes());
-    header.extend_from_slice(&(metadata.len() as u64).to_le_bytes());
-    fn string(b: &mut Vec<u8>, s: &str) {
-        b.extend_from_slice(&(s.len() as u64).to_le_bytes());
-        b.extend_from_slice(s.as_bytes())
-    }
-    fn value(b: &mut Vec<u8>, v: &Value) -> Result<()> {
-        match v {
-            Value::U8(x) => b.push(*x),
-            Value::I8(x) => b.push(*x as u8),
-            Value::U16(x) => b.extend(x.to_le_bytes()),
-            Value::I16(x) => b.extend(x.to_le_bytes()),
-            Value::U32(x) => b.extend(x.to_le_bytes()),
-            Value::I32(x) => b.extend(x.to_le_bytes()),
-            Value::F32(x) => b.extend(x.to_le_bytes()),
-            Value::Bool(x) => b.push(u8::from(*x)),
-            Value::String(x) => string(b, x),
-            Value::U64(x) => b.extend(x.to_le_bytes()),
-            Value::I64(x) => b.extend(x.to_le_bytes()),
-            Value::F64(x) => b.extend(x.to_le_bytes()),
-            Value::Array {
-                element_type,
-                values,
-            } => {
-                if *element_type > 12
-                    || *element_type == 9
-                    || values.iter().any(|v| v.type_id() != *element_type)
-                {
-                    return Err(invalid("heterogeneous or nested array"));
-                }
-                b.extend(element_type.to_le_bytes());
-                b.extend((values.len() as u64).to_le_bytes());
-                for v in values {
-                    value(b, v)?
-                }
-            }
-        }
-        Ok(())
-    }
-    for (k, v) in metadata {
-        if k.is_empty() || k.contains('\0') {
-            return Err(invalid("invalid metadata key"));
-        }
-        string(&mut header, k);
-        header.extend(v.type_id().to_le_bytes());
-        value(&mut header, v)?
-    }
-    let mut offset = 0u64;
-    let mut names = BTreeSet::new();
-    for t in tensors {
-        if t.name.len() >= 64
-            || t.name.contains('\0')
-            || !names.insert(t.name)
-            || t.dimensions.len() > 4
-        {
-            return Err(invalid("invalid tensor descriptor"));
-        }
-        dimension_elements(t.dimensions)?;
-        let row = usize::try_from(t.dimensions.first().copied().unwrap_or(1))
-            .map_err(|_| invalid("dimension exceeds usize"))?;
-        let n = t.dimensions.iter().skip(1).try_fold(
-            t.dtype.row_bytes(row).map_err(|e| invalid(e.to_string()))? as u64,
-            |a, &b| {
-                a.checked_mul(b)
-                    .ok_or_else(|| invalid("tensor size overflow"))
-            },
-        )?;
-        if n != t.data.len() as u64 {
-            return Err(invalid(format!(
-                "tensor {} payload length mismatch",
-                t.name
-            )));
-        }
-        string(&mut header, t.name);
-        header.extend((t.dimensions.len() as u32).to_le_bytes());
-        for d in t.dimensions {
-            header.extend(d.to_le_bytes())
-        }
-        header.extend(t.dtype.id().to_le_bytes());
-        header.extend(offset.to_le_bytes());
-        offset = align(
-            offset
-                .checked_add(n)
-                .ok_or_else(|| invalid("tensor offset overflow"))?,
-            alignment as u64,
-        )?;
-    }
-    let padded = usize::try_from(align(header.len() as u64, alignment as u64)?)
-        .map_err(|_| invalid("header size overflow"))?;
-    header.resize(padded, 0);
-    out.write_all(&header)?;
-    for t in tensors {
-        out.write_all(t.data)?;
-        let padding = align(t.data.len() as u64, alignment as u64)? - t.data.len() as u64;
-        io::copy(&mut io::repeat(0).take(padding), &mut out)?;
-    }
-    Ok(())
+    writer::write_map(out, metadata, tensors)
 }
 
 #[cfg(test)]

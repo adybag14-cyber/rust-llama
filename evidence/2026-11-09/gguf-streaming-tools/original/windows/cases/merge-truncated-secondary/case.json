@@ -1,0 +1,50 @@
+{
+  "name": "merge-truncated-secondary",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "truncated-payload",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 351,
+      "sha256": "20cd5ab94d77215a607face9e5c665e6ffcc80cb9c0835165d89970faaaf5f29"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 351,
+      "sha256": "20cd5ab94d77215a607face9e5c665e6ffcc80cb9c0835165d89970faaaf5f29",
+      "existed_before": true
+    },
+    {
+      "name": "merged.gguf",
+      "bytes": 1504,
+      "sha256": "565e1a3fc2ecdafc614d066fd3189c6d20bd667d8e7d37dc21d857ac0032dbd8",
+      "existed_before": false,
+      "inspection_exit_code": 1,
+      "inspection": {
+        "accepted": false
+      }
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.024017499999899883,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00002-of-00002.gguf ...gguf_merge: failed to read 28 bytes at offset 352, input file may be truncated\n"
+}

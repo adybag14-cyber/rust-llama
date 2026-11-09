@@ -1,0 +1,40 @@
+{
+  "name": "merge-secondary-split-count-missing",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "native-secondary-validation",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 352,
+      "sha256": "bf3425f2e730ac30ccfb89eedf28f5c4d2300f5f892fbcf6147c260e9a785d5e"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "3429ce8c6089eb8c47f325b85b3e9e18d2b54478759b1a11c8dd75f8a6b1da9e",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 352,
+      "sha256": "bf3425f2e730ac30ccfb89eedf28f5c4d2300f5f892fbcf6147c260e9a785d5e",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.09613857799922698,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...\ngguf_merge: in-00002-of-00002.gguf is not split 2 of 2\n"
+}

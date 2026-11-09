@@ -1,0 +1,89 @@
+{
+  "name": "key-nul-single",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 160,
+      "sha256": "f3984906c6c65719d92f158fcbcd22d2354bca5d8eaee9f8764eb0cb69ebbd78",
+      "hex": "4747554603000000010000000000000002000000000000000a000000000000006b657900737566666978040000000700000004000000000000007461696c08000000050000000000000076616c756503000000000000006f6e6501000000010000000000000000000000000000000000000000000000000000000000000000000000a03f00000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 0.17480392300058156,
+  "stdout": "n_split: 1\nsplit 00001: n_tensors = 1, total_size = 0M\nWriting file result-00001-of-00001.gguf ... done\n",
+  "stderr": "gguf_split: 1 gguf split written with a total of 1 tensors.\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 160,
+      "sha256": "f3984906c6c65719d92f158fcbcd22d2354bca5d8eaee9f8764eb0cb69ebbd78",
+      "existed_before": true
+    },
+    {
+      "name": "result-00001-of-00001.gguf",
+      "bytes": 224,
+      "sha256": "b28ebccf9fd4c05aa29f894c0dd8750b91414c4911217ac701d7c7914d43f97e",
+      "existed_before": false,
+      "inspection_exit_code": 0,
+      "inspection_file": {
+        "bytes": 762,
+        "sha256": "e3f832cbd58515644720d7ae785a4b008237be95af4dd43f7902fb057bab131d"
+      },
+      "inspection": {
+        "accepted": true,
+        "version": 3,
+        "alignment": 32,
+        "data_offset": 192,
+        "metadata": [
+          {
+            "key": "key",
+            "type": 4,
+            "value": 7
+          },
+          {
+            "key": "tail",
+            "type": 8,
+            "value": "value"
+          },
+          {
+            "key": "split.no",
+            "type": 2,
+            "value": 0
+          },
+          {
+            "key": "split.tensors.count",
+            "type": 5,
+            "value": 1
+          },
+          {
+            "key": "split.count",
+            "type": 2,
+            "value": 1
+          }
+        ],
+        "tensors": [
+          {
+            "name": "one",
+            "dimensions": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "dtype": 0,
+            "offset": 0,
+            "byte_len": 4,
+            "payload_offset": 0,
+            "payload_complete": true,
+            "payload_bytes": 4
+          }
+        ],
+        "payload_bytes": 4
+      }
+    }
+  ]
+}

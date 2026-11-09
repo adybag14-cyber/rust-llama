@@ -1,0 +1,27 @@
+{
+  "name": "name-nul-exact-collision",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 192,
+      "sha256": "3fa596228bc46ba4a67b88edc341c6a99dee2f22383f5ddfdf63012a71410d1f",
+      "hex": "474755460300000002000000000000000100000000000000040000000000000074657374040000000100000009000000000000006f6e6500666972737401000000010000000000000000000000000000000000000003000000000000006f6e6501000000010000000000000000000000200000000000000000000000000000000000a03f000000000000000000000000000000000000000000000000000000000000f84000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": -6,
+  "seconds": 0.2877118239994161,
+  "stdout": "[Thread debugging using libthread_db enabled]\nUsing host libthread_db library \"/lib/x86_64-linux-gnu/libthread_db.so.1\".\n0x0000707f968ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6\n#0  0x0000707f968ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6\n#1  0x0000707f96f936cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#2  0x0000707f96f93862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#3  0x0000707f97010513 in gguf_add_tensor () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0\n#4  0x0000627ec6f99121 in split_strategy::split_strategy(split_params const&, std::basic_ifstream<char, std::char_traits<char> >&, gguf_context*, ggml_context*) ()\n#5  0x0000627ec6f97259 in main ()\n[Inferior 1 (process 351316) detached]\n",
+  "stderr": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/gguf.cpp:1414: duplicate tensor name: one\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 192,
+      "sha256": "3fa596228bc46ba4a67b88edc341c6a99dee2f22383f5ddfdf63012a71410d1f",
+      "existed_before": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,hashlib,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-streaming-integration-v1')
+repo=base/'rust-draft';evidence=repo/'evidence/2026-11-09/gguf-streaming-tools'
+out=base/'evidence-encoding-v2';out.mkdir(exist_ok=False)
+sha=lambda data:hashlib.sha256(data).hexdigest()
+inventory=json.loads((base/'evidence-stage-inventory-v1.json').read_text(encoding='utf-8'))
+for r in inventory:
+ p=evidence/r['path'];assert p.stat().st_size==r['bytes'] and sha(p.read_bytes())==r['sha256'],r['path']
+failed=base/'validation/final-integrity-v1'
+status=json.loads((failed/'status.json').read_text(encoding='utf-8'));assert status['status']=='failed'
+paths=[x.split('unclassified non-Rust item: ',1)[1] for x in (failed/'audit-write.log').read_text(encoding='utf-8').splitlines() if 'unclassified non-Rust item: ' in x]
+assert len(paths)==len(set(paths))==344
+records=[]
+for rel in paths:
+ p=repo/rel;assert p.is_relative_to(evidence) and p.suffix in ('.gguf','.bin')
+ data=p.read_bytes();encoded=('\n'.join(data[i:i+64].hex() for i in range(0,len(data),64))+'\n').encode('ascii')
+ assert bytes.fromhex(encoded.decode('ascii'))==data
+ dst=Path(str(p)+'.hex.txt');assert not dst.exists();dst.write_bytes(encoded)
+ assert bytes.fromhex(dst.read_text(encoding='ascii'))==data
+ records.append({'source_path':str((base/'evidence-stage-v1')/p.relative_to(evidence)),
+ 'original_evidence_path':p.relative_to(evidence).as_posix(),'encoded_evidence_path':dst.relative_to(evidence).as_posix(),
+ 'decoded_bytes':len(data),'decoded_sha256':sha(data),'encoded_bytes':len(encoded),'encoded_sha256':sha(encoded),
+ 'encoding':'lowercase hexadecimal, 64 source bytes per line; ignore ASCII whitespace when decoding'})
+ p.unlink()
+record={'schema':1,'status':'succeeded','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+'purpose':'Preserve exact independent binary evidence as lossless textual provenance under the existing source audit policy. No implementation, ordinary fixture bytes, test oracle or tolerance changed.',
+'failed_audit_status_sha256':sha((failed/'status.json').read_bytes()),'failed_audit_log_sha256':sha((failed/'audit-write.log').read_bytes()),
+'original_inventory_sha256':sha((base/'evidence-stage-inventory-v1.json').read_bytes()),'files':records}
+(out/'record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+destination=evidence/'integration/evidence-encoding-v2';destination.mkdir(parents=True,exist_ok=False)
+for p in [out/'record.json',Path(__file__)]:
+ name=p.name+('.txt' if p.suffix=='.py' else '')
+ (destination/name).write_bytes(p.read_bytes())
+for p in sorted(failed.iterdir()):
+ if p.is_file():
+  target=evidence/'integration/validation/final-integrity-v1'/p.name
+  assert not target.exists();target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(p.read_bytes())
+readme=evidence/'README.md'
+readme.write_bytes(readme.read_bytes()+b'\nThe final packaging audit rejected 344 binary evidence paths outside declared\nfixture directories. Their evidence copies now use lossless hexadecimal text;\nintegration/evidence-encoding-v2/record.json records original and encoded hashes,\npaths, lengths and the decoding rule. Raw originals remain in the external\nreference archive. The audit failure is retained. Execution inputs, ordinary\nfixture bytes and expected test results are unchanged.\n')
+new_inventory=[{'path':p.relative_to(evidence).as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())} for p in sorted(evidence.rglob('*')) if p.is_file()]
+(base/'evidence-stage-inventory-v2.json').write_bytes((json.dumps(new_inventory,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'status':'succeeded','encoded_files':len(records),'decoded_bytes':sum(r['decoded_bytes'] for r in records),'evidence_files':len(new_inventory),'record_sha256':sha((out/'record.json').read_bytes())},indent=2))

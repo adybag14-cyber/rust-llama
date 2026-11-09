@@ -1,0 +1,44 @@
+--- a/fixtures/gguf-split/README.md
++++ b/fixtures/gguf-split/README.md
+@@ -31,4 +31,6 @@
+ 
+ The Rust delete operation is intentionally stronger: input splits are deleted only after the complete output is flushed and synced. A separate regression adds `--delete-splits` to the unchanged original truncated-secondary inputs and requires every input to survive failure. This safety test is distinguished from the 103-case native corpus; the original incremental deletion behavior is not claimed as an input-preservation oracle.
+ 
++The no-deletion guarantee applies to failures before that complete output has been flushed and synced. Once cleanup starts, removal or logging can fail after some shards have already been deleted; the completed output remains. Destructive cleanup requires stable, exclusively managed input and output paths. Safe standard Rust does not provide an atomic file-identity-check-and-unlink operation, so arbitrary concurrent path replacement is outside this cleanup guarantee. The truncated-secondary regression exercises only failure before cleanup, not a rollback guarantee for cleanup errors.
++
+ All native sources, executables and capture/packing scripts remain outside the product. These fixtures carry the existing upstream MIT provenance; no pretrained model weights are included.
+--- a/fixtures/gguf-split/provenance.json
++++ b/fixtures/gguf-split/provenance.json
+@@ -1120,7 +1120,8 @@
+     "The source advertises -h but its parser enters option handling only for -- prefixes; captured -h is a normal rejected argument.",
+     "Version/build-banner bytes identify the original build and are retained only as evidence; Rust must identify its own build.",
+     "Delete-splits in Rust is deliberately strengthened to delete only after the completed output is flushed/synced. Successful bytes and final deletions match the source; deletion log order and mid-failure destructive behavior are not replayed.",
+-    "Failed truncated-output bytes differ between original compilers. Their complete bytes are retained but the Rust adapter requires a checked error and intact inputs rather than failed partial-output byte parity."
++    "Failed truncated-output bytes differ between original compilers. Their complete bytes are retained but the Rust adapter requires a checked error and intact inputs rather than failed partial-output byte parity.",
++    "The no-deletion guarantee applies to failures before that complete output has been flushed and synced. Once cleanup starts, removal or logging can fail after some shards have already been deleted; the completed output remains. Destructive cleanup requires stable, exclusively managed input and output paths. Safe standard Rust does not provide an atomic file-identity-check-and-unlink operation, so arbitrary concurrent path replacement is outside this cleanup guarantee. The truncated-secondary regression exercises only failure before cleanup, not a rollback guarantee for cleanup errors."
+   ],
+   "original_failed_output_inspections": [
+     {
+@@ -1154,6 +1155,21 @@
+     "safe_delete_help_original": "  --delete-splits         delete the split files during merge to free up disk space WARNING: this option is unsafe and will leave you in an unrecoverable state if something fails during the merge",
+     "safe_delete_help_rust": "  --delete-splits         delete split files only after the complete merge is flushed and synced",
+     "derived_safety_regression": "Add --delete-splits to unchanged original merge-truncated-secondary arguments and require every initial file to survive a normal failure. This is an explicit stronger Rust contract, not an additional original output capture.",
+-    "metadata_correction": "The initial pack listed every rejected output inspection under a success-labelled field. Split the two failed merge-truncated-secondary records into original_failed_output_inspections; all original records and bytes are unchanged."
++    "metadata_correction": "The initial pack listed every rejected output inspection under a success-labelled field. Split the two failed merge-truncated-secondary records into original_failed_output_inspections; all original records and bytes are unchanged.",
++    "cleanup_guarantee_scope": {
++      "before_completion": "Failures before the complete output is flushed and synced preserve every input shard.",
++      "after_completion": "Removal or logging can fail after partial input deletion; the completed output remains. No cleanup rollback is promised.",
++      "filesystem_concurrency": "Destructive cleanup requires stable, exclusively managed input/output paths; no atomic identity-check-and-unlink is available in safe standard Rust.",
++      "measured_safety_case": "The unchanged truncated-secondary regression fails before cleanup; it does not exercise cleanup rollback."
++    }
++  },
++  "documentation_supplement": {
++    "revision": "corpus-adapter-docs-v2",
++    "purpose": "Clarify the existing stronger Rust delete contract, without changing native expected bytes, original reports, adapter assertions or initial inputs.",
++    "preimages": {
++      "fixtures/gguf-split/README.md": "cc6f788e114eb98f15412a9832f7873d55d309221f448e8473cad0eedbc1d765",
++      "fixtures/gguf-split/provenance.json": "ac884c2a75447dac0300b78072ef0977b2f00250c39d63c802e8a60185e8267e"
++    },
++    "preserved_v1": "corpus-adapter-v1 remains unchanged."
+   }
+ }

@@ -1,0 +1,30 @@
+{
+  "name": "size-first-too-large",
+  "args": [
+    "--split-max-size",
+    "1M",
+    "input.gguf",
+    "result"
+  ],
+  "scope": "defined",
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1001056,
+      "sha256": "7da1dfaf8805cc9eaf200c09976e55c54d70c9e53201f40baa7d214112db1d63"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1001056,
+      "sha256": "7da1dfaf8805cc9eaf200c09976e55c54d70c9e53201f40baa7d214112db1d63",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.09883750500011956,
+  "stdout": "",
+  "stderr": "error: one of splits have 0 tensors. Maybe size or tensors limit is too small\n"
+}

@@ -1,0 +1,124 @@
+from pathlib import Path
+import subprocess,json,hashlib,tarfile,datetime
+ref=Path(r'C:\Users\adyba\rust-llama-reference');product=Path(r'C:\Users\adyba\rust-llama')
+root=ref/'gguf-streaming-integration-v1';repo=root/'rust-draft';handoff=ref/'gguf-split-port/handoff-v1'
+out=root/'merge-v1';out.mkdir(parents=True,exist_ok=False)
+report={'status':'running','started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':'1890f03291299ca3dca591f90d8b88ba6d29f1d5','changes':[]}
+def put(p,b):p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+def save():put(out/'status.json',(json.dumps(report,indent=2)+'\n').encode('utf-8'))
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def info(b):return {'bytes':len(b),'sha256':sha(b)}
+def edit(name,changes):
+ p=repo/name;before=p.read_bytes();text=before.decode('utf-8')
+ for old,new in changes:
+  assert text.count(old)==1,(name,old[:160],text.count(old))
+  text=text.replace(old,new)
+ after=text.encode('utf-8');p.write_bytes(after);report['changes'].append({'path':name,'kind':'scope-documentation','before':info(before),'after':info(after)});save()
+save()
+try:
+ assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=product).decode().strip()==report['base_commit']
+ assert subprocess.check_output(['git','status','--porcelain'],cwd=product)==b''
+ data=(handoff/'manifest.json').read_bytes();assert sha(data)=='722ddfa27953210698f9129cc80bee1aa52b48746d32a3d83f6af77464283cea'
+ manifest=json.loads(data);report['handoff_sha256']=sha(data);report['focused_execution_inputs']=manifest['execution_inputs']
+ assert not repo.exists();repo.mkdir()
+ with (out/'git-archive.stderr.log').open('wb') as log:
+  p=subprocess.Popen(['git','archive','--format=tar',report['base_commit']],cwd=product,stdout=subprocess.PIPE,stderr=log)
+  try:
+   with tarfile.open(fileobj=p.stdout,mode='r|') as archive:archive.extractall(repo,filter='data')
+  except BaseException:p.kill();p.wait();raise
+  assert p.wait(timeout=120)==0
+ assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=product).decode().strip()==report['base_commit']
+ for e in manifest['source']:
+  name=e['path'];incoming=(handoff/'candidate'/name).read_bytes();assert info(incoming)==e['after']
+  dst=repo/name;current=dst.read_bytes() if dst.exists() else None
+  if e['before'] is None:
+   assert current is None,name;merged=incoming;kind='new-source'
+  else:
+   base=(handoff/'preimages'/name).read_bytes();assert info(base)=={k:e['before'][k] for k in ('bytes','sha256')}
+   if current==base:merged=incoming;kind='preimage-verified-copy'
+   else:
+    assert name=='crates/gguf/README.md',('unexpected overlap',name)
+    temp=out/'three-way';temp.mkdir(exist_ok=True)
+    for n,b in [('current',current),('base',base),('incoming',incoming)]:put(temp/n,b)
+    p=subprocess.run(['git','merge-file','-p',str(temp/'current'),str(temp/'base'),str(temp/'incoming')],capture_output=True)
+    put(temp/'stdout.txt',p.stdout);put(temp/'stderr.txt',p.stderr);assert p.returncode==0,('three-way conflict',name)
+    merged=p.stdout;kind='clean-three-way'
+  put(dst,merged);report['changes'].append({'path':name,'kind':kind,'before':None if current is None else info(current),'after':info(merged)});save()
+ for e in manifest['fixtures']:
+  dst=repo/e['path'];assert not dst.exists(),e['path'];data=(handoff/'candidate'/e['path']).read_bytes()
+  assert info(data)=={'bytes':e['bytes'],'sha256':e['sha256']};put(dst,data)
+  report['changes'].append({'path':e['path'],'kind':'immutable-fixture','before':None,'after':info(data)});save()
+ path=repo/'docs/integration-fixture-manifest.tsv';before=path.read_bytes()
+ additions=(handoff/'fixture-manifest-additions.tsv').read_bytes();assert sha(additions)==manifest['fixture_additions_sha256']
+ lines=additions.decode('utf-8').splitlines();assert lines[0]==before.decode('utf-8').splitlines()[0]
+ present={line.split('\t')[0] for line in before.decode('utf-8').splitlines()[1:]}
+ assert all(line.split('\t')[0] not in present for line in lines[1:])
+ after=before.rstrip(b'\n')+b'\n'+('\n'.join(lines[1:])+'\n').encode('utf-8');path.write_bytes(after)
+ report['changes'].append({'path':'docs/integration-fixture-manifest.tsv','kind':'seven-additive-fixtures','before':info(before),'after':info(after)})
+ edit('README.md',[
+  ('## Encode a BERT sequence','''## Split and merge GGUF files
+
+The native Rust llama-gguf-split executable streams tensor payloads through a
+bounded buffer and preserves the frozen tool's defined metadata order and file
+layout:
+
+~~~sh
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split-max-size 4G model.gguf output/model
+cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --merge output/model-00001-of-00003.gguf merged.gguf
+~~~
+
+Tensor-count limits, metadata-only first splits, dry runs and deletion after a
+complete merge are supported. Destructive cleanup requires stable paths under
+the caller's control. See [the precise format and tool contract](crates/gguf/README.md)
+for resource limits, original producer quirks and remaining arbitrary-byte
+metadata compatibility.
+
+## Encode a BERT sequence'''),
+  ('little-endian writer, scalar endian conversion, Llama SPM','ordered little-endian streaming writer, bounded split/merge executable, scalar endian conversion, Llama SPM'),
+  ('Ordered streaming split/merge and checkpoint converters remain open.','Architecture-specific checkpoint converters and remaining format boundaries stay open.'),
+  ('- **Vocabulary behavior:**','- **GGUF streaming tools:** all 103 independent original CLI cases per compiler profile pass, with 63 defined successes and 40 checked errors. Complete post-operation comparisons cover 12,179,168 exact file bytes. Cumulative budgets, one-byte copy buffers, retained-handle alias protection and pre-completion input preservation are checked separately. Arbitrary-byte/NUL keys and names remain an inherited reader limitation; source UB produces checked errors.\n- **Vocabulary behavior:**')
+ ])
+ edit('docs/PORT_STATUS.md',[
+  ('tensor validation, little-endian writer, scalar endian conversion, SPM','tensor validation, ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, SPM'),
+  ('Checkpoint/Safetensors conversion and ordered streaming split/merge; all converters, metadata tools and quantization applications.','Checkpoint/Safetensors conversion; arbitrary-byte/NUL GGUF keys and names; remaining metadata tools and quantization applications.'),
+  ('This does not close conversion, ordered streaming split/merge tools or every native C override configuration.','This does not close architecture conversion or every native C override configuration.'),
+  ('## Memory and execution qualifications','''## GGUF streaming tool checkpoint
+
+The Rust llama-gguf-split executable and llama_gguf::split APIs now perform
+bounded split/merge operations. The public ordered writer preflights complete
+headers before writing; tool-private behavior preserves original metadata order,
+32-byte physical output layout, rank canonicalization and C-string value
+handling. The public writer retains valid metadata-selected alignment and
+supplied dimensions. Certain original producer quirks can still create files
+that the original reader rejects; the corpus records those outcomes explicitly.
+
+The unchanged original 103-case corpus passes on Windows and GNU in both debug
+and release: 63 defined successes, 40 checked errors and 12,179,168 exact
+post-operation file bytes per run. Focused validation passes 65/67 ordinary
+tests per profile, strict Clippy, formatting and fixture integrity. Safe resource
+and alias regressions cover header budgets before reservation, cumulative merge
+limits, one-byte streaming buffers and output-path replacement after planning.
+
+Merge deletion starts after the complete output has been flushed and synced.
+Earlier failures preserve all inputs. A later cleanup error can leave some
+inputs deleted and the complete merged output available. Destructive cleanup
+requires stable, exclusively managed paths. The source's earlier deletion timing
+and undefined parser inputs are retained in original evidence and qualified.
+
+The inherited Rust reader still requires UTF-8 metadata and rejects NUL keys
+and tensor names. A separate original-only 22-case corpus per host captures
+native byte-string/NUL alias behavior for subsequent work. This checkpoint
+does not claim full arbitrary-byte GGUF or T04 completion.
+
+## Memory and execution qualifications''')
+ ])
+ assert b'dense Qwen3' in (repo/'crates/gguf/README.md').read_bytes()
+ prior=ref/'qwen3-and-f16-integration-v1';report['validation_drivers']=[]
+ for name in ['verify-embedding-cli.py','verify-decoder-cli.py','verify-qwen2-http.py','verify-qwen3-http.py','verify-sharded-apps-v2.py']:
+  before=(prior/name).read_bytes();text=before.decode('utf-8');assert 'qwen3-and-f16-integration-v1' in text
+  after=text.replace('qwen3-and-f16-integration-v1','gguf-streaming-integration-v1').encode('utf-8');put(root/name,after)
+  report['validation_drivers'].append({'name':name,'before':info(before),'after':info(after),'change':'Only integration root and target directory names changed; native expectations unchanged.'})
+ report['status']='succeeded'
+except BaseException as e:report['status']='failed';report['error']=repr(e);raise
+finally:report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps({k:v for k,v in report.items() if k not in ('changes','validation_drivers')},indent=2))

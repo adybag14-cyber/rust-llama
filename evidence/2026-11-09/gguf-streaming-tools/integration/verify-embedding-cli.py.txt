@@ -1,0 +1,109 @@
+from pathlib import Path
+import os,subprocess,json,time,threading,queue,urllib.request,urllib.error,hashlib,datetime,sys
+windows=os.name=='nt'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+repo=reference/'gguf-streaming-integration-v1/rust-draft'
+platform='windows' if windows else 'linux'
+out=reference/'gguf-streaming-integration-v1/validation/applications-v1'/platform/'embedding-cli-details'
+out.mkdir(parents=True,exist_ok=True)
+target=reference/'gguf-streaming-integration-v1/windows-target' if windows else Path('/home/tdamre/.cache/rust-llama-gguf-streaming-integration-v1')
+exe=target/'release'/('llama-server.exe' if windows else 'llama-server')
+model=repo/'fixtures/inference/tiny-bert-missing-pooling.gguf'
+fixture_path=repo/('fixtures/inference/embedding-http-tiny.json' if windows else 'fixtures/inference/embedding-http-tiny-gnu.json')
+fixture=json.loads(fixture_path.read_text(encoding="utf-8"))
+report={'platform':platform,'executable_sha256':hashlib.sha256(exe.read_bytes()).hexdigest(),'model_sha256':hashlib.sha256(model.read_bytes()).hexdigest(),'cases':[],'passed':False}
+def save():
+ (out/'embedding-cli.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+def request(base,path,body=None):
+ data=None if body is None else json.dumps(body).encode()
+ req=urllib.request.Request(base+path,data=data,headers={'Content-Type':'application/json'})
+ try:
+  with urllib.request.urlopen(req,timeout=10) as r:return r.status,json.load(r)
+ except urllib.error.HTTPError as e:return e.code,json.load(e)
+def compare(actual,expected):
+ if isinstance(expected,(float,int)) and not isinstance(expected,bool):
+  assert isinstance(actual,(float,int)),(actual,expected)
+  bound=0 # Both verified profiles require exact corresponding native JSON values.
+  assert abs(actual-expected)<=bound,(actual,expected,bound)
+ elif isinstance(expected,dict):
+  assert set(actual)==set(expected),(set(actual),set(expected))
+  for k in expected:compare(actual[k],expected[k])
+ elif isinstance(expected,list):
+  assert len(actual)==len(expected)
+  for a,e in zip(actual,expected):compare(a,e)
+ else:assert actual==expected,(actual,expected)
+def start(args,name,eof=False):
+ log=(out/('embedding-cli-'+name+'.log')).open('wb')
+ p=subprocess.Popen([str(exe),*args],cwd=repo,stdin=subprocess.DEVNULL if eof else subprocess.PIPE,stdout=subprocess.PIPE,stderr=log)
+ q=queue.Queue()
+ def reader():
+  line=p.stdout.readline()
+  log.write(line);log.flush();q.put(line.decode('utf-8','replace'))
+ threading.Thread(target=reader,daemon=True).start()
+ try:
+  line=q.get(timeout=15)
+  assert line.startswith('Listening on http://'),line
+  base=line.split(';',1)[0].removeprefix('Listening on ')
+  return p,base,log
+ except BaseException:
+  if p.poll() is None:p.terminate()
+  p.wait(timeout=10);log.close();raise
+def stop(p,log,graceful=True):
+ try:
+  if graceful and p.poll() is None:
+   p.stdin.write(b'quit\n');p.stdin.flush()
+   assert p.wait(timeout=10)==0
+  elif p.poll() is None:
+   p.terminate();p.wait(timeout=10)
+ finally:
+  if p.poll() is None:p.kill();p.wait(timeout=10)
+  log.close()
+try:
+ for group in fixture['cases_by_pooling']:
+  label=group['pooling']
+  pooling='cls' if label=='cls_norm1' else label
+  norm='1' if label=='cls_norm1' else '2'
+  flag='--embedding' if label=='mean' else '--embeddings'
+  args=['--model',str(model),'--bind','127.0.0.1:0',flag,'--pooling',pooling,'--embd-normalize',norm]
+  p,base,log=start(args,label)
+  try:
+   checked=0
+   for native in group['cases']:
+    if native['name']!='single':continue
+    body=dict(native['request']);body['model']='fixture-model'
+    status,result=request(base,native['path'],body)
+    expected=native['response']
+    assert status==expected['status'],(label,status,expected['status'])
+    if status==200:compare(result,expected['body'])
+    else:assert result.get('error')
+    checked+=1
+   assert checked==2,(label,checked)
+   report['cases'].append({'name':label,'argv':args,'native_http_cases':checked,'passed':True})
+  finally:stop(p,log)
+  save()
+ invalid=[
+  ('missing-model',['--embeddings']),
+  ('bad-pooling',['--pooling','invalid']),
+  ('missing-pooling-value',['--pooling']),
+  ('incompatible-generation-model',['--model',str(reference/'models/stories260K.gguf'),'--embeddings'])
+ ]
+ for name,args in invalid:
+  r=subprocess.run([str(exe),*args],cwd=repo,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=15)
+  (out/('embedding-cli-'+name+'.log')).write_bytes(r.stdout)
+  assert r.returncode!=0,(name,r.stdout)
+  report['cases'].append({'name':name,'exit_code':r.returncode,'passed':True})
+  save()
+ p,base,log=start(['--model',str(model),'--bind','127.0.0.1:0','--embeddings','--pooling','mean'],'stdin-eof',eof=True)
+ try:
+  status,body=request(base,'/health')
+  assert status==200 and p.poll() is None,(status,body,p.poll())
+  status,body=request(base,'/v1/embeddings',{'input':'hello world','model':'fixture-model'})
+  assert status==200 and p.poll() is None
+  report['cases'].append({'name':'stdin-eof','health_status':200,'embedding_status':200,'remained_running':True,'passed':True})
+ finally:stop(p,log,graceful=False)
+ report['passed']=True
+except BaseException as e:
+ report['error']=repr(e);raise
+finally:
+ report['finished_at_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps({'platform':platform,'passed':report['passed'],'scenarios':len(report['cases']),'native_http_cases':12}))

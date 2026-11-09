@@ -1,0 +1,40 @@
+{
+  "name": "merge-primary-count-missing",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "defined",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1248,
+      "sha256": "85fe605e02cab7e42dd5bd87795969fb072526b005c3280569a5cdfc5ad436a5"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1248,
+      "sha256": "85fe605e02cab7e42dd5bd87795969fb072526b005c3280569a5cdfc5ad436a5",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.09267857600207208,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\ngguf_merge: input file does not contain split.count metadata\n"
+}

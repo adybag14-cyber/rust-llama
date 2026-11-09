@@ -1,0 +1,88 @@
+{
+  "name": "alignment-8",
+  "args": [
+    "--split-max-tensors",
+    "2",
+    "input.gguf",
+    "result"
+  ],
+  "scope": "native-custom-alignment-output",
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1128,
+      "sha256": "4a8d262a0b2c1f6f97fb81993b4eb31061ae0c38d74700f390be810ca7c76016"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1128,
+      "sha256": "4a8d262a0b2c1f6f97fb81993b4eb31061ae0c38d74700f390be810ca7c76016",
+      "existed_before": true
+    },
+    {
+      "name": "result-00001-of-00002.gguf",
+      "bytes": 1248,
+      "sha256": "92bcdcc08d74f7e0d39dade6686fd55039135840ade963e48fea0c749c462c5d",
+      "existed_before": false,
+      "inspection_exit_code": 1,
+      "inspection": {
+        "accepted": false
+      }
+    },
+    {
+      "name": "result-00002-of-00002.gguf",
+      "bytes": 192,
+      "sha256": "d8ec577f0814d1dc4570db5cee17b53c9197be428795dfca15555532aa033039",
+      "existed_before": false,
+      "inspection_exit_code": 0,
+      "inspection": {
+        "accepted": true,
+        "version": 3,
+        "alignment": 32,
+        "data_offset": 160,
+        "metadata": [
+          {
+            "key": "split.no",
+            "type": 2,
+            "value": 1
+          },
+          {
+            "key": "split.tensors.count",
+            "type": 5,
+            "value": 3
+          },
+          {
+            "key": "split.count",
+            "type": 2,
+            "value": 2
+          }
+        ],
+        "tensors": [
+          {
+            "name": "c",
+            "dimensions": [
+              5,
+              1,
+              1,
+              1
+            ],
+            "dtype": 24,
+            "offset": 0,
+            "byte_len": 5,
+            "payload_offset": 0,
+            "payload_complete": true,
+            "payload_bytes": 5
+          }
+        ],
+        "payload_bytes": 5
+      }
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "seconds": 0.03232479999860516,
+  "stdout": "n_split: 2\nsplit 00001: n_tensors = 2, total_size = 0M\nsplit 00002: n_tensors = 1, total_size = 0M\nWriting file result-00001-of-00002.gguf ... done\nWriting file result-00002-of-00002.gguf ... done\n",
+  "stderr": "gguf_split: 2 gguf split written with a total of 3 tensors.\n"
+}

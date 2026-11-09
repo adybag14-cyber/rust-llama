@@ -1,0 +1,112 @@
+{
+  "name": "merge-key-nul-primary-count",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 224,
+      "sha256": "fb19391dedb3f2b8c6546024a641b70a0a4076d0e788eaf0ca3faa012663254f",
+      "hex": "474755460300000001000000000000000400000000000000080000000000000073706c69742e6e6f0200000000000d0000000000000073706c69742e636f756e740078020000000200130000000000000073706c69742e74656e736f72732e636f756e740500000002000000040000000000000074657374080000000500000000000000666972737403000000000000006f6e6501000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000a03f00000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 192,
+      "sha256": "673d7556062a147719ba06669d71cc4c1f03cc0c59122b53c71677d2a5e0e57d",
+      "hex": "474755460300000001000000000000000300000000000000080000000000000073706c69742e6e6f0200000001000b0000000000000073706c69742e636f756e74020000000200130000000000000073706c69742e74656e736f72732e636f756e740500000002000000030000000000000074776f010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000f84000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 0.17555865299800644,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: writing tensors in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: merged.gguf merged from 2 split with 2 tensors.\n",
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 224,
+      "sha256": "fb19391dedb3f2b8c6546024a641b70a0a4076d0e788eaf0ca3faa012663254f",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 192,
+      "sha256": "673d7556062a147719ba06669d71cc4c1f03cc0c59122b53c71677d2a5e0e57d",
+      "existed_before": true
+    },
+    {
+      "name": "merged.gguf",
+      "bytes": 288,
+      "sha256": "a974c8659102192624ae76435f13bbf2e8237b9eee4323ee0d3d361c6473ef90",
+      "existed_before": false,
+      "inspection_exit_code": 0,
+      "inspection_file": {
+        "bytes": 946,
+        "sha256": "043a46b32179aeca5a89c76e0dcdf85a0e60a004f4d2146e841c01c82f3498fb"
+      },
+      "inspection": {
+        "accepted": true,
+        "version": 3,
+        "alignment": 32,
+        "data_offset": 224,
+        "metadata": [
+          {
+            "key": "split.no",
+            "type": 2,
+            "value": 0
+          },
+          {
+            "key": "split.tensors.count",
+            "type": 5,
+            "value": 2
+          },
+          {
+            "key": "test",
+            "type": 8,
+            "value": "first"
+          },
+          {
+            "key": "split.count",
+            "type": 2,
+            "value": 0
+          }
+        ],
+        "tensors": [
+          {
+            "name": "one",
+            "dimensions": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "dtype": 0,
+            "offset": 0,
+            "byte_len": 4,
+            "payload_offset": 0,
+            "payload_complete": true,
+            "payload_bytes": 4
+          },
+          {
+            "name": "two",
+            "dimensions": [
+              1,
+              1,
+              1,
+              1
+            ],
+            "dtype": 0,
+            "offset": 32,
+            "byte_len": 4,
+            "payload_offset": 4,
+            "payload_complete": true,
+            "payload_bytes": 4
+          }
+        ],
+        "payload_bytes": 8
+      }
+    }
+  ]
+}

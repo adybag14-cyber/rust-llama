@@ -1,0 +1,33 @@
+from pathlib import Path
+import hashlib,json,datetime,zipfile
+ref=Path(r'C:\Users\adyba\rust-llama-reference');root=ref/'gguf-streaming-integration-v1';source=ref/'llama.cpp-master'
+out=root/'validation/source-cleanup-v1';out.mkdir(parents=True,exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+prior=root/'validation/full-v1/windows/status.json';prior_bytes=prior.read_bytes();prior_report=json.loads(prior_bytes)
+assert prior_report['status']=='failed' and prior_report['steps'][-1]['name']=='source' and prior_report['steps'][-1]['exit_code']==1
+report={'status':'running','started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'cause':'Independent frozen SafetensorsLocal capture imported utility.py under Python3.10/3.14 and created two cache files. The capture owner confirmed this side effect and enabled Python -B for every future original-module import. Frozen source files remain unchanged.','prior_windows_status':{'sha256':sha(prior_bytes),'bytes':len(prior_bytes)},'relocated':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+try:
+ archive=Path(r'C:\Users\adyba\Downloads\llama.cpp-master.zip')
+ assert sha(archive.read_bytes())=='2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122'
+ relative='gguf-py/gguf/utility.py'
+ actual=(source/relative).read_bytes()
+ with zipfile.ZipFile(archive) as z:
+  names=[n for n in z.namelist() if n.endswith('/'+relative)]
+  assert len(names)==1,names;expected=z.read(names[0])
+ assert actual==expected
+ report['unchanged_frozen_module']={'path':relative,'bytes':len(actual),'sha256':sha(actual)}
+ for name in ['utility.cpython-310.pyc','utility.cpython-314.pyc']:
+  p=source/'gguf-py/gguf/__pycache__'/name
+  assert p.is_file() and not p.is_symlink()
+  data=p.read_bytes();dst=out/'archived-generated-cache'/name;dst.parent.mkdir(exist_ok=True)
+  assert not dst.exists();p.rename(dst)
+  assert dst.read_bytes()==data and not p.exists()
+  report['relocated'].append({'original_path':str(p),'archive_path':str(dst),'bytes':len(data),'sha256':sha(data)});save()
+ directory=source/'gguf-py/gguf/__pycache__'
+ if not any(directory.iterdir()):directory.rmdir()
+ report['status']='succeeded'
+except BaseException as e:report['status']='failed';report['error']=repr(e);raise
+finally:report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2))

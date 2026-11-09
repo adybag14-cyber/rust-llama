@@ -1,0 +1,32 @@
+from pathlib import Path
+import os,json,hashlib,subprocess,time,datetime
+ref=Path(r'C:\Users\adyba\rust-llama-reference');root=ref/'gguf-streaming-integration-v1';repo=root/'rust-draft';old=ref/'qwen3-and-f16-integration-v1'
+out=root/'prepare-v2';out.mkdir(parents=True,exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def info(b):return {'bytes':len(b),'sha256':sha(b)}
+first=json.loads((root/'merge-v1/status.json').read_text(encoding='utf-8'))
+assert first['status']=='failed' and first['error']=='AssertionError()'
+assert len(first['changes'])==19
+for e in first['changes']:assert info((repo/e['path']).read_bytes())==e['after'],e['path']
+text=(repo/'crates/gguf/README.md').read_text(encoding='utf-8')
+assert 'GgufSet. Dense Llama, dense Qwen2/Qwen3, Mamba-1 and dense BERT keep their existing' in text
+assert '## Ordered writing and the split/merge executable' in text
+report={'status':'running','base_commit':first['base_commit'],'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Complete root merge continuation and preflight, without changing any source or native expected data.','preserved_failure':{'path':'merge-v1/status.json','sha256':sha((root/'merge-v1/status.json').read_bytes()),'cause':'Post-merge documentation assertion expected the literal dense Qwen3; the correctly retained published sentence uses dense Qwen2/Qwen3.'},'validation_drivers':[],'steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+try:
+ for name in ['verify-embedding-cli.py','verify-decoder-cli.py','verify-qwen2-http.py','verify-qwen3-http.py','verify-sharded-apps-v2.py']:
+  before=(old/name).read_bytes();text=before.decode('utf-8');assert 'qwen3-and-f16-integration-v1' in text
+  after=text.replace('qwen3-and-f16-integration-v1','gguf-streaming-integration-v1').encode('utf-8');assert not (root/name).exists();(root/name).write_bytes(after)
+  report['validation_drivers'].append({'name':name,'before':info(before),'after':info(after),'change':'Only integration root and target names changed; native expectations unchanged.'})
+ save()
+ env=os.environ.copy();env['CARGO_TARGET_DIR']=str(root/'windows-target');env['CARGO_BUILD_JOBS']='2'
+ for name,args in [('fmt',['fmt','--all','--','--check']),('audit-write',['run','--offline','--locked','-p','xtask','--','audit','--write']),('audit',['run','--offline','--locked','-p','xtask','--','audit']),('fixtures',['run','--offline','--locked','-p','xtask','--','fixtures'])]:
+  started=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:p=subprocess.run(['cargo','+1.99.1',*args],cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=900)
+  data=(out/(name+'.log')).read_bytes();report['steps'].append({'name':name,'exit_code':p.returncode,'seconds':time.monotonic()-started,'log_sha256':sha(data)});save()
+  assert p.returncode==0,(name,data.decode('utf-8','replace')[-12000:])
+ report['status']='succeeded'
+except BaseException as e:report['status']='failed';report['error']=repr(e);raise
+finally:report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2))

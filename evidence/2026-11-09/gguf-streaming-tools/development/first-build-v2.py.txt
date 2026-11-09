@@ -1,0 +1,20 @@
+from pathlib import Path
+import subprocess,os,json
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port');root=base/'rust-draft'
+p=root/'crates/gguf/src/writer.rs';s=p.read_text(encoding='utf-8')
+assert s.count('let mut offset = 0;')==1
+p.write_bytes(s.replace('let mut offset = 0;','let mut offset = 0u64;').encode('utf-8'))
+out=base/'first-build-v2';out.mkdir(exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'target-windows');env['CARGO_BUILD_JOBS']='2'
+report=[]
+for name,args in [
+ ('fmt',['fmt','--all']),
+ ('check',['check','--offline','--locked','-p','llama-gguf','-p','rust-llama-cli','--all-targets']),
+ ('test',['test','--offline','--locked','-p','llama-gguf','-p','rust-llama-cli','--all-targets']),
+ ('clippy',['clippy','--offline','--locked','-p','llama-gguf','-p','rust-llama-cli','--all-targets','--','-D','warnings']),
+]:
+ r=subprocess.run(['cargo','+1.99.1']+args,cwd=root,env=env,capture_output=True)
+ (out/(name+'.stdout.txt')).write_bytes(r.stdout);(out/(name+'.stderr.txt')).write_bytes(r.stderr)
+ report.append({'name':name,'exit_code':r.returncode});(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+ print(json.dumps(report[-1]),flush=True)
+ if r.returncode:raise SystemExit(r.returncode)

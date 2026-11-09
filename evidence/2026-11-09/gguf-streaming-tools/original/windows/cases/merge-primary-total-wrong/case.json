@@ -1,0 +1,40 @@
+{
+  "name": "merge-primary-total-wrong",
+  "args": [
+    "--merge",
+    "in-00001-of-00002.gguf",
+    "merged.gguf"
+  ],
+  "scope": "defined",
+  "input_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "9f420711838ee36e01a23224628d91ba7a63ff051296b6d5e6cc971be0657b7b"
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "in-00001-of-00002.gguf",
+      "bytes": 1280,
+      "sha256": "9f420711838ee36e01a23224628d91ba7a63ff051296b6d5e6cc971be0657b7b",
+      "existed_before": true
+    },
+    {
+      "name": "in-00002-of-00002.gguf",
+      "bytes": 384,
+      "sha256": "54264bcfb6a3dea5bac3e29d2b0ab3c4e252fd7cacf8ba7311258103861fd7d0",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.013289499998791143,
+  "stdout": "",
+  "stderr": "gguf_merge: in-00001-of-00002.gguf -> merged.gguf\ngguf_merge: reading metadata in-00001-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: reading metadata in-00002-of-00002.gguf ...\u001b[3Ddone\ngguf_merge: splits contain 7 tensors, which does not match split.tensors.count\n"
+}

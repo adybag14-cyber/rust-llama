@@ -1,0 +1,28 @@
+{
+  "name": "big-endian-header",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "scope": "native-endian-domain",
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "ee1dd60bf20d9127c63b851588159e1e17f1499cc3cd0a341527bfda930a986d"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "ee1dd60bf20d9127c63b851588159e1e17f1499cc3cd0a341527bfda930a986d",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.01141769999958342,
+  "stdout": "",
+  "stderr": "gguf_init_from_reader: failed to load model: this GGUF file version 50331648 is extremely large, is there a mismatch between the host and model endianness?\ngguf_init_from_reader: failed to read header\ngguf_split:  failed to load input GGUF from input.gguf\n"
+}

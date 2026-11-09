@@ -1,0 +1,27 @@
+{
+  "name": "parse-short-help",
+  "args": [
+    "-h"
+  ],
+  "scope": "native-parser-or-undefined-input",
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1440,
+      "sha256": "0b818497d5772de175f1ca7730fc328a3a45cd363256beabbf1569be61f8e5e1"
+    }
+  ],
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 1440,
+      "sha256": "0b818497d5772de175f1ca7730fc328a3a45cd363256beabbf1569be61f8e5e1",
+      "existed_before": true
+    }
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "seconds": 0.011999800000921823,
+  "stdout": "\nusage: $EXE [options] GGUF_IN GGUF_OUT\n\nApply a GGUF operation on IN to OUT.\noptions:\n  -h, --help              show this help message and exit\n  --version               show version and build info\n  --split                 split GGUF to multiple GGUF (enabled by default)\n  --merge                 merge multiple GGUF to a single GGUF\n  --split-max-tensors     max tensors in each split (default: 128)\n  --split-max-size N(M|G) max size per split\n  --no-tensor-first-split do not add tensors to the first split (disabled by default)\n  --dry-run               only print out a split plan and exit, without writing any new files\n  --delete-splits         delete the split files during merge to free up disk space WARNING: this option is unsafe and will leave you in an unrecoverable state if something fails during the merge\n\n",
+  "stderr": "error: bad arguments\n"
+}

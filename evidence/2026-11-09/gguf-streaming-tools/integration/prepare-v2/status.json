@@ -1,0 +1,100 @@
+{
+  "status": "succeeded",
+  "base_commit": "1890f03291299ca3dca591f90d8b88ba6d29f1d5",
+  "started_utc": "2026-11-09T19:31:20.068214+00:00",
+  "scope": "Complete root merge continuation and preflight, without changing any source or native expected data.",
+  "preserved_failure": {
+    "path": "merge-v1/status.json",
+    "sha256": "e4b655ef225c108cb125267fad9939c58ea70e610a3a55eb076b7d9a887fc8fd",
+    "cause": "Post-merge documentation assertion expected the literal dense Qwen3; the correctly retained published sentence uses dense Qwen2/Qwen3."
+  },
+  "validation_drivers": [
+    {
+      "name": "verify-embedding-cli.py",
+      "before": {
+        "bytes": 5510,
+        "sha256": "0e0677d959f193d7442c50dd6b33914caf294f1f26c795357025474064c1d712"
+      },
+      "after": {
+        "bytes": 5514,
+        "sha256": "53e527997439f2e074f20890878cf6fd904d828bdd8e47ea4b74ff235ab16b60"
+      },
+      "change": "Only integration root and target names changed; native expectations unchanged."
+    },
+    {
+      "name": "verify-decoder-cli.py",
+      "before": {
+        "bytes": 2628,
+        "sha256": "1928a70ed8db418dcfe3dda34cdeb0e1c8c95ecb7341cc9cba094cbbed3e16a1"
+      },
+      "after": {
+        "bytes": 2631,
+        "sha256": "427ea2883733264d59001bc3df78ea502b6f0e0d80f6de9103be6bb02627c918"
+      },
+      "change": "Only integration root and target names changed; native expectations unchanged."
+    },
+    {
+      "name": "verify-qwen2-http.py",
+      "before": {
+        "bytes": 6431,
+        "sha256": "3130da0ae50036cf2a20bcf28f745cfe7664670eb48bc88b428a0aee3ffa0f62"
+      },
+      "after": {
+        "bytes": 6433,
+        "sha256": "3e23333d01c5e945278d63508a145f41627c2637c46998ef511c58790693f6d1"
+      },
+      "change": "Only integration root and target names changed; native expectations unchanged."
+    },
+    {
+      "name": "verify-qwen3-http.py",
+      "before": {
+        "bytes": 6420,
+        "sha256": "e3739c565cfac2f475d7b3694c5c5cff2b54d26207767801543d95d834dfab87"
+      },
+      "after": {
+        "bytes": 6422,
+        "sha256": "aa2a4be3430266e383acaff59bc4c47bab7ff9e5b96b93ab2c5bf99d571bab68"
+      },
+      "change": "Only integration root and target names changed; native expectations unchanged."
+    },
+    {
+      "name": "verify-sharded-apps-v2.py",
+      "before": {
+        "bytes": 8113,
+        "sha256": "d46615584b213cf6a054786f685ec52c512d531832f64ec834121c5faf2f3a9b"
+      },
+      "after": {
+        "bytes": 8115,
+        "sha256": "8569523308cb7ca4412ab89c4dd3c2d760484670c9f60f7dc7044b60349633f2"
+      },
+      "change": "Only integration root and target names changed; native expectations unchanged."
+    }
+  ],
+  "steps": [
+    {
+      "name": "fmt",
+      "exit_code": 0,
+      "seconds": 1.398924299995997,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "audit-write",
+      "exit_code": 0,
+      "seconds": 23.206477399995492,
+      "log_sha256": "8cfe88467dda226ae9fc8a70f8a0e3903f1dc1f296edaa2baaecde596705d25d"
+    },
+    {
+      "name": "audit",
+      "exit_code": 0,
+      "seconds": 20.557935700002417,
+      "log_sha256": "be51c23f9014eff5cf71e1e61d6ae7791f3a1385a9934e5cf92cff2192384517"
+    },
+    {
+      "name": "fixtures",
+      "exit_code": 0,
+      "seconds": 20.664480899999035,
+      "log_sha256": "6b816df912b5b7847cdb68249bdf08d99a364c20ca06af986d6422b5f061167e"
+    }
+  ],
+  "finished_utc": "2026-11-09T19:32:25.901661+00:00"
+}

@@ -1,0 +1,33 @@
+from pathlib import Path
+import hashlib,json,subprocess,os
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port')
+root=base/'rust-draft';hand=base/'corpus-adapter-v1';candidate=hand/'candidate'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+raw=(hand/'fixture-records.json').read_bytes()
+assert sha(raw)=='be07ff486de3afe0ebf56415c41144c5900e77d184f9f0c75cb77568712be60f'
+rows=json.loads(raw)
+test={'path':'crates/cli/tests/gguf_split_native.rs','bytes':16451,'sha256':'7902f3811e8d84380a9abb88010639f87f6616f0477b1428c076f8cd6a481873'}
+pending=[]
+for row in [test]+rows:
+ target=root/row['path'];assert not target.exists(),row['path']
+ data=(candidate/row['path']).read_bytes();assert len(data)==row['bytes'] and sha(data)==row['sha256'],row['path']
+ pending.append((target,data))
+manifest=root/'docs/integration-fixture-manifest.tsv';before=manifest.read_bytes()
+lines=(hand/'fixture-manifest-additions.tsv').read_text(encoding='utf-8').splitlines()
+assert lines[0]=='path\tsha256\torigin\tsource_identity'
+oldpaths={line.split('\t')[0] for line in before.decode('utf-8').splitlines()[1:]}
+assert len(lines[1:])==len(rows)
+for line,row in zip(lines[1:],rows):
+ fields=line.split('\t');assert fields[:2]==[row['path'],row['sha256']]
+ assert row['path'] not in oldpaths
+pending.append((manifest,before+b''.join((line+'\n').encode('utf-8') for line in lines[1:])))
+for target,data in pending:
+ target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+(base/'corpus-import-v1.json').write_bytes((json.dumps({'test':test,'fixtures':rows,'manifest_before_sha256':sha(before),'manifest_after_sha256':sha(manifest.read_bytes())},indent=2)+'\n').encode('utf-8'))
+out=base/'corpus-first-comparison-v1/windows';out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'target-windows');env['CARGO_BUILD_JOBS']='2'
+args=['cargo','+1.99.1','test','--offline','--locked','-p','rust-llama-cli','--test','gguf_split_native','--','--nocapture']
+p=subprocess.run(args,cwd=root,env=env,capture_output=True)
+(out/'stdout.txt').write_bytes(p.stdout);(out/'stderr.txt').write_bytes(p.stderr)
+(out/'status.json').write_bytes((json.dumps({'exit_code':p.returncode,'argv':args},indent=2)+'\n').encode('utf-8'))
+print(p.stdout.decode('utf-8','replace')[-6000:]);print(p.stderr.decode('utf-8','replace')[-16000:]);raise SystemExit(p.returncode)

@@ -1,0 +1,37 @@
+from pathlib import Path
+import hashlib,json,subprocess,os
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port');root=base/'rust-draft'
+p=root/'crates/gguf/tests/split_limits.rs';before=p.read_bytes();text=before.decode('utf-8')
+assert text.count('use llama_gguf::{DType,')==1
+text=text.replace('use llama_gguf::{DType,','use llama_quant::DType;\nuse llama_gguf::{')
+p.write_bytes(text.encode('utf-8'))
+s=root/'crates/gguf/src/split.rs';text=s.read_text(encoding='utf-8')
+text=text.replace('/// reading tensor payloads, as in the original tool.','/// requiring complete tensor payloads, as in the original tool. Bounded header\n/// read-ahead can still prefetch a payload prefix.')
+s.write_bytes(text.encode('utf-8'))
+hand=base/'corpus-adapter-docs-v2';raw=(hand/'records.json').read_bytes()
+assert hashlib.sha256(raw).hexdigest()=='1ce4a43d69a77030c5f9be3723cbddd003ed67621ee109efb0706aef5a9f159b'
+record=json.loads(raw)
+for r in record['files']:
+ assert hashlib.sha256((root/r['path']).read_bytes()).hexdigest()==r['preimage_sha256']
+ assert hashlib.sha256((hand/'candidate'/r['path']).read_bytes()).hexdigest()==r['sha256']
+for r in record['unchanged_native_data']:
+ assert hashlib.sha256((root/r['path']).read_bytes()).hexdigest()==r['sha256']
+manifest=root/'docs/integration-fixture-manifest.tsv'
+rows=manifest.read_text(encoding='utf-8').splitlines()
+replacements=(hand/'fixture-manifest-replacements.tsv').read_text(encoding='utf-8').splitlines()
+assert replacements[0]==rows[0]=='path\tsha256\torigin\tsource_identity'
+for r,line in zip(record['files'],replacements[1:]):
+ assert line.split('\t')[:2]==[r['path'],r['sha256']]
+ indices=[i for i,row in enumerate(rows) if row.startswith(r['path']+'\t')]
+ assert len(indices)==1 and rows[indices[0]].split('\t')[1]==r['preimage_sha256']
+ rows[indices[0]]=line
+for r in record['files']:(root/r['path']).write_bytes((hand/'candidate'/r['path']).read_bytes())
+manifest.write_bytes(('\n'.join(rows)+'\n').encode('utf-8'))
+out=base/'prepare-focused-v2';out.mkdir(exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'target-windows');env['CARGO_BUILD_JOBS']='2'
+p=subprocess.run(['cargo','+1.99.1','fmt','--all'],cwd=root,env=env,capture_output=True)
+(out/'fmt.stdout.txt').write_bytes(p.stdout);(out/'fmt.stderr.txt').write_bytes(p.stderr)
+assert p.returncode==0,p.stderr.decode('utf-8','replace')
+report={'passed':True,'test_import_correction':'Use the existing public llama_quant::DType, not the private imported gguf type. No production change for this test-only compile failure.','documentation_supplement':record,'source_ready':True}
+(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'passed':True,'source_ready':True}))

@@ -1,0 +1,154 @@
+"""Pack immutable original split/merge evidence; no Rust expected outputs."""
+from pathlib import Path
+import collections,datetime,hashlib,json,os,shutil
+ROOT=Path(__file__).resolve().parent
+OUT=ROOT/'corpus-adapter-v1'
+FIX=OUT/'candidate/fixtures/gguf-split'
+SOURCE=ROOT.parent/'llama.cpp-master'
+EXPECTED_INDEX='dcfce851b54b8fefb3db53346953051cdcac41e55da5c9c734783acf3d44b565'
+EXPECTED_REPORTS={'windows':'fc59723ff92d5a358533ad6736fcb3b6ac37c63c77c6e611eec0db6f9c207be1','linux':'47dbdd19f6f96cd10d23cd1d4f5cccf0c160ac4bc43c4c3984dcecc18ce136a8'}
+def digest(raw):return hashlib.sha256(raw).hexdigest()
+def obj(path):return json.loads(path.read_text(encoding='utf-8'))
+def save(path,value):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,indent=2,ensure_ascii=True)+'\n',encoding='utf-8',newline='\n')
+def file_row(path,relative=None):
+ raw=path.read_bytes()
+ return {'path':str(path) if relative is None else relative,'bytes':len(raw),'sha256':digest(raw)}
+index_path=ROOT/'original-inputs-v1/index.json'
+assert digest(index_path.read_bytes())==EXPECTED_INDEX
+index=obj(index_path)
+reports={}
+for profile,expected in EXPECTED_REPORTS.items():
+ path=ROOT/'original-v1'/profile/'report.json';assert digest(path.read_bytes())==expected
+ report=obj(path)
+ assert report['status']=='succeeded' and report['case_count']==103 and report['successful_processes']==64 and report['native_nonzero_processes']==39 and report['timed_out_processes']==0
+ reports[profile]=report
+assert len(index['cases'])==103
+assert not OUT.exists(),'immutable packaging location exists'
+FIX.mkdir(parents=True)
+pool=bytearray();blobs={}
+def intern(raw):
+ key=digest(raw)
+ if key in blobs:
+  record=blobs[key];assert pool[record['offset']:record['offset']+record['bytes']]==raw
+ else:
+  record={'offset':len(pool),'bytes':len(raw),'sha256':key};blobs[key]=record;pool.extend(raw)
+ return dict(record)
+def record_matches(raw,record):
+ assert len(raw)==record['bytes'] and digest(raw)==record['sha256'],record
+def native_snapshot(case):
+ return sorted((row['name'],row['bytes'],row['sha256']) for row in case['after_files'])
+native={profile:{case['name']:case for case in report['cases']} for profile,report in reports.items()}
+cases=[];differences=[];source_assertions=[];rejected_outputs=[]
+ub={
+ 'zero-limit-many':'The source evaluates i_tensor % 0 once i_tensor>0; native integer-division fault becomes a checked error.',
+ 'junk-limit-many':'atoi(junk) yields zero; the source later evaluates i_tensor % 0. The Rust tool returns a checked error.',
+ 'parse-junk-size':'The source ignores sscanf conversion failure and reads uninitialized int n. Both captures happened to succeed; this has no defined successful-output contract and Rust must return a checked error.',
+ 'parse-empty-size':'The source calls std::string::back() on an empty string. Both captures returned a diagnostic, but the undefined access does not establish portable diagnostic bytes.'
+}
+truncated={'truncated-input','merge-truncated-secondary','merge-truncated-secondary-dry'}
+for original in index['cases']:
+ name=original['name'];w=native['windows'][name];l=native['linux'][name]
+ assert original['args']==w['args']==l['args'] and original['scope']==w['scope']==l['scope']
+ assert w['timed_out']==l['timed_out']==False
+ initial=[]
+ for row in original['files']:
+  raw=(ROOT/'original-inputs-v1'/row['blob']).read_bytes();record_matches(raw,row)
+  initial.append({'name':row['name'],**intern(raw)})
+ for profile,n in [('windows',w),('linux',l)]:
+  assert [{k:v for k,v in row.items() if k not in ('offset',)} for row in initial]==n['input_files'],(profile,name,'initial hash/order')
+ output={}
+ for profile,n in [('windows',w),('linux',l)]:
+  folder=ROOT/'original-v1'/profile/'cases'/name
+  raw_case=obj(folder/'case.json');assert raw_case==n,(profile,name,'case.json differs')
+  expected=[]
+  paths=sorted(path.relative_to(folder).as_posix() for path in folder.rglob('*.gguf'))
+  assert paths==[row['name'] for row in n['after_files']],(profile,name,'unrecorded files')
+  for row in n['after_files']:
+   raw=(folder/row['name']).read_bytes();record_matches(raw,row)
+   expected.append({'name':row['name'],**intern(raw),'existed_before':row['existed_before']})
+   if 'inspection' in row and not row['inspection'].get('accepted',False):
+    rejected_outputs.append({'profile':profile,'case':name,'name':row['name'],'inspection_exit_code':row.get('inspection_exit_code'),'sha256':row['sha256']})
+  logs={}
+  for stream in ['stdout','stderr']:
+   raw=(folder/(stream+'.log')).read_bytes()
+   normalized=raw.decode('utf-8','replace').replace(reports[profile]['sources'][-2]['path'],'$EXE').replace('\r\n','\n')
+   assert normalized==n[stream],(profile,name,stream,'normalization differs')
+   logs[stream]={'raw':intern(raw),'normalized':n[stream]}
+  output[profile]={'exit_code':n['exit_code'],'after_files':expected,**logs}
+ assert w['exit_code']==0 if l['exit_code']==0 else w['exit_code']!=0
+ if native_snapshot(w)!=native_snapshot(l):
+  differences.append({'case':name,'windows_files':w['after_files'],'linux_files':l['after_files'],'qualification':'Original partial-output bytes vary by host after a failed read. The Rust regression requires a normal failure, preserved inputs and only bounded permitted partial outputs; it does not compare failed partial bytes.'})
+ if w['exit_code']==3221226505 or l['exit_code']==-6:
+  source_assertions.append(name)
+ expected_success=w['exit_code']==0 and name not in ub
+ if expected_success:
+  assert native_snapshot(w)==native_snapshot(l),(name,'successful output mismatch')
+  contract='exact-after-files'
+ elif name in truncated:
+  contract='checked-error-preserve-inputs-permit-partial-output'
+ else:
+  contract='checked-error-exact-inputs'
+ optional_outputs=sorted({row['name'] for n in [w,l] for row in n['after_files']} - {row['name'] for row in initial}) if name in truncated else []
+ plan=[line for line in w['stdout'].splitlines() if line.startswith('n_split: ') or line.startswith('split ')]
+ assert plan==[line for line in l['stdout'].splitlines() if line.startswith('n_split: ') or line.startswith('split ')]
+ if name=='parse-help':stdout_contract='usage-options'
+ elif name=='parse-version':stdout_contract='version-banner'
+ elif expected_success and plan:stdout_contract='split-plan-lines'
+ else:stdout_contract='captured-only'
+ cases.append({'name':name,'args':original['args'],'original_scope':original['scope'],'input_files':initial,
+               'rust_success':expected_success,'filesystem_contract':contract,'optional_partial_outputs':optional_outputs,
+               'stdout_contract':stdout_contract,'plan_lines':plan,'native':output,
+               'qualification':ub.get(name,'')})
+assert [x['case'] for x in differences]==['truncated-input','merge-truncated-secondary']
+assert len(source_assertions)==5
+(FIX/'native-data.bin').write_bytes(pool)
+reference={'schema':1,'source_archive_sha256':reports['windows']['source_archive_sha256'],
+ 'data':{'path':'native-data.bin','bytes':len(pool),'sha256':digest(pool),'unique_blobs':len(blobs)},
+ 'case_count':103,'native_success_count_per_profile':64,'native_failure_count_per_profile':39,
+ 'rust_expected_successes':sum(c['rust_success'] for c in cases),'rust_expected_checked_errors':sum(not c['rust_success'] for c in cases),
+ 'cases':cases}
+save(FIX/'native-reference.json',reference)
+for profile,destination in [('windows','native-msvc-report.json'),('linux','native-gnu-report.json')]:
+ shutil.copyfile(ROOT/'original-v1'/profile/'report.json',FIX/destination)
+shutil.copyfile(index_path,FIX/'original-input-index.json')
+source_paths=['tools/gguf-split/gguf-split.cpp','ggml/src/gguf.cpp','ggml/src/ggml.c','src/llama.cpp','ggml/include/gguf.h','ggml/include/ggml.h','include/llama.h','common/common.h','LICENSE']
+sources=[file_row(SOURCE/path,path) for path in source_paths]
+libraries=[]
+for profile,folder,names in [
+ ('msvc',ROOT.parent/'build/bin/Release',['llama.dll','ggml.dll','ggml-base.dll','ggml-cpu.dll']),
+ ('gnu',ROOT.parent/'build-ggml-linux-llama/bin',['libllama.so','libggml.so','libggml-base.so','libggml-cpu.so'])]:
+ for name in names:libraries.append({'profile':profile,**file_row(folder/name)})
+provenance={
+ 'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'source_archive_sha256':reference['source_archive_sha256'],
+ 'independence':'Expected output bytes and process transcripts are read only from the two immutable original-v1 captures. No Rust tool is invoked by this packer. Input constructors were separately replayed and hash-matched to both original reports, including inputs deleted or overwritten during original execution.',
+ 'license':'Synthetic GGUF wire fixtures and frozen source behavior; original llama.cpp/ggml MIT license preserved by the repository upstream license/notice.',
+ 'sources':sources,'original_capture_sources':{p:r['sources'] for p,r in reports.items()},'native_libraries':libraries,
+ 'capture_script':file_row(ROOT/'capture-original-v1.py','capture-original-v1.py'),
+ 'input_replay_script':file_row(ROOT/'retain-original-inputs-v1.py','retain-original-inputs-v1.py'),
+ 'packing_script':file_row(Path(__file__).resolve(),Path(__file__).name),
+ 'original_reports':{p:file_row(ROOT/'original-v1'/p/'report.json',f'original-v1/{p}/report.json') for p in reports},
+ 'original_input_index':file_row(index_path,'original-inputs-v1/index.json'),
+ 'original_gnu_build':obj(ROOT/'original-v1/linux/build.json'),
+ 'counts':{'cases_per_profile':103,'native_successes_per_profile':64,'native_nonzero_per_profile':39,'native_timeouts':0,'rust_success_contracts':reference['rust_expected_successes'],'rust_checked_error_contracts':reference['rust_expected_checked_errors'],'unique_initial_blobs':index['unique_blobs'],'initial_unique_bytes':index['unique_bytes'],'packed_unique_blobs':len(blobs),'packed_bytes':len(pool)},
+ 'packing':'One byte pool interns complete exact input files, exact original after-files and raw stdout/stderr transcripts by SHA-256 with a mandatory byte-equality check on reuse. Compact records point to full blob offsets/lengths. Full original reports and the original input index are copied byte-for-byte alongside the compact reference.',
+ 'source_undefined_behavior':ub,'native_assertions_converted_to_checked_errors':source_assertions,
+ 'profile_specific_failed_output_bytes':differences,
+ 'original_success_outputs_rejected_by_original_inspector':rejected_outputs,
+ 'qualification':[
+ 'All successful native after-file bytes agree between the two captures. parse-junk-size is excluded from a successful Rust contract because the source reads an uninitialized variable.',
+ 'Custom alignment may preserve a metadata alignment that disagrees with the source tool data padding, and canonicalized zero-dimensional/zero-extent tensors may produce original-invalid files. Successful output bytes must be preserved without asking the stricter reader to accept them.',
+ 'NUL-containing metadata strings are truncated according to original C-string transfer. Integer tensor limits retain atoi-prefix behavior; negative divisors work, and zero limits succeed when zero/one tensor short-circuits the modulo operation.',
+ 'Split dry-run reads headers and can succeed on truncated payloads. Merge dry-run still reads every payload and rejects the captured truncated secondary.',
+ 'The source advertises -h but its parser enters option handling only for -- prefixes; captured -h is a normal rejected argument.',
+ 'Version/build-banner bytes identify the original build and are retained only as evidence; Rust must identify its own build.',
+ 'Delete-splits in Rust is deliberately strengthened to delete only after the completed output is flushed/synced. Successful bytes and final deletions match the source; deletion log order and mid-failure destructive behavior are not replayed.',
+ 'Failed truncated-output bytes differ between original compilers. Their complete bytes are retained but the Rust adapter requires a checked error and intact inputs rather than failed partial-output byte parity.'
+ ]}
+save(FIX/'provenance.json',provenance)
+save(OUT/'pack-review.json',{'source_reports_verified':True,'initial_index_verified':True,'all_raw_file_and_log_hashes_verified':True,
+ 'cases_per_profile':103,'native_successes_per_profile':64,'rust_success_contracts':reference['rust_expected_successes'],
+ 'source_ub_cases':list(ub),'source_assertion_cases':source_assertions,'partial_output_difference_cases':[x['case'] for x in differences],
+ 'invalid_original_output_records':len(rejected_outputs),'candidate_fixture_directory':str(FIX),
+ 'reference_sha256':digest((FIX/'native-reference.json').read_bytes()),'data_sha256':digest(pool)})
+print(json.dumps(obj(OUT/'pack-review.json'),indent=2))

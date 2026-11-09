@@ -1,0 +1,40 @@
+{
+  "name": "name-non-utf8",
+  "args": [
+    "input.gguf",
+    "result"
+  ],
+  "input_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "87c602adb129f34316e801144237e689fb0c1ce1d71f088d6ba404ebbca69e03",
+      "hex": "474755460300000001000000000000000100000000000000040000000000000074657374040000000100000004000000000000006f6e65ff010000000100000000000000000000000000000000000000000000000000000000000000000000000000a03f00000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 0.0823889999956009,
+  "stdout": "n_split: 1\nsplit 00001: n_tensors = 1, total_size = 0M\nWriting file result-00001-of-00001.gguf ... done\n",
+  "stderr": "gguf_split: 1 gguf split written with a total of 1 tensors.\n",
+  "after_files": [
+    {
+      "name": "input.gguf",
+      "bytes": 128,
+      "sha256": "87c602adb129f34316e801144237e689fb0c1ce1d71f088d6ba404ebbca69e03",
+      "existed_before": true
+    },
+    {
+      "name": "result-00001-of-00001.gguf",
+      "bytes": 224,
+      "sha256": "2f4ede12be703f92fd02c3dd2c6b5cea0ce9ae35110c18426cc5fdf6894150b0",
+      "existed_before": false,
+      "inspection_exit_code": 3221226505,
+      "inspection_file": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "inspection_adapter_error": "Expecting value: line 1 column 1 (char 0)",
+      "inspection_adapter_qualification": "The native inspector could not serialize/emit valid UTF-8 JSON; retain its exact raw file and stderr, do not alter the original output."
+    }
+  ]
+}

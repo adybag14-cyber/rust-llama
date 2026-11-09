@@ -1,0 +1,58 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime,difflib
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-split-port');src=base/'rust-draft';product=Path(r'C:\Users\adyba\rust-llama')
+old='e0af03a97ca7077c6f2aee680fb84b3fa688f82a'
+out=base/'handoff-v1';out.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def put(p,b):p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)
+def jsonput(p,x):put(p,(json.dumps(x,indent=2)+'\n').encode('utf-8'))
+rows=[]
+for p in src.rglob('*'):
+ rel=p.relative_to(src)
+ if p.is_file() and 'evidence' not in rel.parts and '.git' not in rel.parts and (p.suffix in ('.rs','.json','.bin','.gguf') or p.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or rel.as_posix() in ('.cargo/config.toml','.github/workflows/ci.yml')):
+  rows.append({'path':rel.as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())})
+rows.sort(key=lambda r:r['path'])
+fingerprint={'files':len(rows),'sha256':sha('\n'.join(r['path']+'\0'+r['sha256'] for r in rows).encode('utf-8'))}
+assert fingerprint=={'files':617,'sha256':'2b90e10d264a322529723ca3cb7f2bdf1bdd3f334f9f6e9caf12b00703638d05'}
+for platform in ('windows','linux'):
+ report=json.loads((base/'validation/focused-v2'/platform/'status.json').read_text(encoding='utf-8'))
+ assert report['status']=='succeeded' and report['execution_inputs_after']==fingerprint
+tree=subprocess.check_output(['git','ls-tree','-r','-z',old],cwd=product)
+tracked={}
+for entry in tree.split(b'\0'):
+ if not entry:continue
+ meta,path=entry.split(b'\t',1);mode,kind,blob=meta.split()
+ if kind==b'blob':tracked[path.decode('utf-8')]=blob.decode('ascii')
+changed=[]
+for p in src.rglob('*'):
+ rel=p.relative_to(src)
+ if not p.is_file() or rel.parts[0] in ('evidence','.git','target'):continue
+ name=rel.as_posix();data=p.read_bytes();oid=hashlib.sha1(b'blob '+str(len(data)).encode('ascii')+b'\0'+data).hexdigest()
+ if tracked.get(name)!=oid:changed.append(name)
+missing=[n for n in tracked if not n.startswith('evidence/') and not (src/n).is_file()]
+assert not missing,missing
+source_paths=['Cargo.lock','crates/gguf/src/lib.rs','crates/gguf/src/writer.rs','crates/gguf/src/split.rs','crates/gguf/tests/split_limits.rs','crates/gguf/README.md','crates/cli/Cargo.toml','crates/cli/src/gguf_split.rs','crates/cli/tests/gguf_split_native.rs']
+fixture_paths=sorted(p.relative_to(src).as_posix() for p in (src/'fixtures/gguf-split').iterdir() if p.is_file())
+assert len(fixture_paths)==7
+expected=set(source_paths+fixture_paths+['docs/integration-fixture-manifest.tsv'])
+assert set(changed)==expected,{'extra':sorted(set(changed)-expected),'missing':sorted(expected-set(changed))}
+records=[];patch=[]
+for name in sorted(source_paths):
+ after=(src/name).read_bytes();before=subprocess.check_output(['git','show',old+':'+name],cwd=product) if name in tracked else None
+ put(out/'candidate'/name,after)
+ if before is not None:put(out/'preimages'/name,before)
+ records.append({'path':name,'before':None if before is None else {'bytes':len(before),'sha256':sha(before),'git_blob':tracked[name]},'after':{'bytes':len(after),'sha256':sha(after)}})
+ patch.extend(difflib.unified_diff([] if before is None else before.decode('utf-8').splitlines(keepends=True),after.decode('utf-8').splitlines(keepends=True),fromfile='/dev/null' if before is None else 'a/'+name,tofile='b/'+name))
+put(out/'source.patch',''.join(patch).encode('utf-8'))
+for name in fixture_paths:put(out/'candidate'/name,(src/name).read_bytes())
+manifest=(src/'docs/integration-fixture-manifest.tsv').read_text(encoding='utf-8').splitlines()
+header=manifest[0];assert header.split('\t')==['path','sha256','origin','source_identity']
+selected=[line for line in manifest[1:] if line.split('\t')[0] in fixture_paths]
+assert len(selected)==7
+for line in selected:
+ fields=line.split('\t');assert sha((src/fields[0]).read_bytes())==fields[1],fields[0]
+put(out/'fixture-manifest-additions.tsv',('\n'.join([header]+selected)+'\n').encode('utf-8'))
+fixtures=[{'path':n,'bytes':(src/n).stat().st_size,'sha256':sha((src/n).read_bytes())} for n in fixture_paths]
+report={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':old,'source_archive_sha256':'2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122','execution_inputs':fingerprint,'source':records,'fixtures':fixtures,'scope':'Native Rust bounded ordered GGUF writer, split/merge tool and immutable original CLI comparisons. Arbitrary-byte/NUL metadata keys and tensor names remain an inherited open reader boundary; T04 remains open.','validation':{p:{'path':str(base/'validation/focused-v2'/p/'status.json'),'sha256':sha((base/'validation/focused-v2'/p/'status.json').read_bytes())} for p in ('windows','linux')},'source_patch_sha256':sha((out/'source.patch').read_bytes()),'fixture_additions_sha256':sha((out/'fixture-manifest-additions.tsv').read_bytes())}
+jsonput(out/'manifest.json',report)
+print(json.dumps({'handoff':str(out),'manifest_sha256':sha((out/'manifest.json').read_bytes()),'source_files':len(records),'fixture_files':len(fixtures),'fixture_bytes':sum(r['bytes'] for r in fixtures),'execution_inputs':fingerprint,'changed':sorted(changed)},indent=2))

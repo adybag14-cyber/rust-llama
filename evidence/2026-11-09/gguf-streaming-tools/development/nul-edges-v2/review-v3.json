@@ -1,0 +1,1047 @@
+{
+  "schema": 1,
+  "independence": "Only original C++ programs executed before this analysis. No Rust comparison or expected-output generation occurred. This addon retains the pre-existing strict reader-domain gaps separately from new streaming-tool behavior.",
+  "native_source": "source ZIP 2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "counts": {
+    "cases_per_profile": 22,
+    "successes_per_profile": 17,
+    "failures_per_profile": 5,
+    "verified_after_file_records": 90,
+    "prior_complete_case_file_and_exit_records_identical": 30,
+    "prior_failure_transcript_differences": [
+      {
+        "profile": "linux",
+        "case": "key-nul-leading",
+        "stdout_changed": true,
+        "stderr_changed": false,
+        "qualification": "Native failure/backtrace logging can vary by process. Raw v1/v2 logs remain unchanged; exit status and all input/output bytes still match."
+      },
+      {
+        "profile": "linux",
+        "case": "key-nul-alignment-type-collision",
+        "stdout_changed": true,
+        "stderr_changed": false,
+        "qualification": "Native failure/backtrace logging can vary by process. Raw v1/v2 logs remain unchanged; exit status and all input/output bytes still match."
+      },
+      {
+        "profile": "linux",
+        "case": "name-nul-collision",
+        "stdout_changed": true,
+        "stderr_changed": false,
+        "qualification": "Native failure/backtrace logging can vary by process. Raw v1/v2 logs remain unchanged; exit status and all input/output bytes still match."
+      },
+      {
+        "profile": "linux",
+        "case": "name-nul-exact-collision",
+        "stdout_changed": true,
+        "stderr_changed": false,
+        "qualification": "Native failure/backtrace logging can vary by process. Raw v1/v2 logs remain unchanged; exit status and all input/output bytes still match."
+      }
+    ],
+    "all_after_file_bytes_equal_across_profiles": true
+  },
+  "reports": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-split-port\\nul-edges-v2\\windows\\report.json",
+      "bytes": 61808,
+      "sha256": "08db532e37a69e62dc2a58617970b2385853a0bcbd8edcd66ee5b63e5d91da24"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-split-port\\nul-edges-v2\\linux\\report.json",
+      "bytes": 66221,
+      "sha256": "90bd8d451e597fc3c95d45dcedb048f2b3fe43803c3dc288518244da83d09c15"
+    }
+  ],
+  "adapter_failure_retained": {
+    "windows_job": "job-1794250511749-af36b72c-8d2",
+    "gnu_job": "job-1794250512122-e4169fb5-c01",
+    "reason": "v1 attempted to JSON-decode the original inspector empty output on invalid-UTF8 strings. Both stopped after 15 complete cases. v2 preserves the inspector exit, raw bytes and decode failure, and reruns in new directories; every prior complete case has identical input/output bytes and exit status. A separate list records differing native failure logs."
+  },
+  "reader_boundary": "The current Rust public GGUF reader rejects empty/NUL metadata keys, NUL tensor names and non-UTF8 strings. Empty key rejection agrees with source; the other accepted addon cases document a stricter existing domain, not complete byte-string compatibility. No source or fixture assertion was changed for this report.",
+  "cases": [
+    {
+      "case": "key-nul-single",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "b28ebccf9fd4c05aa29f894c0dd8750b91414c4911217ac701d7c7914d43f97e",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "key",
+              "type": 4,
+              "value": 7
+            },
+            {
+              "key": "tail",
+              "type": 8,
+              "value": "value"
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-nul-collision",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "97455c6c3f9baba13d7bd84f77dd088768cbfba0e2ceb95b55da95f1c5b511a3",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "middle",
+              "type": 4,
+              "value": 9
+            },
+            {
+              "key": "key",
+              "type": 4,
+              "value": 2
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-nul-exact-collision",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "97455c6c3f9baba13d7bd84f77dd088768cbfba0e2ceb95b55da95f1c5b511a3",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "middle",
+              "type": 4,
+              "value": 9
+            },
+            {
+              "key": "key",
+              "type": 4,
+              "value": 2
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-nul-leading",
+      "windows_exit": 3221226505,
+      "gnu_exit": -6,
+      "output_files": []
+    },
+    {
+      "case": "key-empty",
+      "windows_exit": 1,
+      "gnu_exit": 1,
+      "output_files": []
+    },
+    {
+      "case": "key-nul-split-count",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "da3bda6ad0b2843cc09a29b3b7a1a3b77eed7fd33e0316c170c9f780dcf3f226",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "tail",
+              "type": 8,
+              "value": "value"
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-nul-alignment",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 256,
+          "sha256": "862ebc5b6d71b1fc0e79f41d857ccc16c4f3926321137ca73d2478eeab1be39d",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "general.alignment",
+              "type": 4,
+              "value": 64
+            },
+            {
+              "key": "tail",
+              "type": 4,
+              "value": 9
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": false,
+              "payload_bytes": 0
+            }
+          ],
+          "payload_prefix_hex": ""
+        }
+      ]
+    },
+    {
+      "case": "key-nul-alignment-collision",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 256,
+          "sha256": "cb65bb02af8bc1e69b975e274899e33f6e64c70e2bd91d1f20a345e3cf27fcc7",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "middle",
+              "type": 4,
+              "value": 9
+            },
+            {
+              "key": "general.alignment",
+              "type": 4,
+              "value": 32
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-nul-alignment-type-collision",
+      "windows_exit": 3221226505,
+      "gnu_exit": -6,
+      "output_files": []
+    },
+    {
+      "case": "name-nul-single",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "71bcf922a612b6cd80f20c3786492567e677c59562af2faf047b032aae6226e3",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "test",
+              "type": 4,
+              "value": 1
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "name-nul-leading",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 192,
+          "sha256": "70c9867e3ae0eb4be62a1abcd9b73e686dab58a8b6db874241ccd0941004ca49",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "test",
+              "type": 4,
+              "value": 1
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 1
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 1
+            }
+          ],
+          "tensors": [
+            {
+              "name": "",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "name-nul-collision",
+      "windows_exit": 3221226505,
+      "gnu_exit": -6,
+      "output_files": []
+    },
+    {
+      "case": "name-nul-collision-split-one",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00002.gguf",
+          "bytes": 224,
+          "sha256": "eba3a32d3c87f257e2c992a7993fc1ca685f6ddf24cea0d0977beeab1c561a36",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "test",
+              "type": 4,
+              "value": 1
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 2
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        },
+        {
+          "name": "result-00002-of-00002.gguf",
+          "bytes": 192,
+          "sha256": "8d1eff00746d4bf1610abbea79e7c7662041c0ce2a2dc58dcbf3418d38ff497f",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 1
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 2
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "name-nul-exact-collision",
+      "windows_exit": 3221226505,
+      "gnu_exit": -6,
+      "output_files": []
+    },
+    {
+      "case": "name-nul-exact-collision-split-one",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00002.gguf",
+          "bytes": 224,
+          "sha256": "eba3a32d3c87f257e2c992a7993fc1ca685f6ddf24cea0d0977beeab1c561a36",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "test",
+              "type": 4,
+              "value": 1
+            },
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 2
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        },
+        {
+          "name": "result-00002-of-00002.gguf",
+          "bytes": 192,
+          "sha256": "8d1eff00746d4bf1610abbea79e7c7662041c0ce2a2dc58dcbf3418d38ff497f",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 1
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 2
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "key-non-utf8",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "6348df7c65718164eb1768a1f27f3e14078138002250f5e003a3a65cb5e41d86",
+          "inspection_exit_code": 3221226505,
+          "inspection_adapter_error": "Expecting value: line 1 column 1 (char 0)",
+          "inspection_stderr": ""
+        }
+      ]
+    },
+    {
+      "case": "value-non-utf8",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "713454a1063f6d1ab25f1f6ccede8fe9829cbee176aadd346b7f538c16118555",
+          "inspection_exit_code": 3221226505,
+          "inspection_adapter_error": "Expecting value: line 1 column 1 (char 0)",
+          "inspection_stderr": ""
+        }
+      ]
+    },
+    {
+      "case": "name-non-utf8",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "result-00001-of-00001.gguf",
+          "bytes": 224,
+          "sha256": "2f4ede12be703f92fd02c3dd2c6b5cea0ce9ae35110c18426cc5fdf6894150b0",
+          "inspection_exit_code": 3221226505,
+          "inspection_adapter_error": "Expecting value: line 1 column 1 (char 0)",
+          "inspection_stderr": ""
+        }
+      ]
+    },
+    {
+      "case": "merge-key-nul-primary-count",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "merged.gguf",
+          "bytes": 288,
+          "sha256": "a974c8659102192624ae76435f13bbf2e8237b9eee4323ee0d3d361c6473ef90",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "test",
+              "type": 8,
+              "value": "first"
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 0
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            },
+            {
+              "name": "two",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 32,
+              "byte_len": 4,
+              "payload_offset": 4,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "merge-key-nul-primary-total",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "merged.gguf",
+          "bytes": 288,
+          "sha256": "a974c8659102192624ae76435f13bbf2e8237b9eee4323ee0d3d361c6473ef90",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "test",
+              "type": 8,
+              "value": "first"
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 0
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            },
+            {
+              "name": "two",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 32,
+              "byte_len": 4,
+              "payload_offset": 4,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "merge-key-nul-secondary-no",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "merged.gguf",
+          "bytes": 288,
+          "sha256": "a974c8659102192624ae76435f13bbf2e8237b9eee4323ee0d3d361c6473ef90",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "test",
+              "type": 8,
+              "value": "first"
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 0
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            },
+            {
+              "name": "two",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 32,
+              "byte_len": 4,
+              "payload_offset": 4,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "case": "merge-key-nul-secondary-count",
+      "windows_exit": 0,
+      "gnu_exit": 0,
+      "output_files": [
+        {
+          "name": "merged.gguf",
+          "bytes": 288,
+          "sha256": "a974c8659102192624ae76435f13bbf2e8237b9eee4323ee0d3d361c6473ef90",
+          "accepted_by_inspector": true,
+          "metadata": [
+            {
+              "key": "split.no",
+              "type": 2,
+              "value": 0
+            },
+            {
+              "key": "split.tensors.count",
+              "type": 5,
+              "value": 2
+            },
+            {
+              "key": "test",
+              "type": 8,
+              "value": "first"
+            },
+            {
+              "key": "split.count",
+              "type": 2,
+              "value": 0
+            }
+          ],
+          "tensors": [
+            {
+              "name": "one",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 0,
+              "byte_len": 4,
+              "payload_offset": 0,
+              "payload_complete": true,
+              "payload_bytes": 4
+            },
+            {
+              "name": "two",
+              "dimensions": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "dtype": 0,
+              "offset": 32,
+              "byte_len": 4,
+              "payload_offset": 4,
+              "payload_complete": true,
+              "payload_bytes": 4
+            }
+          ],
+          "payload_prefix_hex": "0000a03f000000000000000000000000"
+        }
+      ]
+    }
+  ]
+}

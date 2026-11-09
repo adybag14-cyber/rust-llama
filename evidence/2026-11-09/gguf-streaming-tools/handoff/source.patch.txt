@@ -1,0 +1,2612 @@
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -120,6 +120,7 @@
+ version = "0.1.0"
+ dependencies = [
+  "llama-behavior",
++ "llama-conformance",
+  "llama-gguf",
+  "llama-inference",
+  "llama-tokenizer",
+--- a/crates/cli/Cargo.toml
++++ b/crates/cli/Cargo.toml
+@@ -1,5 +1,6 @@
+ [package]
+ name = "rust-llama-cli"
++default-run = "rust-llama"
+ version.workspace = true
+ edition.workspace = true
+ rust-version.workspace = true
+@@ -9,8 +10,15 @@
+ name = "rust-llama"
+ path = "src/main.rs"
+ 
++[[bin]]
++name = "llama-gguf-split"
++path = "src/gguf_split.rs"
++
+ [dependencies]
+ llama-inference = { path = "../inference" }
+ llama-gguf = { path = "../gguf" }
+ llama-tokenizer = { path = "../tokenizer" }
+ llama-behavior = { path = "../llama-behavior" }
++
++[dev-dependencies]
++llama-conformance = { path = "../llama-conformance" }
+--- /dev/null
++++ b/crates/cli/src/gguf_split.rs
+@@ -0,0 +1,248 @@
++//! Command-line port of the frozen tools/gguf-split utility.
++use llama_gguf::ShardLimits;
++use llama_gguf::split::{self, MergeOptions, SplitLimit, SplitOptions};
++use std::ffi::{OsStr, OsString};
++use std::io::{self, Write};
++use std::path::PathBuf;
++use std::process::ExitCode;
++
++fn usage(out: &mut impl Write, executable: &OsStr) -> io::Result<()> {
++    writeln!(out)?;
++    writeln!(
++        out,
++        "usage: {} [options] GGUF_IN GGUF_OUT",
++        executable.to_string_lossy()
++    )?;
++    writeln!(out)?;
++    writeln!(out, "Apply a GGUF operation on IN to OUT.")?;
++    writeln!(out, "options:")?;
++    writeln!(
++        out,
++        "  -h, --help              show this help message and exit"
++    )?;
++    writeln!(out, "  --version               show version and build info")?;
++    writeln!(
++        out,
++        "  --split                 split GGUF to multiple GGUF (enabled by default)"
++    )?;
++    writeln!(
++        out,
++        "  --merge                 merge multiple GGUF to a single GGUF"
++    )?;
++    writeln!(
++        out,
++        "  --split-max-tensors     max tensors in each split (default: 128)"
++    )?;
++    writeln!(out, "  --split-max-size N(M|G) max size per split")?;
++    writeln!(
++        out,
++        "  --no-tensor-first-split do not add tensors to the first split (disabled by default)"
++    )?;
++    writeln!(
++        out,
++        "  --dry-run               only print out a split plan and exit, without writing any new files"
++    )?;
++    writeln!(
++        out,
++        "  --delete-splits         delete split files only after the complete merge is flushed and synced"
++    )?;
++    writeln!(out)
++}
++
++#[derive(Clone, Copy, PartialEq, Eq)]
++enum Operation {
++    Split,
++    Merge,
++}
++enum Action {
++    Help,
++    Version,
++    Run {
++        operation: Operation,
++        input: PathBuf,
++        output: PathBuf,
++        split: SplitOptions,
++        merge: MergeOptions,
++    },
++}
++
++// Match the defined decimal-prefix behavior of atoi/sscanf("%d"). Overflow and
++// a missing sscanf value are checked instead of reproducing C undefined behavior.
++fn decimal_prefix(text: &str) -> Result<Option<i32>, String> {
++    let bytes = text.as_bytes();
++    let mut index = 0;
++    while bytes
++        .get(index)
++        .is_some_and(|c| matches!(c, b' ' | b'\t' | b'\n' | b'\r' | b'\x0b' | b'\x0c'))
++    {
++        index += 1;
++    }
++    let negative = bytes.get(index) == Some(&b'-');
++    if negative || bytes.get(index) == Some(&b'+') {
++        index += 1;
++    }
++    let start = index;
++    let mut value = 0u64;
++    while let Some(&digit) = bytes.get(index).filter(|c| c.is_ascii_digit()) {
++        value = value
++            .checked_mul(10)
++            .and_then(|n| n.checked_add(u64::from(digit - b'0')))
++            .ok_or_else(|| {
++                "error: decimal argument overflows the source signed integer".to_string()
++            })?;
++        if value > i32::MAX as u64 + u64::from(negative) {
++            return Err("error: decimal argument overflows the source signed integer".into());
++        }
++        index += 1;
++    }
++    if index == start {
++        return Ok(None);
++    }
++    let value = if negative {
++        -(value as i64)
++    } else {
++        value as i64
++    };
++    Ok(Some(value as i32))
++}
++fn size(text: &str) -> Result<u64, String> {
++    let unit = match text.as_bytes().last() {
++        Some(b'M') => 1_000_000u64,
++        Some(b'G') => 1_000_000_000u64,
++        Some(c) => {
++            return Err(format!(
++                "error: supported units are M (megabytes) or G (gigabytes), but got: {}",
++                char::from(*c)
++            ));
++        }
++        None => return Err("error: size argument is empty".into()),
++    };
++    let n = decimal_prefix(text)?
++        .ok_or_else(|| "error: size argument has no decimal value".to_string())?;
++    if n <= 0 {
++        return Err("error: size must be a positive value".into());
++    }
++    (n as u64)
++        .checked_mul(unit)
++        .ok_or_else(|| "error: size argument overflows the byte count".into())
++}
++fn parse(args: &[OsString]) -> Result<Action, String> {
++    let mut operation = None;
++    let mut mode = None;
++    let mut split = SplitOptions::default();
++    let mut merge = MergeOptions::default();
++    let mut index = 0;
++    while let Some(raw) = args
++        .get(index)
++        .and_then(|x| x.to_str())
++        .filter(|x| x.starts_with("--"))
++    {
++        let arg = raw.replace('_', "-");
++        match arg.as_str() {
++            "--help" => return Ok(Action::Help),
++            "--version" => return Ok(Action::Version),
++            "--dry-run" => {
++                split.dry_run = true;
++                merge.dry_run = true;
++            }
++            "--no-tensor-first-split" => split.no_tensor_first_split = true,
++            "--delete-splits" => merge.delete_splits = true,
++            "--split" | "--merge" => {
++                let next = if arg == "--split" {
++                    Operation::Split
++                } else {
++                    Operation::Merge
++                };
++                if operation.is_some_and(|old| old != next) {
++                    return Err(
++                        "error: either --split or --merge can be specified, but not both".into(),
++                    );
++                }
++                operation = Some(next);
++            }
++            "--split-max-tensors" | "--split-max-size" => {
++                index += 1;
++                let value = args
++                    .get(index)
++                    .ok_or_else(|| format!("error: invalid parameter for argument: {arg}"))?;
++                let value = value
++                    .to_str()
++                    .ok_or_else(|| format!("error: non-text parameter for argument: {arg}"))?;
++                let is_size = arg == "--split-max-size";
++                if mode.is_some_and(|old| old != is_size) {
++                    return Err("error: either --split-max-tensors or --split-max-size can be specified, but not both".into());
++                }
++                mode = Some(is_size);
++                split.limit = if is_size {
++                    SplitLimit::Bytes(size(value)?)
++                } else {
++                    SplitLimit::Tensors(decimal_prefix(value)?.unwrap_or(0))
++                };
++            }
++            _ => return Err(format!("error: unknown argument: {arg}")),
++        }
++        index += 1;
++    }
++    if args.len() - index != 2 {
++        return Err("error: bad arguments".into());
++    }
++    Ok(Action::Run {
++        operation: operation.unwrap_or(Operation::Split),
++        input: PathBuf::from(&args[index]),
++        output: PathBuf::from(&args[index + 1]),
++        split,
++        merge,
++    })
++}
++fn main() -> ExitCode {
++    let mut args = std::env::args_os();
++    let executable = args
++        .next()
++        .unwrap_or_else(|| OsString::from("llama-gguf-split"));
++    let args: Vec<_> = args.collect();
++    let mut out = io::stdout().lock();
++    let mut err = io::stderr().lock();
++    let action = match parse(&args) {
++        Ok(action) => action,
++        Err(message) => {
++            let _ = writeln!(err, "{message}");
++            let _ = usage(&mut out, &executable);
++            return ExitCode::FAILURE;
++        }
++    };
++    let result: Result<(), Box<dyn std::error::Error>> = match action {
++        Action::Help => usage(&mut out, &executable).map_err(Into::into),
++        Action::Version => writeln!(
++            err,
++            "version: rust-llama {}\nnative Rust GGUF utility for {}-{}",
++            env!("CARGO_PKG_VERSION"),
++            std::env::consts::ARCH,
++            std::env::consts::OS
++        )
++        .map_err(Into::into),
++        Action::Run {
++            operation,
++            input,
++            output,
++            split,
++            merge,
++        } => {
++            let limits = ShardLimits::default();
++            match operation {
++                Operation::Split => {
++                    split::split(&input, &output, split, &limits, &mut out, &mut err)
++                }
++                Operation::Merge => split::merge(&input, &output, merge, &limits, &mut err),
++            }
++            .map(|_| ())
++            .map_err(Into::into)
++        }
++    };
++    match result {
++        Ok(()) => ExitCode::SUCCESS,
++        Err(error) => {
++            let _ = writeln!(err, "error: {error}");
++            ExitCode::FAILURE
++        }
++    }
++}
+--- /dev/null
++++ b/crates/cli/tests/gguf_split_native.rs
+@@ -0,0 +1,464 @@
++//! Black-box regressions captured only from the frozen C++ gguf-split tool.
++//! See fixtures/gguf-split/provenance.json for UB, partial-output and safe-delete
++//! qualifications. Original-invalid successful GGUF bytes are compared directly.
++use llama_behavior::json::{self, Value};
++use llama_conformance::digest::sha256;
++use std::{
++    collections::{BTreeMap, BTreeSet},
++    fs::{self, File},
++    io::Read,
++    path::{Component, Path, PathBuf},
++    process::{Child, Command, ExitStatus, Stdio},
++    sync::atomic::{AtomicU64, Ordering},
++    thread,
++    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
++};
++
++const REFERENCE_SHA: &str = "8e215c082250d335dd38ec5256f61484d8a0f9f6473c9bbfb54357336863ec0c";
++const DATA_SHA: &str = "f34d665678bb6dce9a87b9ff5f30c63e925715f36be59eb2846356049d693d58";
++const MAX_CAPTURE: u64 = 4 * 1024 * 1024;
++const ORIGINAL_DELETE_HELP: &str = "  --delete-splits         delete the split files during merge to free up disk space WARNING: this option is unsafe and will leave you in an unrecoverable state if something fails during the merge\n";
++const SAFE_DELETE_HELP: &str = "  --delete-splits         delete split files only after the complete merge is flushed and synced\n";
++
++fn field<'a>(value: &'a Value, key: &str) -> &'a Value {
++    value.get(key).unwrap_or_else(|| panic!("missing {key}"))
++}
++fn string(value: &Value) -> &str {
++    value.as_str().expect("fixture string")
++}
++fn array(value: &Value) -> &[Value] {
++    value.as_array().expect("fixture array")
++}
++fn number(value: &Value) -> usize {
++    usize::try_from(value.as_u64().expect("fixture nonnegative integer")).unwrap()
++}
++fn boolean(value: &Value) -> bool {
++    value.as_bool().expect("fixture boolean")
++}
++fn fixture(name: &str) -> PathBuf {
++    Path::new(env!("CARGO_MANIFEST_DIR"))
++        .join("../../fixtures/gguf-split")
++        .join(name)
++}
++fn pinned(name: &str, expected: &str) -> Vec<u8> {
++    let raw = fs::read(fixture(name)).unwrap();
++    assert_eq!(sha256(&raw), expected, "fixture {name}");
++    raw
++}
++fn relative(name: &str) -> &Path {
++    let path = Path::new(name);
++    assert!(
++        !name.is_empty()
++            && path
++                .components()
++                .all(|part| matches!(part, Component::Normal(_))),
++        "unsafe fixture path {name:?}"
++    );
++    path
++}
++struct Corpus {
++    reference: Value,
++    data: Vec<u8>,
++}
++impl Corpus {
++    fn new() -> Self {
++        let reference = json::parse(
++            std::str::from_utf8(&pinned("native-reference.json", REFERENCE_SHA)).unwrap(),
++        )
++        .unwrap();
++        let data = pinned("native-data.bin", DATA_SHA);
++        assert_eq!(
++            data.len(),
++            number(field(field(&reference, "data"), "bytes"))
++        );
++        assert_eq!(array(field(&reference, "cases")).len(), 103);
++        for (name, hash) in [
++            (
++                "native-msvc-report.json",
++                "fc59723ff92d5a358533ad6736fcb3b6ac37c63c77c6e611eec0db6f9c207be1",
++            ),
++            (
++                "native-gnu-report.json",
++                "47dbdd19f6f96cd10d23cd1d4f5cccf0c160ac4bc43c4c3984dcecc18ce136a8",
++            ),
++            (
++                "original-input-index.json",
++                "dcfce851b54b8fefb3db53346953051cdcac41e55da5c9c734783acf3d44b565",
++            ),
++        ] {
++            pinned(name, hash);
++        }
++        Self { reference, data }
++    }
++    fn blob(&self, record: &Value) -> &[u8] {
++        let start = number(field(record, "offset"));
++        let end = start.checked_add(number(field(record, "bytes"))).unwrap();
++        let raw = self.data.get(start..end).expect("bounded fixture blob");
++        assert_eq!(sha256(raw), string(field(record, "sha256")));
++        raw
++    }
++    fn cases(&self) -> &[Value] {
++        array(field(&self.reference, "cases"))
++    }
++    fn case(&self, name: &str) -> &Value {
++        self.cases()
++            .iter()
++            .find(|case| string(field(case, "name")) == name)
++            .unwrap()
++    }
++    fn materialize(&self, case: &Value) -> WorkingDirectory {
++        let work = WorkingDirectory::new();
++        for record in array(field(case, "input_files")) {
++            let path = work.root.join(relative(string(field(record, "name"))));
++            fs::create_dir_all(path.parent().unwrap()).unwrap();
++            fs::write(path, self.blob(record)).unwrap();
++        }
++        work
++    }
++}
++struct WorkingDirectory {
++    root: PathBuf,
++}
++impl WorkingDirectory {
++    fn new() -> Self {
++        static NEXT: AtomicU64 = AtomicU64::new(0);
++        let root = std::env::temp_dir().join(format!(
++            "rust-llama-split-native-{}-{}-{}",
++            std::process::id(),
++            SystemTime::now()
++                .duration_since(UNIX_EPOCH)
++                .unwrap()
++                .as_nanos(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ));
++        fs::create_dir(&root).unwrap();
++        Self { root }
++    }
++}
++impl Drop for WorkingDirectory {
++    fn drop(&mut self) {
++        let _ = fs::remove_dir_all(&self.root);
++    }
++}
++struct ChildGuard(Child);
++impl Drop for ChildGuard {
++    fn drop(&mut self) {
++        let _ = self.0.kill();
++        let _ = self.0.wait();
++    }
++}
++struct Captured {
++    status: ExitStatus,
++    stdout: String,
++    stderr: String,
++}
++fn limited_text(path: &Path) -> Result<String, String> {
++    let mut raw = Vec::new();
++    File::open(path)
++        .map_err(|e| e.to_string())?
++        .take(MAX_CAPTURE + 1)
++        .read_to_end(&mut raw)
++        .map_err(|e| e.to_string())?;
++    if raw.len() as u64 > MAX_CAPTURE {
++        return Err("CLI transcript exceeded 4 MiB".into());
++    }
++    let program = env!("CARGO_BIN_EXE_llama-gguf-split");
++    Ok(String::from_utf8_lossy(&raw)
++        .replace(program, "$EXE")
++        .replace("\r\n", "\n"))
++}
++fn run(work: &WorkingDirectory, args: &[String]) -> Result<Captured, String> {
++    let stdout_path = work.root.join("__capture_stdout.txt");
++    let stderr_path = work.root.join("__capture_stderr.txt");
++    let mut child = ChildGuard(
++        Command::new(env!("CARGO_BIN_EXE_llama-gguf-split"))
++            .args(args)
++            .current_dir(&work.root)
++            .stdin(Stdio::null())
++            .stdout(Stdio::from(
++                File::create(&stdout_path).map_err(|e| e.to_string())?,
++            ))
++            .stderr(Stdio::from(
++                File::create(&stderr_path).map_err(|e| e.to_string())?,
++            ))
++            .spawn()
++            .map_err(|e| e.to_string())?,
++    );
++    let started = Instant::now();
++    let status = loop {
++        if let Some(status) = child.0.try_wait().map_err(|e| e.to_string())? {
++            break status;
++        }
++        if started.elapsed() >= Duration::from_secs(30) {
++            return Err("CLI exceeded its 30-second direct-child deadline".into());
++        }
++        thread::sleep(Duration::from_millis(5));
++    };
++    Ok(Captured {
++        status,
++        stdout: limited_text(&stdout_path)?,
++        stderr: limited_text(&stderr_path)?,
++    })
++}
++fn disk_files(root: &Path) -> Result<BTreeMap<String, PathBuf>, String> {
++    fn visit(
++        root: &Path,
++        directory: &Path,
++        result: &mut BTreeMap<String, PathBuf>,
++    ) -> Result<(), String> {
++        for entry in fs::read_dir(directory).map_err(|e| e.to_string())? {
++            let entry = entry.map_err(|e| e.to_string())?;
++            let path = entry.path();
++            let kind = entry.file_type().map_err(|e| e.to_string())?;
++            if kind.is_symlink() {
++                return Err(format!("unexpected output symlink {}", path.display()));
++            }
++            if kind.is_dir() {
++                visit(root, &path, result)?;
++            } else if kind.is_file() {
++                let name = path
++                    .strip_prefix(root)
++                    .unwrap()
++                    .to_str()
++                    .unwrap()
++                    .replace('\\', "/");
++                if !matches!(
++                    name.as_str(),
++                    "__capture_stdout.txt" | "__capture_stderr.txt"
++                ) {
++                    result.insert(name, path);
++                }
++            } else {
++                return Err(format!("unexpected output file type {}", path.display()));
++            }
++        }
++        Ok(())
++    }
++    let mut result = BTreeMap::new();
++    visit(root, root, &mut result)?;
++    Ok(result)
++}
++fn compare_file(path: &Path, expected: &[u8]) -> Result<(), String> {
++    let size = fs::metadata(path).map_err(|e| e.to_string())?.len();
++    if size != expected.len() as u64 {
++        return Err(format!(
++            "{}: {size} bytes, expected {}",
++            path.display(),
++            expected.len()
++        ));
++    }
++    let actual = fs::read(path).map_err(|e| e.to_string())?;
++    if actual != expected {
++        return Err(format!(
++            "{}: SHA {} != expected {}",
++            path.display(),
++            sha256(&actual),
++            sha256(expected)
++        ));
++    }
++    Ok(())
++}
++fn compare_snapshot(
++    corpus: &Corpus,
++    disk: &BTreeMap<String, PathBuf>,
++    expected: &[Value],
++) -> Result<usize, String> {
++    let names: BTreeSet<_> = expected
++        .iter()
++        .map(|r| string(field(r, "name")).to_owned())
++        .collect();
++    if disk.keys().cloned().collect::<BTreeSet<_>>() != names {
++        return Err(format!(
++            "file names differ: actual {:?}, expected {names:?}",
++            disk.keys().collect::<Vec<_>>()
++        ));
++    }
++    let mut bytes = 0;
++    for record in expected {
++        let name = string(field(record, "name"));
++        let expected = corpus.blob(record);
++        compare_file(&disk[name], expected)?;
++        bytes += expected.len();
++    }
++    Ok(bytes)
++}
++fn without_deletions(text: &str) -> (String, Vec<&str>) {
++    let mut ordinary = String::new();
++    let mut deletions = Vec::new();
++    for line in text.split_inclusive('\n') {
++        if line.starts_with("gguf_merge: deleted file ") {
++            deletions.push(line);
++        } else {
++            ordinary.push_str(line);
++        }
++    }
++    (ordinary, deletions)
++}
++fn compare_success_text(case: &Value, captured: &Captured, native: &Value) -> Result<(), String> {
++    let name = string(field(case, "name"));
++    let expected_stdout = string(field(field(native, "stdout"), "normalized"));
++    let expected_stderr = string(field(field(native, "stderr"), "normalized"));
++    if name == "parse-version" {
++        let banner = format!("{}{}", captured.stdout, captured.stderr);
++        if !banner.to_ascii_lowercase().contains("rust") {
++            return Err(format!(
++                "version must identify the Rust implementation: {banner:?}"
++            ));
++        }
++        return Ok(());
++    }
++    let expected_stdout = if name == "parse-help" {
++        assert_eq!(expected_stdout.matches(ORIGINAL_DELETE_HELP).count(), 1);
++        expected_stdout.replace(ORIGINAL_DELETE_HELP, SAFE_DELETE_HELP)
++    } else {
++        expected_stdout.to_owned()
++    };
++    if captured.stdout != expected_stdout {
++        return Err(format!(
++            "successful stdout differs:\nactual {:?}\nexpected {:?}",
++            captured.stdout, expected_stdout
++        ));
++    }
++    if name == "merge-delete" {
++        // Completion is now flushed/synced before deletion. Preserve all text,
++        // and the order within each class, while allowing those lines to move.
++        if without_deletions(&captured.stderr) != without_deletions(expected_stderr) {
++            return Err(format!(
++                "successful merge-delete stderr differs beyond deletion timing:\nactual {:?}\nexpected {:?}",
++                captured.stderr, expected_stderr
++            ));
++        }
++    } else if captured.stderr != expected_stderr {
++        return Err(format!(
++            "successful stderr differs:\nactual {:?}\nexpected {:?}",
++            captured.stderr, expected_stderr
++        ));
++    }
++    Ok(())
++}
++fn verify_failure_files(
++    corpus: &Corpus,
++    case: &Value,
++    work: &WorkingDirectory,
++) -> Result<(), String> {
++    let disk = disk_files(&work.root)?;
++    let initial = array(field(case, "input_files"));
++    if string(field(case, "filesystem_contract")) == "checked-error-exact-inputs" {
++        compare_snapshot(corpus, &disk, initial)?;
++    } else {
++        let inputs: BTreeSet<_> = initial
++            .iter()
++            .map(|r| string(field(r, "name")).to_owned())
++            .collect();
++        let permitted: BTreeSet<_> = array(field(case, "optional_partial_outputs"))
++            .iter()
++            .map(|r| string(r).to_owned())
++            .collect();
++        for record in initial {
++            let name = string(field(record, "name"));
++            let path = disk
++                .get(name)
++                .ok_or_else(|| format!("input {name} disappeared on failure"))?;
++            compare_file(path, corpus.blob(record))?;
++        }
++        for (name, path) in &disk {
++            if !inputs.contains(name) {
++                if !permitted.contains(name) {
++                    return Err(format!("unexpected failure artifact {name}"));
++                }
++                if fs::metadata(path).map_err(|e| e.to_string())?.len() > MAX_CAPTURE {
++                    return Err(format!("failed output {name} exceeds 4 MiB"));
++                }
++            }
++        }
++    }
++    Ok(())
++}
++fn check_case(corpus: &Corpus, case: &Value) -> Result<usize, String> {
++    let work = corpus.materialize(case);
++    let args: Vec<_> = array(field(case, "args"))
++        .iter()
++        .map(|v| string(v).to_owned())
++        .collect();
++    let captured = run(&work, &args)?;
++    let success = boolean(field(case, "rust_success"));
++    if success {
++        if captured.status.code() != Some(0) {
++            return Err(format!(
++                "expected success, got {:?}: {}",
++                captured.status.code(),
++                captured.stderr
++            ));
++        }
++        let native = field(
++            field(case, "native"),
++            if cfg!(windows) { "windows" } else { "linux" },
++        );
++        let bytes = compare_snapshot(
++            corpus,
++            &disk_files(&work.root)?,
++            array(field(native, "after_files")),
++        )?;
++        compare_success_text(case, &captured, native)?;
++        Ok(bytes)
++    } else {
++        // A native abort, signal or UB observation is deliberately not replayed.
++        // Require the ordinary Rust error exit, so a panic/abort cannot pass.
++        if captured.status.code() != Some(1) || captured.stderr.is_empty() {
++            return Err(format!(
++                "expected checked error exit1, got {:?}, stderr={:?}",
++                captured.status.code(),
++                captured.stderr
++            ));
++        }
++        verify_failure_files(corpus, case, &work)?;
++        Ok(0)
++    }
++}
++
++#[test]
++fn frozen_original_split_merge_cli_cases() {
++    let corpus = Corpus::new();
++    let mut failures = Vec::new();
++    let mut success = 0;
++    let mut errors = 0;
++    let mut exact_bytes = 0;
++    for case in corpus.cases() {
++        let name = string(field(case, "name"));
++        match check_case(&corpus, case) {
++            Ok(bytes) => {
++                exact_bytes += bytes;
++                if boolean(field(case, "rust_success")) {
++                    success += 1;
++                } else {
++                    errors += 1;
++                }
++            }
++            Err(error) => failures.push(format!("{name}: {error}")),
++        }
++    }
++    eprintln!(
++        "gguf-split-native: cases=103 success={success} checked_errors={errors} exact_after_file_bytes={exact_bytes}"
++    );
++    assert!(failures.is_empty(), "{}", failures.join("\n\n"));
++    assert_eq!((success, errors), (63, 40));
++}
++
++/// An intentional stronger Rust ownership contract, using unchanged original
++/// truncated input bytes. The original incremental delete loop is not an oracle
++/// for preserving early splits when a later payload fails.
++#[test]
++fn failed_delete_merge_preserves_every_original_split() {
++    let corpus = Corpus::new();
++    let case = corpus.case("merge-truncated-secondary");
++    let work = corpus.materialize(case);
++    let mut args: Vec<_> = array(field(case, "args"))
++        .iter()
++        .map(|v| string(v).to_owned())
++        .collect();
++    args.insert(1, "--delete-splits".into());
++    let captured = run(&work, &args).unwrap();
++    assert_eq!(captured.status.code(), Some(1), "{}", captured.stderr);
++    assert!(!captured.stderr.is_empty());
++    verify_failure_files(&corpus, case, &work).unwrap();
++}
+--- a/crates/gguf/README.md
++++ b/crates/gguf/README.md
+@@ -1,4 +1,4 @@
+-# Bounded GGUF files and model shards
++# Bounded GGUF files, model shards and streaming tools
+ 
+ The crate reads seekable GGUF v2/v3 files, validates their metadata and tensor
+ directories, and reads tensor payloads on demand. It also owns complete GGUF
+@@ -6,9 +6,9 @@
+ implementation is Rust; no original llama/ggml binary or foreign executable is
+ called at runtime.
+ 
+-This is a formats and loading slice of T04. It does not implement the frozen
+-checkpoint converters, the ordered streaming split/merge applications, or every
+-format compatibility edge.
++This is a formats, loading and streaming-tool slice of T04. It includes the
++native Rust `llama-gguf-split` executable and checked ordered header writing.
++Checkpoint converters and arbitrary-byte metadata compatibility remain open.
+ 
+ ## Single files and shard sets
+ 
+@@ -99,8 +99,11 @@
+ 
+ The raw original no_alloc GGUF reader can accept a truncated tensor payload
+ because it only parses the header. The original model loader rejects that file.
+-The Rust parser checks payload bounds during opening and rejects it earlier;
+-the native test corpus records this distinction explicitly.
++The public Rust parser checks payload bounds during opening and rejects it
++earlier. The private split/merge tool path deliberately validates headers first,
++then checks payload reads when the operation requires them. This preserves the
++original distinction between split and merge dry-run without weakening model
++loading. Bounded header read-ahead can still prefetch a payload prefix.
+ 
+ The existing Rust reader also supports opposite-endian scalar GGUF decoding.
+ The frozen original C reader rejects the opposite-endian file, so that extension
+@@ -254,13 +257,84 @@
+ from timing. Existing decoder CLI evidence preserves the original 90-95 second
+ Qwen loads; native numerical references remain unchanged.
+ 
++## Ordered writing and the split/merge executable
++
++`Gguf::metadata_order()` exposes the original serialized order of keys still
++present in the public map. Newly inserted map keys have no original position;
++callers constructing a modified header supply their chosen order explicitly.
++The existing `write` API retains sorted-map ordering. `write_ordered` accepts a
++borrowed ordered key/value list and borrowed payloads. `write_header` accepts
++borrowed `TensorDescriptor` values and explicit `Limits`, writes a little-endian
++v3 header, and returns `WriteLayout` with checked payload offsets and padding.
++It validates the entire header and tensor layout before its first output byte.
++An I/O failure can still leave partial output. The caller writes the header at
++the beginning of its output and then streams the payloads using those offsets.
++No header-sized temporary buffer or copied metadata-value tree is required.
++
++The executable is built with the normal workspace:
++
++~~~sh
++cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split --split-max-tensors 128 model.gguf output/model
++cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --split-max-size 4G model.gguf output/model
++cargo run --release --offline --locked -p rust-llama-cli --bin llama-gguf-split -- --merge output/model-00001-of-00003.gguf merged.gguf
++~~~
++
++The source defaults to split mode with 128 tensors per output. The Rust
++`split::{split, merge}` APIs take explicit options and `ShardLimits`. Numbered
++paths retain native OS path representations. Split overwrites existing output
++files, except aliases of its retained input; merge refuses an existing output.
++`--no-tensor-first-split` emits a metadata-only primary file. Split dry-run plans
++without requiring complete payloads; merge dry-run still validates every payload
++read. `--delete-splits` applies only to a real merge.
++
++The port preserves defined original parser behavior, including repeated flags,
++leading option underscore normalization, stopping options at the first
++positional argument and signed decimal-prefix limits. Size units are decimal
++M/G, and the original integer prefix means `1.5M` is treated as 1M. The frozen
++parser advertises `-h` but only admits `--help`; the regression retains that
++observable behavior. Missing size integers, empty size strings, integer
++overflow, division by zero and native assertions produce checked Rust errors.
++The version banner identifies the Rust implementation.
++
++Output metadata order, tensor order, padding and bytes match the frozen tool's
++measured producer contract. A private compatibility policy preserves three
++source quirks: copied `general.alignment` metadata does not change its fresh
++32-byte physical output alignment; GGML rank canonicalization removes trailing
++ones and trailing zero dimensions; scalar/array string values pass through
++C-string truncation at NUL. Certain custom-alignment and zero-dimension inputs
++therefore produce the same original-invalid output files. The normal public
++writer uses valid metadata-selected alignment and preserves supplied dimensions
++and string lengths. The inherited parser boundary for NUL keys/names and
++non-UTF-8 metadata remains explicit.
++
++Payload copies use a fallibly allocated buffer of at most 64 KiB, further
++bounded by `max_tensor_read_bytes`. Split plans and validates all headers before
++opening any output. Merge keeps the parsed input handles, charges header usage
++cumulatively and uses create-new output semantics. On Unix, a split output is
++opened without truncation and compared by retained handle identity before it
++is shortened. On Windows, retained input handles deny write/delete sharing.
++Both paths prevent output aliases from truncating the retained input.
++
++With `--delete-splits`, input deletion begins only after the complete merged
++output has been flushed and synced. Read/write/validation failures before that
++point preserve every input. A cleanup error can occur after some splits were
++removed; the complete merged output remains available. Destructive cleanup
++requires stable, exclusively managed paths: safe standard Rust has no atomic
++identity-check-and-unlink operation against concurrent directory replacement.
++This safety improvement changes deletion log timing and the help line, while
++successful file bytes and eventual deletions retain the original contract.
++
++The independent CLI corpus has 103 cases per original compiler profile. It
++requires 63 defined successes and 40 checked errors, exact successful files and
++transcripts, and 12,179,168 bytes of complete post-operation file comparisons.
++Original UB observations, assertions and platform-specific failed partial files
++remain raw evidence; they are not silently promoted to portable requirements.
++The derived truncated-payload deletion test uses unchanged original inputs and
++checks the stronger pre-completion preservation guarantee. Additional resource
++and alias tests cover cumulative limits, one-byte copy buffers and path changes
++after preflight. See [the corpus provenance](../../fixtures/gguf-split/README.md).
++
+ ## Remaining format and conversion work
+-
+-The existing writer emits little-endian GGUF from a sorted metadata map and
+-borrowed tensor payloads. It is not an ordered streaming source-equivalent
+-split/merge writer. An ordered metadata representation and a bounded streaming
+-payload writer are needed before those tools can preserve original output
+-ordering and handle large transformations faithfully.
+ 
+ Local Safetensors/index loading, architecture-specific checkpoint conversion,
+ tokenizer/config translation, quantization application policy, PyTorch inputs,
+--- a/crates/gguf/src/lib.rs
++++ b/crates/gguf/src/lib.rs
+@@ -3,7 +3,10 @@
+ #![forbid(unsafe_code)]
+ 
+ mod shards;
++pub mod split;
++mod writer;
+ pub use shards::{GgufSet, ShardInfo, ShardLimits};
++pub use writer::{TensorDescriptor, WriteLayout, write_header, write_ordered};
+ 
+ use llama_quant::DType;
+ use std::{
+@@ -186,6 +189,7 @@
+     pub endian: Endian,
+     pub alignment: u32,
+     pub metadata: BTreeMap<String, Value>,
++    metadata_order: Vec<String>,
+     pub tensors: Vec<TensorInfo>,
+     pub data_offset: u64,
+     pub file_len: u64,
+@@ -201,7 +205,17 @@
+     }
+ }
+ impl<R: Read + Seek> Gguf<R> {
+-    pub fn read(mut reader: R, limits: Limits) -> Result<Self> {
++    pub fn read(reader: R, limits: Limits) -> Result<Self> {
++        Self::read_with_payload_validation(reader, limits, true)
++    }
++    pub(crate) fn read_header(reader: R, limits: Limits) -> Result<Self> {
++        Self::read_with_payload_validation(reader, limits, false)
++    }
++    fn read_with_payload_validation(
++        mut reader: R,
++        limits: Limits,
++        validate_payload: bool,
++    ) -> Result<Self> {
+         let file_len = reader.seek(SeekFrom::End(0))?;
+         reader.seek(SeekFrom::Start(0))?;
+         let mut magic = [0; 4];
+@@ -239,6 +253,11 @@
+             };
+             let nt = p.count(limits.max_tensors, "tensor count")?;
+             let nk = p.count(limits.max_metadata_entries, "metadata count")?;
++            p.minimum_encoded(nk, 14, "metadata entries")?;
++            let mut metadata_order = Vec::new();
++            metadata_order
++                .try_reserve_exact(nk)
++                .map_err(|_| Error::Limit("metadata order allocation".into()))?;
+             let mut metadata = BTreeMap::new();
+             for _ in 0..nk {
+                 let key = p.string()?;
+@@ -247,6 +266,12 @@
+                 }
+                 let ty = p.u32()?;
+                 let value = p.value(ty, false)?;
++                let mut ordered_key = String::new();
++                ordered_key
++                    .try_reserve_exact(key.len())
++                    .map_err(|_| Error::Limit("metadata order key allocation".into()))?;
++                ordered_key.push_str(&key);
++                metadata_order.push(ordered_key);
+                 if metadata.insert(key.clone(), value).is_some() {
+                     return Err(invalid(format!("duplicate metadata key {key}")));
+                 }
+@@ -347,16 +372,24 @@
+                 let end = start
+                     .checked_add(t.byte_len)
+                     .ok_or_else(|| invalid("tensor end overflow"))?;
+-                if end > file_len {
++                if validate_payload && end > file_len {
+                     return Err(invalid(format!("tensor {} exceeds file length", t.name)));
+                 }
+             }
+-            Ok((metadata, tensors, alignment, data_offset, header_usage))
++            Ok((
++                metadata,
++                metadata_order,
++                tensors,
++                alignment,
++                data_offset,
++                header_usage,
++            ))
+         })();
+         // Rewind bounded read-ahead on success and failure. Preserve the
+         // original parse error if synchronization also fails.
+         let synchronized = header_reader.finish();
+-        let (metadata, tensors, alignment, data_offset, header_usage) = parsed_header?;
++        let (metadata, metadata_order, tensors, alignment, data_offset, header_usage) =
++            parsed_header?;
+         synchronized?;
+         Ok(Self {
+             reader,
+@@ -364,12 +397,21 @@
+             endian,
+             alignment,
+             metadata,
++            metadata_order,
+             tensors,
+             data_offset,
+             file_len,
+             limits,
+             header_usage,
+         })
++    }
++    /// Original on-disk metadata key order. The public map remains available for lookup.
++    /// Keys removed from that map are omitted; new map entries have no on-disk position.
++    pub fn metadata_order(&self) -> impl Iterator<Item = &str> {
++        self.metadata_order
++            .iter()
++            .filter(|key| self.metadata.contains_key(*key))
++            .map(String::as_str)
+     }
+     pub fn header_usage(&self) -> HeaderUsage {
+         self.header_usage
+@@ -728,118 +770,11 @@
+     pub data: &'a [u8],
+ }
+ pub fn write<W: Write>(
+-    mut out: W,
++    out: W,
+     metadata: &BTreeMap<String, Value>,
+     tensors: &[TensorData<'_>],
+ ) -> Result<()> {
+-    let alignment = match metadata.get("general.alignment") {
+-        None => 32,
+-        Some(Value::U32(v)) => *v,
+-        _ => return Err(invalid("general.alignment must be UINT32")),
+-    };
+-    if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
+-        return Err(invalid("invalid alignment"));
+-    }
+-    let mut header = Vec::new();
+-    header.extend_from_slice(b"GGUF");
+-    header.extend_from_slice(&3u32.to_le_bytes());
+-    header.extend_from_slice(&(tensors.len() as u64).to_le_bytes());
+-    header.extend_from_slice(&(metadata.len() as u64).to_le_bytes());
+-    fn string(b: &mut Vec<u8>, s: &str) {
+-        b.extend_from_slice(&(s.len() as u64).to_le_bytes());
+-        b.extend_from_slice(s.as_bytes())
+-    }
+-    fn value(b: &mut Vec<u8>, v: &Value) -> Result<()> {
+-        match v {
+-            Value::U8(x) => b.push(*x),
+-            Value::I8(x) => b.push(*x as u8),
+-            Value::U16(x) => b.extend(x.to_le_bytes()),
+-            Value::I16(x) => b.extend(x.to_le_bytes()),
+-            Value::U32(x) => b.extend(x.to_le_bytes()),
+-            Value::I32(x) => b.extend(x.to_le_bytes()),
+-            Value::F32(x) => b.extend(x.to_le_bytes()),
+-            Value::Bool(x) => b.push(u8::from(*x)),
+-            Value::String(x) => string(b, x),
+-            Value::U64(x) => b.extend(x.to_le_bytes()),
+-            Value::I64(x) => b.extend(x.to_le_bytes()),
+-            Value::F64(x) => b.extend(x.to_le_bytes()),
+-            Value::Array {
+-                element_type,
+-                values,
+-            } => {
+-                if *element_type > 12
+-                    || *element_type == 9
+-                    || values.iter().any(|v| v.type_id() != *element_type)
+-                {
+-                    return Err(invalid("heterogeneous or nested array"));
+-                }
+-                b.extend(element_type.to_le_bytes());
+-                b.extend((values.len() as u64).to_le_bytes());
+-                for v in values {
+-                    value(b, v)?
+-                }
+-            }
+-        }
+-        Ok(())
+-    }
+-    for (k, v) in metadata {
+-        if k.is_empty() || k.contains('\0') {
+-            return Err(invalid("invalid metadata key"));
+-        }
+-        string(&mut header, k);
+-        header.extend(v.type_id().to_le_bytes());
+-        value(&mut header, v)?
+-    }
+-    let mut offset = 0u64;
+-    let mut names = BTreeSet::new();
+-    for t in tensors {
+-        if t.name.len() >= 64
+-            || t.name.contains('\0')
+-            || !names.insert(t.name)
+-            || t.dimensions.len() > 4
+-        {
+-            return Err(invalid("invalid tensor descriptor"));
+-        }
+-        dimension_elements(t.dimensions)?;
+-        let row = usize::try_from(t.dimensions.first().copied().unwrap_or(1))
+-            .map_err(|_| invalid("dimension exceeds usize"))?;
+-        let n = t.dimensions.iter().skip(1).try_fold(
+-            t.dtype.row_bytes(row).map_err(|e| invalid(e.to_string()))? as u64,
+-            |a, &b| {
+-                a.checked_mul(b)
+-                    .ok_or_else(|| invalid("tensor size overflow"))
+-            },
+-        )?;
+-        if n != t.data.len() as u64 {
+-            return Err(invalid(format!(
+-                "tensor {} payload length mismatch",
+-                t.name
+-            )));
+-        }
+-        string(&mut header, t.name);
+-        header.extend((t.dimensions.len() as u32).to_le_bytes());
+-        for d in t.dimensions {
+-            header.extend(d.to_le_bytes())
+-        }
+-        header.extend(t.dtype.id().to_le_bytes());
+-        header.extend(offset.to_le_bytes());
+-        offset = align(
+-            offset
+-                .checked_add(n)
+-                .ok_or_else(|| invalid("tensor offset overflow"))?,
+-            alignment as u64,
+-        )?;
+-    }
+-    let padded = usize::try_from(align(header.len() as u64, alignment as u64)?)
+-        .map_err(|_| invalid("header size overflow"))?;
+-    header.resize(padded, 0);
+-    out.write_all(&header)?;
+-    for t in tensors {
+-        out.write_all(t.data)?;
+-        let padding = align(t.data.len() as u64, alignment as u64)? - t.data.len() as u64;
+-        io::copy(&mut io::repeat(0).take(padding), &mut out)?;
+-    }
+-    Ok(())
++    writer::write_map(out, metadata, tensors)
+ }
+ 
+ #[cfg(test)]
+--- /dev/null
++++ b/crates/gguf/src/split.rs
+@@ -0,0 +1,643 @@
++//! Safe Rust port of the frozen tools/gguf-split file operations.
++//! Payloads are copied in bounded chunks. The original producer's metadata
++//! ordering, 32-byte physical output layout and rank canonicalization are
++//! retained, including its documented custom-alignment/zero-dimension quirks.
++//! Resource limits, arithmetic errors and original assertion failures are checked.
++use crate::writer::{self, HeaderPolicy, TensorDescriptor, WriteLayout};
++use crate::{Endian, Error, Gguf, HeaderUsage, Limits, Result, ShardLimits, Value, align, invalid};
++use std::ffi::OsString;
++use std::fs::{self, File, OpenOptions};
++use std::io::{self, BufWriter, Read, Seek, SeekFrom, Write};
++use std::ops::Range;
++use std::path::{Path, PathBuf};
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub enum SplitLimit {
++    Tensors(i32),
++    Bytes(u64),
++}
++#[derive(Debug, Clone, Copy)]
++pub struct SplitOptions {
++    pub limit: SplitLimit,
++    pub no_tensor_first_split: bool,
++    pub dry_run: bool,
++}
++impl Default for SplitOptions {
++    fn default() -> Self {
++        Self {
++            limit: SplitLimit::Tensors(128),
++            no_tensor_first_split: false,
++            dry_run: false,
++        }
++    }
++}
++#[derive(Debug, Clone, Copy, Default)]
++pub struct MergeOptions {
++    pub dry_run: bool,
++    pub delete_splits: bool,
++}
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub struct Summary {
++    pub shards: usize,
++    pub tensors: usize,
++}
++
++fn descriptors(file: &Gguf<File>, range: Range<usize>) -> Result<Vec<TensorDescriptor<'_>>> {
++    let tensors = file
++        .tensors
++        .get(range)
++        .ok_or_else(|| invalid("tensor range exceeds input"))?;
++    let mut result = Vec::new();
++    result
++        .try_reserve_exact(tensors.len())
++        .map_err(|_| Error::Limit("tool tensor descriptor allocation".into()))?;
++    result.extend(tensors.iter().map(|tensor| TensorDescriptor {
++        name: &tensor.name,
++        dimensions: &tensor.dimensions,
++        dtype: tensor.dtype,
++    }));
++    Ok(result)
++}
++fn original_header(path: &Path, limits: Limits) -> Result<Gguf<File>> {
++    let mut open = OpenOptions::new();
++    open.read(true);
++    // Deny write/delete while the input handle is retained on Windows. This
++    // prevents truncation through hard-link aliases without unsafe file-ID APIs.
++    #[cfg(windows)]
++    {
++        use std::os::windows::fs::OpenOptionsExt;
++        open.share_mode(1); // FILE_SHARE_READ
++    }
++    let file = Gguf::read_header(open.open(path)?, limits)?;
++    if file.endian != Endian::Little {
++        return Err(Error::Unsupported(
++            "the frozen x86_64 gguf-split tool requires a little-endian header".into(),
++        ));
++    }
++    Ok(file)
++}
++fn split_metadata<T>(
++    file: &Gguf<File>,
++    index: usize,
++    count: usize,
++    total: usize,
++    action: impl FnOnce(&[(&str, &Value)]) -> Result<T>,
++) -> Result<T> {
++    let split_no =
++        Value::U16(u16::try_from(index).map_err(|_| invalid("split index exceeds UINT16"))?);
++    let total =
++        Value::I32(i32::try_from(total).map_err(|_| invalid("tensor count exceeds INT32"))?);
++    let split_count =
++        Value::U16(u16::try_from(count).map_err(|_| invalid("split count exceeds UINT16"))?);
++    let mut metadata = Vec::new();
++    let capacity = if index == 0 { file.metadata.len() } else { 0 };
++    metadata
++        .try_reserve_exact(
++            capacity
++                .checked_add(3)
++                .ok_or_else(|| invalid("metadata index overflow"))?,
++        )
++        .map_err(|_| Error::Limit("tool metadata index allocation".into()))?;
++    if index == 0 {
++        for key in file.metadata_order() {
++            if !matches!(key, "split.no" | "split.count" | "split.tensors.count") {
++                metadata.push((key, &file.metadata[key]));
++            }
++        }
++    }
++    // gguf_set_val removes the old entry and appends it. The final count
++    // replacement therefore follows split.tensors.count, even on existing keys.
++    metadata.extend([
++        ("split.no", &split_no),
++        ("split.tensors.count", &total),
++        ("split.count", &split_count),
++    ]);
++    action(&metadata)
++}
++fn split_header(
++    file: &Gguf<File>,
++    range: Range<usize>,
++    index: usize,
++    count: usize,
++    limits: &Limits,
++    out: &mut impl Write,
++) -> Result<WriteLayout> {
++    let tensors = descriptors(file, range)?;
++    split_metadata(file, index, count, file.tensors.len(), |metadata| {
++        writer::header_with_policy(out, metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
++    })
++}
++fn buffer(limits: &Limits, any_payload: bool) -> Result<Vec<u8>> {
++    let size = limits.max_tensor_read_bytes.min(64 * 1024);
++    if any_payload && size == 0 {
++        return Err(Error::Limit(
++            "streaming payload buffer budget is zero".into(),
++        ));
++    }
++    let mut data = Vec::new();
++    data.try_reserve_exact(size)
++        .map_err(|_| Error::Limit("streaming payload buffer allocation".into()))?;
++    data.resize(size, 0);
++    Ok(data)
++}
++fn copy_exact<R: Read + Seek, W: Write>(
++    input: &mut R,
++    out: &mut W,
++    offset: u64,
++    mut bytes: u64,
++    buffer: &mut [u8],
++) -> Result<()> {
++    if bytes != 0 && buffer.is_empty() {
++        return Err(Error::Limit("streaming payload buffer is empty".into()));
++    }
++    input.seek(SeekFrom::Start(offset))?;
++    while bytes != 0 {
++        let length = bytes.min(buffer.len() as u64) as usize;
++        input.read_exact(&mut buffer[..length])?;
++        out.write_all(&buffer[..length])?;
++        bytes -= length as u64;
++    }
++    Ok(())
++}
++fn reject_same_path(input: &Path, output: &Path) -> Result<()> {
++    if output.exists() && fs::canonicalize(input)? == fs::canonicalize(output)? {
++        return Err(invalid("output aliases an input file"));
++    }
++    #[cfg(unix)]
++    if output.exists() {
++        use std::os::unix::fs::MetadataExt;
++        let a = fs::metadata(input)?;
++        let b = fs::metadata(output)?;
++        if a.dev() == b.dev() && a.ino() == b.ino() {
++            return Err(invalid("output is a hard link to an input file"));
++        }
++    }
++    Ok(())
++}
++fn open_split_output(input: &File, path: &Path) -> Result<File> {
++    // Opening without truncation retains the exact destination handle across
++    // the identity check. A symlink/path swap after the earlier preflight
++    // cannot turn set_len or subsequent writes into input-file truncation.
++    let destination = OpenOptions::new()
++        .write(true)
++        .create(true)
++        .truncate(false)
++        .open(path)?;
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::MetadataExt;
++        let source = input.metadata()?;
++        let target = destination.metadata()?;
++        if source.dev() == target.dev() && source.ino() == target.ino() {
++            return Err(invalid("output handle aliases the retained input file"));
++        }
++    }
++    #[cfg(not(unix))]
++    let _ = input;
++    // Windows inputs deny write sharing while retained, so opening an alias
++    // above fails before any truncation. See original_header.
++    destination.set_len(0)?;
++    Ok(destination)
++}
++pub fn split_path(prefix: &Path, index: usize, count: usize) -> Result<PathBuf> {
++    if count == 0 || count > u16::MAX as usize || index >= count {
++        return Err(invalid("split index/count outside UINT16 range"));
++    }
++    let mut name = prefix.as_os_str().to_os_string();
++    name.push(format!("-{:05}-of-{count:05}.gguf", index + 1));
++    Ok(PathBuf::from(name))
++}
++fn split_prefix(path: &Path, count: usize) -> Result<PathBuf> {
++    let suffix = format!("-00001-of-{count:05}.gguf");
++    #[cfg(unix)]
++    let prefix = {
++        use std::os::unix::ffi::{OsStrExt, OsStringExt};
++        let bytes = path.as_os_str().as_bytes();
++        let prefix = bytes
++            .strip_suffix(suffix.as_bytes())
++            .ok_or_else(|| invalid("unexpected first split filename"))?;
++        OsString::from_vec(prefix.to_vec())
++    };
++    #[cfg(windows)]
++    let prefix = {
++        use std::os::windows::ffi::{OsStrExt, OsStringExt};
++        let bytes: Vec<u16> = path.as_os_str().encode_wide().collect();
++        let suffix: Vec<u16> = suffix.encode_utf16().collect();
++        let prefix = bytes
++            .strip_suffix(suffix.as_slice())
++            .ok_or_else(|| invalid("unexpected first split filename"))?;
++        OsString::from_wide(prefix)
++    };
++    #[cfg(not(any(unix, windows)))]
++    let prefix = {
++        let path = path
++            .to_str()
++            .ok_or_else(|| Error::Unsupported("native path encoding".into()))?;
++        OsString::from(
++            path.strip_suffix(&suffix)
++                .ok_or_else(|| invalid("unexpected first split filename"))?,
++        )
++    };
++    if prefix.is_empty() {
++        return Err(invalid("split filename has an empty prefix"));
++    }
++    Ok(PathBuf::from(prefix))
++}
++
++/// Split one GGUF. The first output contains primary metadata; later files
++/// contain only the three split keys. Dry-run validates/plans headers without
++/// requiring complete tensor payloads, as in the original tool. Bounded header
++/// read-ahead can still prefetch a payload prefix.
++pub fn split<W: Write, E: Write>(
++    input: &Path,
++    output_prefix: &Path,
++    options: SplitOptions,
++    limits: &ShardLimits,
++    stdout: &mut W,
++    stderr: &mut E,
++) -> Result<Summary> {
++    let mut file = original_header(input, limits.gguf.clone())?;
++    let count = file.tensors.len();
++    if count > i32::MAX as usize {
++        return Err(invalid("tensor count exceeds source INT32 field"));
++    }
++    match options.limit {
++        SplitLimit::Tensors(0) if count > 1 => {
++            return Err(invalid("zero tensor split limit would divide by zero"));
++        }
++        SplitLimit::Bytes(0) => return Err(invalid("size must be a positive value")),
++        _ => {}
++    }
++    let max_shards = limits.max_shards.min(u16::MAX as usize);
++    if max_shards == 0 {
++        return Err(Error::Limit("split file budget is zero".into()));
++    }
++    let mut ranges = Vec::new();
++    ranges
++        .try_reserve_exact((count + 2).min(max_shards))
++        .map_err(|_| Error::Limit("split plan allocation".into()))?;
++    if options.no_tensor_first_split {
++        ranges.push(0..0);
++    }
++    let mut start = 0;
++    let mut bytes = 0u64;
++    for (index, tensor) in file.tensors.iter().enumerate() {
++        let padded = align(tensor.byte_len, 32)?;
++        let next = bytes
++            .checked_add(padded)
++            .ok_or_else(|| invalid("split byte count overflow"))?;
++        let boundary = match options.limit {
++            SplitLimit::Tensors(number) => index > 0 && index % number.unsigned_abs() as usize == 0,
++            SplitLimit::Bytes(limit) => next > limit,
++        };
++        if boundary {
++            if index == start {
++                return Err(invalid(
++                    "one split would contain zero tensors; size limit is too small",
++                ));
++            }
++            if ranges.len() + 1 >= max_shards {
++                return Err(Error::Limit("split count exceeds file budget".into()));
++            }
++            ranges.push(start..index);
++            start = index;
++            bytes = padded;
++        } else {
++            bytes = next;
++        }
++    }
++    if ranges.len() >= max_shards {
++        return Err(Error::Limit("split count exceeds file budget".into()));
++    }
++    ranges.push(start..count);
++    // Every output header and path is checked before the first file is opened.
++    let mut plans = Vec::new();
++    plans
++        .try_reserve_exact(ranges.len())
++        .map_err(|_| Error::Limit("split output plan allocation".into()))?;
++    for (index, range) in ranges.iter().enumerate() {
++        let header = split_header(
++            &file,
++            range.clone(),
++            index,
++            ranges.len(),
++            &limits.gguf,
++            &mut io::sink(),
++        )?;
++        let path = split_path(output_prefix, index, ranges.len())?;
++        reject_same_path(input, &path)?;
++        let raw_bytes = file.tensors[range.clone()]
++            .iter()
++            .try_fold(0u64, |sum, tensor| {
++                sum.checked_add(tensor.byte_len)
++                    .ok_or_else(|| invalid("display byte count overflow"))
++            })?;
++        let displayed_mb = header
++            .data_offset
++            .checked_add(raw_bytes)
++            .ok_or_else(|| invalid("display size overflow"))?
++            / 1_000_000;
++        plans.push((path, header, displayed_mb));
++    }
++    writeln!(stdout, "n_split: {}", ranges.len())?;
++    for (index, (range, (_, _, size))) in ranges.iter().zip(&plans).enumerate() {
++        writeln!(
++            stdout,
++            "split {:05}: n_tensors = {}, total_size = {size}M",
++            index + 1,
++            range.len()
++        )?;
++    }
++    if !options.dry_run {
++        let mut copy_buffer = buffer(
++            &limits.gguf,
++            file.tensors.iter().any(|tensor| tensor.byte_len != 0),
++        )?;
++        for (index, (range, (path, expected, _))) in ranges.iter().zip(&plans).enumerate() {
++            write!(stdout, "Writing file {} ... ", path.display())?;
++            stdout.flush()?;
++            let destination = open_split_output(&file.reader, path)?;
++            let mut output = BufWriter::with_capacity(64 * 1024, destination);
++            let actual = split_header(
++                &file,
++                range.clone(),
++                index,
++                ranges.len(),
++                &limits.gguf,
++                &mut output,
++            )?;
++            if &actual != expected {
++                return Err(invalid("split plan changed before writing"));
++            }
++            for tensor_index in range.clone() {
++                let tensor = &file.tensors[tensor_index];
++                let offset = file
++                    .data_offset
++                    .checked_add(tensor.offset)
++                    .ok_or_else(|| invalid("input offset overflow"))?;
++                copy_exact(
++                    &mut file.reader,
++                    &mut output,
++                    offset,
++                    tensor.byte_len,
++                    &mut copy_buffer,
++                )?;
++                writer::zeros(&mut output, align(tensor.byte_len, 32)? - tensor.byte_len)?;
++            }
++            output.flush()?;
++            writeln!(stdout, "done")?;
++        }
++    }
++    writeln!(
++        stderr,
++        "gguf_split: {} gguf split written with a total of {count} tensors.",
++        ranges.len()
++    )?;
++    Ok(Summary {
++        shards: ranges.len(),
++        tensors: count,
++    })
++}
++fn remaining_limits(limits: &Limits, used: HeaderUsage) -> Result<Limits> {
++    let mut remaining = limits.clone();
++    remaining.max_metadata_bytes = limits
++        .max_metadata_bytes
++        .checked_sub(used.bytes)
++        .ok_or_else(|| Error::Limit("combined header byte budget".into()))?;
++    remaining.max_metadata_entries = limits
++        .max_metadata_entries
++        .checked_sub(used.metadata_entries)
++        .ok_or_else(|| Error::Limit("combined metadata entry budget".into()))?;
++    remaining.max_total_values = limits
++        .max_total_values
++        .checked_sub(used.metadata_values)
++        .ok_or_else(|| Error::Limit("combined metadata value budget".into()))?;
++    remaining.max_tensors = limits
++        .max_tensors
++        .checked_sub(used.tensors)
++        .ok_or_else(|| Error::Limit("combined tensor budget".into()))?;
++    Ok(remaining)
++}
++fn charge(used: &mut HeaderUsage, new: HeaderUsage) -> Result<()> {
++    used.bytes = used
++        .bytes
++        .checked_add(new.bytes)
++        .ok_or_else(|| invalid("combined header bytes overflow"))?;
++    used.metadata_entries = used
++        .metadata_entries
++        .checked_add(new.metadata_entries)
++        .ok_or_else(|| invalid("combined metadata entries overflow"))?;
++    used.metadata_values = used
++        .metadata_values
++        .checked_add(new.metadata_values)
++        .ok_or_else(|| invalid("combined metadata values overflow"))?;
++    used.tensors = used
++        .tensors
++        .checked_add(new.tensors)
++        .ok_or_else(|| invalid("combined tensor count overflow"))?;
++    Ok(())
++}
++fn merge_header(
++    files: &[Gguf<File>],
++    limits: &Limits,
++    out: &mut impl Write,
++) -> Result<WriteLayout> {
++    let first = files.first().ok_or_else(|| invalid("empty merge input"))?;
++    let count = Value::U16(0);
++    let mut metadata = Vec::new();
++    metadata
++        .try_reserve_exact(first.metadata.len())
++        .map_err(|_| Error::Limit("merge metadata index allocation".into()))?;
++    for key in first.metadata_order() {
++        if key != "split.count" {
++            metadata.push((key, &first.metadata[key]));
++        }
++    }
++    metadata.push(("split.count", &count));
++    let total = files.iter().try_fold(0usize, |sum, file| {
++        sum.checked_add(file.tensors.len())
++            .ok_or_else(|| invalid("merged tensor count overflow"))
++    })?;
++    let mut tensors = Vec::new();
++    tensors
++        .try_reserve_exact(total)
++        .map_err(|_| Error::Limit("merge descriptor allocation".into()))?;
++    for file in files {
++        tensors.extend(descriptors(file, 0..file.tensors.len())?);
++    }
++    writer::header_with_policy(out, &metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
++}
++
++/// Merge numbered shards. Primary split.no is deliberately not consulted;
++/// subsidiary split.no and split.count must match, and the primary signed
++/// tensor total must match the complete directory. This differs from model
++/// shard discovery and therefore does not reuse its acceptance policy.
++///
++/// Existing output files are refused even during dry-run. With delete_splits,
++/// source deletion starts only after the complete output is flushed and synced.
++/// This strengthens the original tool's failure safety; successful bytes and
++/// deletions are the same. Failures before a complete flushed/synced output
++/// preserve every input. Cleanup can fail after removing some shards; the
++/// completed output remains. Destructive cleanup requires stable, exclusively
++/// managed paths: standard Rust has no atomic identity-check-and-unlink API.
++pub fn merge<W: Write>(
++    input: &Path,
++    output: &Path,
++    options: MergeOptions,
++    limits: &ShardLimits,
++    stderr: &mut W,
++) -> Result<Summary> {
++    writeln!(
++        stderr,
++        "gguf_merge: {} -> {}",
++        input.display(),
++        output.display()
++    )?;
++    if output.exists() {
++        return Err(invalid(format!(
++            "output file {} already exists",
++            output.display()
++        )));
++    }
++    let first = original_header(input, limits.gguf.clone())?;
++    let count = match first.metadata.get("split.count") {
++        Some(Value::U16(count)) if *count != 0 => usize::from(*count),
++        _ => return Err(invalid("input requires a positive UINT16 split.count")),
++    };
++    if count > limits.max_shards {
++        return Err(Error::Limit("merge exceeds owned file budget".into()));
++    }
++    let prefix = split_prefix(input, count)?;
++    let mut used = first.header_usage();
++    let mut files = Vec::new();
++    let mut paths = Vec::new();
++    files
++        .try_reserve_exact(count)
++        .map_err(|_| Error::Limit("merge file owner allocation".into()))?;
++    paths
++        .try_reserve_exact(count)
++        .map_err(|_| Error::Limit("merge path allocation".into()))?;
++    write!(
++        stderr,
++        "gguf_merge: reading metadata {} ...",
++        input.display()
++    )?;
++    files.push(first);
++    paths.push(input.to_path_buf());
++    writeln!(stderr, "\x1b[3Ddone")?;
++    for index in 1..count {
++        let path = split_path(&prefix, index, count)?;
++        write!(
++            stderr,
++            "gguf_merge: reading metadata {} ...",
++            path.display()
++        )?;
++        let file = original_header(&path, remaining_limits(&limits.gguf, used)?)?;
++        if !matches!(file.metadata.get("split.no"), Some(Value::U16(number)) if usize::from(*number)==index)
++            || !matches!(file.metadata.get("split.count"), Some(Value::U16(number)) if usize::from(*number)==count)
++        {
++            return Err(invalid(format!(
++                "{} is not split {} of {count}",
++                path.display(),
++                index + 1
++            )));
++        }
++        charge(&mut used, file.header_usage())?;
++        files.push(file);
++        paths.push(path);
++        writeln!(stderr, "\x1b[3Ddone")?;
++    }
++    if !matches!(files[0].metadata.get("split.tensors.count"), Some(Value::I32(total)) if *total >= 0 && *total as usize == used.tensors)
++    {
++        return Err(invalid(
++            "split tensor total does not match primary INT32 split.tensors.count",
++        ));
++    }
++    let plan = merge_header(&files, &limits.gguf, &mut io::sink())?;
++    let mut copy_buffer = buffer(
++        &limits.gguf,
++        files
++            .iter()
++            .any(|file| file.tensors.iter().any(|tensor| tensor.byte_len != 0)),
++    )?;
++    let mut destination = if options.dry_run {
++        None
++    } else {
++        let file = OpenOptions::new()
++            .write(true)
++            .create_new(true)
++            .open(output)?;
++        let mut out = BufWriter::with_capacity(64 * 1024, file);
++        writer::zeros(&mut out, plan.data_offset)?;
++        Some(out)
++    };
++    for (file, path) in files.iter_mut().zip(&paths) {
++        write!(stderr, "gguf_merge: writing tensors {} ...", path.display())?;
++        for tensor in &file.tensors {
++            let offset = file
++                .data_offset
++                .checked_add(tensor.offset)
++                .ok_or_else(|| invalid("input tensor offset overflow"))?;
++            if let Some(out) = &mut destination {
++                copy_exact(
++                    &mut file.reader,
++                    out,
++                    offset,
++                    tensor.byte_len,
++                    &mut copy_buffer,
++                )?;
++                writer::zeros(out, align(tensor.byte_len, 32)? - tensor.byte_len)?;
++            } else {
++                copy_exact(
++                    &mut file.reader,
++                    &mut io::sink(),
++                    offset,
++                    tensor.byte_len,
++                    &mut copy_buffer,
++                )?;
++            }
++        }
++        writeln!(stderr, "\x1b[3Ddone")?;
++    }
++    if let Some(out) = &mut destination {
++        out.seek(SeekFrom::Start(0))?;
++        let actual = merge_header(&files, &limits.gguf, out)?;
++        if actual != plan {
++            return Err(invalid("merge plan changed before writing"));
++        }
++        out.flush()?;
++        if options.delete_splits {
++            out.get_ref().sync_all()?;
++        }
++    }
++    // Close all input/output handles before optional deletion (also on Windows).
++    drop(files);
++    drop(destination);
++    let mut deletion_error = None;
++    if !options.dry_run && options.delete_splits {
++        for path in &paths {
++            match fs::remove_file(path) {
++                Ok(()) => writeln!(stderr, "gguf_merge: deleted file {}", path.display())?,
++                Err(error) => {
++                    writeln!(stderr, "error: failed to delete {}", path.display())?;
++                    if deletion_error.is_none() {
++                        deletion_error = Some(error);
++                    }
++                }
++            }
++        }
++    }
++    writeln!(
++        stderr,
++        "gguf_merge: {} merged from {count} split with {} tensors.",
++        output.display(),
++        used.tensors
++    )?;
++    if let Some(error) = deletion_error {
++        return Err(Error::Io(error));
++    }
++    Ok(Summary {
++        shards: count,
++        tensors: used.tensors,
++    })
++}
+--- /dev/null
++++ b/crates/gguf/src/writer.rs
+@@ -0,0 +1,536 @@
++//! Ordered GGUF headers and bounded streaming payload layout.
++//! Validation precedes the first output byte; metadata values stay borrowed.
++use crate::{DType, Error, Limits, Result, TensorData, Value, align, dimension_elements, invalid};
++use std::collections::{BTreeMap, BTreeSet};
++use std::io::Write;
++
++/// A borrowed tensor description; its payload need not be resident in memory.
++#[derive(Debug, Clone, Copy)]
++pub struct TensorDescriptor<'a> {
++    pub name: &'a str,
++    pub dimensions: &'a [u64],
++    pub dtype: DType,
++}
++
++/// Checked offsets for streaming payloads after an independently written header.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub struct WriteLayout {
++    pub data_offset: u64,
++    pub alignment: u32,
++    pub tensor_offsets: Vec<u64>,
++    pub tensor_bytes: Vec<u64>,
++    pub file_bytes: u64,
++}
++
++#[derive(Clone, Copy)]
++pub(crate) struct HeaderPolicy {
++    pub(crate) frozen_tool: bool,
++}
++impl HeaderPolicy {
++    const STANDARD: Self = Self { frozen_tool: false };
++    /// Frozen gguf-split creates a fresh alignment-32 context and copies keys
++    /// without updating context alignment. It also serializes ggml_n_dims and
++    /// copies strings through C strings. Keep these measured producer behaviors
++    /// distinct from the valid-layout public writer.
++    pub(crate) const FROZEN_TOOL: Self = Self { frozen_tool: true };
++    fn string(self, value: &str) -> &str {
++        if self.frozen_tool {
++            value.split('\0').next().unwrap_or("")
++        } else {
++            value
++        }
++    }
++    fn rank(self, dimensions: &[u64]) -> usize {
++        if self.frozen_tool {
++            dimensions
++                .iter()
++                .enumerate()
++                .rev()
++                .find(|&(i, &dimension)| i > 0 && dimension > 1)
++                .map_or(1, |(i, _)| i + 1)
++        } else {
++            dimensions.len()
++        }
++    }
++}
++
++fn add(total: &mut u64, count: u64, limit: u64) -> Result<()> {
++    *total = total
++        .checked_add(count)
++        .ok_or_else(|| Error::Limit("encoded header size overflow".into()))?;
++    if *total > limit {
++        return Err(Error::Limit(
++            "encoded header exceeds metadata byte budget".into(),
++        ));
++    }
++    Ok(())
++}
++fn string_size(text: &str, limits: &Limits, policy: HeaderPolicy) -> Result<u64> {
++    let text = policy.string(text);
++    if text.len() > limits.max_string_bytes {
++        return Err(Error::Limit(
++            "encoded string exceeds string byte budget".into(),
++        ));
++    }
++    (text.len() as u64)
++        .checked_add(8)
++        .ok_or_else(|| Error::Limit("encoded string size overflow".into()))
++}
++fn value_size(
++    value: &Value,
++    limits: &Limits,
++    policy: HeaderPolicy,
++    total_values: &mut usize,
++) -> Result<u64> {
++    *total_values = total_values
++        .checked_add(1)
++        .filter(|count| *count <= limits.max_total_values)
++        .ok_or_else(|| Error::Limit("encoded metadata value budget".into()))?;
++    Ok(match value {
++        Value::U8(_) | Value::I8(_) | Value::Bool(_) => 1,
++        Value::U16(_) | Value::I16(_) => 2,
++        Value::U32(_) | Value::I32(_) | Value::F32(_) => 4,
++        Value::U64(_) | Value::I64(_) | Value::F64(_) => 8,
++        Value::String(text) => string_size(text, limits, policy)?,
++        Value::Array {
++            element_type,
++            values,
++        } => {
++            if *element_type > 12 || *element_type == 9 {
++                return Err(invalid("heterogeneous or nested array"));
++            }
++            if values.len() > limits.max_array_values
++                || values.len() > limits.max_total_values.saturating_sub(*total_values)
++            {
++                return Err(Error::Limit("encoded array value budget".into()));
++            }
++            let mut bytes = 12;
++            for item in values {
++                if item.type_id() != *element_type {
++                    return Err(invalid("heterogeneous or nested array"));
++                }
++                add(
++                    &mut bytes,
++                    value_size(item, limits, policy, total_values)?,
++                    limits.max_metadata_bytes,
++                )?;
++            }
++            bytes
++        }
++    })
++}
++
++pub(crate) fn tensor_bytes(tensor: &TensorDescriptor<'_>) -> Result<u64> {
++    if tensor.dimensions.len() > 4 {
++        return Err(invalid("tensor has more than four dimensions"));
++    }
++    dimension_elements(tensor.dimensions)?;
++    let row = usize::try_from(tensor.dimensions.first().copied().unwrap_or(1))
++        .map_err(|_| invalid("dimension exceeds usize"))?;
++    tensor.dimensions.iter().skip(1).try_fold(
++        tensor
++            .dtype
++            .row_bytes(row)
++            .map_err(|error| invalid(error.to_string()))? as u64,
++        |bytes, &dimension| {
++            bytes
++                .checked_mul(dimension)
++                .ok_or_else(|| invalid("tensor size overflow"))
++        },
++    )
++}
++
++pub(crate) fn layout(
++    metadata: &[(&str, &Value)],
++    tensors: &[TensorDescriptor<'_>],
++    limits: &Limits,
++    policy: HeaderPolicy,
++) -> Result<WriteLayout> {
++    if metadata.len() > limits.max_metadata_entries || tensors.len() > limits.max_tensors {
++        return Err(Error::Limit(
++            "encoded metadata or tensor count budget".into(),
++        ));
++    }
++    let metadata_alignment = match metadata.iter().find(|(key, _)| *key == "general.alignment") {
++        None => 32,
++        Some((_, Value::U32(value))) => *value,
++        _ => return Err(invalid("general.alignment must be UINT32")),
++    };
++    if !metadata_alignment.is_power_of_two() || metadata_alignment > 1024 * 1024 {
++        return Err(invalid("invalid alignment"));
++    }
++    let alignment = if policy.frozen_tool {
++        32
++    } else {
++        metadata_alignment
++    };
++    let mut header = 0;
++    add(&mut header, 24, limits.max_metadata_bytes)?;
++    let mut keys = BTreeSet::new();
++    let mut values = 0;
++    for &(key, value) in metadata {
++        if key.is_empty() || key.contains('\0') || !keys.insert(key) {
++            return Err(invalid("empty, NUL or duplicated metadata key"));
++        }
++        add(
++            &mut header,
++            string_size(key, limits, policy)?,
++            limits.max_metadata_bytes,
++        )?;
++        add(&mut header, 4, limits.max_metadata_bytes)?;
++        add(
++            &mut header,
++            value_size(value, limits, policy, &mut values)?,
++            limits.max_metadata_bytes,
++        )?;
++    }
++    // A rank-zero tensor with an empty name still needs 24 encoded bytes.
++    // Reject impossible descriptor counts before reserving per-tensor arrays.
++    let minimum = u64::try_from(tensors.len())
++        .ok()
++        .and_then(|count| count.checked_mul(24))
++        .ok_or_else(|| Error::Limit("encoded tensor descriptor count overflow".into()))?;
++    if minimum > limits.max_metadata_bytes.saturating_sub(header) {
++        return Err(Error::Limit(
++            "tensor descriptors minimum encoded size exceeds remaining metadata budget".into(),
++        ));
++    }
++    #[cfg(test)]
++    LAYOUT_RESERVATIONS.with(|calls| calls.set(calls.get() + 1));
++    let mut tensor_offsets = Vec::new();
++    let mut lengths = Vec::new();
++    tensor_offsets
++        .try_reserve_exact(tensors.len())
++        .map_err(|_| Error::Limit("writer tensor offset allocation".into()))?;
++    lengths
++        .try_reserve_exact(tensors.len())
++        .map_err(|_| Error::Limit("writer tensor length allocation".into()))?;
++    let mut names = BTreeSet::new();
++    let mut offset = 0u64;
++    for tensor in tensors {
++        if tensor.name.len() >= 64 || tensor.name.contains('\0') || !names.insert(tensor.name) {
++            return Err(invalid("invalid or duplicated tensor name"));
++        }
++        let bytes = tensor_bytes(tensor)?;
++        let rank = policy.rank(tensor.dimensions);
++        add(
++            &mut header,
++            string_size(tensor.name, limits, policy)?,
++            limits.max_metadata_bytes,
++        )?;
++        add(&mut header, 16 + rank as u64 * 8, limits.max_metadata_bytes)?;
++        tensor_offsets.push(offset);
++        lengths.push(bytes);
++        offset = offset
++            .checked_add(align(bytes, alignment as u64)?)
++            .ok_or_else(|| invalid("tensor offset overflow"))?;
++    }
++    let data_offset = align(header, alignment as u64)?;
++    if data_offset > limits.max_metadata_bytes {
++        return Err(Error::Limit(
++            "encoded header including padding exceeds budget".into(),
++        ));
++    }
++    let file_bytes = data_offset
++        .checked_add(offset)
++        .ok_or_else(|| invalid("output file size overflow"))?;
++    Ok(WriteLayout {
++        data_offset,
++        alignment,
++        tensor_offsets,
++        tensor_bytes: lengths,
++        file_bytes,
++    })
++}
++
++pub(crate) fn zeros<W: Write>(out: &mut W, mut count: u64) -> Result<()> {
++    const ZERO: [u8; 4096] = [0; 4096];
++    while count != 0 {
++        let part = count.min(ZERO.len() as u64) as usize;
++        out.write_all(&ZERO[..part])?;
++        count -= part as u64;
++    }
++    Ok(())
++}
++struct Encoder<'a, W: Write> {
++    out: &'a mut W,
++    bytes: u64,
++    policy: HeaderPolicy,
++}
++impl<W: Write> Encoder<'_, W> {
++    fn raw(&mut self, bytes: &[u8]) -> Result<()> {
++        self.out.write_all(bytes)?;
++        self.bytes = self
++            .bytes
++            .checked_add(bytes.len() as u64)
++            .ok_or_else(|| invalid("encoded byte count overflow"))?;
++        Ok(())
++    }
++    fn string(&mut self, value: &str) -> Result<()> {
++        let value = self.policy.string(value);
++        self.raw(&(value.len() as u64).to_le_bytes())?;
++        self.raw(value.as_bytes())
++    }
++    fn value(&mut self, value: &Value) -> Result<()> {
++        match value {
++            Value::U8(value) => self.raw(&[*value]),
++            Value::I8(value) => self.raw(&[*value as u8]),
++            Value::U16(value) => self.raw(&value.to_le_bytes()),
++            Value::I16(value) => self.raw(&value.to_le_bytes()),
++            Value::U32(value) => self.raw(&value.to_le_bytes()),
++            Value::I32(value) => self.raw(&value.to_le_bytes()),
++            Value::F32(value) => self.raw(&value.to_le_bytes()),
++            Value::Bool(value) => self.raw(&[u8::from(*value)]),
++            Value::String(value) => self.string(value),
++            Value::U64(value) => self.raw(&value.to_le_bytes()),
++            Value::I64(value) => self.raw(&value.to_le_bytes()),
++            Value::F64(value) => self.raw(&value.to_le_bytes()),
++            Value::Array {
++                element_type,
++                values,
++            } => {
++                self.raw(&element_type.to_le_bytes())?;
++                self.raw(&(values.len() as u64).to_le_bytes())?;
++                for value in values {
++                    self.value(value)?;
++                }
++                Ok(())
++            }
++        }
++    }
++}
++pub(crate) fn header_with_policy<W: Write>(
++    out: &mut W,
++    metadata: &[(&str, &Value)],
++    tensors: &[TensorDescriptor<'_>],
++    limits: &Limits,
++    policy: HeaderPolicy,
++) -> Result<WriteLayout> {
++    let layout = layout(metadata, tensors, limits, policy)?;
++    let mut encoder = Encoder {
++        out,
++        bytes: 0,
++        policy,
++    };
++    encoder.raw(b"GGUF")?;
++    encoder.raw(&3u32.to_le_bytes())?;
++    encoder.raw(&(tensors.len() as u64).to_le_bytes())?;
++    encoder.raw(&(metadata.len() as u64).to_le_bytes())?;
++    for &(key, value) in metadata {
++        encoder.string(key)?;
++        encoder.raw(&value.type_id().to_le_bytes())?;
++        encoder.value(value)?;
++    }
++    for (tensor, &offset) in tensors.iter().zip(&layout.tensor_offsets) {
++        encoder.string(tensor.name)?;
++        let rank = policy.rank(tensor.dimensions);
++        encoder.raw(&(rank as u32).to_le_bytes())?;
++        for dimension in 0..rank {
++            encoder.raw(
++                &tensor
++                    .dimensions
++                    .get(dimension)
++                    .copied()
++                    .unwrap_or(1)
++                    .to_le_bytes(),
++            )?;
++        }
++        encoder.raw(&tensor.dtype.id().to_le_bytes())?;
++        encoder.raw(&offset.to_le_bytes())?;
++    }
++    let padding = layout
++        .data_offset
++        .checked_sub(encoder.bytes)
++        .ok_or_else(|| invalid("header preflight and encoding disagree"))?;
++    zeros(encoder.out, padding)?;
++    Ok(layout)
++}
++
++/// Write a little-endian v3 header in the caller's metadata order, without
++/// allocating a header-sized buffer or copying metadata arrays. The returned
++/// offsets describe the payloads and their zero padding. Validation completes
++/// before the first write; an output I/O failure can still leave partial bytes.
++pub fn write_header<W: Write>(
++    out: &mut W,
++    metadata: &[(&str, &Value)],
++    tensors: &[TensorDescriptor<'_>],
++    limits: &Limits,
++) -> Result<WriteLayout> {
++    header_with_policy(out, metadata, tensors, limits, HeaderPolicy::STANDARD)
++}
++
++/// Ordered counterpart to the existing in-memory payload writer.
++pub fn write_ordered<W: Write>(
++    mut out: W,
++    metadata: &[(&str, &Value)],
++    tensors: &[TensorData<'_>],
++) -> Result<()> {
++    let limits = Limits::default();
++    if tensors.len() > limits.max_tensors {
++        return Err(Error::Limit("encoded tensor count budget".into()));
++    }
++    let mut descriptors = Vec::new();
++    descriptors
++        .try_reserve_exact(tensors.len())
++        .map_err(|_| Error::Limit("writer tensor descriptor allocation".into()))?;
++    for tensor in tensors {
++        let descriptor = TensorDescriptor {
++            name: tensor.name,
++            dimensions: tensor.dimensions,
++            dtype: tensor.dtype,
++        };
++        if tensor_bytes(&descriptor)? != tensor.data.len() as u64 {
++            return Err(invalid(format!(
++                "tensor {} payload length mismatch",
++                tensor.name
++            )));
++        }
++        descriptors.push(descriptor);
++    }
++    let layout = write_header(&mut out, metadata, &descriptors, &limits)?;
++    for (tensor, &bytes) in tensors.iter().zip(&layout.tensor_bytes) {
++        out.write_all(tensor.data)?;
++        zeros(&mut out, align(bytes, layout.alignment as u64)? - bytes)?;
++    }
++    Ok(())
++}
++pub(crate) fn write_map<W: Write>(
++    out: W,
++    metadata: &BTreeMap<String, Value>,
++    tensors: &[TensorData<'_>],
++) -> Result<()> {
++    if metadata.len() > Limits::default().max_metadata_entries {
++        return Err(Error::Limit("encoded metadata entry budget".into()));
++    }
++    let mut ordered = Vec::new();
++    ordered
++        .try_reserve_exact(metadata.len())
++        .map_err(|_| Error::Limit("writer metadata index allocation".into()))?;
++    ordered.extend(metadata.iter().map(|(key, value)| (key.as_str(), value)));
++    write_ordered(out, &ordered, tensors)
++}
++
++#[cfg(test)]
++std::thread_local! {
++    static LAYOUT_RESERVATIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::Gguf;
++    use std::io::{self, Cursor};
++
++    #[test]
++    fn ordered_streaming_header_preserves_order_nan_bits_and_custom_alignment() {
++        let first = Value::String("large\0value".into());
++        let nan = Value::F32(f32::from_bits(0x7fa1_2345));
++        let alignment = Value::U32(64);
++        let metadata = [
++            ("z", &first),
++            ("a", &nan),
++            ("general.alignment", &alignment),
++        ];
++        let descriptors = [TensorDescriptor {
++            name: "x",
++            dimensions: &[3],
++            dtype: DType::I8,
++        }];
++        let mut bytes = Vec::new();
++        let layout = write_header(&mut bytes, &metadata, &descriptors, &Limits::default()).unwrap();
++        assert_eq!(layout.data_offset % 64, 0);
++        assert_eq!(bytes.len() as u64, layout.data_offset);
++        bytes.extend([4, 5, 6]);
++        zeros(&mut bytes, 61).unwrap();
++        assert_eq!(bytes.len() as u64, layout.file_bytes);
++        let parsed = Gguf::read(Cursor::new(bytes), Limits::default()).unwrap();
++        assert_eq!(
++            parsed.metadata_order().collect::<Vec<_>>(),
++            ["z", "a", "general.alignment"]
++        );
++        assert_eq!(parsed.metadata["z"], first);
++        assert!(matches!(parsed.metadata["a"], Value::F32(x) if x.to_bits()==0x7fa1_2345));
++    }
++
++    struct NoWrite;
++    impl Write for NoWrite {
++        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
++            panic!("invalid metadata must be rejected before the first output write")
++        }
++        fn flush(&mut self) -> io::Result<()> {
++            Ok(())
++        }
++    }
++    #[test]
++    fn all_header_validation_precedes_output_and_enforces_padding_budget() {
++        let invalid_array = Value::Array {
++            element_type: 0,
++            values: vec![Value::I8(2)],
++        };
++        assert!(
++            write_header(
++                &mut NoWrite,
++                &[("x", &invalid_array)],
++                &[],
++                &Limits::default()
++            )
++            .is_err()
++        );
++        let alignment = Value::U32(64);
++        let limits = Limits {
++            max_metadata_bytes: 63,
++            ..Limits::default()
++        };
++        assert!(matches!(
++            write_header(
++                &mut NoWrite,
++                &[("general.alignment", &alignment)],
++                &[],
++                &limits
++            ),
++            Err(Error::Limit(_))
++        ));
++        let value = Value::U32(1);
++        assert!(
++            write_header(
++                &mut NoWrite,
++                &[("x", &value), ("x", &value)],
++                &[],
++                &Limits::default()
++            )
++            .is_err()
++        );
++        assert!(
++            write_header(
++                &mut NoWrite,
++                &[],
++                &[TensorDescriptor {
++                    name: "x",
++                    dimensions: &[i64::MAX as u64, 2],
++                    dtype: DType::F32
++                }],
++                &Limits::default()
++            )
++            .is_err()
++        );
++    }
++    #[test]
++    fn impossible_header_budget_rejects_before_tensor_layout_reservations() {
++        let descriptor = TensorDescriptor {
++            name: "x",
++            dimensions: &[],
++            dtype: DType::I8,
++        };
++        let descriptors = vec![descriptor; 64];
++        let limits = Limits {
++            max_metadata_bytes: 32,
++            ..Limits::default()
++        };
++        LAYOUT_RESERVATIONS.with(|calls| calls.set(0));
++        assert!(matches!(
++            write_header(&mut NoWrite, &[], &descriptors, &limits),
++            Err(Error::Limit(_))
++        ));
++        assert_eq!(LAYOUT_RESERVATIONS.with(|calls| calls.get()), 0);
++    }
++}
+--- /dev/null
++++ b/crates/gguf/tests/split_limits.rs
+@@ -0,0 +1,309 @@
++//! Resource and file-ownership regressions for the streaming split/merge API.
++//! These are explicit Rust error contracts; native output parity is exercised
++//! independently by the CLI's frozen original corpus.
++use llama_gguf::split::{self, MergeOptions, SplitLimit, SplitOptions};
++use llama_gguf::{Error, Limits, ShardLimits, TensorData, Value};
++use llama_quant::DType;
++use std::collections::BTreeMap;
++use std::fs::{self, File};
++use std::path::{Path, PathBuf};
++use std::sync::atomic::{AtomicU64, Ordering};
++
++struct Work(PathBuf);
++impl Work {
++    fn new() -> Self {
++        static NEXT: AtomicU64 = AtomicU64::new(0);
++        let path = std::env::temp_dir().join(format!(
++            "rust-llama-gguf-limits-{}-{}",
++            std::process::id(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ));
++        fs::create_dir(&path).unwrap();
++        Self(path)
++    }
++}
++impl Drop for Work {
++    fn drop(&mut self) {
++        let _ = fs::remove_dir_all(&self.0);
++    }
++}
++fn input(path: &Path) -> Vec<u8> {
++    let payload = (0..96).collect::<Vec<u8>>();
++    let metadata = BTreeMap::from([("test".into(), Value::String("streaming".into()))]);
++    let tensors = [
++        TensorData {
++            name: "a",
++            dimensions: &[33],
++            dtype: DType::I8,
++            data: &payload[..33],
++        },
++        TensorData {
++            name: "b",
++            dimensions: &[63],
++            dtype: DType::I8,
++            data: &payload[33..],
++        },
++    ];
++    llama_gguf::write(File::create(path).unwrap(), &metadata, &tensors).unwrap();
++    fs::read(path).unwrap()
++}
++fn files(path: &Path) -> BTreeMap<String, Vec<u8>> {
++    fs::read_dir(path)
++        .unwrap()
++        .map(|entry| {
++            let entry = entry.unwrap();
++            (
++                entry.file_name().into_string().unwrap(),
++                fs::read(entry.path()).unwrap(),
++            )
++        })
++        .collect()
++}
++fn two_shards(work: &Work) -> Vec<PathBuf> {
++    let source = work.0.join("input.gguf");
++    input(&source);
++    let prefix = work.0.join("parts");
++    let summary = split::split(
++        &source,
++        &prefix,
++        SplitOptions {
++            limit: SplitLimit::Tensors(1),
++            ..SplitOptions::default()
++        },
++        &ShardLimits::default(),
++        &mut Vec::new(),
++        &mut Vec::new(),
++    )
++    .unwrap();
++    assert_eq!((summary.shards, summary.tensors), (2, 2));
++    (0..2)
++        .map(|i| split::split_path(&prefix, i, 2).unwrap())
++        .collect()
++}
++#[test]
++fn split_resource_failures_precede_file_mutation() {
++    let work = Work::new();
++    let source = work.0.join("input.gguf");
++    input(&source);
++    let before = files(&work.0);
++    let options = SplitOptions {
++        limit: SplitLimit::Tensors(1),
++        ..SplitOptions::default()
++    };
++    let limits = ShardLimits {
++        max_shards: 1,
++        ..ShardLimits::default()
++    };
++    assert!(matches!(
++        split::split(
++            &source,
++            &work.0.join("parts"),
++            options,
++            &limits,
++            &mut Vec::new(),
++            &mut Vec::new()
++        ),
++        Err(Error::Limit(_))
++    ));
++    assert_eq!(files(&work.0), before);
++
++    let limits = ShardLimits {
++        gguf: Limits {
++            max_tensor_read_bytes: 0,
++            ..Limits::default()
++        },
++        ..ShardLimits::default()
++    };
++    assert!(matches!(
++        split::split(
++            &source,
++            &work.0.join("parts"),
++            options,
++            &limits,
++            &mut Vec::new(),
++            &mut Vec::new()
++        ),
++        Err(Error::Limit(_))
++    ));
++    assert_eq!(files(&work.0), before);
++    let dry = SplitOptions {
++        dry_run: true,
++        ..options
++    };
++    assert!(
++        split::split(
++            &source,
++            &work.0.join("parts"),
++            dry,
++            &limits,
++            &mut Vec::new(),
++            &mut Vec::new()
++        )
++        .is_ok()
++    );
++    assert_eq!(files(&work.0), before);
++}
++#[test]
++fn merge_cumulative_limits_and_zero_buffer_preserve_inputs() {
++    let work = Work::new();
++    let shards = two_shards(&work);
++    let before = files(&work.0);
++    let options = MergeOptions {
++        delete_splits: true,
++        ..MergeOptions::default()
++    };
++    // The first header has four entries and the second three: each fits six,
++    // but the complete owned set exceeds that explicit combined allowance.
++    let limits = ShardLimits {
++        gguf: Limits {
++            max_metadata_entries: 6,
++            ..Limits::default()
++        },
++        ..ShardLimits::default()
++    };
++    assert!(matches!(
++        split::merge(
++            &shards[0],
++            &work.0.join("merged.gguf"),
++            options,
++            &limits,
++            &mut Vec::new()
++        ),
++        Err(Error::Limit(_))
++    ));
++    assert_eq!(files(&work.0), before);
++    let limits = ShardLimits {
++        gguf: Limits {
++            max_tensor_read_bytes: 0,
++            ..Limits::default()
++        },
++        ..ShardLimits::default()
++    };
++    assert!(matches!(
++        split::merge(
++            &shards[0],
++            &work.0.join("merged.gguf"),
++            options,
++            &limits,
++            &mut Vec::new()
++        ),
++        Err(Error::Limit(_))
++    ));
++    assert_eq!(files(&work.0), before);
++    // Native merge dry-run still reads payloads, unlike split dry-run.
++    assert!(matches!(
++        split::merge(
++            &shards[0],
++            &work.0.join("merged.gguf"),
++            MergeOptions {
++                dry_run: true,
++                ..options
++            },
++            &limits,
++            &mut Vec::new()
++        ),
++        Err(Error::Limit(_))
++    ));
++    assert_eq!(files(&work.0), before);
++}
++#[test]
++fn minimal_streaming_buffer_keeps_payload_bytes() {
++    let work = Work::new();
++    let shards = two_shards(&work);
++    let output = work.0.join("merged.gguf");
++    let limits = ShardLimits {
++        gguf: Limits {
++            max_tensor_read_bytes: 1,
++            ..Limits::default()
++        },
++        ..ShardLimits::default()
++    };
++    split::merge(
++        &shards[0],
++        &output,
++        MergeOptions::default(),
++        &limits,
++        &mut Vec::new(),
++    )
++    .unwrap();
++    let mut original = llama_gguf::Gguf::open(work.0.join("input.gguf")).unwrap();
++    let mut merged = llama_gguf::Gguf::open(&output).unwrap();
++    for name in ["a", "b"] {
++        assert_eq!(
++            original.read_tensor(name).unwrap(),
++            merged.read_tensor(name).unwrap()
++        );
++    }
++}
++#[cfg(any(unix, windows))]
++#[test]
++fn split_cannot_truncate_input_through_a_hard_link() {
++    let work = Work::new();
++    let source = work.0.join("input.gguf");
++    let original = input(&source);
++    let prefix = work.0.join("alias");
++    let alias = split::split_path(&prefix, 0, 1).unwrap();
++    fs::hard_link(&source, &alias).unwrap();
++    assert!(
++        split::split(
++            &source,
++            &prefix,
++            SplitOptions::default(),
++            &ShardLimits::default(),
++            &mut Vec::new(),
++            &mut Vec::new()
++        )
++        .is_err()
++    );
++    assert_eq!(fs::read(&source).unwrap(), original);
++    assert_eq!(fs::read(&alias).unwrap(), original);
++}
++
++#[cfg(unix)]
++#[test]
++fn split_checks_retained_handles_after_path_preflight() {
++    use std::io::{self, Write};
++    struct AliasAfterPreflight {
++        source: PathBuf,
++        destination: PathBuf,
++        swapped: bool,
++    }
++    impl Write for AliasAfterPreflight {
++        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
++            if !self.swapped {
++                fs::remove_file(&self.destination)?;
++                fs::hard_link(&self.source, &self.destination)?;
++                self.swapped = true;
++            }
++            Ok(bytes.len())
++        }
++        fn flush(&mut self) -> io::Result<()> {
++            Ok(())
++        }
++    }
++    let work = Work::new();
++    let source = work.0.join("input.gguf");
++    let original = input(&source);
++    let prefix = work.0.join("swapped");
++    let destination = split::split_path(&prefix, 0, 1).unwrap();
++    fs::write(&destination, b"unrelated output allowed to be overwritten").unwrap();
++    let mut stdout = AliasAfterPreflight {
++        source: source.clone(),
++        destination: destination.clone(),
++        swapped: false,
++    };
++    assert!(
++        split::split(
++            &source,
++            &prefix,
++            SplitOptions::default(),
++            &ShardLimits::default(),
++            &mut stdout,
++            &mut Vec::new()
++        )
++        .is_err()
++    );
++    assert!(stdout.swapped);
++    assert_eq!(fs::read(source).unwrap(), original);
++    assert_eq!(fs::read(destination).unwrap(), original);
++}
