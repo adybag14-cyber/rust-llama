@@ -1,25 +1,20 @@
 //! Native dense Qwen2 GGUF graph loading.
 use crate::loader::{
-    bias, details, float, matrix, require_causal, require_unscaled_rope, split_count, uint,
-    unsupported, vector,
+    bias, details, float, matrix, require_causal, require_unscaled_rope, uint, unsupported, vector,
 };
 use crate::{Error, Executor, LoadOptions, Model, Result};
-use llama_gguf::{Gguf, Value};
+use llama_gguf::{GgufSet, Value};
 use llama_model_runtime::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
 use llama_tokenizer::Tokenizer;
-use std::{collections::BTreeSet, fs::File, path::Path, sync::Arc};
+use std::{collections::BTreeSet, path::Path, sync::Arc};
 
-pub(super) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Result<Model> {
-    let metadata = &g.metadata;
+pub(super) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result<Model> {
+    let metadata = g.metadata();
     match metadata.get("general.type") {
         None => {}
         Some(Value::String(kind)) if kind == "model" => {}
         Some(Value::String(kind)) => return Err(unsupported(format!("GGUF general.type={kind}"))),
         Some(_) => return Err(Error::Invalid("general.type must be a string".into())),
-    }
-    let splits = split_count(metadata)?;
-    if splits > 1 {
-        return Err(unsupported("split GGUF model loading"));
     }
     let tokenizer = Tokenizer::from_metadata(metadata)?;
     let layers = uint(metadata, "qwen2.block_count", None)?;
@@ -184,7 +179,7 @@ pub(super) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
         });
     }
     let unconsumed: Vec<_> = g
-        .tensors
+        .tensors()
         .iter()
         .filter(|tensor| !used.contains(&tensor.name))
         .map(|tensor| tensor.name.as_str())

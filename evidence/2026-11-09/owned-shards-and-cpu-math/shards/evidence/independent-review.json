@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reviewer": "/root/quantization",
+  "scope": "Independent read-only shard parser and bounded-header review; not a formal proof or whole-project audit.",
+  "reviews": [
+    {
+      "stage": "Initial shard review",
+      "source_hashes": {
+        "shards_rs_prefix": "c28d9c19",
+        "lib_rs_prefix": "050abec1"
+      },
+      "findings": [
+        "Array-value reservation preflight compared the minimum encoded bytes with remaining file bytes but not the remaining metadata budget.",
+        "Tensor descriptor reservation occurred before proving the remaining file/header budget could contain even the smallest legal descriptor."
+      ],
+      "other_observations": "No unsafe, direct malformed-input index panic, shard ownership or transactional-construction bypass found in the reviewed scope."
+    },
+    {
+      "stage": "Allocation correction and reader domain review",
+      "lib_rs_sha256": "a64f289e1f3a560a2390116fd12ac6d64e499c196398d020867164e36a00bee6",
+      "result": "Both narrow findings closed; small-budget tests target the early errors.",
+      "observations": [
+        "minimum_encoded checks both remaining physical bytes and cumulative header budget before array/descriptor reservation.",
+        "Scalar dimensions default to one, zero extents preserve sequential source checks, empty-directory data offset and descriptor-order padded offsets match the frozen source.",
+        "Rust UTF-8/NUL-name restrictions remain a documented stricter domain; no extra native malformed-name acceptance claim."
+      ]
+    },
+    {
+      "stage": "Bounded HeaderReader review",
+      "lib_rs_sha256": "7bf88e7c2322abc55c141ec218c18f235ce05e95ab2aca12dd2e3bd318d2e81d",
+      "result": "No new buffering-boundary issue found.",
+      "observations": [
+        "Fallible allocation capped to 64 KiB.",
+        "Refill capped to remaining physical bytes and cumulative header allowance.",
+        "Consumed position remains in the initial bounded range.",
+        "Short reads and interrupted read_exact behavior remain valid.",
+        "finish executes after parse success/error, restores the consumed position, and preserves an original parse error if synchronization also fails.",
+        "Earlier reservation preflight remains present."
+      ]
+    }
+  ],
+  "negative_control": "allocation-negative-result.json; both preflight tests fail with only the early preflight calls removed.",
+  "product_mutated": false
+}

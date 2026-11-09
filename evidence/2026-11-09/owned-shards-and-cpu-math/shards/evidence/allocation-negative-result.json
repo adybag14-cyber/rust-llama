@@ -1,0 +1,28 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "-p",
+    "llama-gguf",
+    "preflight",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\allocation-before-fix",
+  "elapsed_seconds": 1.441636323928833,
+  "exit_code": 101,
+  "expected_negative_control": true,
+  "source_unchanged": true,
+  "source_sha256": "5023430a886bdb90317e0f4d56bce58156373d70e607b72751d2c90b6a668774",
+  "summary": [
+    "test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... FAILED",
+    "test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... FAILED",
+    "    tests::arrays_preflight_the_remaining_header_budget_before_reservation",
+    "    tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation",
+    "test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s",
+    "thread 'tests::arrays_preflight_the_remaining_header_budget_before_reservation' (4680) panicked at crates\\gguf\\src\\lib.rs:903:9:",
+    "thread 'tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation' (44656) panicked at crates\\gguf\\src\\lib.rs:921:9:"
+  ],
+  "setup_failure_preserved": "allocation-before-fix-setup-failure.json"
+}

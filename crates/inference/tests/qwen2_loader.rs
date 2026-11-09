@@ -125,6 +125,12 @@ fn qwen2_source_typed_dimensions_and_limits_reject_malformed_files() {
         rejected_metadata("qwen2.attention.layer_norm_rms_epsilon", None),
         Error::Invalid(_)
     ));
+    // A split declaration now enters shard validation. This primary input
+    // lacks split.no and must fail before the architecture reads any weights.
+    assert!(matches!(
+        rejected_metadata("split.count", Some(Value::U16(2))),
+        Error::Invalid(message) if message == "invalid GGUF: missing split.no"
+    ));
 }
 
 #[test]
@@ -143,7 +149,6 @@ fn qwen2_unimplemented_model_modes_are_explicit() {
         ("qwen2.nextn_predict_layers", Value::U32(1)),
         ("prism.hadamard.version", Value::U32(1)),
         ("general.type", Value::String("adapter".into())),
-        ("split.count", Value::U16(2)),
     ] {
         assert!(
             matches!(rejected_metadata(key, Some(value)), Error::Unsupported(_)),

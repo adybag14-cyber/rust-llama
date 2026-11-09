@@ -1,0 +1,16 @@
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\sharded-gguf-port\qwen-validation-draft\crates\gguf)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\sharded-gguf-port\qwen-validation-draft\crates\tokenizer)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama-reference\sharded-gguf-port\qwen-validation-draft\crates\inference)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.72s
+     Running unittests src\lib.rs (target\debug\deps\llama_gguf-c5a486ed5fd22931.exe)
+     Running unittests src\lib.rs (target\debug\deps\llama_inference-a4e5dafdaab291e9.exe)
+     Running tests\bert_defaults.rs (target\debug\deps\bert_defaults-35b34ffaae36de54.exe)
+native missing-pooling default: 3 prompts, 11 token embeddings, 3 explicit mean vectors, 56 floats, max_abs=0.000000000e0
+     Running tests\bert_reference.rs (target\debug\deps\bert_reference-11fe3db17cece275.exe)
+     Running tests\mamba_loader.rs (target\debug\deps\mamba_loader-531c0acdd6557c4c.exe)
+
+thread 'missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights' (18644) panicked at crates\inference\tests\mamba_loader.rs:163:5:
+assertion failed: matches!(rejected_metadata("split.count", Some(Value::U16(2))),
+    Error::Unsupported(_))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p llama-inference --test mamba_loader`

@@ -1,0 +1,316 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T18:10:26.061401+00:00",
+  "base_commit": "ff898aadc24961afc77711e1a690d75458b1f155",
+  "qualification": "Full combined owned GGUF shards, bounded metadata I/O, same-owner C shard loading/statistics, shared scalar/SSE2 tensor/model math and explicit OS erff boundary. Qwen3, native F16 KV and flash attention are separate unmerged work.",
+  "fingerprint_scope": "All Rust, Cargo/compiler/CI inputs and JSON/bin/GGUF data outside historical evidence; canonical POSIX relative paths, same ordering on both hosts.",
+  "execution_inputs_before": {
+    "files": 606,
+    "sha256": "03365c9600e8ad652a4921a1ca0d0e8288f76cf1bb655ae22e8bf700610f4bfe"
+  },
+  "external_driver_sha256": {
+    "verify-embedding-cli.py": "29ed5aa57e2ed23a6e578bc1f8534b485c4afacf91a78f83f5cd4d9d410d91fb",
+    "verify-decoder-cli.py": "b6568ee9ff3ae41e6d2ba88b5ee04cb84c2a02293394a7cab9ef829c340d1252",
+    "verify-qwen2-http.py": "fa9419b029641404a70aa16a856275f64ef23b3dfb8c797d0100fe8d28b6b13b",
+    "verify-sharded-apps.py": "cebf0072e952e93146e17d7ee4e134dff4740e0f235883717c92f9b92cd680ed",
+    "verify-sharded-apps-v2.py": "82157bdb51e273c1c18c7e9c1093154848f847877464cb57b67ae5412dacdbd3",
+    "validate-full-v1.py": "c1d340954ab3fac6dac8e7bb8fb9e4c4915e86b578e85998b74137eb7deecfb2",
+    "validate-completion-v2.py": "2e9af19df76179156b145b467cff6f8066738b59d6c3fee83215ab96ad238959"
+  },
+  "steps": [
+    {
+      "name": "sharded-applications",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\verify-sharded-apps-v2.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.47593269999924814,
+      "log_sha256": "9f2b1a0fe39d7d52716889f71038069815e057f39e0cc18775809b68ab69cde1"
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 137.64973450000252,
+      "log_sha256": "dc550b7078b99f71521dc195cb8182cbea82e971fc47b609043363c8535a56ae",
+      "tests": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 12
+      }
+    },
+    {
+      "name": "generation-http",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-server",
+        "--example",
+        "verify_model_server",
+        "--",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 10.277245699999185,
+      "log_sha256": "49bc9af69003c70b9c9f622fe7b2c1a6aebbd74564878757e58781e4a9d64974"
+    },
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 13.534879200000432,
+      "log_sha256": "d33dc89e52007c0c7c2d5cd58e55785de7a059d41d4376dba00044c56856f2c4"
+    },
+    {
+      "name": "release-gate",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.08375289999821689,
+      "log_sha256": "850967757d4370be0983c877615707c518b3a5d381fc9407ded58c446540a5af"
+    }
+  ],
+  "previous_stage": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\validation\\full-v1\\windows\\status.json",
+    "sha256": "462687ee07259fbe6cb2b11795cabfa90edd54f46e0aba149c1b3b121dff2150",
+    "passed_steps": [
+      {
+        "name": "fmt",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "fmt",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.938601199999539,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "debug",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "test",
+          "--workspace",
+          "--all-targets",
+          "--offline",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 80.52865869999732,
+        "log_sha256": "f819ae5d43359648baf9a45528b0fb4586d5055ad2d9066ee80b33accca275d1",
+        "tests": {
+          "passed": 436,
+          "failed": 0,
+          "ignored": 18,
+          "suites": 82
+        }
+      },
+      {
+        "name": "release",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "test",
+          "--workspace",
+          "--all-targets",
+          "--release",
+          "--offline",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 416.5768179000006,
+        "log_sha256": "838821d2cbea81c495c5ea239edf7ef58e2a3b198fc43df2f5ec4708dd7c3463",
+        "tests": {
+          "passed": 436,
+          "failed": 0,
+          "ignored": 18,
+          "suites": 82
+        }
+      },
+      {
+        "name": "clippy",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "clippy",
+          "--workspace",
+          "--all-targets",
+          "--offline",
+          "--locked",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 7.587399899999582,
+        "log_sha256": "ed0f000fcfb55087ce327dc6c727dc1e71349d741ed166f1c775c1d6309c0bbd"
+      },
+      {
+        "name": "audit",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "run",
+          "--offline",
+          "--locked",
+          "-p",
+          "xtask",
+          "--",
+          "audit"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 13.309363600001234,
+        "log_sha256": "39bd3aa2f9c595fe9c1688f1dd1382be05c86361d93af1c28090d342ed0d35c3"
+      },
+      {
+        "name": "math-provider",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "run",
+          "--offline",
+          "--locked",
+          "-p",
+          "xtask",
+          "--",
+          "hash",
+          "C:\\Windows\\System32\\ucrtbase.dll"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.15228680000291206,
+        "log_sha256": "278973ee4c1d8257d9efa55b43e55af3f22b50f7a9eeeb4ee0db64e8eccb2ebd"
+      },
+      {
+        "name": "fixtures",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "run",
+          "--offline",
+          "--locked",
+          "-p",
+          "xtask",
+          "--",
+          "fixtures"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 14.071002299999236,
+        "log_sha256": "4d2b88d1bf4f658fe57ef8ccd47216de891c1897b8d3479d5fee52202a8c8861"
+      },
+      {
+        "name": "build",
+        "argv": [
+          "cargo",
+          "+1.99.1",
+          "build",
+          "--workspace",
+          "--release",
+          "--offline",
+          "--locked"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 39.74490810000134,
+        "log_sha256": "ccff5cc95acb1a5877af98b8994e1251097aedb19f76597d0df88aa72ccacf39"
+      },
+      {
+        "name": "embedding-cli",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\verify-embedding-cli.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.4761237999991863,
+        "log_sha256": "a55b819ce2ceb36ba0b3b09e23b76714d605678905e167b8eda0f8768783a93d"
+      },
+      {
+        "name": "decoder-cli",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\verify-decoder-cli.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 43.129012299999886,
+        "log_sha256": "cb778f07e4b5b8af1b0303d373e5558d4c6cd2be090dfabeffd8dba79d7b6508"
+      },
+      {
+        "name": "qwen2-http",
+        "argv": [
+          "C:\\Python314\\python.exe",
+          "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\verify-qwen2-http.py"
+        ],
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 30.106907299999875,
+        "log_sha256": "9d632d2e6897348840426f30955bb89543565ed24bd8456a5e61149ce037cef6"
+      }
+    ],
+    "failure": "External shard HTTP driver requested max-absolute scaling mode0 while comparing raw C API mean vectors. Original driver/logs retained. v2 selects the existing unnormalized mode-1; Rust source and native expected data unchanged."
+  },
+  "execution_inputs_after": {
+    "files": 606,
+    "sha256": "03365c9600e8ad652a4921a1ca0d0e8288f76cf1bb655ae22e8bf700610f4bfe"
+  },
+  "finished_utc": "2026-11-09T18:13:10.874686+00:00"
+}

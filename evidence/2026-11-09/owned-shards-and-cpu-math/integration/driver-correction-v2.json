@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "external_test_adapter_correction",
+  "reviewer": "independent application workstream",
+  "old_driver_sha256": "cebf0072e952e93146e17d7ee4e134dff4740e0f235883717c92f9b92cd680ed",
+  "change": "The v2 driver changes only its output directory and --embd-normalize from0 to-1. It leaves the original driver and failed run intact.",
+  "reason": "Mode0 rescales pooled BERT vectors by32760/max_abs, whereas the retained original C API means are raw vectors. Mode-1 preserves those vectors. The server parser admits signed i32 values.",
+  "product_changes": false,
+  "expected_fixture_changes": false,
+  "budget_changes": false,
+  "expected_checks": {
+    "cli": 8,
+    "http": 19
+  },
+  "source_confirmation": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\crates\\llama-server\\src\\embedding.rs",
+      "sha256": "3e8efc20b0c4d98f565be6f53de88140306b599c7bd0e83bb924e231aeeaaacf"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\crates\\llama-server\\src\\main.rs",
+      "sha256": "8fff84f713e5d5e75f85a80b16d1ab364e094fddfdd4ea1ddbb8f0966b7edcd5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\crates\\llama-server\\src\\runtime.rs",
+      "sha256": "005ce6f4a6c1393c2179fd140c0b63104e1b1488614d4a24ba9841191303b959"
+    }
+  ],
+  "remaining_steps": [
+    "sharded-applications",
+    "pretrained",
+    "generation-http",
+    "source",
+    "release-gate"
+  ],
+  "unchanged_execution_inputs": {
+    "files": 606,
+    "sha256": "03365c9600e8ad652a4921a1ca0d0e8288f76cf1bb655ae22e8bf700610f4bfe"
+  }
+}

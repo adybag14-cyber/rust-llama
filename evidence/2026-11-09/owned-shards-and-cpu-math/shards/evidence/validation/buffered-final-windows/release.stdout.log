@@ -1,0 +1,81 @@
+
+running 11 tests
+test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... ok
+test tests::buffered_headers_preserve_short_reads_io_errors_and_payload_seeks ... ok
+test tests::big_endian_metadata_and_scalar_payload ... ok
+test tests::header_read_ahead_never_exceeds_the_remaining_byte_budget ... ok
+test tests::every_truncated_header_and_payload_is_rejected ... ok
+test tests::overlap_is_rejected ... ok
+test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... ok
+test tests::writer_rejects_invalid_arrays ... ok
+test tests::metadata_budget_and_counts_are_enforced ... ok
+test tests::roundtrip_preserves_types_and_payload ... ok
+test tests::large_metadata_uses_bounded_batched_reads_and_preserves_reader_position ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test stream::tests::invalid_utf8_and_tail_are_replaced_once ... ok
+test stream::tests::sink_failure_propagates ... ok
+test stream::tests::unmatched_stop_prefix_is_flushed ... ok
+test stream::tests::stop_spans_tokens_without_leaking_prefix ... ok
+test stream::tests::utf8_is_preserved_across_every_byte_boundary ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test missing_pooling_metadata_keeps_original_unpooled_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test big_endian_bert_preserves_the_same_native_model_outputs ... ignored, requires hash-pinned big-endian BERT model; set LLAMA_TEST_BERT_BE_MODEL and run --release --ignored --nocapture
+test trained_bert_full_sequence_and_all_pooling_modes ... ignored, requires hash-pinned external BERT model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test cancellation_and_restore_keep_recurrent_state_transactional ... ok
+test required_shapes_unused_tensors_and_weight_budget_are_enforced ... ok
+test missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 8 tests
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external mamba-130m-hf.f16.gguf; set LLAMA_TEST_MAMBA_MODEL and run --release --ignored --nocapture
+test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external SmolLM2-135M-Q4_K_M.gguf; set LLAMA_TEST_BPE_MODEL and run --release --ignored --nocapture
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories15M-q4_0.gguf; set LLAMA_TEST_Q4_MODEL and run --release --ignored --nocapture
+test trained_stories260k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories260K.gguf; set LLAMA_TEST_MODEL and run --ignored --nocapture
+test tiny_mamba_native_default_rms_and_untied_output ... ok
+test original_spm_68_unicode_special_and_empty_cases ... ok
+test tiny_qwen2_separate_fused_partial_bias_and_output_graphs ... ok
+
+test result: ok. 3 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 4 tests
+test qwen2_unimplemented_model_modes_are_explicit ... ok
+test source_rope_defaults_factor_precedence_and_single_file_counts_are_preserved ... ok
+test missing_mis_shaped_or_unimplemented_qwen2_tensors_fail_explicitly ... ok
+test qwen2_source_typed_dimensions_and_limits_reject_malformed_files ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+running 7 tests
+test model_weight_budget_counts_all_shards_before_decoding ... ok
+test reads_keep_the_validated_file_handles_after_path_replacement ... ok
+test cumulative_limits_include_every_shard_and_reads_remain_lazy ... ok
+test automatic_discovery_preserves_unicode_file_paths ... ok
+test original_reader_headers_shapes_offsets_and_payloads ... ok
+test original_model_shard_admission_primary_metadata_and_file_origins ... ok
+test all_four_architectures_execute_original_sharded_native_corpora ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+

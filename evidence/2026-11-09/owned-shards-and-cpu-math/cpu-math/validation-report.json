@@ -1,0 +1,252 @@
+{
+  "job": "job-1794245196435-daf16f16-466",
+  "linkage_job": "job-1794245580006-eea0909e-4e9",
+  "scope": "Four-crate external workspace; not the combined product workspace",
+  "platforms": {
+    "msvc": {
+      "tests": {
+        "debug": {
+          "passed": 125,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 31
+        },
+        "release": {
+          "passed": 125,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 31
+        }
+      },
+      "gates": {
+        "platform": "msvc",
+        "steps": [
+          {
+            "step": "fmt",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "fmt",
+              "--all",
+              "--check"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "debug",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "test",
+              "--workspace",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "release",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "test",
+              "--release",
+              "--workspace",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "clippy",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "source_sha256": {
+          "crates/quant/src/cpu_math.rs": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5",
+          "crates/tensor/src/cpu.rs": "81f824d2b59dd3c76ba906ee0ab18550f27802e1d90e252f417461fcbdf87968",
+          "crates/tensor/src/cpu_extra.rs": "236ae09abd5d70701ebd588625170fe8afe8da43d5ce6dea440b736c702558ae",
+          "crates/model-runtime/src/math/native_rows.rs": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90",
+          "crates/platform-loader/src/math.rs": "e9133d01f72188c11c151bcd32765a6fab2d77c24a28410570373c5ea8df995b"
+        }
+      },
+      "linkage": {
+        "platform": "msvc",
+        "binary": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy\\rust-draft\\target\\release\\deps\\system_erf-14407e457c09d58a.exe",
+        "bytes": 4741120,
+        "sha256": "e9aa66d0e1488b9f4c1ea0ff804aef477d1de91e94bdb0b83c163253a6ee02fc",
+        "libraries": [
+          "api-ms-win-core-synch-l1-2-0.dll",
+          "bcryptprimitives.dll",
+          "KERNEL32.dll",
+          "api-ms-win-crt-math-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "ntdll.dll",
+          "USERENV.dll",
+          "VCRUNTIME140.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll"
+        ],
+        "erff_imports": [
+          {
+            "library": "api-ms-win-crt-math-l1-1-0.dll",
+            "line": "B0 erff"
+          }
+        ],
+        "commands": [
+          [
+            "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\dumpbin.exe",
+            "/imports",
+            "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy\\rust-draft\\target\\release\\deps\\system_erf-14407e457c09d58a.exe"
+          ]
+        ],
+        "no_project_or_oracle_runtime_import": true
+      }
+    },
+    "gnu": {
+      "tests": {
+        "debug": {
+          "passed": 126,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 31
+        },
+        "release": {
+          "passed": 126,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 31
+        }
+      },
+      "gates": {
+        "platform": "gnu",
+        "steps": [
+          {
+            "step": "fmt",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "fmt",
+              "--all",
+              "--check"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "debug",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "test",
+              "--workspace",
+              "--target-dir",
+              "/tmp/rust-llama-tensor-row-policy",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "release",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "test",
+              "--release",
+              "--workspace",
+              "--target-dir",
+              "/tmp/rust-llama-tensor-row-policy",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0
+          },
+          {
+            "step": "clippy",
+            "command": [
+              "cargo",
+              "+1.99.1",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--target-dir",
+              "/tmp/rust-llama-tensor-row-policy",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "source_sha256": {
+          "crates/quant/src/cpu_math.rs": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5",
+          "crates/tensor/src/cpu.rs": "81f824d2b59dd3c76ba906ee0ab18550f27802e1d90e252f417461fcbdf87968",
+          "crates/tensor/src/cpu_extra.rs": "236ae09abd5d70701ebd588625170fe8afe8da43d5ce6dea440b736c702558ae",
+          "crates/model-runtime/src/math/native_rows.rs": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90",
+          "crates/platform-loader/src/math.rs": "e9133d01f72188c11c151bcd32765a6fab2d77c24a28410570373c5ea8df995b"
+        }
+      },
+      "linkage": {
+        "platform": "gnu",
+        "binary": "/tmp/rust-llama-tensor-row-policy/release/deps/system_erf-c1424c283db1b72d",
+        "bytes": 5064944,
+        "sha256": "0bd3430a5622cf8370e75d52d6a0b0412e084c7b0b7d39969291714841de6345",
+        "libraries": [
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ],
+        "erff_imports": [
+          {
+            "line": "17: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND erff@GLIBC_2.2.5 (6)"
+          },
+          {
+            "line": "1486: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND erff"
+          }
+        ],
+        "commands": [
+          [
+            "readelf",
+            "-d",
+            "/tmp/rust-llama-tensor-row-policy/release/deps/system_erf-c1424c283db1b72d"
+          ],
+          [
+            "readelf",
+            "-Ws",
+            "/tmp/rust-llama-tensor-row-policy/release/deps/system_erf-c1424c283db1b72d"
+          ]
+        ],
+        "no_project_or_oracle_runtime_import": true
+      }
+    }
+  },
+  "exact_per_host": {
+    "native_tensor_graphs": 1007,
+    "native_tensor_output_bytes": 2909056,
+    "system_erff_raw_words": 502058,
+    "scalar_quick_gelu_raw_words": 502058
+  },
+  "retained_portable_erf_high_precision_checks": 96910,
+  "source_unchanged_after_validation": true,
+  "documentation_only_after_validation": true,
+  "historical_extended_test_log": "The unchanged older extended.rs diagnostic still describes its historical portable ERF limitation; the new same-profile row_policy.rs and system_erf.rs gates are separate. No old expected bytes or tolerances were changed.",
+  "qualifications": [
+    "Nearest-even rounding; gradual underflow; floating exception status flag parity excluded.",
+    "MathPolicy selects vector grouping and uses current-host scalar CRT; it does not emulate a foreign CRT.",
+    "Exact OS-provider verification applies to exercised x86_64 dynamic MSVC/UCRT 10.0.26100.9711 and GNU/glibc 2.35 profiles; mathematical fallback remains for other/static targets.",
+    "All prior model-runtime native-row tests execute through its unchanged public facade.",
+    "The isolated workspace uses a reduced generated root Cargo manifest for testing; never replace the product root manifest or lock with it."
+  ]
+}

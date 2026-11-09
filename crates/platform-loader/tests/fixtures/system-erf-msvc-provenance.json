@@ -1,0 +1,54 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "oracle": "Independent C++ harness calls the operating-system erff through its exact typed function pointer; no Rust or original project implementation is linked.",
+  "platform": "msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "provider": {
+    "path": "C:\\Windows\\System32\\ucrtbase.dll",
+    "version": "10.0.26100.9711",
+    "bytes": 1399656,
+    "sha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+  },
+  "function": "float erff(float)",
+  "count": 502058,
+  "floating_environment": {
+    "rounding": 0,
+    "mxcsr_before": 8097,
+    "mxcsr_after": 8115,
+    "contract": "Round-to-nearest ties-to-even, gradual underflow; exception status flag parity is excluded."
+  },
+  "input": {
+    "name": "inputs.bin",
+    "bytes": 2008232,
+    "sha256": "3f987f083364d7d3aefa28b30635e3a7d3ea8f2e7937d3516eadeb285b114f3e"
+  },
+  "output": {
+    "name": "system-erf-msvc-reference.bin",
+    "bytes": 4016480,
+    "sha256": "b9a25c6a9c8cff91f22cf5ea8941770464398ee00a3c5f58d683e114ca7d6c43"
+  },
+  "sources": {
+    "capture.py": {
+      "bytes": 6689,
+      "sha256": "957f6100cc5d21bb389052cb3b78c133361eb6d339155c385017346e2780e669"
+    },
+    "oracle.cpp": {
+      "bytes": 952,
+      "sha256": "09b6c7e4db738cab86956e49c487df02cbcd71c5cc93d5e8675ddb73b4cc7216"
+    },
+    "CMakeLists.txt": {
+      "bytes": 279,
+      "sha256": "ad23149e84980bb8f4267658b11692560fb062c6f01e108431d23a6bf04370da"
+    },
+    "system_erf_oracle.dll": {
+      "bytes": 9728,
+      "sha256": "ef968c66309dcac1558edeb5e90f9cc9148bf3ccf9d2767ce1ecd0cf97824c14"
+    }
+  },
+  "coverage": [
+    "All binary16 and bfloat16 input encodings represented in binary32, including signed zero and NaN words.",
+    "All finite binary16 GELU_ERF arguments rounded after multiplication by the exact source sqrt(1/2) F32 constant.",
+    "65,537 dense points over [-8,8], 262,144 seeded arbitrary binary32 words and representable neighbors around reduction/known-mismatch locations.",
+    "Raw integer-word I/O preserves signaling and quiet NaN inputs without passing them through a Python floating conversion."
+  ]
+}

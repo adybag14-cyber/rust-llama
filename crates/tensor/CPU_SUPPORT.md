@@ -98,7 +98,7 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 89 | `DSV4_HC_PRE` | Pending | — | No executable Op constructor; no fallback result. |
 | 90 | `DSV4_HC_POST` | Pending | — | No executable Op constructor; no fallback result. |
 | 91 | `TOP_K_MASK` | Implemented slice | F32/F16 mask + I32 indices | Optional score/block/extra inputs, source invalid-index skipping, batch repeats, raw retained payload bits. |
-| 92 | `UNARY` | Implemented slice | F32 / F16 / BF16 | All 22 scalar formulas; XIELU needs explicit parameters; exact UCRT ERF bit parity remains open. |
+| 92 | `UNARY` | Implemented slice | F32 / F16 / BF16 | All 22 scalar formulas; XIELU needs explicit parameters; OS ERF provider exact on verified dynamic-CRT profiles; mathematical fallback elsewhere. |
 | 93 | `MAP_CUSTOM1` | Pending | — | No executable Op constructor; no fallback result. |
 | 94 | `MAP_CUSTOM2` | Pending | — | No executable Op constructor; no fallback result. |
 | 95 | `MAP_CUSTOM3` | Pending | — | No executable Op constructor; no fallback result. |
@@ -123,7 +123,7 @@ GELU is intentionally dtype-specific: F32 follows the frozen half lookup with it
 | 1 | GEGLU | F32/F16/BF16 | `Glu` / `GluPacked`; dtype-specific GELU rounding |
 | 2 | SWIGLU | F32/F16/BF16 | `Glu` / `GluPacked` |
 | 3 | SWIGLU_OAI | F32/F16 | `SwiGluOai` / `SwiGluOaiPacked`; explicit alpha and limit |
-| 4 | GEGLU_ERF | F32/F16/BF16 | `Glu` / `GluPacked`; portable ERF numerical contract |
+| 4 | GEGLU_ERF | F32/F16/BF16 | `Glu` / `GluPacked`; verified OS ERF or explicit mathematical fallback |
 | 5 | GEGLU_QUICK | F32/F16/BF16 | `Glu` / `GluPacked` |
 | 6 | SWIGLU_CLAMP | F32/F16 | `SwiGluClamp` / `SwiGluClampPacked`; explicit limit |
 
@@ -135,7 +135,7 @@ The README lists every native CPU conversion destination and CPY pair. Missing C
 
 ## Still open
 
-Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The portable ERF implementation's exact equivalence to Windows UCRT `erff` also remains open; a numerical-comparison pass does not close that requirement.
+Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The retained portable ERF is a mathematical fallback, not a foreign-libm emulator. Exact provider equivalence outside the exercised x86_64 dynamic-UCRT/glibc profiles remains open; the new same-profile byte gate is separate from historical numerical comparisons.
 
 ## Convolution, extraction, pooling and resize bounds
 
@@ -166,11 +166,17 @@ from these original CPU constructors, non-F32 resize, arbitrary depthwise storag
 layouts, or antialiased nearest/bicubic modes. General graph autodiff remains
 open; the two new backward operators require their gradients explicitly.
 
-## Separate GNU vector-row policy work
+## Shared scalar and GNU SSE2 row policies
 
-The previously captured scalar NORM, SiLU and softmax references are the frozen
-MSVC profile. GNU selects additional SSE2 vector-prefix policies in these
-operators. The independently verified row helpers developed for model-runtime
-have not yet been wired into this tensor crate. GNU exact row-policy completion
-for those existing operators remains a separate integration item; passing the
-convolution or indexing cohort does not close it.
+Tensor and inference now share `llama_quant::cpu_math`. F32 SiLU/quick GELU
+and their GLUs apply the source row's vector prefix and scalar tail. Softmax
+uses the corresponding exponential and reduction grouping. Contiguous NORM
+uses profile-specific centered variance; strided NORM and RMS_NORM retain
+their independent source arithmetic. F16/BF16 scalar/table paths are unchanged.
+
+The independent matching-profile gate contains 1,007 graphs per host and
+2,909,056 exact output bytes. It includes 72 odd packed-row cases, raw NaNs,
+infinities and subnormals; no numerical tolerance is used for this gate.
+The platform-loader OS-erff boundary independently matches 502,058 raw words
+per host. See README for runtime versions, fallback proof and preserved prior
+failures. MathPolicy changes vector grouping but keeps the target's scalar CRT.

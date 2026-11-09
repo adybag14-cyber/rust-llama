@@ -1,0 +1,13 @@
+{
+  "id": "job-1794243825567-47ef5747-5eb",
+  "mode": "shell",
+  "command": "python apply_candidate.py\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\nSet-Location rust-draft\ncargo +1.99.1 fmt --all\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo +1.99.1 test -p llama-tensor --test row_policy -- --nocapture\n$win = $LASTEXITCODE\ncargo +1.99.1 test -p llama-platform-loader --test system_erf -- --nocapture\n$erf = $LASTEXITCODE\nwsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft && cargo +1.99.1 test --target-dir /tmp/rust-llama-tensor-row-policy -p llama-tensor --test row_policy -- --nocapture; a=$?; cargo +1.99.1 test --target-dir /tmp/rust-llama-tensor-row-policy -p llama-platform-loader --test system_erf -- --nocapture; b=$?; if [ $a -ne 0 ] || [ $b -ne 0 ]; then exit 1; fi'\n$linux = $LASTEXITCODE\nif ($win -ne 0 -or $erf -ne 0 -or $linux -ne 0) { exit 1 }",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy",
+  "timeoutMs": 900000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "light",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T17:03:45.567Z"
+}

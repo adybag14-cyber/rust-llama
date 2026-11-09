@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "captured_utc": "2026-11-09T17:41:11.669886+00:00",
+  "matrix_sha256": "7f5b4183156e7c7d286908885c917c5d105b374863d15c4c311d9650f10a5c02",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_inputs": {
+    "path": "fixtures/gguf/shards-inputs.bin",
+    "sha256": "b444d977bd9326a352a9967efcdf3d2d44ea3397b608cf2562879ad6e1ed8086"
+  },
+  "matrix_cases": 96,
+  "accepted_per_profile": 53,
+  "rejected_per_profile": 43,
+  "original_logit_words_per_profile": 163840,
+  "unique_logit_words_per_profile": {
+    "msvc": 16384,
+    "gnu": 16384
+  },
+  "references_per_profile": {
+    "msvc": 11,
+    "gnu": 11
+  },
+  "fixtures": [
+    {
+      "path": "fixtures/ffi/shards-reference.json",
+      "bytes": 94297,
+      "sha256": "40fd4471d4234604e6e6d75fc29bc9e1acfb9471dc2ffa2951744c99a47b6dbc"
+    },
+    {
+      "path": "fixtures/ffi/shards-msvc-values.f32le.bin",
+      "bytes": 65536,
+      "sha256": "1d2b78e5e9be22a9e45475c8dbbf011826b9b1dec460cfd73cd43c6cd0b9244f"
+    },
+    {
+      "path": "fixtures/ffi/shards-gnu-values.f32le.bin",
+      "bytes": 65536,
+      "sha256": "040576f13cb8d69bfe95c11daeddac922e3e84757a03b9c0d31e12cb04a4b11f"
+    }
+  ],
+  "native": {
+    "msvc": {
+      "source": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\ffi-shards-port\\oracle.cpp",
+        "bytes": 19543,
+        "sha256": "676e4971e1ed7033038548aeab600bcb9dad4242b15dd7f234c439513cd23785"
+      },
+      "header": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\include\\llama.h",
+        "bytes": 91177,
+        "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+      },
+      "library": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "bytes": 3211264,
+        "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+      },
+      "harness": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\ffi-shards-port\\build-windows\\Release\\ffi-shards-oracle.exe",
+        "bytes": 169984,
+        "sha256": "b4d305e2b31b47bd2ed5f0286fdf67ae17f688662e9ab487b6b8ad57b1578135"
+      },
+      "matrix": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\ffi-shards-port\\case-matrix.json",
+        "bytes": 102691,
+        "sha256": "7f5b4183156e7c7d286908885c917c5d105b374863d15c4c311d9650f10a5c02"
+      }
+    },
+    "gnu": {
+      "source": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/oracle.cpp",
+        "bytes": 19543,
+        "sha256": "676e4971e1ed7033038548aeab600bcb9dad4242b15dd7f234c439513cd23785"
+      },
+      "header": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/include/llama.h",
+        "bytes": 91177,
+        "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+      },
+      "library": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "bytes": 5499792,
+        "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+      },
+      "harness": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "bytes": 1057200,
+        "sha256": "64af75021b8e05926d53265fa28abbc1b0aa8cef5cf0bcddf2907008288ab9f7"
+      },
+      "matrix": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/case-matrix.json",
+        "bytes": 102691,
+        "sha256": "7f5b4183156e7c7d286908885c917c5d105b374863d15c4c311d9650f10a5c02"
+      }
+    }
+  },
+  "initial_attempts": {
+    "windows_v1": "C harness compilation rejected Windows min macro; NOMINMAX added without any oracle equation change. Original failure logs retained in native-capture-v1/windows.",
+    "linux_v1": "Succeeded. A fresh same-source v2 cohort also succeeded; v1 outputs retained."
+  },
+  "scope": "Auto-discovery model loading and getters only; no C split-list export or additional architecture execution support. Vocabulary-only includes Llama/BERT/Qwen2; full C execution remains Llama."
+}

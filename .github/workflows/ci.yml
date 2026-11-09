@@ -34,6 +34,12 @@ jobs:
         run: cargo clippy --workspace --all-targets --offline --locked -- -D warnings
       - name: Source and dependency audit
         run: cargo run --offline --locked -p xtask -- audit
+      - name: Windows system math file identity
+        if: runner.os == 'Windows'
+        run: cargo run --offline --locked -p xtask -- hash "$env:SystemRoot\System32\ucrtbase.dll"
+      - name: GNU system math file identity
+        if: runner.os == 'Linux'
+        run: cargo run --offline --locked -p xtask -- hash /lib/x86_64-linux-gnu/libm.so.6
       - name: Independent fixture integrity
         run: cargo run --offline --locked -p xtask -- fixtures
       - name: Release build

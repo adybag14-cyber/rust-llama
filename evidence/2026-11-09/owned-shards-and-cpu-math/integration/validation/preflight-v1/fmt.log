@@ -1,0 +1,19 @@
+Diff in \\?\C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\rust-draft\crates\inference\tests\shards.rs:379:
+             "{label}: {a:.9e} != {e:.9e}; difference={difference:.9e} budget={budget:.9e}"
+         );
+         if cfg!(any(
+[31m-            all(target_arch = "x86_64", target_os = "windows", target_env = "msvc"),
+[0m[31m-            all(target_arch = "x86_64", target_os = "linux", target_env = "gnu")
+[0m[32m+            all(
+[0m[32m+                target_arch = "x86_64",
+[0m[32m+                target_os = "windows",
+[0m[32m+                target_env = "msvc"
+[0m[32m+            ),
+[0m[32m+            all(
+[0m[32m+                target_arch = "x86_64",
+[0m[32m+                target_os = "linux",
+[0m[32m+                target_env = "gnu"
+[0m[32m+            )
+[0m         )) {
+             assert_eq!(
+                 a.to_bits(),

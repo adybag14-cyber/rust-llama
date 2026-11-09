@@ -1,0 +1,91 @@
+   Compiling llama-server v0.1.0 (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\rust-draft\crates\llama-server)
+    Finished `release` profile [optimized] target(s) in 8.83s
+     Running unittests src\lib.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\llama_inference-aedee68e4f602e78.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests\bert_defaults.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\bert_defaults-aecec8696eb6051c.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests\bert_reference.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\bert_reference-0e713c1d9216ebaa.exe)
+
+running 2 tests
+BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0
+test trained_bert_full_sequence_and_all_pooling_modes ... ok
+BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0
+test big_endian_bert_preserves_the_same_native_model_outputs ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.57s
+
+     Running tests\mamba_loader.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\mamba_loader-a81e31ecb29d8f99.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests\native_reference.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\native_reference-c228bd18d88b7912.exe)
+
+running 5 tests
+native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0
+test trained_stories260k_full_logits_greedy_ids_and_text ... ok
+native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ok
+native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ok
+native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)
+test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ok
+test trained_mamba130m_full_logits_greedy_ids_and_text has been running for over 60 seconds
+native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 64.60s
+
+     Running tests\qwen2_loader.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\qwen2_loader-72b22143724db58d.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests\shards.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\shards-f4e09e3452f711c8.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\llama_server-4636f28fbeb7e116.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\llama_server-1e820f12f59604ff.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\embedding_http.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\embedding_http-73511a8b7aa7a9a0.exe)
+
+running 1 test
+Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0
+test pretrained_bert_matches_original_embedding_http_transcripts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 41.44s
+
+     Running tests\embedding_lifecycle.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\embedding_lifecycle-93d45c6486b02b7e.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests\tcp.rs (C:\Users\adyba\rust-llama-reference\loading-and-cpu-math-integration-v1\windows-target\release\deps\tcp-3a91ed54cc8dce0a.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+

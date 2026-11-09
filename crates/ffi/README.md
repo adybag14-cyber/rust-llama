@@ -41,7 +41,16 @@ flags and RoPE enum follow the frozen header/source values even though C context
 execution is unavailable.
 
 Weights use the same validated GGUF loader and its memory budget, numerical
-formats and explicit architecture restrictions.
+formats and explicit architecture restrictions. File loading automatically
+discovers the frozen numbered GGUF shards when primary split.count exceeds one.
+Vocabulary-only loading validates every declared shard too. Architecture,
+tokenizer and string metadata come only from the primary file; tensor byte and
+parameter totals, and guessed file type, cover the complete validated set.
+Full model loading consumes those same owned file handles. A primary split.count
+of zero, one or absent retains the original single-file interpretation.
+Missing siblings, malformed headers, duplicate tensor names, invalid indices or
+payload extents fail with a diagnostic. The explicit C split-list and filename
+buffer APIs remain unexported.
 
 Start with the frozen default parameter functions, then select CPU loading,
 F32 KV caches and causal decoding. For example, a client using the frozen C
@@ -128,9 +137,22 @@ data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
-adapters, encoder entry points, model saving, split-file loading and performance
-APIs remain absent. Source custom chat-template lookup
+adapters, encoder entry points, model saving, explicit split-list loading and
+performance APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
+
+## Automatic shard regression
+
+The ordinary model_shard_tests replay uses independent frozen-header C captures
+from Windows MSVC and GNU x86_64. Each profile checks 96 auto-load cases:
+53 accepted and 43 rejected, including metadata-only first files, subsidiary
+metadata conflicts, inferred file types, missing split.count partial totals,
+missing siblings and malformed shards. Successful cases check model dimensions,
+description, type, byte/parameter totals, vocabulary, token IDs/pieces and
+detokenization. Full Llama cases additionally compare 163,840 F32 logit words
+exactly, including greedy continuations. Expected values are deduplicated to
+16,384 stored words per profile, with the original captures retained separately.
+fixtures/ffi/shards-provenance.json records input and capture hashes.
 
 ## CPU sampling
 

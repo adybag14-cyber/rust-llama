@@ -1,0 +1,2191 @@
+{
+  "schema": 1,
+  "host": "linux",
+  "passed": true,
+  "created_utc": "2026-11-09T17:39:22.583867+00:00",
+  "source": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/oracle.cpp",
+    "bytes": 19543,
+    "sha256": "676e4971e1ed7033038548aeab600bcb9dad4242b15dd7f234c439513cd23785"
+  },
+  "header": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/include/llama.h",
+    "bytes": 91177,
+    "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+  },
+  "library": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+    "bytes": 5499792,
+    "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+  },
+  "matrix": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/case-matrix.json",
+    "bytes": 102691,
+    "sha256": "7f5b4183156e7c7d286908885c917c5d105b374863d15c4c311d9650f10a5c02"
+  },
+  "steps": [
+    {
+      "name": "configure",
+      "command": [
+        "cmake",
+        "-S",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port",
+        "-B",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "cmake",
+        "--build",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux",
+        "--config",
+        "Release",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "single-auto-vocab",
+      "path": "rust-draft/fixtures/ffi/native-context-model.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/rust-draft/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "single-auto-full",
+      "path": "rust-draft/fixtures/ffi/native-context-model.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/rust-draft/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "two-auto-vocab",
+      "path": "native-capture/models/two/llama-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/two/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "two-auto-full",
+      "path": "native-capture/models/two/llama-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/two/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/two-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "three-auto-vocab",
+      "path": "native-capture/models/three/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/three/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "three-auto-full",
+      "path": "native-capture/models/three/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/three/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/three-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "many-auto-vocab",
+      "path": "native-capture/models/many/llama-00001-of-00035.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/many/llama-00001-of-00035.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "many-auto-full",
+      "path": "native-capture/models/many/llama-00001-of-00035.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/many/llama-00001-of-00035.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/many-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "metadata-first-auto-vocab",
+      "path": "native-capture/models/metadata-first/llama-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/metadata-first/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "metadata-first-auto-full",
+      "path": "native-capture/models/metadata-first/llama-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/metadata-first/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "one-auto-vocab",
+      "path": "native-capture/models/one/llama-00001-of-00001.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/one/llama-00001-of-00001.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "one-auto-full",
+      "path": "native-capture/models/one/llama-00001-of-00001.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/one/llama-00001-of-00001.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/one-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "sub-metadata-absent-vocab",
+      "path": "native-capture/models/sub-metadata-absent/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-metadata-absent/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "sub-metadata-absent-full",
+      "path": "native-capture/models/sub-metadata-absent/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-metadata-absent/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-absent-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "sub-metadata-conflicts-vocab",
+      "path": "native-capture/models/sub-metadata-conflicts/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-metadata-conflicts/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "sub-metadata-conflicts-full",
+      "path": "native-capture/models/sub-metadata-conflicts/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-metadata-conflicts/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-metadata-conflicts-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "sub-no-missing-vocab",
+      "path": "native-capture/models/sub-no-missing/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-missing-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-missing-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "sub-no-missing-full",
+      "path": "native-capture/models/sub-no-missing/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-missing-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-missing-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "sub-no-wrong-value-vocab",
+      "path": "native-capture/models/sub-no-wrong-value/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-wrong-value/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-value-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-value-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "sub-no-wrong-value-full",
+      "path": "native-capture/models/sub-no-wrong-value/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-wrong-value/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-value-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-value-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "sub-no-wrong-type-vocab",
+      "path": "native-capture/models/sub-no-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-type-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-type-vocab/native.json"
+      ],
+      "exit_code": -6,
+      "accepted": false
+    },
+    {
+      "name": "sub-no-wrong-type-full",
+      "path": "native-capture/models/sub-no-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-no-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-type-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-no-wrong-type-full/native.json"
+      ],
+      "exit_code": -6,
+      "accepted": false
+    },
+    {
+      "name": "sub-alignment64-vocab",
+      "path": "native-capture/models/sub-alignment64/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-alignment64/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "sub-alignment64-full",
+      "path": "native-capture/models/sub-alignment64/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/sub-alignment64/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/sub-alignment64-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "first-count-missing-vocab",
+      "path": "native-capture/models/first-count-missing/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-missing-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-missing-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-missing-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "8495f58d1222d29d0e7bd42e22349d13e3f0a4a3bc7b67e7b87f653d3ee09c6b"
+      },
+      "stats": {
+        "model_tensor_bytes": 16912,
+        "model_parameters": 4228,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "first-count-missing-full",
+      "path": "native-capture/models/first-count-missing/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-missing-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-missing-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-wrong-type-vocab",
+      "path": "native-capture/models/first-count-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-wrong-type-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-wrong-type-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-wrong-type-full",
+      "path": "native-capture/models/first-count-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-wrong-type-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-wrong-type-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-too-large-vocab",
+      "path": "native-capture/models/first-count-too-large/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-too-large/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-large-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-large-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-too-large-full",
+      "path": "native-capture/models/first-count-too-large/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-too-large/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-large-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-large-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-too-small-vocab",
+      "path": "native-capture/models/first-count-too-small/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-too-small/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-small-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-small-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-count-too-small-full",
+      "path": "native-capture/models/first-count-too-small/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-count-too-small/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-small-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-count-too-small-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-missing-vocab",
+      "path": "native-capture/models/first-no-missing/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-missing-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-missing-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-missing-full",
+      "path": "native-capture/models/first-no-missing/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-missing-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-missing-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-wrong-value-vocab",
+      "path": "native-capture/models/first-no-wrong-value/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-wrong-value/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-value-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-value-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-wrong-value-full",
+      "path": "native-capture/models/first-no-wrong-value/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-wrong-value/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-value-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-value-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-wrong-type-vocab",
+      "path": "native-capture/models/first-no-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-type-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-type-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-no-wrong-type-full",
+      "path": "native-capture/models/first-no-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-no-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-type-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-no-wrong-type-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-missing-vocab",
+      "path": "native-capture/models/first-total-missing/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-missing-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-missing-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-missing-full",
+      "path": "native-capture/models/first-total-missing/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-missing/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-missing-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-missing-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-wrong-type-vocab",
+      "path": "native-capture/models/first-total-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-wrong-type-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-wrong-type-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-wrong-type-full",
+      "path": "native-capture/models/first-total-wrong-type/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-wrong-type/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-wrong-type-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-wrong-type-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-negative-vocab",
+      "path": "native-capture/models/first-total-negative/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-negative/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-negative-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-negative-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-negative-full",
+      "path": "native-capture/models/first-total-negative/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-negative/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-negative-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-negative-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-mismatch-vocab",
+      "path": "native-capture/models/first-total-mismatch/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-mismatch/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-mismatch-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-mismatch-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "first-total-mismatch-full",
+      "path": "native-capture/models/first-total-mismatch/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/first-total-mismatch/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-mismatch-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/first-total-mismatch-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "single-count-0-extra-ignored-vocab",
+      "path": "native-capture/models/single-count-0/native-context-model.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/single-count-0/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "single-count-0-extra-ignored-full",
+      "path": "native-capture/models/single-count-0/native-context-model.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/single-count-0/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-0-extra-ignored-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "single-count-1-extra-ignored-vocab",
+      "path": "native-capture/models/single-count-1/native-context-model.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/single-count-1/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "single-count-1-extra-ignored-full",
+      "path": "native-capture/models/single-count-1/native-context-model.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/single-count-1/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/single-count-1-extra-ignored-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "duplicate-global-vocab",
+      "path": "native-capture/models/duplicate-global/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/duplicate-global/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/duplicate-global-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/duplicate-global-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "duplicate-global-full",
+      "path": "native-capture/models/duplicate-global/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/duplicate-global/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/duplicate-global-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/duplicate-global-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "custom-explicit-vocab",
+      "path": "native-capture/models/custom-names/arbitrary-0.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/custom-names/arbitrary-0.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/custom-explicit-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/custom-explicit-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "custom-explicit-full",
+      "path": "native-capture/models/custom-names/arbitrary-0.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/custom-names/arbitrary-0.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/custom-explicit-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/custom-explicit-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "second-as-first-vocab",
+      "path": "native-capture/models/three/llama-00002-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/three/llama-00002-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/second-as-first-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/second-as-first-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "second-as-first-full",
+      "path": "native-capture/models/three/llama-00002-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/three/llama-00002-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/second-as-first-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/second-as-first-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "truncated-header-vocab",
+      "path": "native-capture/models/truncated-header/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/truncated-header/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-header-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-header-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "truncated-header-full",
+      "path": "native-capture/models/truncated-header/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/truncated-header/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-header-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-header-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "truncated-payload-vocab",
+      "path": "native-capture/models/truncated-payload/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/truncated-payload/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-payload-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-payload-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "truncated-payload-full",
+      "path": "native-capture/models/truncated-payload/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/truncated-payload/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-payload-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/truncated-payload-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "payload-gap-vocab",
+      "path": "native-capture/models/payload-gap/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/payload-gap/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-gap-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-gap-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "payload-gap-full",
+      "path": "native-capture/models/payload-gap/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/payload-gap/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-gap-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-gap-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "payload-reordered-vocab",
+      "path": "native-capture/models/payload-reordered/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/payload-reordered/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-reordered-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-reordered-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "payload-reordered-full",
+      "path": "native-capture/models/payload-reordered/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/payload-reordered/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-reordered-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/payload-reordered-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "metadata-first-unpadded-vocab",
+      "path": "native-capture/models/metadata-first-unpadded/llama-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/metadata-first-unpadded/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "metadata-first-unpadded-full",
+      "path": "native-capture/models/metadata-first-unpadded/llama-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/native-capture/models/metadata-first-unpadded/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/metadata-first-unpadded-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "packed-llama-single-auto-vocab",
+      "path": "extended-capture/packed-llama.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/packed-llama.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "1681aa9c429ad9d16a78c9fda72b2c3f5053ab4139902541e47a8dc2e03775b9"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "packed-llama-single-auto-full",
+      "path": "extended-capture/packed-llama.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/packed-llama.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-single-auto-full/native.json",
+        "bytes": 165695,
+        "sha256": "dbd18f85e0379ebd10825babff81246fdd47567c7b7f720a7ed00d1820cabe6a"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 2,
+        "model_description": "llama ?B Q4_0",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "packed-llama-split-auto-vocab",
+      "path": "extended-capture/models/packed-llama-split/model-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/packed-llama-split/model-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "1681aa9c429ad9d16a78c9fda72b2c3f5053ab4139902541e47a8dc2e03775b9"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "packed-llama-split-auto-full",
+      "path": "extended-capture/models/packed-llama-split/model-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/packed-llama-split/model-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-split-auto-full/native.json",
+        "bytes": 165695,
+        "sha256": "dbd18f85e0379ebd10825babff81246fdd47567c7b7f720a7ed00d1820cabe6a"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 2,
+        "model_description": "llama ?B Q4_0",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "packed-llama-metadata-first-auto-vocab",
+      "path": "extended-capture/models/packed-llama-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/packed-llama-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "1681aa9c429ad9d16a78c9fda72b2c3f5053ab4139902541e47a8dc2e03775b9"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "packed-llama-metadata-first-auto-full",
+      "path": "extended-capture/models/packed-llama-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/packed-llama-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/packed-llama-metadata-first-auto-full/native.json",
+        "bytes": 165695,
+        "sha256": "dbd18f85e0379ebd10825babff81246fdd47567c7b7f720a7ed00d1820cabe6a"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 2,
+        "model_description": "llama ?B Q4_0",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "bert-single-auto-vocab",
+      "path": "rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+      "vocab_only": true,
+      "architecture": "bert",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-single-auto-vocab/native.json",
+        "bytes": 1061,
+        "sha256": "9c4ab170dbec3e3f9c4b0395644ab337fb1e7424f199007d844441bd786ffab7"
+      },
+      "stats": {
+        "model_tensor_bytes": 2536,
+        "model_parameters": 634,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 108
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "bert-split-auto-vocab",
+      "path": "extended-capture/models/bert-split/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "bert",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/bert-split/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-split-auto-vocab/native.json",
+        "bytes": 1061,
+        "sha256": "9c4ab170dbec3e3f9c4b0395644ab337fb1e7424f199007d844441bd786ffab7"
+      },
+      "stats": {
+        "model_tensor_bytes": 2536,
+        "model_parameters": 634,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 108
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "bert-metadata-first-auto-vocab",
+      "path": "extended-capture/models/bert-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "bert",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extended-capture/models/bert-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/bert-metadata-first-auto-vocab/native.json",
+        "bytes": 1061,
+        "sha256": "9c4ab170dbec3e3f9c4b0395644ab337fb1e7424f199007d844441bd786ffab7"
+      },
+      "stats": {
+        "model_tensor_bytes": 2536,
+        "model_parameters": 634,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 108
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-separate-single-auto-vocab",
+      "path": "qwen-capture/tiny-qwen2-separate.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/tiny-qwen2-separate.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-single-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "9671756c27fd719faec8c43570dad8db841c61df52586e790a2332088d1400e3"
+      },
+      "stats": {
+        "model_tensor_bytes": 20512,
+        "model_parameters": 5128,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-separate-split-auto-vocab",
+      "path": "qwen-capture/models/qwen-separate-split/model-00001-of-00007.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-separate-split/model-00001-of-00007.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-split-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "9671756c27fd719faec8c43570dad8db841c61df52586e790a2332088d1400e3"
+      },
+      "stats": {
+        "model_tensor_bytes": 20512,
+        "model_parameters": 5128,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-separate-metadata-first-auto-vocab",
+      "path": "qwen-capture/models/qwen-separate-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-separate-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-separate-metadata-first-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "9671756c27fd719faec8c43570dad8db841c61df52586e790a2332088d1400e3"
+      },
+      "stats": {
+        "model_tensor_bytes": 20512,
+        "model_parameters": 5128,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-fused-q4-single-auto-vocab",
+      "path": "qwen-capture/tiny-qwen2-fused-q4.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/tiny-qwen2-fused-q4.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-single-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "fdddcb0d4fe70627df12762665aecfa5173a2888b763530432788de2d4a9ddb1"
+      },
+      "stats": {
+        "model_tensor_bytes": 32000,
+        "model_parameters": 52000,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-fused-q4-split-auto-vocab",
+      "path": "qwen-capture/models/qwen-fused-q4-split/model-00001-of-00005.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-fused-q4-split/model-00001-of-00005.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-split-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "fdddcb0d4fe70627df12762665aecfa5173a2888b763530432788de2d4a9ddb1"
+      },
+      "stats": {
+        "model_tensor_bytes": 32000,
+        "model_parameters": 52000,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-fused-q4-metadata-first-auto-vocab",
+      "path": "qwen-capture/models/qwen-fused-q4-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-fused-q4-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-fused-q4-metadata-first-auto-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "fdddcb0d4fe70627df12762665aecfa5173a2888b763530432788de2d4a9ddb1"
+      },
+      "stats": {
+        "model_tensor_bytes": 32000,
+        "model_parameters": 52000,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-untied-output-bias-single-auto-vocab",
+      "path": "qwen-capture/tiny-qwen2-untied-output-bias.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/tiny-qwen2-untied-output-bias.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-single-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "59b0ece1135ed04ce897a546928e35b5c32016e0b36a097a6adde6460dd5e976"
+      },
+      "stats": {
+        "model_tensor_bytes": 38944,
+        "model_parameters": 9736,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-untied-output-bias-split-auto-vocab",
+      "path": "qwen-capture/models/qwen-untied-output-bias-split/model-00001-of-00007.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-untied-output-bias-split/model-00001-of-00007.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-split-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "59b0ece1135ed04ce897a546928e35b5c32016e0b36a097a6adde6460dd5e976"
+      },
+      "stats": {
+        "model_tensor_bytes": 38944,
+        "model_parameters": 9736,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "qwen-untied-output-bias-metadata-first-auto-vocab",
+      "path": "qwen-capture/models/qwen-untied-output-bias-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "qwen2",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/qwen-capture/models/qwen-untied-output-bias-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/qwen-untied-output-bias-metadata-first-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "59b0ece1135ed04ce897a546928e35b5c32016e0b36a097a6adde6460dd5e976"
+      },
+      "stats": {
+        "model_tensor_bytes": 38944,
+        "model_parameters": 9736,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-single-auto-vocab",
+      "path": "shape-capture/llama-trailing-unit-dimensions.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/llama-trailing-unit-dimensions.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-single-auto-full",
+      "path": "shape-capture/llama-trailing-unit-dimensions.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/llama-trailing-unit-dimensions.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-single-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-split-auto-vocab",
+      "path": "shape-capture/models/llama-trailing-unit-dimensions-split/model-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/models/llama-trailing-unit-dimensions-split/model-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-split-auto-full",
+      "path": "shape-capture/models/llama-trailing-unit-dimensions-split/model-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/models/llama-trailing-unit-dimensions-split/model-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-split-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-metadata-first-auto-vocab",
+      "path": "shape-capture/models/llama-trailing-unit-dimensions-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/models/llama-trailing-unit-dimensions-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "llama-trailing-unit-dimensions-metadata-first-auto-full",
+      "path": "shape-capture/models/llama-trailing-unit-dimensions-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/shape-capture/models/llama-trailing-unit-dimensions-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/llama-trailing-unit-dimensions-metadata-first-auto-full/native.json",
+        "bytes": 167153,
+        "sha256": "470818a9af8820e19883ab1dbab9ec5dab1abc3f8ee626a67a5808a1a29d4611"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "llama ?B all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "guessed-f32-metadata-first-vocab",
+      "path": "extra/guessed-f32-metadata-first/llama-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/guessed-f32-metadata-first/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-vocab/native.json",
+        "bytes": 1027,
+        "sha256": "1d36b7cbbcb63d0de9f646887f00e96640f263e375e8c873c7172dabfec9d8b2"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "guessed-f32-metadata-first-full",
+      "path": "extra/guessed-f32-metadata-first/llama-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/guessed-f32-metadata-first/llama-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-f32-metadata-first-full/native.json",
+        "bytes": 167166,
+        "sha256": "2614bb4c426b5d9e8343bd9ea7413bf39f4b5aea91cfdbd01c41e6e3d6da0af6"
+      },
+      "stats": {
+        "model_tensor_bytes": 17648,
+        "model_parameters": 4412,
+        "model_ftype": 1024,
+        "model_description": "llama ?B (guessed) all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "guessed-q4-metadata-first-vocab",
+      "path": "extra/guessed-q4-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/guessed-q4-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-vocab/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-vocab/native.json",
+        "bytes": 1028,
+        "sha256": "1681aa9c429ad9d16a78c9fda72b2c3f5053ab4139902541e47a8dc2e03775b9"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 0,
+        "model_description": "",
+        "n_vocab": 512
+      },
+      "logit_words": 0
+    },
+    {
+      "name": "guessed-q4-metadata-first-full",
+      "path": "extra/guessed-q4-metadata-first/model-00001-of-00002.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/guessed-q4-metadata-first/model-00001-of-00002.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-full/native.json"
+      ],
+      "exit_code": 0,
+      "accepted": true,
+      "output": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/guessed-q4-metadata-first-full/native.json",
+        "bytes": 165711,
+        "sha256": "236493c30f8a817d6f89a384219b8ab18459ea37ceb5217c922622708e97c1ed"
+      },
+      "stats": {
+        "model_tensor_bytes": 57984,
+        "model_parameters": 51872,
+        "model_ftype": 1024,
+        "model_description": "llama ?B (guessed) all F32",
+        "n_vocab": 512
+      },
+      "logit_words": 8192
+    },
+    {
+      "name": "missing-auto-sibling-vocab",
+      "path": "extra/missing-sibling/llama-00001-of-00003.gguf",
+      "vocab_only": true,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/missing-sibling/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/missing-auto-sibling-vocab/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/missing-auto-sibling-vocab/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    },
+    {
+      "name": "missing-auto-sibling-full",
+      "path": "extra/missing-sibling/llama-00001-of-00003.gguf",
+      "vocab_only": false,
+      "architecture": "llama",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/inputs/extra/missing-sibling/llama-00001-of-00003.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/missing-auto-sibling-full/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/native-capture-v2/linux/cases/missing-auto-sibling-full/native.json"
+      ],
+      "exit_code": 1,
+      "accepted": false
+    }
+  ],
+  "harness": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/build-linux/ffi-shards-oracle",
+    "bytes": 1057200,
+    "sha256": "64af75021b8e05926d53265fa28abbc1b0aa8cef5cf0bcddf2907008288ab9f7"
+  },
+  "accepted": 53,
+  "rejected": 43,
+  "logit_words": 163840
+}

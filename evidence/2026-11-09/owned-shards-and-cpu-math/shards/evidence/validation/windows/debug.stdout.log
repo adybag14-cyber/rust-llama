@@ -1,0 +1,49 @@
+
+running 8 tests
+test tests::writer_rejects_invalid_arrays ... ok
+test tests::metadata_budget_and_counts_are_enforced ... ok
+test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... ok
+test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... ok
+test tests::overlap_is_rejected ... ok
+test tests::roundtrip_preserves_types_and_payload ... ok
+test tests::big_endian_metadata_and_scalar_payload ... ok
+test tests::every_truncated_header_and_payload_is_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test stream::tests::sink_failure_propagates ... ok
+test stream::tests::stop_spans_tokens_without_leaking_prefix ... ok
+test stream::tests::invalid_utf8_and_tail_are_replaced_once ... ok
+test stream::tests::unmatched_stop_prefix_is_flushed ... ok
+test stream::tests::utf8_is_preserved_across_every_byte_boundary ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test missing_pooling_metadata_keeps_original_unpooled_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 2 tests
+test big_endian_bert_preserves_the_same_native_model_outputs ... ignored, requires hash-pinned big-endian BERT model; set LLAMA_TEST_BERT_BE_MODEL and run --release --ignored --nocapture
+test trained_bert_full_sequence_and_all_pooling_modes ... ignored, requires hash-pinned external BERT model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test cancellation_and_restore_keep_recurrent_state_transactional ... ok
+test required_shapes_unused_tensors_and_weight_budget_are_enforced ... ok
+test missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights ... FAILED
+
+failures:
+
+failures:
+    missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

@@ -1,0 +1,27 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\sharded-gguf-port\allocation-before-fix\crates\quant)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\sharded-gguf-port\allocation-before-fix\crates\gguf)
+warning: method `minimum_encoded` is never used
+   --> crates\gguf\src\lib.rs:513:8
+    |
+493 | impl<R: Read> Parser<'_, R> {
+    | --------------------------- method in this implementation
+...
+513 |     fn minimum_encoded(&self, count: usize, bytes_each: u64, label: &str) -> Result<()> {
+    |        ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `llama-gguf` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.38s
+     Running unittests src\lib.rs (target\debug\deps\llama_gguf-e3cb57eb2cc7f75f.exe)
+
+thread 'tests::arrays_preflight_the_remaining_header_budget_before_reservation' (4680) panicked at crates\gguf\src\lib.rs:903:9:
+assertion failed: matches!(Gguf::read(Cursor::new(bytes), limits), Err(Error::Limit(message)) if
+    message == "array minimum encoded size exceeds remaining metadata budget")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation' (44656) panicked at crates\gguf\src\lib.rs:921:9:
+assertion failed: matches!(Gguf::read(Cursor::new(enough_file), limits),
+    Err(Error::Limit(message)) if message ==
+    "tensor descriptors minimum encoded size exceeds remaining metadata budget")
+error: test failed, to rerun pass `-p llama-gguf --lib`

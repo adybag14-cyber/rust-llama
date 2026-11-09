@@ -1,0 +1,205 @@
+
+running 21 tests
+test context::allocation_tests::explicit_default_and_zero_state_budget ... ok
+test math::tests::attention_masks_and_physical_layout_bounds_fail_safely ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+test context::allocation_tests::live_checkpoints_and_fallible_copies_share_the_originating_budget ... ok
+test context::native::tests::native_resource_limits_fail_before_allocating_or_mutating ... ok
+test context::allocation_tests::pending_kv_growth_and_sequence_multiplicity_cannot_bypass_budget ... ok
+test context::allocation_tests::reset_removal_and_truncation_preserve_truthful_capacity_accounting ... ok
+test context::allocation_tests::serialized_output_reserve_is_checked_and_then_returns_caller_owned_bytes ... ok
+test context::allocation_tests::fork_checkpoint_restore_and_serialized_restore_fail_atomically ... ok
+test state::tests::known_crc32_vector ... ok
+test context::allocation_tests::initial_state_capacity_has_an_exact_checked_threshold ... ok
+test context::allocation_tests::checked_overflow_and_concurrent_reservations_never_exceed_the_ledger ... ok
+test context::allocation_tests::every_fallible_state_reservation_rolls_back_when_allocation_fails ... ok
+test context::native::tests::metadata_membership_is_fixed_and_queued_copies_reuse_buffers_in_order ... ok
+test math::packed_matrix_tests::unsupported_dot_types_are_rejected_at_load ... ok
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test math::packed_matrix_tests::packed_matrix_preserves_storage_and_native_activation_quantization ... ok
+test math::packed_matrix_tests::every_source_cpu_weight_type_loads_and_executes_through_matrix ... ok
+test math::native_attention_tests::twelve_bert_layers_match_original_scalar_attention ... ok
+test context::native::tests::later_microbatches_are_counted_before_any_state_is_committed ... ok
+test context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+
+running 1 test
+original graph cases=198, exact F32 output checks=144666, failures=0
+test actual_original_graphs_preserve_row_boundaries_scaling_and_platform_policy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+running 1 test
+portable SSE2 polynomial exact outputs=270060
+test explicit_sse2_prefix_matches_original_bits_on_either_host ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+
+running 2 tests
+centered outputs checked=206952, F64 variances=2786, finite mismatches=0, all mismatches=0
+test original_scalar_and_sse2_centered_variance_match_all_primitive_bits ... ok
+actual NORM graphs=312, F32 outputs=368208, failures=0
+test actual_original_norm_graphs_match_native_policy_and_rounding ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+
+running 3 tests
+test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+test llama_outputs_match_frozen_ggml_graph ... ok
+test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 2 tests
+test finite_qwen2_projection_and_bias_overflow_cannot_commit_state ... ok
+test qwen2_late_output_overflow_rolls_back_other_sequences ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 29 tests
+test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+test malformed_model_shapes_and_norms_fail_before_execution ... ok
+test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+test bad_adapters_leave_configuration_and_state_unchanged ... ok
+test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+test interleaved_sequences_remain_independent ... ok
+test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+test supplied_embeddings_match_tokens_and_validate_shape ... ok
+test context_limit_failure_preserves_prior_state ... ok
+test kv_suffix_truncation_matches_recomputed_prefix ... ok
+test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+test state_rejects_different_model_weights_or_adapters ... ok
+test requested_outputs_are_selected_without_dropping_state_updates ... ok
+test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+test copied_prefix_diverges_without_mutating_original_sequence ... ok
+test smoke_demo_is_real_execution_with_reproducible_state ... ok
+test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+test valid_control_vector_resets_cache_and_changes_model_output ... ok
+test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+test batching_and_microbatch_boundaries_preserve_decode ... ok
+test truncated_or_corrupted_state_never_mutates_context ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 2 tests
+test tests::loads_real_windows_symbol_and_rejects_missing ... ok
+test tests::missing_library_is_an_error ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test native_system_erf_matches_all_captured_raw_float_words ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+
+running 1 test
+test iq_sort::tests::equal_value_order_matches_original_iq1_native_sort ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 4 tests
+test extended_packed_validation_is_atomic ... ok
+test integer_conversion_rejects_undefined_source_assignments_atomically ... ok
+test integer_assignment_matches_original_c_in_its_defined_domain ... ok
+test extended_reference_encoders_match_original_c_bytes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+
+running 1 test
+test f16_reduction_matches_original_batched_graphs_bit_for_bit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+
+running 2 tests
+test iq1_invalid_later_blocks_cannot_change_destination ... ok
+test iq1_encoders_match_original_lattice_search_and_packing ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.63s
+
+
+running 2 tests
+test iq2_invalid_later_blocks_cannot_change_destination ... ok
+test iq2_encoders_match_original_lattice_search_and_packing ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.44s
+
+
+running 2 tests
+test iq3_invalid_later_blocks_cannot_change_destination ... ok
+test iq3_encoders_match_original_lattice_search_and_packing ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.46s
+
+
+running 3 tests
+test matvec_rejects_non_weight_types_and_malformed_rows ... ok
+test activation_quantization_is_not_replaced_with_a_dense_dot ... ok
+test native_matvec_matches_generic_c_and_real_ggml_graphs ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 5 tests
+test native_weight_dot_capabilities_distinguish_all_twenty_nine_supported_types ... ok
+test q8k_preflight_is_atomic_and_zero_blocks_are_canonical ... ok
+test every_extended_matvec_path_rejects_malformed_dimensions_and_packing ... ok
+test q8k_activation_encoder_matches_original_c_including_extreme_finite_values ... ok
+test all_twenty_remaining_dots_match_both_independent_c_oracles_bitwise ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+
+running 8 tests
+test bf16_and_fp8_edge_cases_are_ieee_correct ... ok
+test numeric_ids_preserve_every_reserved_hole ... ok
+test malformed_rows_are_rejected_before_output_is_changed ... ok
+test quantizer_fails_clearly_without_mutating_the_destination ... ok
+test multiblock_decode_does_not_interleave_or_bleed_rows ... ok
+test half_ieee_boundaries_and_ties_are_explicit ... ok
+test reference_encoders_match_frozen_c_bytes ... ok
+test all_active_decoders_match_independent_frozen_c_reference ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 5 tests
+test uninitialized_source_iq4_nl_zero_payload_is_canonicalized ... ok
+test required_importance_is_explicit_and_validation_is_atomic ... ok
+test weighted_and_iq4_encoders_match_unmodified_c_bytes ... ok
+test codec_and_source_model_quantizer_capabilities_are_distinct ... ok
+test iq_numeric_failures_and_malformed_buffers_are_atomic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.42s
+
+
+running 1 test
+test cpu_extra::accuracy_tests::erf_rounding_matches_independent_80_digit_references ... FAILED
+
+failures:
+
+failures:
+    cpu_extra::accuracy_tests::erf_rounding_matches_independent_80_digit_references
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

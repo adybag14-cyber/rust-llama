@@ -1,0 +1,180 @@
+{
+  "host": "linux",
+  "started_utc": "2026-11-09T17:02:26.182537+00:00",
+  "repo": "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/qwen-validation-draft",
+  "target_dir": "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/qwen-validation-draft/target-linux",
+  "input_fingerprint": "2e6a9cdfaf237107e0a90204ce15e82be9abefcfeacfd2587f9752481b0bff57",
+  "input_count": 623,
+  "scope": "GGUF/inference all-target ordinary debug+release, strict Clippy, formatting, and all seven hash-pinned external inference model tests. Runtime algorithms and expected outputs unchanged.",
+  "steps": [
+    {
+      "name": "toolchain",
+      "command": [
+        "rustc",
+        "-vV"
+      ],
+      "started_utc": "2026-11-09T17:02:30.793129+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04606318473815918,
+      "finished_utc": "2026-11-09T17:02:30.839182+00:00",
+      "stdout": {
+        "path": "toolchain.stdout.log",
+        "bytes": 196,
+        "sha256": "f22d5e4e9ced367e774ce5bc140d9e6b1235c1882fec80d011044851f3ae6369"
+      },
+      "stderr": {
+        "path": "toolchain.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "cargo-version",
+      "command": [
+        "cargo",
+        "-vV"
+      ],
+      "started_utc": "2026-11-09T17:02:40.048320+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12893104553222656,
+      "finished_utc": "2026-11-09T17:02:40.177241+00:00",
+      "stdout": {
+        "path": "cargo-version.stdout.log",
+        "bytes": 335,
+        "sha256": "1c018063008bac1aae7a69ff62c75c3d40b97d355f7c61433bf0de2d0f1cf88b"
+      },
+      "stderr": {
+        "path": "cargo-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-inference",
+        "--",
+        "--check"
+      ],
+      "started_utc": "2026-11-09T17:02:49.307959+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.7793242931365967,
+      "finished_utc": "2026-11-09T17:02:50.087273+00:00",
+      "stdout": {
+        "path": "format.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "format.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "started_utc": "2026-11-09T17:02:59.264227+00:00",
+      "status": "failed",
+      "exit_code": 101,
+      "elapsed_seconds": 17.97127938270569,
+      "finished_utc": "2026-11-09T17:03:17.235499+00:00",
+      "stdout": {
+        "path": "debug.stdout.log",
+        "bytes": 3772,
+        "sha256": "32ec94c19e0333357de32662d65835f4ed73e0bcfdc9ff2413bffb5370429a87"
+      },
+      "stderr": {
+        "path": "debug.stderr.log",
+        "bytes": 7748,
+        "sha256": "3d0cc857aa0d8bac5b396b38f61325165df091933ce5dffe356a3de33258a069"
+      },
+      "test_totals": {
+        "passed": 23,
+        "failed": 1,
+        "ignored": 7,
+        "executables": 7
+      },
+      "evidence_lines": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s",
+        "test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s",
+        "test result: ok. 3 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 6.26s",
+        "test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+        "   Compiling llama-conformance v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/qwen-validation-draft/crates/llama-conformance)",
+        "native missing-pooling default: 3 prompts, 11 token embeddings, 3 explicit mean vectors, 56 floats, max_abs=1.192092896e-7",
+        "native tiny-qwen2-fused-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-mamba-default conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-no-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-mamba-rms conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-k conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-mamba-untied conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-kv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-q conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-qk conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-qv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-partial-v conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-q4 conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-fused-separate-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-no-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-output-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-k conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-kv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-q conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-qk conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-qv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate-partial-v conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-separate conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-untied-output-bias conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)",
+        "native tiny-qwen2-untied-output conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)"
+      ]
+    }
+  ],
+  "status": "failed",
+  "finished_utc": "2026-11-09T17:03:21.920951+00:00",
+  "error": "RuntimeError('debug failed; see preserved logs')",
+  "traceback": "Traceback (most recent call last):\n  File \"/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/validate_candidate.py\", line 90, in <module>\n    run('debug',['cargo','test','--offline','--locked','-p','llama-gguf','-p','llama-inference','--all-targets','--','--nocapture'])\n  File \"/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/validate_candidate.py\", line 84, in run\n    raise RuntimeError(label+' failed; see preserved logs')\nRuntimeError: debug failed; see preserved logs\n"
+}

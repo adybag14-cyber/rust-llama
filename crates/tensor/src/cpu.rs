@@ -194,11 +194,13 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
                         "softmax row has no finite maximum or contains NaN",
                     ));
                 }
-                let mut sum = 0.0_f64;
                 for (o, &v) in output.iter_mut().zip(input) {
-                    *o = (v * scale - max).exp();
-                    sum += *o as f64;
+                    *o = v * scale;
                 }
+                if output.iter().any(|value| value.is_nan()) {
+                    return Err(TensorError::Parameters("softmax scaling produced a NaN"));
+                }
+                let sum = llama_quant::cpu_math::softmax_exp_sum_f32_in_place(output, max);
                 let inv = (1.0 / sum) as f32;
                 for o in output {
                     *o *= inv;
@@ -231,7 +233,12 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
                         squares += *o * *o;
                     }
                     squares / n[0] as f32
+                } else if matches!(op, Norm { .. }) {
+                    output.copy_from_slice(input);
+                    llama_quant::cpu_math::center_f32_and_variance(output, mean) as f32
                 } else {
+                    // RMS_NORM retains the source scalar F32-product/F64-sum
+                    // reduction; it does not use the NORM SSE2 variance path.
                     let mut squares = 0.0_f64;
                     for (o, &v) in output.iter_mut().zip(input) {
                         *o = v - mean;

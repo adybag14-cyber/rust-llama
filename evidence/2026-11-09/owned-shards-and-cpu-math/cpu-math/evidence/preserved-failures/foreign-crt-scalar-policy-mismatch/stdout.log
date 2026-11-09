@@ -1,0 +1,16 @@
+msvc fmt
+{"step": "fmt", "command": ["cargo", "+1.99.1", "fmt", "--all", "--check"], "exit_code": 0}
+msvc debug
+{"step": "debug", "command": ["cargo", "+1.99.1", "test", "--workspace", "--", "--nocapture"], "exit_code": 0}
+msvc release
+{"step": "release", "command": ["cargo", "+1.99.1", "test", "--release", "--workspace", "--", "--nocapture"], "exit_code": 0}
+msvc clippy
+{"step": "clippy", "command": ["cargo", "+1.99.1", "clippy", "--workspace", "--all-targets", "--", "-D", "warnings"], "exit_code": 0}
+gnu fmt
+{"step": "fmt", "command": ["cargo", "+1.99.1", "fmt", "--all", "--check"], "exit_code": 0}
+gnu debug
+{"step": "debug", "command": ["cargo", "+1.99.1", "test", "--workspace", "--target-dir", "/tmp/rust-llama-tensor-row-policy", "--", "--nocapture"], "exit_code": 101}
+gnu release
+{"step": "release", "command": ["cargo", "+1.99.1", "test", "--release", "--workspace", "--target-dir", "/tmp/rust-llama-tensor-row-policy", "--", "--nocapture"], "exit_code": 101}
+gnu clippy
+{"step": "clippy", "command": ["cargo", "+1.99.1", "clippy", "--workspace", "--all-targets", "--target-dir", "/tmp/rust-llama-tensor-row-policy", "--", "-D", "warnings"], "exit_code": 0}

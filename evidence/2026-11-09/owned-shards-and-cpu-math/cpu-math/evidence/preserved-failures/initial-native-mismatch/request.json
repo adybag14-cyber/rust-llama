@@ -1,0 +1,13 @@
+{
+  "id": "job-1794243029785-d0f92117-6e4",
+  "mode": "shell",
+  "command": "python stage_fixtures.py; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Push-Location rust-draft; cargo +1.99.1 test --offline -p llama-tensor --test row_policy -- --nocapture; $windowsResult=$LASTEXITCODE; Pop-Location; wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft && cargo +1.99.1 test --offline -p llama-tensor --test row_policy --target-dir /tmp/rust-llama-tensor-row-policy -- --nocapture'; $linuxResult=$LASTEXITCODE; Write-Output \"Baseline exit codes: Windows=$windowsResult Linux=$linuxResult\"; if (($windowsResult -ne 0) -or ($linuxResult -ne 0)) { exit 1 }",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy",
+  "timeoutMs": 1800000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "light",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T16:50:29.785Z"
+}

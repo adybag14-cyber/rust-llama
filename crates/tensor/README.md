@@ -85,7 +85,7 @@ including padding. Float padding first affects the constructor's F32 output-size
 calculation and is then truncated to I32 for actual sample coordinates. Max
 pooling starts at negative F32 maximum and preserves the original comparator
 argument order, signed zeros and NaN payloads. Backward max pooling preserves the
-source's first-maximum tie behavior and explicit NaN comparisons. Forward average pooling
+source's first-maximum tie behavior and explicit NaN comparisons. Average pooling
 retains the first NaN accumulated by the original kernels; its initial payload
 mismatch and all native values are preserved in external evidence.
 
@@ -115,10 +115,13 @@ finite arithmetic is unchanged. The earlier mismatch and an initial test-adapter
 enum error remain in the evidence. These exceptional-value comparisons run only
 on the two verified x86_64 MSVC/GNU targets; other toolchains remain unverified.
 
-The independently verified GNU vector-row policies for existing SiLU, softmax
-and NORM are a separate integration item. Their model-runtime helpers do not
-automatically change this tensor executor, whose earlier scalar fixture set
-targets the frozen MSVC profile.
+Tensor and model-runtime now consume one maintained safe implementation in
+`llama_quant::cpu_math`. F32 SiLU, quick GELU, SwiGLU and quick GEGLU restart
+the GNU four-element vector prefix at each logical inner row; scalar tails keep
+the host CRT expression. Softmax preserves the original exponential/reduction
+grouping. Contiguous NORM uses the source-profile centered variance; strided
+NORM and RMS_NORM retain their separate native reductions. F16/BF16 activation
+paths keep their original scalar or lookup arithmetic.
 
 ### Source activation rounding
 
@@ -126,25 +129,66 @@ GELU preserves the frozen half lookup's input/output rounding on F32 and F16 pat
 
 The source has two different softplus expressions. UNARY SOFTPLUS uses `log1pf(expf(x))` below its threshold. XIELU's constructor coefficient helper uses `logf(1 + expf(x))`. The implementation and tiny-value fixtures keep that distinction. REGLU/RELU and hard-sigmoid also preserve the source's NaN and signed-zero branches.
 
-## ERF accuracy and native parity are separate gates
+## System ERF parity and mathematical fallback
 
-The Rust 1.99.1 toolchain still reports `f32::erf` as the unstable `float_erf` feature. The maintained implementation therefore uses a dependency-free positive-term F64 series, then one F32 conversion. For `|x| >= 4`, the exact ERF value rounds to the returned signed 1 in F32.
+Rust 1.99.1 still reports `f32::erf` as unstable. On the two exercised
+x86_64 dynamic-CRT profiles, GELU_ERF and GEGLU_ERF therefore call the same
+standard OS `erff(float)` boundary as the source through a tiny audited binding
+in `llama-platform-loader`. Windows uses the UCRT import library; GNU/Linux
+uses system libm. This is an explicit OS runtime dependency, alongside the
+toolchain's existing system math/runtime imports. No original llama/ggml binary,
+vendor math package, C shim, registry crate or build script is part of the product.
 
-For smaller arguments, successive series ratios decrease. After term `t` with next ratio `r < 1`, the omitted positive tail is bounded by `t*r/(1-r)`. Iteration only stops when that bound is at most one eighth of F64 epsilon times the sum; the maximum is 160 terms. This bounds truncation separately from floating evaluation and the standard F64 exp/sqrt implementation. The final F32 rounding contributes at most half the adjacent F32 spacing. Correct rounding for every possible F32 input is not formally proved.
+The captured Windows provider is UCRT **10.0.26100.9711**, and the GNU provider
+is glibc **2.35**. Each independently compiled native provider oracle recorded
+**502,058 distinct raw F32 inputs and outputs** before the Rust binding was
+written. Rust compares every output word exactly, including subnormals, both
+zero signs and NaN payloads. The new native graph corpus also checks actual
+GELU_ERF/GEGLU_ERF surrounding arithmetic, including all 65,536 F16 and all
+65,536 BF16 source words.
 
-An independent 80-decimal-digit mpmath oracle supplies **48,455 nonnegative arguments**, also checked at their negative counterparts: **96,910** accuracy checks. Inputs include all finite F16/BF16 activation arguments in the nonsaturated range, a dense grid, powers of two and nearby boundary values. Every tested result is the correctly rounded F32 value; the observed maximum absolute rounding error is **2.98014634e-8**. Those mathematical references never replace the native GGML outputs.
+Other targets, including static-CRT configurations, use the retained
+dependency-free positive-term F64 series, then one F32 conversion. For
+|x| >= 4 the exact mathematical result rounds to signed 1. For smaller
+arguments, successive series ratios decrease; after term t with next ratio
+r < 1, the omitted positive tail is bounded by t*r/(1-r). Iteration stops
+only below one eighth of F64 epsilon times the sum, with a maximum of
+160 terms. This bounds truncation separately from floating evaluation and the
+standard F64 exp/sqrt implementation. Final F32 rounding contributes at most
+half its adjacent spacing; correct rounding for every possible F32 input is
+not formally proved.
 
-**Exact Windows UCRT erff equivalence remains open.** For example, input GELU x = -2.0546875 produces native ERF bits bf75c885, while the correctly rounded mathematical ERF has bits bf75c883. That difference crosses a final F16 rounding boundary: native GELU is -0.040985107421875 and Rust is -0.041015625. The first failing 295-case capture and logs are preserved outside the product with SHA256 `74d04184c941a9058c5321cc568c7e81c458fbe3dcec9aa8ab64a6dc7ae4fa89`. The committed expanded native corpus retains the raw original values and exhaustively checks the finite F16/BF16 ERF domains.
+The unchanged independent 80-digit mpmath oracle contains **48,455 nonnegative
+arguments**, also checked at their negative counterparts: **96,910 accuracy
+checks** for the portable implementation. Every tested result is correctly
+rounded F32; observed maximum absolute rounding error is **2.98014634e-8**.
+These mathematical references never replace native graph outputs.
 
-### Comparison criteria, independent of observed maxima
+### Preserved earlier ERF failures and comparison criteria
 
-Arithmetic, layout, integer and packed-dot cases compare exact output bits, except NaN payloads. Exhaustive finite F16 GELU/GELU_QUICK and BF16 GELU cases also use exact comparisons.
+The original portable implementation differed from UCRT. At GELU x=-2.0546875,
+native ERF bits were bf75c885 while mathematical rounding produced bf75c883;
+the final F16 values were -0.040985107421875 and -0.041015625 respectively.
+The first failing 295-case capture (SHA256
+74d04184c941a9058c5321cc568c7e81c458fbe3dcec9aa8ab64a6dc7ae4fa89), the
+four original rounding-envelope failures and all raw expected bytes remain
+preserved. The new same-provider gate closes that measured OS boundary on the
+two exercised profiles; it does not claim that the mathematical approximation
+became bit-identical to every platform libm.
 
-The F32 transcendental comparison budget remains `B = 2e-6 + 2e-6*abs(reference)`. This is a numerical validation criterion, not a claim of exact platform libm reproduction. For F16/BF16 outputs the bound additionally includes half the adjacent output spacing for each result. If two underlying F32 values differ by at most B and each undergoes a final nearest-even conversion Q, then the triangle inequality gives:
+The historical 297-case fixture retains its original numerical criteria:
+F32 transcendental budget B=2e-6+2e-6*abs(reference), with a half-spacing term
+for each final F16/BF16 conversion. The triangle inequality gives
+|Q(a)-Q(b)| <= B + 0.5*spacing(Q(a)) + 0.5*spacing(Q(b)).
+This bound is derived independently of observed maxima. The earlier four
+comparisons requiring it remain historical evidence, and cross-platform
+comparisons against that original MSVC fixture remain numerical comparisons.
+No expected value or tolerance has been changed to obtain a pass.
 
-`|Q(a) - Q(b)| <= B + 0.5*spacing(Q(a)) + 0.5*spacing(Q(b))`.
-
-The test derives these spacing terms from dtype bits; it does not set a tolerance from the measured maximum. Finite/nonfinite classifications must still match, and all arithmetic gates stay exact. Four comparisons in the expanded corpus require this final-conversion envelope: three distinct finite F16 GELU_ERF inputs and one duplicate ordinary case. Numerical comparison success does **not** close exact UCRT ERF parity.
+The new matching-profile row corpus has **no tolerance and no NaN exemption**:
+every output byte must equal its original native capture. Floating exception
+flags are outside this tensor API; the verified environment uses nearest-even
+rounding and gradual underflow with FTZ/DAZ disabled.
 
 ## Independent evidence
 
@@ -164,9 +208,9 @@ The fixtures come from independent programs outside this product:
 
 The original **362 native graph cases** include every native weight matmul and out-product dtype, packed RHS input, typed unary/GLU kernels, batch expansion, row padding/permutation, uneven normalization groups, cancellation-sensitive reductions, signed zero/NaN branches, cropping/wrapping, repeated row indices and explicit backward operators. Exhaustive activation captures contain every one of the **63,488 finite F16 bit patterns** and every one of the **65,280 finite BF16 bit patterns**.
 
-In the 297-case extension, **256,233 floating outputs use bit-exact checks** (including exact activation-table cases); **170,260 use the documented transcendental criteria**. On Windows, the latter contain **1,815 bit differences** from native, with maximum F32 difference **4.7683716e-7**. On GNU/Linux they contain **1,838 bit differences**, with maximum F32 difference **1.9073486e-6**; the maximum across all output dtypes is **9.765625e-4**, one F16 step. These observed maxima are reported separately from the criteria above.
+Before this shared-row extension, the 297-case extension reported **256,233 floating outputs use bit-exact checks** (including exact activation-table cases); **170,260 use the documented transcendental criteria**. On Windows, the latter contain **1,815 bit differences** from native, with maximum F32 difference **4.7683716e-7**. On GNU/Linux they contain **1,838 bit differences**, with maximum F32 difference **1.9073486e-6**; the maximum across all output dtypes is **9.765625e-4**, one F16 step. These observed maxima are reported separately from the criteria above.
 
-The indexing corpus adds **890 distinct graph cases per platform**: 6 ADD_ID, 59 MUL_MAT_ID, 51 SET_ROWS, 116 CPY/cast, 3 ACC, 6 SET, 225 ARGSORT, 408 TOP_K and 16 TOP_K_MASK. All new numerical outputs compare exact bytes in debug and release; no transcendental tolerance applies. Together with the 961 convolution/extraction/pooling/resize cases and 20 additional overlapping backward-pooling controls, the total is **2,233 distinct native graph cases**. The 890 indexing and 981 convolution/pooling cases were independently captured on both platforms, giving **4,104 native graph captures overall**.
+The indexing corpus adds **890 distinct graph cases per platform**: 6 ADD_ID, 59 MUL_MAT_ID, 51 SET_ROWS, 116 CPY/cast, 3 ACC, 6 SET, 225 ARGSORT, 408 TOP_K and 16 TOP_K_MASK. All new numerical outputs compare exact bytes in debug and release; no transcendental tolerance applies. Before the shared-row extension below, together with the 961 convolution/extraction/pooling/resize cases and 20 additional overlapping backward-pooling controls, the total was **2,233 distinct native graph cases**. The 890 indexing and 981 convolution/pooling cases were independently captured on both platforms, giving **4,104 native graph captures overall**.
 
 Malformed-input tests cover unsupported parameterized variants, native undefined offsets, half-row strides, unsupported BF16 clamped GLU, shape/stride overflow, invalid indices, empty/extreme descriptors, allocation size checks, storage aliasing, I64 identity, node ownership, graph cancellation and zero-input nodes.
 
@@ -177,10 +221,31 @@ Focused validation commands:
 - `cargo clippy -p llama-tensor --all-targets --offline -- -D warnings`
 - `cargo fmt -p llama-tensor --check`
 
-Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call uses one CPU thread. GNU's default `__SSE2__` also enables original SiLU/softmax exponential and NORM variance paths that MSVC does not select; the indexing and image-operation cases do not execute those operators, and this slice does not claim their native cross-platform equivalence. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
+Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call uses one CPU thread. GNU's default `__SSE2__` enables original SiLU/quick-GELU/softmax exponential and NORM variance paths that MSVC does not select. The new row-policy corpus checks those matching native profiles separately; it does not require GNU and Windows outputs to equal each other. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
+
+## Shared row-policy evidence
+
+This extension adds **1,007 distinct original graph cases per host**:
+935 whole-row/activation/normalization/softmax/OS-ERF cases and 72 odd packed
+GLU cases. Each matching profile requires exact equality for **2,909,056 output
+bytes**. Both swapped gate orders, row padding/permutation, scalar tails,
+half/bfloat control paths and raw exceptional payloads are retained. Odd
+packed rows keep the source's floor-half behavior and ignore the trailing scalar.
+
+The explicit SSE2 quick-GELU vector prefix is additionally checked against
+GNU native graph words on both hosts. Scalar quick GELU is checked separately
+against **502,058 raw inputs per host** through the original inline
+`ggml_gelu_quick_f32` function. MathPolicy selects arithmetic/vector grouping;
+its scalar operations use the current host's CRT. It does not emulate a foreign
+CRT. The initial failed GNU-to-UCRT scalar comparison is preserved alongside
+the corrected, independently captured matching-host gate.
+
+The old model-runtime native-row tests still run through its unchanged public
+module path, now a re-export of the quant implementation. The 96,910
+mathematical ERF checks remain independent of the new platform boundary.
 
 ## Open T02 gates
 
-The remaining 26 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, exact platform ERF behavior, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+The remaining 26 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
 
 Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.

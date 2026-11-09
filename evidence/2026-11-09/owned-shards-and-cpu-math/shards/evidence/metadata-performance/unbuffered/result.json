@@ -1,0 +1,46 @@
+{
+  "label": "unbuffered",
+  "source_sha256": "a64f289e1f3a560a2390116fd12ac6d64e499c196398d020867164e36a00bee6",
+  "source_unchanged": true,
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "model_bytes": 491400032,
+  "command": [
+    "wsl.exe",
+    "-d",
+    "Ubuntu",
+    "--",
+    "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/metadata-bench/target-unbuffered/release/gguf-header-bench",
+    "/mnt/c/Users/adyba/rust-llama-reference/models/qwen2.5-0.5b-instruct-q4_k_m.gguf"
+  ],
+  "build_command": [
+    "wsl.exe",
+    "-d",
+    "Ubuntu",
+    "--",
+    "env",
+    "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+    "cargo",
+    "build",
+    "--offline",
+    "--release",
+    "--manifest-path",
+    "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/metadata-bench/Cargo.toml",
+    "--target-dir",
+    "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/metadata-bench/target-unbuffered"
+  ],
+  "binary_sha256": "fb97adadb394fbf2ae8673e205c93aff00e4f644f9b8c185da0addd0b6954870",
+  "measurement": {
+    "elapsed_seconds": 100.565787346,
+    "read_calls": 760618,
+    "read_bytes": 5947741,
+    "seek_calls": 2,
+    "largest_read_request": 2509,
+    "header_bytes": 5947744,
+    "metadata_entries": 26,
+    "metadata_values": 455285,
+    "tensors": 291,
+    "file_bytes": 491400032
+  },
+  "process_wall_seconds": 100.6486701965332,
+  "qualification": "Single header-only parse of the actual Qwen2 GGUF under WSL /mnt/c, through an instrumented File Read/Seek wrapper. Wall time includes this host current load and cache state; no general CPU/disk performance claim. Same compiler, file and parser limits. Counts describe underlying File reads, not OS syscall tracing."
+}

@@ -147,6 +147,22 @@ impl Model {
     pub fn load_with_options(path: impl AsRef<Path>, options: &LoadOptions) -> Result<Self> {
         loader::load(path.as_ref(), options)
     }
+    /// Load a caller-supplied ordered GGUF split list with the default limits.
+    pub fn load_from_splits<P: AsRef<Path>>(paths: &[P]) -> Result<Self> {
+        Self::load_from_splits_with_options(paths, &LoadOptions::default())
+    }
+    pub fn load_from_splits_with_options<P: AsRef<Path>>(
+        paths: &[P],
+        options: &LoadOptions,
+    ) -> Result<Self> {
+        loader::load_splits(paths, options)
+    }
+    /// Execute a previously validated owned GGUF set. Callers can select
+    /// explicit cumulative parser/shard budgets when opening that set.
+    pub fn load_from_gguf(files: llama_gguf::GgufSet, options: &LoadOptions) -> Result<Self> {
+        let path = files.primary_path().to_path_buf();
+        loader::load_files(files, &path, options)
+    }
     pub fn model_id(&self) -> &str {
         &self.id
     }

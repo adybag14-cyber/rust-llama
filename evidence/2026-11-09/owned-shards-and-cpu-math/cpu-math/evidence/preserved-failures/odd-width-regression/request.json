@@ -1,0 +1,13 @@
+{
+  "id": "job-1794244545497-8d3a04bf-3c3",
+  "mode": "shell",
+  "command": "python correct_accuracy_test.py\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\nPush-Location rust-draft\ncargo +1.99.1 fmt --all\nPop-Location\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\npython validate.py\n$windows = $LASTEXITCODE\nwsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy && python3 validate.py'\n$linux = $LASTEXITCODE\nif ($windows -ne 0 -or $linux -ne 0) { exit 1 }",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy",
+  "timeoutMs": 2400000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "light",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T17:15:45.497Z"
+}

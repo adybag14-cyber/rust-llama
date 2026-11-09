@@ -233,3 +233,6 @@ mod sampler_reference_tests;
 
 #[cfg(test)]
 mod context_reference_tests;
+
+#[cfg(test)]
+mod model_shard_tests;

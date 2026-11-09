@@ -1,0 +1,132 @@
+{
+  "platform": "windows",
+  "executable_sha256": "c1862c0e3ace7feb5ab391ea799654d5351f06439f02ea403842b1018b863fb1",
+  "model_sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3",
+  "cases": [
+    {
+      "name": "model",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "model",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "none",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "none",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "mean",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embedding",
+        "--pooling",
+        "mean",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "cls",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "cls",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "last",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "last",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "cls_norm1",
+      "argv": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\loading-and-cpu-math-integration-v1\\rust-draft\\fixtures\\inference\\tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "cls",
+        "--embd-normalize",
+        "1"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "missing-model",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "bad-pooling",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-pooling-value",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "incompatible-generation-model",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "stdin-eof",
+      "health_status": 200,
+      "embedding_status": 200,
+      "remained_running": true,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "finished_at_utc": "2026-11-09T18:07:33.008198+00:00"
+}

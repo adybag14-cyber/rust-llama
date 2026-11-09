@@ -1,0 +1,8 @@
+{
+  "path": "crates/ffi/src/model.rs",
+  "current_root_sha256": "8ce0348254e6b35b2918611e6a5d7b596760c06409cc81c58aca6a9ffe8b85f9",
+  "problem": "Existing C auto-load would begin accepting split Llama through the updated facade while size, n_params and guessed ftype still inspect only the primary Gguf. A metadata-only first shard would report zero tensor totals.",
+  "required_action": "Core/root must route this metadata/statistics path through GgufSet and preferably consume that same owner through Model::load_from_gguf before promoting shards, or preserve an explicit checked rejection until that adaptation is independently validated.",
+  "ownership": "Reported to root and audit_core_progress. No FFI source modified by this handoff.",
+  "new_c_exports": false
+}

@@ -19,6 +19,15 @@ All 29 weight types supported by the frozen scalar CPU dot contract are accepted
 
 `Model::load` uses a 2 GiB decoded F32 weight budget and a requested context of 1,024 tokens, capped to the training context. `Model::load_with_options` lets the caller set those limits. The pinned Qwen2.5-0.5B Q4_K_M model has a separate output matrix and a decoded cache larger than 2 GiB; its comparisons use a 3 GiB weight budget and context 128.
 
+The single-path APIs automatically discover declared GGUF siblings. The Rust
+`Model::load_from_splits` and `load_from_splits_with_options` APIs take explicit
+ordered paths; `Model::load_from_gguf` consumes a validated `GgufSet`. Primary
+metadata is authoritative, tensor names are globally unique, and each tensor
+retains its own file offset and byte order. Limits apply cumulatively across
+the set. The decoded-weight allowance covers every tensor before decoding.
+Missing or malformed siblings fail transactionally. The [GGUF documentation](../gguf/README.md)
+describes filename rules, safe input bounds and the remaining converter/writer work.
+
 Matrices retain decoded F32 values for row access. Supported non-F32 matrices also retain their packed representation so multiplication preserves the original activation conversion and scaling order. The decoded-weight budget does not include packed bytes, activations, KV state, tokenizer data or other allocations. Loading is into host memory; there is no mmap or GPU model placement claim.
 
 The GGUF reader handles little- and big-endian scalar values. F16 and BF16 packed matrix words are converted to the Rust kernel's byte order; F8 requires no word swap. Other big-endian packed arithmetic remains unsupported.
@@ -72,6 +81,12 @@ The checks against each matching original profile record:
 - Qwen2.5-0.5B Q4_K_M: three prompts, 5,165,824 unique logits and 24 greedy IDs, bit-identical against each original profile. Twenty-one synthetic variants add 165,888 unique logits and 198 greedy IDs, with metadata, partial-bias and output-bias overflow regressions.
 - F16 BERT: three prompts, 25 token vectors and nine pooled vectors, totaling 13,056 values, bit-identical after preserving attention, pooling and GNU variance order.
 - BERT diagnosis: all 122 captured stages of the first sequence match exactly; a committed independent attention fixture checks 46,080 output values across all 12 layers.
+
+The ordinary shard regression executes 64 model configurations drawn from 90
+native admission cases, comparing 464,272 model/embedding values and 590 greedy
+IDs per profile. It includes metadata-only first shards and both automatic and
+explicit path loading. The two verified x86_64 MSVC/GNU targets require exact
+F32 bits; other targets retain the predeclared portability criterion.
 
 The original builds have distinct math profiles: scalar rows on verified MSVC and source SSE2 rows on verified GNU. Captures preserve both profiles; tests choose expected data from target configuration independently of the Rust runtime's arithmetic dispatch. Attention retains masked physical columns and the source's padded row width. A wrong dispatch therefore cannot silently choose a matching wrong expectation.
 

@@ -209,6 +209,20 @@ fn run(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<Tensor> {
                     "XIELU requires explicit constructor parameters",
                 ));
             }
+            if a.dtype() == DType::F32 && matches!(kind, UnaryOp::SILU | UnaryOp::GELU_QUICK) {
+                let mut values = float_values(a)?;
+                if n[0] != 0 {
+                    for row in values.chunks_exact_mut(n[0]) {
+                        check_cancel(cancel)?;
+                        if *kind == UnaryOp::SILU {
+                            llama_quant::cpu_math::silu_f32_in_place(row);
+                        } else {
+                            llama_quant::cpu_math::gelu_quick_f32_in_place(row);
+                        }
+                    }
+                }
+                return Tensor::from_f32(n, &values);
+            }
             typed_map(a, cancel, |x| activation(*kind, x, a.dtype()))
         }
         Square => typed_map(a, cancel, |x| Ok(x * x)),
@@ -1012,6 +1026,7 @@ fn glu(
     };
     let mut shape = an;
     if b.is_none() {
+        // The frozen constructor deliberately floors odd packed row widths.
         shape[0] /= 2;
     }
     if a.dtype() == DType::BF16 && matches!(kind, GluOp::SWIGLU_OAI | GluOp::SWIGLU_CLAMP) {
@@ -1036,6 +1051,35 @@ fn glu(
         ))?])?;
     }
     let mut out = zeros(count(shape)?)?;
+    if a.dtype() == DType::F32 && matches!(kind, GluOp::SWIGLU | GluOp::GEGLU_QUICK) {
+        if shape[0] != 0 {
+            for (row_index, output) in out.chunks_exact_mut(shape[0]).enumerate() {
+                check_cancel(cancel)?;
+                let offset = row_index * an[0];
+                let first = &x[offset..offset + shape[0]];
+                let second = if let Some(y) = &y {
+                    &y[offset..offset + shape[0]]
+                } else {
+                    &x[offset + shape[0]..offset + 2 * shape[0]]
+                };
+                let (gate, value) = if swap {
+                    (second, first)
+                } else {
+                    (first, second)
+                };
+                output.copy_from_slice(gate);
+                if kind == GluOp::SWIGLU {
+                    llama_quant::cpu_math::silu_f32_in_place(output);
+                } else {
+                    llama_quant::cpu_math::gelu_quick_f32_in_place(output);
+                }
+                for (output, value) in output.iter_mut().zip(value) {
+                    *output = glu_product(a.dtype(), *output, *value);
+                }
+            }
+        }
+        return Tensor::from_f32(shape, &out);
+    }
     for (i, o) in out.iter_mut().enumerate() {
         if i % 4096 == 0 {
             check_cancel(cancel)?;
@@ -1057,9 +1101,13 @@ fn glu(
                 }
             }
             GluOp::GEGLU => activation(UnaryOp::GELU, gate, a.dtype())? * value,
-            GluOp::SWIGLU => gate / (1.0 + (-gate).exp()) * value,
+            GluOp::SWIGLU => glu_product(a.dtype(), gate / (1.0 + (-gate).exp()), value),
             GluOp::GEGLU_ERF => crate::cpu::unary(UnaryOp::GELU_ERF, gate)? * value,
-            GluOp::GEGLU_QUICK => activation(UnaryOp::GELU_QUICK, gate, a.dtype())? * value,
+            GluOp::GEGLU_QUICK => glu_product(
+                a.dtype(),
+                activation(UnaryOp::GELU_QUICK, gate, a.dtype())?,
+                value,
+            ),
             GluOp::SWIGLU_OAI | GluOp::SWIGLU_CLAMP => {
                 let limit = limit.expect("validated limit");
                 // std::min/std::clamp preserve NaN first arguments.
@@ -1084,10 +1132,52 @@ fn glu(
     typed_float(a.dtype(), shape, &out)
 }
 
-/// Positive-term erf series, evaluated in F64 then rounded once to F32.
-/// For |x| >= 4 the true result rounds to +/-1 in F32. No foreign libm is
-/// linked; graph fixtures compare this implementation with the source erff.
+// Frozen scalar/SSE2 GLU kernels select the activation NaN first for F32.
+// GNU's inline BF16 loop has the value operand first in its final multiply.
+// Express that captured operand policy explicitly: Rust does not specify which
+// NaN payload an ordinary multiplication selects. Finite arithmetic is unchanged.
+fn glu_product(dtype: DType, activation: f32, value: f32) -> f32 {
+    let value_first = dtype == DType::BF16
+        && cfg!(all(
+            target_arch = "x86_64",
+            target_os = "linux",
+            target_env = "gnu"
+        ));
+    let (first, second) = if value_first {
+        (value, activation)
+    } else {
+        (activation, value)
+    };
+    if first.is_nan() {
+        f32::from_bits(first.to_bits() | 0x0040_0000)
+    } else if second.is_nan() {
+        f32::from_bits(second.to_bits() | 0x0040_0000)
+    } else {
+        activation * value
+    }
+}
+
+/// The original graph calls the standard OS C-runtime erff. Use that same
+/// independently verified boundary when available; retain the mathematical
+/// implementation on targets whose system ABI has not been exercised.
 pub(crate) fn erf_f32(x: f32) -> f32 {
+    #[cfg(all(
+        target_arch = "x86_64",
+        any(
+            all(target_os = "windows", target_env = "msvc"),
+            all(target_os = "linux", target_env = "gnu")
+        )
+    ))]
+    if let Some(value) = llama_platform_loader::math::erf_f32(x) {
+        return value;
+    }
+    portable_erf_f32(x)
+}
+
+/// Positive-term erf series, evaluated in F64 then rounded once to F32.
+/// For |x| >= 4 the true result rounds to +/-1 in F32. Its independent 80-digit
+/// accuracy corpus remains separate from platform-specific native parity.
+pub(crate) fn portable_erf_f32(x: f32) -> f32 {
     if x.is_nan() || x == 0.0 {
         return x;
     }
@@ -1124,10 +1214,10 @@ mod accuracy_tests {
             let x = f32::from_le_bytes(record[..4].try_into().unwrap());
             let expected = f32::from_le_bytes(record[4..8].try_into().unwrap());
             let reference = f64::from_le_bytes(record[8..16].try_into().unwrap());
-            let actual = super::erf_f32(x);
+            let actual = super::portable_erf_f32(x);
             assert_eq!(actual.to_bits(), expected.to_bits(), "erf({x:?})");
             assert_eq!(
-                super::erf_f32(-x).to_bits(),
+                super::portable_erf_f32(-x).to_bits(),
                 (-expected).to_bits(),
                 "erf({:?})",
                 -x

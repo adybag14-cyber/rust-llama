@@ -1,0 +1,57 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Actual frozen original GGML graph constructors and CPU execution, one thread; generated before Rust changes and comparisons.",
+  "platform": "gnu",
+  "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "cases": 935,
+  "output_bytes": 2894848,
+  "file": {
+    "name": "tensor-row-policy-reference.bin",
+    "bytes": 7815367,
+    "sha256": "fa3f3f5a938c4038ed7b9ff332b8f4da6d3306c24b8472f184149479faa9c1e6"
+  },
+  "case_ledger": {
+    "name": "cases.jsonl",
+    "bytes": 244170,
+    "sha256": "d58526dc66a6049981e0c7e9f3fb97ce260a1a05581ca36852f19df3d6bca74d"
+  },
+  "sources": {
+    "tensor-oracle/row-policy/capture_graphs.py": {
+      "bytes": 12301,
+      "sha256": "16e6dd54a071255179a02fd5a2a0d757b6a9c9dfbab2faec9d517e3f1176cc14"
+    },
+    "build-ggml-linux-llama/bin/libggml-base.so": {
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "build-ggml-linux-llama/bin/libggml-cpu.so": {
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/unary-ops.cpp": {
+      "bytes": 11550,
+      "sha256": "57a73a81b91473945040054a03bd921f1f77656d217e205cf8fd7f1e0acae7ad"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    }
+  },
+  "contracts": [
+    "F32 SiLU, SwiGLU, GELU_QUICK and GEGLU_QUICK use each source row's GNU SSE2 prefix and scalar tail; MSVC scalar profile is separate.",
+    "F16/BF16 scalar/table activation controls must not acquire the F32 vector policy.",
+    "NORM contiguous-inner-axis variance uses the source profile; strided inner-axis NORM and RMS_NORM retain separate reductions.",
+    "System ERF captures cover raw binary16 and bfloat16 words plus dense and arbitrary F32 inputs through actual GELU_ERF/GEGLU_ERF graphs.",
+    "Unary SOFTPLUS is log1pf(expf(x)); Mamba's separate helper uses logf(1+expf(x)).",
+    "No expected value was obtained from Rust; all comparisons require exact bytes for this target-specific corpus.",
+    "Nearest-even and gradual underflow; NaN words are carried as raw input bytes. Floating exception flag parity is outside the tensor API."
+  ]
+}

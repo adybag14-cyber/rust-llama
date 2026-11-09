@@ -65,6 +65,23 @@ Q3_K/Q4_K/Q5_K/Q6_K preserve the original eight floating accumulation lanes acro
 
 The reference consists of unmodified functions extracted from the frozen `ggml-quants.c`, including its original numeric codebooks and scalar conversion helpers. Q8_1 has no upstream dequantization entry point, so its expected output is produced by an independent C loop over the original struct's scale and quants. Integer/F32/F64 reference conversion uses C casts or copying. These exceptions are recorded in the provenance.
 
+## Shared safe CPU row arithmetic
+
+The dependency-free `cpu_math` module is shared by tensor execution and the
+model-runtime compatibility facade. It implements frozen scalar/SSE2 row
+SiLU, quick GELU, softmax exponentials/sums and centered variance using safe
+Rust and explicit F32/F64 rounding/grouping. Four-element vector prefixes
+restart at each source row; scalar tails use the current host's standard
+math lowering. Explicit MathPolicy selects grouping and does not emulate a
+foreign operating-system CRT.
+
+Existing model-runtime native-row fixtures remain the regression gate for
+the moved code. The tensor row-policy corpus adds 1,007 matching native graph
+cases per host, including F16/BF16 controls and odd packed GLU rows. A separate
+original-inline scalar quick-GELU oracle checks 502,058 raw F32 words on each
+host; portable SSE2 quick prefixes are also checked on both hosts against
+the GNU native graph bytes. This module adds no C dependency to this crate.
+
 ## Remaining T03 work
 
 Scalar codec and original weighted-encoder coverage is complete for the defined source entry points, with the explicit undefined-source qualifications above. Optimized CPU kernels/dispatch, ISA-specific numerical/performance checks and general GGML operation coverage remain open. Completing the scalar codec and CPU dot inventories does not close those gates. This crate does not claim throughput, pretrained-model parity or complete T03 coverage.

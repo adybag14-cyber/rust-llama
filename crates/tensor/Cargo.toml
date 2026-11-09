@@ -10,3 +10,6 @@ workspace = true
 
 [dependencies]
 llama-quant = { path = "../quant" }
+
+[target.'cfg(all(target_arch = "x86_64", any(all(target_os = "windows", target_env = "msvc"), all(target_os = "linux", target_env = "gnu"))))'.dependencies]
+llama-platform-loader = { path = "../platform-loader" }

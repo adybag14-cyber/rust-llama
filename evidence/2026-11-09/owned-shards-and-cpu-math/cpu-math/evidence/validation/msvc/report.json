@@ -1,0 +1,62 @@
+{
+  "platform": "msvc",
+  "steps": [
+    {
+      "step": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--workspace",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": {
+    "crates/quant/src/cpu_math.rs": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5",
+    "crates/tensor/src/cpu.rs": "81f824d2b59dd3c76ba906ee0ab18550f27802e1d90e252f417461fcbdf87968",
+    "crates/tensor/src/cpu_extra.rs": "236ae09abd5d70701ebd588625170fe8afe8da43d5ce6dea440b736c702558ae",
+    "crates/model-runtime/src/math/native_rows.rs": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90",
+    "crates/platform-loader/src/math.rs": "e9133d01f72188c11c151bcd32765a6fab2d77c24a28410570373c5ea8df995b"
+  }
+}

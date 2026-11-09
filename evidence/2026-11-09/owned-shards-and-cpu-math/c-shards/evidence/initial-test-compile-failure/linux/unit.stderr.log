@@ -1,0 +1,155 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/quant)
+   Compiling llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/llama-behavior)
+   Compiling llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/gguf)
+   Compiling llama-model-runtime v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/model-runtime)
+   Compiling llama-tokenizer v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/tokenizer)
+   Compiling llama-inference v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/inference)
+   Compiling llama-ffi v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/ffi-shards-port/rust-draft/crates/ffi)
+error[E0308]: mismatched types
+   --> crates/ffi/src/model_shard_tests.rs:183:79
+    |
+183 | ... = llama...piece(vocab, token, ptr::null_mut(), 0, 0, special);
+    |       -----...-----                                      ^^^^^^^ expected `u8`, found `bool`
+    |       |
+    |       arguments to this function are incorrect
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:228:5
+    |
+228 |     llama...piece(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: mismatched types
+   --> crates/ffi/src/model_shard_tests.rs:193:17
+    |
+187 | ...   llama...piece(
+    |       -----...----- arguments to this function are incorrect
+...
+193 | ...       special
+    |           ^^^^^^^ expected `u8`, found `bool`
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:228:5
+    |
+228 |     llama...piece(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: arguments to this function are incorrect
+   --> crates/ffi/src/model_shard_tests.rs:283:25
+    |
+283 | ...et count = llama...enize(
+    |               ^^^^^...^^^^^
+...
+289 | ...   flag(...al")),
+    |       -----...----- expected `u8`, found `bool`
+290 | ...   flag(...al")),
+    |       -----...----- expected `u8`, found `bool`
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:207:5
+    |
+207 |     llama...enize(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: arguments to this function are incorrect
+   --> crates/ffi/src/model_shard_tests.rs:295:17
+    |
+295 | ...   llama...enize(
+    |       ^^^^^...^^^^^
+...
+301 | ...       flag(...al")),
+    |           -----...----- expected `u8`, found `bool`
+302 | ...       flag(...al"))
+    |           -----...----- expected `u8`, found `bool`
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:207:5
+    |
+207 |     llama...enize(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: arguments to this function are incorrect
+   --> crates/ffi/src/model_shard_tests.rs:316:25
+    |
+316 | ...et count = llama...enize(
+    |               ^^^^^...^^^^^
+...
+322 | ...   true,
+    |       ---- expected `u8`, found `bool`
+323 | ...   false,
+    |       ----- expected `u8`, found `bool`
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:321:5
+    |
+321 |     llama...enize(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: arguments to this function are incorrect
+   --> crates/ffi/src/model_shard_tests.rs:327:25
+    |
+327 | ...et count = llama...enize(
+    |               ^^^^^...^^^^^
+...
+333 | ...   true,
+    |       ---- expected `u8`, found `bool`
+334 | ...   false,
+    |       ----- expected `u8`, found `bool`
+    |
+note: function defined here
+   --> crates/ffi/src/vocab.rs:321:5
+    |
+321 |     llama...enize(
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+error[E0308]: mismatched types
+   --> crates/ffi/src/model_shard_tests.rs:340:65
+    |
+340 | ...   llama...clear(llama_get_memory(context.0), true);
+    |       -----...-----                              ^^^^ expected `u8`, found `bool`
+    |       |
+    |       arguments to this function are incorrect
+    |
+note: function defined here
+   --> crates/ffi/src/memory.rs:14:5
+    |
+ 14 |     llama...clear(me...
+    |     ^^^^^...^^^^^
+    |
+   ::: crates/ffi/src/lib.rs:69:42
+    |
+ 69 | ...($($arg:$ty),*...
+    |       --------
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `llama-ffi` (lib test) due to 7 previous errors

@@ -1,0 +1,1 @@
+Unmodified-source baseline against fixed original outputs: Windows six cases / 6,586 values differ; GNU 419 cases / 72,279 values differ. Expected reference bytes are retained unchanged. The source preimages and exact job logs precede the first row-policy source revision.

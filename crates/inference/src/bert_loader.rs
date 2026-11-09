@@ -1,20 +1,17 @@
 //! Dense BERT GGUF loader, following the frozen src/models/bert.cpp names/shapes.
-use crate::loader::{bias, details, float, matrix, split_count, uint, unsupported, vector};
+use crate::loader::{bias, details, float, matrix, uint, unsupported, vector};
 use crate::{Error, Executor, LoadOptions, Model, Result};
-use llama_gguf::{Gguf, Value};
+use llama_gguf::{GgufSet, Value};
 use llama_model_runtime::{BertConfig, BertLayer, BertModel, BertWeights, Pooling};
 use llama_tokenizer::Tokenizer;
-use std::{collections::BTreeSet, fs::File, path::Path, sync::Arc};
+use std::{collections::BTreeSet, path::Path, sync::Arc};
 
-pub(crate) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Result<Model> {
-    let m = &g.metadata;
+pub(crate) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result<Model> {
+    let m = g.metadata();
     if let Some(t) = m.get("general.type").and_then(Value::as_str)
         && t != "model"
     {
         return Err(unsupported(format!("GGUF general.type={t}")));
-    }
-    if split_count(m)? > 1 {
-        return Err(unsupported("split GGUF model loading"));
     }
     if m.get("tokenizer.ggml.model").and_then(Value::as_str) != Some("bert") {
         return Err(unsupported(
@@ -145,7 +142,7 @@ pub(crate) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
         });
     }
     let unused: Vec<_> = g
-        .tensors
+        .tensors()
         .iter()
         .filter(|t| !used.contains(&t.name))
         .map(|t| t.name.as_str())

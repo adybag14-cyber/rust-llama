@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "passed": false,
+  "host": "linux",
+  "profile": "debug",
+  "sources": {
+    "crates/ffi/src/model.rs": {
+      "bytes": 16725,
+      "sha256": "3974819e417e8ced416ec2da4f61c3269706a9245ac0552450d87e6ac8d4a783"
+    },
+    "crates/ffi/src/lib.rs": {
+      "bytes": 8572,
+      "sha256": "78bb56f0aa985210798df90c3fd71f80c932c85301437bf4cf9d2c271364d801"
+    },
+    "crates/ffi/src/model_shard_tests.rs": {
+      "bytes": 16205,
+      "sha256": "7e55d8a249e60ad060131a1659fcd87a9ff515c73b84d3079ffe46d48cdaccf7"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "unit",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--lib"
+      ],
+      "exit_code": 101
+    }
+  ],
+  "cases": []
+}

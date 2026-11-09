@@ -2,6 +2,9 @@
 //! Tensor payloads remain on disk until explicitly requested. No native code is linked.
 #![forbid(unsafe_code)]
 
+mod shards;
+pub use shards::{GgufSet, ShardInfo, ShardLimits};
+
 use llama_quant::DType;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -152,6 +155,16 @@ impl Default for Limits {
         }
     }
 }
+/// Parser work charged to one header, including data-section alignment padding.
+/// A shard set applies its limits to the cumulative values across all files.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct HeaderUsage {
+    pub bytes: u64,
+    pub metadata_entries: usize,
+    pub metadata_values: usize,
+    pub tensors: usize,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TensorInfo {
     pub name: String,
@@ -163,10 +176,7 @@ pub struct TensorInfo {
 }
 impl TensorInfo {
     pub fn elements(&self) -> Result<usize> {
-        self.dimensions.iter().try_fold(1usize, |a, &b| {
-            a.checked_mul(usize::try_from(b).map_err(|_| invalid("dimension exceeds usize"))?)
-                .ok_or_else(|| invalid("element count overflow"))
-        })
+        dimension_elements(&self.dimensions)
     }
 }
 
@@ -180,6 +190,7 @@ pub struct Gguf<R: Read + Seek> {
     pub data_offset: u64,
     pub file_len: u64,
     limits: Limits,
+    header_usage: HeaderUsage,
 }
 impl Gguf<File> {
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
@@ -209,104 +220,144 @@ impl<R: Read + Seek> Gguf<R> {
                 "version bytes {version_bytes:?}; supported versions are 2 and 3"
             )));
         };
-        let mut p = Parser {
-            reader: &mut reader,
-            endian,
-            position: 8,
-            file_len,
-            limits: &limits,
-            total_values: 0,
-        };
-        let nt = p.count(limits.max_tensors, "tensor count")?;
-        let nk = p.count(limits.max_metadata_entries, "metadata count")?;
-        let mut metadata = BTreeMap::new();
-        for _ in 0..nk {
-            let key = p.string()?;
-            if key.is_empty() || key.contains('\0') {
-                return Err(invalid("empty/NUL metadata key"));
-            }
-            let ty = p.u32()?;
-            let value = p.value(ty, false)?;
-            if metadata.insert(key.clone(), value).is_some() {
-                return Err(invalid(format!("duplicate metadata key {key}")));
-            }
-        }
-        let alignment = match metadata.get("general.alignment") {
-            None => 32,
-            Some(Value::U32(v)) => *v,
-            _ => return Err(invalid("general.alignment must be UINT32")),
-        };
-        if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
-            return Err(invalid(
-                "alignment must be a power of two within 1..=1048576",
-            ));
-        }
-        let mut tensors = Vec::new();
-        tensors
-            .try_reserve_exact(nt)
-            .map_err(|_| Error::Limit("tensor descriptors allocation".into()))?;
-        let mut names = BTreeSet::new();
-        for _ in 0..nt {
-            let name = p.string()?;
-            if name.is_empty() || name.contains('\0') || !names.insert(name.clone()) {
-                return Err(invalid("empty, NUL or duplicate tensor name"));
-            }
-            let nd = p.u32()?;
-            if !(1..=4).contains(&nd) {
-                return Err(invalid(format!("tensor {name} has {nd} dimensions")));
-            }
-            let mut dimensions = Vec::new();
-            for _ in 0..nd {
-                let n = p.u64()?;
-                if n == 0 || n > i64::MAX as u64 {
-                    return Err(invalid("invalid tensor dimension"));
+        // Keep the public owner R unchanged. Only header parsing borrows a
+        // bounded, fallibly allocated buffer; payload reads use the same R.
+        let mut header_reader = HeaderReader::new(
+            &mut reader,
+            8,
+            file_len.saturating_sub(8),
+            limits.max_metadata_bytes.saturating_sub(8),
+        )?;
+        let parsed_header: Result<_> = (|| {
+            let mut p = Parser {
+                reader: &mut header_reader,
+                endian,
+                position: 8,
+                file_len,
+                limits: &limits,
+                total_values: 0,
+            };
+            let nt = p.count(limits.max_tensors, "tensor count")?;
+            let nk = p.count(limits.max_metadata_entries, "metadata count")?;
+            let mut metadata = BTreeMap::new();
+            for _ in 0..nk {
+                let key = p.string()?;
+                if key.is_empty() || key.contains('\0') {
+                    return Err(invalid("empty/NUL metadata key"));
                 }
-                dimensions.push(n)
+                let ty = p.u32()?;
+                let value = p.value(ty, false)?;
+                if metadata.insert(key.clone(), value).is_some() {
+                    return Err(invalid(format!("duplicate metadata key {key}")));
+                }
             }
-            let id = p.u32()?;
-            let dtype = DType::from_id(id).map_err(|e| invalid(e.to_string()))?;
-            let row =
-                usize::try_from(dimensions[0]).map_err(|_| invalid("row size exceeds usize"))?;
-            let row_bytes = dtype.row_bytes(row).map_err(|e| invalid(e.to_string()))? as u64;
-            let byte_len = dimensions[1..].iter().try_fold(row_bytes, |a, &b| {
-                a.checked_mul(b)
-                    .ok_or_else(|| invalid("tensor byte size overflow"))
-            })?;
-            let offset = p.u64()?;
-            if offset % alignment as u64 != 0 {
-                return Err(invalid(format!("tensor {name} offset is unaligned")));
+            let alignment = match metadata.get("general.alignment") {
+                None => 32,
+                Some(Value::U32(v)) => *v,
+                _ => return Err(invalid("general.alignment must be UINT32")),
+            };
+            if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
+                return Err(invalid(
+                    "alignment must be a power of two within 1..=1048576",
+                ));
             }
-            tensors.push(TensorInfo {
-                name,
-                dimensions,
-                dtype,
-                offset,
-                byte_len,
-            });
-        }
-        let data_offset = align(p.position, alignment as u64)?;
-        let mut ranges = Vec::with_capacity(nt);
-        for t in &tensors {
-            let start = data_offset
-                .checked_add(t.offset)
-                .ok_or_else(|| invalid("tensor absolute offset overflow"))?;
-            let end = start
-                .checked_add(t.byte_len)
-                .ok_or_else(|| invalid("tensor end overflow"))?;
-            if end > file_len {
-                return Err(invalid(format!("tensor {} exceeds file length", t.name)));
+            // Even a zero-dimensional tensor with an empty name needs 24
+            // encoded descriptor bytes. Check both backing file and header budget
+            // before reserving descriptor storage for an attacker-controlled count.
+            p.minimum_encoded(nt, 24, "tensor descriptors")?;
+            let mut tensors = Vec::new();
+            tensors
+                .try_reserve_exact(nt)
+                .map_err(|_| Error::Limit("tensor descriptors allocation".into()))?;
+            let mut names = BTreeSet::new();
+            let mut expected_offset = 0u64;
+            for _ in 0..nt {
+                let name = p.string()?;
+                if name.len() >= 64 || name.contains('\0') || !names.insert(name.clone()) {
+                    return Err(invalid(
+                        "tensor name is too long, contains NUL, or is duplicated",
+                    ));
+                }
+                let nd = p.u32()?;
+                if nd > 4 {
+                    return Err(invalid(format!("tensor {name} has {nd} dimensions")));
+                }
+                let mut dimensions = Vec::new();
+                dimensions
+                    .try_reserve_exact(nd as usize)
+                    .map_err(|_| Error::Limit("tensor dimensions allocation".into()))?;
+                for _ in 0..nd {
+                    let n = p.u64()?;
+                    if n > i64::MAX as u64 {
+                        return Err(invalid("invalid tensor dimension"));
+                    }
+                    dimensions.push(n)
+                }
+                let id = p.u32()?;
+                let dtype = DType::from_id(id).map_err(|e| invalid(e.to_string()))?;
+                dimension_elements(&dimensions)?;
+                let row = usize::try_from(dimensions.first().copied().unwrap_or(1))
+                    .map_err(|_| invalid("row size exceeds usize"))?;
+                let row_bytes = dtype.row_bytes(row).map_err(|e| invalid(e.to_string()))? as u64;
+                let byte_len = dimensions.iter().skip(1).try_fold(row_bytes, |a, &b| {
+                    a.checked_mul(b)
+                        .ok_or_else(|| invalid("tensor byte size overflow"))
+                })?;
+                let offset = p.u64()?;
+                // Frozen gguf.cpp requires descriptor-order contiguous padded payloads,
+                // not merely aligned, non-overlapping regions.
+                if offset != expected_offset {
+                    return Err(invalid(format!(
+                        "tensor {name} offset {offset} differs from expected {expected_offset} (gap, overlap, or reordering)"
+                    )));
+                }
+                expected_offset = expected_offset
+                    .checked_add(align(byte_len, alignment as u64)?)
+                    .ok_or_else(|| invalid("padded tensor data size overflow"))?;
+                tensors.push(TensorInfo {
+                    name,
+                    dimensions,
+                    dtype,
+                    offset,
+                    byte_len,
+                });
             }
-            ranges.push((start, end, &t.name));
-        }
-        ranges.sort_unstable_by_key(|r| r.0);
-        for pair in ranges.windows(2) {
-            if pair[0].1 > pair[1].0 {
-                return Err(invalid(format!(
-                    "overlapping tensor payloads {} and {}",
-                    pair[0].2, pair[1].2
-                )));
+            // The frozen reader does not align the reported data offset for an
+            // empty tensor directory, even when the writer included padding.
+            let data_offset = if nt == 0 {
+                p.position
+            } else {
+                align(p.position, alignment as u64)?
+            };
+            if data_offset > limits.max_metadata_bytes {
+                return Err(Error::Limit(
+                    "metadata byte budget including alignment".into(),
+                ));
             }
-        }
+            let header_usage = HeaderUsage {
+                bytes: data_offset,
+                metadata_entries: nk,
+                metadata_values: p.total_values,
+                tensors: nt,
+            };
+            for t in &tensors {
+                let start = data_offset
+                    .checked_add(t.offset)
+                    .ok_or_else(|| invalid("tensor absolute offset overflow"))?;
+                let end = start
+                    .checked_add(t.byte_len)
+                    .ok_or_else(|| invalid("tensor end overflow"))?;
+                if end > file_len {
+                    return Err(invalid(format!("tensor {} exceeds file length", t.name)));
+                }
+            }
+            Ok((metadata, tensors, alignment, data_offset, header_usage))
+        })();
+        // Rewind bounded read-ahead on success and failure. Preserve the
+        // original parse error if synchronization also fails.
+        let synchronized = header_reader.finish();
+        let (metadata, tensors, alignment, data_offset, header_usage) = parsed_header?;
+        synchronized?;
         Ok(Self {
             reader,
             version,
@@ -317,75 +368,130 @@ impl<R: Read + Seek> Gguf<R> {
             data_offset,
             file_len,
             limits,
+            header_usage,
         })
+    }
+    pub fn header_usage(&self) -> HeaderUsage {
+        self.header_usage
     }
     pub fn tensor(&self, name: &str) -> Option<&TensorInfo> {
         self.tensors.iter().find(|t| t.name == name)
     }
     pub fn read_tensor(&mut self, name: &str) -> Result<Vec<u8>> {
-        let t = self
-            .tensor(name)
+        let info = self
+            .tensors
+            .iter()
+            .find(|t| t.name == name)
             .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
-        let n = usize::try_from(t.byte_len)
-            .map_err(|_| Error::Limit("tensor length exceeds usize".into()))?;
-        if n > self.limits.max_tensor_read_bytes {
-            return Err(Error::Limit(format!(
-                "tensor {name} read exceeds {} bytes",
-                self.limits.max_tensor_read_bytes
-            )));
-        }
-        let offset = self
-            .data_offset
-            .checked_add(t.offset)
-            .ok_or_else(|| invalid("tensor absolute offset overflow"))?;
-        if offset
-            .checked_add(n as u64)
-            .is_none_or(|end| end > self.file_len)
-        {
-            return Err(invalid("tensor read exceeds file length"));
-        }
-        let mut bytes = Vec::new();
-        bytes
-            .try_reserve_exact(n)
-            .map_err(|_| Error::Limit("tensor allocation".into()))?;
-        bytes.resize(n, 0);
-        self.reader.seek(SeekFrom::Start(offset))?;
-        self.reader.read_exact(&mut bytes)?;
-        Ok(bytes)
+        read_tensor_payload(
+            &mut self.reader,
+            self.data_offset,
+            self.file_len,
+            &self.limits,
+            info,
+        )
     }
     pub fn read_f32(&mut self, name: &str) -> Result<Vec<f32>> {
-        let t = self
-            .tensor(name)
-            .ok_or_else(|| invalid(format!("missing tensor {name}")))?
-            .clone();
-        let n = t.elements()?;
-        let max = n
-            .checked_mul(4)
-            .ok_or_else(|| Error::Limit("decoded tensor size overflow".into()))?;
-        if max > self.limits.max_tensor_read_bytes {
-            return Err(Error::Limit("decoded tensor exceeds read budget".into()));
-        }
-        let mut bytes = self.read_tensor(name)?;
-        if self.endian == Endian::Big {
-            let size = match t.dtype.id() {
-                0 => 4,
-                1 | 30 => 2,
-                24 => 1,
-                25 => 2,
-                26 => 4,
-                27 | 28 => 8,
-                _ => {
-                    return Err(Error::Unsupported(
-                        "big-endian quantized tensor payload".into(),
-                    ));
-                }
-            };
-            for part in bytes.chunks_exact_mut(size) {
-                part.reverse()
-            }
-        }
-        llama_quant::dequantize(t.dtype, &bytes, n).map_err(|e| invalid(e.to_string()))
+        let info = self
+            .tensors
+            .iter()
+            .find(|t| t.name == name)
+            .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
+        read_tensor_f32(
+            &mut self.reader,
+            self.data_offset,
+            self.file_len,
+            self.endian,
+            &self.limits,
+            info,
+        )
     }
+}
+
+fn dimension_elements(dimensions: &[u64]) -> Result<usize> {
+    dimensions.iter().try_fold(1usize, |count, &dimension| {
+        if dimension > i64::MAX as u64 {
+            return Err(invalid("dimension exceeds signed GGML range"));
+        }
+        let dimension =
+            usize::try_from(dimension).map_err(|_| invalid("dimension exceeds usize"))?;
+        let result = count
+            .checked_mul(dimension)
+            .ok_or_else(|| invalid("element count overflow"))?;
+        if result as u64 > i64::MAX as u64 {
+            return Err(invalid("element count exceeds signed GGML range"));
+        }
+        Ok(result)
+    })
+}
+
+fn read_tensor_payload<R: Read + Seek>(
+    reader: &mut R,
+    data_offset: u64,
+    file_len: u64,
+    limits: &Limits,
+    info: &TensorInfo,
+) -> Result<Vec<u8>> {
+    let n = usize::try_from(info.byte_len)
+        .map_err(|_| Error::Limit("tensor length exceeds usize".into()))?;
+    if n > limits.max_tensor_read_bytes {
+        return Err(Error::Limit(format!(
+            "tensor {} read exceeds {} bytes",
+            info.name, limits.max_tensor_read_bytes
+        )));
+    }
+    let offset = data_offset
+        .checked_add(info.offset)
+        .ok_or_else(|| invalid("tensor absolute offset overflow"))?;
+    if offset
+        .checked_add(n as u64)
+        .is_none_or(|end| end > file_len)
+    {
+        return Err(invalid("tensor read exceeds file length"));
+    }
+    let mut bytes = Vec::new();
+    bytes
+        .try_reserve_exact(n)
+        .map_err(|_| Error::Limit("tensor allocation".into()))?;
+    bytes.resize(n, 0);
+    reader.seek(SeekFrom::Start(offset))?;
+    reader.read_exact(&mut bytes)?;
+    Ok(bytes)
+}
+
+fn read_tensor_f32<R: Read + Seek>(
+    reader: &mut R,
+    data_offset: u64,
+    file_len: u64,
+    endian: Endian,
+    limits: &Limits,
+    info: &TensorInfo,
+) -> Result<Vec<f32>> {
+    let n = info.elements()?;
+    let decoded = n
+        .checked_mul(4)
+        .ok_or_else(|| Error::Limit("decoded tensor size overflow".into()))?;
+    if decoded > limits.max_tensor_read_bytes {
+        return Err(Error::Limit("decoded tensor exceeds read budget".into()));
+    }
+    let mut bytes = read_tensor_payload(reader, data_offset, file_len, limits, info)?;
+    if endian == Endian::Big {
+        let size = match info.dtype.id() {
+            0 | 26 => 4,
+            1 | 25 | 30 => 2,
+            24 => 1,
+            27 | 28 => 8,
+            _ => {
+                return Err(Error::Unsupported(
+                    "big-endian quantized tensor payload".into(),
+                ));
+            }
+        };
+        for part in bytes.chunks_exact_mut(size) {
+            part.reverse();
+        }
+    }
+    llama_quant::dequantize(info.dtype, &bytes, n).map_err(|e| invalid(e.to_string()))
 }
 
 fn align(n: u64, a: u64) -> Result<u64> {
@@ -393,6 +499,74 @@ fn align(n: u64, a: u64) -> Result<u64> {
         .map(|v| v & !(a - 1))
         .ok_or_else(|| invalid("alignment overflow"))
 }
+/// Header-only read-ahead. The owned file/reader remains in Gguf<R>.
+/// Unlike an unbounded convenience buffer, this allocation is fallible and
+/// each refill is capped by the remaining physical file and header allowance.
+struct HeaderReader<'a, R: Read + Seek> {
+    reader: &'a mut R,
+    buffer: Vec<u8>,
+    begin: usize,
+    end: usize,
+    remaining: u64,
+    position: u64,
+}
+impl<'a, R: Read + Seek> HeaderReader<'a, R> {
+    fn new(
+        reader: &'a mut R,
+        position: u64,
+        file_remaining: u64,
+        header_remaining: u64,
+    ) -> Result<Self> {
+        let remaining = file_remaining.min(header_remaining);
+        let capacity = remaining.min(64 * 1024) as usize;
+        let mut buffer = Vec::new();
+        buffer
+            .try_reserve_exact(capacity)
+            .map_err(|_| Error::Limit("GGUF header read buffer allocation".into()))?;
+        buffer.resize(capacity, 0);
+        Ok(Self {
+            reader,
+            buffer,
+            begin: 0,
+            end: 0,
+            remaining,
+            position,
+        })
+    }
+    fn finish(self) -> Result<()> {
+        self.reader.seek(SeekFrom::Start(self.position))?;
+        Ok(())
+    }
+}
+impl<R: Read + Seek> Read for HeaderReader<'_, R> {
+    fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+        if output.is_empty() {
+            return Ok(0);
+        }
+        if self.begin == self.end {
+            if self.remaining == 0 {
+                return Ok(0);
+            }
+            let request = self.remaining.min(self.buffer.len() as u64) as usize;
+            let received = self.reader.read(&mut self.buffer[..request])?;
+            if received > request {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "reader returned more bytes than requested",
+                ));
+            }
+            self.remaining -= received as u64;
+            self.begin = 0;
+            self.end = received;
+        }
+        let count = output.len().min(self.end - self.begin);
+        output[..count].copy_from_slice(&self.buffer[self.begin..self.begin + count]);
+        self.begin += count;
+        self.position += count as u64;
+        Ok(count)
+    }
+}
+
 struct Parser<'a, R> {
     reader: &'a mut R,
     endian: Endian,
@@ -418,6 +592,22 @@ impl<R: Read> Parser<'_, R> {
         }
         if self.position > self.limits.max_metadata_bytes {
             return Err(Error::Limit("metadata byte budget".into()));
+        }
+        Ok(())
+    }
+    fn minimum_encoded(&self, count: usize, bytes_each: u64, label: &str) -> Result<()> {
+        let minimum = (count as u64)
+            .checked_mul(bytes_each)
+            .ok_or_else(|| Error::Limit(format!("{label} minimum encoded size overflow")))?;
+        if minimum > self.file_len.saturating_sub(self.position) {
+            return Err(invalid(format!(
+                "{label} minimum encoded size exceeds remaining file bytes"
+            )));
+        }
+        if minimum > self.limits.max_metadata_bytes.saturating_sub(self.position) {
+            return Err(Error::Limit(format!(
+                "{label} minimum encoded size exceeds remaining metadata budget"
+            )));
         }
         Ok(())
     }
@@ -508,12 +698,7 @@ impl<R: Read> Parser<'_, R> {
                     4..=6 => 4,
                     _ => 8,
                 };
-                if (n as u64)
-                    .checked_mul(min)
-                    .is_none_or(|v| v > self.file_len - self.position)
-                {
-                    return Err(invalid("truncated array"));
-                }
+                self.minimum_encoded(n, min, "array")?;
                 let mut values = Vec::new();
                 values
                     .try_reserve_exact(n)
@@ -608,17 +793,17 @@ pub fn write<W: Write>(
     let mut offset = 0u64;
     let mut names = BTreeSet::new();
     for t in tensors {
-        if t.name.is_empty()
+        if t.name.len() >= 64
             || t.name.contains('\0')
             || !names.insert(t.name)
-            || !(1..=4).contains(&t.dimensions.len())
-            || t.dimensions.contains(&0)
+            || t.dimensions.len() > 4
         {
             return Err(invalid("invalid tensor descriptor"));
         }
-        let row =
-            usize::try_from(t.dimensions[0]).map_err(|_| invalid("dimension exceeds usize"))?;
-        let n = t.dimensions[1..].iter().try_fold(
+        dimension_elements(t.dimensions)?;
+        let row = usize::try_from(t.dimensions.first().copied().unwrap_or(1))
+            .map_err(|_| invalid("dimension exceeds usize"))?;
+        let n = t.dimensions.iter().skip(1).try_fold(
             t.dtype.row_bytes(row).map_err(|e| invalid(e.to_string()))? as u64,
             |a, &b| {
                 a.checked_mul(b)
@@ -780,5 +965,161 @@ mod tests {
             },
         );
         assert!(write(Vec::new(), &m, &[]).is_err());
+    }
+    #[test]
+    fn arrays_preflight_the_remaining_header_budget_before_reservation() {
+        let mut bytes = b"GGUF".to_vec();
+        bytes.extend(3u32.to_le_bytes());
+        bytes.extend(0u64.to_le_bytes());
+        bytes.extend(1u64.to_le_bytes());
+        bytes.extend(1u64.to_le_bytes());
+        bytes.push(b'a');
+        bytes.extend(9u32.to_le_bytes());
+        bytes.extend(0u32.to_le_bytes());
+        bytes.extend(64u64.to_le_bytes());
+        let value_start = bytes.len();
+        bytes.resize(value_start + 64, 0);
+        let limits = Limits {
+            max_metadata_bytes: value_start as u64 + 1,
+            ..Limits::default()
+        };
+        assert!(matches!(
+            Gguf::read(Cursor::new(bytes), limits),
+            Err(Error::Limit(message)) if message == "array minimum encoded size exceeds remaining metadata budget"
+        ));
+    }
+
+    #[test]
+    fn tensor_counts_preflight_the_remaining_header_and_file_before_reservation() {
+        let mut bytes = b"GGUF".to_vec();
+        bytes.extend(3u32.to_le_bytes());
+        bytes.extend(64u64.to_le_bytes());
+        bytes.extend(0u64.to_le_bytes());
+        let mut enough_file = bytes.clone();
+        enough_file.resize(24 + 64 * 24, 0);
+        let limits = Limits {
+            max_metadata_bytes: 32,
+            ..Limits::default()
+        };
+        assert!(matches!(
+            Gguf::read(Cursor::new(enough_file), limits),
+            Err(Error::Limit(message)) if message == "tensor descriptors minimum encoded size exceeds remaining metadata budget"
+        ));
+        assert!(matches!(
+            Gguf::read(Cursor::new(bytes), Limits::default()),
+            Err(Error::Invalid(message)) if message == "tensor descriptors minimum encoded size exceeds remaining file bytes"
+        ));
+    }
+    struct ReadMeter {
+        cursor: Cursor<Vec<u8>>,
+        calls: usize,
+        bytes: usize,
+        largest_request: usize,
+        max_read: usize,
+        fail_at: Option<u64>,
+    }
+    impl ReadMeter {
+        fn new(bytes: Vec<u8>) -> Self {
+            Self {
+                cursor: Cursor::new(bytes),
+                calls: 0,
+                bytes: 0,
+                largest_request: 0,
+                max_read: usize::MAX,
+                fail_at: None,
+            }
+        }
+    }
+    impl Read for ReadMeter {
+        fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+            self.calls += 1;
+            self.largest_request = self.largest_request.max(output.len());
+            let mut count = output.len().min(self.max_read);
+            if let Some(end) = self.fail_at {
+                if self.cursor.position() >= end {
+                    return Err(io::Error::other("injected header I/O failure"));
+                }
+                count = count.min((end - self.cursor.position()) as usize);
+            }
+            let actual = self.cursor.read(&mut output[..count])?;
+            self.bytes += actual;
+            Ok(actual)
+        }
+    }
+    impl Seek for ReadMeter {
+        fn seek(&mut self, position: SeekFrom) -> io::Result<u64> {
+            self.cursor.seek(position)
+        }
+    }
+
+    #[test]
+    fn large_metadata_uses_bounded_batched_reads_and_preserves_reader_position() {
+        let mut metadata = BTreeMap::new();
+        metadata.insert(
+            "tokenizer.ggml.tokens".into(),
+            Value::Array {
+                element_type: 8,
+                values: (0..12_000)
+                    .map(|index| Value::String(format!("token-{index:06}-界")))
+                    .collect(),
+            },
+        );
+        let mut bytes = Vec::new();
+        write(&mut bytes, &metadata, &[]).unwrap();
+        let mut meter = ReadMeter::new(bytes);
+        {
+            let parsed = Gguf::read(&mut meter, Limits::default()).unwrap();
+            assert_eq!(parsed.metadata, metadata);
+            assert!(parsed.tensors.is_empty());
+            // The original empty-directory offset is the exact logical end,
+            // before any optional writer padding.
+            assert_eq!(parsed.reader.cursor.position(), parsed.data_offset);
+        }
+        assert!(
+            meter.calls <= 100,
+            "small per-value reads escaped to the backing reader: {}",
+            meter.calls
+        );
+        assert!(meter.largest_request <= 64 * 1024);
+    }
+
+    #[test]
+    fn header_read_ahead_never_exceeds_the_remaining_byte_budget() {
+        let mut bytes = sample();
+        bytes.resize(200_000, 0);
+        let mut meter = ReadMeter::new(bytes);
+        let limits = Limits {
+            max_metadata_bytes: 32,
+            ..Limits::default()
+        };
+        assert!(matches!(
+            Gguf::read(&mut meter, limits),
+            Err(Error::Limit(_))
+        ));
+        assert!(meter.bytes <= 32, "prefetched {} bytes", meter.bytes);
+        assert!(meter.cursor.position() <= 32);
+    }
+
+    #[test]
+    fn buffered_headers_preserve_short_reads_io_errors_and_payload_seeks() {
+        let mut meter = ReadMeter::new(sample());
+        meter.max_read = 3;
+        {
+            let mut parsed = Gguf::read(&mut meter, Limits::default()).unwrap();
+            // sample(): 24-byte preamble + 37-byte array + 33-byte string
+            // entry + 33-byte tensor descriptor; the data starts at 128.
+            assert_eq!(parsed.reader.cursor.position(), 127);
+            assert_eq!(parsed.data_offset, 128);
+            assert_eq!(parsed.read_f32("x").unwrap(), [1.0, -2.0]);
+        }
+        assert_eq!(meter.cursor.position(), 136);
+        let mut failing = ReadMeter::new(sample());
+        failing.max_read = 7;
+        failing.fail_at = Some(40);
+        assert!(matches!(
+            Gguf::read(&mut failing, Limits::default()),
+            Err(Error::Io(error)) if error.kind() == io::ErrorKind::Other
+        ));
+        assert_eq!(failing.cursor.position(), 40);
     }
 }

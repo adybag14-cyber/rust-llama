@@ -1,0 +1,153 @@
+{
+  "host": "windows",
+  "started_utc": "2026-11-09T16:58:56.970961+00:00",
+  "repo": "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\qwen-validation-draft",
+  "target_dir": "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\qwen-validation-draft\\target",
+  "input_fingerprint": "eb2e1f02b2647decefcfacf0312cf8ae7521b99f5f3f261cfcb0fab10107a6b9",
+  "input_count": 623,
+  "scope": "GGUF/inference all-target ordinary debug+release, strict Clippy, formatting, and all seven hash-pinned external inference model tests. Runtime algorithms and expected outputs unchanged.",
+  "steps": [
+    {
+      "name": "toolchain",
+      "command": [
+        "rustc",
+        "-vV"
+      ],
+      "started_utc": "2026-11-09T16:58:57.418971+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1702136993408203,
+      "finished_utc": "2026-11-09T16:58:57.589181+00:00",
+      "stdout": {
+        "path": "toolchain.stdout.log",
+        "bytes": 194,
+        "sha256": "341fed434cf52bd9ba5ab2f3507dbd943a2062212028574e529fc3e7e5ecd7a8"
+      },
+      "stderr": {
+        "path": "toolchain.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "cargo-version",
+      "command": [
+        "cargo",
+        "-vV"
+      ],
+      "started_utc": "2026-11-09T16:58:58.099066+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04424428939819336,
+      "finished_utc": "2026-11-09T16:58:58.143306+00:00",
+      "stdout": {
+        "path": "cargo-version.stdout.log",
+        "bytes": 321,
+        "sha256": "c5b2acca9eb8b506e8aabb0e86e73bae1fb5f9da8a37ee243992f18a529a5511"
+      },
+      "stderr": {
+        "path": "cargo-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-inference",
+        "--",
+        "--check"
+      ],
+      "started_utc": "2026-11-09T16:58:58.557849+00:00",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.3079547882080078,
+      "finished_utc": "2026-11-09T16:58:58.865800+00:00",
+      "stdout": {
+        "path": "format.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "format.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "executables": 0
+      },
+      "evidence_lines": []
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "started_utc": "2026-11-09T16:58:59.312245+00:00",
+      "status": "failed",
+      "exit_code": 101,
+      "elapsed_seconds": 4.056426525115967,
+      "finished_utc": "2026-11-09T16:59:03.368654+00:00",
+      "stdout": {
+        "path": "debug.stdout.log",
+        "bytes": 2152,
+        "sha256": "d5b93d06b75c01f95ab017dd8390d1d385c91d79b08d4d7dfdf9b17690f7e815"
+      },
+      "stderr": {
+        "path": "debug.stderr.log",
+        "bytes": 1438,
+        "sha256": "dff47f83ddc2be88da43cf94417bd38f7c1fd2993f92389f6ff0c12bcd25b271"
+      },
+      "test_totals": {
+        "passed": 16,
+        "failed": 1,
+        "ignored": 2,
+        "executables": 5
+      },
+      "evidence_lines": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s",
+        "native missing-pooling default: 3 prompts, 11 token embeddings, 3 explicit mean vectors, 56 floats, max_abs=0.000000000e0"
+      ]
+    }
+  ],
+  "status": "failed",
+  "finished_utc": "2026-11-09T16:59:03.825872+00:00",
+  "error": "RuntimeError('debug failed; see preserved logs')",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\validate_candidate.py\", line 87, in <module>\n    run('debug',['cargo','test','--offline','--locked','-p','llama-gguf','-p','llama-inference','--all-targets','--','--nocapture'])\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\validate_candidate.py\", line 81, in run\n    raise RuntimeError(label+' failed; see preserved logs')\nRuntimeError: debug failed; see preserved logs\n"
+}

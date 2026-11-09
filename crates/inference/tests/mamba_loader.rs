@@ -160,9 +160,11 @@ fn missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights() {
         rejected_metadata("general.type", Some(Value::String("adapter".into()))),
         Error::Unsupported(_)
     ));
+    // Sharded loading is implemented: this declaration still fails because
+    // the primary file lacks the required split.no, before any weight reads.
     assert!(matches!(
         rejected_metadata("split.count", Some(Value::U16(2))),
-        Error::Unsupported(_)
+        Error::Invalid(message) if message == "invalid GGUF: missing split.no"
     ));
 }
 

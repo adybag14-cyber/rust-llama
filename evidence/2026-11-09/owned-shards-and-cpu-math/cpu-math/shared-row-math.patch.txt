@@ -1,0 +1,1461 @@
+--- a/crates/model-runtime/src/math/native_rows.rs
++++ b/crates/model-runtime/src/math/native_rows.rs
+@@ -1,190 +1,5 @@
+-//! Frozen scalar/SSE2 F32 row policies, expressed in safe Rust.
++//! Compatibility facade for the shared safe scalar/SSE2 CPU row routines.
+ //!
+-//! The SSE2 policy follows the no-FMA branch in the original ggml vec.h.
+-//! Four-element prefixes and scalar tails are part of the numerical contract.
+-//! Environment: round-to-nearest ties-to-even and gradual underflow. The API
+-//! does not promise to reproduce floating exception status flags.
+-#![forbid(unsafe_code)]
+-
+-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+-pub enum MathPolicy {
+-    Scalar,
+-    Sse2,
+-}
+-
+-pub const fn native_math_policy() -> MathPolicy {
+-    if cfg!(all(
+-        target_arch = "x86_64",
+-        target_os = "linux",
+-        target_env = "gnu"
+-    )) {
+-        MathPolicy::Sse2
+-    } else {
+-        MathPolicy::Scalar
+-    }
+-}
+-
+-/// SiLU on one source row. Do not split a row into arbitrary scalar calls.
+-pub fn silu_f32_in_place(values: &mut [f32]) {
+-    silu_f32_with_policy(values, native_math_policy());
+-}
+-
+-/// Select the vector-prefix policy explicitly. Scalar tail exp uses the target
+-/// platform's normal Rust/libm lowering, even for an explicitly selected policy.
+-pub fn silu_f32_with_policy(values: &mut [f32], policy: MathPolicy) {
+-    let prefix = if policy == MathPolicy::Sse2 {
+-        values.len() / 4 * 4
+-    } else {
+-        0
+-    };
+-    let (vector, tail) = values.split_at_mut(prefix);
+-    for group in vector.as_chunks_mut::<4>().0 {
+-        let exponent = sse2_exp_f32x4(group.map(|v| 0.0 - v));
+-        for (value, exp) in group.iter_mut().zip(exponent) {
+-            *value /= 1.0 + exp;
+-        }
+-    }
+-    for value in tail {
+-        *value /= 1.0 + (-*value).exp();
+-    }
+-}
+-
+-/// Replace one row with exp(value-maximum) and return the original F64 sum.
+-/// The caller retains source maximum validation and final reciprocal scaling.
+-pub fn softmax_exp_sum_f32_in_place(values: &mut [f32], maximum: f32) -> f64 {
+-    softmax_exp_sum_f32_with_policy(values, maximum, native_math_policy())
+-}
+-
+-pub fn softmax_exp_sum_f32_with_policy(
+-    values: &mut [f32],
+-    maximum: f32,
+-    policy: MathPolicy,
+-) -> f64 {
+-    let prefix = if policy == MathPolicy::Sse2 {
+-        values.len() / 4 * 4
+-    } else {
+-        0
+-    };
+-    let (vector, tail) = values.split_at_mut(prefix);
+-    let mut sum = 0.0_f64;
+-    for group in vector.as_chunks_mut::<4>().0 {
+-        let output = sse2_exp_f32x4(group.map(|v| v - maximum));
+-        group.copy_from_slice(&output);
+-        // Original no-AVX SSE2 shuffle: adjacent pairs in F32, then one F32 add.
+-        let pairs = ordered_add_f32(
+-            ordered_add_f32(output[0], output[1]),
+-            ordered_add_f32(output[2], output[3]),
+-        );
+-        sum = ordered_add_f64(sum, pairs as f64);
+-    }
+-    for value in tail {
+-        *value = (*value - maximum).exp();
+-        sum = if policy == MathPolicy::Sse2 {
+-            ordered_add_f64(sum, *value as f64)
+-        } else {
+-            sum + *value as f64
+-        };
+-    }
+-    sum
+-}
+-
+-/// Original four-lane SSE2 exponential. Constants are exact source F32 bits.
+-/// This intentionally reproduces the original approximation and scaling, rather
+-/// than replacing it with a differently rounded scalar exponential.
+-pub fn sse2_exp_f32x4(input: [f32; 4]) -> [f32; 4] {
+-    let parts = input.map(|x| {
+-        let z = x * f32::from_bits(0x3fb8_aa3b) + f32::from_bits(0x4b40_0000);
+-        let n = z - f32::from_bits(0x4b40_0000);
+-        let b = (x - n * f32::from_bits(0x3f31_7200)) - n * f32::from_bits(0x35bf_be8e);
+-        let exponent = z.to_bits().wrapping_shl(23);
+-        let scale = f32::from_bits(exponent.wrapping_add(0x3f80_0000));
+-        let squared = b * b;
+-        let first = f32::from_bits(0x3c07_2010) * b + f32::from_bits(0x3d2b_9f17);
+-        let second = f32::from_bits(0x3e2a_af33) * b + f32::from_bits(0x3eff_fedb);
+-        let polynomial = (first * squared + second) * squared + f32::from_bits(0x3f7f_fff6) * b;
+-        (n, exponent, scale, polynomial)
+-    });
+-    // The source branches once for the complete vector, not once per element.
+-    if !parts.iter().any(|p| p.0.abs() > 126.0) {
+-        return parts.map(|(_, _, scale, polynomial)| polynomial * scale + scale);
+-    }
+-    parts.map(|(n, exponent, scale, polynomial)| {
+-        let shift = if n <= 0.0 { 0x8200_0000_u32 } else { 0 };
+-        let high = f32::from_bits(shift.wrapping_add(0x7f00_0000));
+-        let low = f32::from_bits(exponent.wrapping_sub(shift));
+-        if n.abs() > 192.0 {
+-            high * high
+-        } else if n.abs() > 126.0 {
+-            (low * polynomial + low) * high
+-        } else {
+-            scale * polynomial + scale
+-        }
+-    })
+-}
+-
+-// Scalar Rust/LLVM may commute an add and choose a different NaN payload.
+-// The frozen GNU SSE2 shuffle and F64 accumulator preserve the first NaN.
+-fn ordered_add_f32(left: f32, right: f32) -> f32 {
+-    if left.is_nan() {
+-        f32::from_bits(left.to_bits() | 0x0040_0000)
+-    } else if right.is_nan() {
+-        f32::from_bits(right.to_bits() | 0x0040_0000)
+-    } else {
+-        left + right
+-    }
+-}
+-fn ordered_add_f64(left: f64, right: f64) -> f64 {
+-    if left.is_nan() {
+-        f64::from_bits(left.to_bits() | 0x0008_0000_0000_0000)
+-    } else if right.is_nan() {
+-        f64::from_bits(right.to_bits() | 0x0008_0000_0000_0000)
+-    } else {
+-        left + right
+-    }
+-}
+-
+-/// Center a whole contiguous F32 row using the original variance reduction.
+-/// The return value is the F64 square sum divided by the row width. A NORM
+-/// caller rounds it to F32 before adding epsilon and computing its scale.
+-/// An empty row returns the original floating zero-divided-by-zero result.
+-pub fn center_f32_and_variance(values: &mut [f32], mean: f32) -> f64 {
+-    center_f32_and_variance_with_policy(values, mean, native_math_policy())
+-}
+-
+-pub fn center_f32_and_variance_with_policy(
+-    values: &mut [f32],
+-    mean: f32,
+-    policy: MathPolicy,
+-) -> f64 {
+-    let width = values.len();
+-    let prefix = width / 4 * 4;
+-    let (vector, tail) = values.split_at_mut(prefix);
+-    let mut sum = 0.0_f64;
+-    for group in vector.as_chunks_mut::<4>().0 {
+-        for value in group.iter_mut() {
+-            *value -= mean;
+-        }
+-        let squares = group.map(|value| value * value);
+-        if policy == MathPolicy::Sse2 {
+-            let paired = ordered_add_f32(
+-                ordered_add_f32(squares[0], squares[1]),
+-                ordered_add_f32(squares[2], squares[3]),
+-            );
+-            sum = ordered_add_f64(sum, paired as f64);
+-        } else {
+-            // The frozen MSVC scalar function unrolls four iterations. Each
+-            // F64 add places the new square in the first operand; its scalar
+-            // tail places the running sum first. Numeric reduction order is
+-            // unchanged, but the distinction preserves observed NaN payloads.
+-            for square in squares {
+-                sum = ordered_add_f64(square as f64, sum);
+-            }
+-        }
+-    }
+-    for value in tail {
+-        *value -= mean;
+-        let squared = *value * *value;
+-        sum = ordered_add_f64(sum, squared as f64);
+-    }
+-    sum / width as f64
+-}
++//! Tensor and inference use one maintained implementation. This module preserves
++//! the existing model-runtime public API path.
++pub use llama_quant::cpu_math::*;
+--- /dev/null
++++ b/crates/platform-loader/README.md
+@@ -0,0 +1,39 @@
++# Standard OS integration boundaries
++
++This crate contains the narrow Rust boundaries for native driver loading and
++system scalar math. It does not load llama/ggml or compile any project C/C++.
++
++## System scalar ERF
++
++The frozen CPU GELU_ERF uses the operating system's C-runtime
++`float erff(float)`. `math::erf_f32` exposes the same function through a safe
++`Option<f32>` API. The only unsafe operation is an audited call with one F32
++argument and one F32 result; no pointers, ownership, callbacks or allocation
++cross this boundary.
++
++| Build target | Linkage | Independently exercised runtime |
++| --- | --- | --- |
++| x86_64 Windows MSVC, dynamic CRT | Standard `ucrt` import library | `ucrtbase.dll` 10.0.26100.9711 |
++| x86_64 Linux GNU, dynamic CRT | Standard `-lm` system import | glibc libm 2.35 |
++| Other targets or static CRT | No ERF import from this module | Returns `None`; caller chooses its explicit fallback |
++
++Target selection identifies a linkage profile, not a guarantee for every future
++version of its runtime. `math::erf_provider` reports the selected provider.
++Tensor execution uses the existing independently bounded pure Rust
++mathematical ERF when this module declines a provider.
++
++The two original operating-system captures each contain **502,058 raw F32
++inputs and outputs**, including all half/bfloat encodings represented in F32,
++dense finite points, seeded raw bits, signed zero, infinities and NaN payloads.
++Both debug and release regression tests require exact output words against
++the matching host's independently captured reference. The fixtures and their
++provider/source hashes are under `tests/fixtures`. An additional original
++GGML graph corpus checks the enclosing GELU_ERF and GEGLU_ERF computations.
++
++The numerical environment is nearest-even rounding with gradual underflow.
++This API does not change the floating environment or promise floating exception
++status-flag parity. Cross-CRT equality, unmeasured runtime versions and other
++target profiles remain separate verification requirements.
++
++This addition introduces no third-party Cargo dependency, build script, C shim,
++vendor math library, or original-project binary into the Rust product.
+--- a/crates/platform-loader/src/lib.rs
++++ b/crates/platform-loader/src/lib.rs
+@@ -3,6 +3,8 @@
+ //! This is an integration seam pending T01 platform integration. It never loads
+ //! llama/ggml and is intentionally not Send or Sync. Symbols must not outlive
+ //! the library that owns them.
++pub mod math;
++
+ use std::ffi::{CStr, CString, c_void};
+ use std::fmt;
+ use std::ptr::NonNull;
+--- /dev/null
++++ b/crates/platform-loader/src/math.rs
+@@ -0,0 +1,96 @@
++//! Narrow bindings to standard operating-system scalar math.
++//!
++//! The original CPU GELU_ERF calls the OS C-runtime erff. These declarations
++//! preserve that same external boundary; no llama/ggml or vendor math library is
++//! loaded. Only the two independently exercised dynamic-CRT target profiles
++//! select this provider. Other targets, including static-CRT configurations,
++//! return None so callers can select their documented pure Rust fallback.
++//!
++//! Numerical evidence assumes nearest-even rounding and gradual underflow.
++//! This API does not reproduce or reset floating exception status flags.
++
++/// The standard OS math provider selected at build time.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ErfProvider {
++    /// Windows Universal C Runtime, linked through its ucrt import library.
++    WindowsUcrt,
++    /// GNU/Linux system libm, linked with -lm.
++    GnuLibm,
++}
++
++pub const fn erf_provider() -> Option<ErfProvider> {
++    if cfg!(all(
++        target_arch = "x86_64",
++        target_os = "windows",
++        target_env = "msvc",
++        not(target_feature = "crt-static")
++    )) {
++        Some(ErfProvider::WindowsUcrt)
++    } else if cfg!(all(
++        target_arch = "x86_64",
++        target_os = "linux",
++        target_env = "gnu",
++        not(target_feature = "crt-static")
++    )) {
++        Some(ErfProvider::GnuLibm)
++    } else {
++        None
++    }
++}
++
++/// Call the platform's C float erff(float) when its ABI/linkage profile is
++/// exercised. Every F32 bit pattern is a valid argument, including infinities,
++/// signed zero and NaNs. This call owns no memory or external handle.
++pub fn erf_f32(value: f32) -> Option<f32> {
++    #[cfg(all(
++        target_arch = "x86_64",
++        any(
++            all(target_os = "windows", target_env = "msvc"),
++            all(target_os = "linux", target_env = "gnu")
++        ),
++        not(target_feature = "crt-static")
++    ))]
++    {
++        // SAFETY: erff has this exact C ABI on the two selected targets and
++        // accepts every C float value. The system import remains valid for the
++        // process lifetime. No pointer, alias, allocation or callback crosses
++        // the boundary; the result is an ordinary F32 value.
++        Some(unsafe { system::c_erff(value) })
++    }
++    #[cfg(not(all(
++        target_arch = "x86_64",
++        any(
++            all(target_os = "windows", target_env = "msvc"),
++            all(target_os = "linux", target_env = "gnu")
++        ),
++        not(target_feature = "crt-static")
++    )))]
++    {
++        let _ = value;
++        None
++    }
++}
++
++#[cfg(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    ),
++    not(target_feature = "crt-static")
++))]
++mod system {
++    #[cfg(target_os = "windows")]
++    #[link(name = "ucrt")]
++    unsafe extern "C" {
++        #[link_name = "erff"]
++        pub(super) fn c_erff(value: f32) -> f32;
++    }
++
++    #[cfg(target_os = "linux")]
++    #[link(name = "m")]
++    unsafe extern "C" {
++        #[link_name = "erff"]
++        pub(super) fn c_erff(value: f32) -> f32;
++    }
++}
+--- /dev/null
++++ b/crates/platform-loader/tests/system_erf.rs
+@@ -0,0 +1,91 @@
++//! The expected words were produced by an independently compiled native C++
++//! call to the operating system erff before this Rust boundary was implemented.
++#[cfg(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    ),
++    not(target_feature = "crt-static")
++))]
++use llama_platform_loader::math::{ErfProvider, erf_f32, erf_provider};
++
++#[cfg(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    ),
++    not(target_feature = "crt-static")
++))]
++#[test]
++fn native_system_erf_matches_all_captured_raw_float_words() {
++    let (expected_provider, bytes): (ErfProvider, &[u8]) = {
++        #[cfg(all(
++            target_arch = "x86_64",
++            target_os = "windows",
++            target_env = "msvc",
++            not(target_feature = "crt-static")
++        ))]
++        {
++            (
++                ErfProvider::WindowsUcrt,
++                include_bytes!("fixtures/system-erf-msvc-reference.bin"),
++            )
++        }
++        #[cfg(all(
++            target_arch = "x86_64",
++            target_os = "linux",
++            target_env = "gnu",
++            not(target_feature = "crt-static")
++        ))]
++        {
++            (
++                ErfProvider::GnuLibm,
++                include_bytes!("fixtures/system-erf-gnu-reference.bin"),
++            )
++        }
++    };
++    assert_eq!(erf_provider(), Some(expected_provider));
++    assert_eq!(&bytes[..8], b"ERFSYS01");
++    let count = u64::from_le_bytes(bytes[8..16].try_into().unwrap()) as usize;
++    assert_eq!(count, 502_058);
++    assert_eq!(bytes.len(), 16 + count * 8);
++    let inputs = &bytes[16..16 + count * 4];
++    let expected = &bytes[16 + count * 4..];
++    let mut mismatches = 0;
++    let mut examples = Vec::new();
++    for (index, (input, expected)) in inputs
++        .as_chunks::<4>()
++        .0
++        .iter()
++        .zip(expected.as_chunks::<4>().0)
++        .enumerate()
++    {
++        let input = u32::from_le_bytes(*input);
++        let expected = u32::from_le_bytes(*expected);
++        let actual = erf_f32(f32::from_bits(input)).unwrap().to_bits();
++        if actual != expected {
++            mismatches += 1;
++            if examples.len() < 16 {
++                examples.push((index, input, expected, actual));
++            }
++        }
++    }
++    assert_eq!(mismatches, 0, "raw-word mismatches: {examples:08x?}");
++    eprintln!("system erff provider {expected_provider:?}: {count} raw-word comparisons exact");
++}
++
++#[cfg(not(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    ),
++    not(target_feature = "crt-static")
++)))]
++#[test]
++fn unverified_or_static_crt_targets_decline_the_native_provider() {
++    assert_eq!(llama_platform_loader::math::erf_provider(), None);
++    assert_eq!(llama_platform_loader::math::erf_f32(0.0), None);
++}
+--- a/crates/quant/README.md
++++ b/crates/quant/README.md
+@@ -65,6 +65,23 @@
+ 
+ The reference consists of unmodified functions extracted from the frozen `ggml-quants.c`, including its original numeric codebooks and scalar conversion helpers. Q8_1 has no upstream dequantization entry point, so its expected output is produced by an independent C loop over the original struct's scale and quants. Integer/F32/F64 reference conversion uses C casts or copying. These exceptions are recorded in the provenance.
+ 
++## Shared safe CPU row arithmetic
++
++The dependency-free `cpu_math` module is shared by tensor execution and the
++model-runtime compatibility facade. It implements frozen scalar/SSE2 row
++SiLU, quick GELU, softmax exponentials/sums and centered variance using safe
++Rust and explicit F32/F64 rounding/grouping. Four-element vector prefixes
++restart at each source row; scalar tails use the current host's standard
++math lowering. Explicit MathPolicy selects grouping and does not emulate a
++foreign operating-system CRT.
++
++Existing model-runtime native-row fixtures remain the regression gate for
++the moved code. The tensor row-policy corpus adds 1,007 matching native graph
++cases per host, including F16/BF16 controls and odd packed GLU rows. A separate
++original-inline scalar quick-GELU oracle checks 502,058 raw F32 words on each
++host; portable SSE2 quick prefixes are also checked on both hosts against
++the GNU native graph bytes. This module adds no C dependency to this crate.
++
+ ## Remaining T03 work
+ 
+ Scalar codec and original weighted-encoder coverage is complete for the defined source entry points, with the explicit undefined-source qualifications above. Optimized CPU kernels/dispatch, ISA-specific numerical/performance checks and general GGML operation coverage remain open. Completing the scalar codec and CPU dot inventories does not close those gates. This crate does not claim throughput, pretrained-model parity or complete T03 coverage.
+--- /dev/null
++++ b/crates/quant/src/cpu_math.rs
+@@ -0,0 +1,215 @@
++//! Frozen scalar/SSE2 F32 row policies, expressed in safe Rust.
++//!
++//! The SSE2 policy follows the no-FMA branch in the original ggml vec.h.
++//! Four-element prefixes and scalar tails are part of the numerical contract.
++//! Environment: round-to-nearest ties-to-even and gradual underflow. The API
++//! does not promise to reproduce floating exception status flags.
++#![forbid(unsafe_code)]
++
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum MathPolicy {
++    Scalar,
++    Sse2,
++}
++
++pub const fn native_math_policy() -> MathPolicy {
++    if cfg!(all(
++        target_arch = "x86_64",
++        target_os = "linux",
++        target_env = "gnu"
++    )) {
++        MathPolicy::Sse2
++    } else {
++        MathPolicy::Scalar
++    }
++}
++
++/// SiLU on one source row. Do not split a row into arbitrary scalar calls.
++pub fn silu_f32_in_place(values: &mut [f32]) {
++    silu_f32_with_policy(values, native_math_policy());
++}
++
++/// Select the vector-prefix policy explicitly. Scalar tail exp uses the target
++/// platform's normal Rust/libm lowering, even for an explicitly selected policy.
++pub fn silu_f32_with_policy(values: &mut [f32], policy: MathPolicy) {
++    let prefix = if policy == MathPolicy::Sse2 {
++        values.len() / 4 * 4
++    } else {
++        0
++    };
++    let (vector, tail) = values.split_at_mut(prefix);
++    for group in vector.as_chunks_mut::<4>().0 {
++        let exponent = sse2_exp_f32x4(group.map(|v| 0.0 - v));
++        for (value, exp) in group.iter_mut().zip(exponent) {
++            *value /= 1.0 + exp;
++        }
++    }
++    for value in tail {
++        *value /= 1.0 + (-*value).exp();
++    }
++}
++
++/// Replace one row with exp(value-maximum) and return the original F64 sum.
++/// The caller retains source maximum validation and final reciprocal scaling.
++pub fn softmax_exp_sum_f32_in_place(values: &mut [f32], maximum: f32) -> f64 {
++    softmax_exp_sum_f32_with_policy(values, maximum, native_math_policy())
++}
++
++pub fn softmax_exp_sum_f32_with_policy(
++    values: &mut [f32],
++    maximum: f32,
++    policy: MathPolicy,
++) -> f64 {
++    let prefix = if policy == MathPolicy::Sse2 {
++        values.len() / 4 * 4
++    } else {
++        0
++    };
++    let (vector, tail) = values.split_at_mut(prefix);
++    let mut sum = 0.0_f64;
++    for group in vector.as_chunks_mut::<4>().0 {
++        let output = sse2_exp_f32x4(group.map(|v| v - maximum));
++        group.copy_from_slice(&output);
++        // Original no-AVX SSE2 shuffle: adjacent pairs in F32, then one F32 add.
++        let pairs = ordered_add_f32(
++            ordered_add_f32(output[0], output[1]),
++            ordered_add_f32(output[2], output[3]),
++        );
++        sum = ordered_add_f64(sum, pairs as f64);
++    }
++    for value in tail {
++        *value = (*value - maximum).exp();
++        sum = if policy == MathPolicy::Sse2 {
++            ordered_add_f64(sum, *value as f64)
++        } else {
++            sum + *value as f64
++        };
++    }
++    sum
++}
++
++/// Original four-lane SSE2 exponential. Constants are exact source F32 bits.
++/// This intentionally reproduces the original approximation and scaling, rather
++/// than replacing it with a differently rounded scalar exponential.
++pub fn sse2_exp_f32x4(input: [f32; 4]) -> [f32; 4] {
++    let parts = input.map(|x| {
++        let z = x * f32::from_bits(0x3fb8_aa3b) + f32::from_bits(0x4b40_0000);
++        let n = z - f32::from_bits(0x4b40_0000);
++        let b = (x - n * f32::from_bits(0x3f31_7200)) - n * f32::from_bits(0x35bf_be8e);
++        let exponent = z.to_bits().wrapping_shl(23);
++        let scale = f32::from_bits(exponent.wrapping_add(0x3f80_0000));
++        let squared = b * b;
++        let first = f32::from_bits(0x3c07_2010) * b + f32::from_bits(0x3d2b_9f17);
++        let second = f32::from_bits(0x3e2a_af33) * b + f32::from_bits(0x3eff_fedb);
++        let polynomial = (first * squared + second) * squared + f32::from_bits(0x3f7f_fff6) * b;
++        (n, exponent, scale, polynomial)
++    });
++    // The source branches once for the complete vector, not once per element.
++    if !parts.iter().any(|p| p.0.abs() > 126.0) {
++        return parts.map(|(_, _, scale, polynomial)| polynomial * scale + scale);
++    }
++    parts.map(|(n, exponent, scale, polynomial)| {
++        let shift = if n <= 0.0 { 0x8200_0000_u32 } else { 0 };
++        let high = f32::from_bits(shift.wrapping_add(0x7f00_0000));
++        let low = f32::from_bits(exponent.wrapping_sub(shift));
++        if n.abs() > 192.0 {
++            high * high
++        } else if n.abs() > 126.0 {
++            (low * polynomial + low) * high
++        } else {
++            scale * polynomial + scale
++        }
++    })
++}
++
++// Scalar Rust/LLVM may commute an add and choose a different NaN payload.
++// The frozen GNU SSE2 shuffle and F64 accumulator preserve the first NaN.
++fn ordered_add_f32(left: f32, right: f32) -> f32 {
++    if left.is_nan() {
++        f32::from_bits(left.to_bits() | 0x0040_0000)
++    } else if right.is_nan() {
++        f32::from_bits(right.to_bits() | 0x0040_0000)
++    } else {
++        left + right
++    }
++}
++fn ordered_add_f64(left: f64, right: f64) -> f64 {
++    if left.is_nan() {
++        f64::from_bits(left.to_bits() | 0x0008_0000_0000_0000)
++    } else if right.is_nan() {
++        f64::from_bits(right.to_bits() | 0x0008_0000_0000_0000)
++    } else {
++        left + right
++    }
++}
++
++/// Center a whole contiguous F32 row using the original variance reduction.
++/// The return value is the F64 square sum divided by the row width. A NORM
++/// caller rounds it to F32 before adding epsilon and computing its scale.
++/// An empty row returns the original floating zero-divided-by-zero result.
++pub fn center_f32_and_variance(values: &mut [f32], mean: f32) -> f64 {
++    center_f32_and_variance_with_policy(values, mean, native_math_policy())
++}
++
++pub fn center_f32_and_variance_with_policy(
++    values: &mut [f32],
++    mean: f32,
++    policy: MathPolicy,
++) -> f64 {
++    let width = values.len();
++    let prefix = width / 4 * 4;
++    let (vector, tail) = values.split_at_mut(prefix);
++    let mut sum = 0.0_f64;
++    for group in vector.as_chunks_mut::<4>().0 {
++        for value in group.iter_mut() {
++            *value -= mean;
++        }
++        let squares = group.map(|value| value * value);
++        if policy == MathPolicy::Sse2 {
++            let paired = ordered_add_f32(
++                ordered_add_f32(squares[0], squares[1]),
++                ordered_add_f32(squares[2], squares[3]),
++            );
++            sum = ordered_add_f64(sum, paired as f64);
++        } else {
++            // The frozen MSVC scalar function unrolls four iterations. Each
++            // F64 add places the new square in the first operand; its scalar
++            // tail places the running sum first. Numeric reduction order is
++            // unchanged, but the distinction preserves observed NaN payloads.
++            for square in squares {
++                sum = ordered_add_f64(square as f64, sum);
++            }
++        }
++    }
++    for value in tail {
++        *value -= mean;
++        let squared = *value * *value;
++        sum = ordered_add_f64(sum, squared as f64);
++    }
++    sum / width as f64
++}
++
++/// F32 quick GELU on a source row, including its distinct vector division and
++/// scalar reciprocal-multiply rounding. Half/BF16 activation kernels do not
++/// use this F32 row policy.
++pub fn gelu_quick_f32_in_place(values: &mut [f32]) {
++    gelu_quick_f32_with_policy(values, native_math_policy());
++}
++
++pub fn gelu_quick_f32_with_policy(values: &mut [f32], policy: MathPolicy) {
++    let prefix = if policy == MathPolicy::Sse2 {
++        values.len() / 4 * 4
++    } else {
++        0
++    };
++    let (vector, tail) = values.split_at_mut(prefix);
++    for group in vector.as_chunks_mut::<4>().0 {
++        let exponent = sse2_exp_f32x4(group.map(|value| value * -1.702_f32));
++        for (value, exp) in group.iter_mut().zip(exponent) {
++            *value /= 1.0 + exp;
++        }
++    }
++    for value in tail {
++        *value *= 1.0 / (1.0 + (-1.702_f32 * *value).exp());
++    }
++}
+--- a/crates/quant/src/lib.rs
++++ b/crates/quant/src/lib.rs
+@@ -12,6 +12,8 @@
+ //! them. Activation codecs and scalar conversion helpers remain distinct from
+ //! stored model weight support. Optimized CPU/backend parity is separate.
+ #![forbid(unsafe_code)]
++
++pub mod cpu_math;
+ 
+ mod activation;
+ mod conversion;
+--- /dev/null
++++ b/crates/quant/tests/cpu_math_scalar.rs
+@@ -0,0 +1,50 @@
++#![cfg(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    )
++))]
++use llama_quant::cpu_math::{MathPolicy, gelu_quick_f32_with_policy};
++
++#[test]
++fn scalar_quick_gelu_matches_original_inline_function_on_this_host() {
++    #[cfg(target_os = "windows")]
++    let bytes = include_bytes!("fixtures/quick-scalar-msvc-reference.bin").as_slice();
++    #[cfg(target_os = "linux")]
++    let bytes = include_bytes!("fixtures/quick-scalar-gnu-reference.bin").as_slice();
++    assert_eq!(&bytes[..8], b"QSCL0001");
++    let count = u64::from_le_bytes(bytes[8..16].try_into().unwrap()) as usize;
++    assert_eq!(count, 502_058);
++    assert_eq!(bytes.len(), 16 + count * 8);
++    let source = &bytes[16..16 + count * 4];
++    let expected = &bytes[16 + count * 4..];
++    let mut values = source
++        .as_chunks::<4>()
++        .0
++        .iter()
++        .map(|word| f32::from_le_bytes(*word))
++        .collect::<Vec<_>>();
++    gelu_quick_f32_with_policy(&mut values, MathPolicy::Scalar);
++    let mut different = 0;
++    let mut examples = Vec::new();
++    for (index, (actual, expected)) in values.iter().zip(expected.as_chunks::<4>().0).enumerate() {
++        let expected = u32::from_le_bytes(*expected);
++        if actual.to_bits() != expected {
++            different += 1;
++            if examples.len() < 16 {
++                examples.push((
++                    index,
++                    u32::from_le_bytes(source[index * 4..index * 4 + 4].try_into().unwrap()),
++                    actual.to_bits(),
++                    expected,
++                ));
++            }
++        }
++    }
++    assert_eq!(
++        different, 0,
++        "scalar quick GELU mismatches(index,input,actual,expected):{examples:08x?}"
++    );
++    println!("Original scalar quick GELU: {count} raw float output words exact");
++}
+--- a/crates/tensor/CPU_SUPPORT.md
++++ b/crates/tensor/CPU_SUPPORT.md
+@@ -98,7 +98,7 @@
+ | 89 | `DSV4_HC_PRE` | Pending | — | No executable Op constructor; no fallback result. |
+ | 90 | `DSV4_HC_POST` | Pending | — | No executable Op constructor; no fallback result. |
+ | 91 | `TOP_K_MASK` | Implemented slice | F32/F16 mask + I32 indices | Optional score/block/extra inputs, source invalid-index skipping, batch repeats, raw retained payload bits. |
+-| 92 | `UNARY` | Implemented slice | F32 / F16 / BF16 | All 22 scalar formulas; XIELU needs explicit parameters; exact UCRT ERF bit parity remains open. |
++| 92 | `UNARY` | Implemented slice | F32 / F16 / BF16 | All 22 scalar formulas; XIELU needs explicit parameters; OS ERF provider exact on verified dynamic-CRT profiles; mathematical fallback elsewhere. |
+ | 93 | `MAP_CUSTOM1` | Pending | — | No executable Op constructor; no fallback result. |
+ | 94 | `MAP_CUSTOM2` | Pending | — | No executable Op constructor; no fallback result. |
+ | 95 | `MAP_CUSTOM3` | Pending | — | No executable Op constructor; no fallback result. |
+@@ -123,7 +123,7 @@
+ | 1 | GEGLU | F32/F16/BF16 | `Glu` / `GluPacked`; dtype-specific GELU rounding |
+ | 2 | SWIGLU | F32/F16/BF16 | `Glu` / `GluPacked` |
+ | 3 | SWIGLU_OAI | F32/F16 | `SwiGluOai` / `SwiGluOaiPacked`; explicit alpha and limit |
+-| 4 | GEGLU_ERF | F32/F16/BF16 | `Glu` / `GluPacked`; portable ERF numerical contract |
++| 4 | GEGLU_ERF | F32/F16/BF16 | `Glu` / `GluPacked`; verified OS ERF or explicit mathematical fallback |
+ | 5 | GEGLU_QUICK | F32/F16/BF16 | `Glu` / `GluPacked` |
+ | 6 | SWIGLU_CLAMP | F32/F16 | `SwiGluClamp` / `SwiGluClampPacked`; explicit limit |
+ 
+@@ -135,7 +135,7 @@
+ 
+ ## Still open
+ 
+-Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The portable ERF implementation's exact equivalence to Windows UCRT `erff` also remains open; a numerical-comparison pass does not close that requirement.
++Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The retained portable ERF is a mathematical fallback, not a foreign-libm emulator. Exact provider equivalence outside the exercised x86_64 dynamic-UCRT/glibc profiles remains open; the new same-profile byte gate is separate from historical numerical comparisons.
+ 
+ ## Convolution, extraction, pooling and resize bounds
+ 
+@@ -166,11 +166,17 @@
+ layouts, or antialiased nearest/bicubic modes. General graph autodiff remains
+ open; the two new backward operators require their gradients explicitly.
+ 
+-## Separate GNU vector-row policy work
++## Shared scalar and GNU SSE2 row policies
+ 
+-The previously captured scalar NORM, SiLU and softmax references are the frozen
+-MSVC profile. GNU selects additional SSE2 vector-prefix policies in these
+-operators. The independently verified row helpers developed for model-runtime
+-have not yet been wired into this tensor crate. GNU exact row-policy completion
+-for those existing operators remains a separate integration item; passing the
+-convolution or indexing cohort does not close it.
++Tensor and inference now share `llama_quant::cpu_math`. F32 SiLU/quick GELU
++and their GLUs apply the source row's vector prefix and scalar tail. Softmax
++uses the corresponding exponential and reduction grouping. Contiguous NORM
++uses profile-specific centered variance; strided NORM and RMS_NORM retain
++their independent source arithmetic. F16/BF16 scalar/table paths are unchanged.
++
++The independent matching-profile gate contains 1,007 graphs per host and
++2,909,056 exact output bytes. It includes 72 odd packed-row cases, raw NaNs,
++infinities and subnormals; no numerical tolerance is used for this gate.
++The platform-loader OS-erff boundary independently matches 502,058 raw words
++per host. See README for runtime versions, fallback proof and preserved prior
++failures. MathPolicy changes vector grouping but keeps the target's scalar CRT.
+--- a/crates/tensor/Cargo.toml
++++ b/crates/tensor/Cargo.toml
+@@ -10,3 +10,6 @@
+ 
+ [dependencies]
+ llama-quant = { path = "../quant" }
++
++[target.'cfg(all(target_arch = "x86_64", any(all(target_os = "windows", target_env = "msvc"), all(target_os = "linux", target_env = "gnu"))))'.dependencies]
++llama-platform-loader = { path = "../platform-loader" }
+--- a/crates/tensor/README.md
++++ b/crates/tensor/README.md
+@@ -85,7 +85,7 @@
+ calculation and is then truncated to I32 for actual sample coordinates. Max
+ pooling starts at negative F32 maximum and preserves the original comparator
+ argument order, signed zeros and NaN payloads. Backward max pooling preserves the
+-source's first-maximum tie behavior and explicit NaN comparisons. Forward average pooling
++source's first-maximum tie behavior and explicit NaN comparisons. Average pooling
+ retains the first NaN accumulated by the original kernels; its initial payload
+ mismatch and all native values are preserved in external evidence.
+ 
+@@ -115,10 +115,13 @@
+ enum error remain in the evidence. These exceptional-value comparisons run only
+ on the two verified x86_64 MSVC/GNU targets; other toolchains remain unverified.
+ 
+-The independently verified GNU vector-row policies for existing SiLU, softmax
+-and NORM are a separate integration item. Their model-runtime helpers do not
+-automatically change this tensor executor, whose earlier scalar fixture set
+-targets the frozen MSVC profile.
++Tensor and model-runtime now consume one maintained safe implementation in
++`llama_quant::cpu_math`. F32 SiLU, quick GELU, SwiGLU and quick GEGLU restart
++the GNU four-element vector prefix at each logical inner row; scalar tails keep
++the host CRT expression. Softmax preserves the original exponential/reduction
++grouping. Contiguous NORM uses the source-profile centered variance; strided
++NORM and RMS_NORM retain their separate native reductions. F16/BF16 activation
++paths keep their original scalar or lookup arithmetic.
+ 
+ ### Source activation rounding
+ 
+@@ -126,25 +129,66 @@
+ 
+ The source has two different softplus expressions. UNARY SOFTPLUS uses `log1pf(expf(x))` below its threshold. XIELU's constructor coefficient helper uses `logf(1 + expf(x))`. The implementation and tiny-value fixtures keep that distinction. REGLU/RELU and hard-sigmoid also preserve the source's NaN and signed-zero branches.
+ 
+-## ERF accuracy and native parity are separate gates
+-
+-The Rust 1.99.1 toolchain still reports `f32::erf` as the unstable `float_erf` feature. The maintained implementation therefore uses a dependency-free positive-term F64 series, then one F32 conversion. For `|x| >= 4`, the exact ERF value rounds to the returned signed 1 in F32.
+-
+-For smaller arguments, successive series ratios decrease. After term `t` with next ratio `r < 1`, the omitted positive tail is bounded by `t*r/(1-r)`. Iteration only stops when that bound is at most one eighth of F64 epsilon times the sum; the maximum is 160 terms. This bounds truncation separately from floating evaluation and the standard F64 exp/sqrt implementation. The final F32 rounding contributes at most half the adjacent F32 spacing. Correct rounding for every possible F32 input is not formally proved.
+-
+-An independent 80-decimal-digit mpmath oracle supplies **48,455 nonnegative arguments**, also checked at their negative counterparts: **96,910** accuracy checks. Inputs include all finite F16/BF16 activation arguments in the nonsaturated range, a dense grid, powers of two and nearby boundary values. Every tested result is the correctly rounded F32 value; the observed maximum absolute rounding error is **2.98014634e-8**. Those mathematical references never replace the native GGML outputs.
+-
+-**Exact Windows UCRT erff equivalence remains open.** For example, input GELU x = -2.0546875 produces native ERF bits bf75c885, while the correctly rounded mathematical ERF has bits bf75c883. That difference crosses a final F16 rounding boundary: native GELU is -0.040985107421875 and Rust is -0.041015625. The first failing 295-case capture and logs are preserved outside the product with SHA256 `74d04184c941a9058c5321cc568c7e81c458fbe3dcec9aa8ab64a6dc7ae4fa89`. The committed expanded native corpus retains the raw original values and exhaustively checks the finite F16/BF16 ERF domains.
+-
+-### Comparison criteria, independent of observed maxima
+-
+-Arithmetic, layout, integer and packed-dot cases compare exact output bits, except NaN payloads. Exhaustive finite F16 GELU/GELU_QUICK and BF16 GELU cases also use exact comparisons.
+-
+-The F32 transcendental comparison budget remains `B = 2e-6 + 2e-6*abs(reference)`. This is a numerical validation criterion, not a claim of exact platform libm reproduction. For F16/BF16 outputs the bound additionally includes half the adjacent output spacing for each result. If two underlying F32 values differ by at most B and each undergoes a final nearest-even conversion Q, then the triangle inequality gives:
+-
+-`|Q(a) - Q(b)| <= B + 0.5*spacing(Q(a)) + 0.5*spacing(Q(b))`.
+-
+-The test derives these spacing terms from dtype bits; it does not set a tolerance from the measured maximum. Finite/nonfinite classifications must still match, and all arithmetic gates stay exact. Four comparisons in the expanded corpus require this final-conversion envelope: three distinct finite F16 GELU_ERF inputs and one duplicate ordinary case. Numerical comparison success does **not** close exact UCRT ERF parity.
++## System ERF parity and mathematical fallback
++
++Rust 1.99.1 still reports `f32::erf` as unstable. On the two exercised
++x86_64 dynamic-CRT profiles, GELU_ERF and GEGLU_ERF therefore call the same
++standard OS `erff(float)` boundary as the source through a tiny audited binding
++in `llama-platform-loader`. Windows uses the UCRT import library; GNU/Linux
++uses system libm. This is an explicit OS runtime dependency, alongside the
++toolchain's existing system math/runtime imports. No original llama/ggml binary,
++vendor math package, C shim, registry crate or build script is part of the product.
++
++The captured Windows provider is UCRT **10.0.26100.9711**, and the GNU provider
++is glibc **2.35**. Each independently compiled native provider oracle recorded
++**502,058 distinct raw F32 inputs and outputs** before the Rust binding was
++written. Rust compares every output word exactly, including subnormals, both
++zero signs and NaN payloads. The new native graph corpus also checks actual
++GELU_ERF/GEGLU_ERF surrounding arithmetic, including all 65,536 F16 and all
++65,536 BF16 source words.
++
++Other targets, including static-CRT configurations, use the retained
++dependency-free positive-term F64 series, then one F32 conversion. For
++|x| >= 4 the exact mathematical result rounds to signed 1. For smaller
++arguments, successive series ratios decrease; after term t with next ratio
++r < 1, the omitted positive tail is bounded by t*r/(1-r). Iteration stops
++only below one eighth of F64 epsilon times the sum, with a maximum of
++160 terms. This bounds truncation separately from floating evaluation and the
++standard F64 exp/sqrt implementation. Final F32 rounding contributes at most
++half its adjacent spacing; correct rounding for every possible F32 input is
++not formally proved.
++
++The unchanged independent 80-digit mpmath oracle contains **48,455 nonnegative
++arguments**, also checked at their negative counterparts: **96,910 accuracy
++checks** for the portable implementation. Every tested result is correctly
++rounded F32; observed maximum absolute rounding error is **2.98014634e-8**.
++These mathematical references never replace native graph outputs.
++
++### Preserved earlier ERF failures and comparison criteria
++
++The original portable implementation differed from UCRT. At GELU x=-2.0546875,
++native ERF bits were bf75c885 while mathematical rounding produced bf75c883;
++the final F16 values were -0.040985107421875 and -0.041015625 respectively.
++The first failing 295-case capture (SHA256
++74d04184c941a9058c5321cc568c7e81c458fbe3dcec9aa8ab64a6dc7ae4fa89), the
++four original rounding-envelope failures and all raw expected bytes remain
++preserved. The new same-provider gate closes that measured OS boundary on the
++two exercised profiles; it does not claim that the mathematical approximation
++became bit-identical to every platform libm.
++
++The historical 297-case fixture retains its original numerical criteria:
++F32 transcendental budget B=2e-6+2e-6*abs(reference), with a half-spacing term
++for each final F16/BF16 conversion. The triangle inequality gives
++|Q(a)-Q(b)| <= B + 0.5*spacing(Q(a)) + 0.5*spacing(Q(b)).
++This bound is derived independently of observed maxima. The earlier four
++comparisons requiring it remain historical evidence, and cross-platform
++comparisons against that original MSVC fixture remain numerical comparisons.
++No expected value or tolerance has been changed to obtain a pass.
++
++The new matching-profile row corpus has **no tolerance and no NaN exemption**:
++every output byte must equal its original native capture. Floating exception
++flags are outside this tensor API; the verified environment uses nearest-even
++rounding and gradual underflow with FTZ/DAZ disabled.
+ 
+ ## Independent evidence
+ 
+@@ -164,9 +208,9 @@
+ 
+ The original **362 native graph cases** include every native weight matmul and out-product dtype, packed RHS input, typed unary/GLU kernels, batch expansion, row padding/permutation, uneven normalization groups, cancellation-sensitive reductions, signed zero/NaN branches, cropping/wrapping, repeated row indices and explicit backward operators. Exhaustive activation captures contain every one of the **63,488 finite F16 bit patterns** and every one of the **65,280 finite BF16 bit patterns**.
+ 
+-In the 297-case extension, **256,233 floating outputs use bit-exact checks** (including exact activation-table cases); **170,260 use the documented transcendental criteria**. On Windows, the latter contain **1,815 bit differences** from native, with maximum F32 difference **4.7683716e-7**. On GNU/Linux they contain **1,838 bit differences**, with maximum F32 difference **1.9073486e-6**; the maximum across all output dtypes is **9.765625e-4**, one F16 step. These observed maxima are reported separately from the criteria above.
+-
+-The indexing corpus adds **890 distinct graph cases per platform**: 6 ADD_ID, 59 MUL_MAT_ID, 51 SET_ROWS, 116 CPY/cast, 3 ACC, 6 SET, 225 ARGSORT, 408 TOP_K and 16 TOP_K_MASK. All new numerical outputs compare exact bytes in debug and release; no transcendental tolerance applies. Together with the 961 convolution/extraction/pooling/resize cases and 20 additional overlapping backward-pooling controls, the total is **2,233 distinct native graph cases**. The 890 indexing and 981 convolution/pooling cases were independently captured on both platforms, giving **4,104 native graph captures overall**.
++Before this shared-row extension, the 297-case extension reported **256,233 floating outputs use bit-exact checks** (including exact activation-table cases); **170,260 use the documented transcendental criteria**. On Windows, the latter contain **1,815 bit differences** from native, with maximum F32 difference **4.7683716e-7**. On GNU/Linux they contain **1,838 bit differences**, with maximum F32 difference **1.9073486e-6**; the maximum across all output dtypes is **9.765625e-4**, one F16 step. These observed maxima are reported separately from the criteria above.
++
++The indexing corpus adds **890 distinct graph cases per platform**: 6 ADD_ID, 59 MUL_MAT_ID, 51 SET_ROWS, 116 CPY/cast, 3 ACC, 6 SET, 225 ARGSORT, 408 TOP_K and 16 TOP_K_MASK. All new numerical outputs compare exact bytes in debug and release; no transcendental tolerance applies. Before the shared-row extension below, together with the 961 convolution/extraction/pooling/resize cases and 20 additional overlapping backward-pooling controls, the total was **2,233 distinct native graph cases**. The 890 indexing and 981 convolution/pooling cases were independently captured on both platforms, giving **4,104 native graph captures overall**.
+ 
+ Malformed-input tests cover unsupported parameterized variants, native undefined offsets, half-row strides, unsupported BF16 clamped GLU, shape/stride overflow, invalid indices, empty/extreme descriptors, allocation size checks, storage aliasing, I64 identity, node ownership, graph cancellation and zero-input nodes.
+ 
+@@ -177,10 +221,31 @@
+ - `cargo clippy -p llama-tensor --all-targets --offline -- -D warnings`
+ - `cargo fmt -p llama-tensor --check`
+ 
+-Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call uses one CPU thread. GNU's default `__SSE2__` also enables original SiLU/softmax exponential and NORM variance paths that MSVC does not select; the indexing and image-operation cases do not execute those operators, and this slice does not claim their native cross-platform equivalence. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
++Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call uses one CPU thread. GNU's default `__SSE2__` enables original SiLU/quick-GELU/softmax exponential and NORM variance paths that MSVC does not select. The new row-policy corpus checks those matching native profiles separately; it does not require GNU and Windows outputs to equal each other. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
++
++## Shared row-policy evidence
++
++This extension adds **1,007 distinct original graph cases per host**:
++935 whole-row/activation/normalization/softmax/OS-ERF cases and 72 odd packed
++GLU cases. Each matching profile requires exact equality for **2,909,056 output
++bytes**. Both swapped gate orders, row padding/permutation, scalar tails,
++half/bfloat control paths and raw exceptional payloads are retained. Odd
++packed rows keep the source's floor-half behavior and ignore the trailing scalar.
++
++The explicit SSE2 quick-GELU vector prefix is additionally checked against
++GNU native graph words on both hosts. Scalar quick GELU is checked separately
++against **502,058 raw inputs per host** through the original inline
++`ggml_gelu_quick_f32` function. MathPolicy selects arithmetic/vector grouping;
++its scalar operations use the current host's CRT. It does not emulate a foreign
++CRT. The initial failed GNU-to-UCRT scalar comparison is preserved alongside
++the corrected, independently captured matching-host gate.
++
++The old model-runtime native-row tests still run through its unchanged public
++module path, now a re-export of the quant implementation. The 96,910
++mathematical ERF checks remain independent of the new platform boundary.
+ 
+ ## Open T02 gates
+ 
+-The remaining 26 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, exact platform ERF behavior, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
++The remaining 26 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+ 
+ Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.
+--- a/crates/tensor/src/cpu.rs
++++ b/crates/tensor/src/cpu.rs
+@@ -194,11 +194,13 @@
+                         "softmax row has no finite maximum or contains NaN",
+                     ));
+                 }
+-                let mut sum = 0.0_f64;
+                 for (o, &v) in output.iter_mut().zip(input) {
+-                    *o = (v * scale - max).exp();
+-                    sum += *o as f64;
+-                }
++                    *o = v * scale;
++                }
++                if output.iter().any(|value| value.is_nan()) {
++                    return Err(TensorError::Parameters("softmax scaling produced a NaN"));
++                }
++                let sum = llama_quant::cpu_math::softmax_exp_sum_f32_in_place(output, max);
+                 let inv = (1.0 / sum) as f32;
+                 for o in output {
+                     *o *= inv;
+@@ -231,7 +233,12 @@
+                         squares += *o * *o;
+                     }
+                     squares / n[0] as f32
++                } else if matches!(op, Norm { .. }) {
++                    output.copy_from_slice(input);
++                    llama_quant::cpu_math::center_f32_and_variance(output, mean) as f32
+                 } else {
++                    // RMS_NORM retains the source scalar F32-product/F64-sum
++                    // reduction; it does not use the NORM SSE2 variance path.
+                     let mut squares = 0.0_f64;
+                     for (o, &v) in output.iter_mut().zip(input) {
+                         *o = v - mean;
+--- a/crates/tensor/src/cpu_extra.rs
++++ b/crates/tensor/src/cpu_extra.rs
+@@ -208,6 +208,20 @@
+                 return Err(TensorError::Unsupported(
+                     "XIELU requires explicit constructor parameters",
+                 ));
++            }
++            if a.dtype() == DType::F32 && matches!(kind, UnaryOp::SILU | UnaryOp::GELU_QUICK) {
++                let mut values = float_values(a)?;
++                if n[0] != 0 {
++                    for row in values.chunks_exact_mut(n[0]) {
++                        check_cancel(cancel)?;
++                        if *kind == UnaryOp::SILU {
++                            llama_quant::cpu_math::silu_f32_in_place(row);
++                        } else {
++                            llama_quant::cpu_math::gelu_quick_f32_in_place(row);
++                        }
++                    }
++                }
++                return Tensor::from_f32(n, &values);
+             }
+             typed_map(a, cancel, |x| activation(*kind, x, a.dtype()))
+         }
+@@ -1012,6 +1026,7 @@
+     };
+     let mut shape = an;
+     if b.is_none() {
++        // The frozen constructor deliberately floors odd packed row widths.
+         shape[0] /= 2;
+     }
+     if a.dtype() == DType::BF16 && matches!(kind, GluOp::SWIGLU_OAI | GluOp::SWIGLU_CLAMP) {
+@@ -1036,6 +1051,35 @@
+         ))?])?;
+     }
+     let mut out = zeros(count(shape)?)?;
++    if a.dtype() == DType::F32 && matches!(kind, GluOp::SWIGLU | GluOp::GEGLU_QUICK) {
++        if shape[0] != 0 {
++            for (row_index, output) in out.chunks_exact_mut(shape[0]).enumerate() {
++                check_cancel(cancel)?;
++                let offset = row_index * an[0];
++                let first = &x[offset..offset + shape[0]];
++                let second = if let Some(y) = &y {
++                    &y[offset..offset + shape[0]]
++                } else {
++                    &x[offset + shape[0]..offset + 2 * shape[0]]
++                };
++                let (gate, value) = if swap {
++                    (second, first)
++                } else {
++                    (first, second)
++                };
++                output.copy_from_slice(gate);
++                if kind == GluOp::SWIGLU {
++                    llama_quant::cpu_math::silu_f32_in_place(output);
++                } else {
++                    llama_quant::cpu_math::gelu_quick_f32_in_place(output);
++                }
++                for (output, value) in output.iter_mut().zip(value) {
++                    *output = glu_product(a.dtype(), *output, *value);
++                }
++            }
++        }
++        return Tensor::from_f32(shape, &out);
++    }
+     for (i, o) in out.iter_mut().enumerate() {
+         if i % 4096 == 0 {
+             check_cancel(cancel)?;
+@@ -1057,9 +1101,13 @@
+                 }
+             }
+             GluOp::GEGLU => activation(UnaryOp::GELU, gate, a.dtype())? * value,
+-            GluOp::SWIGLU => gate / (1.0 + (-gate).exp()) * value,
++            GluOp::SWIGLU => glu_product(a.dtype(), gate / (1.0 + (-gate).exp()), value),
+             GluOp::GEGLU_ERF => crate::cpu::unary(UnaryOp::GELU_ERF, gate)? * value,
+-            GluOp::GEGLU_QUICK => activation(UnaryOp::GELU_QUICK, gate, a.dtype())? * value,
++            GluOp::GEGLU_QUICK => glu_product(
++                a.dtype(),
++                activation(UnaryOp::GELU_QUICK, gate, a.dtype())?,
++                value,
++            ),
+             GluOp::SWIGLU_OAI | GluOp::SWIGLU_CLAMP => {
+                 let limit = limit.expect("validated limit");
+                 // std::min/std::clamp preserve NaN first arguments.
+@@ -1084,10 +1132,52 @@
+     typed_float(a.dtype(), shape, &out)
+ }
+ 
++// Frozen scalar/SSE2 GLU kernels select the activation NaN first for F32.
++// GNU's inline BF16 loop has the value operand first in its final multiply.
++// Express that captured operand policy explicitly: Rust does not specify which
++// NaN payload an ordinary multiplication selects. Finite arithmetic is unchanged.
++fn glu_product(dtype: DType, activation: f32, value: f32) -> f32 {
++    let value_first = dtype == DType::BF16
++        && cfg!(all(
++            target_arch = "x86_64",
++            target_os = "linux",
++            target_env = "gnu"
++        ));
++    let (first, second) = if value_first {
++        (value, activation)
++    } else {
++        (activation, value)
++    };
++    if first.is_nan() {
++        f32::from_bits(first.to_bits() | 0x0040_0000)
++    } else if second.is_nan() {
++        f32::from_bits(second.to_bits() | 0x0040_0000)
++    } else {
++        activation * value
++    }
++}
++
++/// The original graph calls the standard OS C-runtime erff. Use that same
++/// independently verified boundary when available; retain the mathematical
++/// implementation on targets whose system ABI has not been exercised.
++pub(crate) fn erf_f32(x: f32) -> f32 {
++    #[cfg(all(
++        target_arch = "x86_64",
++        any(
++            all(target_os = "windows", target_env = "msvc"),
++            all(target_os = "linux", target_env = "gnu")
++        )
++    ))]
++    if let Some(value) = llama_platform_loader::math::erf_f32(x) {
++        return value;
++    }
++    portable_erf_f32(x)
++}
++
+ /// Positive-term erf series, evaluated in F64 then rounded once to F32.
+-/// For |x| >= 4 the true result rounds to +/-1 in F32. No foreign libm is
+-/// linked; graph fixtures compare this implementation with the source erff.
+-pub(crate) fn erf_f32(x: f32) -> f32 {
++/// For |x| >= 4 the true result rounds to +/-1 in F32. Its independent 80-digit
++/// accuracy corpus remains separate from platform-specific native parity.
++pub(crate) fn portable_erf_f32(x: f32) -> f32 {
+     if x.is_nan() || x == 0.0 {
+         return x;
+     }
+@@ -1124,10 +1214,10 @@
+             let x = f32::from_le_bytes(record[..4].try_into().unwrap());
+             let expected = f32::from_le_bytes(record[4..8].try_into().unwrap());
+             let reference = f64::from_le_bytes(record[8..16].try_into().unwrap());
+-            let actual = super::erf_f32(x);
++            let actual = super::portable_erf_f32(x);
+             assert_eq!(actual.to_bits(), expected.to_bits(), "erf({x:?})");
+             assert_eq!(
+-                super::erf_f32(-x).to_bits(),
++                super::portable_erf_f32(-x).to_bits(),
+                 (-expected).to_bits(),
+                 "erf({:?})",
+                 -x
+--- /dev/null
++++ b/crates/tensor/tests/row_policy.rs
+@@ -0,0 +1,297 @@
++#![cfg(all(
++    target_arch = "x86_64",
++    any(
++        all(target_os = "windows", target_env = "msvc"),
++        all(target_os = "linux", target_env = "gnu")
++    ),
++    not(target_feature = "crt-static")
++))]
++
++use llama_tensor::{DType, GluOp, Graph, Op, Tensor, TensorDesc, UnaryOp};
++
++struct Reader {
++    bytes: &'static [u8],
++    at: usize,
++}
++impl Reader {
++    fn take(&mut self, n: usize) -> &'static [u8] {
++        let out = &self.bytes[self.at..self.at + n];
++        self.at += n;
++        out
++    }
++    fn u32(&mut self) -> u32 {
++        u32::from_le_bytes(self.take(4).try_into().unwrap())
++    }
++    fn u64(&mut self) -> usize {
++        usize::try_from(u64::from_le_bytes(self.take(8).try_into().unwrap())).unwrap()
++    }
++    fn i64(&mut self) -> i64 {
++        i64::from_le_bytes(self.take(8).try_into().unwrap())
++    }
++    fn f32(&mut self) -> f32 {
++        f32::from_le_bytes(self.take(4).try_into().unwrap())
++    }
++    fn string(&mut self) -> &'static str {
++        let n = self.u32() as usize;
++        std::str::from_utf8(self.take(n)).unwrap()
++    }
++    fn tensor(&mut self, strided: bool) -> Tensor {
++        let dtype = DType::from_id(self.u32()).unwrap();
++        let shape = std::array::from_fn(|_| self.u64());
++        let desc = if strided {
++            TensorDesc::with_strides(dtype, shape, std::array::from_fn(|_| self.u64())).unwrap()
++        } else {
++            TensorDesc::contiguous(dtype, shape).unwrap()
++        };
++        let bytes = self.u64();
++        Tensor::from_bytes(desc, self.take(bytes).to_vec()).unwrap()
++    }
++}
++
++fn evaluate(op: Op, inputs: Vec<Tensor>) -> llama_tensor::Result<Tensor> {
++    let mut graph = Graph::new();
++    let ids = inputs
++        .into_iter()
++        .map(|t| graph.input(t))
++        .collect::<Vec<_>>();
++    let target = graph.op(op, &ids)?;
++    graph.evaluate(target)
++}
++
++fn operation(tag: &str, ints: &[i64], floats: &[f32]) -> Op {
++    match tag {
++        "unary" => Op::Unary(UnaryOp::from_id(ints[0] as u32).unwrap()),
++        "glu" => Op::Glu {
++            kind: GluOp::from_id(ints[0] as u32).unwrap(),
++            swap: ints[1] != 0,
++        },
++        "glu_packed" => Op::GluPacked {
++            kind: GluOp::from_id(ints[0] as u32).unwrap(),
++            swap: ints[1] != 0,
++        },
++        "norm" => Op::Norm { epsilon: floats[0] },
++        "rms_norm" => Op::RmsNorm { epsilon: floats[0] },
++        "softmax" => Op::Softmax { scale: floats[0] },
++        _ => panic!("unexpected source operation {tag}"),
++    }
++}
++fn compare_fixture(bytes: &'static [u8], expected_cases: u32, expected_bytes: usize) {
++    let mut reader = Reader { bytes, at: 0 };
++    assert_eq!(reader.take(8), b"GGTR0002");
++    let cases = reader.u32();
++    let mut total_bytes = 0;
++    let mut bad_cases = 0;
++    let mut bad_values = 0;
++    let mut finite_bad = 0;
++    let mut details = Vec::new();
++    for _ in 0..cases {
++        let name = reader.string();
++        let tag = reader.string();
++        assert_eq!(reader.u32(), 0, "exact native-byte reference");
++        let ni = reader.u32();
++        let ints = (0..ni).map(|_| reader.i64()).collect::<Vec<_>>();
++        let nf = reader.u32();
++        let floats = (0..nf).map(|_| reader.f32()).collect::<Vec<_>>();
++        let nt = reader.u32();
++        let inputs = (0..nt).map(|_| reader.tensor(true)).collect::<Vec<_>>();
++        let expected = reader.tensor(false);
++        let result = match evaluate(operation(tag, &ints, &floats), inputs) {
++            Ok(value) => value,
++            Err(error) => {
++                bad_cases += 1;
++                details.push(format!("{name}: {error}"));
++                continue;
++            }
++        };
++        assert_eq!(result.dtype(), expected.dtype(), "{name}");
++        assert_eq!(result.shape(), expected.shape(), "{name}");
++        let dtype = result.dtype();
++        let actual = result.to_bytes().unwrap();
++        let expected = expected.to_bytes().unwrap();
++        assert_eq!(actual.len(), expected.len(), "{name}");
++        total_bytes += actual.len();
++        let width = if dtype == DType::F32 { 4 } else { 2 };
++        let mut case_bad = 0;
++        let mut case_finite = 0;
++        let mut first = None;
++        for (index, (a, b)) in actual
++            .chunks_exact(width)
++            .zip(expected.chunks_exact(width))
++            .enumerate()
++        {
++            if a == b {
++                continue;
++            }
++            case_bad += 1;
++            let decode = |raw: &[u8]| match dtype {
++                DType::F32 => f32::from_le_bytes(raw.try_into().unwrap()),
++                DType::F16 => llama_quant::f16_to_f32(u16::from_le_bytes(raw.try_into().unwrap())),
++                DType::BF16 => {
++                    llama_quant::bf16_to_f32(u16::from_le_bytes(raw.try_into().unwrap()))
++                }
++                _ => panic!("unexpected native output dtype"),
++            };
++            let av = decode(a);
++            let bv = decode(b);
++            if av.is_finite() && bv.is_finite() {
++                case_finite += 1;
++            }
++            if first.is_none() {
++                first = Some(format!(
++                    "index {index}: Rust {a:02x?} ({av:?}), native {b:02x?} ({bv:?})"
++                ));
++            }
++        }
++        if case_bad > 0 {
++            bad_cases += 1;
++            bad_values += case_bad;
++            finite_bad += case_finite;
++            if details.len() < 80 {
++                details.push(format!(
++                    "{name}: {case_bad} differing values ({case_finite} finite); {}",
++                    first.unwrap()
++                ));
++            }
++        }
++    }
++    assert_eq!(reader.at, bytes.len());
++    assert_eq!(cases, expected_cases);
++    assert_eq!(total_bytes, expected_bytes);
++    println!(
++        "{cases} source-native tensor row cases; output bytes {total_bytes}; differing cases {bad_cases}; differing values {bad_values}; finite differing values {finite_bad}"
++    );
++    assert_eq!(bad_cases, 0, "{}", details.join("\n"));
++}
++#[test]
++fn native_tensor_row_policies_and_system_erf_match_original_graph_bytes() {
++    #[cfg(all(target_arch = "x86_64", target_os = "windows", target_env = "msvc"))]
++    compare_fixture(
++        include_bytes!("fixtures/row-policy/msvc/tensor-row-policy-reference.bin"),
++        935,
++        2_894_848,
++    );
++    #[cfg(all(target_arch = "x86_64", target_os = "linux", target_env = "gnu"))]
++    compare_fixture(
++        include_bytes!("fixtures/row-policy/gnu/tensor-row-policy-reference.bin"),
++        935,
++        2_894_848,
++    );
++}
++
++#[test]
++fn explicit_sse2_quick_prefix_matches_native_gnu_on_both_hosts() {
++    use llama_quant::cpu_math::{MathPolicy, gelu_quick_f32_with_policy};
++    let bytes = include_bytes!("fixtures/row-policy/gnu/tensor-row-policy-reference.bin");
++    let mut reader = Reader { bytes, at: 0 };
++    assert_eq!(reader.take(8), b"GGTR0002");
++    let count = reader.u32();
++    let mut checked = 0;
++    for _ in 0..count {
++        let name = reader.string();
++        let tag = reader.string();
++        assert_eq!(reader.u32(), 0);
++        let ni = reader.u32();
++        let ints = (0..ni).map(|_| reader.i64()).collect::<Vec<_>>();
++        let nf = reader.u32();
++        for _ in 0..nf {
++            reader.f32();
++        }
++        let nt = reader.u32();
++        let inputs = (0..nt).map(|_| reader.tensor(true)).collect::<Vec<_>>();
++        let expected = reader.tensor(false);
++        if tag != "unary"
++            || inputs[0].dtype() != DType::F32
++            || ints[0] != UnaryOp::GELU_QUICK as i64
++        {
++            continue;
++        }
++        let mut values = inputs[0].to_f32().unwrap();
++        let expected = expected.to_f32().unwrap();
++        let width = inputs[0].shape()[0];
++        let prefix = width / 4 * 4;
++        for (row_index, (row, expected)) in values
++            .chunks_exact_mut(width)
++            .zip(expected.chunks_exact(width))
++            .enumerate()
++        {
++            gelu_quick_f32_with_policy(row, MathPolicy::Sse2);
++            for (column, (actual, expected)) in
++                row[..prefix].iter().zip(&expected[..prefix]).enumerate()
++            {
++                assert_eq!(
++                    actual.to_bits(),
++                    expected.to_bits(),
++                    "{name} row{row_index} column{column}"
++                );
++            }
++            checked += prefix;
++        }
++    }
++    assert_eq!(reader.at, bytes.len());
++    assert!(checked > 1_000);
++    println!("Portable SSE2 quick GELU prefix: {checked} exact GNU source output words");
++    // Scalar tails call the current host CRT. Native whole-row graph fixtures
++    // and the separate original-inline scalar oracle check that distinct gate.
++}
++
++#[test]
++fn row_policy_errors_are_checked_and_input_storage_is_unchanged() {
++    let original = Tensor::from_f32([2, 1, 1, 1], &[0.0, f32::NEG_INFINITY]).unwrap();
++    let before = original.to_bytes().unwrap();
++    let mut graph = Graph::new();
++    let input = graph.input(original.clone());
++    let target = graph.op(Op::Softmax { scale: 0.0 }, &[input]).unwrap();
++    assert!(
++        graph.evaluate(target).is_err(),
++        "zero times infinity cannot be silently ignored"
++    );
++    assert_eq!(original.to_bytes().unwrap(), before);
++    assert_eq!(graph.evaluate(input).unwrap().to_bytes().unwrap(), before);
++
++    let odd = Tensor::from_f32([3, 1, 1, 1], &[1.0, 2.0, 3.0]).unwrap();
++    let changed_tail = Tensor::from_f32([3, 1, 1, 1], &[1.0, 2.0, 999.0]).unwrap();
++    let operation = Op::GluPacked {
++        kind: GluOp::SWIGLU,
++        swap: false,
++    };
++    let result = evaluate(operation.clone(), vec![odd]).unwrap();
++    assert_eq!(result.shape(), [1, 1, 1, 1]);
++    assert_eq!(
++        result.to_bytes().unwrap(),
++        evaluate(operation, vec![changed_tail])
++            .unwrap()
++            .to_bytes()
++            .unwrap()
++    );
++
++    let empty = Tensor::from_f32([0, 3, 1, 1], &[]).unwrap();
++    let result = evaluate(Op::Unary(UnaryOp::SILU), vec![empty.clone()]).unwrap();
++    assert_eq!(result.shape(), [0, 3, 1, 1]);
++    assert!(result.to_bytes().unwrap().is_empty());
++    let result = evaluate(
++        Op::GluPacked {
++            kind: GluOp::GEGLU_QUICK,
++            swap: true,
++        },
++        vec![empty],
++    )
++    .unwrap();
++    assert_eq!(result.shape(), [0, 3, 1, 1]);
++    assert!(result.to_bytes().unwrap().is_empty());
++}
++
++#[test]
++fn odd_packed_glu_preserves_source_flooring_and_vector_row_boundaries() {
++    #[cfg(target_os = "windows")]
++    compare_fixture(
++        include_bytes!("fixtures/row-policy/odd-glu/msvc/odd-glu-reference.bin"),
++        72,
++        14_208,
++    );
++    #[cfg(target_os = "linux")]
++    compare_fixture(
++        include_bytes!("fixtures/row-policy/odd-glu/gnu/odd-glu-reference.bin"),
++        72,
++        14_208,
++    );
++}

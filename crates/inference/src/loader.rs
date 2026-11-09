@@ -1,10 +1,9 @@
 use crate::{Error, Executor, LoadOptions, Model, Result};
-use llama_gguf::{Gguf, Value};
+use llama_gguf::{GgufSet, Value};
 use llama_model_runtime::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights, Matrix};
 use llama_tokenizer::Tokenizer;
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs::File,
     path::Path,
     sync::Arc,
 };
@@ -19,17 +18,6 @@ pub(super) fn uint(
         Some(Value::U32(value)) => Ok(*value as usize),
         Some(_) => Err(Error::Invalid(format!("{key} must have GGUF UINT32 type"))),
         None => default.ok_or_else(|| Error::Invalid(format!("missing {key}"))),
-    }
-}
-/// The original split count is UINT16. Zero and an omitted field both denote
-/// an ordinary single-file load; counts above one need shard resolution.
-pub(super) fn split_count(m: &BTreeMap<String, Value>) -> Result<usize> {
-    match m.get("split.count") {
-        None => Ok(0),
-        Some(Value::U16(value)) => Ok(usize::from(*value)),
-        Some(_) => Err(Error::Invalid(
-            "split.count must have GGUF UINT16 type".into(),
-        )),
     }
 }
 pub(super) fn float(m: &BTreeMap<String, Value>, key: &str, default: f32) -> Result<f32> {
@@ -103,8 +91,18 @@ pub(super) fn unsupported(s: impl Into<String>) -> Error {
     Error::Unsupported(s.into())
 }
 
+// GGML tensor shapes have four dimensions, with unspecified trailing axes
+// equal to one. The source splitter may canonicalize those serialized axes.
+fn same_shape(actual: &[u64], expected: &[u64]) -> bool {
+    actual.len() <= 4
+        && expected.len() <= 4
+        && (0..4).all(|axis| {
+            actual.get(axis).copied().unwrap_or(1) == expected.get(axis).copied().unwrap_or(1)
+        })
+}
+
 pub(super) fn vector(
-    g: &mut Gguf<File>,
+    g: &mut GgufSet,
     used: &mut BTreeSet<String>,
     name: &str,
     n: usize,
@@ -112,7 +110,7 @@ pub(super) fn vector(
     let t = g
         .tensor(name)
         .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
-    if t.dimensions != [n as u64] {
+    if !same_shape(&t.dimensions, &[n as u64]) {
         return Err(Error::Invalid(format!(
             "tensor {name} expected shape [{n}], found {:?}",
             t.dimensions
@@ -122,7 +120,7 @@ pub(super) fn vector(
     Ok(g.read_f32(name)?)
 }
 pub(super) fn matrix(
-    g: &mut Gguf<File>,
+    g: &mut GgufSet,
     used: &mut BTreeSet<String>,
     name: &str,
     rows: usize,
@@ -131,7 +129,7 @@ pub(super) fn matrix(
     let t = g
         .tensor(name)
         .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
-    if t.dimensions != [cols as u64, rows as u64] {
+    if !same_shape(&t.dimensions, &[cols as u64, rows as u64]) {
         return Err(Error::Invalid(format!(
             "tensor {name} expected GGML shape [{cols},{rows}], found {:?}",
             t.dimensions
@@ -143,7 +141,7 @@ pub(super) fn matrix(
         return Ok(Matrix::new(rows, cols, g.read_f32(name)?)?);
     }
     let mut bytes = g.read_tensor(name)?;
-    if g.endian == llama_gguf::Endian::Big {
+    if g.tensor_endian(name) == Some(llama_gguf::Endian::Big) {
         if matches!(dtype.id(), 1 | 30) {
             for word in bytes.as_chunks_mut::<2>().0 {
                 word.reverse();
@@ -155,7 +153,7 @@ pub(super) fn matrix(
     Ok(Matrix::from_quantized(rows, cols, dtype, bytes)?)
 }
 pub(super) fn bias(
-    g: &mut Gguf<File>,
+    g: &mut GgufSet,
     used: &mut BTreeSet<String>,
     name: &str,
     n: usize,
@@ -168,11 +166,11 @@ pub(super) fn bias(
 }
 
 pub(super) fn details(
-    g: &Gguf<File>,
+    g: &GgufSet,
     path: &Path,
     options: &LoadOptions,
 ) -> Result<(String, Option<String>, usize)> {
-    let m = &g.metadata;
+    let m = g.metadata();
     let id = m
         .get("general.name")
         .and_then(Value::as_str)
@@ -190,7 +188,7 @@ pub(super) fn details(
         None => None,
     };
     let mut decoded_weight_bytes = 0usize;
-    for tensor in &g.tensors {
+    for tensor in g.tensors() {
         decoded_weight_bytes = decoded_weight_bytes
             .checked_add(
                 tensor
@@ -211,13 +209,30 @@ pub(super) fn details(
 }
 
 pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
+    validate_options(options)?;
+    load_files(GgufSet::open(path)?, path, options)
+}
+
+pub(crate) fn load_splits<P: AsRef<Path>>(paths: &[P], options: &LoadOptions) -> Result<Model> {
+    validate_options(options)?;
+    let first = paths
+        .first()
+        .ok_or_else(|| Error::Invalid("list of GGUF splits is empty".into()))?;
+    load_files(GgufSet::open_splits(paths)?, first.as_ref(), options)
+}
+
+fn validate_options(options: &LoadOptions) -> Result<()> {
     if options.context_length == 0 || options.max_decoded_weight_bytes == 0 {
         return Err(Error::Invalid(
             "context and weight budget must be nonzero".into(),
         ));
     }
-    let mut g = Gguf::open(path)?;
-    let m = &g.metadata;
+    Ok(())
+}
+
+pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result<Model> {
+    validate_options(options)?;
+    let m = g.metadata();
     let architecture = m
         .get("general.architecture")
         .and_then(Value::as_str)
@@ -241,9 +256,6 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         && t != "model"
     {
         return Err(unsupported(format!("GGUF general.type={t}")));
-    }
-    if split_count(m)? > 1 {
-        return Err(unsupported("split GGUF model loading"));
     }
     let tokenizer = Tokenizer::from_metadata(m)?;
     let width = uint(m, "llama.embedding_length", None)?;
@@ -368,7 +380,7 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         used.insert("rope_freqs.weight".into());
     }
     let unconsumed: Vec<_> = g
-        .tensors
+        .tensors()
         .iter()
         .filter(|t| !used.contains(&t.name))
         .map(|t| t.name.as_str())

@@ -1,0 +1,33 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft/crates/quant)
+   Compiling llama-platform-loader v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft/crates/platform-loader)
+   Compiling llama-model-runtime v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft/crates/model-runtime)
+   Compiling llama-tensor v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft/crates/tensor)
+    Finished `release` profile [optimized] target(s) in 29.86s
+     Running unittests src/lib.rs (/tmp/rust-llama-tensor-row-policy/release/deps/llama_model_runtime-8d4918a525a3f243)
+     Running tests/native_rows_graphs.rs (/tmp/rust-llama-tensor-row-policy/release/deps/native_rows_graphs-99fd171209f06512)
+     Running tests/native_rows_native.rs (/tmp/rust-llama-tensor-row-policy/release/deps/native_rows_native-23d159766a59193c)
+     Running tests/native_rows_variance.rs (/tmp/rust-llama-tensor-row-policy/release/deps/native_rows_variance-e867243ce1188d91)
+     Running tests/numerical_reference.rs (/tmp/rust-llama-tensor-row-policy/release/deps/numerical_reference-711b1ae035f81323)
+     Running tests/qwen2.rs (/tmp/rust-llama-tensor-row-policy/release/deps/qwen2-1b888dda180d0625)
+     Running tests/runtime.rs (/tmp/rust-llama-tensor-row-policy/release/deps/runtime-c503a28bb2bdab49)
+     Running unittests src/lib.rs (/tmp/rust-llama-tensor-row-policy/release/deps/llama_platform_loader-3d98a7270dd1871e)
+     Running tests/system_erf.rs (/tmp/rust-llama-tensor-row-policy/release/deps/system_erf-c1424c283db1b72d)
+system erff provider GnuLibm: 502058 raw-word comparisons exact
+     Running unittests src/lib.rs (/tmp/rust-llama-tensor-row-policy/release/deps/llama_quant-375df077ce42b04c)
+     Running tests/encoders_extended.rs (/tmp/rust-llama-tensor-row-policy/release/deps/encoders_extended-c473692c4a0098f1)
+     Running tests/f16_matmul.rs (/tmp/rust-llama-tensor-row-policy/release/deps/f16_matmul-5c3e0b70eefed84c)
+     Running tests/iq1_encoders.rs (/tmp/rust-llama-tensor-row-policy/release/deps/iq1_encoders-2c70870dc52b6783)
+     Running tests/iq2_encoders.rs (/tmp/rust-llama-tensor-row-policy/release/deps/iq2_encoders-d694064cc7c8a1cf)
+     Running tests/iq3_encoders.rs (/tmp/rust-llama-tensor-row-policy/release/deps/iq3_encoders-95be583c8988716f)
+     Running tests/matvec.rs (/tmp/rust-llama-tensor-row-policy/release/deps/matvec-017a4b0ed628c1c1)
+     Running tests/matvec_extended.rs (/tmp/rust-llama-tensor-row-policy/release/deps/matvec_extended-3838cc7b40d8fdf5)
+     Running tests/reference.rs (/tmp/rust-llama-tensor-row-policy/release/deps/reference-6694b0abe9707dde)
+     Running tests/weighted_encoders.rs (/tmp/rust-llama-tensor-row-policy/release/deps/weighted_encoders-d6c955e56bed28b7)
+     Running unittests src/lib.rs (/tmp/rust-llama-tensor-row-policy/release/deps/llama_tensor-3d5ad5df11e87cea)
+
+thread 'cpu_extra::accuracy_tests::erf_rounding_matches_independent_80_digit_references' (275854) panicked at crates/tensor/src/cpu_extra.rs:1221:13:
+assertion `left == right` failed: erf(-6e-45)
+  left: 2147483652
+ right: 2147483653
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p llama-tensor --lib`

@@ -1,13 +1,13 @@
 //! Frozen Mamba-1 GGUF loading. Recurrent arithmetic lives in the Rust runtime.
-use crate::loader::{details, float, matrix, split_count, uint, unsupported, vector};
+use crate::loader::{details, float, matrix, uint, unsupported, vector};
 use crate::{Error, Executor, LoadOptions, Model, Result};
-use llama_gguf::{Gguf, Value};
+use llama_gguf::{GgufSet, Value};
 use llama_model_runtime::{MambaConfig, MambaLayer, MambaModel, MambaWeights, Matrix};
 use llama_tokenizer::Tokenizer;
-use std::{collections::BTreeSet, fs::File, path::Path, sync::Arc};
+use std::{collections::BTreeSet, path::Path, sync::Arc};
 
 fn scalar_matrix(
-    g: &mut Gguf<File>,
+    g: &mut GgufSet,
     used: &mut BTreeSet<String>,
     name: &str,
     rows: usize,
@@ -26,8 +26,8 @@ fn scalar_matrix(
     matrix(g, used, name, rows, cols)
 }
 
-pub(super) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Result<Model> {
-    let metadata = &g.metadata;
+pub(super) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result<Model> {
+    let metadata = g.metadata();
     match metadata.get("general.type") {
         None => {}
         Some(Value::String(kind)) if kind == "model" => {}
@@ -35,10 +35,6 @@ pub(super) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
             return Err(unsupported(format!("GGUF general.type={kind}")));
         }
         Some(_) => return Err(Error::Invalid("general.type must be a string".into())),
-    }
-    let splits = split_count(metadata)?;
-    if splits > 1 {
-        return Err(unsupported("split GGUF model loading"));
     }
     let tokenizer = Tokenizer::from_metadata(metadata)?;
     let layers = uint(metadata, "mamba.block_count", None)?;
@@ -161,7 +157,7 @@ pub(super) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
         });
     }
     let unconsumed: Vec<_> = g
-        .tensors
+        .tensors()
         .iter()
         .filter(|tensor| !used.contains(&tensor.name))
         .map(|tensor| tensor.name.as_str())

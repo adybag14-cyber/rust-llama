@@ -1,0 +1,1506 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Frozen original GGUF parser/writer/splitter and llama C APIs on x64 MSVC and x64 GNU.",
+  "independence": "All model/index/format outputs were captured before any Rust model evaluation. Only lossless extraction, exact duplicate removal and f32 little-endian serialization occur in packaging. Expected data never comes from Rust.",
+  "tolerance_absolute": 0.0002,
+  "tolerance_relative": 2e-05,
+  "tolerance_origin": "Existing inference portability budget, selected in this packer before the first Rust shard evaluation. It does not replace the original architecture-specific fixtures or their stricter gates. Token IDs, byte payloads and structural decisions remain exact.",
+  "cases": 90,
+  "index_accepted": 65,
+  "numeric_model_loads": 64,
+  "format_cases": 10,
+  "unique_input_blobs": 132,
+  "materialized_file_paths": 187,
+  "capture_reports": [
+    {
+      "path": "sharded-gguf-port/native-capture/capture-report.json",
+      "bytes": 69411,
+      "sha256": "f47a2e4dd6f7355b280d8514c55bac03d3369c89499d987006d6aa5456ce8383"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/capture-report.json",
+      "bytes": 35096,
+      "sha256": "f2634fd0fb347ce80193119e6cb67e288e3b9972540769aa225427558c0476d6"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/capture-report.json",
+      "bytes": 16015,
+      "sha256": "5269c49cae7a4276bb566acbc815708ee29324caac374ca0edc54bf743d17f49"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/capture-report.json",
+      "bytes": 14674,
+      "sha256": "589485f99ca839619b208d45eb22109d0ce537fb198584555b8c8453269f6d32"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/capture-report.json",
+      "bytes": 11955,
+      "sha256": "4077be058c76b0a75ddfdde9da3ddb6904603fcea6e0063e1c0461b984497222"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/capture-report.json",
+      "bytes": 11331,
+      "sha256": "354c6b7ea3d6946a7ac0d168acd9e6872c2df9e6a4553d6fe79950e367575b3d"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/capture-report.json",
+      "bytes": 4520,
+      "sha256": "e4fa749ecc4e3f2cc9b2fada645fcb0b0f73bc316653b0befee57ab211d4e628"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/capture-report.json",
+      "bytes": 4069,
+      "sha256": "9aa114e4a53e25a7e6ce41dd0e69baabacd9bedc6ef33aafdb6356e81283616d"
+    }
+  ],
+  "raw_native_outputs": [
+    {
+      "path": "sharded-gguf-port/pack-capture/6355a20e09202ea517837709d678372271156aa096ed5d6390be1c91600108a0.json",
+      "bytes": 5164,
+      "sha256": "1e192354239d8047acf74e3fee2cc5ed17eeb8a2ad9727c7f59a1f0c1864355e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/12d721628d752b43a7d7a80eff1aa93ea9dd2d43c66004a1da5781e7ecf0b23d.json",
+      "bytes": 6174,
+      "sha256": "c15b617856a1899c04f94a23f8c4fa539b2d43d0e948016939835ee1d549bc83"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/dcef4d3246001a9c4d8a522fd128d554cb3f2a098df7bdf86e3bd20db7abb32d.json",
+      "bytes": 8460,
+      "sha256": "6644c92017a80a5aa0138e0bb9968ce0580b3ec6853e771ed491635ceeaa689d"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8e2edbdfd234344cd6e9261b9fcc1c61bbb2df777b5574a121b44e167cbff8df.json",
+      "bytes": 2851,
+      "sha256": "3116286f39c43836943001802d617fa5914bde707c7df07a0c9f951c99b35523"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a19d67269d472bb861541a1a5ea6f4328c62af29f1a6dd7281997f75411594a5.json",
+      "bytes": 20335,
+      "sha256": "aff73263956f6126f509987d70d7e45c48f84114511449174d23188c148d81ff"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8fe005df0f522382fb53bb85276e330fc14effffae4d2748628434c8198739ef.json",
+      "bytes": 6410,
+      "sha256": "352f54fb8890921d5eae78372b61e129e15dcae4462c4820557eac80a52611c0"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/71f4aaa665c0be316df36e00e893f5a0232275d689a09f3e2355cde5b933530d.json",
+      "bytes": 23625,
+      "sha256": "6fd59807b255ca0835b2054e43c480463cbce9322dc357dc6e2c2455ba095fd6"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/5cb189c52227432420657c4ddbab448d4359385ad7529dc2bf76924217204653.json",
+      "bytes": 3089,
+      "sha256": "1e96f467551f8e046230c5b566ff5bdb5734fba226aa51221bc7d8b2f4752239"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/cd585269202a09dfc758e49edd9e91d1feb1c1b287aa8cae1d60662d2461317c.json",
+      "bytes": 20418,
+      "sha256": "be70edca7541a82abd73539a9227c4c8fc2b0a2429939b0af6185998df627915"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/7bb7a0aa19f626273e2a089361bd38036aa6954d37e075a449d5df3f491b9310.json",
+      "bytes": 23708,
+      "sha256": "0378281240412b220075796558ff24b9f0b5428ce572741fb5dfcb7dfe6453a6"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/f3fda41a6e7a2260d5f36894d891e78d666a50d8b6bf101e744e96c64153a265.json",
+      "bytes": 20422,
+      "sha256": "f3c584e50efa4eb0cbe1face489ec20628cf1f7b7583056282a90fe97ee3cc13"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/1e12002682de61c1e9cdad2c1a0f31e7392f61bf36c2669b08baa6e704fb4ec9.json",
+      "bytes": 6686,
+      "sha256": "d1eafa301318580923ab985c556bf5700284bddf5bc0a181df3efa0d4c0cbb65"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/bf094fe11d0a3acde0e78a677c8341d159b649339f782f089e8f291f257ed19a.json",
+      "bytes": 23712,
+      "sha256": "cd5c7db5c451cf066845488c25bc73b9c9691db41559e006d5f74a259b399d8b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/cb7f8fae2564d0d5113ee998b5b3130311d1615d173b7e38b3059b85cbe04889.json",
+      "bytes": 3363,
+      "sha256": "636c2e6d32e93034316d5360aaa915f8fb3ab8801c4348c5a7133fe1aa772fc3"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/1548884f1a8cf2a4e9fab5d59b73096229e5e26710f1b43b636f86eb0b03fe95.json",
+      "bytes": 20204,
+      "sha256": "2768579c788265bf1e8c613cedd4dc566c21aba66ac1d3e9daabf0e020a59098"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/cd6d7e0579eb5fd2f5e700a58228d7909b9713ee2737f09c522414b89737edbb.json",
+      "bytes": 10175,
+      "sha256": "988a47e75503369a82c4f3e471402ce4e27066231c0a44249c17638d28ca2305"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/e04d120a4f1732cfc01672ea959c62e9c21cdbb42fcc5e887cea359ce7e493f9.json",
+      "bytes": 23580,
+      "sha256": "b53306cc98dd1a514e40bc09e0c86a4f38f98adddf5d3992037dba3235cb2435"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/030169bf8a9fcb8b21662dd16bd48971cc794f26c4530fb60ca05994b6838a66.json",
+      "bytes": 3680,
+      "sha256": "a5c9501d121c12f6ac052e9a6630e86d6e98feb9fd911daa7c504638304937b4"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6112e3a1285419b7453f1a7b049b86bab3896223e5464413930d27502fcafa5d.json",
+      "bytes": 3428,
+      "sha256": "29def6fec20288474ec70dfb3030ce87e13f5b71a3c1712c7ada3ff6748ae820"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0b2d305b88068371ad0c9c9945b1683f96286bf8a01d98268d2b9cb2e8260882.json",
+      "bytes": 29777,
+      "sha256": "38c507b45843b759a9cbf1c5db7e3d09971044df7523d702c3ae594d4b9472e6"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/9ef8494f4e2686dc9537e50e31dee5e9f440842d22eb85d23d74698a7f3f5aea.json",
+      "bytes": 23531,
+      "sha256": "47139c8212c845f8fcdfe03bc51b25dee3945d12ca9483f2de69e3c59bcd9ded"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/54609e9210f24933610ce8398d2789cac06a79cf214040476a8f41f313246a5c.json",
+      "bytes": 3621,
+      "sha256": "808c036172dd92c78e8b6927ca6d9b624dfba32115b4eb4e902bbbd709cbb24e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/83957a06dc1cbeca41a501318571ecf46a126828877b8a6f5a99e7fa1d1bb4fc.json",
+      "bytes": 3360,
+      "sha256": "4c246e31ed67767cc6b6fe723b60ac49034d413064b7d7a640998340d2c630c3"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ca74e886800778f8a129d95be4eb531e022eb7f2b436310b9524ffba331504c2.json",
+      "bytes": 3621,
+      "sha256": "92638b99d80b8f0492d9fc54a9d44ab437ee354f874dbd22d0c9837716016153"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/84768061471c5cdb63e57354dcdf61b6e8e60c66bcbdfc4f18b3be677559344f.json",
+      "bytes": 23456,
+      "sha256": "9c4dda73bdbb9e82d95ca650fa54191f4f0790d66324cb3d6855f8172737794f"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/5d4c4506a7d481cd4570e1794d9feb7a161b3c9ed010c1859ede49eb1466315b.json",
+      "bytes": 23531,
+      "sha256": "4f1db5486af4455b0d92646f9766982c305c51bd87fc4176394098e792166542"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/822377a107be6c05fd225cf7e261d44a9a08561e0aa602cfeafeb95ffff21628.json",
+      "bytes": 23531,
+      "sha256": "5a2f75d3f67869418b677e010062477848a3dd1cc636e8a61ab671f4b2d13df9"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0965930ead1f74037d83fa4c49beb2cbb2e174f2d3b846a7c7c3a5d201fd50ca.json",
+      "bytes": 23531,
+      "sha256": "e272972383472864402368193afe5f6afc99fec952e471df9062afc1afab7d30"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ee1430dd95bfccd6cca92b29857eab5ea8baa1f9c984ca95e459d1e1f4b6de89.json",
+      "bytes": 23459,
+      "sha256": "15617cb3b088c56d972faaf713c57bdb1ee0fd9742c39b067cf50605a5851779"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6f193a477ed0365a55bd3e4dfe54198396cbb87dd10b201012f3111427258fba.json",
+      "bytes": 23531,
+      "sha256": "cba7a24aeb6db226acec38cfe1aaf71ddcd26f8cd8c877b74e7b82b92d002da5"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/82912c76d0e5c8c43acfad7a4ce1e4bdf41748a0a40fa804780031ddbb7dd1f2.json",
+      "bytes": 23531,
+      "sha256": "922994a5c51876585d27578b9929b4442ec579efdc81559037ab7efaef78c267"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6f57041f90946a82b7485365fdfdf2ea5e40c2c37f0f39d5fdb25c4c10182fbf.json",
+      "bytes": 23530,
+      "sha256": "83de27d76f7a9cf9aec2ebac9dadb7ecec94b5c596a014445a46e56815c8fd40"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/690768a5860b2e154ebc252cb56c8842f225e8f17f8738f448d6cd966f9fd2a4.json",
+      "bytes": 23447,
+      "sha256": "2857f02cfdea290c76dd79a360c663fec5a324269989207449a9a8a38ed82901"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/f416e6fd6c39554a0f540f1b462b02bf84a607417d331541c07ebded699db123.json",
+      "bytes": 23531,
+      "sha256": "9629112b3c7b7c572d3de1cffc6f7b472de86f639e20e2b72edf559a04bd7da5"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/5f4d309a7f91832580460d7433ec4a729f312bd3eb8b9581c78329f35214f3de.json",
+      "bytes": 23531,
+      "sha256": "eaa7f4b7d00ee8f22f8da0ba05195ad167327766c36361bd3e3be5979dac6f9b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/df87419209be86db157aa48aa53fd62b7aaa7dbbbc06cb666ce8747df2e36d39.json",
+      "bytes": 20486,
+      "sha256": "7dbe6efc1e30f33b2c6a441c3a85434cb21f3ad73b81e4a66827eb27fa5ac194"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/65a754ff3170bd11b78a56db8e96599a4889e9839c3d0a1c4f63032a434f1e0a.json",
+      "bytes": 641,
+      "sha256": "d4e9158c4c9de3bf2380be59a7bd6d244c71254110352abdeab80be54f1c59f3"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/422bc4856b02510fecb548fdabe91f2ab09557161f4de4ddc6f54e949c89bc05.json",
+      "bytes": 644,
+      "sha256": "27e341bf0a7dd7cd8f0913d70d9d4f4273773c44b517a8850b09bfd057be7a70"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/05791384da1e0564e936b776e817b20a6416dbeecfc1031626191b41e0b6e62d.json",
+      "bytes": 645,
+      "sha256": "14d4d51ae1a3e565813df4ecfad75a367b12a1a98c2aaf3f83b76a4e33cd4872"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/b0ca04e8837cb594abe14d81c3b129b3281bb80f4a7d3caeac5345d71a427f1a.json",
+      "bytes": 644,
+      "sha256": "683b05f6c03d9856a6706b13be0d3e8cbbb85aedb28194bd65189eb0b80654e1"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6244e2acf852c33c53e6cb15ead1ebbf0983a3695d22d0a0e7325df388153500.json",
+      "bytes": 642,
+      "sha256": "bfc1eae7a1219f5d9eabfa97eadede6b482807d8837c6931d42020decc3d7175"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0028d1f1a66117e2b2bd8b45559885062169d82f1288dfd0a251b36f1a119f38.json",
+      "bytes": 642,
+      "sha256": "2d170c70d64282ea79137f275bfca437aa7a2efe0b79aef96a39b1e87198a749"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/eee931ecfc452352e310c0802feb9e3656eee656c00aca634c2f2df7b3d8d5e9.json",
+      "bytes": 642,
+      "sha256": "f610168ce3feca7d7dc53cd26419d3e2380dc4e01312490ab46ab040cc320d25"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/49d604a711b62a48aafd226a0ffeaa0b329c188ac93436071f151189c3e07723.json",
+      "bytes": 647,
+      "sha256": "6009a168e816396eefbe3cc2f2ba5ba53ec79afca3351674e6e70cec46a9b88c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/dd6685363b947e10e14b422c9c5708a4d1853cccdab264af1b229c9273468d0e.json",
+      "bytes": 644,
+      "sha256": "d2b9928a51e0fa939dd84b25212b355958f2a11e7548119ad067be72e9013f98"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/1afdf7955c9ae4a468054fa442adffeadb93514b50fc9b51b23fc196b965f8e1.json",
+      "bytes": 643,
+      "sha256": "f8c8f16a9e7e29fe000d3d1edece6f04d8809c483465a42863c238bc3f260082"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/32fba4056dbadd227a7ba5d40bd71e1c1d158dac8597c1d925f1c2c79172812c.json",
+      "bytes": 645,
+      "sha256": "e0192643aa1459839da44800a5f79c773cc01af9992d23f0743657813a483b4a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a9fe06f7b0ae9f095a6eff078393709534d1834565939cdb45ea84368ddc4d62.json",
+      "bytes": 641,
+      "sha256": "7bf8316c927bb9b1308fce66ca1fbba6c0e9e7bf6b8f58b1a62236615fab70d9"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/58a3bac2ab5a2b9a8b2e2687a84f58edde3b7aef9bff0eebf0c529fb2fd85988.json",
+      "bytes": 638,
+      "sha256": "35f2e7803da912f2107739034c4ca572523d2966b08d25a29894c9402d2e6717"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/bf98906404ab64e2d254774792a05454b08066f992ed9fc6760f1106b438508c.json",
+      "bytes": 638,
+      "sha256": "63bcd5b46800b3d3b2067aa96ebb7e474ab58dd6e10dc76dfc9f5228a0726a25"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8d8a7da82e4d795e7343b7f770eb14d6078a4cf33272bf9f8e1f92bc4bd5ce85.json",
+      "bytes": 646,
+      "sha256": "004be3cd2a17751d394aae3cce68bcd6d9d2e20d3d530086101abe1694e36df4"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/fc3acb6caaf9d777eff11fc92a3eb002edd013b326105dfb57f6fb301c85381c.json",
+      "bytes": 643,
+      "sha256": "421dab2915d9bd3791376d9510614e1edccd1e30124f5db5f3e9b23b274b5e45"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0a99e0d8893c1116771b9e442f4417f65f47d112f7d5a2653afd314ded95a4db.json",
+      "bytes": 641,
+      "sha256": "a95a7774569f986a38db1223d82de4b8e1f6374e08eb3e853bcd67535e96600c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a41536ec4d724f564fe704857c23b949542cd8aa543af8b0ced0de97266d1da7.json",
+      "bytes": 643,
+      "sha256": "dd34ddad7cabd4bf0e186342586289bee1bf78738cdd87640aa8d4f5028c534e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/c180eda7a214f97b90c794d76d28faf000e4267c5b3479f70f4db82b40137607.json",
+      "bytes": 646,
+      "sha256": "7cc6da3c6d733eba94c07654d59eb94ca8e1c4044044a8e3f7e958ec36c7ef9c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/eb9fddf79215adcb9bde87274f1a52bbfb68396c7b9ac0080f7bd6a4f9d22b82.json",
+      "bytes": 645,
+      "sha256": "2b7f512e6dca452980e18f2bcd00e83a6152b8aed161c37d6d4e5e51ef906e25"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/9a17049f06f8aaeddbe37f83e2d578b0f2723aaa6c203258660e668b2ef6a5ea.json",
+      "bytes": 643,
+      "sha256": "d12ff7d466ed9bc3342305c406756da5d480e5f5084a876face2f747b2e51e3e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8b900ac906fb33e0132546ae718242c91e55117f8a5d0f8c2f504fab98c26114.json",
+      "bytes": 643,
+      "sha256": "a736ff4d291665fe3861af1c977c456a429b3becda44e2d565b84e8991190f68"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/56aae381e3156035e4263a35a87aae8221834528bc164a6039420c02f4853fc9.json",
+      "bytes": 643,
+      "sha256": "765d3ff648a074b2ad28928ce1b96faa0e1c2c47c952821c338cfa0a2c6a3d58"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/5de3884b6afd72f94e4ba73ed0ae4108e6515d79165ebf6a13dee766f9cb6e84.json",
+      "bytes": 648,
+      "sha256": "d059f26486dde0828669e111d6cd693e37291723d1cd26e4ff57a062e59de503"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/05482849f8c49f1881d7c323b386b6762a3856af4e5c3d026a4fbf43d754de78.json",
+      "bytes": 645,
+      "sha256": "8cc1ca7ae546c596a62955034a2ecefdf6800556cec3c405fc773149c4582b2c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/41d24b2ff718c4e252013c58fc83cc78301bf9cb7e047e9b07a9c5d9eec3cdcd.json",
+      "bytes": 643,
+      "sha256": "1603af4b96718756aa413e6a823dbc1fc0ea50794aa10d0508dc72bef28e3d00"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/44667881d067d0d0c6a150a01b9c1de15ba15784ea13661ac5f30e3c0a8ca009.json",
+      "bytes": 645,
+      "sha256": "f4f2a870ba9060eb66816821e415ae30e267d06a5eae9c1aef8ba453cb71a020"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/74855b0293aded85e5cba681bb7dc5a244801101eff14bcea703398fe05b7e7a.json",
+      "bytes": 641,
+      "sha256": "db18f0ed15dd130d0145a13d32f8bb1b2939da7ace086f976d3a113559e784a3"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/4ce97f9f95455bfd40be526cce51802e4c89b365763174adcb2d24029e30e57c.json",
+      "bytes": 638,
+      "sha256": "9544769312ef7cbc05e98633b529d0aa115e9a60fec7726c189f153880d7c492"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/46da7a85eaae378bd93258ff849abb2f06e7d0a0c6f015aaf11a846bef334a13.json",
+      "bytes": 638,
+      "sha256": "ba8087e3dfac2516747245b8abeb6790236bbaa3662106f4455fc05af8e0c23a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/31f1a249aed6922f8104558416dee19c4f5fa00ba215044fd60064f9e8b67f3f.json",
+      "bytes": 646,
+      "sha256": "f87122b4d1b5174c6193ba714d7ea18200b06557384c45e55328910078cd04f7"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a915c5f1096f9ee480bc09ca01807b3cff55c54a12f7c9412fecea88001e759d.json",
+      "bytes": 643,
+      "sha256": "dd6724e008b0d8b4299531f14e915d1097d27f9b1dc4f473ec26ef78c114dbbe"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6815c8d3fdfd184077e90e47694df8c38ed40e4d7fd4be483a95d947883b00d4.json",
+      "bytes": 641,
+      "sha256": "abfc53e876eb1fbf7ab67170b8706e4b5e98e0958ede75902aad40baa81eaec0"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/60fe1c9a2e33dc708f241b3e042bd3fb3215e8184de209280edf1c7044a26eb3.json",
+      "bytes": 643,
+      "sha256": "9be1bce1b9c2f8750a5de07e510c2bcb6ae057d1c05b77298c2838205c421467"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/b9b20cfc6d0a6604a1cfb5e948bc61ca73eebd8b5d01a0255f8518abb406c05c.json",
+      "bytes": 20208,
+      "sha256": "bc65f2261f75f9ebd7382620a6659595ee4dc348017fdafe06899b9274b18c81"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/f3d4385da95f7e1df891fe36e2c8711fb0b7c5d740bc07d6fda9991e0fa9a3ea.json",
+      "bytes": 10038,
+      "sha256": "a7b4aab71bdd57d0371534880d947dd74c1952476844fa93fbdaf163e55d11d1"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/e9d35d581198c17012a4284921113e25ecc860c1fa78efbfa6e807332fa67288.json",
+      "bytes": 20208,
+      "sha256": "bc65f2261f75f9ebd7382620a6659595ee4dc348017fdafe06899b9274b18c81"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/f5b986e59b84eb7c4aeb9d40d76596f803f142570f05a3ca4e9356695d21c913.json",
+      "bytes": 29875,
+      "sha256": "b9768f562fde7aede71de03143cc11bc4094fc0a2329f36512f2b8f1b1c4f6f7"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/45d88b5a649ce0a0647bfb947055042ffb4f262cde5b0c2d79e2512f382835d4.json",
+      "bytes": 24,
+      "sha256": "5465a882d1c10320b75f77ce1f922b8f2e6f91c66e3c48f5ea3b7a36c6ea2c7e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/57850d2f8b704f78de41fd53f768ec7071d73a6c62b055d7e1db93feb6613bf3.json",
+      "bytes": 24,
+      "sha256": "5465a882d1c10320b75f77ce1f922b8f2e6f91c66e3c48f5ea3b7a36c6ea2c7e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/7c693273d240cff8e19a4becd38701baf4bd15ac030be0ca20dc911007bc46a7.json",
+      "bytes": 29890,
+      "sha256": "e7ba58bcb1e2f12c80cfa6e30c06f858744391ea3f2fecc06380832a3421ab90"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/54c0c59f8b7e4a94756f07d47f2bac095c0080d9ee4ebdd6616fc832d6dd5ce7.json",
+      "bytes": 29890,
+      "sha256": "00c2206fed0de72ac0f0f9ae1f4ec1cfdf20b72d55fb08d1929175e5e00a614b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/7c57cf47d27d048b109f876899468b3d91c543e6fe8fe79ff953baac1a2921d0.json",
+      "bytes": 4303,
+      "sha256": "c5d24ec2c257c80b56207054b2a937d3f649f0777abea8e54f68200ff8de4dd9"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0c2f2fc12367e2e462bcd37485fea456d7badcc4350b57777dca68380fca5e32.json",
+      "bytes": 3462,
+      "sha256": "323dc364ea52ad4f6e17dcca3a5ca356f66d9a43c229d08ae2c62d6836f11b18"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/4306478a96a016c99a2c43afa2f4b1b3d4defc9539afadd441d8e219c2f2f00b.json",
+      "bytes": 3914,
+      "sha256": "fbfcb5dd26c646f869fb0a7a63118ed9b59f5248d5666a0a7f753635391fac4a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/cb9cd46e8bc094e1f3c2694691b64e8e60a26faf019039efc68f055024b18dba.json",
+      "bytes": 3549,
+      "sha256": "b7919a0354652c1bb3fba5410f88b3b5576f2f7c053806d00bc120747e741bbd"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/546a5248e88000104c1a0e3db182cd2e3232042f1b87c2fb2ebeffd98ca5c822.json",
+      "bytes": 3621,
+      "sha256": "ecdd1d100d407bdd56d8ed5d2809d54438d9f60f1a61cd094d407694647cf04c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/64dbd8f394c8b2de572e655f0d88f59ed4d6ce7c30d47c5fb8020645a92aab88.json",
+      "bytes": 3621,
+      "sha256": "4e9e2ce3166a006c0bee1b3b8d11b3a19994913dd0fa60d5d43942bf0e144eca"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/64dbf9efd02702be44101f6dc5f833069ab2077703893921766367e29316bb2c.json",
+      "bytes": 24,
+      "sha256": "5465a882d1c10320b75f77ce1f922b8f2e6f91c66e3c48f5ea3b7a36c6ea2c7e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/0cf511ddda6e3971a2590f59b87bbfbb258bbeeef91b37a96315e6fdcbd8734b.json",
+      "bytes": 3622,
+      "sha256": "49eca76263ddaf86f991acbccb7138922a370ca0bcc0e2f37d196692eca9428a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/71e672b1ba97e831afce3b326c71df4ccd400a6cdb2bde9c01aea9cd1725d9ce.json",
+      "bytes": 25178,
+      "sha256": "5c3c1114c882ea071c71747cd8378b7654037827d1fdf3b491fbf80b2ecf8d12"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/98447358de18914c64b6dacf9c602bfd0d15c3f439210881b68bb4b3a03060e2.json",
+      "bytes": 4994,
+      "sha256": "53a56eaaf7f3d3eb92bf7e4561574191027ddf0e9e2713f559f8e8ea5772b53a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/dce22b53789a8d5746fff10552b8c7660f8c6323c9942b5aad5a47bcc57c4d6c.json",
+      "bytes": 20317,
+      "sha256": "63a96bf7eccba8e878311f7f47a58c709a301754449d7cfec31a80d4dfdf0b2a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/2e9918abbd0a67126872206df2ce95f84c8181ddac59883666d072dfe24eaba2.json",
+      "bytes": 5997,
+      "sha256": "c2f9b888f815775fe9cf63d73246dd39e996ece2f972b51bdb5cbcc867d84bde"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/9efebb39f43ff5b75232db486bfa1befd256ec72df68ff4904d23ee522ea6af7.json",
+      "bytes": 21421,
+      "sha256": "e9c8bbfacd9e81deb7ae5e1ac25af43893898df236141df4d73f8adbb88f462c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ce6f711d06cf0f3175e9905b7a7076e53de827e3b869c400102bfb40b8045d2b.json",
+      "bytes": 1489,
+      "sha256": "50918a53bfdeea923ace1d3a92eb4dfc38c5098c237dc3434da4c8357bd89f85"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8c571b06ebc244c910693dfad0d430bd0175a905387e85442ba42d14e8717f3b.json",
+      "bytes": 1490,
+      "sha256": "09757c5b3ba2ff073b03e1154c6ac173f2bc794f3fa12d1c5ea1cefa8f7b1b95"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8c14a762dd5d23d1ced1468f3fb85563dac6904f88da42813e416710480f61d8.json",
+      "bytes": 1489,
+      "sha256": "77dc79e6b33811d2242708b538eb9490b34fab2b17395dec9e23493efe4bb0c2"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/41db1f1216d5c5c9c62d6879404b63aed30e78adbce2d74edc386321b01905ef.json",
+      "bytes": 1490,
+      "sha256": "c23ce8851f63ad71d2b16c450424c73501e378d060518044e53caf68476b4b4d"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/7324fbd9cff1cb4216e2d220bfc59db1aef27332bc167da18ccd2011685ee1bb.json",
+      "bytes": 20316,
+      "sha256": "eec500b8d235ba5ff65f4dc58a183ab13dcffac10aa2ffc828737560e3d35fb2"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6ac327c517292272c6d1d5facaafbfd0bdc2e2c41e1bac285406cf61686b7737.json",
+      "bytes": 7600,
+      "sha256": "6d1c1c402f7840bfc53c8cd14d7ee1bc6c4ef3df13fdc00ce5c72536f4080351"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/45725ef969d1b8e74ad54cc862fd23eaaa665962ecfa0c6bb082fcb494049700.json",
+      "bytes": 21428,
+      "sha256": "a263ab5efd2f1b80e9fb36f636d1ae5a13f92463ef3da1383f33dbde3bed613d"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/2695bb983a4946c7c4284cfdc22168505a68ca6eb31ca7ab21a88dd6c265bdda.json",
+      "bytes": 1458,
+      "sha256": "371d09e988ca8a3dd6e61ee5c5f2fe64d79cbb591b7364803dbcab8552550749"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/9f0079c631660e9d0b8f3a927e5e43ec632c5bc288326266fa5708037536ef8f.json",
+      "bytes": 1468,
+      "sha256": "3edd3a2fda0e1143680fd719aa2be322db01a2a071cd27088e929e0f578f31ba"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ef917479201edffe923d5c9369b77791191cdd755562ca1afb8da0b785a24611.json",
+      "bytes": 1472,
+      "sha256": "4e73b738269b0aa292652afb2667826613b39ddda60e18b0ca653187ec249b0b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/fe1bf2f8f35bb63963c7277881d8779f0fcac3934b7c7a1c42495f75742ee047.json",
+      "bytes": 1458,
+      "sha256": "0f01efc471a8dfe839952e5173d242f60a06764f9017a4a81cbf9922549a7d02"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/eae99d9feab9153efe3e0311e3964439b7981f49b2ab17f2f2ec342cd0cbd4d0.json",
+      "bytes": 1468,
+      "sha256": "583c47059ee2647c4708610a6c3313ace032f976863cea667dcb4254dcb26041"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/e71e5ba620c1613afd5a329b7c20ec0f8ebaea4c7a1897af3dd2e43555e0cb6c.json",
+      "bytes": 922,
+      "sha256": "0b34867683f2f192e0c638e46ff5e1fde68248ba9290bf8076732eff87d776bd"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ede213cfb35f4c5f01745065ce627ad114df4f6d605d83044311ea1f1ae6beac.json",
+      "bytes": 20326,
+      "sha256": "b9607515046e62f2fde833d6bbdd3296511dc15d7dee6eb7f03c2748745fd117"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/e21150900cd45a8a3fe7fb74ae6fed66ed270d14cf257620fdbe86018a71b2ec.json",
+      "bytes": 8152,
+      "sha256": "03cba0861fb3fcd1c224c78bc519aeb71e7650bd730314bce6b025f51e23b634"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/3adaddec02d6b83026dc67cd876edf671e27f8c4ccf115e60a01eb37daa8b6d8.json",
+      "bytes": 21433,
+      "sha256": "22e80da1c76ed104513af563c60ee977aaa9fa4693e8ebc34e7d9c55c7b4cce8"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/27319ffad8c4c8c0ba9399264f8fd52eaffde79a0074152b07806dd21e989705.json",
+      "bytes": 1465,
+      "sha256": "92acc1c71415e82f6fe36bb97f8e0a2dacf4092fbcbe145b177831900cecaa05"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/f3acde7b1037bd620f772768324837bceeded484378a60c087e7f8337bfcbb9b.json",
+      "bytes": 1453,
+      "sha256": "c362cbad9c8b05fff573c203f234b1e2575737ddeb2d43e61e7ea3b495557a4c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/c302230ecf1931f8a347ff8687cbab7b09af65cf15ac51753d652895be993a70.json",
+      "bytes": 1472,
+      "sha256": "aa968f514a26dce6b9f8b85e49e0e39a800c9943d6186eda661667858dab86df"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/56882f9e01c4819aa372879476e67d1a68c21147195d9ef5eb6e511d2c12874e.json",
+      "bytes": 1465,
+      "sha256": "69b83fba64c28cc5a52ee6a85d7a1def86dd95a0a3d0ae75c7854650618c4de9"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/9b61aa4138375603c31022e6f3e9fb432cee6b3a643b2f417e637b7e9af239a9.json",
+      "bytes": 1453,
+      "sha256": "4b713e9162f37e4d80deff001ad602aa9505a8174968d8aacbb646a9912803a6"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/85377fe33bd16fb00214980caf3c86efbd55971d8e6c9b419339ba24566bc68a.json",
+      "bytes": 1472,
+      "sha256": "e2135c453100a734e6c83f2d24a0dfa251bbd45e09a446d93d8b0929265ae7ef"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/45cdda6eaad3427e2a34f13f77319dae9585347a70f8e93fd8b54c4f217a76bc.json",
+      "bytes": 25712,
+      "sha256": "9347ce8319f8ee7ae64c404ebc3b70c7ee5d647bfab928c65112d640dec85392"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/8ab2b140510fdb657b1c166b74148f153c6ebc943c52766ab82903104057d28f.json",
+      "bytes": 27314,
+      "sha256": "175ff4717ffdd466ce28d88194d3218367aa20563ffc08d719442aed6b4d9513"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/27536ee416bac393c9be51cdc90cecc7dc381a2f4453c1bcce22ef057963e92e.json",
+      "bytes": 27876,
+      "sha256": "122ccbd10e9eceb74de740687dd068562e143d702cb23c71bb0d3c0a31552ae2"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18.json",
+      "bytes": 29644,
+      "sha256": "21158b8edb8cd56491b2ca222755fb516a9af303bf2ba74e27632d8061fb7d03"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3.json",
+      "bytes": 10736,
+      "sha256": "fb1916117ded8a108af3dc36e68af05c4e331a726ddefff145de6520cddf3d92"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/50ec6a3787b9311f9a25b801180003b122009d442e72921d86a78532666aa003.json",
+      "bytes": 26143,
+      "sha256": "f999e704624238248721f5ed9b6a018a45e265fea6d41bef302f2cfcf705530c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/29bb3f8ed8e05c80676bb64a5d09d19a7ed8592240c494e3126cdaa3aacdfb85.json",
+      "bytes": 26226,
+      "sha256": "6d291191fb3d88b15921949a3c613d4c63fdfe01d66a8731700a6bc61097cb6a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/e0dabebc8a3e44e5bda8fcc4e204034a0d9c302f7fd02a95ecf4fab0dce5b24f.json",
+      "bytes": 26506,
+      "sha256": "d04c51fa7ffe46e6a5e26706e8f4b822c256ce7e86d2e8d08da0e0490cc1a5a2"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/6ccf1ac0a7efd02e9f006cdf4c9b7273c647ad3868924e89965e7b2ab2eeedf2.json",
+      "bytes": 29644,
+      "sha256": "71fdcca4eee4a3b8985e1ccc01781801895cb4aa704370ac3312e90b5fa05f26"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/33a114eadee5b44adf579f0af7ab767c08abf7fb6a08662e13c601e919af0c07.json",
+      "bytes": 386,
+      "sha256": "8854d323a06a1b94c3c070d1c7df93010887586d30ce667ccedf7c415f01e7d6"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a3718c7940c34ff91a906d0758debb656aed43d1aa8b23b99f67cb106cdbc881.json",
+      "bytes": 136,
+      "sha256": "e26724b09e24e7613f40af5e75e3403db0294d9b220a8a254c02b88db52b9a6b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/1792040cbd23cfbf32292339e2c7c6c0e29aebd16396afa23df3669c937d8a35.json",
+      "bytes": 386,
+      "sha256": "b977230309b832f590d99f27117704ce939af79630e7c1555d0c85532baf9d7a"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/db72b9b0b3f4f505454ba23d2a266b322854796b21a325b849ff0fb29ebf18fe.json",
+      "bytes": 385,
+      "sha256": "6d46d4a3853500623342d4596203629c98851b3448a05d7f6a79f9200dd04069"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a4e5e156ddec27e286f75328784d7106b60a4eb1d246e950a001a3f944fbda99.json",
+      "bytes": 136,
+      "sha256": "e26724b09e24e7613f40af5e75e3403db0294d9b220a8a254c02b88db52b9a6b"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/72483a1963bb2bc7c324b02e61c742cfa457e8dd5d5f21baf6b6462b9633cbca.json",
+      "bytes": 205,
+      "sha256": "f21f944ab3f926da7201f398f3994f784dcf6a0be6873feee2e4f7a9b68a381c"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/5a7008adafca82f8f325e78a7041260a076168129c4447b7ef357a89b634ff4d.json",
+      "bytes": 449,
+      "sha256": "87c681df2a7c57cb28ed05f2a04e3fb32deece9009208208a3721ec4a53e3739"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/a5eb9e1f75ba5a64fe16332495488c402f743d6bc97930f922a44b2e2f1ffa95.json",
+      "bytes": 24,
+      "sha256": "5465a882d1c10320b75f77ce1f922b8f2e6f91c66e3c48f5ea3b7a36c6ea2c7e"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/ce133d97edc69f7289e67dbd565493ebaa6f0a7786be3e6c27dfe9f5fb8af5cd.json",
+      "bytes": 386,
+      "sha256": "9f26f6ad67d86641d7edef55fc4bd5ae200b408afa1d056de7bed6114620d2e4"
+    },
+    {
+      "path": "sharded-gguf-port/pack-capture/187f055599b2acee883cfb257e232b2255793b9972286977ccd4974a38be9275.json",
+      "bytes": 634,
+      "sha256": "1ebe5ca0b47432ff2c20dd19f07015b3ef2259dd8fd9784633396b6536ceae7c"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/single-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/single-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/single-explicit-extra-ignored/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/single-explicit-extra-ignored/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/two-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/two-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/two-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/two-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/three-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/three-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/three-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/three-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/many-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/many-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/many-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/many-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/metadata-first-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/metadata-first-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/metadata-first-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/metadata-first-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/one-auto/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/one-auto/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/one-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/one-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/sub-metadata-absent/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/sub-metadata-absent/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/sub-metadata-conflicts/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/sub-metadata-conflicts/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/sub-alignment64/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/sub-alignment64/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/single-count-0-extra-ignored/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/single-count-0-extra-ignored/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/single-count-1-extra-ignored/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/single-count-1-extra-ignored/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/custom-explicit/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/custom-explicit/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture/cases/metadata-first-unpadded/inference-native.json",
+      "bytes": 167030,
+      "sha256": "1381d6c1b883b2157b53d014723ed1d59e62e44397cc2ed2c04687c015043395"
+    },
+    {
+      "path": "sharded-gguf-port/native-capture-gnu/cases/metadata-first-unpadded/inference-native.json",
+      "bytes": 167007,
+      "sha256": "a5fb1d7803d162679ac671d77cb1cab75b9e2e4ae13dbc1682430828274e1fe3"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/packed-llama-single-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/packed-llama-single-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/packed-llama-split-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/packed-llama-split-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/packed-llama-split-explicit/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/packed-llama-split-explicit/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/packed-llama-metadata-first-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/packed-llama-metadata-first-auto/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/packed-llama-metadata-first-explicit/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/packed-llama-metadata-first-explicit/inference-native.json",
+      "bytes": 185389,
+      "sha256": "6214318b41b2948426f682919957f6fab46a071eb199b0790ff0002e7c8085b8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-default-single-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-default-single-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-default-split-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-default-split-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-default-split-explicit/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-default-split-explicit/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-default-metadata-first-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-default-metadata-first-auto/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-default-metadata-first-explicit/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-default-metadata-first-explicit/inference-native.json",
+      "bytes": 189002,
+      "sha256": "9e3fb6fc2bc333590765ca325b5a3b8799a45b14a19bf79056a120bb96507c63"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-rms-single-auto/inference-native.json",
+      "bytes": 189125,
+      "sha256": "168d0e8caf5e09e10307427dfc22a8a7b19799e268657a5038fa1d8ed4506f27"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-rms-single-auto/inference-native.json",
+      "bytes": 189237,
+      "sha256": "c92b2fc4626367765e82e555b61fd7130d86f39393294ac6d9f6140babb02fa8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-rms-split-auto/inference-native.json",
+      "bytes": 189125,
+      "sha256": "168d0e8caf5e09e10307427dfc22a8a7b19799e268657a5038fa1d8ed4506f27"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-rms-split-auto/inference-native.json",
+      "bytes": 189237,
+      "sha256": "c92b2fc4626367765e82e555b61fd7130d86f39393294ac6d9f6140babb02fa8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-rms-split-explicit/inference-native.json",
+      "bytes": 189125,
+      "sha256": "168d0e8caf5e09e10307427dfc22a8a7b19799e268657a5038fa1d8ed4506f27"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-rms-split-explicit/inference-native.json",
+      "bytes": 189237,
+      "sha256": "c92b2fc4626367765e82e555b61fd7130d86f39393294ac6d9f6140babb02fa8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-rms-metadata-first-auto/inference-native.json",
+      "bytes": 189125,
+      "sha256": "168d0e8caf5e09e10307427dfc22a8a7b19799e268657a5038fa1d8ed4506f27"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-rms-metadata-first-auto/inference-native.json",
+      "bytes": 189237,
+      "sha256": "c92b2fc4626367765e82e555b61fd7130d86f39393294ac6d9f6140babb02fa8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-rms-metadata-first-explicit/inference-native.json",
+      "bytes": 189125,
+      "sha256": "168d0e8caf5e09e10307427dfc22a8a7b19799e268657a5038fa1d8ed4506f27"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-rms-metadata-first-explicit/inference-native.json",
+      "bytes": 189237,
+      "sha256": "c92b2fc4626367765e82e555b61fd7130d86f39393294ac6d9f6140babb02fa8"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-untied-single-auto/inference-native.json",
+      "bytes": 188262,
+      "sha256": "7905ac7768ad36ef6bb7639b65becc87fcad041a14e4495e188bcc683ecdd148"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-untied-single-auto/inference-native.json",
+      "bytes": 188263,
+      "sha256": "a6f04e108914bf5b40d1dcaa1583cbf890043ccaecea6026036cb6a1e29b8873"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-untied-split-auto/inference-native.json",
+      "bytes": 188262,
+      "sha256": "7905ac7768ad36ef6bb7639b65becc87fcad041a14e4495e188bcc683ecdd148"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-untied-split-auto/inference-native.json",
+      "bytes": 188263,
+      "sha256": "a6f04e108914bf5b40d1dcaa1583cbf890043ccaecea6026036cb6a1e29b8873"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-untied-split-explicit/inference-native.json",
+      "bytes": 188262,
+      "sha256": "7905ac7768ad36ef6bb7639b65becc87fcad041a14e4495e188bcc683ecdd148"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-untied-split-explicit/inference-native.json",
+      "bytes": 188263,
+      "sha256": "a6f04e108914bf5b40d1dcaa1583cbf890043ccaecea6026036cb6a1e29b8873"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-untied-metadata-first-auto/inference-native.json",
+      "bytes": 188262,
+      "sha256": "7905ac7768ad36ef6bb7639b65becc87fcad041a14e4495e188bcc683ecdd148"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-untied-metadata-first-auto/inference-native.json",
+      "bytes": 188263,
+      "sha256": "a6f04e108914bf5b40d1dcaa1583cbf890043ccaecea6026036cb6a1e29b8873"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/mamba-untied-metadata-first-explicit/inference-native.json",
+      "bytes": 188262,
+      "sha256": "7905ac7768ad36ef6bb7639b65becc87fcad041a14e4495e188bcc683ecdd148"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/mamba-untied-metadata-first-explicit/inference-native.json",
+      "bytes": 188263,
+      "sha256": "a6f04e108914bf5b40d1dcaa1583cbf890043ccaecea6026036cb6a1e29b8873"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/bert-single-auto/inference-native.json",
+      "bytes": 3925,
+      "sha256": "2f7f398f9179d2ba5f967cc7b2ee7c90de592b94172b1fa1abbc26744b81d8e1"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/bert-single-auto/inference-native.json",
+      "bytes": 3931,
+      "sha256": "8b7672a3e4dafd6dde64d890ef1d7ba890a12b4eff307c6dfe6e75f1b941936a"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/bert-split-auto/inference-native.json",
+      "bytes": 3925,
+      "sha256": "2f7f398f9179d2ba5f967cc7b2ee7c90de592b94172b1fa1abbc26744b81d8e1"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/bert-split-auto/inference-native.json",
+      "bytes": 3931,
+      "sha256": "8b7672a3e4dafd6dde64d890ef1d7ba890a12b4eff307c6dfe6e75f1b941936a"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/bert-split-explicit/inference-native.json",
+      "bytes": 3925,
+      "sha256": "2f7f398f9179d2ba5f967cc7b2ee7c90de592b94172b1fa1abbc26744b81d8e1"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/bert-split-explicit/inference-native.json",
+      "bytes": 3931,
+      "sha256": "8b7672a3e4dafd6dde64d890ef1d7ba890a12b4eff307c6dfe6e75f1b941936a"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/bert-metadata-first-auto/inference-native.json",
+      "bytes": 3925,
+      "sha256": "2f7f398f9179d2ba5f967cc7b2ee7c90de592b94172b1fa1abbc26744b81d8e1"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/bert-metadata-first-auto/inference-native.json",
+      "bytes": 3931,
+      "sha256": "8b7672a3e4dafd6dde64d890ef1d7ba890a12b4eff307c6dfe6e75f1b941936a"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture/cases/bert-metadata-first-explicit/inference-native.json",
+      "bytes": 3925,
+      "sha256": "2f7f398f9179d2ba5f967cc7b2ee7c90de592b94172b1fa1abbc26744b81d8e1"
+    },
+    {
+      "path": "sharded-gguf-port/extended-capture-gnu/cases/bert-metadata-first-explicit/inference-native.json",
+      "bytes": 3931,
+      "sha256": "8b7672a3e4dafd6dde64d890ef1d7ba890a12b4eff307c6dfe6e75f1b941936a"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-separate-single-auto/inference-native.json",
+      "bytes": 187555,
+      "sha256": "5999028e5c31aa4c427f604163f71d2ab69755a49150aea0e13eae808c6fd356"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-separate-single-auto/inference-native.json",
+      "bytes": 187432,
+      "sha256": "0d1f3086dcb90d3ad964d8234b70772128f85bc13b37daf065df9ee84e4bdc3e"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-separate-split-auto/inference-native.json",
+      "bytes": 187555,
+      "sha256": "5999028e5c31aa4c427f604163f71d2ab69755a49150aea0e13eae808c6fd356"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-separate-split-auto/inference-native.json",
+      "bytes": 187432,
+      "sha256": "0d1f3086dcb90d3ad964d8234b70772128f85bc13b37daf065df9ee84e4bdc3e"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-separate-split-explicit/inference-native.json",
+      "bytes": 187555,
+      "sha256": "5999028e5c31aa4c427f604163f71d2ab69755a49150aea0e13eae808c6fd356"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-separate-split-explicit/inference-native.json",
+      "bytes": 187432,
+      "sha256": "0d1f3086dcb90d3ad964d8234b70772128f85bc13b37daf065df9ee84e4bdc3e"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-separate-metadata-first-auto/inference-native.json",
+      "bytes": 187555,
+      "sha256": "5999028e5c31aa4c427f604163f71d2ab69755a49150aea0e13eae808c6fd356"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-separate-metadata-first-auto/inference-native.json",
+      "bytes": 187432,
+      "sha256": "0d1f3086dcb90d3ad964d8234b70772128f85bc13b37daf065df9ee84e4bdc3e"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-separate-metadata-first-explicit/inference-native.json",
+      "bytes": 187555,
+      "sha256": "5999028e5c31aa4c427f604163f71d2ab69755a49150aea0e13eae808c6fd356"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-separate-metadata-first-explicit/inference-native.json",
+      "bytes": 187432,
+      "sha256": "0d1f3086dcb90d3ad964d8234b70772128f85bc13b37daf065df9ee84e4bdc3e"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-fused-q4-single-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-fused-q4-single-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-fused-q4-split-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-fused-q4-split-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-fused-q4-split-explicit/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-fused-q4-split-explicit/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-fused-q4-metadata-first-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-fused-q4-metadata-first-auto/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-fused-q4-metadata-first-explicit/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-fused-q4-metadata-first-explicit/inference-native.json",
+      "bytes": 184067,
+      "sha256": "237de45dac51469c9d6817004f6dbb2f930ac38f36381b9980ce66404dc95b48"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-untied-output-bias-single-auto/inference-native.json",
+      "bytes": 185923,
+      "sha256": "3713395757ccafd98ace2cc81ab856019646d1cb61bbf16b7e4fb9cd5d0d6084"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-untied-output-bias-single-auto/inference-native.json",
+      "bytes": 186008,
+      "sha256": "5af309609e0f30e123c4368a0f99e0f6cacde387f32e1d2df79bc36bde258388"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-untied-output-bias-split-auto/inference-native.json",
+      "bytes": 185923,
+      "sha256": "3713395757ccafd98ace2cc81ab856019646d1cb61bbf16b7e4fb9cd5d0d6084"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-untied-output-bias-split-auto/inference-native.json",
+      "bytes": 186008,
+      "sha256": "5af309609e0f30e123c4368a0f99e0f6cacde387f32e1d2df79bc36bde258388"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-untied-output-bias-split-explicit/inference-native.json",
+      "bytes": 185923,
+      "sha256": "3713395757ccafd98ace2cc81ab856019646d1cb61bbf16b7e4fb9cd5d0d6084"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-untied-output-bias-split-explicit/inference-native.json",
+      "bytes": 186008,
+      "sha256": "5af309609e0f30e123c4368a0f99e0f6cacde387f32e1d2df79bc36bde258388"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-untied-output-bias-metadata-first-auto/inference-native.json",
+      "bytes": 185923,
+      "sha256": "3713395757ccafd98ace2cc81ab856019646d1cb61bbf16b7e4fb9cd5d0d6084"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-untied-output-bias-metadata-first-auto/inference-native.json",
+      "bytes": 186008,
+      "sha256": "5af309609e0f30e123c4368a0f99e0f6cacde387f32e1d2df79bc36bde258388"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture/cases/qwen-untied-output-bias-metadata-first-explicit/inference-native.json",
+      "bytes": 185923,
+      "sha256": "3713395757ccafd98ace2cc81ab856019646d1cb61bbf16b7e4fb9cd5d0d6084"
+    },
+    {
+      "path": "sharded-gguf-port/qwen-capture-gnu/cases/qwen-untied-output-bias-metadata-first-explicit/inference-native.json",
+      "bytes": 186008,
+      "sha256": "5af309609e0f30e123c4368a0f99e0f6cacde387f32e1d2df79bc36bde258388"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/cases/llama-trailing-unit-dimensions-single-auto/inference-native.json",
+      "bytes": 186359,
+      "sha256": "ceb7f74c9941d48cf355077b88ae5e542ef98a577c646e3cac567f73218b322a"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/cases/llama-trailing-unit-dimensions-single-auto/inference-native.json",
+      "bytes": 186615,
+      "sha256": "bbe05b75b45f1bfca80852cca41395d52044b4917e9ea0a23312c149049e8aae"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/cases/llama-trailing-unit-dimensions-split-auto/inference-native.json",
+      "bytes": 186359,
+      "sha256": "ceb7f74c9941d48cf355077b88ae5e542ef98a577c646e3cac567f73218b322a"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/cases/llama-trailing-unit-dimensions-split-auto/inference-native.json",
+      "bytes": 186615,
+      "sha256": "bbe05b75b45f1bfca80852cca41395d52044b4917e9ea0a23312c149049e8aae"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/cases/llama-trailing-unit-dimensions-split-explicit/inference-native.json",
+      "bytes": 186359,
+      "sha256": "ceb7f74c9941d48cf355077b88ae5e542ef98a577c646e3cac567f73218b322a"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/cases/llama-trailing-unit-dimensions-split-explicit/inference-native.json",
+      "bytes": 186615,
+      "sha256": "bbe05b75b45f1bfca80852cca41395d52044b4917e9ea0a23312c149049e8aae"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/cases/llama-trailing-unit-dimensions-metadata-first-auto/inference-native.json",
+      "bytes": 186359,
+      "sha256": "ceb7f74c9941d48cf355077b88ae5e542ef98a577c646e3cac567f73218b322a"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/cases/llama-trailing-unit-dimensions-metadata-first-auto/inference-native.json",
+      "bytes": 186615,
+      "sha256": "bbe05b75b45f1bfca80852cca41395d52044b4917e9ea0a23312c149049e8aae"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture/cases/llama-trailing-unit-dimensions-metadata-first-explicit/inference-native.json",
+      "bytes": 186359,
+      "sha256": "ceb7f74c9941d48cf355077b88ae5e542ef98a577c646e3cac567f73218b322a"
+    },
+    {
+      "path": "sharded-gguf-port/shape-capture-gnu/cases/llama-trailing-unit-dimensions-metadata-first-explicit/inference-native.json",
+      "bytes": 186615,
+      "sha256": "bbe05b75b45f1bfca80852cca41395d52044b4917e9ea0a23312c149049e8aae"
+    }
+  ],
+  "sources": [
+    {
+      "path": "sharded-gguf-port/pack_native.py",
+      "bytes": 10224,
+      "sha256": "1127516d39b59ed1cb6fd2420ac927cab472c12310a7c89ce1043aba830aee93"
+    },
+    {
+      "path": "sharded-gguf-port/gguf-inspect-oracle.cpp",
+      "bytes": 4696,
+      "sha256": "c018b8382b31c7c8308e6afb89cf915daa61e239905ad582d3ea69fc1b7180e7"
+    },
+    {
+      "path": "sharded-gguf-port/shard-inference-oracle.cpp",
+      "bytes": 11599,
+      "sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555"
+    },
+    {
+      "path": "sharded-gguf-port/shard-embedding-oracle.cpp",
+      "bytes": 4677,
+      "sha256": "1b6cb948b42e44bda444cb78841fcef655fcd822ed79a5810efb11ffe4656569"
+    },
+    {
+      "path": "sharded-gguf-port/packed-model.cpp",
+      "bytes": 3733,
+      "sha256": "f660e1c17cc35ebd7855debb95aa6675ac21eddfc1596551bd62c2a17993260c"
+    },
+    {
+      "path": "llama.cpp-master/ggml/src/gguf.cpp",
+      "bytes": 60086,
+      "sha256": "51bd966ab0494aa20d4087975f17d8b9b8ed9c4b63d7cbffe9315ed45de5dd78"
+    },
+    {
+      "path": "llama.cpp-master/src/llama-model-loader.cpp",
+      "bytes": 82846,
+      "sha256": "b856b513340e9e86ab81e2d8d110fedd07b60f508e0e4f8513690150f8efd7e1"
+    },
+    {
+      "path": "llama.cpp-master/src/llama-model-loader.h",
+      "bytes": 9885,
+      "sha256": "4eb5318f7b70333015386d612738f507153770e4e5635895b2c1d8355ff22103"
+    },
+    {
+      "path": "llama.cpp-master/src/llama.cpp",
+      "bytes": 22050,
+      "sha256": "0283e941ddd0ac3f8bc637a2e058336201bcd0784e1ebc697ea9bee3b2761bcd"
+    },
+    {
+      "path": "llama.cpp-master/tools/gguf-split/gguf-split.cpp",
+      "bytes": 23504,
+      "sha256": "90b4f4f733c947d86e86411f553c16d2a20bb3cc7dc7ad25015d2799e0959396"
+    },
+    {
+      "path": "sharded-gguf-port/rust-draft/fixtures/ffi/native-context-provenance.json",
+      "bytes": 10520,
+      "sha256": "4c3bf64186206e646abc188062b82f89ef1e1428a440f107a699df318a4cbcfc"
+    },
+    {
+      "path": "sharded-gguf-port/rust-draft/fixtures/inference/bert-defaults-provenance.json",
+      "bytes": 3538,
+      "sha256": "140e405cfb55109c92e587cd6d3adc9350323925723943da0c6436ed3d75ff05"
+    },
+    {
+      "path": "sharded-gguf-port/rust-draft/fixtures/inference/tiny-mamba-default-provenance.json",
+      "bytes": 2223,
+      "sha256": "149fc6e8ec001c8754e0e7f505bc68aaee8e361cda6b8a4e48d16d9fe99057a4"
+    },
+    {
+      "path": "sharded-gguf-port/rust-draft/fixtures/inference/tiny-mamba-rms-provenance.json",
+      "bytes": 2222,
+      "sha256": "0118b8e69161c04c12e8d9f22e976479eddd314fbfaf6f52e2a5811cbeab42a8"
+    },
+    {
+      "path": "sharded-gguf-port/rust-draft/fixtures/inference/tiny-mamba-untied-provenance.json",
+      "bytes": 2222,
+      "sha256": "d63eb7cf62d0298967b6ad3b6e606613e7b3196428c49f626015788320916d34"
+    },
+    {
+      "path": "qwen2-integration-v1/rust-draft/fixtures/inference/tiny-qwen2-separate-provenance.json",
+      "bytes": 2197,
+      "sha256": "0dd091c0ca131eb0fc87245b3bf8a23b1d5d69c49f8eee1c2dbedd82ab547ee9"
+    },
+    {
+      "path": "qwen2-integration-v1/rust-draft/fixtures/inference/tiny-qwen2-fused-q4-provenance.json",
+      "bytes": 2197,
+      "sha256": "4b2c0f3f23e8951404bea883a096a4878a7e7810beac3ae695b9fa512e7e4982"
+    },
+    {
+      "path": "qwen2-integration-v1/rust-draft/fixtures/inference/tiny-qwen2-untied-output-bias-provenance.json",
+      "bytes": 2207,
+      "sha256": "c17fc28de0a249060f7277f7f99deb381a61d10555ca3fd0f1ea96dd400ca6ba"
+    },
+    {
+      "path": "build/bin/Release/ggml-base.dll",
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    {
+      "path": "build/bin/Release/ggml-cpu.dll",
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    {
+      "path": "build/bin/Release/ggml.dll",
+      "bytes": 62464,
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    },
+    {
+      "path": "build/bin/Release/llama.dll",
+      "bytes": 3211264,
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "fixtures/gguf/shards-reference.json",
+      "bytes": 1711785,
+      "sha256": "401f9fdc2bbac985fc3d4e388ff5f53d31223ca1216aaeb403b37fcd3024e343"
+    },
+    {
+      "path": "fixtures/gguf/shards-inputs.bin",
+      "bytes": 1482956,
+      "sha256": "b444d977bd9326a352a9967efcdf3d2d44ea3397b608cf2562879ad6e1ed8086"
+    },
+    {
+      "path": "fixtures/gguf/shards-payloads.bin",
+      "bytes": 165155,
+      "sha256": "ff5011cc2ae4f56edb0df766446ed6fdec83059e8b1d9604a9e6dce1b42e662e"
+    },
+    {
+      "path": "fixtures/gguf/shards-msvc-values.f32le.bin",
+      "bytes": 280864,
+      "sha256": "35860bb0a792444bea671ccf10f48ebd517dac581c2d92dd1fb2929b7c59df69"
+    },
+    {
+      "path": "fixtures/gguf/shards-gnu-values.f32le.bin",
+      "bytes": 280864,
+      "sha256": "4effdf50c872281c8dcbf5ab1b77068377017367cf5bf7dbc26d265a3e067148"
+    }
+  ],
+  "qualifications": [
+    "The original subsidiary split.no wrong-type getter aborts; the Rust API returns a checked error instead. Native exit codes are retained.",
+    "Native raw GGUF inspection with no_alloc can parse a truncated payload; the model loader rejects it. The Rust reader performs the model payload-bounds validation at parse time.",
+    "Primary metadata alone controls the model. Subsidiary metadata is not merged; only split.no is required and checked.",
+    "The source zero-tensor writer pads, while its reader reports the unpadded header position.",
+    "Synthetic model data validates execution and loader integration; it is not pretrained-model coverage.",
+    "The existing Rust parser strict UTF-8/NUL-key boundary, ordered streaming split/merge writer and external checkpoint conversion are not closed by this shard slice."
+  ]
+}

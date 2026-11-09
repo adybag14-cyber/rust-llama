@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "commit": "ff898aadc24961afc77711e1a690d75458b1f155",
+  "run_id": 42666469417,
+  "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/42666469417",
+  "status": "completed",
+  "conclusion": "success",
+  "qualification": "Independent GitHub-hosted MSVC and GNU checkpoint validation. Raw job logs retained; test counts parsed by cargo invocation. Numerical budgets and expected fixtures were not changed.",
+  "jobs": [
+    {
+      "platform": "linux",
+      "sections": {
+        "cargo test --workspace --all-targets --offline --locked": {
+          "suites": 78,
+          "passed": 419,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --workspace --all-targets --release --offline --locked": {
+          "suites": 78,
+          "passed": 419,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture": {
+          "suites": 11,
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 65
+        }
+      },
+      "interesting": [
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture",
+        "test pretrained_bert_matches_original_embedding_http_transcripts ... ignored, requires the hash-pinned BGE model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture",
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture",
+        "test pretrained_bert_matches_original_embedding_http_transcripts ... ignored, requires the hash-pinned BGE model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture",
+        "BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)",
+        "native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0",
+        "native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)",
+        "native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)",
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ok",
+        "native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)",
+        "Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0"
+      ]
+    },
+    {
+      "platform": "windows",
+      "sections": {
+        "cargo test --workspace --all-targets --offline --locked": {
+          "suites": 78,
+          "passed": 417,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --workspace --all-targets --release --offline --locked": {
+          "suites": 78,
+          "passed": 417,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture": {
+          "suites": 11,
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 65
+        }
+      },
+      "interesting": [
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture",
+        "test pretrained_bert_matches_original_embedding_http_transcripts ... ignored, requires the hash-pinned BGE model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture",
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture",
+        "test pretrained_bert_matches_original_embedding_http_transcripts ... ignored, requires the hash-pinned BGE model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture",
+        "BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)",
+        "native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0",
+        "native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)",
+        "native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)",
+        "test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ok",
+        "native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)",
+        "Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0"
+      ]
+    }
+  ]
+}

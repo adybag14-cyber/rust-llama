@@ -1,5 +1,5 @@
 use crate::*;
-use llama_gguf::{Gguf, Value};
+use llama_gguf::{GgufSet, Value};
 use llama_inference::{LoadOptions, Model};
 use llama_tokenizer::Tokenizer;
 use std::collections::BTreeMap;
@@ -94,11 +94,11 @@ fn file_type_name(ftype: i32) -> String {
         if ftype & 1024 != 0 { "(guessed) " } else { "" }
     )
 }
-fn guess_ftype<R: std::io::Read + std::io::Seek>(file: &Gguf<R>) -> i32 {
+fn guess_ftype(files: &GgufSet) -> i32 {
     let mut counts = BTreeMap::new();
     let mut dominant = 0;
     let mut largest = 0;
-    let mut ordered: Vec<_> = file.tensors.iter().collect();
+    let mut ordered: Vec<_> = files.tensors().iter().collect();
     ordered.sort_by(|a, b| a.name.cmp(&b.name));
     for tensor in ordered {
         let n = counts.entry(tensor.dtype as u32).or_insert(0usize);
@@ -188,8 +188,10 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     unsafe {
         progress(&p, 0.0)?;
     }
-    let file = Gguf::open(path).map_err(|e| e.to_string())?;
-    let m = &file.metadata;
+    // Vocabulary-only loading also validates every declared shard. Metadata is
+    // taken only from the primary file; statistics cover the validated set.
+    let files = GgufSet::open(path).map_err(|e| e.to_string())?;
+    let m = files.metadata();
     let architecture = m
         .get("general.architecture")
         .and_then(Value::as_str)
@@ -295,20 +297,12 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     {
         return Err("negative model dimension metadata".into());
     }
-    let mut bytes = 0u64;
-    let mut parameters = 0u64;
-    for tensor in &file.tensors {
-        bytes = bytes
-            .checked_add(tensor.byte_len)
-            .ok_or("model size overflow")?;
-        parameters = parameters
-            .checked_add(tensor.elements().map_err(|e| e.to_string())? as u64)
-            .ok_or("parameter count overflow")?;
-    }
+    let bytes = files.tensor_bytes();
+    let parameters = files.tensor_elements();
     let ftype = if vocab_only {
         0
     } else {
-        integer(m, "general.file_type", guess_ftype(&file))?
+        integer(m, "general.file_type", guess_ftype(&files))?
     };
     let family = if architecture == "bert" {
         match (layers, width) {
@@ -344,6 +338,7 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
         .iter()
         .filter_map(|(key, value)| value.as_str().map(|v| (key.clone(), nul_bytes(v))))
         .collect();
+    let architecture = architecture.to_owned();
     let model = if vocab_only {
         None
     } else {
@@ -351,8 +346,9 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
             return Err("missing positive training context".into());
         }
         Some(
-            Model::load_with_options(
-                path,
+            // Consume the same validated handles used for the getters above.
+            Model::load_from_gguf(
+                files,
                 &LoadOptions {
                     context_length: train_context as usize,
                     ..LoadOptions::default()
@@ -366,7 +362,7 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     }
     let data = Arc::new(ModelData {
         model,
-        architecture: architecture.to_owned(),
+        architecture,
         vocab: VocabHandle {
             add_sep: tokenizer.add_sep,
             tokenizer,

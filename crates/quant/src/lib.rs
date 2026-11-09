@@ -13,6 +13,8 @@
 //! stored model weight support. Optimized CPU/backend parity is separate.
 #![forbid(unsafe_code)]
 
+pub mod cpu_math;
+
 mod activation;
 mod conversion;
 mod decode;

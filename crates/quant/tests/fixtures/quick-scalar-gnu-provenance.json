@@ -1,0 +1,34 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "gnu",
+  "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "reference": "Independent call to original inline ggml_gelu_quick_f32 from frozen vec.h; each host uses its own standard expf.",
+  "count": 502058,
+  "file": {
+    "bytes": 4016480,
+    "sha256": "10a5d0048c12a96dc45c544f99ada4fb65a51163f4019e79614b7f1e3c957d34"
+  },
+  "sources": {
+    "/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/quick-scalar-oracle/capture.py": {
+      "bytes": 1951,
+      "sha256": "e825b865d6b9911eb66b6c0f3ce84d17b1ef10d625651a0e21d5d3bc7e89beeb"
+    },
+    "/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/quick-scalar-oracle/oracle.cpp": {
+      "bytes": 522,
+      "sha256": "b95fbb2b9e9d3892f5bdda1303bdb8b58f81c92089c8630f052c3c7f100788cc"
+    },
+    "/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/quick-scalar-oracle/CMakeLists.txt": {
+      "bytes": 504,
+      "sha256": "f3604f722cc01b59089fb6b4ca622e6f1befb6d37cb71b643643842ec0d02a27"
+    },
+    "/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/quick-scalar-oracle/libquick_scalar_oracle.so": {
+      "bytes": 15576,
+      "sha256": "ac413fe8641863daa8a8cdea21170958431c5128bd93e572440a6723d0b361bc"
+    },
+    "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    }
+  },
+  "qualification": "MathPolicy::Scalar chooses scalar source arithmetic using the current host's expf; it is not an emulator for a foreign C-runtime. Separate expected words retain any native UCRT/glibc difference. No fast-math, default nearest-even, gradual underflow."
+}
