@@ -1,14 +1,29 @@
 use crate::{DType, QuantError, f32_to_bf16, f32_to_f16};
 
-/// Encode reference scalar, legacy, K, ternary and FP4 formats.
-/// IQ encoders and importance-weighted encoding remain separate capabilities.
-/// Other encoders return an explicit error. Quantized inputs must be finite and
-/// their scale calculation must not overflow; IEEE scalar encoders permit NaNs.
+/// Encode one complete row with the original unweighted reference algorithm.
+/// IQ2_XXS, IQ2_XS and IQ1_S require explicit importance weights; use
+/// [`crate::quantize_with_weights`] for them. Integer assignments have a separate
+/// checked API. This also exposes Q8_1/Q8_K activation codecs and F64 scalar
+/// serialization, which are not upstream stored-model quantizers.
+/// Packed inputs and scale computations must be representable; scalar IEEE
+/// encoders permit non-finite inputs.
 pub fn quantize(dtype: DType, values: &[f32]) -> Result<Vec<u8>, QuantError> {
     let bytes = dtype.row_bytes(values.len())?;
     supported(dtype)?;
     if crate::encode_k::supports(dtype) {
         return crate::encode_k::encode(dtype, values);
+    }
+    if matches!(dtype, DType::IQ4_NL | DType::IQ4_XS) {
+        return crate::encode_iq4::encode(dtype, values, None);
+    }
+    if matches!(dtype, DType::IQ3_XXS | DType::IQ3_S) {
+        return crate::encode_iq3::encode(dtype, values, None);
+    }
+    if dtype == DType::IQ1_M {
+        return crate::encode_iq1::encode(dtype, values, None);
+    }
+    if dtype == DType::IQ2_S {
+        return crate::encode_iq2::encode(dtype, values, None);
     }
     let mut out = Vec::new();
     out.try_reserve_exact(bytes)
@@ -24,6 +39,26 @@ pub fn quantize_into(dtype: DType, values: &[f32], out: &mut [u8]) -> Result<(),
     supported(dtype)?;
     if crate::encode_k::supports(dtype) {
         let staged = crate::encode_k::encode(dtype, values)?;
+        out.copy_from_slice(&staged);
+        return Ok(());
+    }
+    if matches!(dtype, DType::IQ4_NL | DType::IQ4_XS) {
+        let staged = crate::encode_iq4::encode(dtype, values, None)?;
+        out.copy_from_slice(&staged);
+        return Ok(());
+    }
+    if matches!(dtype, DType::IQ3_XXS | DType::IQ3_S) {
+        let staged = crate::encode_iq3::encode(dtype, values, None)?;
+        out.copy_from_slice(&staged);
+        return Ok(());
+    }
+    if dtype == DType::IQ1_M {
+        let staged = crate::encode_iq1::encode(dtype, values, None)?;
+        out.copy_from_slice(&staged);
+        return Ok(());
+    }
+    if dtype == DType::IQ2_S {
+        let staged = crate::encode_iq2::encode(dtype, values, None)?;
         out.copy_from_slice(&staged);
         return Ok(());
     }
@@ -66,9 +101,13 @@ pub fn quantize_into(dtype: DType, values: &[f32], out: &mut [u8]) -> Result<(),
 
 fn supported(t: DType) -> Result<(), QuantError> {
     use DType::*;
+    if crate::requires_importance_weights(t) {
+        return Err(QuantError::ImportanceWeightsRequired(t));
+    }
     match t {
-        F32 | F16 | BF16 | F64 | Q2_K | Q3_K | Q4_K | Q5_K | Q6_K | F8_E4M3 | TQ1_0 | TQ2_0
-        | MXFP4 | NVFP4 | Q8_K | Q1_0 | Q2_0 | Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 => Ok(()),
+        IQ1_M | IQ2_S | IQ3_XXS | IQ3_S | IQ4_NL | IQ4_XS | F32 | F16 | BF16 | F64 | Q2_K
+        | Q3_K | Q4_K | Q5_K | Q6_K | F8_E4M3 | TQ1_0 | TQ2_0 | MXFP4 | NVFP4 | Q8_K | Q1_0
+        | Q2_0 | Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 => Ok(()),
         _ => Err(QuantError::UnsupportedQuantization(t)),
     }
 }

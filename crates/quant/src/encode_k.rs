@@ -285,7 +285,7 @@ fn encode_block(t: DType, x: &[f32], out: &mut [u8]) -> Result<(), ()> {
         DType::Q2_K => encode_q2(x, out, &mut levels),
         DType::Q3_K => encode_q3(x, out, &mut levels),
         DType::Q4_K | DType::Q5_K => encode_q45(t, x, out, &mut levels),
-        DType::Q6_K => encode_q6(x, out, &mut levels),
+        DType::Q6_K => encode_q6(x, out, &mut levels, None),
         _ => unreachable!("validated K encoder dtype"),
     }
 }
@@ -344,7 +344,7 @@ fn encode_q2(x: &[f32], out: &mut [u8], levels: &mut [i32; 256]) -> Result<(), (
     pack_two_bits(levels, &mut out[16..80]);
     Ok(())
 }
-fn pack_two_bits(levels: &[i32; 256], out: &mut [u8]) {
+pub(super) fn pack_two_bits(levels: &[i32; 256], out: &mut [u8]) {
     for group in 0..2 {
         for j in 0..32 {
             out[group * 32 + j] = levels[group * 128 + j] as u8
@@ -505,7 +505,12 @@ fn encode_q45(t: DType, x: &[f32], out: &mut [u8], levels: &mut [i32; 256]) -> R
     }
     Ok(())
 }
-fn encode_q6(x: &[f32], out: &mut [u8], levels: &mut [i32; 256]) -> Result<(), ()> {
+pub(super) fn encode_q6(
+    x: &[f32],
+    out: &mut [u8],
+    levels: &mut [i32; 256],
+    importance: Option<&[f32]>,
+) -> Result<(), ()> {
     let mut scales = [0.0; 16];
     let mut maximum_scale = 0.0;
     let mut maximum_magnitude = 0.0;
@@ -515,7 +520,7 @@ fn encode_q6(x: &[f32], out: &mut [u8], levels: &mut [i32; 256]) -> Result<(), (
             32,
             &mut levels[sub * 16..(sub + 1) * 16],
             1,
-            None,
+            importance.map(|w| &w[sub * 16..(sub + 1) * 16]),
         )?;
         if scales[sub].abs() > maximum_magnitude {
             maximum_magnitude = scales[sub].abs();

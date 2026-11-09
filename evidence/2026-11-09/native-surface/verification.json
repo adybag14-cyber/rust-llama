@@ -1,0 +1,432 @@
+{
+  "schema": 1,
+  "recorded_at_utc": "2026-11-09T14:07:30.428146+00:00",
+  "scope": "Validated native scalar/BPE/sampler/embedding checkpoint; full port remains incomplete",
+  "parent_commit": "24878b33de096cc6622711197379e12d781f10cb",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "execution_inputs": {
+    "files": 333,
+    "sha256": "5a253504d5a50463d5fd8cc2bef4c26633389e7e385b3141b7d1483deceeb718",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "platforms": {
+    "windows": {
+      "status_file": "evidence/2026-11-09/native-surface/windows/revalidated/status.json",
+      "sha256": "9cbd102e11a4dc2ad503452234063013c58b7c867e712bbf2d04fb22750d4989",
+      "steps": [
+        {
+          "name": "fmt",
+          "argv": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 0.827191699998366
+        },
+        {
+          "name": "debug",
+          "argv": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--all-targets",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 61.19862650000141,
+          "tests": {
+            "passed": 360,
+            "failed": 0,
+            "ignored": 14,
+            "suites": 66
+          }
+        },
+        {
+          "name": "release",
+          "argv": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--all-targets",
+            "--release",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 115.61924349999754,
+          "tests": {
+            "passed": 360,
+            "failed": 0,
+            "ignored": 14,
+            "suites": 66
+          }
+        },
+        {
+          "name": "clippy",
+          "argv": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--offline",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 2.564427600002091
+        },
+        {
+          "name": "audit",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "audit"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 3.976674500001536
+        },
+        {
+          "name": "fixtures",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 3.5288231000013184
+        },
+        {
+          "name": "build",
+          "argv": [
+            "cargo",
+            "build",
+            "--workspace",
+            "--release",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 17.079852999999275
+        },
+        {
+          "name": "embedding-cli",
+          "argv": [
+            "C:\\Python314\\python.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\verify-embedding-cli.py"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 0.39654040000095847
+        },
+        {
+          "name": "pretrained",
+          "argv": [
+            "cargo",
+            "test",
+            "--release",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-inference",
+            "-p",
+            "llama-server",
+            "--tests",
+            "--",
+            "--ignored",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 68.13159019999875
+        },
+        {
+          "name": "generation-http",
+          "argv": [
+            "cargo",
+            "run",
+            "--release",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-server",
+            "--example",
+            "verify_model_server",
+            "--",
+            "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.13643729999967
+        },
+        {
+          "name": "source",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "verify-source",
+            "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 12.82666429999881
+        },
+        {
+          "name": "release-gate",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "release-check"
+          ],
+          "exit_code": 1,
+          "expected_exit_code": 1,
+          "seconds": 0.0856270999975095
+        }
+      ]
+    },
+    "linux": {
+      "status_file": "evidence/2026-11-09/native-surface/linux/revalidated/status.json",
+      "sha256": "099d48ebbb9e127253afa93de1df476e894102a4d505e43560d34be1b50d5319",
+      "steps": [
+        {
+          "name": "fmt",
+          "argv": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.078641701000379
+        },
+        {
+          "name": "debug",
+          "argv": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--all-targets",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 50.19755509099923,
+          "tests": {
+            "passed": 361,
+            "failed": 0,
+            "ignored": 14,
+            "suites": 66
+          }
+        },
+        {
+          "name": "release",
+          "argv": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--all-targets",
+            "--release",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 159.26463784299995,
+          "tests": {
+            "passed": 361,
+            "failed": 0,
+            "ignored": 14,
+            "suites": 66
+          }
+        },
+        {
+          "name": "clippy",
+          "argv": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--offline",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 6.633906815000955
+        },
+        {
+          "name": "audit",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "audit"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 6.533031135000783
+        },
+        {
+          "name": "fixtures",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 6.283279535000474
+        },
+        {
+          "name": "build",
+          "argv": [
+            "cargo",
+            "build",
+            "--workspace",
+            "--release",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 21.87043793599878
+        },
+        {
+          "name": "embedding-cli",
+          "argv": [
+            "/usr/bin/python3",
+            "/mnt/c/Users/adyba/rust-llama-reference/verify-embedding-cli.py"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 0.9696166360008647
+        },
+        {
+          "name": "pretrained",
+          "argv": [
+            "cargo",
+            "test",
+            "--release",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-inference",
+            "-p",
+            "llama-server",
+            "--tests",
+            "--",
+            "--ignored",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 149.5243554539993
+        },
+        {
+          "name": "generation-http",
+          "argv": [
+            "cargo",
+            "run",
+            "--release",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-server",
+            "--example",
+            "verify_model_server",
+            "--",
+            "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.831927860999713
+        },
+        {
+          "name": "source",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "verify-source",
+            "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 21.87053579300118
+        },
+        {
+          "name": "release-gate",
+          "argv": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "release-check"
+          ],
+          "exit_code": 1,
+          "expected_exit_code": 1,
+          "seconds": 0.4185453749996668
+        }
+      ]
+    }
+  },
+  "full_port_release_gate": "blocked",
+  "collector_hashes": {
+    "validate-native-surface-revalidated.py": "e94656af2acaa575e6c9d3f7d10a07cb67b3ef8b53e14c33ebc556b08316089b",
+    "verify-embedding-cli.py": "73f2fab1ce8fa5ae5ffbc3339f18693f87e04f15aa003c967aec89880fff016f"
+  },
+  "grammar_reconstruction": "evidence/2026-11-09/sampler-cpu/revalidated/recovery-report.json"
+}

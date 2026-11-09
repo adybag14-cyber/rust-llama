@@ -1,0 +1,95 @@
+{
+  "captured_at_utc": "2026-11-09T13:15:41.755035+00:00",
+  "capture_script": {
+    "bytes": 4532,
+    "sha256": "91a05eaaa3a0fd05c3e84d6228cba26e3feca4c9df467d70ee50279f06cbf636"
+  },
+  "executable": {
+    "bytes": 10752,
+    "sha256": "61f0ab4155a10cf172fac007f1846522a938dc38d43035692a8d47615077e411"
+  },
+  "build_configuration": {
+    "bytes": 3629,
+    "sha256": "397e96c6669550191c31a1fbc71e3ae6e81acbcd367cd3156d75d60d6c7b1a29"
+  },
+  "libraries": {
+    "ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "380898cc048112235d0b30dff11c1ef8466d83bb557b54a80fef8498673cc779"
+    },
+    "ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "d068ecd6af522e4d08f567ae795cbbf2abd2a23621c9df4b11f5086361659c11"
+    },
+    "ggml.dll": {
+      "bytes": 62464,
+      "sha256": "b32907340c78ab565b0c3f09fffc115eb7a68d582e1dc02a0bf489ec9ffc7833"
+    },
+    "llama-common.dll": {
+      "bytes": 8956416,
+      "sha256": "d11cc91b1b738ca2039b4307532d32e41b6ad8e54ade74a542bce12cbd0e8962"
+    },
+    "llama-server-impl.dll": {
+      "bytes": 4140544,
+      "sha256": "795ebbcf4e62c4ae174ea836d583d4f0e7f0236d98bcabf4667d4356fd7a4011"
+    },
+    "llama.dll": {
+      "bytes": 3211264,
+      "sha256": "1319f148ed12560c5c4bf24a1207d64e21debe89f7f94b229acb8191aac50dc8"
+    },
+    "mtmd.dll": {
+      "bytes": 2981376,
+      "sha256": "a936145850424db965eca5a5dd48835a708dab47778fa94959a5d108ab05ca6d"
+    }
+  },
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_files": {
+    "tools/server/server-common.cpp": {
+      "bytes": 79532,
+      "sha256": "b686729ed7d098e2f0c3da1ba28325d0e6d30721dab09f71cb9b53f342710ddb"
+    },
+    "tools/server/server-context.cpp": {
+      "bytes": 307072,
+      "sha256": "7951bd7d768f158d9be2234f87a44beca18d89b075e88c948234b6572da391f0"
+    },
+    "tools/server/server-task.cpp": {
+      "bytes": 69243,
+      "sha256": "d84f77943d9cd085863234e5f50a29ebd2b0a2fa31bec92fa588305c1b3525e1"
+    },
+    "common/common.cpp": {
+      "bytes": 85563,
+      "sha256": "ccf17d20a2ec772558d4fc14eec1dcea534dca1e2baccd7201d3b5d283cbb828"
+    },
+    "src/models/bert.cpp": {
+      "bytes": 9226,
+      "sha256": "9173dc75465a3a86f3ca5c5983d9496dcfd9512a3b913d7613581aa1c5b86300"
+    },
+    "src/llama-vocab.cpp": {
+      "bytes": 208197,
+      "sha256": "ac6fd43eca27c67a213a98e27b87e8ca1f26d8d82a63e79543a06ca64ef10a95"
+    }
+  },
+  "model": {
+    "bytes": 67308128,
+    "sha256": "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999"
+  },
+  "fixture": {
+    "bytes": 952627,
+    "sha256": "78f8b93f5df0ca29a6464722e1931730c1389e31c3724da0e0dd2da3abb97945"
+  },
+  "request_count": 27,
+  "comparison": "Raw BERT outputs retain 2e-4 absolute plus 2e-5 relative. Mode 0 propagates this unchanged raw bound through int16-range normalization using the recorded formula. Windows MSVC x64 additionally requires exact f32 bits and base64.",
+  "portable_mode_zero_budget": {
+    "declared_at_utc": "2026-11-09T13:18:18.311382+00:00",
+    "declared_before_first_rust_bge_http_comparison": true,
+    "reason": "Normalization mode 0 scales the maximum magnitude to 32760. Applying an unchanged raw-vector absolute bound to these scaled values would change the accuracy requirement. Keep the frozen raw BERT bound and propagate it through this known scaling.",
+    "raw_absolute": 0.0002,
+    "raw_relative": 2e-05,
+    "native_raw_maximum": 3.1209604740142822,
+    "raw_maximum_error_bound": 0.00026241920948028567,
+    "derived_absolute": 2.0995302605172497,
+    "derived_relative": 0.000104568426045001,
+    "formula": "Let M=max(abs(native_raw)), E=a+r*M. For y=32760*x/M, bound |delta y| by 32760*a/(M-E) + abs(y)*((r*M+E)/(M-E)+4*f32_epsilon). All metadata remains exact.",
+    "additional_gate": "Direct normalization of the same frozen native raw vectors is checked independently within two f32 ULPs on portable targets and bit for bit on Windows MSVC x64. End-to-end Windows values and base64 remain exact."
+  }
+}

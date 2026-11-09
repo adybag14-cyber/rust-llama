@@ -1,0 +1,67 @@
+{
+  "status": "failed",
+  "platform": "linux",
+  "started_at_utc": "2026-11-09T13:41:12.431089+00:00",
+  "parent_commit": "24878b33de096cc6622711197379e12d781f10cb",
+  "execution_inputs_before": {
+    "files": 333,
+    "sha256": "3700027a03529ed072b10a280e9d55969fbf5fbe36606b37da34bf4517be5265",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 3.9756636130005063
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 53.802516227000524,
+      "tests": {
+        "passed": 361,
+        "failed": 0,
+        "ignored": 14,
+        "suites": 66
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 101,
+      "expected_exit_code": 0,
+      "seconds": 1.3188479589989583,
+      "tests": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 0
+      }
+    }
+  ]
+}

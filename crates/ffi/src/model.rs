@@ -194,12 +194,30 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
         .get("general.architecture")
         .and_then(Value::as_str)
         .unwrap_or("llama");
-    if !["llama", "bert"].contains(&architecture) {
-        return Err("this C ABI model loader supports Llama and vocabulary-only BERT".into());
+    // These frozen architectures share the implemented tokenizer families. Their
+    // vocabulary-only source path does not load tensor hyperparameters.
+    if ![
+        "llama",
+        "bert",
+        "gpt2",
+        "gptneox",
+        "mpt",
+        "falcon",
+        "command-r",
+        "refact",
+        "starcoder2",
+        "qwen2",
+        "gemma4",
+    ]
+    .contains(&architecture)
+    {
+        return Err(format!(
+            "unsupported C ABI model architecture: {architecture}"
+        ));
     }
     if !vocab_only && architecture != "llama" {
         return Err(
-            "BERT execution is not yet available through this C ABI; use vocabulary-only loading"
+            "this C ABI currently executes Llama; this architecture supports vocabulary-only loading"
                 .into(),
         );
     }
@@ -224,54 +242,15 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     special.insert("sep", tokenizer.sep_id);
     special.insert("pad", tokenizer.pad_id);
     special.insert("mask", tokenizer.mask_id);
-    let eot = match m.get("tokenizer.ggml.eot_token_id") {
-        None => -1,
-        Some(value) => {
-            let id = value.as_u64().ok_or("EOT id must be unsigned")?;
-            if id < tokenizer.vocabulary_size() as u64 {
-                id as i32
-            } else {
-                -1
-            }
-        }
-    };
-    special.insert("eot", eot);
-    // Native SPM byte_to_token uses the literal byte token, falling back to PAD.
-    let nl = if tokenizer.vocab_type() == llama_tokenizer::VocabType::Wpm {
-        0
-    } else {
-        texts
-            .iter()
-            .position(|t| t.as_slice() == b"<0x0A>\0")
-            .map_or(special["pad"], |i| i as i32)
-    };
-    special.insert("nl", nl);
-    // The source auto-detects EOT spellings. Multiple matching spellings have no
-    // stable precedence in its unordered map; reject ambiguity rather than guess.
-    if special["eot"] == -1 {
-        let spellings = [
-            "<|eot_id|>",
-            "<|im_end|>",
-            "<|end|>",
-            "<end_of_turn>",
-            "<|endoftext|>",
-            "<|end_of_text|>",
-            "<EOT>",
-            "_<EOT>",
-            "[EOT]",
-            "<｜end▁of▁sentence｜>",
-            "<end_of_utterance>",
-        ];
-        let matches: Vec<_> = (0..tokenizer.vocabulary_size())
-            .filter(|&id| spellings.contains(&tokenizer.token_info(id as i32).unwrap().0))
-            .collect();
-        if matches.len() > 1 {
-            return Err("ambiguous auto-detected EOT ids; explicit eot_token_id required".into());
-        }
-        if let Some(&id) = matches.first() {
-            special.insert("eot", id as i32);
-        }
-    }
+    special.insert("eot", tokenizer.eot_id);
+    special.insert("eom", tokenizer.eom_id);
+    special.insert("fim_pre", tokenizer.fim_pre_id);
+    special.insert("fim_suf", tokenizer.fim_suf_id);
+    special.insert("fim_mid", tokenizer.fim_mid_id);
+    special.insert("fim_pad", tokenizer.fim_pad_id);
+    special.insert("fim_rep", tokenizer.fim_rep_id);
+    special.insert("fim_sep", tokenizer.fim_sep_id);
+    special.insert("nl", tokenizer.newline_id());
     let train_context = if vocab_only {
         0
     } else {
@@ -489,11 +468,14 @@ ffi!(
     llama_model_rope_type(model: *const ModelHandle) -> i32,
     -1,
     {
+        // Exact frozen public architecture classification; these values also
+        // apply when the source loader stops after vocabulary-only loading.
         Ok(
-            if unsafe { reference(model)? }.data.architecture == "bert" {
-                2
-            } else {
-                0
+            match unsafe { reference(model)? }.data.architecture.as_str() {
+                "gpt2" | "mpt" | "refact" => -1,
+                "llama" | "command-r" => 0,
+                "bert" | "gptneox" | "falcon" | "starcoder2" | "qwen2" | "gemma4" => 2,
+                _ => return Err("unsupported model RoPE classification".into()),
             },
         )
     }

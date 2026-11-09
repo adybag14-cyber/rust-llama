@@ -7,16 +7,18 @@
 #![forbid(unsafe_code)]
 
 pub mod client;
+mod embedding;
 pub mod http;
 pub mod provider;
 pub mod runtime;
 pub mod server;
 pub mod stream;
 
+pub use llama_inference::Pooling;
 pub use provider::{
-    GenerationRequest, GenerationSummary, InferenceProvider, ModelInfo, Prompt, ProviderError,
-    ProviderStatus, TokenSink, UnavailableProvider,
+    EmbeddingInfo, GenerationRequest, GenerationSummary, InferenceProvider, ModelInfo, Prompt,
+    ProviderError, ProviderStatus, TokenSink, UnavailableProvider,
 };
-pub use runtime::RuntimeProvider;
+pub use runtime::{EmbeddingOptions, RuntimeProvider};
 pub use server::{RunningServer, Server, ServerConfig};
 pub use stream::CancellationToken;

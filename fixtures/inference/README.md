@@ -144,3 +144,45 @@ cargo test --locked --offline -p llama-inference --test bert_defaults
 CI additionally supplies all four pretrained model environment variables and
 runs the complete set of explicit ignored model comparisons in release mode.
 Other ignored vendor/hardware tests have separate prerequisites.
+
+## Original server embedding HTTP corpus
+
+The embedding-http-tiny, embedding-http-coercions and embedding-http-bge
+JSON/provenance pairs capture actual HTTP responses from the frozen original
+C++ server. The tiny model is the existing deterministic
+tiny-bert-missing-pooling.gguf; the pretrained model is the hash-pinned
+little-endian BGE file above. These are reference data, not an embedded server
+implementation.
+
+The ordinary tests execute 226 tiny-model transcripts plus 30 numeric-conversion
+transcripts through the Rust TCP server. The separate pretrained test executes
+27 transcripts with raw/normalized vectors, all four pooling modes, batched
+inputs, special tokens, usage, legacy response shapes and base64 bytes.
+
+~~~sh
+cargo test --offline --locked -p llama-server --test embedding_http
+LLAMA_TEST_BERT_MODEL=/path/to/bert-bge-small-f16.gguf \
+cargo test --release --offline --locked -p llama-server \
+  --test embedding_http -- --ignored --nocapture
+~~~
+
+Expected vectors and wire fields come only from the original server. Its
+configured alias fixture-model is mapped to the Rust provider's identifier
+only when the request does not supply a string model label. Explicit labels,
+indices, field structure and token counts remain exact.
+
+Windows MSVC x64 requires exact F32 bits and base64 payloads. Portable raw BERT
+comparisons keep the predeclared bound 2e-4 + 2e-5 * abs(reference). Mode 0
+normalization magnifies values into the range +/-32760; its bound is propagated
+from the same raw-vector bound using the formula recorded in
+embedding-http-bge-provenance.json, declared before the first Rust HTTP
+comparison. Direct normalization of the identical native raw vectors is also
+checked independently for 4,608 outputs, with zero Windows ULP difference and
+at most two portable ULPs. This separates encoder math-library differences
+from normalization/serialization correctness.
+
+The numeric-conversion corpus preserves exact i64/u64 identity, native integer
+narrowing, boolean conversions, finite truncation and the lexical distinction
+between JSON integer and floating token arrays. Source-undefined out-of-range
+floating casts are rejected safely. Multimodal requests and reranking are not
+covered by this text-only embedding corpus.

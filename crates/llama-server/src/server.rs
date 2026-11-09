@@ -20,6 +20,7 @@ pub struct ServerConfig {
     pub allowed_origins: Vec<String>,
     pub max_connections: usize,
     pub max_generations: usize,
+    pub max_embedding_inputs: usize,
     pub queue_bytes: usize,
     pub replay_bytes: usize,
     pub replay_sessions: usize,
@@ -38,6 +39,7 @@ impl Default for ServerConfig {
             allowed_origins: Vec::new(),
             max_connections: 32,
             max_generations: 4,
+            max_embedding_inputs: 64,
             queue_bytes: 64 * 1024,
             replay_bytes: 4 * 1024 * 1024,
             replay_sessions: 32,
@@ -55,6 +57,8 @@ impl ServerConfig {
             || self.max_connections > 4096
             || self.max_generations == 0
             || self.max_generations > 256
+            || self.max_embedding_inputs == 0
+            || self.max_embedding_inputs > 4096
             || self.queue_bytes == 0
             || self.queue_bytes > 16 * 1024 * 1024
             || self.replay_bytes == 0
@@ -710,6 +714,9 @@ fn route(
             | "/chat/completions"
             | "/v1/chat/completions",
         ) => generation(socket, request, shared, headers),
+        ("POST", "/embedding" | "/embeddings" | "/v1/embeddings") => {
+            embeddings(socket, request, shared, headers)
+        }
         ("POST", "/apply-template") => {
             let body = json_body(request)?;
             let fields = body
@@ -916,6 +923,9 @@ fn known_path(path: &str) -> bool {
             | "/v1/completions"
             | "/chat/completions"
             | "/v1/chat/completions"
+            | "/embedding"
+            | "/embeddings"
+            | "/v1/embeddings"
             | "/v1/stream"
             | "/v1/streams/lookup"
     )
@@ -927,9 +937,6 @@ fn pending_path(path: &str) -> bool {
             | "/v1/responses"
             | "/v1/messages"
             | "/v1/messages/count_tokens"
-            | "/embedding"
-            | "/embeddings"
-            | "/v1/embeddings"
             | "/rerank"
             | "/reranking"
             | "/v1/rerank"
@@ -1207,6 +1214,104 @@ fn generation(
     }
 }
 
+fn embeddings(
+    socket: &mut TcpStream,
+    request: &Request,
+    shared: &Arc<Shared>,
+    headers: &[(String, String)],
+) -> Result<(), ProviderError> {
+    ensure_ready(shared)?;
+    let info = shared.provider.embedding_info()?;
+    let openai = request.path() == "/v1/embeddings";
+    // The original rejects OAI with NONE pooling before examining legacy
+    // content keys or parsing the JSON body.
+    if openai && !info.pooled {
+        return Err(ProviderError::invalid(
+            "Pooling type 'none' is not OAI compatible. Please use a different pooling type",
+        ));
+    }
+    let body = json_body(request)?;
+    let prepared = crate::embedding::prepare(
+        &body,
+        openai,
+        info,
+        shared.provider.as_ref(),
+        shared.config.max_embedding_inputs,
+        shared.config.max_response_bytes,
+    )?;
+    let cancel = CancellationToken::new();
+    let started = Instant::now();
+    let guard = begin_generation(shared, cancel.clone())?;
+    let id = format!("embd-rust-{}", guard.id);
+    let (tx, rx) = mpsc::sync_channel(1);
+    let state = shared.clone();
+    let producer_cancel = cancel.clone();
+    spawn_producer(shared, move || {
+        let _guard = guard;
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let mut response =
+                crate::embedding::Response::new(&prepared, state.config.max_response_bytes)?;
+            for tokens in &prepared.inputs {
+                if producer_cancel.is_cancelled() {
+                    return Err(ProviderError::cancelled());
+                }
+                let vectors =
+                    state
+                        .provider
+                        .embed(tokens, prepared.normalization, &producer_cancel)?;
+                response.push(&vectors, info, tokens.len())?;
+            }
+            response.finish()
+        }))
+        .unwrap_or_else(|_| Err(ProviderError::internal("Inference provider panicked")));
+        let _ = tx.send(result);
+    })?;
+    loop {
+        match rx.recv_timeout(Duration::from_millis(25)) {
+            Ok(result) => {
+                // The listener can cancel expired work before this handler's
+                // timed receive completes. Check the same elapsed deadline
+                // before forwarding a worker's generic cancellation result.
+                if started.elapsed() >= shared.config.generation_timeout {
+                    cancel.cancel();
+                    return Err(ProviderError::new(
+                        504,
+                        "embedding_timeout",
+                        "Embedding deadline exceeded",
+                    ));
+                }
+                let body = result?;
+                let mut headers = headers.to_vec();
+                headers.push(("X-Request-Id".into(), id));
+                return write_bytes(
+                    socket,
+                    200,
+                    "application/json; charset=utf-8",
+                    body.as_bytes(),
+                    &headers,
+                )
+                .map_err(io_error);
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                return Err(ProviderError::internal("Inference worker stopped"));
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {}
+        }
+        if shared.shutdown.is_cancelled() || started.elapsed() >= shared.config.generation_timeout {
+            cancel.cancel();
+            return Err(ProviderError::new(
+                504,
+                "embedding_timeout",
+                "Embedding deadline exceeded",
+            ));
+        }
+        if disconnected(socket) {
+            cancel.cancel();
+            return Ok(());
+        }
+    }
+}
+
 struct CollectSink {
     text: String,
     limit: usize,
@@ -1248,6 +1353,7 @@ fn complete_generation(
     headers: &[(String, String)],
 ) -> Result<(), ProviderError> {
     let cancel = CancellationToken::new();
+    let started = Instant::now();
     let guard = begin_generation(shared, cancel.clone())?;
     let id = format!("cmpl-rust-{}", guard.id);
     let (tx, rx) = mpsc::sync_channel(1);
@@ -1270,10 +1376,20 @@ fn complete_generation(
         .unwrap_or_else(|_| Err(ProviderError::internal("Inference provider panicked")));
         let _ = tx.send(result.map(|summary| (sink.text, summary)));
     })?;
-    let started = Instant::now();
     loop {
         match rx.recv_timeout(Duration::from_millis(25)) {
             Ok(result) => {
+                // The listener can cancel expired work before this handler's
+                // timed receive completes. Check the same elapsed deadline
+                // before forwarding a worker's generic cancellation result.
+                if started.elapsed() >= shared.config.generation_timeout {
+                    cancel.cancel();
+                    return Err(ProviderError::new(
+                        504,
+                        "generation_timeout",
+                        "Generation deadline exceeded",
+                    ));
+                }
                 let (text, summary) = result?;
                 let value = completion_value(wire, &id, &model, &text, &summary)?;
                 let mut headers = headers.to_vec();

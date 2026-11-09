@@ -77,6 +77,22 @@ impl Candidates {
         }
         Ok(())
     }
+    /// Native candidate arrays may contain repeated IDs and stale selection or
+    /// ordering metadata. Keep those source-defined cases separate from validate.
+    pub fn validate_native(&self) -> Result<()> {
+        if self.data.len() > MAX_CANDIDATES {
+            return Err(Error::new("candidate limit exceeded"));
+        }
+        for token in &self.data {
+            if token.id < 0 {
+                return Err(Error::new("negative native candidate ID"));
+            }
+            if token.logit.is_nan() || token.logit == f32::INFINITY {
+                return Err(Error::new("logits must be finite or negative infinity"));
+            }
+        }
+        Ok(())
+    }
     fn sort(&mut self) {
         if !self.sorted {
             self.data.sort_by(|a, b| b.logit.total_cmp(&a.logit));
@@ -514,14 +530,14 @@ impl Sampler {
         let mut values = candidates.clone();
         let selected = values.selected.take();
         let sorted = std::mem::replace(&mut values.sorted, false);
-        values.validate()?;
+        values.validate_native()?;
         values.selected = selected;
         values.sorted = sorted;
         let mut next = self.clone();
         let prefix = next.apply_inner(&mut values, true)?;
         let selected = values.selected.take();
         let sorted = std::mem::replace(&mut values.sorted, false);
-        values.validate()?;
+        values.validate_native()?;
         values.selected = selected;
         values.sorted = sorted;
         *self = next;
@@ -544,6 +560,23 @@ impl Sampler {
             result.rng = Some(Mt19937::new(seed));
         }
         Ok(result)
+    }
+
+    /// Replace only the native RNG seed/state while preserving adaptive EMA.
+    pub fn reseed_native(&mut self, value: u32) -> Result<()> {
+        if value == u32::MAX {
+            return Err(Error::new("reserved random seed sentinel"));
+        }
+        match &mut self.config {
+            Config::Dist { seed }
+            | Config::Xtc { seed, .. }
+            | Config::Mirostat { seed, .. }
+            | Config::MirostatV2 { seed, .. }
+            | Config::AdaptiveP { seed, .. } => *seed = value,
+            _ => return Err(Error::new("sampler has no RNG")),
+        }
+        self.rng = Some(Mt19937::new(value));
+        Ok(())
     }
 
     fn apply_inner(&mut self, c: &mut Candidates, native: bool) -> Result<Vec<TokenData>> {
@@ -1528,6 +1561,314 @@ fn dry(
         }
     }
     c.sorted = false;
+}
+
+/// CPU DRY state for the frozen C contract. Raw breaker preprocessing belongs
+/// to the vocabulary adapter; each map value excludes its head token.
+#[derive(Debug, Clone)]
+pub struct NativeDry {
+    multiplier: f32,
+    base: f32,
+    allowed_length: i32,
+    last_n: usize,
+    breakers: BTreeMap<TokenId, Vec<Vec<TokenId>>>,
+    history: VecDeque<TokenId>,
+}
+impl NativeDry {
+    pub fn new(
+        multiplier: f32,
+        base: f32,
+        allowed_length: i32,
+        last_n: usize,
+        breakers: BTreeMap<TokenId, Vec<Vec<TokenId>>>,
+    ) -> Result<Self> {
+        if !multiplier.is_finite() || !base.is_finite() || last_n > MAX_HISTORY {
+            return Err(Error::new(
+                "invalid native DRY parameters or history budget",
+            ));
+        }
+        let mut sequences = 0usize;
+        let mut tokens = 0usize;
+        for (&head, tails) in &breakers {
+            if head < 0 {
+                return Err(Error::new("negative DRY breaker head"));
+            }
+            for tail in tails {
+                sequences = sequences
+                    .checked_add(1)
+                    .ok_or_else(|| Error::new("DRY breaker count overflow"))?;
+                tokens = tokens
+                    .checked_add(tail.len())
+                    .ok_or_else(|| Error::new("DRY breaker token count overflow"))?;
+                if tail.len() > 20 || tail.iter().any(|&t| t < 0) {
+                    return Err(Error::new("native DRY breaker tail exceeds source limit"));
+                }
+            }
+        }
+        if sequences > MAX_CANDIDATES || tokens > 8 * MAX_CANDIDATES {
+            return Err(Error::new("native DRY processed-breaker budget exceeded"));
+        }
+        Ok(Self {
+            multiplier,
+            base,
+            allowed_length,
+            last_n,
+            breakers,
+            history: VecDeque::new(),
+        })
+    }
+    pub fn accept(&mut self, token: TokenId) -> Result<()> {
+        if token < 0 {
+            return Err(Error::new("cannot accept negative token ID"));
+        }
+        if self.multiplier == 0.0 || self.base < 1.0 || self.last_n == 0 {
+            return Ok(());
+        }
+        if self.history.len() == self.last_n {
+            self.history.pop_front();
+        }
+        self.history.push_back(token);
+        Ok(())
+    }
+    pub fn reset(&mut self) {
+        self.history.clear();
+    }
+    pub fn apply(&self, c: &mut Candidates) -> Result<()> {
+        if self.multiplier == 0.0 || self.base < 1.0 || self.last_n == 0 {
+            return Ok(());
+        }
+        let reversed: Vec<TokenId> = self
+            .history
+            .iter()
+            .rev()
+            .take(self.last_n)
+            .copied()
+            .collect();
+        let n = reversed.len();
+        if n as i64 <= i64::from(self.allowed_length) {
+            return Ok(());
+        }
+        let mut limit = n;
+        for i in 0..n {
+            let Some(tails) = self.breakers.get(&reversed[i]) else {
+                continue;
+            };
+            let longest = tails
+                .iter()
+                .filter(|tail| {
+                    tail.len() <= i
+                        && tail
+                            .iter()
+                            .enumerate()
+                            .all(|(j, &token)| token == reversed[i - j - 1])
+                })
+                .map(Vec::len)
+                .max();
+            if let Some(tail) = longest {
+                limit = i - tail;
+                break;
+            }
+        }
+        if (limit as i64) < i64::from(self.allowed_length) {
+            return Ok(());
+        }
+        // This is the source Z-box algorithm, including clamped cached values.
+        let mut counts = vec![0usize; n];
+        let (mut right, mut left) = (0usize, 0usize);
+        for k in 1..n {
+            if k > right {
+                let mut length = 0;
+                while length + k < n && reversed[length] == reversed[length + k] {
+                    length += 1;
+                }
+                counts[k] = length.min(limit);
+                if length > 0 {
+                    left = k;
+                    right = k + length - 1;
+                }
+            } else {
+                let p = k - left;
+                let remaining = right - k + 1;
+                if counts[p] < remaining {
+                    counts[k] = counts[p].min(limit);
+                } else {
+                    let mut i = right + 1;
+                    while i < n && reversed[i] == reversed[i - k] {
+                        i += 1;
+                    }
+                    counts[k] = (i - k).min(limit);
+                    left = k;
+                    right = i - 1;
+                }
+            }
+        }
+        let mut repeats = BTreeMap::<TokenId, usize>::new();
+        for k in 1..n {
+            let count = counts[k];
+            if count as i64 >= i64::from(self.allowed_length) {
+                repeats
+                    .entry(reversed[k - 1])
+                    .and_modify(|v| *v = (*v).max(count))
+                    .or_insert(count);
+            }
+        }
+        let max_exponent = if self.base > 1.000001 {
+            (88.722_84f32 / self.base.ln()) as i32
+        } else {
+            0
+        };
+        let mut updated = Vec::with_capacity(c.data.len());
+        for token in &c.data {
+            let mut logit = token.logit;
+            if let Some(&count) = repeats.get(&token.id) {
+                let single = self
+                    .breakers
+                    .get(&token.id)
+                    .is_some_and(|tails| tails.iter().any(Vec::is_empty));
+                if !single {
+                    let exponent = i64::try_from(count).unwrap() - i64::from(self.allowed_length);
+                    let exponent = i32::try_from(exponent).map_err(|_| {
+                        Error::new("native DRY exponent exceeds defined source integer range")
+                    })?;
+                    let exponent = if max_exponent > 0 {
+                        exponent.min(max_exponent)
+                    } else {
+                        exponent
+                    };
+                    // std::pow(float, int) promotes both operands to double.
+                    let penalty = (f64::from(self.multiplier)
+                        * f64::from(self.base).powf(f64::from(exponent)))
+                        as f32;
+                    logit -= penalty;
+                    if logit.is_nan() || logit == f32::INFINITY {
+                        return Err(Error::new("native DRY produced an invalid logit"));
+                    }
+                }
+            }
+            updated.push(logit);
+        }
+        for (token, logit) in c.data.iter_mut().zip(updated) {
+            token.logit = logit;
+        }
+        c.sorted = false;
+        Ok(())
+    }
+}
+
+/// Frozen infill filtering, including retained selection/sorted flags and the
+/// fallback token's unmodified probability payload. Vocabulary callbacks supply
+/// actual special=false pieces and normalized EOG metadata.
+pub fn infill_native(
+    candidates: &mut Candidates,
+    mut piece: impl FnMut(TokenId) -> Result<Vec<u8>>,
+    mut is_eog: impl FnMut(TokenId) -> bool,
+    fallback: TokenId,
+) -> Result<()> {
+    if candidates.data.is_empty() {
+        return Err(Error::new("native infill requires candidates"));
+    }
+    let mut c = candidates.clone();
+    softmax_mode(&mut c, true, true)?;
+    let (mut text_sum, mut eog_sum) = (0.0f32, 0.0f32);
+    for t in &c.data {
+        if is_eog(t.id) {
+            eog_sum += t.p;
+        } else {
+            text_sum += t.p;
+        }
+    }
+    if 3.0 * eog_sum * c.data.len() as f32 > text_sum {
+        let mut sum = 0.0f32;
+        c.data.retain(|t| {
+            let keep = is_eog(t.id);
+            if keep {
+                sum += t.p;
+            }
+            keep
+        });
+        for t in &mut c.data {
+            t.p /= sum;
+        }
+        *candidates = c;
+        return Ok(());
+    }
+    if c.data.len() > 4096 {
+        return Err(Error::new(
+            "native infill prefix comparison budget exceeds 4096 candidates",
+        ));
+    }
+    let mut pieces = BTreeMap::new();
+    for t in &c.data {
+        if let std::collections::btree_map::Entry::Vacant(entry) = pieces.entry(t.id) {
+            entry.insert(piece(t.id)?);
+        }
+    }
+    for i0 in 0..c.data.len() {
+        for i1 in 0..c.data.len() {
+            if c.data[i0].logit == f32::NEG_INFINITY {
+                break;
+            }
+            if i0 == i1 || c.data[i1].logit == f32::NEG_INFINITY {
+                continue;
+            }
+            let a = &pieces[&c.data[i0].id];
+            let b = &pieces[&c.data[i1].id];
+            if !a.is_empty() && b.starts_with(a) {
+                let (dst, src) = if c.data[i1].p > c.data[i0].p {
+                    (i1, i0)
+                } else {
+                    (i0, i1)
+                };
+                c.data[dst].p += c.data[src].p;
+                c.data[src].logit = f32::NEG_INFINITY;
+                c.data[src].p = 0.0;
+            }
+        }
+    }
+    let (mut non_eog, mut sum) = (0usize, 0.0f32);
+    let original_first = c.data[0];
+    c.data.retain(|t| {
+        let end = is_eog(t.id);
+        if t.p < 0.2 && !end {
+            return false;
+        }
+        if !end {
+            non_eog += 1;
+        }
+        sum += t.p;
+        true
+    });
+    if non_eog == 0 {
+        if fallback < 0 {
+            return Err(Error::new(
+                "native infill requires an EOT or EOS fallback token",
+            ));
+        }
+        let mut first = c.data.first().copied().unwrap_or(original_first);
+        first.id = fallback;
+        first.logit = 1.0;
+        c.data.clear();
+        c.data.push(first);
+        *candidates = c;
+        return Ok(());
+    }
+    for t in &mut c.data {
+        t.p /= sum;
+    }
+    let threshold = (1.0f64 / (non_eog + 1) as f64) as f32;
+    let mut sum = 0.0f32;
+    c.data.retain(|t| {
+        if t.p < threshold && !is_eog(t.id) {
+            return false;
+        }
+        sum += t.p;
+        true
+    });
+    for t in &mut c.data {
+        t.p /= sum;
+    }
+    *candidates = c;
+    Ok(())
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]

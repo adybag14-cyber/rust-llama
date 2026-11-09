@@ -1,10 +1,9 @@
 # llama-tokenizer
 
 Rust implementation of the frozen source's `llama` SentencePiece-style scored
-BPE and `bert` WordPiece vocabulary families. The crate forbids unsafe Rust,
+BPE, `bert` WordPiece, and `gpt2`/`gemma4`/`hybriddna`/`whitespace` BPE families. The crate forbids unsafe Rust,
 uses no native library, and depends at runtime only on the workspace GGUF
-metadata types. Unsupported vocabulary families and precompiled normalization
-maps return explicit errors.
+metadata types. Other vocabulary families and unimplemented normalization maps return explicit errors.
 
 ## Public interface
 
@@ -15,14 +14,17 @@ entries, scores, token types and relevant metadata.
 | Method | Behavior |
 | --- | --- |
 | `tokenize(text, add_special, parse_special)` | Returns exact token IDs; the insertion and literal-special parsing flags are independent. |
+| `tokenize_bytes(bytes, add_special, parse_special)` | Preserves the source's raw-byte input behavior, including malformed UTF-8 and truncated sampler breakers. |
+| `newline_id()` | Returns the source newline ID resolved before optional metadata overrides. |
+| `metaspace_prepend_first()` | Exposes the source BPE first-rendered-piece space policy for C buffer sizing. |
 | `token_piece(id, special)` | Returns bytes, preserving partial UTF-8 and source special-token visibility. |
 | `detokenize_bytes(ids, remove_special, unparse_special)` | Joins pieces with the source's leading-space policy and optional ordered cleanup passes. |
 | `token_info(id)` | Returns text, score and the normalized legacy token kind. |
 | `token_attributes(id)` | Returns the original public attribute bitset, including combined control/unused and strip flags. |
-| `vocab_type()` | Returns `VocabType::Spm = 1` or `VocabType::Wpm = 3`, matching frozen C ABI values. |
+| `vocab_type()` | Returns `VocabType::Spm = 1`, `VocabType::Bpe = 2` or `VocabType::Wpm = 3`, matching frozen C ABI values. |
 | `is_end_of_generation(id)` | Checks the source's configured and inferred end markers. |
 
-The public BOS, EOS, UNK, SEP, PAD and MASK IDs use `-1` when unavailable.
+The public BOS, EOS, EOT, EOM, UNK, SEP, PAD, MASK and six FIM IDs use `-1` when unavailable.
 Out-of-range metadata overrides, including UINT32_MAX, retain the source's
 in-range family default; defaults outside the vocabulary are disabled.
 The `add_bos`, `add_eos`, `add_sep`, `add_space_prefix` and `clean_spaces`
@@ -73,13 +75,44 @@ and implements:
 
 The code uses frozen tables rather than the Rust toolchain's changing Unicode
 data. Byte-oriented UTF-8 helpers intentionally retain the source's surrogate
-encoding and decoding behavior; Rust string tokenization still accepts
-`&str`. Out-of-range codepoints and malformed sequences return errors or use
+encoding and decoding behavior. Both Rust string and raw-byte tokenization are
+available. Out-of-range codepoints and malformed sequences return errors or use
 the original per-byte replacement policy, according to the selected helper.
 
-The BPE-specific regular-expression splitting dispatcher is a separate
-unimplemented requirement. Unicode core support does not advertise the other
-vocabulary families or their pretokenizers.
+## BPE pretokenizers and sessions
+
+All 64 pretokenizer types and 99 metadata spellings from the frozen source are
+explicitly dispatched. Merge ranks come from GGUF, equal-rank candidates use
+the source leftmost tie break, duplicate merge pairs keep their first rank,
+and profiles with ignore-merges retain their direct-token fast path.
+
+The implementation includes byte-encoded GPT-2/Llama/Qwen-style profiles,
+raw Gemma 4 and MMBERT, Nemotron normalization, Soprano normalization and
+fallback, whitespace sessions, and HybridDNA six-base k-mers with source
+tagging, padding and auto-detection. Metaspace first/never, forced Gemma 4 BOS,
+normalizer options, EOG metadata and per-token stripping follow the source.
+Unknown pretokenizer names and the source-rejected BPE metaspace `always`
+setting return explicit errors.
+
+Ambiguous inferred special tokens retain the frozen x64 native container order: MSVC and libstdc++ can select different IDs. Configured metadata takes precedence, with deprecated FIM keys applied in source order. The native map/hash corpus and a dedicated ambiguous-vocabulary corpus verify these accessors and their effects on token attributes.
+
+The regular-expression engine implements the exact frozen expression set,
+including lookahead and zero-length matches. It uses the frozen Unicode
+properties, all eight source custom splitters, and measured default-locale
+wide-regex classes. Windows and Linux retain their source differences:
+Windows wchar values truncate to 16 bits, and its native digit class includes
+additional BMP characters; Linux's default wide digit class is ASCII.
+
+Public input is bounded to 4 MiB; derived normalized input can expand to
+12 MiB plus one prefix. The regex VM has explicit instruction/work bounds
+and returns a limit error if a pathological input exhausts its budget.
+It does not silently switch to another tokenizer. Raw BPE/WPM inputs use
+the source decoder's per-byte replacement and accepted-surrogate behavior;
+SPM preserves source byte segmentation and fallback.
+
+T5/UGM, RWKV and PLaMo remain separate unimplemented families. Implementing
+BPE does not expand the model architectures or backends supported by the
+inference loader.
 
 ## Independent validation
 
@@ -96,6 +129,11 @@ data generated exclusively by original C/C++ functions outside the product:
 | WordPiece vocabulary | All 30,522 entries: text, score, attributes, EOG and both piece modes |
 | WordPiece corpus | 1,728 cases across nine metadata variants, both piece modes and four detokenization flag combinations |
 | Special metadata boundaries | 72 native SPM/WordPiece cases, including UINT32_MAX and exact vocabulary-size overrides |
+| BPE pipelines and expressions | 126,896 native splits per platform, all 64 profiles / 99 aliases, and exhaustive source wide-regex classes |
+| BPE sessions and options | 23,754 cases across 111 variants, plus 18,381 full vocabulary records |
+| Original GPT-2 vocabulary | All 50,257 entries and 364 cases with the actual frozen merge table |
+| Raw tokenization input | 22,518 native cases across SPM, WPM and seven BPE/session modes |
+| Ambiguous special inference | All 51 inferred spellings, ten metadata variants, 5,680 complete records and native table ordering for 5,970 keys per platform |
 | Preserved SPM corpus | 68 original cases and 312 pieces through the inference integration test |
 
 Run:
@@ -108,7 +146,12 @@ cargo test --locked --offline -p llama-inference --test native_reference origina
 cargo xtask fixtures
 ```
 
-See `fixtures/tokenizer/README.md` and `fixtures/tokenizer/provenance.json`
+Additional explicit tests cover all 14 original BPE vocabularies and all 99
+profiles using the original GPT-2 merge table. See `fixtures/tokenizer/bpe/README.md`
+for the external-input commands and the exact framed-hash schema.
+
+See `fixtures/tokenizer/README.md`, `fixtures/tokenizer/provenance.json` and
+`fixtures/tokenizer/bpe/provenance.json`
 for exact original source, library, driver, vocabulary and fixture identities.
 The frozen source archive and retained `LICENSE-UPSTREAM` define the data
 provenance.

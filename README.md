@@ -59,7 +59,7 @@ Dense `bert` GGUF models use the native WordPiece tokenizer and bidirectional en
 
 See the [inference API and model boundaries](crates/inference/README.md).
 
-## Serve completions
+## Serve completions and embeddings
 
 ```sh
 cargo run --release --offline --locked -p llama-server -- \
@@ -68,19 +68,31 @@ cargo run --release --offline --locked -p llama-server -- \
 
 The server connects native/OpenAI text completions and SSE to real Rust inference, with bounded HTTP parsing, cancellation, stop strings and replay. Text chat requires a supported model template. Unsupported request options fail explicitly. Without `--model`, the executable is a diagnostics service and reports inference unavailable.
 
+To serve a supported BERT model's embeddings:
+
+~~~sh
+cargo run --release --offline --locked -p llama-server -- \
+  --model /path/to/bert.gguf --embeddings --pooling model
+~~~
+
+The native /embedding and /embeddings routes preserve pooled or per-token
+vectors; /v1/embeddings provides OpenAI shapes, token usage and optional base64
+for pooled output. Pooled results use Euclidean normalization by default.
+Text, token, mixed and batched inputs follow the frozen server's rules.
+
 See the [server behavior and supported options](crates/llama-server/README.md). This is not full upstream server/browser parity.
 
 ## What is implemented
 
 | Area | Executable implementation |
 | --- | --- |
-| Quantization | All 36 active dtype decoders; 23 verified codec encoders (including scalar conversions); checked integer setters; source-faithful activation conversion and all 29 scalar CPU weight dots. |
+| Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
 | Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, and independently compared scalar operators. |
-| Formats and vocabulary | Bounded GGUF v2/v3 reader, little-endian writer, scalar endian conversion, Llama SPM, BERT WordPiece, and exhaustive frozen Unicode tables/normalization/UTF-8 behavior. |
+| Formats and vocabulary | Bounded GGUF v2/v3 reader, little-endian writer, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, and exhaustive frozen Unicode/UTF-8 behavior. |
 | Model runtime | Llama, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama and dense BERT. |
-| Inference and applications | Pretrained GGUF generation, CLI, real-model HTTP/SSE server, and a growing C API compatibility surface. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 155 implemented frozen C API exports. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
-| Other imported functionality | Selected native media processing, samplers, native chat formatters, grammar parsing, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
+| Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
 Detailed support boundaries are in the crate READMEs and [PORT_STATUS.md](docs/PORT_STATUS.md). Numeric registries, backend probes and example programs are not counted as complete implementations.
 
@@ -93,13 +105,13 @@ The recorded 9 November 2026 evidence includes:
 - **Pretrained F32 inference:** six prompts, 96 matching greedy token IDs and 62,976 logits, now bit-identical on the frozen Windows comparison after matching source scalar accumulation.
 - **Pretrained Q4_0 inference:** 640,000 logits across 20 rows matched the frozen Windows reference exactly after preserving the source's Q8 activation quantization. Sixteen greedy token IDs matched. The earlier failed all-F32 comparison remains recorded.
 - **BERT embeddings:** 13,056 token/pooled values exactly match the frozen Windows reference. All 122 captured stages of the diagnostic sequence match exactly; 46,080 independent attention outputs remain in the ordinary regression suite.
-- **Vocabulary behavior:** 68 original SPM cases, 1,728 WordPiece cases across nine metadata variants, every one of the 30,522 BERT vocabulary entries, and 72 native special-token fallback cases.
+- **Vocabulary behavior:** the preserved SPM/WordPiece corpora plus 1,499,449 complete BPE vocabulary records across all 14 original BPE models; 5,096 real-model token/piece/detokenization cases; 18,018 GPT-2 alias cases; 23,754 synthetic configuration cases; 22,518 raw-byte cases; 126,896 regex splits. All 64 reachable profiles and 99 aliases are covered on Windows and Linux. Source-inferred special IDs preserve the measured platform container ordering.
 - **Unicode behavior:** all 1,114,112 codepoints, 15,957 normalization sequences and 65,809 valid/malformed UTF-8 cases checked against the original source.
-- **Quant codecs and dots:** all 36 dtype layouts, exhaustive F16/BF16/F8 bit patterns, byte comparisons for 23 encoders, 525 cases for the ten newest formats, 12,329 checked integer inputs, and 6,168 exact F16 matmul outputs.
+- **Quant codecs and dots:** all 36 dtype layouts, exhaustive F16/BF16/F8 patterns, all 29 model quantizers, additional activation/conversion codecs, and complete scalar weight-dot inventory. The weighted/IQ extension adds 3,362 exact original-C encoder rows and 640 native tied-sort cases. Source-undefined payload/access cases have explicit safe behavior documented in the quant crate.
 - **Tensor graphs:** 65 independently executed frozen GGML graph cases.
 - **Actual devices:** 138 CUDA dispatches on RTX 4090 with zero recorded error; OpenCL kernel cases on RTX 4090 and AMD gfx1036 with recorded numerical bounds.
-- **C ABI:** 137 of 255 frozen exports, including model/context/vocabulary calls and sampler/chain ownership, are exercised by independent frozen-header harnesses. The new sampler/WPM harness compares 122,388 floats and 192 generated tokens exactly in each profile; the original core harness now matches all 93,248 values exactly. Exact layouts, seeded sampling, candidate ordering, clone/reset/free behavior and real-context generation are checked; the [coverage inventory](crates/ffi/COVERAGE.md) lists remaining exports.
-- **Server:** 38 ordinary tests and 37 additional requests against the real pretrained model, including streaming, stop strings, cancellation, concurrency and replay.
+- **C ABI:** 155 of 255 frozen exports, plus four diagnostic extensions, are exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. Prior core/sampler/WPM fixtures remain passing. The [coverage inventory](crates/ffi/COVERAGE.md) retains all 100 absent exports and the remaining semantic restrictions.
+- **Server:** 37 real-model generation requests plus 283 independently captured embedding HTTP transcripts (256 tiny-model, 27 pretrained BGE). Windows output bits/base64 match exactly; Linux retains the fixed raw BERT bound with explicitly derived scaling bounds for normalization 0. Independent normalization checks cover 4,608 values. Real TCP lifecycle tests cover limits, provider failures, disconnects, shutdown and complete deadline errors.
 
 Evidence and qualifications are under [evidence/2026-11-09](evidence/2026-11-09). These results establish the exercised configurations, not all hardware, models or performance parity. Pretrained weights are not distributed in this repository; the tokenizer-only GGUF is test data with provenance.
 

@@ -1,0 +1,31 @@
+{
+  "observed_at_utc": "2026-11-09T13:10:14.410153+00:00",
+  "metrics": {
+    "requests": 226,
+    "numeric_values": 1455,
+    "max_absolute_error": 0.0,
+    "float32_bit_mismatches": 0,
+    "base64_exact": 4
+  },
+  "configuration_mapping": "Original server alias fixture-model is compared with the Rust provider's model identifier only where the request has no string model label. Explicit model labels must match exactly.",
+  "differences": [
+    {
+      "pooling": "none",
+      "case": "normalization_True",
+      "path": "/embeddings",
+      "difference": "('status', 400, 200, {'error': {'code': 400, 'message': 'embd_normalize must be numeric', 'type': 'invalid_request_error'}}, [{'index': 0, 'embedding': [[-0.05274590477347374, 1.4145971536636353, -1.3986656665802002, 0.0270509272813797], [1.271033763885498, -0.3601112365722656, 0.3910243809223175, -1.3855189085006714], [-0.9161034226417542, 0.3306891620159149, 1.4898169040679932, -0.8481659293174744], [1.271033763885498, -0.3601112365722656, 0.3910243809223175, -1.3855189085006714]]}])"
+    },
+    {
+      "pooling": "mean",
+      "case": "normalization_True",
+      "path": "/embeddings",
+      "difference": "('status', 400, 200, {'error': {'code': 400, 'message': 'embd_normalize must be numeric', 'type': 'invalid_request_error'}}, [{'index': 0, 'embedding': [[0.22272077202796936, 0.14511846005916595, 0.12361907213926315, -0.5085416436195374]]}])"
+    },
+    {
+      "pooling": "cls",
+      "case": "normalization_True",
+      "path": "/embeddings",
+      "difference": "('status', 400, 200, {'error': {'code': 400, 'message': 'embd_normalize must be numeric', 'type': 'invalid_request_error'}}, [{'index': 0, 'embedding': [[-0.01823187619447708, 0.488962322473526, -0.48345550894737244, 0.009350283071398735]]}])"
+    }
+  ]
+}

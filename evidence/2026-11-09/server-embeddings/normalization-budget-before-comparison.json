@@ -1,0 +1,13 @@
+{
+  "declared_at_utc": "2026-11-09T13:18:18.311382+00:00",
+  "declared_before_first_rust_bge_http_comparison": true,
+  "reason": "Normalization mode 0 scales the maximum magnitude to 32760. Applying an unchanged raw-vector absolute bound to these scaled values would change the accuracy requirement. Keep the frozen raw BERT bound and propagate it through this known scaling.",
+  "raw_absolute": 0.0002,
+  "raw_relative": 2e-05,
+  "native_raw_maximum": 3.1209604740142822,
+  "raw_maximum_error_bound": 0.00026241920948028567,
+  "derived_absolute": 2.0995302605172497,
+  "derived_relative": 0.000104568426045001,
+  "formula": "Let M=max(abs(native_raw)), E=a+r*M. For y=32760*x/M, bound |delta y| by 32760*a/(M-E) + abs(y)*((r*M+E)/(M-E)+4*f32_epsilon). All metadata remains exact.",
+  "additional_gate": "Direct normalization of the same frozen native raw vectors is checked independently within two f32 ULPs on portable targets and bit for bit on Windows MSVC x64. End-to-end Windows values and base64 remain exact."
+}

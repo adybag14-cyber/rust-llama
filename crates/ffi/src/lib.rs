@@ -20,6 +20,8 @@ mod batch;
 mod context;
 mod model;
 mod sampler;
+mod sampler_grammar;
+mod sampler_vocab;
 mod vocab;
 pub use abi::*;
 pub use context::ContextHandle;
@@ -223,3 +225,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod sampler_reference_tests;

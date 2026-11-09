@@ -1,10 +1,11 @@
+use crate::sampler_vocab::SamplerVocab;
 use crate::*;
 use llama_behavior::sampling::{
-    Candidates, Config, MAX_CANDIDATES, MAX_HISTORY, Sampler, TokenData,
+    Candidates, Config, MAX_CANDIDATES, MAX_HISTORY, NativeDry, Sampler, TokenData, infill_native,
 };
 use std::collections::BTreeMap;
 use std::ffi::{CStr, CString, c_char, c_void};
-use std::sync::{Mutex, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
 
 const CHAIN: usize = 0;
 const EMPTY: usize = 1;
@@ -23,6 +24,9 @@ struct Builtin {
 enum State {
     Builtin(Box<Builtin>),
     Bias(Vec<LlamaLogitBias>),
+    Dry(Box<NativeDry>),
+    Infill(Arc<SamplerVocab>),
+    Grammar(Box<crate::sampler_grammar::GrammarState>),
     Empty(&'static CStr),
     Chain(Vec<*mut LlamaSampler>),
 }
@@ -32,6 +36,9 @@ impl State {
             Self::Chain(_) => CHAIN,
             Self::Empty(_) => EMPTY,
             Self::Bias(_) => BIAS,
+            Self::Dry(_) => 17,
+            Self::Infill(_) => 19,
+            Self::Grammar(_) => 18,
             Self::Builtin(b) => match b.sampler.config() {
                 Config::Greedy => 2,
                 Config::Dist { .. } => 3,
@@ -68,7 +75,7 @@ const INTERFACE: LlamaSamplerI = LlamaSamplerI {
     copy_state: None,
 };
 // Distinct addresses preserve sampler type identity, including chain detection.
-static INTERFACES: [LlamaSamplerI; 18] = [INTERFACE; 18];
+static INTERFACES: [LlamaSamplerI; 20] = [INTERFACE; 20];
 #[derive(Default)]
 struct Entry {
     owner: Option<usize>,
@@ -203,6 +210,9 @@ unsafe fn name_impl(sampler: *const LlamaSampler) -> Result<*const c_char> {
         return Ok(match unsafe { state(sampler)? } {
             State::Builtin(b) => b.name.as_ptr(),
             State::Bias(_) => c"logit-bias".as_ptr(),
+            State::Dry(_) => c"dry".as_ptr(),
+            State::Infill(_) => c"infill".as_ptr(),
+            State::Grammar(_) => c"grammar".as_ptr(),
             State::Empty(label) => label.as_ptr(),
             State::Chain(_) => c"chain".as_ptr(),
         });
@@ -234,6 +244,8 @@ unsafe fn accept_impl(sampler: *mut LlamaSampler, token: i32) -> Result<()> {
                 }
                 b.sampler.accept(token).map_err(|e| e.to_string())?;
             }
+            State::Dry(dry) => dry.accept(token).map_err(|e| e.to_string())?,
+            State::Grammar(grammar) => grammar.accept(token)?,
             State::Chain(children) => {
                 let children = children.clone();
                 for child in children {
@@ -260,11 +272,13 @@ fn validate_values(values: &[TokenData]) -> Result<()> {
     };
     // Preserve probability payloads; native non-normalizing stages leave them untouched.
     candidates.sorted = false;
-    candidates.validate().map_err(|e| e.to_string())
+    candidates.validate_native().map_err(|e| e.to_string())
 }
 unsafe fn apply_builtin(sampler: *mut LlamaSampler, array: *mut LlamaTokenDataArray) -> Result<()> {
     let s = unsafe { state_mut(sampler)? };
-    if matches!(s, State::Empty(_)) {
+    if matches!(s, State::Empty(_))
+        || matches!(s,State::Grammar(grammar) if grammar.unconstrained())
+    {
         return Ok(());
     }
     if let State::Chain(children) = s {
@@ -323,6 +337,35 @@ unsafe fn apply_builtin(sampler: *mut LlamaSampler, array: *mut LlamaTokenDataAr
                     .map_err(|e| e.to_string())?,
                 terminal,
             )
+        }
+        State::Grammar(grammar) => {
+            validate_values(&candidates.data)?;
+            grammar.apply(&mut candidates)?;
+            (Vec::new(), false)
+        }
+        State::Dry(dry) => {
+            validate_values(&candidates.data)?;
+            dry.apply(&mut candidates).map_err(|e| e.to_string())?;
+            (Vec::new(), false)
+        }
+        State::Infill(vocab) => {
+            validate_values(&candidates.data)?;
+            for value in &candidates.data {
+                vocab.piece(value.id)?;
+            }
+            infill_native(
+                &mut candidates,
+                |id| {
+                    vocab
+                        .piece(id)
+                        .map(<[u8]>::to_vec)
+                        .map_err(llama_behavior::Error::new)
+                },
+                |id| vocab.is_eog(id),
+                vocab.fallback,
+            )
+            .map_err(|e| e.to_string())?;
+            (Vec::new(), false)
         }
         State::Bias(biases) => {
             validate_values(&candidates.data)?;
@@ -405,6 +448,8 @@ unsafe fn reset_impl(sampler: *mut LlamaSampler) -> Result<()> {
                     b.sampler.reset();
                 }
             }
+            State::Dry(dry) => dry.reset(),
+            State::Grammar(grammar) => grammar.reset(),
             State::Chain(children) => {
                 let children = children.clone();
                 for child in children {
@@ -536,6 +581,28 @@ unsafe fn chain_add_impl(chain: *mut LlamaSampler, sampler: *mut LlamaSampler) -
         .owner = Some(chain as usize);
     Ok(())
 }
+fn clone_builtin(value: &Builtin) -> Result<Box<Builtin>> {
+    let mut result = value.clone();
+    result.sampler = value.sampler.clone_native().map_err(|e| e.to_string())?;
+    if value.requested_seed == Some(u32::MAX) {
+        match value.sampler.config() {
+            Config::AdaptiveP { .. } => {
+                result.effective_seed = resolve_seed(u32::MAX)?;
+                result
+                    .sampler
+                    .reseed_native(result.effective_seed)
+                    .map_err(|e| e.to_string())?;
+            }
+            Config::Mirostat { .. } | Config::MirostatV2 { .. } => {
+                // The native clone reports a new seed but copies Mirostat RNG state.
+                result.effective_seed = resolve_seed(u32::MAX)?;
+            }
+            _ => {}
+        }
+    }
+    Ok(Box::new(result))
+}
+
 unsafe fn clone_impl(sampler: *const LlamaSampler) -> Result<*mut LlamaSampler> {
     if sampler.is_null() {
         return Ok(ptr::null_mut());
@@ -543,21 +610,11 @@ unsafe fn clone_impl(sampler: *const LlamaSampler) -> Result<*mut LlamaSampler> 
     let h = unsafe { handle(sampler)? };
     if native_index(h.iface).is_some() {
         return match unsafe { state(sampler)? } {
-            State::Builtin(b) => {
-                let mut result = b.clone();
-                result.sampler = b.sampler.clone_native().map_err(|e| e.to_string())?;
-                if b.requested_seed == Some(u32::MAX)
-                    && matches!(
-                        b.sampler.config(),
-                        Config::Mirostat { .. } | Config::MirostatV2 { .. }
-                    )
-                {
-                    // The frozen Mirostat clone constructs a fresh seed_cur but copies its RNG.
-                    result.effective_seed = resolve_seed(u32::MAX)?;
-                }
-                allocate(State::Builtin(result))
-            }
+            State::Builtin(b) => allocate(State::Builtin(clone_builtin(b)?)),
             State::Bias(biases) => allocate(State::Bias(biases.clone())),
+            State::Dry(dry) => allocate(State::Dry(dry.clone())),
+            State::Infill(vocab) => allocate(State::Infill(vocab.clone())),
+            State::Grammar(grammar) => allocate(State::Grammar(grammar.clone())),
             State::Empty(label) => empty(label),
             State::Chain(children) => {
                 let children = children.clone();
@@ -642,7 +699,11 @@ unsafe fn copy_compatible(source: *const LlamaSampler, target: *const LlamaSampl
                 }
             }
         }
-        (State::Bias(_), State::Bias(_)) | (State::Empty(_), State::Empty(_)) => {}
+        (State::Bias(_), State::Bias(_))
+        | (State::Empty(_), State::Empty(_))
+        | (State::Dry(_), State::Dry(_))
+        | (State::Infill(_), State::Infill(_))
+        | (State::Grammar(_), State::Grammar(_)) => {}
         _ => return Err("sampler_copy type mismatch".into()),
     }
     Ok(())
@@ -670,12 +731,11 @@ unsafe fn copy_impl(source: *const LlamaSampler, target: *mut LlamaSampler) -> R
     }
     if native_index(src.iface).is_some() {
         let replacement = match unsafe { state(source)? } {
-            State::Builtin(value) => {
-                let mut b = value.clone();
-                b.sampler = value.sampler.clone_native().map_err(|e| e.to_string())?;
-                State::Builtin(b)
-            }
+            State::Builtin(value) => State::Builtin(clone_builtin(value)?),
             State::Bias(value) => State::Bias(value.clone()),
+            State::Dry(value) => State::Dry(value.clone()),
+            State::Infill(value) => State::Infill(value.clone()),
+            State::Grammar(value) => State::Grammar(value.clone()),
             State::Empty(label) => State::Empty(label),
             State::Chain(_) => unreachable!(),
         };
@@ -1130,6 +1190,120 @@ ffi!(
             return Err("logit biases must be finite or negative infinity".into());
         }
         allocate(State::Bias(biases))
+    }
+);
+
+ffi!(
+    llama_sampler_init_adaptive_p(target: f32, decay: f32, seed: u32) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        builtin(
+            Config::AdaptiveP {
+                target,
+                decay,
+                seed,
+            },
+            Some(seed),
+        )
+    }
+);
+ffi!(
+    llama_sampler_init_dry(
+        vocab: *const VocabHandle,
+        multiplier: f32,
+        base: f32,
+        allowed_length: i32,
+        last_n: i32,
+        breakers: *const *const c_char,
+        num_breakers: usize,
+    ) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        finite(&[multiplier, base])?;
+        let last_n = last_n.max(0) as usize;
+        if multiplier == 0.0 || base < 1.0 || last_n == 0 {
+            return empty(c"?dry");
+        }
+        if last_n > MAX_HISTORY {
+            return Err("DRY history exceeds one million tokens".into());
+        }
+        let processed =
+            unsafe { crate::sampler_vocab::dry_breakers(vocab, breakers, num_breakers)? };
+        let dry = NativeDry::new(multiplier, base, allowed_length, last_n, processed)
+            .map_err(|e| e.to_string())?;
+        allocate(State::Dry(Box::new(dry)))
+    }
+);
+ffi!(
+    llama_sampler_init_infill(vocab: *const VocabHandle) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        let vocab = unsafe { reference(vocab)? };
+        allocate(State::Infill(crate::sampler_vocab::snapshot(vocab, false)?))
+    }
+);
+
+ffi!(
+    llama_sampler_init_grammar(
+        vocab: *const VocabHandle,
+        source: *const c_char,
+        root: *const c_char,
+    ) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        let grammar = unsafe {
+            crate::sampler_grammar::create(
+                vocab,
+                source,
+                root,
+                crate::sampler_grammar::Triggers::None,
+            )?
+        };
+        allocate(State::Grammar(Box::new(grammar)))
+    }
+);
+ffi!(
+    llama_sampler_init_grammar_lazy(
+        vocab: *const VocabHandle,
+        source: *const c_char,
+        root: *const c_char,
+        words: *const *const c_char,
+        word_count: usize,
+        tokens: *const i32,
+        token_count: usize,
+    ) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        let triggers = crate::sampler_grammar::Triggers::Words {
+            strings: words,
+            count: word_count,
+            tokens,
+            token_count,
+        };
+        let grammar = unsafe { crate::sampler_grammar::create(vocab, source, root, triggers)? };
+        allocate(State::Grammar(Box::new(grammar)))
+    }
+);
+ffi!(
+    llama_sampler_init_grammar_lazy_patterns(
+        vocab: *const VocabHandle,
+        source: *const c_char,
+        root: *const c_char,
+        patterns: *const *const c_char,
+        pattern_count: usize,
+        tokens: *const i32,
+        token_count: usize,
+    ) -> *mut LlamaSampler,
+    ptr::null_mut(),
+    {
+        let triggers = crate::sampler_grammar::Triggers::Patterns {
+            strings: patterns,
+            count: pattern_count,
+            tokens,
+            token_count,
+        };
+        let grammar = unsafe { crate::sampler_grammar::create(vocab, source, root, triggers)? };
+        allocate(State::Grammar(Box::new(grammar)))
     }
 );
 

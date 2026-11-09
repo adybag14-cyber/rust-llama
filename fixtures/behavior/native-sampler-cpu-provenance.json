@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "frozen_source_files": {
+    "include/llama.h": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a",
+    "src/llama-sampler.cpp": "6313214bf0a4146036f3d62846299cba4fa9804757c353140a04de52130cf496",
+    "src/llama-grammar.cpp": "f21bd5f6017c70d2ad7358f662fc105043b1188ebbd6a147bb1d0e9a124da8b5",
+    "src/llama-vocab.cpp": "ac6fd43eca27c67a213a98e27b87e8ca1f26d8d82a63e79543a06ca64ef10a95"
+  },
+  "native_dll_sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3",
+  "model": {
+    "name": "stories260K.gguf",
+    "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+  },
+  "oracle": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\sampler-cpu-oracle",
+    "source_sha256": "cec448693189b7c3281dd24991efc480edf56f60973d7b7be76488daef342885",
+    "executable_sha256": "5b83b79807767c34bc27300c190db54943ad04e12b48878a453d3033c7e8d351",
+    "compiler": "MSVC 19.51.36260.0, x64",
+    "capture_sha256": "a2a16834c37a1a13537e8613381cb97c2c2ac9b06b6ca03051a051bfdaf2c3fd"
+  },
+  "fixtures": {
+    "native-sampler-cpu-request.json": "db0d416e431a5b282b18af621c1453ff131d7469845c938eb3018d6306189a45",
+    "native-sampler-cpu-reference.json": "4aec80a58896c228bad6de1743c158d005a841fa8bcd88d188ee5dd779167f49",
+    "stories260k-vocab.gguf": "b92826879eb007ceec40266ac399bed0da789f278312ebee0f7ea007a6a422aa"
+  },
+  "vocabulary_extraction": "Exact original model metadata bytes retained; GGUF tensor count set to zero, tensor records/data removed, padding aligned to 32 bytes. No token text/score/attributes or special metadata was synthesized.",
+  "comparison": "Candidate IDs/order, selected index, sorted flag, pointer offset, all represented float bits, grammar allowed-token masks, history transitions, clone/copy/reset, and real-context generated IDs are exact. All expected data originate from original DLL; no Rust-produced expectations.",
+  "scenarios": {
+    "grammar": 34,
+    "dry": 55,
+    "adaptive_p": 35,
+    "infill": 41,
+    "trained_context": 42
+  },
+  "observations": {
+    "grammar": 339,
+    "dry": 699,
+    "adaptive_p": 1925,
+    "infill": 164
+  },
+  "input_rows": {
+    "grammar": 173568,
+    "dry": 357888,
+    "adaptive_p": 24150,
+    "infill": 17116
+  },
+  "generated_tokens": 585,
+  "target_scope": "Native stream, ordering, and lazy regex parity measured on Windows x64 MSVC. Grammar and DRY regression replay also run on other Rust platforms; full cross-vendor C++ sampler parity remains open.",
+  "ordinary_tests": "crates/ffi/src/sampler_reference_tests.rs uses the 11,360-byte vocabulary-only fixture; actual trained-model execution is an external harness gate."
+}

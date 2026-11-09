@@ -7,8 +7,10 @@
 //!
 //! This crate never casts input bytes to native structures. GGUF tensor data here
 //! is little-endian; callers handling big-endian files must normalize it first.
-//! Decoding is available for every active type in this snapshot. This does not
-//! imply complete optimized CPU kernels or complete encoder coverage.
+//! Decoding covers every active type. Scalar encoders cover every source model
+//! quantizer, including explicit importance weights where the source requires
+//! them. Activation codecs and scalar conversion helpers remain distinct from
+//! stored model weight support. Optimized CPU/backend parity is separate.
 #![forbid(unsafe_code)]
 
 mod activation;
@@ -16,7 +18,17 @@ mod conversion;
 mod decode;
 pub use conversion::{convert_f32_to_integer, convert_f32_to_integer_into};
 mod encode;
+mod encode_iq1;
+mod encode_iq2;
+mod encode_iq3;
+mod encode_iq4;
 mod encode_k;
+mod iq_lattice;
+mod iq_sort;
+mod weighted;
+pub use weighted::{
+    quantize_with_weights, quantize_with_weights_into, requires_importance_weights,
+};
 mod encode_simple;
 mod matvec;
 mod matvec_extra;
@@ -37,6 +49,10 @@ pub enum QuantError {
     InvalidLength { expected: usize, actual: usize },
     AllocationFailed,
     UnsupportedQuantization(DType),
+    UnsupportedWeightedQuantization(DType),
+    ImportanceWeightsRequired(DType),
+    InvalidImportanceLength { expected: usize, actual: usize },
+    InvalidImportanceWeight { index: usize },
     UnsupportedIntegerConversion(DType),
     IntegerOutOfRange { dtype: DType, index: usize },
     NonFiniteInput { index: usize },
@@ -77,6 +93,21 @@ impl std::fmt::Display for QuantError {
                 write!(f, "expected {expected} bytes, got {actual}")
             }
             Self::AllocationFailed => f.write_str("unable to allocate tensor output"),
+            Self::UnsupportedWeightedQuantization(dtype) => write!(
+                f,
+                "importance-weighted row encoder is not available for {dtype:?}"
+            ),
+            Self::ImportanceWeightsRequired(dtype) => write!(
+                f,
+                "the source requires explicit importance weights for {dtype:?}"
+            ),
+            Self::InvalidImportanceLength { expected, actual } => {
+                write!(f, "expected {expected} importance weights, got {actual}")
+            }
+            Self::InvalidImportanceWeight { index } => write!(
+                f,
+                "importance weight {index} must be finite and nonnegative"
+            ),
             Self::UnsupportedQuantization(dtype) => {
                 write!(f, "encoder for {dtype:?} has not been ported")
             }

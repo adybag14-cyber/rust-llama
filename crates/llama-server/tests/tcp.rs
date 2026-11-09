@@ -1004,3 +1004,51 @@ fn tokenizer_never_ignores_unimplemented_modes() {
     assert_eq!(result.status, 200);
     server.shutdown().unwrap();
 }
+
+#[test]
+fn nonstream_deadline_always_returns_a_complete_gateway_timeout() {
+    let provider = FixtureProvider::new(Mode::Gate);
+    let mut settings = config();
+    settings.generation_timeout = Duration::from_millis(100);
+    let server = Server::new(settings, provider.clone())
+        .unwrap()
+        .spawn()
+        .unwrap();
+    let result = response(
+        server.local_addr(),
+        "POST",
+        "/v1/completions",
+        r#"{"prompt":"hi"}"#,
+        "",
+    );
+    assert_eq!(result.status, 504);
+    let value = json::parse(&result.body).unwrap();
+    assert_eq!(
+        value
+            .get("error")
+            .unwrap()
+            .get("type")
+            .and_then(Value::as_str),
+        Some("generation_timeout")
+    );
+    assert!(value.get("choices").is_none());
+    wait_for(|| provider.cancelled.load(Ordering::SeqCst) == 1);
+    provider.release.store(true, Ordering::SeqCst);
+    let started = Instant::now();
+    loop {
+        let result = response(
+            server.local_addr(),
+            "POST",
+            "/v1/completions",
+            r#"{"prompt":"hi"}"#,
+            "",
+        );
+        if result.status == 200 {
+            break;
+        }
+        assert_eq!(result.status, 429);
+        assert!(started.elapsed() < Duration::from_secs(2));
+        thread::sleep(Duration::from_millis(3));
+    }
+    server.shutdown().unwrap();
+}

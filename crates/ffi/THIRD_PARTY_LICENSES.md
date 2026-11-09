@@ -2,6 +2,11 @@
 
 The MSVC ordering compatibility helpers `native_unstable_sort`, `median_three`, `sort_heap_repair`, and `msvc_sort_range` in `crates/llama-behavior/src/sampling.rs` are a Rust adaptation of the Microsoft STL sort algorithm observed in MSVC 14.51.36231 headers. They preserve the native order of tied scores for the frozen llama.cpp C sampler ABI. The adaptation uses checked Rust slices and indices; no C++ library is linked into the product.
 
+The native_regex module in the behavior crate also uses Microsoft STL regex
+parser/class/capture semantics as compatibility reference. Its byte matcher is
+written in Rust with bounded states/work. The same included license and notice
+cover any derived compatibility details.
+
 Microsoft STL copyright (c) Microsoft Corporation. SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception. The complete upstream license follows.
 
 License source: https://raw.githubusercontent.com/microsoft/STL/main/LICENSE.txt

@@ -52,4 +52,4 @@ jobs:
           LLAMA_TEST_Q4_MODEL: ${{ runner.temp }}/stories15M-q4_0.gguf
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
-        run: cargo test --release --offline --locked -p llama-inference --tests -- --ignored --nocapture
+        run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture

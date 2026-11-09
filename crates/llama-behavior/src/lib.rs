@@ -8,6 +8,8 @@
 pub mod chat;
 pub mod grammar;
 pub mod json;
+pub mod native_grammar;
+pub mod native_regex;
 pub mod sampling;
 pub mod speculative;
 

@@ -1,0 +1,21 @@
+   Compiling llama-server v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.34s
+     Running tests\embedding_lifecycle.rs (target\debug\deps\embedding_lifecycle-85a43cd3459b5c7f.exe)
+
+running 6 tests
+
+thread 'llama-inference-provider' (18612) panicked at crates\llama-server\tests\embedding_lifecycle.rs:72:28:
+test embedding provider panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'llama-inference-provider' (28652) panicked at crates\llama-server\tests\embedding_lifecycle.rs:72:28:
+test embedding provider panic
+test embedding_response_limits_are_transactional_and_release_admission ... ok
+test embedding_preflight_limits_do_not_admit_model_work ... ok
+test disabled_embeddings_and_unavailable_models_fail_before_decoding ... ok
+test embedding_disconnect_and_shutdown_cancel_held_requests ... ok
+test embedding_provider_failures_never_send_partial_success_json ... ok
+test embedding_deadline_cancels_work_and_releases_capacity ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

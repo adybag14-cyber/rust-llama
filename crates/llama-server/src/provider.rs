@@ -14,6 +14,16 @@ pub struct ModelInfo {
     pub owned_by: String,
 }
 
+/// Fixed embedding capabilities of the currently loaded provider.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EmbeddingInfo {
+    pub dimensions: usize,
+    pub vocabulary_size: usize,
+    pub context_length: usize,
+    pub pooled: bool,
+    pub normalization: i32,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChatMessage {
     pub role: String,
@@ -115,6 +125,25 @@ pub trait TokenSink {
 pub trait InferenceProvider: Send + Sync + 'static {
     fn status(&self) -> ProviderStatus;
     fn models(&self) -> Vec<ModelInfo>;
+    /// Validate embedding availability without executing a model.
+    fn embedding_info(&self) -> Result<EmbeddingInfo, ProviderError> {
+        Err(ProviderError::unsupported(
+            "This provider does not implement embeddings",
+        ))
+    }
+    /// Encode one complete token sequence. Return one vector for a pooled
+    /// provider, or one vector per input token when pooling is disabled.
+    /// Honor cancellation during model execution. Normalize only pooled vectors.
+    fn embed(
+        &self,
+        _tokens: &[i32],
+        _normalization: i32,
+        _cancel: &CancellationToken,
+    ) -> Result<Vec<Vec<f32>>, ProviderError> {
+        Err(ProviderError::unsupported(
+            "This provider does not implement embeddings",
+        ))
+    }
     /// Validate runtime-owned options before response headers or inference admission.
     /// This must remain bounded and must not run model decoding.
     fn validate_generation(&self, _request: &GenerationRequest) -> Result<(), ProviderError> {

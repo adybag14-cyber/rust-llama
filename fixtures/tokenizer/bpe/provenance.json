@@ -1,0 +1,793 @@
+{
+  "schema": 1,
+  "captured_at_utc": "2026-11-09T13:27:07.222666+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_notice": "Original llama.cpp data retained under LICENSE-UPSTREAM; source files and all C/C++ tooling remain outside the Rust product.",
+  "sources": {
+    "src/llama-vocab.cpp": {
+      "bytes": 208197,
+      "sha256": "ac6fd43eca27c67a213a98e27b87e8ca1f26d8d82a63e79543a06ca64ef10a95"
+    },
+    "src/llama-vocab.h": {
+      "bytes": 8079,
+      "sha256": "b201040378716d004b2ded39165f92c1cffc129a361d8c6a42d8b4a1a2fd65f4"
+    },
+    "src/unicode.cpp": {
+      "bytes": 65529,
+      "sha256": "bac986de7abfc4f5701fd56993b2acfb33370cd5d4fc2ca19879e11f506bc6e8"
+    },
+    "src/unicode.h": {
+      "bytes": 4101,
+      "sha256": "f20178df3709554d1b2514e7ba7e087fe61067b3a4c87e4b11d8e409dddaa31f"
+    },
+    "src/unicode-data.cpp": {
+      "bytes": 288635,
+      "sha256": "5c80b44db0958e673a1940e2a602a5eea2725916ff67bbaeb48ecc7634f84f29"
+    },
+    "src/unicode-data.h": {
+      "bytes": 895,
+      "sha256": "370697e8379a9712acd423759c076972fa5f3ec690133a9c295cd87f39c63fd1"
+    },
+    "src/llama-arch.cpp": {
+      "bytes": 108115,
+      "sha256": "d7a123dc2e146d09a3d17bc751020e0e669e72534867d18da8eb3afbb454dc57"
+    },
+    "include/llama.h": {
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    }
+  },
+  "oracle_sources_and_generators": {
+    "regex-oracle.cpp": {
+      "bytes": 1971,
+      "sha256": "8d0582e7a80d48865f1cc86cf179623ff007ff297a8ab2f7715a735210987e05"
+    },
+    "wide-classes.cpp": {
+      "bytes": 671,
+      "sha256": "3661bd8209214e7785047bf67086dfcf7fd9f6159bed8c76455dc5a4123d7e42"
+    },
+    "vocab-oracle.cpp": {
+      "bytes": 7458,
+      "sha256": "8a99d74269c35081b16f70487ec13b249e5ba8893ccd96076f180297310660ea"
+    },
+    "getter-oracle.cpp": {
+      "bytes": 7768,
+      "sha256": "23fbceeb189709dcb19c588c23f180eb7be631b92892ef5cce8da820aef5ea69"
+    },
+    "map-oracle.cpp": {
+      "bytes": 1201,
+      "sha256": "9b2d1acab4e6aecb716a1eaf1ae13fe7761954701f657b57b0651a60ff9ee568"
+    },
+    "CMakeLists.txt": {
+      "bytes": 2143,
+      "sha256": "0396689c7dfeffc694cdd7b847a128b2301386a4c73f5f01db7ee4f79fc268ec"
+    },
+    "reference-specs.json": {
+      "bytes": 22781,
+      "sha256": "bd982df8629620291e55097e4083d524af8b8be96d3b1fcadf39464363a2d30f"
+    },
+    "make-synthetic.py": {
+      "bytes": 5649,
+      "sha256": "7735430795fdbecaa109df0f0497202e28ff690a32e3f1b3774a23696c90044f"
+    },
+    "make-regex-fuzz.py": {
+      "bytes": 871,
+      "sha256": "dee48efc8e69aa079ac3d427d11271ec22d9a99c86dafd12cbe43165ec115dd3"
+    },
+    "make-raw.py": {
+      "bytes": 1941,
+      "sha256": "cbcea36ba6c40b8e2c2cb1a553e5983e216824f212402ddb2f5d0f36d3142aef"
+    },
+    "make-map.py": {
+      "bytes": 387,
+      "sha256": "eeefd104bf5c9112d6b42df4cd54ddf37895342c9d97c63c8ca238e89ec6a5ae"
+    },
+    "make-special-order.py": {
+      "bytes": 3587,
+      "sha256": "2ca2ed67c12b5ebf014e2799e8c3043f6ee19425855f5f2f0f52e0a9c785c141"
+    },
+    "capture-vocab.py": {
+      "bytes": 1254,
+      "sha256": "cde1b3db39692ab433df9441fa32a52a3e836384cd2bc4b64378841c206d814b"
+    },
+    "capture-profiles.py": {
+      "bytes": 579,
+      "sha256": "9812c75bb28451aa48b3fc23f39e3e408c9de3e20aea10665a26feffeb8871aa"
+    },
+    "capture-synthetic.py": {
+      "bytes": 534,
+      "sha256": "ba1bcffeb302cad7ed1ae8d630d28eab251326e05aa938403cac1ecb24572a5e"
+    },
+    "capture-platform.py": {
+      "bytes": 1574,
+      "sha256": "7125a1e34fa7a32e8e826b29dc7ce867e43e7fdc554f32ab25945519f9c4059b"
+    },
+    "capture-getters.py": {
+      "bytes": 1313,
+      "sha256": "13936ddd4d4458b33016f21084e1e8277cb531d6f3c20ffd0558adfef9247eea"
+    },
+    "capture-special-order.py": {
+      "bytes": 925,
+      "sha256": "812baa7c7a77333913def45869ecab3be02b1516573336f8fb637eea5a244cba"
+    },
+    "capture-aquila.py": {
+      "bytes": 947,
+      "sha256": "bdb560ec40f676d3b0046cddafac989da4bbe19455045a438da12d5e636200d8"
+    },
+    "compact-reference.py": {
+      "bytes": 5847,
+      "sha256": "c5472b508a4e7fd7402a308e2555b7cce2b2e3688d8b35ab58f772f8a16d0b61"
+    }
+  },
+  "earlier_native_c_api_driver": {
+    "wordpiece-oracle.cpp": {
+      "bytes": 7105,
+      "sha256": "07443cde5c46300d8ac7728a658c993f9f47b7880a74fa101dd5e85493e695bc"
+    },
+    "build/Release/wordpiece-oracle.exe": {
+      "bytes": 156160,
+      "sha256": "a050ce69efb4f08af1e637abca66cf117910ed1b11eaa1ab0bb77250fbcf9946"
+    }
+  },
+  "requests": {
+    "getter-request.json": {
+      "bytes": 57,
+      "sha256": "9fc747188438f13f0a720853aecb434f7d5e65f18c20198cc59128915a7376ec"
+    },
+    "map-request.json": {
+      "bytes": 213295,
+      "sha256": "8f1cbd162fd0c13bdb70334756403c0147135ff9d68819385cedbadb1e6f4513"
+    },
+    "profile-request.json": {
+      "bytes": 25754,
+      "sha256": "9497d5146085e7b9cd89d7f746eebf399e5597e8d2b3bba728005ec50e460130"
+    },
+    "raw-base-request.json": {
+      "bytes": 237134,
+      "sha256": "e7e9eaf84397179ab3eef9d155b6474028d0c5ca3aa6ea75b4a852b1b767c622"
+    },
+    "raw-bpe-request.json": {
+      "bytes": 237596,
+      "sha256": "cd700dda3c5f309f162fd0dd71c44a5af8cd6415b204ffe3fef0a075ed85d12c"
+    },
+    "regex-fuzz-request.json": {
+      "bytes": 218497,
+      "sha256": "c16bf211899e743e14a008999e7aebe594346210b8d6169d60bed4bf09e0780a"
+    },
+    "regex-request.json": {
+      "bytes": 33051,
+      "sha256": "2662e4ef09e2e8c2021b3c8a9b652082e3e4472495df33de0a678b726430d5e2"
+    },
+    "special-order-request.json": {
+      "bytes": 5882,
+      "sha256": "4f62e36e882829087e91c75208ce06133deb9e6a2d08b491381fcfcb6791404f"
+    },
+    "synthetic-request.json": {
+      "bytes": 32249,
+      "sha256": "1ca9d48a95793a5df38952c3c4618b0eda0b249077615dfdd743eeea3a1222bc"
+    },
+    "vocab-request.json": {
+      "bytes": 38194,
+      "sha256": "91d27a95289e2481df78c4c2aa558041a6d12c91f2e0e70b74dc1607474d0443"
+    }
+  },
+  "windows": {
+    "profile": "x64 MSVC 19.51.36260.0, Release C++17; default locale and 16-bit wchar_t; original llama DLL",
+    "native_libraries": {
+      "llama.dll": {
+        "bytes": 3211264,
+        "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+      },
+      "ggml.dll": {
+        "bytes": 62464,
+        "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+      },
+      "ggml-base.dll": {
+        "bytes": 718336,
+        "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+      },
+      "ggml-cpu.dll": {
+        "bytes": 878592,
+        "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+      }
+    },
+    "executables": {
+      "bpe-regex-oracle.exe": {
+        "bytes": 562176,
+        "sha256": "9dcebe8a4580e22ab7ea4a62cf8e16059426868eb731175dc2d1c43b63b9ec70"
+      },
+      "wide-classes.exe": {
+        "bytes": 87552,
+        "sha256": "f93355e979e8f158432fa65220994df93085a7a09bac7ad6cb69242e6d06d8c1"
+      },
+      "vocab-oracle.exe": {
+        "bytes": 155648,
+        "sha256": "3e8bd748f903e650955a02d6706216a7c7b93693edbc188878cb21d28e559393"
+      },
+      "getter-oracle.exe": {
+        "bytes": 158208,
+        "sha256": "ca816391f8029e9777e9f95f30d4218089b38abb8f3dfc6d23f4f687a07632eb"
+      },
+      "map-oracle.exe": {
+        "bytes": 145920,
+        "sha256": "ad2d55e055141e3bd2e7282c52ee470dc86d441c0bff8b55ad8e0928a872b1f3"
+      }
+    }
+  },
+  "linux": {
+    "profile": "x64 GCC 11.4.0 / libstdc++, Release C++17; default C locale and 32-bit wchar_t; unmodified frozen source built separately under WSL Ubuntu",
+    "configure_options": [
+      "CMAKE_BUILD_TYPE=Release",
+      "LLAMA_BUILD_COMMON=OFF",
+      "LLAMA_BUILD_TESTS=OFF",
+      "LLAMA_BUILD_TOOLS=OFF",
+      "LLAMA_BUILD_EXAMPLES=OFF",
+      "LLAMA_BUILD_SERVER=OFF",
+      "LLAMA_BUILD_APP=OFF",
+      "LLAMA_OPENSSL=OFF",
+      "GGML_OPENMP=OFF",
+      "GGML_NATIVE=OFF",
+      "GGML_AVX=OFF",
+      "GGML_AVX2=OFF",
+      "GGML_FMA=OFF",
+      "GGML_F16C=OFF",
+      "LLAMA_BUILD_IS_DEV=OFF"
+    ],
+    "artifacts": {
+      "libllama.so": {
+        "sha256": "e80891b25d168138c450beda5156aa9bdb05d6bba3d2523dbd4dd9250b5c6a95",
+        "external_path": "/home/tdamre/rust-llama-native-bpe-build/bin/libllama.so"
+      },
+      "libggml.so": {
+        "sha256": "90479b806e0d37bf8efe6c2482ea75bf264fcd8ac9883d5e022fd9c3e589e668",
+        "external_path": "/home/tdamre/rust-llama-native-bpe-build/bin/libggml.so"
+      },
+      "libggml-base.so": {
+        "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c",
+        "external_path": "/home/tdamre/rust-llama-native-bpe-build/bin/libggml-base.so"
+      },
+      "libggml-cpu.so": {
+        "sha256": "3e9d10fd748c88f2adfb1a967443c5b2211c9d5ed3d33772dca7ba252433eff0",
+        "external_path": "/home/tdamre/rust-llama-native-bpe-build/bin/libggml-cpu.so"
+      },
+      "bpe-regex-oracle": {
+        "sha256": "2f3025a179f36f40b99cb8d7996c3fec7e59554cb2e8688dd7dff66e7cb1b26e",
+        "external_path": "/home/tdamre/bpe-regex-oracle-build/bpe-regex-oracle"
+      },
+      "vocab-oracle": {
+        "sha256": "6349d464db7401d02d618504cc589f721d453ccdc172b454eaac5bb39ab4e5de",
+        "external_path": "/home/tdamre/bpe-regex-oracle-build/vocab-oracle"
+      },
+      "getter-oracle": {
+        "sha256": "a2c5e857fd8409617b2d78eb2d49f6dcb9db702a9749b3cf12cfcf7bb95b7f3d",
+        "external_path": "/home/tdamre/bpe-regex-oracle-build/getter-oracle"
+      },
+      "map-oracle": {
+        "sha256": "f53584c832644f22b2753fbe608326e8516b66353a53048970a417c700757172",
+        "external_path": "/home/tdamre/bpe-regex-oracle-build/map-oracle"
+      },
+      "wide-classes": {
+        "sha256": "7a245cbee8f24d55d65d7208a50f4d3d79a2c81942b2e0ae0f87ecee5cae575e",
+        "external_path": "/home/tdamre/bpe-regex-oracle-build/wide-classes"
+      }
+    }
+  },
+  "vocabularies": {
+    "ggml-vocab-gpt-2.gguf": {
+      "bytes": 1766807,
+      "sha256": "cedc56ca6e2e89f63e781696d1fd76b4b1d49e6720dee86463e915f6e90016ac"
+    },
+    "ggml-vocab-gpt-neox.gguf": {
+      "bytes": 1771431,
+      "sha256": "ae593a7f9b8bb174ed4f5019e41530463e4dac7aa06e42dee8aa650d2bdac53d"
+    },
+    "ggml-vocab-mpt.gguf": {
+      "bytes": 1771393,
+      "sha256": "59dc382612866d1fc6c11ea531318d327598f3412d9c8f8600607cdf3030898f"
+    },
+    "ggml-vocab-falcon.gguf": {
+      "bytes": 2287728,
+      "sha256": "9f0bf8b0733680398b72e652e90f260f43782f326e75545fc0e49611a5ba35ad"
+    },
+    "ggml-vocab-command-r.gguf": {
+      "bytes": 10874545,
+      "sha256": "a2f8cfea952ef7c391a6d92a1c309d0bd32e36384d9b9230569a7425732f27d9"
+    },
+    "ggml-vocab-llama-bpe.gguf": {
+      "bytes": 7818140,
+      "sha256": "97272e430d53bc7688f52d5e0ad8ea8f163ede9f1bbd1694feaa504797d5d96e"
+    },
+    "ggml-vocab-deepseek-coder.gguf": {
+      "bytes": 1156067,
+      "sha256": "91cb1379f2e33af1c4866b194622b7a0e12e8f0c9dba7ba2f10d55978730bec1"
+    },
+    "ggml-vocab-deepseek-llm.gguf": {
+      "bytes": 3970167,
+      "sha256": "867f77537b54565f0d81d508c04edc41aa1d4ffc1a92745f225b4c1b02755f76"
+    },
+    "ggml-vocab-refact.gguf": {
+      "bytes": 1720710,
+      "sha256": "ac3ceda902fed91ccf74312b305d9b86c37e4f8e35fa9cc6ef3ce34fca7d4678"
+    },
+    "ggml-vocab-starcoder.gguf": {
+      "bytes": 1719346,
+      "sha256": "fedb892b4e1bd3c1f2fcdae356440b14fb458f4264d586e5c987ed93df4e174d"
+    },
+    "ggml-vocab-qwen2.gguf": {
+      "bytes": 5928681,
+      "sha256": "44c2f46b715f585c6ab513970e8a006bfa5badd6108560054921cf598d154d8c"
+    },
+    "ggml-vocab-qwen35.gguf": {
+      "bytes": 5928682,
+      "sha256": "63ed952ff338996cf0bdf24a7b10015124273f75c6dc9bb427356aa3f67ec62c"
+    },
+    "ggml-vocab-gemma-4.gguf": {
+      "bytes": 15776467,
+      "sha256": "58b1ba0b57f3b4d7c468ba4ffd91ad85190346a3d7ad7e71d1cabaae8a14bb65"
+    },
+    "ggml-vocab-aquila.gguf": {
+      "bytes": 4825676,
+      "sha256": "7c53c3c516ac67c7ca12977b9690fdea3d2ef13bbaed6378f98191a13ef5ca00"
+    }
+  },
+  "synthetic_inputs": {
+    "synthetic-bpe.gguf": {
+      "bytes": 128192,
+      "sha256": "b50e0f5c9d4c66fc8c78e544a87ad0c5f3d8ee8960e14a988168d481214aea70",
+      "tokens": 6127,
+      "merge_entries": 124,
+      "tensors": 0,
+      "generator": "make-synthetic.py"
+    },
+    "special-order.gguf": {
+      "bytes": 10144,
+      "sha256": "17cb9de4085eb789cad0ddde0f19769a1cb30fbe80957f04271aa45a6bb2d3e6",
+      "tokens": 568,
+      "tensors": 0,
+      "inferred_special_spellings": 51,
+      "generator": "make-special-order.py"
+    }
+  },
+  "coverage": {
+    "pretokenizer_types": 64,
+    "metadata_aliases": 99,
+    "pipelines": 40,
+    "regular_expressions": 48,
+    "custom_splitters": 8,
+    "custom_trigger_strings": 10,
+    "regex_input_cases": 1442,
+    "regex_native_splits_per_platform": 126896,
+    "native_wide_class_values": {
+      "windows": 65536,
+      "linux": 1114112
+    },
+    "synthetic_variants": 111,
+    "synthetic_cases": 23754,
+    "synthetic_full_vocabulary_records": 18381,
+    "original_bpe_vocabularies": 14,
+    "original_vocabulary_records": 1499449,
+    "original_vocabulary_input_cases": 5096,
+    "gpt2_all_alias_cases": 18018,
+    "raw_byte_cases": 22518,
+    "raw_input_variants": 9,
+    "ambiguous_special_variants": 10,
+    "ambiguous_special_records": 5680,
+    "ambiguous_special_cases": 40,
+    "native_map_tables_per_platform": 20,
+    "native_map_keys_per_platform": 5970,
+    "native_libstdcxx_reserve_max_entries": 1000000
+  },
+  "comparison_contract": {
+    "expected_data_source": "Only original C++ Unicode functions, original C API calls and native standard-library operations produce expected results. Rust never produces expected fixture data.",
+    "framing": "Exact SHA-256 of little-endian length-framed native token IDs, attributes, byte pieces and four detokenizations; vocabulary score bits and EOG included. Detailed schemas in README.md.",
+    "platform_differences": "Native wide regex and ambiguous inferred special-ID map order have explicit separate Windows/Linux expectations. No broad tolerances or fallback tokenizers.",
+    "special_order": "Original reserves n_tokens before insertion. MSVC uses FNV-1a64 and power-of-two buckets, groups in first-insertion order; libstdc++ uses MurmurHash64A and recorded prime buckets, groups in reverse first-insertion order. Collision groups iterate reverse insertion in both. Data and hashes independently captured.",
+    "optional_inputs": "All 14 original BPE vocabularies are hash-pinned; only GPT-2 is copied into the repository. Other frozen source vocabularies are supplied through LLAMA_TEST_BPE_VOCAB_DIR for explicit tests.",
+    "limits": "4 MiB public input; 1 million vocabulary entries; 4 million merge entries; frozen regex VM bounded by nesting 64, repetition 4096, program 65536 and explicit work budget. Exceeding a bound is an explicit error.",
+    "remaining_families": "T5/UGM, RWKV and PLaMo are separate unimplemented tokenizer families. This corpus does not claim new model architectures or backends."
+  },
+  "full_native_captures": {
+    "regex-windows-reference.json": {
+      "bytes": 4662981,
+      "sha256": "685d56259c4d225d9d6c70817b6c7515cb90811e9c50886bcbf31f2f33ffaac9"
+    },
+    "regex-linux-reference.json": {
+      "bytes": 4661205,
+      "sha256": "7ce255378dc0264307bacea7b5013fac75220ab9002dddf5b65056267b4ab57e"
+    },
+    "regex-fuzz-windows.json": {
+      "bytes": 26906116,
+      "sha256": "95e15bfa17d7a6fe4bba3918564e3d12c40d4a0eed0392807c22cb18ed7b70a0"
+    },
+    "regex-fuzz-linux.json": {
+      "bytes": 26879707,
+      "sha256": "d37db223b0f479e1b4ae386218ab437704be8fc5b534f8421b0e1cb824861eac"
+    },
+    "wide-windows-reference.bin": {
+      "bytes": 65544,
+      "sha256": "2e57ba2dfbcea4d205380927bb9c3e0d2e2f4b006f76eca2517c35e70c03c44f"
+    },
+    "wide-linux-reference.bin": {
+      "bytes": 1114120,
+      "sha256": "032d2805d08a3ba20b2aeb60a974791fb6fb55ead32e7b7fc765f987bfa1e303"
+    },
+    "synthetic-reference.json": {
+      "bytes": 19645324,
+      "sha256": "675b5c67eaed169981f21797ae0ea29bd5b61d1be9d073cfdb2518cc3146eb91"
+    },
+    "linux-captures/synthetic.json": {
+      "bytes": 19645324,
+      "sha256": "675b5c67eaed169981f21797ae0ea29bd5b61d1be9d073cfdb2518cc3146eb91"
+    },
+    "vocab-captures/all-profiles.json": {
+      "bytes": 11727585,
+      "sha256": "f4d8cc2f26dbd99026d7a1ddba1a52c8272b5c120a1de7e63cb8a1a973d606d1"
+    },
+    "linux-captures/all-profiles.json": {
+      "bytes": 11727537,
+      "sha256": "d56a2d719f5677447f31928da74d6c85f943bb693c2f1ef75b57b4b45ec869cb"
+    },
+    "special-order-windows.json": {
+      "bytes": 821123,
+      "sha256": "1eff2fd4b7e83f88c88e174d16091ad163b24b1f78e9306e473bfb1261752556"
+    },
+    "special-order-linux.json": {
+      "bytes": 816759,
+      "sha256": "026b266e8dc8b51f2f8634d0855328c8f6b4048ebfad38015115269720e837d7"
+    },
+    "map-windows.json": {
+      "bytes": 272264,
+      "sha256": "b745bd7d174b10f279670a7fe61417cd27c3a9658c19074bc0fd8d7c2936306d"
+    },
+    "map-linux.json": {
+      "bytes": 272995,
+      "sha256": "03021ed5605d1b69298efd6602fe5d6258aa5a30b4cca14dedf1cb0d4ed05e6b"
+    },
+    "getters/all.json": {
+      "bytes": 11154,
+      "sha256": "898f578515c5d3ea2a62bed386ffc6a2c87f3408cc8493eee294cadee3f1fa4b"
+    },
+    "windows-captures/raw-bpe.json": {
+      "bytes": 7703896,
+      "sha256": "cc2ee0728a404af2395feeaa8029d9d0ece22832f4abefbe537a6437c0300138"
+    },
+    "windows-captures/raw-spm.json": {
+      "bytes": 971426,
+      "sha256": "222646a439b83928cc6a20a3050dc6ea7b8d450027ce2fe1e32c6caef4a8fbc9"
+    },
+    "windows-captures/raw-wpm.json": {
+      "bytes": 889286,
+      "sha256": "ef7a28cd2aaf9481b53934f1abc888a8f22a58de8c2ca27202124a485b51c411"
+    },
+    "linux-captures/raw-bpe.json": {
+      "bytes": 7703896,
+      "sha256": "cc2ee0728a404af2395feeaa8029d9d0ece22832f4abefbe537a6437c0300138"
+    },
+    "linux-captures/raw-spm.json": {
+      "bytes": 971426,
+      "sha256": "222646a439b83928cc6a20a3050dc6ea7b8d450027ce2fe1e32c6caef4a8fbc9"
+    },
+    "linux-captures/raw-wpm.json": {
+      "bytes": 889286,
+      "sha256": "ef7a28cd2aaf9481b53934f1abc888a8f22a58de8c2ca27202124a485b51c411"
+    },
+    "vocab-captures/gpt-2.json": {
+      "bytes": 3033769,
+      "sha256": "e2178b7d7ddd1d49bc2cd1d1927efa4e008a0985dde144dfd6b64bc40412bc26"
+    },
+    "vocab-captures/gpt-neox.json": {
+      "bytes": 3004503,
+      "sha256": "60fe493f9c6366683684af8315ff7ee770eacf4b1fd6de59cafb5042a55331b3"
+    },
+    "vocab-captures/mpt.json": {
+      "bytes": 3002761,
+      "sha256": "01630593221159dd6822f7e478eedbd013d7bd7bc9b2fdef6692abd8c92e4075"
+    },
+    "vocab-captures/falcon.json": {
+      "bytes": 3819207,
+      "sha256": "54f7a90e8d5b72880d001cca52d46bc7210632d7570ff8c24add4e0795ff39c0"
+    },
+    "vocab-captures/command-r.json": {
+      "bytes": 16654814,
+      "sha256": "285c293e6dfb667cd70b228a72d190f02986ad275114ade0a9c03109cce5137d"
+    },
+    "vocab-captures/llama-bpe.json": {
+      "bytes": 7599271,
+      "sha256": "b3bce32fc5b4b28f61d476b8a6393f734bf2666f6d5c421dca91f522977e2399"
+    },
+    "vocab-captures/deepseek-coder.json": {
+      "bytes": 1993383,
+      "sha256": "40ddabad7b83e4d96b30625c6d987c846d5126d8a25ab04e597090382bdf90cd"
+    },
+    "vocab-captures/deepseek-llm.json": {
+      "bytes": 6337069,
+      "sha256": "108270da736ccfd9d3833809221d86995106112f68f310f2f77c64ae189bffab"
+    },
+    "vocab-captures/refact.json": {
+      "bytes": 2888974,
+      "sha256": "70be2ff1e78063c1910b42f7d9d340984f70b63c1c5ed59f78142cc6d4d918c8"
+    },
+    "vocab-captures/starcoder.json": {
+      "bytes": 2885300,
+      "sha256": "314079a3924de56c5dadeadb85f596091ea837dabf09a36a2303fa531e73b62c"
+    },
+    "vocab-captures/qwen2.json": {
+      "bytes": 9008047,
+      "sha256": "dcb59cd1c1d52eb85839da989e7d2b47e4c132b2fcc925893cf26a06ba76343a"
+    },
+    "vocab-captures/qwen35.json": {
+      "bytes": 9008047,
+      "sha256": "dcb59cd1c1d52eb85839da989e7d2b47e4c132b2fcc925893cf26a06ba76343a"
+    },
+    "vocab-captures/gemma-4.json": {
+      "bytes": 17783818,
+      "sha256": "fb59c183034c18f661833f45284ab57c23fe4cb6a5aa8300219d72c1905f22a7"
+    },
+    "vocab-captures/aquila.json": {
+      "bytes": 6526867,
+      "sha256": "b2e93785b311570f6069ce143cfeb4f515825980e9c9527627298eec7adab538"
+    },
+    "linux-captures/gpt-2.json": {
+      "bytes": 3033769,
+      "sha256": "e2178b7d7ddd1d49bc2cd1d1927efa4e008a0985dde144dfd6b64bc40412bc26"
+    },
+    "linux-captures/gpt-neox.json": {
+      "bytes": 3004503,
+      "sha256": "60fe493f9c6366683684af8315ff7ee770eacf4b1fd6de59cafb5042a55331b3"
+    },
+    "linux-captures/mpt.json": {
+      "bytes": 3002761,
+      "sha256": "01630593221159dd6822f7e478eedbd013d7bd7bc9b2fdef6692abd8c92e4075"
+    },
+    "linux-captures/falcon.json": {
+      "bytes": 3819207,
+      "sha256": "54f7a90e8d5b72880d001cca52d46bc7210632d7570ff8c24add4e0795ff39c0"
+    },
+    "linux-captures/command-r.json": {
+      "bytes": 16654814,
+      "sha256": "285c293e6dfb667cd70b228a72d190f02986ad275114ade0a9c03109cce5137d"
+    },
+    "linux-captures/llama-bpe.json": {
+      "bytes": 7599271,
+      "sha256": "b3bce32fc5b4b28f61d476b8a6393f734bf2666f6d5c421dca91f522977e2399"
+    },
+    "linux-captures/deepseek-coder.json": {
+      "bytes": 1993383,
+      "sha256": "40ddabad7b83e4d96b30625c6d987c846d5126d8a25ab04e597090382bdf90cd"
+    },
+    "linux-captures/deepseek-llm.json": {
+      "bytes": 6337069,
+      "sha256": "108270da736ccfd9d3833809221d86995106112f68f310f2f77c64ae189bffab"
+    },
+    "linux-captures/refact.json": {
+      "bytes": 2888974,
+      "sha256": "70be2ff1e78063c1910b42f7d9d340984f70b63c1c5ed59f78142cc6d4d918c8"
+    },
+    "linux-captures/starcoder.json": {
+      "bytes": 2885300,
+      "sha256": "314079a3924de56c5dadeadb85f596091ea837dabf09a36a2303fa531e73b62c"
+    },
+    "linux-captures/qwen2.json": {
+      "bytes": 9008047,
+      "sha256": "dcb59cd1c1d52eb85839da989e7d2b47e4c132b2fcc925893cf26a06ba76343a"
+    },
+    "linux-captures/qwen35.json": {
+      "bytes": 9008047,
+      "sha256": "dcb59cd1c1d52eb85839da989e7d2b47e4c132b2fcc925893cf26a06ba76343a"
+    },
+    "linux-captures/gemma-4.json": {
+      "bytes": 17783818,
+      "sha256": "fb59c183034c18f661833f45284ab57c23fe4cb6a5aa8300219d72c1905f22a7"
+    },
+    "linux-captures/aquila.json": {
+      "bytes": 6526867,
+      "sha256": "b2e93785b311570f6069ce143cfeb4f515825980e9c9527627298eec7adab538"
+    },
+    "getters/ggml-vocab-aquila-linux.json": {
+      "bytes": 378,
+      "sha256": "aff66c8d046f467a750174bfa728ece77ff1befe7ecf6187ba557ee8498aae5b"
+    },
+    "getters/ggml-vocab-aquila-windows.json": {
+      "bytes": 378,
+      "sha256": "aff66c8d046f467a750174bfa728ece77ff1befe7ecf6187ba557ee8498aae5b"
+    },
+    "getters/ggml-vocab-baichuan-linux.json": {
+      "bytes": 376,
+      "sha256": "4f2a4659e03d656c880f37da94151fd498e9143802519db1f7b6456a8fc2c1e2"
+    },
+    "getters/ggml-vocab-baichuan-windows.json": {
+      "bytes": 376,
+      "sha256": "4f2a4659e03d656c880f37da94151fd498e9143802519db1f7b6456a8fc2c1e2"
+    },
+    "getters/ggml-vocab-bert-bge-linux.json": {
+      "bytes": 377,
+      "sha256": "4169a79e22a20f1c06cbc9b35bd01f661a7b89b45883184e36f91545dff00085"
+    },
+    "getters/ggml-vocab-bert-bge-windows.json": {
+      "bytes": 377,
+      "sha256": "4169a79e22a20f1c06cbc9b35bd01f661a7b89b45883184e36f91545dff00085"
+    },
+    "getters/ggml-vocab-command-r-linux.json": {
+      "bytes": 381,
+      "sha256": "56e9cc73173f223b504354e5152a687e9c096868c86e8253252a859304523324"
+    },
+    "getters/ggml-vocab-command-r-windows.json": {
+      "bytes": 381,
+      "sha256": "56e9cc73173f223b504354e5152a687e9c096868c86e8253252a859304523324"
+    },
+    "getters/ggml-vocab-deepseek-coder-linux.json": {
+      "bytes": 400,
+      "sha256": "dae6828afd4835c7863024d1cb2cc9f79ae9fe6c0143d602d2f43213ad0bd375"
+    },
+    "getters/ggml-vocab-deepseek-coder-windows.json": {
+      "bytes": 400,
+      "sha256": "dae6828afd4835c7863024d1cb2cc9f79ae9fe6c0143d602d2f43213ad0bd375"
+    },
+    "getters/ggml-vocab-deepseek-llm-linux.json": {
+      "bytes": 396,
+      "sha256": "fe11554004f1b8f336e988198a16e0f2bbaf3f55eaf160e8d6135d8d97325e02"
+    },
+    "getters/ggml-vocab-deepseek-llm-windows.json": {
+      "bytes": 396,
+      "sha256": "fe11554004f1b8f336e988198a16e0f2bbaf3f55eaf160e8d6135d8d97325e02"
+    },
+    "getters/ggml-vocab-falcon-linux.json": {
+      "bytes": 380,
+      "sha256": "dabc19996572d148015f7e7f71525f1ed4b42c8be696481ea9f6ee431bc6a5eb"
+    },
+    "getters/ggml-vocab-falcon-windows.json": {
+      "bytes": 380,
+      "sha256": "dabc19996572d148015f7e7f71525f1ed4b42c8be696481ea9f6ee431bc6a5eb"
+    },
+    "getters/ggml-vocab-gemma-4-linux.json": {
+      "bytes": 376,
+      "sha256": "4e128e0e04ad1d56db2f7ffe7e390cd9c172207090b52c54fd01db299fdd5853"
+    },
+    "getters/ggml-vocab-gemma-4-windows.json": {
+      "bytes": 376,
+      "sha256": "4e128e0e04ad1d56db2f7ffe7e390cd9c172207090b52c54fd01db299fdd5853"
+    },
+    "getters/ggml-vocab-gpt-2-linux.json": {
+      "bytes": 389,
+      "sha256": "f94f97a89909d9b5ce2862957c63a553983c695e863e52d415fcf846d94b0869"
+    },
+    "getters/ggml-vocab-gpt-2-windows.json": {
+      "bytes": 389,
+      "sha256": "f94f97a89909d9b5ce2862957c63a553983c695e863e52d415fcf846d94b0869"
+    },
+    "getters/ggml-vocab-gpt-neox-linux.json": {
+      "bytes": 377,
+      "sha256": "e1bc62eab6ac8ef1dff86470ae72cee0226b7d4559ef68037aa5381c4d49bd1e"
+    },
+    "getters/ggml-vocab-gpt-neox-windows.json": {
+      "bytes": 377,
+      "sha256": "e1bc62eab6ac8ef1dff86470ae72cee0226b7d4559ef68037aa5381c4d49bd1e"
+    },
+    "getters/ggml-vocab-llama-bpe-linux.json": {
+      "bytes": 392,
+      "sha256": "24c698bd29b81b810e08273ffc4f2c7b2df874234f350fe00eeeb91d121b5b27"
+    },
+    "getters/ggml-vocab-llama-bpe-windows.json": {
+      "bytes": 392,
+      "sha256": "89a3fe91f7399211b542a230e51b6675af0d28f592e17e7c3f1d4cd33e6e4c24"
+    },
+    "getters/ggml-vocab-llama-spm-linux.json": {
+      "bytes": 376,
+      "sha256": "99d03e4b07d7785aaa394beda1d5ded01041b0f441996b3b85b2df8e4963f061"
+    },
+    "getters/ggml-vocab-llama-spm-windows.json": {
+      "bytes": 376,
+      "sha256": "99d03e4b07d7785aaa394beda1d5ded01041b0f441996b3b85b2df8e4963f061"
+    },
+    "getters/ggml-vocab-mpt-linux.json": {
+      "bytes": 377,
+      "sha256": "e1bc62eab6ac8ef1dff86470ae72cee0226b7d4559ef68037aa5381c4d49bd1e"
+    },
+    "getters/ggml-vocab-mpt-windows.json": {
+      "bytes": 377,
+      "sha256": "e1bc62eab6ac8ef1dff86470ae72cee0226b7d4559ef68037aa5381c4d49bd1e"
+    },
+    "getters/ggml-vocab-nomic-bert-moe-linux.json": {
+      "bytes": 377,
+      "sha256": "ff5144b0bbf3fc248c466f1b2d0258472778e843be58139448aefa71522e405a"
+    },
+    "getters/ggml-vocab-nomic-bert-moe-windows.json": {
+      "bytes": 377,
+      "sha256": "ff5144b0bbf3fc248c466f1b2d0258472778e843be58139448aefa71522e405a"
+    },
+    "getters/ggml-vocab-phi-3-linux.json": {
+      "bytes": 386,
+      "sha256": "65b42b0897a40d78432d2e8b9c984f5290bb14566a77d152427c9b180e965026"
+    },
+    "getters/ggml-vocab-phi-3-windows.json": {
+      "bytes": 386,
+      "sha256": "65b42b0897a40d78432d2e8b9c984f5290bb14566a77d152427c9b180e965026"
+    },
+    "getters/ggml-vocab-qwen2-linux.json": {
+      "bytes": 397,
+      "sha256": "ea8e21662c59bf8fc2874e8ac37679ffcb52b224ee9f37e24e44c7cd0b515692"
+    },
+    "getters/ggml-vocab-qwen2-windows.json": {
+      "bytes": 397,
+      "sha256": "ea8e21662c59bf8fc2874e8ac37679ffcb52b224ee9f37e24e44c7cd0b515692"
+    },
+    "getters/ggml-vocab-qwen35-linux.json": {
+      "bytes": 397,
+      "sha256": "ea8e21662c59bf8fc2874e8ac37679ffcb52b224ee9f37e24e44c7cd0b515692"
+    },
+    "getters/ggml-vocab-qwen35-windows.json": {
+      "bytes": 397,
+      "sha256": "ea8e21662c59bf8fc2874e8ac37679ffcb52b224ee9f37e24e44c7cd0b515692"
+    },
+    "getters/ggml-vocab-refact-linux.json": {
+      "bytes": 373,
+      "sha256": "602b6a911fbe84281d07d73c53afb6a35bc7b3e702e6d870846442011b9e9d62"
+    },
+    "getters/ggml-vocab-refact-windows.json": {
+      "bytes": 373,
+      "sha256": "602b6a911fbe84281d07d73c53afb6a35bc7b3e702e6d870846442011b9e9d62"
+    },
+    "getters/ggml-vocab-starcoder-linux.json": {
+      "bytes": 373,
+      "sha256": "acfe51a59fa439f7a4c0a09de14dd25f1c1350de14ce7b5ffe38197dc819fb53"
+    },
+    "getters/ggml-vocab-starcoder-windows.json": {
+      "bytes": 373,
+      "sha256": "acfe51a59fa439f7a4c0a09de14dd25f1c1350de14ce7b5ffe38197dc819fb53"
+    }
+  },
+  "fixtures": {
+    "ggml-vocab-gpt-2.gguf": {
+      "bytes": 1766807,
+      "sha256": "cedc56ca6e2e89f63e781696d1fd76b4b1d49e6720dee86463e915f6e90016ac"
+    },
+    "gpt2-profiles-reference.json": {
+      "bytes": 129420,
+      "sha256": "5faa7478503654c53ad06e0466362778d3981108441474ae49aef570df7b3dd1"
+    },
+    "map-reference.json": {
+      "bytes": 4369,
+      "sha256": "bd59f83a924a1cd8e895eb2fcc812a143f9fde0b4e46203edc685f81d7201685"
+    },
+    "raw-bpe-reference.json": {
+      "bytes": 511638,
+      "sha256": "d5a7948300cdae18d42d610cc8e1e955a84fd53f6043742f1488f7f9d38ca15b"
+    },
+    "raw-spm-reference.json": {
+      "bytes": 416690,
+      "sha256": "9573455ca053c0486f773e79dd4681164e5788f228181d9e21564b807d2612ad"
+    },
+    "raw-wpm-reference.json": {
+      "bytes": 289718,
+      "sha256": "34cd299195f987affa09883966915662f1034664a331051e61e9015c4c22eeb2"
+    },
+    "README.md": {
+      "bytes": 5848,
+      "sha256": "8c03cb4273bb168e468e0d75657fb1f63fd29e1881f35530a99ae0d45cd98376"
+    },
+    "regex-reference.json": {
+      "bytes": 540685,
+      "sha256": "af3649be4cf847cfed3590a9b274df641df6493850a974711a8dc431f9479ad3"
+    },
+    "special-order-reference.json": {
+      "bytes": 13892,
+      "sha256": "9941cce190dabd807b2ab0719829daba3bf5bd6252da1c56ce5ccc027ef33c58"
+    },
+    "special-order.gguf": {
+      "bytes": 10144,
+      "sha256": "17cb9de4085eb789cad0ddde0f19769a1cb30fbe80957f04271aa45a6bb2d3e6"
+    },
+    "synthetic-bpe.gguf": {
+      "bytes": 128192,
+      "sha256": "b50e0f5c9d4c66fc8c78e544a87ad0c5f3d8ee8960e14a988168d481214aea70"
+    },
+    "synthetic-reference.json": {
+      "bytes": 209423,
+      "sha256": "e62cf150b845e90e3ca1625f6234c3558489d0e1cf60c6bf1ab76d03220e9bae"
+    },
+    "vocabulary-reference.json": {
+      "bytes": 1070454,
+      "sha256": "7e0e446b0f51db9c58b9a9bb609dde9536e59d99caf2be73ae62fcb20f9ef50d"
+    }
+  }
+}

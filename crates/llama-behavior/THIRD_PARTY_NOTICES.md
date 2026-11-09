@@ -5,6 +5,12 @@ helpers in src/sampling.rs adapt the Microsoft STL sorting policy from the
 MSVC 14.51.36231 algorithm header to checked Rust slices and indices. Their
 tie ordering is observable through the frozen llama.cpp sampler C ABI.
 
+src/native_regex.rs is an independently written bounded Rust byte matcher whose
+parser/class/capture compatibility was informed by the same Microsoft STL regex
+header and verified against std::regex. This notice and license also cover any
+derived compatibility details in that module; its execution engine uses checked
+Rust states and explicit allocation/work bounds.
+
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception.
 
@@ -13,7 +19,7 @@ LICENSE-MICROSOFT-STL.txt. The rest of this crate retains its MIT license; LICEN
 LICENSE-LLAMA-CPP.txt preserve the project and frozen upstream MIT notices.
 The combined package license is MIT AND (Apache-2.0 WITH LLVM-exception).
 
-Source: Microsoft STL, MSVC 14.51.36231 include/algorithm.
+Source: Microsoft STL, MSVC 14.51.36231 include/algorithm and include/regex.
 License source: https://raw.githubusercontent.com/microsoft/STL/main/LICENSE.txt
 License SHA-256: 1fc6b6db121d4555d8f661937d7f6013693cd8fd67495d5e5d98c1d18fb83eda
 

@@ -1,0 +1,79 @@
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-behavior)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama\crates\inference)
+   Compiling llama-ffi v0.1.0 (C:\Users\adyba\rust-llama\crates\ffi)
+    Finished `release` profile [optimized] target(s) in 13.31s
+     Running unittests src\lib.rs (target\release\deps\llama_behavior-dae8ee4f63dcc1df.exe)
+
+running 45 tests
+test chat::tests::chatml_exact_bytes ... ok
+test chat::tests::gemma_merges_system_only_into_non_model_turn ... ok
+test chat::tests::llama2_history_and_ascii_whitespace_contract ... ok
+test chat::tests::native_detection_order_and_unknown_jinja_are_explicit ... ok
+test chat::tests::every_registered_native_name_has_implementation ... ok
+test chat::tests::malformed_roles_nuls_and_output_limits_are_rejected ... ok
+test grammar::tests::nullable_rules_and_repeated_groups ... ok
+test native_grammar::tests::parser_accounts_for_transient_nested_expansion_and_symbol_storage ... ok
+test json::tests::enforces_limits_and_handles_negative_zero ... ok
+test native_grammar::tests::token_masking_and_acceptance_keep_the_source_distinction ... ok
+test grammar::tests::full_gbnf_character_syntax_and_bounds ... ok
+test grammar::tests::rejects_invalid_grammars_and_unimplemented_token_terminals ... ok
+test grammar::tests::recursive_nested_json_and_prefix_status ... ok
+test json::tests::rejects_malformed_ambiguous_or_non_finite_input ... ok
+test native_grammar::tests::parser_and_state_resource_errors_are_bounded_and_transactional ... ok
+test grammar::tests::split_utf8_checks_partial_ranges_and_rolls_back ... ok
+test json::tests::unicode_surrogates_and_escape_roundtrip ... ok
+test native_grammar::tests::native_literals_alternatives_and_transactional_accept ... ok
+test native_grammar::tests::numeric_named_and_inverse_token_terminals ... ok
+test json::tests::deterministic_key_order ... ok
+test native_grammar::tests::raw_utf8_prefixes_match_native_non_scalar_behavior ... ok
+test native_regex::tests::lookahead_backreferences_and_lazy_order ... ok
+test json::tests::integers_preserve_identity_beyond_binary64_precision ... ok
+test grammar::tests::state_budget_failure_is_transactional ... ok
+test grammar::tests::token_piece_filter_uses_bytes_and_end_state ... ok
+test sampling::tests::distribution_clone_reset_singleton_consumption ... ok
+test native_grammar::tests::partial_classes_and_nul_sentinel_are_source_specific ... ok
+test native_regex::tests::raw_byte_classes_and_captures ... ok
+test sampling::tests::chain_order_is_observable ... ok
+test sampling::tests::dry_source_cases_and_breakers ... ok
+test sampling::tests::penalty_window_positive_negative_and_reset ... ok
+test sampling::tests::mt19937_standard_seed_reference_vector ... ok
+test sampling::tests::reference_sampling_probability_cases ... ok
+test sampling::tests::errors_do_not_consume_rng_or_mutate_candidates ... ok
+test sampling::tests::adaptive_accept_only_commits_matching_pending_token ... ok
+test sampling::tests::xtc_source_case ... ok
+test speculative::tests::dropping_or_invalid_commit_leaves_live_state_untouched ... ok
+test speculative::tests::greedy_rejection_and_bonus ... ok
+test speculative::tests::partial_commit_restores_rng_and_history_exactly ... ok
+test speculative::tests::snapshot_budget_rejects_before_unbounded_chain_copying ... ok
+test native_grammar::tests::bounded_repetitions_comments_and_native_limits ... ok
+test native_regex::tests::reserved_capacity_and_backreference_bytes_consume_budget ... ok
+test native_regex::reference_tests::frozen_msvc_regex_search_and_capture_corpus ... ok
+test native_grammar::tests::native_grammar_matches_original_raw_byte_oracle_and_dll_masks ... ok
+test native_regex::tests::syntax_errors_and_bounded_backtracking ... ok
+
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src\lib.rs (target\release\deps\llama_ffi-254c20ceaadd027a.exe)
+
+running 17 tests
+test abi::tests::frozen_x64_layout ... ok
+test batch::tests::unsafe_allocation_sizes_fail_without_allocating ... ok
+test batch::tests::allocated_token_and_embedding_batches_have_native_shape_and_safe_free ... ok
+test sampler::tests::chain_owns_children_rejects_cycles_and_remove_transfers_ownership ... ok
+test sampler::tests::malformed_candidates_do_not_advance_builtin_rng ... ok
+test sampler::tests::cloned_distribution_and_copy_preserve_rng_and_reset ... ok
+test sampler::tests::native_filter_retains_selection_and_xtc_advances_pointer ... ok
+test sampler::tests::penalty_accept_rejects_out_of_vocabulary_before_history_mutation ... ok
+test sampler_grammar::tests::source_word_escaping_and_capture_start ... ok
+test sampler::tests::sampler_layout_matches_frozen_x64_contract ... ok
+test sampler_reference_tests::pending_adaptive_clone_and_copy_fail_atomically ... ok
+test tests::count_only_and_truncated_buffers_follow_c_conventions ... ok
+test sampler::tests::frozen_windows_tied_sort_regressions ... ok
+test tests::panic_is_contained_and_diagnostic_is_thread_local ... ok
+test sampler_reference_tests::empty_grammar_ignores_unused_pointers_and_owned_vocabulary_survives_model_free ... ok
+test sampler_reference_tests::frozen_dll_grammar_lazy_and_dry_corpus ... ok
+test sampler_reference_tests::frozen_dll_adaptive_rng_and_infill_candidate_corpus ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

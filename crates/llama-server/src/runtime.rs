@@ -4,12 +4,12 @@
 //! sampler and cancellation state. No reference executable or test provider is
 //! called by this module.
 use crate::provider::{
-    FinishReason, GenerationRequest, GenerationSummary, InferenceProvider, ModelInfo, Prompt,
-    ProviderError, ProviderStatus, TokenSink,
+    EmbeddingInfo, FinishReason, GenerationRequest, GenerationSummary, InferenceProvider,
+    ModelInfo, Prompt, ProviderError, ProviderStatus, TokenSink,
 };
 use crate::stream::CancellationToken;
 use llama_behavior::json::Value;
-use llama_inference::{Error, GenerationOptions, Model};
+use llama_inference::{Error, GenerationOptions, Model, Pooling};
 use std::path::Path;
 
 /// Omitted seeds are deterministic until an explicit platform entropy contract
@@ -21,6 +21,24 @@ pub const DEFAULT_SEED: u32 = 0;
 /// invalid model never becomes a ready provider or a synthetic fallback.
 pub struct RuntimeProvider {
     model: Model,
+    embedding: Option<EmbeddingOptions>,
+}
+
+/// Startup options corresponding to --embeddings, --pooling and
+/// --embd-normalize. An omitted pooling mode uses the GGUF model default.
+#[derive(Clone, Copy, Debug)]
+pub struct EmbeddingOptions {
+    pub pooling: Option<Pooling>,
+    pub normalization: i32,
+}
+
+impl Default for EmbeddingOptions {
+    fn default() -> Self {
+        Self {
+            pooling: None,
+            normalization: 2,
+        }
+    }
 }
 
 impl RuntimeProvider {
@@ -29,7 +47,32 @@ impl RuntimeProvider {
     }
 
     pub fn from_model(model: Model) -> Self {
-        Self { model }
+        Self {
+            model,
+            embedding: None,
+        }
+    }
+
+    pub fn with_embeddings(mut self, options: EmbeddingOptions) -> Result<Self, ProviderError> {
+        if !self.model.supports_embeddings() {
+            return Err(ProviderError::unsupported(
+                "Embedding execution is not implemented for this model architecture",
+            ));
+        }
+        self.embedding = Some(options);
+        Ok(self)
+    }
+
+    fn embedding_pooling(&self) -> Result<Pooling, ProviderError> {
+        let options = self.embedding.ok_or_else(|| {
+            ProviderError::unsupported(
+                "This server does not support embeddings. Start it with --embeddings",
+            )
+        })?;
+        Ok(options
+            .pooling
+            .or(self.model.default_embedding_pooling())
+            .unwrap_or(Pooling::None))
     }
 
     pub fn model_id(&self) -> &str {
@@ -188,6 +231,37 @@ impl InferenceProvider for RuntimeProvider {
             id: self.model_id().to_owned(),
             owned_by: "rust-llama".into(),
         }]
+    }
+
+    fn embedding_info(&self) -> Result<EmbeddingInfo, ProviderError> {
+        let pooling = self.embedding_pooling()?;
+        Ok(EmbeddingInfo {
+            dimensions: self.model.embedding_dimensions(),
+            vocabulary_size: self.model.vocabulary_size(),
+            context_length: self.model.context_length(),
+            pooled: pooling != Pooling::None,
+            normalization: self.embedding.map_or(2, |options| options.normalization),
+        })
+    }
+
+    fn embed(
+        &self,
+        tokens: &[i32],
+        normalization: i32,
+        cancel: &CancellationToken,
+    ) -> Result<Vec<Vec<f32>>, ProviderError> {
+        let pooling = self.embedding_pooling()?;
+        let encoded = self
+            .model
+            .embed_tokens(tokens, pooling, &|| cancel.is_cancelled())
+            .map_err(map_error)?;
+        match encoded.pooled {
+            Some(mut vector) => {
+                crate::embedding::normalize(&mut vector, normalization)?;
+                Ok(vec![vector])
+            }
+            None => Ok(encoded.tokens),
+        }
     }
 
     fn validate_generation(&self, request: &GenerationRequest) -> Result<(), ProviderError> {

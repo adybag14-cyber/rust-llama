@@ -1,9 +1,12 @@
-//! Frozen llama.cpp SentencePiece-style scored BPE and BERT WordPiece tokenizers.
-//! Unicode normalization uses complete frozen tables. Other tokenizer families
-//! remain explicit unsupported work.
+//! Frozen llama.cpp SPM, WordPiece and metadata-selected GPT-2/BPE tokenizers.
+//! Unicode properties, raw-byte decoding and pretokenizer profiles use the frozen
+//! source behavior; unimplemented families return explicit errors.
 #![forbid(unsafe_code)]
 
+mod bpe;
 pub mod unicode;
+mod unicode_regex;
+mod vocab_order;
 
 use llama_gguf::Value;
 use std::{
@@ -46,11 +49,13 @@ struct Token {
 #[repr(i32)]
 pub enum VocabType {
     Spm = 1,
+    Bpe = 2,
     Wpm = 3,
 }
 #[derive(Debug, Clone)]
 pub struct Tokenizer {
     family: VocabType,
+    bpe: Option<bpe::Bpe>,
     max_token_len: usize,
     lowercase: bool,
     strip_accents: bool,
@@ -61,10 +66,19 @@ pub struct Tokenizer {
     special: Vec<i32>,
     pub bos_id: i32,
     pub eos_id: i32,
+    pub eot_id: i32,
+    pub eom_id: i32,
+    pub fim_pre_id: i32,
+    pub fim_suf_id: i32,
+    pub fim_mid_id: i32,
+    pub fim_pad_id: i32,
+    pub fim_rep_id: i32,
+    pub fim_sep_id: i32,
     pub unk_id: i32,
     pub sep_id: i32,
     pub pad_id: i32,
     pub mask_id: i32,
+    newline_id: i32,
     pub add_sep: bool,
     pub add_bos: bool,
     pub add_eos: bool,
@@ -73,18 +87,24 @@ pub struct Tokenizer {
 }
 impl Tokenizer {
     pub fn from_metadata(m: &BTreeMap<String, Value>) -> Result<Self> {
-        let family = m
+        let model = m
             .get("tokenizer.ggml.model")
             .and_then(Value::as_str)
             .ok_or_else(|| invalid("missing tokenizer.ggml.model"))?;
-        let family = match family {
+        let family = match model {
             "llama" => VocabType::Spm,
             "bert" => VocabType::Wpm,
+            "gpt2" | "hybriddna" | "whitespace" | "gemma4" => VocabType::Bpe,
             other => {
                 return Err(Error::Unsupported(format!(
-                    "family {other}; implemented families are llama/SPM and bert/WordPiece"
+                    "family {other}; implemented families are llama/SPM, bert/WordPiece, and GPT-2/BPE"
                 )));
             }
+        };
+        let bpe = if family == VocabType::Bpe {
+            Some(bpe::Bpe::from_metadata(m, model)?)
+        } else {
+            None
         };
         let words = m
             .get("tokenizer.ggml.tokens")
@@ -190,15 +210,40 @@ impl Tokenizer {
         };
         let bos_id = optional_id(
             "tokenizer.ggml.bos_token_id",
-            if family == VocabType::Spm { 1 } else { 101 },
+            match family {
+                VocabType::Spm => 1,
+                VocabType::Wpm => 101,
+                VocabType::Bpe => {
+                    if bpe.as_ref().unwrap().gemma_defaults || bpe.as_ref().unwrap().config.bos_null
+                    {
+                        -1
+                    } else {
+                        11
+                    }
+                }
+            },
         )?;
         let eos_id = optional_id(
             "tokenizer.ggml.eos_token_id",
-            if family == VocabType::Spm { 2 } else { -1 },
+            match family {
+                VocabType::Spm => 2,
+                VocabType::Wpm => -1,
+                VocabType::Bpe => {
+                    if bpe.as_ref().unwrap().gemma_defaults {
+                        -1
+                    } else {
+                        11
+                    }
+                }
+            },
         )?;
         let unk_id = optional_id(
             "tokenizer.ggml.unknown_token_id",
-            if family == VocabType::Spm { 0 } else { 100 },
+            match family {
+                VocabType::Spm => 0,
+                VocabType::Wpm => 100,
+                VocabType::Bpe => -1,
+            },
         )?;
         let sep_id = optional_id(
             "tokenizer.ggml.seperator_token_id",
@@ -212,69 +257,143 @@ impl Tokenizer {
             "tokenizer.ggml.mask_token_id",
             if family == VocabType::Wpm { 103 } else { -1 },
         )?;
-        let add_bos = bool_value("tokenizer.ggml.add_bos_token", true)?;
+        let mut add_bos = bool_value(
+            "tokenizer.ggml.add_bos_token",
+            bpe.as_ref().is_none_or(|b| b.config.add_bos),
+        )?;
+        if bpe
+            .as_ref()
+            .is_some_and(|b| b.config.pre == bpe::Pre::Gemma4)
+        {
+            add_bos = true;
+        }
         let add_eos = bool_value("tokenizer.ggml.add_eos_token", false)?;
-        let add_sep = bool_value("tokenizer.ggml.add_sep_token", family == VocabType::Wpm)?;
+        let add_sep = bool_value(
+            "tokenizer.ggml.add_sep_token",
+            family == VocabType::Wpm || bpe.as_ref().is_some_and(|b| b.config.add_sep),
+        )?;
         let add_space_prefix =
             bool_value("tokenizer.ggml.add_space_prefix", family == VocabType::Spm)?;
-        let clean_spaces = bool_value("tokenizer.ggml.clean_spaces", family == VocabType::Wpm)?;
-        let lowercase = bool_value("tokenizer.ggml.normalizer.lowercase", true)?;
+        let clean_spaces = bool_value(
+            "tokenizer.ggml.clean_spaces",
+            family == VocabType::Wpm || bpe.as_ref().is_some_and(|b| b.config.clean_spaces),
+        )?;
+        let lowercase = bool_value(
+            "tokenizer.ggml.normalizer.lowercase",
+            bpe.as_ref().is_none_or(|b| b.config.lowercase),
+        )?;
         let strip_accents = bool_value("tokenizer.ggml.normalizer.strip_accents", lowercase)?;
-        if m.contains_key("tokenizer.ggml.precompiled_charsmap") {
+        if family != VocabType::Bpe && m.contains_key("tokenizer.ggml.precompiled_charsmap") {
             return Err(Error::Unsupported("precompiled normalization map".into()));
         }
-        let mut eog = BTreeSet::new();
-        if eos_id >= 0 {
-            eog.insert(eos_id);
-        }
-        for key in [
-            "tokenizer.ggml.eot_token_id",
-            "tokenizer.ggml.eom_token_id",
-            "tokenizer.ggml.fim_pad_token_id",
-            "tokenizer.ggml.fim_rep_token_id",
-            "tokenizer.ggml.fim_sep_token_id",
-        ] {
-            if m.contains_key(key) {
-                let token = optional_id(key, -1)?;
-                if token >= 0 {
-                    eog.insert(token);
-                }
-            }
-        }
-        // The frozen loader discovers FIM end markers even for WPM. In
-        // particular BERT's [PAD] is also inferred as FIM_PAD and therefore EOG.
+        let mut native_order = None;
         let mut inferred_control = Vec::new();
-        for (key, spellings) in [
-            (
-                "tokenizer.ggml.fim_pad_token_id",
-                &["<|fim_pad|>", "<fim-pad>", "<fim_pad>", "<PAD>", "[PAD]"][..],
-            ),
-            (
-                "tokenizer.ggml.fim_rep_token_id",
-                &[
-                    "<|fim_repo|>",
-                    "<|repo_name|>",
-                    "<fim-repo>",
-                    "<REPO>",
-                    "<reponame>",
-                ][..],
-            ),
-            (
-                "tokenizer.ggml.fim_sep_token_id",
-                &["<|file_sep|>", "<|plamo:file_separator|>"][..],
-            ),
-        ] {
-            let configured = optional_id(key, -1)?;
-            if configured >= 0 {
-                eog.insert(configured);
-            } else if let Some((_, &token)) = lookup
-                .iter()
-                .find(|(text, _)| spellings.contains(&text.as_str()))
-            {
-                eog.insert(token);
-                inferred_control.push(token);
-            }
-        }
+        let mut resolve =
+            |key: &str, deprecated: Option<&str>, spellings: &[&str]| -> Result<i32> {
+                let configured = optional_id(key, -1)?;
+                let configured = match deprecated {
+                    Some(key) => optional_id(key, configured)?,
+                    None => configured,
+                };
+                if configured >= 0 {
+                    return Ok(configured);
+                }
+                if let Some(id) = vocab_order::first_matching(&lookup, spellings, &mut native_order)
+                {
+                    inferred_control.push(id);
+                    Ok(id)
+                } else {
+                    Ok(-1)
+                }
+            };
+        let eot_id = resolve(
+            "tokenizer.ggml.eot_token_id",
+            None,
+            &[
+                "<|eot_id|>",
+                "<|im_end|>",
+                "<|end|>",
+                "<end_of_turn>",
+                "<|endoftext|>",
+                "<|end_of_text|>",
+                "<EOT>",
+                "_<EOT>",
+                "[EOT]",
+                "<｜end▁of▁sentence｜>",
+                "<end_of_utterance>",
+            ],
+        )?;
+        let eom_id = resolve("tokenizer.ggml.eom_token_id", None, &["<|eom_id|>"])?;
+        let fim_pre_id = resolve(
+            "tokenizer.ggml.fim_pre_token_id",
+            Some("tokenizer.ggml.prefix_token_id"),
+            &[
+                "<|fim_prefix|>",
+                "<fim-prefix>",
+                "<fim_prefix>",
+                "<｜fim▁begin｜>",
+                "<PRE>",
+                "▁<PRE>",
+                "<|code_prefix|>",
+                "<|prefix|>",
+                "<|plamo:fim_prefix|>",
+            ],
+        )?;
+        let fim_suf_id = resolve(
+            "tokenizer.ggml.fim_suf_token_id",
+            Some("tokenizer.ggml.suffix_token_id"),
+            &[
+                "<|fim_suffix|>",
+                "<fim-suffix>",
+                "<fim_suffix>",
+                "<｜fim▁hole｜>",
+                "<SUF>",
+                "▁<SUF>",
+                "<|code_suffix|>",
+                "<|suffix|>",
+                "<|plamo:fim_suffix|>",
+            ],
+        )?;
+        let fim_mid_id = resolve(
+            "tokenizer.ggml.fim_mid_token_id",
+            Some("tokenizer.ggml.middle_token_id"),
+            &[
+                "<|fim_middle|>",
+                "<fim-middle>",
+                "<fim_middle>",
+                "<｜fim▁end｜>",
+                "<MID>",
+                "▁<MID>",
+                "<|code_middle|>",
+                "<|middle|>",
+                "<|plamo:fim_middle|>",
+            ],
+        )?;
+        let fim_pad_id = resolve(
+            "tokenizer.ggml.fim_pad_token_id",
+            None,
+            &["<|fim_pad|>", "<fim-pad>", "<fim_pad>", "<PAD>", "[PAD]"],
+        )?;
+        let fim_rep_id = resolve(
+            "tokenizer.ggml.fim_rep_token_id",
+            None,
+            &[
+                "<|fim_repo|>",
+                "<|repo_name|>",
+                "<fim-repo>",
+                "<REPO>",
+                "<reponame>",
+            ],
+        )?;
+        let fim_sep_id = resolve(
+            "tokenizer.ggml.fim_sep_token_id",
+            None,
+            &["<|file_sep|>", "<|plamo:file_separator|>"],
+        )?;
+        let mut eog: BTreeSet<_> = [eos_id, eot_id, eom_id, fim_pad_id, fim_rep_id, fim_sep_id]
+            .into_iter()
+            .filter(|id| *id >= 0)
+            .collect();
         for token in inferred_control {
             tokens[token as usize].attributes |= 8;
             tokens[token as usize].kind = 3;
@@ -341,16 +460,69 @@ impl Tokenizer {
             tokens[id as usize].kind = 1;
             tokens[id as usize].attributes = 4;
         }
-        if family == VocabType::Wpm {
+        if bpe
+            .as_ref()
+            .is_some_and(|b| b.config.pre == bpe::Pre::Flint)
+        {
+            for text in ["<|user|>", "<|observation|>"] {
+                if let Some(&id) = lookup.get(text) {
+                    eog.insert(id);
+                    tokens[id as usize].attributes |= 8;
+                    tokens[id as usize].kind = 3;
+                }
+            }
+        }
+        {
             let name = m
                 .get("general.name")
                 .and_then(Value::as_str)
                 .unwrap_or("")
                 .to_ascii_lowercase();
-            if name.contains("modern-bert")
+            let pre = m
+                .get("tokenizer.ggml.pre")
+                .and_then(Value::as_str)
+                .unwrap_or("");
+            let arch = m
+                .get("general.architecture")
+                .and_then(Value::as_str)
+                .unwrap_or("");
+            if ["jina-v2-de", "jina-v2-es", "jina-v2-code", "mmbert"]
+                .iter()
+                .any(|x| pre.contains(x))
+                || ["nomic-bert-moe", "jina-bert-v3"]
+                    .iter()
+                    .any(|x| arch.contains(x))
+            {
+                if let Some(&mask) = lookup.get("<mask>") {
+                    tokens[mask as usize].attributes |= 128;
+                }
+            } else if name.contains("phi-3") || name.contains("phi3") {
+                for token in &mut tokens {
+                    if token.attributes & (1 | 8 | 16) != 0 || token.text == "</s>" {
+                        token.attributes |= 256;
+                    }
+                }
+                for text in ["<unk>", "<s>", "<|endoftext|>"] {
+                    if let Some(&id) = lookup.get(text) {
+                        tokens[id as usize].attributes &= !256;
+                    }
+                }
+            } else if name.contains("modern-bert")
                 && let Some(&mask) = lookup.get("[MASK]")
             {
                 tokens[mask as usize].attributes |= 128;
+            }
+        }
+        if bpe.as_ref().is_some_and(|b| b.hybrid_dna)
+            && let Some(&oov) = lookup.get("<oov>")
+        {
+            for token in &mut tokens[oov as usize + 1..] {
+                if token.text.len() > 3 && token.text.ends_with('\u{e000}') {
+                    token.text.truncate(token.text.len() - 3);
+                    if let Some(last) = token.text.rfind(|c| c != 'N') {
+                        token.text.truncate(last + 1);
+                    }
+                }
             }
         }
         let max_token_len = tokens
@@ -380,8 +552,9 @@ impl Tokenizer {
                 });
             }
         }
-        Ok(Self {
+        let mut result = Self {
             family,
+            bpe,
             max_token_len,
             lowercase,
             strip_accents,
@@ -390,6 +563,7 @@ impl Tokenizer {
             sep_id,
             pad_id,
             mask_id,
+            newline_id: -1,
             add_sep,
             tokens,
             lookup,
@@ -397,11 +571,32 @@ impl Tokenizer {
             special,
             bos_id,
             eos_id,
+            eot_id,
+            eom_id,
+            fim_pre_id,
+            fim_suf_id,
+            fim_mid_id,
+            fim_pad_id,
+            fim_rep_id,
+            fim_sep_id,
             add_bos,
             add_eos,
             add_space_prefix,
             eog,
-        })
+        };
+        result.newline_id = match family {
+            VocabType::Spm => result.byte_ids[10].unwrap_or(-1),
+            VocabType::Wpm => 0,
+            VocabType::Bpe => result.bpe.as_ref().unwrap().newline(&result),
+        };
+        Ok(result)
+    }
+    /// Source newline token, resolved before optional special-ID/normalizer overrides.
+    pub fn newline_id(&self) -> i32 {
+        self.newline_id
+    }
+    pub fn metaspace_prepend_first(&self) -> bool {
+        self.bpe.as_ref().is_some_and(|bpe| bpe.metaspace_first)
     }
     pub fn vocab_type(&self) -> VocabType {
         self.family
@@ -428,11 +623,21 @@ impl Tokenizer {
     /// Match llama_tokenize's independent add_special and parse_special flags.
     /// USER_DEFINED strings are partitioned even when parse_special is false.
     pub fn tokenize(&self, text: &str, add_special: bool, parse_special: bool) -> Result<Vec<i32>> {
+        self.tokenize_bytes(text.as_bytes(), add_special, parse_special)
+    }
+    /// Byte-preserving input matching the source C API, including malformed
+    /// UTF-8 and byte-truncated DRY breakers. Special literals partition first.
+    pub fn tokenize_bytes(
+        &self,
+        text: &[u8],
+        add_special: bool,
+        parse_special: bool,
+    ) -> Result<Vec<i32>> {
         if text.len() > MAX_INPUT_BYTES {
             return Err(Error::Limit("input exceeds 4 MiB".into()));
         }
         enum Fragment<'a> {
-            Text(&'a str),
+            Text(&'a [u8]),
             Token(i32),
         }
         let mut fragments = if text.is_empty() {
@@ -450,10 +655,15 @@ impl Tokenizer {
                 match fragment {
                     Fragment::Token(id) => next.push(Fragment::Token(id)),
                     Fragment::Text(mut part) => {
-                        while let Some(i) = part.find(&token.text) {
+                        while let Some(i) = find_bytes(part, token.text.as_bytes()) {
                             let mut left = &part[..i];
                             if token.attributes & 128 != 0 {
-                                left = left.trim_end_matches(|c| matches!(c, ' ' | '\t'..='\r'));
+                                while left
+                                    .last()
+                                    .is_some_and(|&b| matches!(b, b' ' | b'\t'..=b'\r'))
+                                {
+                                    left = &left[..left.len() - 1];
+                                }
                             }
                             if !left.is_empty() {
                                 next.push(Fragment::Text(left));
@@ -461,7 +671,12 @@ impl Tokenizer {
                             next.push(Fragment::Token(id));
                             part = &part[i + token.text.len()..];
                             if token.attributes & 256 != 0 {
-                                part = part.trim_start_matches(|c| matches!(c, ' ' | '\t'..='\r'));
+                                while part
+                                    .first()
+                                    .is_some_and(|&b| matches!(b, b' ' | b'\t'..=b'\r'))
+                                {
+                                    part = &part[1..];
+                                }
                             }
                         }
                         if !part.is_empty() {
@@ -480,22 +695,37 @@ impl Tokenizer {
             output.push(self.bos_id)
         }
         let mut previous_special = true;
-        for fragment in fragments {
+        for (fragment_index, fragment) in fragments.into_iter().enumerate() {
             match fragment {
                 Fragment::Token(id) => {
                     output.push(id);
                     previous_special = true;
                 }
                 Fragment::Text(text) => {
+                    if let Some(bpe) = &self.bpe {
+                        let mut prepared = if bpe.config.escape_whitespaces {
+                            escape_spaces(text)
+                        } else {
+                            text.to_vec()
+                        };
+                        if bpe.metaspace_first
+                            && fragment_index == 0
+                            && !prepared.starts_with("▁".as_bytes())
+                        {
+                            prepared.splice(0..0, "▁".bytes());
+                        }
+                        bpe.tokenize(self, &prepared, &mut output)?;
+                        continue;
+                    }
                     if self.family == VocabType::Wpm {
                         self.wordpiece(text, &mut output)?;
                         continue;
                     }
-                    let mut escaped = String::with_capacity(text.len());
+                    let mut escaped = Vec::with_capacity(text.len());
                     if self.add_space_prefix && previous_special {
-                        escaped.push('▁')
+                        escaped.extend("▁".as_bytes())
                     }
-                    escaped.push_str(&text.replace(' ', "▁"));
+                    escaped.extend(escape_spaces(text));
                     self.spm(&escaped, &mut output)?;
                     previous_special = false;
                 }
@@ -516,10 +746,10 @@ impl Tokenizer {
         }
         Ok(output)
     }
-    fn wordpiece(&self, text: &str, out: &mut Vec<i32>) -> Result<()> {
+    fn wordpiece(&self, text: &[u8], out: &mut Vec<i32>) -> Result<()> {
         use unicode::Flags;
-        let mut words = vec![String::new()];
-        for original in text.chars().map(u32::from) {
+        let mut words = vec![Vec::new()];
+        for original in unicode::from_utf8(text) {
             let cp = if self.strip_accents {
                 unicode::nfd_base(original)
             } else {
@@ -528,7 +758,7 @@ impl Tokenizer {
             let flags = unicode::flags(cp);
             if flags.contains(Flags::WHITESPACE) {
                 if !words.last().unwrap().is_empty() {
-                    words.push(String::new());
+                    words.push(Vec::new());
                 }
                 continue;
             }
@@ -543,23 +773,24 @@ impl Tokenizer {
             } else {
                 cp
             };
-            let character = char::from_u32(cased)
-                .ok_or_else(|| invalid("normalizer produced a non-scalar codepoint"))?;
+            let character = unicode::encode_utf8(cased).map_err(|e| invalid(e.to_string()))?;
             if flags.contains(Flags::PUNCTUATION)
                 || (cp < 0x7f && flags.contains(Flags::SYMBOL))
                 || unicode::is_wordpiece_chinese(cp)
             {
                 if !words.last().unwrap().is_empty() {
-                    words.push(String::new());
+                    words.push(Vec::new());
                 }
-                words.last_mut().unwrap().push(character);
-                words.push(String::new());
+                words.last_mut().unwrap().extend(character);
+                words.push(Vec::new());
             } else {
-                words.last_mut().unwrap().push(character);
+                words.last_mut().unwrap().extend(character);
             }
         }
         for word in words.into_iter().filter(|word| !word.is_empty()) {
-            let word = format!("▁{word}");
+            let mut prefixed = "▁".as_bytes().to_vec();
+            prefixed.extend(word);
+            let word = prefixed;
             let initial_len = out.len();
             let mut start = 0;
             while start < word.len() {
@@ -568,6 +799,7 @@ impl Tokenizer {
                     .min(start.saturating_add(self.max_token_len).saturating_add(1));
                 let found = (start + 1..=largest).rev().find_map(|end| {
                     word.get(start..end)
+                        .and_then(|text| std::str::from_utf8(text).ok())
                         .and_then(|text| self.lookup.get(text))
                         .map(|&id| (end, id))
                 });
@@ -590,7 +822,7 @@ impl Tokenizer {
         }
         Ok(())
     }
-    fn spm(&self, text: &str, out: &mut Vec<i32>) -> Result<()> {
+    fn spm(&self, text: &[u8], out: &mut Vec<i32>) -> Result<()> {
         #[derive(Debug)]
         struct Symbol {
             start: usize,
@@ -598,16 +830,19 @@ impl Tokenizer {
             prev: Option<usize>,
             next: Option<usize>,
         }
-        let mut symbols: Vec<Symbol> = text
-            .char_indices()
-            .enumerate()
-            .map(|(i, (start, c))| Symbol {
-                start,
-                len: c.len_utf8(),
-                prev: i.checked_sub(1),
-                next: Some(i + 1),
-            })
-            .collect();
+        let mut symbols: Vec<Symbol> = Vec::new();
+        let mut offset = 0;
+        while offset < text.len() {
+            let length = unicode::len_utf8(text[offset]).min(text.len() - offset);
+            let index = symbols.len();
+            symbols.push(Symbol {
+                start: offset,
+                len: length,
+                prev: index.checked_sub(1),
+                next: Some(index + 1),
+            });
+            offset += length;
+        }
         if symbols.is_empty() {
             return Ok(());
         }
@@ -620,7 +855,7 @@ impl Tokenizer {
             if let (Some(l), Some(r)) = (left, right) {
                 let len = symbols[l].len + symbols[r].len;
                 let s = &text[symbols[l].start..symbols[l].start + len];
-                if let Some(&id) = self.lookup.get(s) {
+                if let Some(&id) = std::str::from_utf8(s).ok().and_then(|s| self.lookup.get(s)) {
                     heap.push(Bigram {
                         left: l,
                         right: r,
@@ -655,10 +890,13 @@ impl Tokenizer {
         while let Some(i) = current {
             let s = &symbols[i];
             let part = &text[s.start..s.start + s.len];
-            if let Some(&id) = self.lookup.get(part) {
+            if let Some(&id) = std::str::from_utf8(part)
+                .ok()
+                .and_then(|s| self.lookup.get(s))
+            {
                 out.push(id)
             } else {
-                for &b in part.as_bytes() {
+                for &b in part {
                     out.push(
                         self.byte_ids[b as usize]
                             .ok_or_else(|| invalid(format!("missing byte fallback 0x{b:02X}")))?,
@@ -677,7 +915,13 @@ impl Tokenizer {
         Ok(match token.kind {
             2 | 3 if !special => vec![],
             2..=4 => token.text.as_bytes().to_vec(),
-            1 => token.text.replace('▁', " ").into_bytes(),
+            1 => {
+                if let Some(bpe) = &self.bpe {
+                    bpe.decode_piece(&token.text)
+                } else {
+                    token.text.replace('▁', " ").into_bytes()
+                }
+            }
             6 => {
                 vec![parse_byte_token(&token.text).ok_or_else(|| invalid("malformed byte token"))?]
             }
@@ -704,12 +948,16 @@ impl Tokenizer {
             tokens = &tokens[..tokens.len() - 1]
         }
         let mut result = Vec::new();
+        let mut remove_first_space = self.metaspace_prepend_first();
         for &id in tokens {
             let mut piece = self.token_piece(id, unparse_special)?;
-            if remove_space && piece.first() == Some(&b' ') {
+            if (remove_space || remove_first_space) && piece.first() == Some(&b' ') {
                 piece.remove(0);
             }
             remove_space = false;
+            if unparse_special || self.token_attributes(id).unwrap_or(0) & (1 | 8) == 0 {
+                remove_first_space = false;
+            }
             if result
                 .len()
                 .checked_add(piece.len())
@@ -725,6 +973,33 @@ impl Tokenizer {
         Ok(result)
     }
 }
+
+fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+    if let (Ok(text), Ok(pattern)) = (std::str::from_utf8(haystack), std::str::from_utf8(needle)) {
+        return text.find(pattern);
+    }
+    haystack
+        .windows(needle.len())
+        .position(|part| part == needle)
+}
+fn replace_bytes(input: &[u8], from: &[u8], to: &[u8]) -> Vec<u8> {
+    let mut output = Vec::new();
+    let mut input = input;
+    while let Some(index) = find_bytes(input, from) {
+        output.extend_from_slice(&input[..index]);
+        output.extend_from_slice(to);
+        input = &input[index + from.len()..];
+    }
+    output.extend_from_slice(input);
+    output
+}
+fn escape_spaces(input: &[u8]) -> Vec<u8> {
+    replace_bytes(input, b" ", "▁".as_bytes())
+}
+
 fn attributes_from_kind(kind: i32) -> u32 {
     match kind {
         1 => 4,

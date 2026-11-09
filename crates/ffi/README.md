@@ -2,7 +2,7 @@
 
 This crate builds a cdylib, staticlib and rlib. The Windows DLL is
 `target/release/llama_ffi.dll`; the import library is `llama_ffi.dll.lib`.
-It executes the Rust GGUF loader, SPM/WordPiece tokenizers, CPU samplers and scalar decoder from this
+It executes the Rust GGUF loader, SPM/BPE/WordPiece tokenizers, CPU samplers and scalar decoder from this
 workspace. No original llama/ggml library is linked or loaded by the product.
 
 **This is an operational subset, not full llama.cpp ABI compatibility.**
@@ -28,7 +28,9 @@ workspace builds additionally check compilation on supported Rust targets.
 ## Operational configuration
 
 The currently accepted execution path is dense Llama with a llama/SPM tokenizer,
-as supported by `llama-inference`. Vocabulary-only Llama/SPM and BERT/WordPiece loading is supported. BERT context execution is explicitly rejected in this C layer.
+as supported by `llama-inference`. Vocabulary-only SPM, BPE and WordPiece loading is supported for llama, bert,
+gpt2, gptneox, mpt, falcon, command-r, refact, starcoder2, qwen2 and gemma4 metadata.
+Execution of non-Llama architectures is explicitly rejected in this C layer.
 Vocabulary-only loading retains the source's unloaded model-info defaults:
 context/embedding/layer dimensions are zero, description is empty and file type
 is F32. Attention-head queries return a diagnostic because the native source
@@ -104,26 +106,29 @@ metadata overrides, positive GPU layer counts, mmap/mlock/direct I/O, forced
 lazy loading, no-host/no-allocation requests and MTP. CPU capability queries
 honestly report the absence of mapped loading, locking, GPU offload and RPC.
 
-SPM tokenization currently accepts UTF-8 text, including embedded NUL bytes when
-the explicit length includes them. Invalid UTF-8 input returns INT32_MIN with a
-diagnostic. Byte pieces and detokenized outputs can contain arbitrary bytes.
-Input and buffer element counts are bounded. Special-token metadata with an
-out-of-range ID retains the source default, including UINT32_MAX padding IDs.
-The frozen misspelling `tokenizer.ggml.seperator_token_id` is intentional.
-Ambiguous auto-detected EOT spellings require an explicit metadata ID.
+The explicit-length tokenization entry point accepts arbitrary bytes, including
+invalid UTF-8 and embedded NUL, with the source behavior of each tokenizer family.
+Byte pieces and detokenized outputs can contain arbitrary bytes. Input and buffer
+element counts remain bounded. Special-token metadata with an out-of-range ID
+retains the source default, including UINT32_MAX padding IDs. The frozen
+misspelling tokenizer.ggml.seperator_token_id is intentional. BOS/EOS/EOT/FIM,
+padding, masks, EOG attributes, newline IDs and insertion flags use the shared
+tokenizer's normalized loader results. Ambiguous inferred special spellings
+follow the independently measured MSVC/libstdc++ source map order.
 
-Broader tokenizer families, remaining sampler/grammar ABI, state/session formats,
+Broader tokenizer families, backend-attached sampling, state/session formats,
 memory manipulation, adapters, encoder entry points, model saving, split-file
 loading and performance APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
 
 ## CPU sampling
 
-SAMPLERS.md documents the 14 supported sampler constructors, generic/custom
-interfaces, owning chains, seeded clone/reset/copy behavior and actual-context
-sampling. The sampler ABI has an independent 36-entry layout check. Grammar,
-DRY preprocessing, adaptive-p, infill, backend sampling and sampler performance
-collection remain explicitly unavailable.
+SAMPLERS.md documents all 20 ordinary CPU sampler constructors, generic/custom
+interfaces, owning chains, raw-byte grammar/lazy triggers, vocabulary-derived DRY
+breakers, adaptive-p, infill, and actual-context sampling. The sampler ABI has an
+independent 36-entry layout check. Backend-attached sampling, llguidance integration
+and sampler performance collection remain unavailable. Source-undefined pending
+adaptive clone/copy is rejected with a diagnostic.
 
 ## Memory, lifetime and error contract
 
@@ -207,8 +212,12 @@ indexing, independent interleaved sequences, mid-batch rollback, abort rollback,
 embedding input/output, model ownership after handle release, vocabulary-only
 loading and explicit rejection of unsupported settings.
 
-The additional sampler and WordPiece C harness, source-specific fixes and
-measurements are documented in SAMPLERS.md and evidence/2026-11-09/sampler-ffi.
+The additional CPU sampler, WordPiece and BPE/FIM C harnesses, source-specific
+fixes and exact measurements are documented in SAMPLERS.md and
+evidence/2026-11-09/sampler-cpu. The new vocabulary harness checks 1,505,576 entries
+across all 14 frozen BPE vocabularies plus the synthetic raw-byte fixture,
+5,096 text cases and 2,502 raw-byte cases, including buffer sizes and partial
+detokenization writes. Prior sampler evidence remains preserved separately.
 
 These checks establish the stated subset on Windows x64. They do not close the
 full ABI, architecture, backend, platform or performance release gates.

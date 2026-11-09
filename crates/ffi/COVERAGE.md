@@ -1,8 +1,8 @@
 # Frozen C ABI export coverage
 
-The frozen header declares 255 llama functions; the independently built reference DLL exports 255 llama symbols. Their union contains 255 symbols. The Rust DLL implements 137 of them, leaves 118 unexported, and adds 4 diagnostic/layout extensions. This count is symbol coverage, not a claim of complete behavior for any broad subsystem. See README.md for every accepted configuration and explicit restriction.
+The frozen header declares 255 llama functions; the independently built reference DLL exports 255 llama symbols. Their union contains 255 symbols. The Rust DLL implements 155 of them, leaves 100 unexported, and adds 4 diagnostic/layout extensions. This is symbol coverage; accepted configurations and behavioral restrictions are documented in README.md and SAMPLERS.md.
 
-The inventory is generated from the actual PE export tables and frozen header, rather than inferred from Rust source names. Machine-readable evidence is in evidence/2026-11-09/sampler-ffi/exports.json and exports.tsv.
+The inventory is generated from the actual PE export tables and frozen header. Machine-readable evidence is in evidence/2026-11-09/sampler-cpu/exports.json and exports.tsv. The previous 137-export checkpoint remains preserved under evidence/2026-11-09/sampler-ffi.
 
 ## Implemented frozen exports
 
@@ -85,8 +85,14 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_sampler_free` |
 | `llama_sampler_get_seed` |
 | `llama_sampler_init` |
+| `llama_sampler_init_adaptive_p` |
 | `llama_sampler_init_dist` |
+| `llama_sampler_init_dry` |
+| `llama_sampler_init_grammar` |
+| `llama_sampler_init_grammar_lazy` |
+| `llama_sampler_init_grammar_lazy_patterns` |
 | `llama_sampler_init_greedy` |
+| `llama_sampler_init_infill` |
 | `llama_sampler_init_logit_bias` |
 | `llama_sampler_init_min_p` |
 | `llama_sampler_init_mirostat` |
@@ -116,6 +122,12 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_token_cls` |
 | `llama_token_eos` |
 | `llama_token_eot` |
+| `llama_token_fim_mid` |
+| `llama_token_fim_pad` |
+| `llama_token_fim_pre` |
+| `llama_token_fim_rep` |
+| `llama_token_fim_sep` |
+| `llama_token_fim_suf` |
 | `llama_token_get_attr` |
 | `llama_token_get_score` |
 | `llama_token_get_text` |
@@ -131,6 +143,12 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_vocab_cls` |
 | `llama_vocab_eos` |
 | `llama_vocab_eot` |
+| `llama_vocab_fim_mid` |
+| `llama_vocab_fim_pad` |
+| `llama_vocab_fim_pre` |
+| `llama_vocab_fim_rep` |
+| `llama_vocab_fim_sep` |
+| `llama_vocab_fim_suf` |
 | `llama_vocab_get_add_bos` |
 | `llama_vocab_get_add_eos` |
 | `llama_vocab_get_add_sep` |
@@ -237,12 +255,6 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_perf_sampler_reset` |
 | `llama_print_system_info` |
 | `llama_process` |
-| `llama_sampler_init_adaptive_p` |
-| `llama_sampler_init_dry` |
-| `llama_sampler_init_grammar` |
-| `llama_sampler_init_grammar_lazy` |
-| `llama_sampler_init_grammar_lazy_patterns` |
-| `llama_sampler_init_infill` |
 | `llama_save_session_file` |
 | `llama_set_adapter_cvec` |
 | `llama_set_adapters_lora` |
@@ -264,17 +276,5 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_state_seq_set_data` |
 | `llama_state_seq_set_data_ext` |
 | `llama_state_set_data` |
-| `llama_token_fim_mid` |
-| `llama_token_fim_pad` |
-| `llama_token_fim_pre` |
-| `llama_token_fim_rep` |
-| `llama_token_fim_sep` |
-| `llama_token_fim_suf` |
-| `llama_vocab_fim_mid` |
-| `llama_vocab_fim_pad` |
-| `llama_vocab_fim_pre` |
-| `llama_vocab_fim_rep` |
-| `llama_vocab_fim_sep` |
-| `llama_vocab_fim_suf` |
 | `llama_vocab_get_suppress_tokens` |
 

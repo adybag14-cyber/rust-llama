@@ -217,10 +217,9 @@ ffi!(
     {
         let v = unsafe { reference(vocab)? };
         let bytes = unsafe { input_slice(text.cast::<u8>(), count(text_len)?)? };
-        let text = std::str::from_utf8(bytes).map_err(|_| "tokenizer input is not UTF-8")?;
         let result = v
             .tokenizer
-            .tokenize(text, boolean(add_special)?, boolean(parse_special)?)
+            .tokenize_bytes(bytes, boolean(add_special)?, boolean(parse_special)?)
             .map_err(|e| e.to_string())?;
         unsafe { copy_buffer(&result, tokens, capacity) }
     }
@@ -271,6 +270,7 @@ unsafe fn detokenize_to_buffer(
     if remove_special && tokenizer.add_eos && tokens.last() == Some(&tokenizer.eos_id) {
         tokens = &tokens[..tokens.len() - 1];
     }
+    let mut remove_first_space = tokenizer.metaspace_prepend_first();
     let mut available = cap;
     let mut written = 0usize;
     let mut total = 0usize;
@@ -278,8 +278,12 @@ unsafe fn detokenize_to_buffer(
         let piece = tokenizer
             .token_piece(token, unparse_special)
             .map_err(|e| e.to_string())?;
-        let skip = usize::from(remove_space && piece.first() == Some(&b' '));
+        let skip =
+            usize::from((remove_space || remove_first_space) && piece.first() == Some(&b' '));
         remove_space = false;
+        if unparse_special || tokenizer.token_attributes(token).unwrap_or(0) & (1 | 8) == 0 {
+            remove_first_space = false;
+        }
         let piece = &piece[skip..];
         total = total
             .checked_add(piece.len())
@@ -336,3 +340,41 @@ ffi!(
         }
     }
 );
+
+// Frozen aliases return the tokenizer loader's normalized FIM identifiers.
+ffi!(llama_vocab_fim_pre(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_pre"])
+});
+ffi!(llama_token_fim_pre(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_pre"])
+});
+ffi!(llama_vocab_fim_suf(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_suf"])
+});
+ffi!(llama_token_fim_suf(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_suf"])
+});
+ffi!(llama_vocab_fim_mid(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_mid"])
+});
+ffi!(llama_token_fim_mid(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_mid"])
+});
+ffi!(llama_vocab_fim_pad(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_pad"])
+});
+ffi!(llama_token_fim_pad(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_pad"])
+});
+ffi!(llama_vocab_fim_rep(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_rep"])
+});
+ffi!(llama_token_fim_rep(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_rep"])
+});
+ffi!(llama_vocab_fim_sep(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_sep"])
+});
+ffi!(llama_token_fim_sep(vocab: *const VocabHandle) -> i32, -1, {
+    Ok(unsafe { reference(vocab)? }.special["fim_sep"])
+});
