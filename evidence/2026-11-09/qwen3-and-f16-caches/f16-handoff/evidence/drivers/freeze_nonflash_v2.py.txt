@@ -1,0 +1,196 @@
+from pathlib import Path
+import datetime,difflib,hashlib,json,re,shutil
+task=Path(__file__).resolve().parent
+draft=task/"rust-draft"
+old=task/"nonflash-checkpoint-v1"
+destination=task/"nonflash-checkpoint-v2"
+assert draft.is_dir() and old.is_dir() and not destination.exists()
+def identity(path):
+    data=path.read_bytes()
+    return {"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()}
+def parse(path): return json.loads(path.read_bytes())
+def json_bytes(value): return (json.dumps(value,indent=2)+"\n").encode()
+old_sources=parse(old/"source-manifest.json")
+new_paths=["crates/ffi/src/lib.rs","crates/ffi/src/f16_context_reference_tests.rs","crates/ffi/README.md","crates/ffi/STATE.md"]
+all_paths=[item["path"] for item in old_sources]+new_paths
+assert len(all_paths)==13 and len(set(all_paths))==13
+fixtures=parse(old/"matmul-test-fixtures.json")+parse(task/"ordinary-fixture-records.json")
+assert len(fixtures)==6 and len({x["path"] for x in fixtures})==6
+for item in fixtures:
+    actual=identity(draft/item["path"])
+    assert actual["bytes"]==item["bytes"] and actual["sha256"]==item["sha256"],item["path"]
+for item in old_sources:
+    current=(draft/item["path"]).read_bytes()
+    previous=(old/"source"/item["path"]).read_bytes()
+    assert hashlib.sha256(previous).hexdigest()==item["sha256"],item["path"]
+    if item["path"]=="crates/model-runtime/src/context/native.rs":
+        wanted=previous.replace(b"/// Dense F32 compatibility cache configuration.",b"/// Dense F32/F16 compatibility cache configuration.")
+        wanted=wanted.replace(b"/// Source-format bytes for dense F32 memory; separate from Context::save_state.",b"/// Source-format bytes for typed dense memory; separate from Context::save_state.")
+        assert current==wanted,"Unexpected semantic delta after initial typed-cache validation"
+    else: assert current==previous,"Unexpected initial-snapshot delta: "+item["path"]
+source_records=[]
+preimage_bytes={}
+for relative in all_paths:
+    old_item=next((x for x in old_sources if x["path"]==relative),None)
+    if old_item is not None:
+        before_hash=old_item["preimage_sha256"]
+        before=(task/"preimages"/relative).read_bytes() if before_hash else b""
+        if before_hash: assert hashlib.sha256(before).hexdigest()==before_hash,relative
+    elif relative.endswith("f16_context_reference_tests.rs"):
+        before_hash=None;before=b""
+    else:
+        before=(task/"ordinary-preimages"/relative).read_bytes()
+        before_hash=hashlib.sha256(before).hexdigest()
+    preimage_bytes[relative]=before
+    source_records.append({"path":relative,**identity(draft/relative),"preimage_sha256":before_hash})
+fingerprint={x["path"]:identity(draft/x["path"]) for x in source_records+fixtures}
+validation=[]
+for platform,wanted_count in [("windows",49),("linux",47)]:
+    for profile in ["debug","release"]:
+        directory=task/"validation"/("nonflash-ordinary-v1-"+platform+"-"+profile)
+        report=parse(directory/"status.json")
+        assert report["passed"] and report["sources_unchanged"]
+        assert len(report["cases"])==8 and all(x["passed"] for x in report["cases"])
+        assert all(x["exit_code"]==0 for x in report["steps"])
+        for relative,saved in report["sources"].items(): assert identity(draft/relative)==saved,relative
+        tests=sum(map(int,re.findall(r"test result: ok\. (\d+) passed", (directory/"unit.stdout.log").read_text())))
+        assert tests==wanted_count,(platform,profile,tests)
+        logits=0
+        def count(value):
+            if isinstance(value,dict):
+                return sum(len(v) if k.endswith("_logit_bits") and isinstance(v,list) else count(v) for k,v in value.items())
+            if isinstance(value,list): return sum(count(x) for x in value)
+            return 0
+        for item in report["cases"]:
+            expected=task/"captures"/platform/item["name"]/"reference.json"
+            assert identity(expected)==item["expected_reference"]
+            logits+=count(parse(expected))
+        validation.append({"platform":platform,"profile":profile,"tests":tests,
+             "logit_words_in_full_c_json":logits,
+             "binary_files":sum(x["binary_files"] for x in report["cases"]),
+             "binary_bytes":sum(x["binary_bytes"] for x in report["cases"]),
+             "status":identity(directory/"status.json"),
+             "relative_evidence":"evidence/"+directory.name+"/status.json"})
+negative_directory=task/"ordinary-negative-control"/"validation"
+negative=parse(negative_directory/"report.json")
+assert negative["negative_control_detected"] and negative["exit_code"]==101
+assert negative["candidate_unchanged_sha256"]==identity(draft/"crates/ffi/src/context.rs")["sha256"]
+negative_stdout=(negative_directory/"stdout.log").read_text()
+negative_stderr=(negative_directory/"stderr.log").read_text()
+assert "exact native typed state bytes" in negative_stdout+negative_stderr
+destination.mkdir()
+def put(relative,data):
+    target=destination/relative
+    assert target.is_relative_to(destination) and target!=destination
+    target.parent.mkdir(parents=True,exist_ok=True)
+    assert not target.exists(),str(target)
+    target.write_bytes(data)
+for item in source_records+fixtures: put("candidate/"+item["path"],(draft/item["path"]).read_bytes())
+full_patch=[];incremental_patch=[]
+for item in source_records:
+    relative=item["path"];before=preimage_bytes[relative];after=(draft/relative).read_bytes()
+    if item["preimage_sha256"]: put("preimages/"+relative,before)
+    full_patch+=difflib.unified_diff(before.decode().splitlines(keepends=True),after.decode().splitlines(keepends=True),fromfile=("a/"+relative if item["preimage_sha256"] else "/dev/null"),tofile="b/"+relative)
+    old_item=next((x for x in old_sources if x["path"]==relative),None)
+    incremental_before=(old/"source"/relative).read_bytes() if old_item else before
+    if incremental_before!=after:
+        incremental_patch+=difflib.unified_diff(incremental_before.decode().splitlines(keepends=True),after.decode().splitlines(keepends=True),fromfile=("a/"+relative if old_item or item["preimage_sha256"] else "/dev/null"),tofile="b/"+relative)
+put("source.patch","".join(full_patch).encode())
+put("incremental-from-v1.patch","".join(incremental_patch).encode())
+put("source-manifest.json",json_bytes(source_records))
+put("fixture-records.json",json_bytes(fixtures))
+for platform in ["windows","linux"]:
+    for profile in ["debug","release"]:
+        directory=task/"validation"/("nonflash-ordinary-v1-"+platform+"-"+profile)
+        for path in sorted(directory.iterdir()):
+            if path.is_file() and (path.suffix==".log" or path.name=="status.json"):
+                put("evidence/"+directory.name+"/"+path.name,path.read_bytes())
+for path in sorted(negative_directory.iterdir()):
+    if path.is_file():put("evidence/negative-control/"+path.name,path.read_bytes())
+for name in ["validation-report.json","source-manifest.json","matmul-test-fixtures.json"]:
+    put("evidence/prior-nonflash-v1/"+name,(old/name).read_bytes())
+put("evidence/ordinary-queue-expiry-2026-11-09.json",(task/"validation/ordinary-queue-expiry-2026-11-09.json").read_bytes())
+for script in ["verify_ordinary_v1.py","ordinary_negative_control.py","pack_ordinary_context.py",Path(__file__).name]:
+    put("evidence/drivers/"+script,(task/script).read_bytes())
+readme="""# Explicit F16/F32 nonflash native context handoff
+
+This immutable follow-on contains 13 source/documentation files and six independently
+captured fixture files. It is independently integrable before the separate per-layer
+microbatch and flash-attention work. The original nonflash-checkpoint-v1 is unchanged.
+
+## Supported and intentionally open settings
+
+Dense Llama NativeContext accepts independent F32/F16 keys and values, explicit
+FLASH_DISABLED, and exactly one generation worker and one batch worker. Existing
+NativeContext::new and the safe strict Context remain F32/nonflash. The original
+C default structure remains F16/F16, AUTO flash and four/four workers. Untouched
+default context creation, AUTO/ENABLED, other worker counts and other cache types
+are rejected with a diagnostic. This also closes the former silent manual
+F32/one-worker/AUTO-to-nonflash fallback. No new C symbol is exported.
+
+Raw F16 u16 storage preserves every bit during copies, pending-copy replay,
+transposition, state/session I/O and CPU-owned snapshots. Evaluation alone converts
+half values. Shared numerical operations retain checked nonfinite-result rejection:
+raw NaN payload preservation does not claim parity with the original NaN logits.
+No strict Context nonfinite check was removed.
+
+## Independent proof
+
+The ordinary FFI module uses losslessly deduplicated original tiny-model data on
+both native compiler profiles. Per profile: all four K/V pairs; 160 memory cases,
+160 sequence-state/flag cases, eight session suites, 384 short-buffer cases;
+258,048 exact logit words and 1,048 exact buffer comparisons totaling 290,328 bytes.
+This includes physical holes, deferred copy/rotation, restore/reserialize without
+evaluation, full/sequence session failure side effects and sentinel boundaries.
+The 520 original binary artifacts per profile reconstruct to their original hashes.
+
+All focused runtime/FFI tests, build, format and strict all-target Clippy passed
+in debug and release on Windows x64 and GNU x64. The external frozen-header C
+adapter separately rechecked both trained and tiny models for all four type pairs.
+See handoff.json for exact counts and evidence hashes. Deliberately forcing every
+valid requested type to F32 storage fails the ordinary exact-state regression.
+
+The preserved first-snapshot evidence also proves all 65,536 F16 patterns through
+raw-state paths and 125 original strided KQ/PV graphs / 245,154 F32 outputs per host.
+The graph fixture is common because both original output files are byte-identical.
+The old trained captures and C sources remain external and are not product code.
+
+Three initially queued release/negative jobs expired before a child process
+started; their exact queue records remain in evidence. A single sequential retry
+completed the remaining gates. These scheduling outcomes are not numerical failures.
+
+## Integration
+
+Apply only source.patch and the six declared fixtures after checking every
+preimage. candidate contains the exact final bytes; preimages contains the
+original root files. incremental-from-v1.patch contains only the ordinary
+regression/docs and two typed-cache comment updates for consumers of v1.
+
+The independent shard FFI handoff also changes crates/ffi/src/lib.rs and README.md.
+Merge both test-module declarations and both documentation sections; do not
+overwrite the shard adaptation with this older model-loader baseline. This
+handoff does not touch crates/ffi/src/model.rs or any Cargo manifest. Preserve
+root's intervening Qwen/shared-row/shard changes by applying narrow hunks.
+
+Fixture manifest additions are in fixture-records.json. The existing
+native-context-model.gguf is reused unchanged. Source-only tests need no trained
+model download or original DLL. This does not close native flash/default worker,
+recurrent cache, full C ABI or general performance coverage.
+"""
+put("README.md",readme.encode())
+assert fingerprint=={x["path"]:identity(draft/x["path"]) for x in source_records+fixtures}
+file_inventory=[{"path":p.relative_to(destination).as_posix(),**identity(p)} for p in sorted(destination.rglob("*")) if p.is_file()]
+report={"schema":2,"created_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"passed":True,
+ "scope":"dense Llama explicit nonflash, single generation/batch worker; independent F32/F16 K/V storage",
+ "source":source_records,"fixtures":fixtures,"validation":validation,
+ "ordinary_per_platform":{"memory_cases":160,"sequence_state_cases":160,"session_suites":8,"short_buffer_cases":384,"logit_words":258048,"buffer_comparisons":1048,"buffer_bytes":290328,"original_binary_files":520},
+ "full_native_c_scope":"trained stories260K and deterministic tiny model, four K/V type pairs, both original platform profiles and both Rust profiles",
+ "negative_control":negative,
+ "prior_raw_and_matmul_proof":{"path":"evidence/prior-nonflash-v1/validation-report.json",**identity(old/"validation-report.json"),"note":"Product semantic source is unchanged since this proof; only two native.rs comments plus new ordinary test/docs changed. All eight new C cohorts reran in every host/profile."},
+ "unchanged_old_snapshot":identity(old/"source-manifest.json"),
+ "settings":{"native_defaults_unchanged":{"key_type":1,"value_type":1,"flash_attention":-1,"threads":4,"threads_batch":4},"supported_flash_attention":0,"supported_worker_counts":[1,1],"unsupported_settings_fail":True,"new_exports":0,"raw_nonfinite_preserved":True,"native_nonfinite_logit_parity":False},
+ "merge_notes":["Merge the shard and F16 test-module declarations in crates/ffi/src/lib.rs.","Apply README documentation hunks without dropping the independent shard paragraph.","Do not replace the whole external workspace or any root-owned newer manifest/model loader."],
+ "jobs":{"debug_windows":"job-1794247047672-48f7f4b1-ab8","debug_gnu":"job-1794247048027-011cc641-777","sequential_release_and_negative_retry":"job-1794248017419-4181bc79-e68"},
+ "files":file_inventory}
+put("handoff.json",json_bytes(report))
+print(json.dumps({"handoff":str(destination),"report":identity(destination/"handoff.json"),"patch":identity(destination/"source.patch"),"source_files":len(source_records),"fixture_files":len(fixtures),"validation":validation},indent=2))

@@ -1,0 +1,100 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,datetime,threading,queue,urllib.request,urllib.error,time
+windows=os.name=='nt'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+root=reference/'qwen3-and-f16-integration-v1';repo=root/'rust-draft';platform='windows' if windows else 'linux'
+out=root/'validation/applications-v1'/platform/'qwen3-http-details'
+out.mkdir(parents=True,exist_ok=False)
+target=root/'windows-target' if windows else Path('/home/tdamre/.cache/rust-llama-qwen3-and-f16-integration-v1')
+exe=target/'release'/('llama-server.exe' if windows else 'llama-server')
+model=reference/'models/qwen3-0.6b-q8_0.gguf'
+metadata_path=repo/'fixtures/inference/qwen3'/('pretrained-msvc-reference.json' if windows else 'pretrained-gnu-reference.json')
+metadata=json.loads(metadata_path.read_text(encoding="utf-8"))
+digest=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
+assert digest(model)=='9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031'
+report={'passed':False,'platform':platform,'executable_sha256':digest(exe),'model_sha256':digest(model),'native_metadata_sha256':digest(metadata_path),'qualification':'Application behavior against the corresponding original C API generation/tokenizer corpus; this is not an original Qwen3 HTTP protocol capture or a performance certification.','startup_cases':[],'requests':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+def request(base,route,body=None):
+ data=None if body is None else json.dumps(body).encode()
+ req=urllib.request.Request(base+route,data=data,headers={'Content-Type':'application/json'})
+ try:
+  with urllib.request.urlopen(req,timeout=120) as response:
+   code=response.status;head=dict(response.headers);raw=response.read(16*1024*1024+1)
+ except urllib.error.HTTPError as response:
+  code=response.code;head=dict(response.headers);raw=response.read(16*1024*1024+1)
+ assert len(raw)<=16*1024*1024
+ index=len(report['requests'])
+ name=f'request-{index:03}.json'
+ (out/name).write_bytes(json.dumps({'route':route,'request':body,'status':code,'headers':head,'response_utf8':raw.decode()},indent=2).encode())
+ report['requests'].append({'route':route,'status':code,'capture':name,'capture_sha256':digest(out/name)})
+ save()
+ return code,head,raw
+def json_request(base,route,body=None):
+ status,head,raw=request(base,route,body)
+ return status,json.loads(raw)
+save()
+process=None;log=None
+try:
+ for name,args,needle in [
+  ('default-weight-budget',['--model',str(model)],'budget'),
+  ('zero-context',['--model',str(model),'--ctx-size','0'],'nonzero'),
+  ('invalid-weight',['--max-weight-mib','invalid'],'invalid'),
+  ('overflow-weight',['--max-weight-mib',str(2**64-1)],'addressable'),
+ ]:
+  p=subprocess.run([str(exe),*args],cwd=repo,input=b'',capture_output=True,timeout=120)
+  (out/(name+'.stdout')).write_bytes(p.stdout);(out/(name+'.stderr')).write_bytes(p.stderr)
+  assert p.returncode!=0 and b'Listening on ' not in p.stdout,(name,p.returncode,p.stdout)
+  assert needle in p.stderr.decode().lower(),(name,p.stderr)
+  report['startup_cases'].append({'name':name,'args':args,'exit_code':p.returncode,'passed':True});save()
+ args=['--model',str(model),'--ctx-size','128','--max-weight-mib','3072','--bind','127.0.0.1:0']
+ log=(out/'server.stderr').open('wb')
+ process=subprocess.Popen([str(exe),*args],cwd=repo,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log)
+ lines=queue.Queue()
+ def read_line():
+  line=process.stdout.readline()
+  (out/'server.stdout').write_bytes(line);lines.put(line.decode())
+ threading.Thread(target=read_line,daemon=True).start()
+ line=lines.get(timeout=180)
+ assert line.startswith('Listening on http://'),line
+ base=line.split(';',1)[0].removeprefix('Listening on ')
+ status,health=json_request(base,'/health');assert status==200,(status,health)
+ status,models=json_request(base,'/v1/models');assert status==200 and models['data'][0]['id']
+ for case in metadata['cases']:
+  status,result=json_request(base,'/tokenize',{'content':case['prompt'],'add_special':True})
+  assert status==200 and result['tokens']==case['tokens'],(case['name'],result)
+  status,result=json_request(base,'/detokenize',{'tokens':case['tokens']})
+  assert status==200 and result['content'].encode()==bytes.fromhex(case['detokenized_hex']),(case['name'],result)
+  body={'prompt':case['prompt'],'max_tokens':metadata['max_tokens'],'temperature':0,'seed':0,'stream':False}
+  status,result=json_request(base,'/v1/completions',body)
+  assert status==200,(status,result)
+  assert result['choices'][0]['text'].encode()==bytes.fromhex(case['generated_hex']),(case['name'],result)
+  assert result['choices'][0]['finish_reason']=='length'
+  assert result['usage']['prompt_tokens']==len(case['tokens'])
+  assert result['usage']['completion_tokens']==len(case['greedy_tokens'])
+  body['stream']=True
+  status,head,raw=request(base,'/v1/completions',body)
+  assert status==200 and any(k.lower()=='content-type' and 'text/event-stream' in v for k,v in head.items()),(status,head,raw)
+  text=[];finishes=[];done=0
+  for event in raw.decode().split('\n\n'):
+   if not event.startswith('data: '):continue
+   data=event[6:]
+   if data=='[DONE]':done+=1;continue
+   value=json.loads(data);assert 'error' not in value,value
+   choice=value['choices'][0];text.append(choice['text'])
+   if choice['finish_reason'] is not None:finishes.append(choice['finish_reason'])
+  assert ''.join(text).encode()==bytes.fromhex(case['generated_hex']),(case['name'],text)
+  assert done==1 and finishes==['length'],(done,finishes)
+ process.stdin.write(b'quit\n');process.stdin.flush()
+ assert process.wait(timeout=30)==0
+ report['startup_cases'].append({'name':'explicit-3-GiB-context-128','args':args,'exit_code':0,'passed':True})
+ report['passed']=True
+except BaseException as error:
+ report['error']=repr(error);raise
+finally:
+ if process is not None and process.poll() is None:
+  process.terminate()
+  try:process.wait(timeout=15)
+  except subprocess.TimeoutExpired:process.kill();process.wait(timeout=15)
+ if log is not None:log.close()
+ report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps({'passed':report['passed'],'platform':platform,'startup_cases':len(report['startup_cases']),'http_requests':len(report['requests']),'exact_native_text_and_token_ids':True},indent=2))

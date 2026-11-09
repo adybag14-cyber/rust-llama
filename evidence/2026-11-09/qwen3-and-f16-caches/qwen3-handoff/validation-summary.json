@@ -1,0 +1,423 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "final_input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+  "input_count": 255,
+  "runs": {
+    "windows-focused-final-v2": {
+      "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+      "label": "windows-focused-final-v2",
+      "mode": "focused",
+      "input_count": 255,
+      "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+      "steps": [
+        {
+          "name": "format",
+          "command": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.1884510000018054,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "debug",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-inference",
+            "--all-targets",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 13.37387999999919,
+          "log_sha256": "ad372210e14f2e3238ee158f70c0f50671a7b1b53ae98f8f8c1574c2daadfb37",
+          "test_counts": {
+            "passed": 91,
+            "failed": 0,
+            "ignored": 8
+          },
+          "native_metrics": [
+            "qwen3-native: active vector storage / ignored partial fused biases host=msvc rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+            "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=msvc rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        },
+        {
+          "name": "release",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-inference",
+            "--all-targets",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 22.38946930000384,
+          "log_sha256": "fd7ee460b699e6568a2816930f35ea505420ead210b3906804d12b96d6164834",
+          "test_counts": {
+            "passed": 91,
+            "failed": 0,
+            "ignored": 8
+          },
+          "native_metrics": [
+            "qwen3-native: active vector storage / ignored partial fused biases host=msvc rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+            "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=msvc rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        },
+        {
+          "name": "clippy-workspace",
+          "command": [
+            "cargo",
+            "clippy",
+            "--offline",
+            "--locked",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 2.9600799000036204,
+          "log_sha256": "9d25b57dfae832070ddb12faba129659c43c2b2d71c2c4e35976b5da13da5870",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "audit",
+          "command": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "audit"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 19.70281509999768,
+          "log_sha256": "454aea29e5a1ffb18c599e17f68a44e623b7547b8b9f00594ab1a634ee89e69f",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "fixtures",
+          "command": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 19.308870300003036,
+          "log_sha256": "f9417d5bed470dedc14bdf78853bbc566b0789549baa3ef3ee894c06bd27d638",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        }
+      ],
+      "inputs_unchanged": true,
+      "all_requested_steps_passed": true
+    },
+    "linux-focused-final-v3": {
+      "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+      "label": "linux-focused-final-v3",
+      "mode": "focused",
+      "input_count": 255,
+      "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+      "steps": [
+        {
+          "name": "format",
+          "command": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.271561525001744,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "debug",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-inference",
+            "--all-targets",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 17.742269154998212,
+          "log_sha256": "2a8813b8d4a7c347042123f2eaee3ae9afb7471661bf287b796db652d11eee32",
+          "test_counts": {
+            "passed": 93,
+            "failed": 0,
+            "ignored": 8
+          },
+          "native_metrics": [
+            "qwen3-native: active vector storage / ignored partial fused biases host=gnu rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+            "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=gnu rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        },
+        {
+          "name": "release",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-inference",
+            "--all-targets",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 19.895454589997826,
+          "log_sha256": "8859b732a37d686d80e3cb2afcd1d5ec852842778ded047eaf01d74ecb84df9d",
+          "test_counts": {
+            "passed": 93,
+            "failed": 0,
+            "ignored": 8
+          },
+          "native_metrics": [
+            "qwen3-native: active vector storage / ignored partial fused biases host=gnu rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+            "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=gnu rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        },
+        {
+          "name": "clippy-workspace",
+          "command": [
+            "cargo",
+            "clippy",
+            "--offline",
+            "--locked",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 5.415689885001484,
+          "log_sha256": "8e4d091c727059a87786e24427abb94c4b34ba617386073536b27ad9f4ece21b",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "audit",
+          "command": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "audit"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 36.32579503799934,
+          "log_sha256": "ebccbff3329e43a795690f1e7e66112453be94d3f6e1cd087d4ac0efee94a55e",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        },
+        {
+          "name": "fixtures",
+          "command": [
+            "cargo",
+            "run",
+            "--offline",
+            "--locked",
+            "-p",
+            "xtask",
+            "--",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 34.817042434999166,
+          "log_sha256": "95c8b94783bbec5663e0584ae1f015e88dbf4a1a4fd99df8ad838101305f735f",
+          "test_counts": {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": []
+        }
+      ],
+      "inputs_unchanged": true,
+      "all_requested_steps_passed": true
+    },
+    "windows-pretrained-final": {
+      "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+      "label": "windows-pretrained-final",
+      "mode": "pretrained",
+      "input_count": 255,
+      "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+      "steps": [
+        {
+          "name": "pretrained-release",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-inference",
+            "--test",
+            "qwen3",
+            "official_qwen3_q8_matches_original_native_profile",
+            "--",
+            "--ignored",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 14.765391300003103,
+          "log_sha256": "c8202cf443099d030d3b5935fa50fc6ac487ddad56417abf953b041ab26745a1",
+          "test_counts": {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": [
+            "test official_qwen3_q8_matches_original_native_profile ... qwen3-native: official Qwen3-0.6B Q8_0 host=msvc rows=36 floats=5469696 bitwise_equal=5469696 greedy_ids=24 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        }
+      ],
+      "inputs_unchanged": true,
+      "all_requested_steps_passed": true
+    },
+    "linux-pretrained-final": {
+      "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+      "label": "linux-pretrained-final",
+      "mode": "pretrained",
+      "input_count": 255,
+      "input_inventory_sha256": "cec43eb6725ac35faef96170a0d0c78afc94caefd5d1d0e687d65cc94a924f4d",
+      "steps": [
+        {
+          "name": "pretrained-release",
+          "command": [
+            "cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-inference",
+            "--test",
+            "qwen3",
+            "official_qwen3_q8_matches_original_native_profile",
+            "--",
+            "--ignored",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 32.94397396200293,
+          "log_sha256": "c4a5a4065b0bf789e6418eae1be05f61a3d66a8dc033462d5fc4915cbcca8783",
+          "test_counts": {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          "native_metrics": [
+            "test official_qwen3_q8_matches_original_native_profile ... qwen3-native: official Qwen3-0.6B Q8_0 host=gnu rows=36 floats=5469696 bitwise_equal=5469696 greedy_ids=24 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+          ]
+        }
+      ],
+      "inputs_unchanged": true,
+      "all_requested_steps_passed": true
+    }
+  },
+  "gnu_pretrained_scope_note": "The complete runtime, inference, numeric comparison and fixture bytes equal the final revision. Its only input difference is the later smoke-test architecture-count correction from4to5; no compiled pretrained dependency or expected output changed.",
+  "gnu_pretrained_only_input_difference": [
+    "crates/model-runtime/tests/runtime.rs"
+  ],
+  "former_cache_failure": "linux-focused-final-v2 reused an older cross-draft target and failed to resolve the newer cpu_math export. With unchanged sources, a fresh isolated target passed in linux-focused-final-v3. Both logs are retained.",
+  "smoke_count_failure": "windows-focused-final exposed the inherited expected architecture count4; the new Qwen3 registry correctly reports5. The single assertion changed, preserving all other checks.",
+  "ordinary_per_host": {
+    "msvc": {
+      "debug": 91,
+      "release": 91,
+      "ignored_per_profile": 8
+    },
+    "gnu": {
+      "debug": 93,
+      "release": 93,
+      "ignored_per_profile": 8
+    }
+  },
+  "native_qwen3_per_host": {
+    "ordinary_logits": 294912,
+    "ordinary_greedy_ids": 400,
+    "pretrained_logits": 5469696,
+    "pretrained_greedy_ids": 24,
+    "max_absolute_error": 0,
+    "exact_measured_profile_bits": true
+  }
+}

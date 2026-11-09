@@ -1,0 +1,56 @@
+from pathlib import Path
+import hashlib,json,subprocess,datetime
+ref=Path(r'C:\Users\adyba\rust-llama-reference');base=ref/'qwen3-and-f16-integration-v1';repo=base/'rust-draft';handoff=ref/'f16-context-oracle/nonflash-checkpoint-v2'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+assert sha((handoff/'handoff.json').read_bytes())=='2244646bcee07dc1ebe8850914b14b50f8cb3f7bcea0aac78baebbac32dbb447'
+manifest=json.loads((handoff/'source-manifest.json').read_text(encoding='utf-8'))
+fixtures=json.loads((handoff/'fixture-records.json').read_text(encoding='utf-8'))
+prepared=[];records=[]
+for entry in manifest:
+ relative=entry['path'];path=repo/relative;candidate=(handoff/'candidate'/relative).read_bytes()
+ assert sha(candidate)==entry['sha256']
+ current=path.read_bytes() if path.exists() else None
+ actual=None if current is None else sha(current)
+ adaptation=None
+ if actual==entry['preimage_sha256']:output=candidate
+ elif relative=='crates/ffi/src/lib.rs':
+  assert actual=='78bb56f0aa985210798df90c3fd71f80c932c85301437bf4cf9d2c271364d801'
+  preimage=(handoff/'preimages'/relative).read_bytes()
+  suffix=b'\n#[cfg(test)]\nmod f16_context_reference_tests;\n'
+  assert candidate==preimage+suffix
+  assert b'mod model_shard_tests;' in current and b'mod f16_context_reference_tests;' not in current
+  output=current+suffix;adaptation='Preserve the published shard module and append the independent F16 module.'
+ elif relative=='crates/ffi/README.md':
+  assert actual=='5f07a266119efbcd7fed050a569fa1fe0cab4c833454626874a35f0510fd62af'
+  merged=subprocess.run(['git','merge-file','--stdout','--diff3',str(path),str(handoff/'preimages'/relative),str(handoff/'candidate'/relative)],capture_output=True)
+  assert merged.returncode==0,merged.stderr
+  output=merged.stdout;assert sha(output)=='36db4594314a985bb921947b038f17898453b8c39d46f2014f88ab4a57ebbb61'
+  adaptation='Automatic three-way merge of disjoint documentation changes preserves same-owner shard loading.'
+ else:raise AssertionError((relative,entry['preimage_sha256'],actual))
+ if relative=='crates/ffi/src/f16_context_reference_tests.rs':
+  text=output.decode('utf-8')
+  guard='#![cfg(all(\n    target_arch = "x86_64",\n    any(\n        all(target_os = "windows", target_env = "msvc"),\n        all(target_os = "linux", target_env = "gnu")\n    )\n))]\n\n'
+  marker='use crate::{batch::*'
+  assert text.count(marker)==1
+  text=text.replace(marker,guard+marker,1);output=text.encode('utf-8')
+  adaptation='Restrict original-native exact replay to the two measured x86_64 MSVC/GNU profiles; expected bytes unchanged.'
+ prepared.append((path,output))
+ records.append({'path':relative,'base_sha256':actual,'handoff_preimage_sha256':entry['preimage_sha256'],'candidate_sha256':entry['sha256'],'result_sha256':sha(output),'adaptation':adaptation})
+for entry in fixtures:
+ source=handoff/'candidate'/entry['path'];path=repo/entry['path'];raw=source.read_bytes()
+ assert len(raw)==entry['bytes'] and sha(raw)==entry['sha256'] and not path.exists()
+ prepared.append((path,raw));records.append({'path':entry['path'],'base_sha256':None,'candidate_sha256':sha(raw),'result_sha256':sha(raw),'adaptation':None})
+p=repo/'docs/integration-fixture-manifest.tsv';old=p.read_bytes();text=old.decode('utf-8')
+assert text.startswith('path\tsha256\torigin\tsource_identity\n') and text.endswith('\n')
+paths={line.split('\t')[0] for line in text.splitlines()[1:] if line}
+for entry in fixtures:
+ assert entry['path'] not in paths
+ text+=entry['path']+'\t'+entry['sha256']+'\tIndependent frozen native F16/F32 KV state or cache matmul fixture\t2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122;'+('fixtures/ffi/f16-context-provenance.json' if entry['path'].startswith('fixtures/ffi/') else 'crates/tensor/tests/fixtures/f16-cache/provenance-msvc.json;crates/tensor/tests/fixtures/f16-cache/provenance-gnu.json')+'\n'
+prepared.append((p,text.encode('utf-8')))
+records.append({'path':p.relative_to(repo).as_posix(),'base_sha256':sha(old),'result_sha256':sha(text.encode('utf-8')),'adaptation':'Append six original fixture declarations without modifying previous records.'})
+for path,raw in prepared:
+ path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw)
+ assert sha(path.read_bytes())==sha(raw)
+report={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':'e0af03a97ca7077c6f2aee680fb84b3fa688f82a','handoff_sha256':'2244646bcee07dc1ebe8850914b14b50f8cb3f7bcea0aac78baebbac32dbb447','files':records,'cargo_changes':False,'product_mutated':False,'scope':'Independent typed F32/F16 keys/values, explicitly disabled flash and one worker for generation/batch; untouched original defaults remain rejected.'}
+(base/'f16-merge-v2.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'files':len(prepared),'new_fixtures':len(fixtures),'adapted':[r for r in records if r['adaptation']]},indent=2))

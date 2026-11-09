@@ -1,0 +1,2121 @@
+--- a/crates/model-runtime/src/lib.rs
++++ b/crates/model-runtime/src/lib.rs
+@@ -1,5 +1,5 @@
+-//! Owned Llama, Qwen2, Mamba-1 and BERT execution in native Rust.
++//! Owned Llama, Qwen2, Qwen3, Mamba-1 and BERT execution in native Rust.
+ //!
+ //! Dense and packed quantized matrix paths execute source-derived equations.
+ //! The strict sequential Context API and the separately bounded NativeContext
+ //! compatibility cache have distinct state contracts. The latter supports the
+@@ -15,8 +15,9 @@
+ pub mod llama;
+ pub mod mamba;
+ pub mod math;
+ pub mod qwen2;
++pub mod qwen3;
+ pub mod registry;
+ mod state;
+ 
+ pub use adapters::{AdapterSet, Lora};
+@@ -29,8 +30,9 @@
+ pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
+ pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
+ pub use math::Matrix;
+ pub use qwen2::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
++pub use qwen3::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
+ 
+ use std::fmt;
+ 
+ pub type Result<T> = std::result::Result<T, Error>;
+@@ -88,64 +90,73 @@
+ pub enum Model {
+     Llama(LlamaModel),
+     Mamba(MambaModel),
+     Qwen2(Qwen2Model),
++    Qwen3(Qwen3Model),
+ }
+ impl Model {
+     pub fn architecture(&self) -> &'static registry::Architecture {
+         match self {
+             Self::Llama(_) => &registry::ARCHITECTURES[1],
+             Self::Mamba(_) => &registry::ARCHITECTURES[60],
+             Self::Qwen2(_) => &registry::ARCHITECTURES[24],
++            Self::Qwen3(_) => &registry::ARCHITECTURES[28],
+         }
+     }
+     pub fn width(&self) -> usize {
+         match self {
+             Self::Llama(m) => m.config().width,
+             Self::Mamba(m) => m.config().width,
+             Self::Qwen2(m) => m.config().width,
++            Self::Qwen3(m) => m.config().width,
+         }
+     }
+     pub fn vocabulary(&self) -> usize {
+         match self {
+             Self::Llama(m) => m.config().vocabulary,
+             Self::Mamba(m) => m.config().vocabulary,
+             Self::Qwen2(m) => m.config().vocabulary,
++            Self::Qwen3(m) => m.config().vocabulary,
+         }
+     }
+     pub fn max_context(&self) -> usize {
+         match self {
+             Self::Llama(m) => m.config().max_context,
+             Self::Mamba(m) => m.config().max_context,
+             Self::Qwen2(m) => m.config().max_context,
++            Self::Qwen3(m) => m.config().max_context,
+         }
+     }
+     pub fn layer_count(&self) -> usize {
+         match self {
+             Self::Llama(m) => m.layer_count(),
+             Self::Mamba(m) => m.layer_count(),
+             Self::Qwen2(m) => m.layer_count(),
++            Self::Qwen3(m) => m.layer_count(),
+         }
+     }
+     pub fn fingerprint(&self) -> u64 {
+         match self {
+             Self::Llama(m) => m.fingerprint(),
+             Self::Mamba(m) => m.fingerprint(),
+             Self::Qwen2(m) => m.fingerprint(),
++            Self::Qwen3(m) => m.fingerprint(),
+         }
+     }
+     pub fn weight(&self, name: &str) -> Option<&Matrix> {
+         match self {
+             Self::Llama(m) => m.weight(name),
+             Self::Mamba(m) => m.weight(name),
+             Self::Qwen2(m) => m.weight(name),
++            Self::Qwen3(m) => m.weight(name),
+         }
+     }
+     pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
+         match self {
+             Self::Llama(m) => m.embedding(token),
+             Self::Mamba(m) => m.embedding(token),
+             Self::Qwen2(m) => m.embedding(token),
++            Self::Qwen3(m) => m.embedding(token),
+         }
+     }
+ }
+ 
+--- a/crates/model-runtime/src/context.rs
++++ b/crates/model-runtime/src/context.rs
+@@ -239,8 +239,17 @@
+                 }
+                 state.position = position;
+                 Ok(())
+             }
++            (Model::Qwen3(model), SequenceMemory::Attention(layers)) => {
++                let length = owned::multiply(position, model.config().kv_width()?)?;
++                for layer in layers {
++                    layer.keys.truncate(length);
++                    layer.values.truncate(length);
++                }
++                state.position = position;
++                Ok(())
++            }
+             (Model::Mamba(_), SequenceMemory::Recurrent(_)) => {
+                 if position == state.position {
+                     Ok(())
+                 } else {
+@@ -413,8 +422,11 @@
+                     (Model::Llama(model), SequenceMemory::Attention(cache)) => {
+                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                     }
+                     (Model::Qwen2(model), SequenceMemory::Attention(cache)) => {
++                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
++                    }
++                    (Model::Qwen3(model), SequenceMemory::Attention(cache)) => {
+                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                     }
+                     (Model::Mamba(model), SequenceMemory::Recurrent(cache)) => {
+                         model.step(input, cache, &self.adapters, &mut cancelled)?
+--- a/crates/model-runtime/src/context/owned.rs
++++ b/crates/model-runtime/src/context/owned.rs
+@@ -152,8 +152,12 @@
+                 layers: model.layer_count(),
+                 width: model.config().kv_width()?,
+             },
+             Model::Qwen2(model) => Self::Attention {
++                layers: model.layer_count(),
++                width: model.config().kv_width()?,
++            },
++            Model::Qwen3(model) => Self::Attention {
+                 layers: model.layer_count(),
+                 width: model.config().kv_width()?,
+             },
+             Model::Mamba(model) => {
+--- a/crates/model-runtime/src/context/allocation_tests.rs
++++ b/crates/model-runtime/src/context/allocation_tests.rs
+@@ -1,8 +1,9 @@
+ //! Resource-boundary regressions. Numeric oracle tests live separately; these
+ //! assert observable atomicity and reservation lifetime under real state copies.
+ use super::*;
+ use crate::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights, fixtures};
++use crate::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
+ use owned::AllocationFailure;
+ 
+ fn models() -> Vec<Arc<Model>> {
+     let llama = fixtures::tiny_llama().unwrap();
+@@ -46,12 +47,54 @@
+                 .collect(),
+         },
+     )
+     .unwrap();
++    let qwen3 = Qwen3Model::new(
++        Qwen3Config {
++            vocabulary: c.vocabulary,
++            width: c.width,
++            feed_forward: c.feed_forward,
++            heads: c.heads,
++            head_dim: c.head_dim().unwrap(),
++            kv_heads: c.kv_heads,
++            max_context: c.max_context,
++            rms_epsilon: c.rms_epsilon,
++            rope_base: c.rope_base,
++        },
++        Qwen3Weights {
++            token_embedding: w.token_embedding.clone(),
++            output_norm: w.output_norm.clone(),
++            output: w.output.clone(),
++            layers: w
++                .layers
++                .iter()
++                .map(|layer| Qwen3Layer {
++                    attention_norm: layer.attention_norm.clone(),
++                    qkv: Qwen3Qkv::Separate {
++                        query: layer.query.clone(),
++                        key: layer.key.clone(),
++                        value: layer.value.clone(),
++                        query_bias: layer.query_bias.clone(),
++                        key_bias: layer.key_bias.clone(),
++                        value_bias: layer.value_bias.clone(),
++                    },
++                    attention_output: layer.attention_output.clone(),
++                    query_norm: vec![1.0; c.head_dim().unwrap()],
++                    key_norm: vec![1.0; c.head_dim().unwrap()],
++                    feed_forward_norm: layer.feed_forward_norm.clone(),
++                    gate: layer.gate.clone(),
++                    up: layer.up.clone(),
++                    down: layer.down.clone(),
++                })
++                .collect(),
++        },
++    )
++    .unwrap();
+     vec![
+         Arc::new(Model::Llama(llama)),
+         Arc::new(Model::Mamba(fixtures::tiny_mamba().unwrap())),
+         Arc::new(Model::Qwen2(qwen)),
++        Arc::new(Model::Qwen3(qwen3)),
+     ]
+ }
+ fn context(model: Arc<Model>, limit: usize) -> Context {
+     Context::new(
+--- a/crates/model-runtime/src/registry.rs
++++ b/crates/model-runtime/src/registry.rs
+@@ -5,8 +5,9 @@
+ 
+ #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+ pub enum ExecutionSlice {
+     Qwen2DenseF32,
++    Qwen3DenseF32,
+     LlamaDenseF32,
+     Mamba1F32,
+     BertDenseF32,
+ }
+@@ -251,9 +252,9 @@
+         cpp_enum: "LLM_ARCH_QWEN3",
+         name: "qwen3",
+         source_factory: Some("llama_model_qwen3"),
+         source_files: &["src/models/qwen3.cpp", "src/models/vllm-decision2.cpp"],
+-        executable_slice: None,
++        executable_slice: Some(ExecutionSlice::Qwen3DenseF32),
+     },
+     Architecture {
+         id: 29,
+         cpp_enum: "LLM_ARCH_QWEN3MOE",
+--- a/crates/inference/src/lib.rs
++++ b/crates/inference/src/lib.rs
+@@ -1,13 +1,14 @@
+ //! Native Rust GGUF -> tokenizer -> model -> sampler integration.
+-//! Model paths: dense Llama/Qwen2, Mamba-1 recurrence and dense BERT embeddings.
++//! Model paths: dense Llama/Qwen2/Qwen3, Mamba-1 recurrence and dense BERT embeddings.
+ //! Unsupported architectures and configuration modes fail before generation.
+ #![forbid(unsafe_code)]
+ 
+ mod bert_loader;
+ mod loader;
+ mod mamba_loader;
+ mod qwen2_loader;
++mod qwen3_loader;
+ mod stream;
+ use llama_behavior::{
+     chat,
+     sampling::{Chain, Config},
+--- a/crates/inference/src/loader.rs
++++ b/crates/inference/src/loader.rs
+@@ -240,17 +240,20 @@
+     shared_metadata(m, architecture)?;
+     if architecture == "bert" {
+         return crate::bert_loader::load(g, path, options);
+     }
++    if architecture == "qwen3" {
++        return crate::qwen3_loader::load(g, path, options);
++    }
+     if architecture == "qwen2" {
+         return crate::qwen2_loader::load(g, path, options);
+     }
+     if architecture == "mamba" {
+         return crate::mamba_loader::load(g, path, options);
+     }
+     if architecture != "llama" {
+         return Err(unsupported(format!(
+-            "model architecture {architecture}; this loader currently executes dense llama, qwen2, bert and mamba"
++            "model architecture {architecture}; this loader currently executes dense llama, qwen2, qwen3, bert and mamba"
+         )));
+     }
+     if let Some(t) = m.get("general.type").and_then(Value::as_str)
+         && t != "model"
+--- a/crates/model-runtime/tests/runtime.rs
++++ b/crates/model-runtime/tests/runtime.rs
+@@ -668,6 +668,6 @@
+     assert!(report.state_roundtrips_match);
+     assert_eq!(report.llama_logits.len(), 7);
+     assert_eq!(report.mamba_logits.len(), 7);
+     assert_eq!(report.bert_mean_embedding.len(), 4);
+-    assert_eq!(report.executable_f32_slices, 4);
+-}
++    assert_eq!(report.executable_f32_slices, 5);
++}
+--- /dev/null
++++ b/crates/model-runtime/src/qwen3.rs
+@@ -0,0 +1,483 @@
++//! Dense Qwen3 graph translated from the frozen src/models/qwen3.cpp.
++//! Independent attention width and learned per-head Q/K RMS precede full-head NeoX RoPE.
++//! The bounded causal LM slice uses the frozen scalar CPU arithmetic profiles.
++use crate::llama::KvLayer;
++use crate::{AdapterSet, Error, Fingerprint, Matrix, Result, check_epsilon, check_positive, math};
++
++#[derive(Debug, Clone)]
++pub struct Qwen3Config {
++    pub vocabulary: usize,
++    pub width: usize,
++    pub feed_forward: usize,
++    pub heads: usize,
++    /// Key/value width per head; independent of embedding width divided by heads.
++    pub head_dim: usize,
++    pub kv_heads: usize,
++    pub max_context: usize,
++    pub rms_epsilon: f32,
++    pub rope_base: f32,
++}
++impl Qwen3Config {
++    pub fn validate(&self) -> Result<()> {
++        check_positive(&[
++            ("vocabulary", self.vocabulary),
++            ("width", self.width),
++            ("feed_forward", self.feed_forward),
++            ("heads", self.heads),
++            ("head_dim", self.head_dim),
++            ("kv_heads", self.kv_heads),
++            ("max_context", self.max_context),
++        ])?;
++        check_epsilon(self.rms_epsilon)?;
++        if !self.head_dim()?.is_multiple_of(2) {
++            return Err(Error::InvalidConfig(
++                "Qwen3 full-head NeoX RoPE requires an even head dimension".into(),
++            ));
++        }
++        if !self.rope_base.is_finite() || self.rope_base <= 0.0 {
++            return Err(Error::InvalidConfig(
++                "RoPE base must be finite and positive".into(),
++            ));
++        }
++        self.kv_width()?
++            .checked_mul(self.max_context)
++            .ok_or_else(|| Error::InvalidConfig("Qwen3 KV size overflow".into()))?;
++        self.qkv_width()?
++            .checked_mul(std::mem::size_of::<f32>())
++            .filter(|bytes| *bytes <= isize::MAX as usize)
++            .ok_or_else(|| Error::InvalidConfig("Qwen3 projection byte size overflow".into()))?;
++        Ok(())
++    }
++    pub fn head_dim(&self) -> Result<usize> {
++        check_positive(&[("head_dim", self.head_dim)])?;
++        Ok(self.head_dim)
++    }
++    pub fn query_width(&self) -> Result<usize> {
++        check_positive(&[("heads", self.heads)])?;
++        self.heads
++            .checked_mul(self.head_dim()?)
++            .ok_or_else(|| Error::InvalidConfig("Qwen3 query width overflow".into()))
++    }
++    pub fn kv_width(&self) -> Result<usize> {
++        check_positive(&[("heads", self.heads), ("kv_heads", self.kv_heads)])?;
++        if !self.heads.is_multiple_of(self.kv_heads) {
++            return Err(Error::InvalidConfig(
++                "Qwen3 attention heads must divide evenly into KV groups".into(),
++            ));
++        }
++        self.kv_heads
++            .checked_mul(self.head_dim()?)
++            .ok_or_else(|| Error::InvalidConfig("Qwen3 KV width overflow".into()))
++    }
++    pub fn qkv_width(&self) -> Result<usize> {
++        let query = self.query_width()?;
++        self.kv_width()?
++            .checked_mul(2)
++            .and_then(|n| n.checked_add(query))
++            .ok_or_else(|| Error::InvalidConfig("Qwen3 QKV size overflow".into()))
++    }
++}
++
++#[derive(Debug, Clone)]
++pub enum Qwen3Qkv {
++    Separate {
++        query: Matrix,
++        key: Matrix,
++        value: Matrix,
++        query_bias: Option<Vec<f32>>,
++        key_bias: Option<Vec<f32>>,
++        value_bias: Option<Vec<f32>>,
++    },
++    /// The original loader prefers a fused bias when present. Separate biases
++    /// are applied only when the fused bias is absent and all three exist.
++    Fused {
++        projection: Matrix,
++        bias: Option<Vec<f32>>,
++        query_bias: Option<Vec<f32>>,
++        key_bias: Option<Vec<f32>>,
++        value_bias: Option<Vec<f32>>,
++    },
++}
++impl Qwen3Qkv {
++    fn validate(&self, c: &Qwen3Config) -> Result<()> {
++        let kv = c.kv_width()?;
++        let (q_bias, k_bias, v_bias) = match self {
++            Self::Separate {
++                query,
++                key,
++                value,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => {
++                query.shape(c.query_width()?, c.width, "Qwen3 query")?;
++                key.shape(kv, c.width, "Qwen3 key")?;
++                value.shape(kv, c.width, "Qwen3 value")?;
++                (query_bias, key_bias, value_bias)
++            }
++            Self::Fused {
++                projection,
++                bias,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => {
++                projection.shape(c.qkv_width()?, c.width, "Qwen3 fused QKV")?;
++                math::optional_bias(bias, c.qkv_width()?, "Qwen3 fused QKV bias")?;
++                if bias.is_some()
++                    && (query_bias.is_some() || key_bias.is_some() || value_bias.is_some())
++                {
++                    return Err(Error::InvalidConfig(
++                        "Qwen3 fused and separate QKV biases cannot both be active".into(),
++                    ));
++                }
++                (query_bias, key_bias, value_bias)
++            }
++        };
++        math::optional_bias(q_bias, c.query_width()?, "Qwen3 query bias")?;
++        math::optional_bias(k_bias, kv, "Qwen3 key bias")?;
++        math::optional_bias(v_bias, kv, "Qwen3 value bias")?;
++        Ok(())
++    }
++    fn project(
++        &self,
++        c: &Qwen3Config,
++        index: usize,
++        input: &[f32],
++        adapters: &AdapterSet,
++    ) -> Result<(Vec<f32>, Vec<f32>, Vec<f32>)> {
++        let (mut q, mut k, mut v, q_bias, k_bias, v_bias, apply_separate_bias) = match self {
++            Self::Separate {
++                query,
++                key,
++                value,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => (
++                adapters.multiply(&format!("blk.{index}.attn_q.weight"), query, input)?,
++                adapters.multiply(&format!("blk.{index}.attn_k.weight"), key, input)?,
++                adapters.multiply(&format!("blk.{index}.attn_v.weight"), value, input)?,
++                query_bias,
++                key_bias,
++                value_bias,
++                true,
++            ),
++            Self::Fused {
++                projection,
++                bias,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => {
++                let mut qkv = adapters.multiply(
++                    &format!("blk.{index}.attn_qkv.weight"),
++                    projection,
++                    input,
++                )?;
++                math::bias(&mut qkv, bias);
++                let kv = c.kv_width()?;
++                let query_width = c.query_width()?;
++                (
++                    qkv[..query_width].to_vec(),
++                    qkv[query_width..query_width + kv].to_vec(),
++                    qkv[query_width + kv..].to_vec(),
++                    query_bias,
++                    key_bias,
++                    value_bias,
++                    query_bias.is_some() && key_bias.is_some() && value_bias.is_some(),
++                )
++            }
++        };
++        // The source fused graph enables separate Q/K/V biases as one group.
++        // Its separate-projection graph applies each optional bias independently.
++        if apply_separate_bias {
++            math::bias(&mut q, q_bias);
++            math::bias(&mut k, k_bias);
++            math::bias(&mut v, v_bias);
++        }
++        Ok((q, k, v))
++    }
++    fn weight(&self, name: &str) -> Option<&Matrix> {
++        match (self, name) {
++            (Self::Separate { query, .. }, "attn_q.weight") => Some(query),
++            (Self::Separate { key, .. }, "attn_k.weight") => Some(key),
++            (Self::Separate { value, .. }, "attn_v.weight") => Some(value),
++            (Self::Fused { projection, .. }, "attn_qkv.weight") => Some(projection),
++            _ => None,
++        }
++    }
++    fn fingerprint(&self, hash: &mut Fingerprint) {
++        let (biases, matrices) = match self {
++            Self::Separate {
++                query,
++                key,
++                value,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => {
++                hash.bytes(b"separate");
++                (
++                    vec![query_bias, key_bias, value_bias],
++                    vec![query, key, value],
++                )
++            }
++            Self::Fused {
++                projection,
++                bias,
++                query_bias,
++                key_bias,
++                value_bias,
++            } => {
++                hash.bytes(b"fused");
++                (
++                    vec![bias, query_bias, key_bias, value_bias],
++                    vec![projection],
++                )
++            }
++        };
++        for matrix in matrices {
++            hash.matrix(matrix);
++        }
++        for bias in biases {
++            hash.usize(usize::from(bias.is_some()));
++            if let Some(bias) = bias {
++                hash.floats(bias);
++            }
++        }
++    }
++}
++
++#[derive(Debug, Clone)]
++pub struct Qwen3Layer {
++    pub attention_norm: Vec<f32>,
++    pub qkv: Qwen3Qkv,
++    pub attention_output: Matrix,
++    pub query_norm: Vec<f32>,
++    pub key_norm: Vec<f32>,
++    pub feed_forward_norm: Vec<f32>,
++    pub gate: Matrix,
++    pub up: Matrix,
++    pub down: Matrix,
++}
++impl Qwen3Layer {
++    fn validate(&self, c: &Qwen3Config) -> Result<()> {
++        math::vector(&self.attention_norm, c.width, "Qwen3 attention RMS weights")?;
++        math::vector(&self.feed_forward_norm, c.width, "Qwen3 FFN RMS weights")?;
++        self.qkv.validate(c)?;
++        self.attention_output
++            .shape(c.width, c.query_width()?, "Qwen3 attention output")?;
++        math::vector(
++            &self.query_norm,
++            c.head_dim()?,
++            "Qwen3 per-head query RMS weights",
++        )?;
++        math::vector(
++            &self.key_norm,
++            c.head_dim()?,
++            "Qwen3 per-head key RMS weights",
++        )?;
++        self.gate.shape(c.feed_forward, c.width, "Qwen3 FFN gate")?;
++        self.up.shape(c.feed_forward, c.width, "Qwen3 FFN up")?;
++        self.down.shape(c.width, c.feed_forward, "Qwen3 FFN down")?;
++        Ok(())
++    }
++}
++
++#[derive(Debug, Clone)]
++pub struct Qwen3Weights {
++    pub token_embedding: Matrix,
++    pub layers: Vec<Qwen3Layer>,
++    pub output_norm: Vec<f32>,
++    pub output: Option<Matrix>,
++}
++#[derive(Debug, Clone)]
++pub struct Qwen3Model {
++    config: Qwen3Config,
++    weights: Qwen3Weights,
++    fingerprint: u64,
++}
++impl Qwen3Model {
++    pub fn new(config: Qwen3Config, weights: Qwen3Weights) -> Result<Self> {
++        config.validate()?;
++        check_positive(&[("layers", weights.layers.len())])?;
++        weights
++            .token_embedding
++            .shape(config.vocabulary, config.width, "Qwen3 token embedding")?;
++        math::vector(&weights.output_norm, config.width, "Qwen3 output norm")?;
++        if let Some(output) = &weights.output {
++            output.shape(config.vocabulary, config.width, "Qwen3 output")?;
++        }
++        for layer in &weights.layers {
++            layer.validate(&config)?;
++        }
++        let mut result = Self {
++            config,
++            weights,
++            fingerprint: 0,
++        };
++        result.fingerprint = result.calculate_fingerprint();
++        Ok(result)
++    }
++    pub fn config(&self) -> &Qwen3Config {
++        &self.config
++    }
++    pub fn weights(&self) -> &Qwen3Weights {
++        &self.weights
++    }
++    pub fn layer_count(&self) -> usize {
++        self.weights.layers.len()
++    }
++    pub fn fingerprint(&self) -> u64 {
++        self.fingerprint
++    }
++    pub fn weight(&self, name: &str) -> Option<&Matrix> {
++        if name == "output.weight" {
++            return Some(
++                self.weights
++                    .output
++                    .as_ref()
++                    .unwrap_or(&self.weights.token_embedding),
++            );
++        }
++        let (index, field) = name.strip_prefix("blk.")?.split_once('.')?;
++        let parsed = index.parse::<usize>().ok()?;
++        if parsed.to_string() != index {
++            return None;
++        }
++        let layer = self.weights.layers.get(parsed)?;
++        layer.qkv.weight(field).or(match field {
++            "attn_output.weight" => Some(&layer.attention_output),
++            "ffn_gate.weight" => Some(&layer.gate),
++            "ffn_up.weight" => Some(&layer.up),
++            "ffn_down.weight" => Some(&layer.down),
++            _ => None,
++        })
++    }
++    pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
++        if token as usize >= self.config.vocabulary {
++            return Err(Error::InvalidToken {
++                token,
++                vocabulary: self.config.vocabulary,
++            });
++        }
++        Ok(self.weights.token_embedding.row(token as usize)?.to_vec())
++    }
++    pub(crate) fn step(
++        &self,
++        mut hidden: Vec<f32>,
++        position: usize,
++        cache: &mut [KvLayer],
++        adapters: &AdapterSet,
++        cancel: &mut impl FnMut() -> bool,
++    ) -> Result<(Vec<f32>, Vec<f32>)> {
++        let c = &self.config;
++        let head_dim = c.head_dim()?;
++        let scale = (head_dim as f32).sqrt().recip();
++        for (index, (layer, kv)) in self.weights.layers.iter().zip(cache).enumerate() {
++            if cancel() {
++                return Err(Error::Cancelled);
++            }
++            let normalized = math::rms_norm(&hidden, &layer.attention_norm, c.rms_epsilon)?;
++            let (mut q, mut k, v) = layer.qkv.project(c, index, &normalized, adapters)?;
++            normalize_heads(&mut q, &layer.query_norm, head_dim, c.rms_epsilon)?;
++            normalize_heads(&mut k, &layer.key_norm, head_dim, c.rms_epsilon)?;
++            math::rope_neox(&mut q, head_dim, position, c.rope_base);
++            math::rope_neox(&mut k, head_dim, position, c.rope_base);
++            kv.keys.extend(k);
++            kv.values.extend(v);
++            let attention = math::attention(
++                &q, &kv.keys, &kv.values, c.heads, c.kv_heads, head_dim, scale,
++            )?;
++            let projected = adapters.multiply(
++                &format!("blk.{index}.attn_output.weight"),
++                &layer.attention_output,
++                &attention,
++            )?;
++            math::add(&mut hidden, &projected);
++            let normalized = math::rms_norm(&hidden, &layer.feed_forward_norm, c.rms_epsilon)?;
++            let mut gate = adapters.multiply(
++                &format!("blk.{index}.ffn_gate.weight"),
++                &layer.gate,
++                &normalized,
++            )?;
++            let up = adapters.multiply(
++                &format!("blk.{index}.ffn_up.weight"),
++                &layer.up,
++                &normalized,
++            )?;
++            math::native_rows::silu_f32_in_place(&mut gate);
++            for (gate, up) in gate.iter_mut().zip(up) {
++                *gate *= up;
++            }
++            let output =
++                adapters.multiply(&format!("blk.{index}.ffn_down.weight"), &layer.down, &gate)?;
++            math::add(&mut hidden, &output);
++            adapters.control(index, &mut hidden);
++            math::finite(&hidden, "Qwen3 layer output")?;
++        }
++        let embedding = math::rms_norm(&hidden, &self.weights.output_norm, c.rms_epsilon)?;
++        let output = self
++            .weights
++            .output
++            .as_ref()
++            .unwrap_or(&self.weights.token_embedding);
++        let logits = adapters.multiply("output.weight", output, &embedding)?;
++        math::finite(&logits, "Qwen3 logits")?;
++        Ok((embedding, logits))
++    }
++    fn calculate_fingerprint(&self) -> u64 {
++        let mut hash = Fingerprint::new();
++        hash.bytes(b"qwen3-dense-neox-v1");
++        let c = &self.config;
++        for value in [
++            c.vocabulary,
++            c.width,
++            c.feed_forward,
++            c.heads,
++            c.head_dim,
++            c.kv_heads,
++            c.max_context,
++            self.layer_count(),
++        ] {
++            hash.usize(value);
++        }
++        hash.floats(&[c.rms_epsilon, c.rope_base]);
++        hash.matrix(&self.weights.token_embedding);
++        hash.floats(&self.weights.output_norm);
++        hash.usize(usize::from(self.weights.output.is_some()));
++        if let Some(output) = &self.weights.output {
++            hash.matrix(output);
++        }
++        for layer in &self.weights.layers {
++            hash.floats(&layer.attention_norm);
++            layer.qkv.fingerprint(&mut hash);
++            hash.floats(&layer.query_norm);
++            hash.floats(&layer.key_norm);
++            hash.floats(&layer.feed_forward_norm);
++            for matrix in [&layer.attention_output, &layer.gate, &layer.up, &layer.down] {
++                hash.matrix(matrix);
++            }
++        }
++        hash.finish()
++    }
++}
++
++/// Q/K are shaped [head_dim, heads, token] by the frozen build_qkv graph.
++/// Normalize each contiguous head row with the same learned vector.
++fn normalize_heads(
++    values: &mut [f32],
++    weights: &[f32],
++    head_dim: usize,
++    epsilon: f32,
++) -> Result<()> {
++    if head_dim == 0 || !values.len().is_multiple_of(head_dim) {
++        return Err(Error::Shape("Qwen3 head normalization shape".into()));
++    }
++    for head in values.chunks_mut(head_dim) {
++        let normalized = math::rms_norm(head, weights, epsilon)?;
++        head.copy_from_slice(&normalized);
++    }
++    Ok(())
++}
+--- /dev/null
++++ b/crates/model-runtime/tests/qwen3.rs
+@@ -0,0 +1,324 @@
++//! Observable Qwen3 state and failure contracts; numeric parity is covered by
++//! the independent original GGUF corpus in llama-inference/tests/qwen3.rs.
++use llama_model_runtime::*;
++use std::sync::Arc;
++
++fn config() -> Qwen3Config {
++    Qwen3Config {
++        vocabulary: 3,
++        width: 3,
++        feed_forward: 5,
++        heads: 2,
++        head_dim: 4,
++        kv_heads: 1,
++        max_context: 64,
++        rms_epsilon: 1e-5,
++        rope_base: 10000.0,
++    }
++}
++fn matrix(rows: usize, columns: usize, seed: usize) -> Matrix {
++    Matrix::new(
++        rows,
++        columns,
++        (0..rows * columns)
++            .map(|i| (((i + seed) * 13 % 17) as i32 - 8) as f32 / 32.0)
++            .collect(),
++    )
++    .unwrap()
++}
++fn ordinary() -> Qwen3Model {
++    let c = config();
++    let layers = (0..2)
++        .map(|i| Qwen3Layer {
++            attention_norm: vec![1.0, 0.75, 1.25],
++            qkv: Qwen3Qkv::Separate {
++                query: matrix(8, 3, i + 1),
++                key: matrix(4, 3, i + 2),
++                value: matrix(4, 3, i + 3),
++                query_bias: None,
++                key_bias: None,
++                value_bias: None,
++            },
++            attention_output: matrix(3, 8, i + 4),
++            query_norm: vec![1.0, 0.5, 1.25, 0.75],
++            key_norm: vec![0.75, 1.5, 0.5, 1.0],
++            feed_forward_norm: vec![1.0; 3],
++            gate: matrix(5, 3, i + 5),
++            up: matrix(5, 3, i + 6),
++            down: matrix(3, 5, i + 7),
++        })
++        .collect();
++    Qwen3Model::new(
++        c,
++        Qwen3Weights {
++            token_embedding: matrix(3, 3, 9),
++            layers,
++            output_norm: vec![1.0; 3],
++            output: None,
++        },
++    )
++    .unwrap()
++}
++fn context(model: Arc<Model>, limit: usize) -> Context {
++    Context::new(
++        model,
++        ContextOptions {
++            max_state_bytes: limit,
++            microbatch_tokens: 1,
++            ..ContextOptions::default()
++        },
++    )
++    .unwrap()
++}
++fn budget_error<T: std::fmt::Debug>(result: Result<T>) {
++    assert!(
++        matches!(result, Err(Error::InvalidState(ref message)) if message.contains("state budget")),
++        "{result:?}"
++    );
++}
++
++#[test]
++fn explicit_head_width_and_checked_shape_products() {
++    let c = config();
++    c.validate().unwrap();
++    assert_eq!(
++        (
++            c.query_width().unwrap(),
++            c.kv_width().unwrap(),
++            c.qkv_width().unwrap()
++        ),
++        (8, 4, 16)
++    );
++    assert!(!c.width.is_multiple_of(c.heads));
++    for change in 0..10 {
++        let mut c = c.clone();
++        match change {
++            0 => c.heads = 0,
++            1 => c.kv_heads = 0,
++            2 => c.kv_heads = 3,
++            3 => c.head_dim = 0,
++            4 => c.head_dim = 3,
++            5 => c.width = 0,
++            6 => c.max_context = 0,
++            7 => c.rms_epsilon = f32::NAN,
++            8 => c.rope_base = f32::INFINITY,
++            9 => {
++                c.heads = u32::MAX as usize;
++                c.kv_heads = c.heads;
++                c.head_dim = (u32::MAX - 1) as usize;
++            }
++            _ => unreachable!(),
++        }
++        assert!(c.validate().is_err(), "invalid configuration {change}");
++    }
++    let good = ordinary();
++    let mut weights = good.weights().clone();
++    weights.layers[0].query_norm.pop();
++    assert!(matches!(
++        Qwen3Model::new(good.config().clone(), weights),
++        Err(Error::Shape(_))
++    ));
++    let mut weights = good.weights().clone();
++    weights.layers[0].key_norm[0] = f32::NAN;
++    assert!(matches!(
++        Qwen3Model::new(good.config().clone(), weights),
++        Err(Error::NonFinite(_))
++    ));
++}
++
++#[test]
++fn cancellation_at_every_boundary_rolls_back_all_sequences_and_reservations() {
++    let model = Arc::new(Model::Qwen3(ordinary()));
++    let mut initial = context(model.clone(), 1 << 20);
++    initial.decode_batch(&[BatchToken::token(0, 0, 0)]).unwrap();
++    let before = initial.save_state().unwrap();
++    let resident = initial.reserved_state_bytes();
++    let mut failures = 0;
++    let mut completed = false;
++    for stop_at in 1..64 {
++        let mut tested = context(model.clone(), 1 << 20);
++        tested.restore_state(&before).unwrap();
++        let mut calls = 0;
++        let result = tested.decode_batch_with_cancel(
++            &[BatchToken::token(0, 1, 1), BatchToken::token(7, 0, 2)],
++            || {
++                calls += 1;
++                calls == stop_at
++            },
++        );
++        match result {
++            Err(Error::Cancelled) => {
++                failures += 1;
++                assert_eq!(tested.save_state().unwrap(), before, "cancel {stop_at}");
++                assert_eq!(tested.reserved_state_bytes(), resident, "cancel {stop_at}");
++            }
++            Ok(outputs) => {
++                assert_eq!(outputs.len(), 2);
++                assert_eq!(tested.next_position(0), Some(2));
++                assert_eq!(tested.next_position(7), Some(1));
++                completed = true;
++                break;
++            }
++            other => panic!("unexpected cancellation result: {other:?}"),
++        }
++    }
++    assert!(completed && failures >= 8);
++}
++
++#[test]
++fn actual_kv_head_width_controls_growth_and_copy_budgets() {
++    let model = Arc::new(Model::Qwen3(ordinary()));
++    let mut reference = context(model.clone(), 1 << 20);
++    reference
++        .decode_batch(&[BatchToken::token(0, 0, 0)])
++        .unwrap();
++    let resident = reference.state_bytes();
++    reference
++        .decode_batch(&[BatchToken::token(0, 1, 1)])
++        .unwrap();
++    // Two layers, K and V, four values/head and one KV head, each an F32.
++    assert_eq!(reference.state_bytes() - resident, 2 * 2 * 4 * 4);
++    let mut limited = context(model, resident * 2 + 32);
++    limited.decode_batch(&[BatchToken::token(0, 0, 0)]).unwrap();
++    let before = limited.save_state().unwrap();
++    let reserved = limited.reserved_state_bytes();
++    let growth: Vec<_> = (1..32)
++        .map(|position| BatchToken::token(0, position, 1))
++        .collect();
++    budget_error(limited.decode_batch(&growth));
++    budget_error(
++        limited.decode_batch(
++            &(1..9)
++                .map(|id| BatchToken::token(id, 0, 1))
++                .collect::<Vec<_>>(),
++        ),
++    );
++    budget_error(limited.fork_sequence(0, 9));
++    assert_eq!(limited.reserved_state_bytes(), reserved);
++    assert_eq!(limited.save_state().unwrap(), before);
++    let checkpoint = limited.checkpoint().unwrap();
++    assert_eq!(
++        limited.reserved_state_bytes(),
++        reserved + checkpoint.state_bytes()
++    );
++    budget_error(checkpoint.try_clone());
++    budget_error(limited.restore_checkpoint(&checkpoint));
++    drop(checkpoint);
++    assert_eq!(limited.save_state().unwrap(), before);
++    assert!(limited.peak_reserved_state_bytes() <= limited.state_budget_bytes());
++}
++
++#[test]
++fn fork_truncate_serialization_and_model_identity_preserve_state() {
++    let native = ordinary();
++    let model = Arc::new(Model::Qwen3(native.clone()));
++    let mut tested = context(model.clone(), 1 << 20);
++    let first = tested
++        .decode_batch(&[BatchToken::token(0, 0, 0), BatchToken::token(0, 1, 1)])
++        .unwrap();
++    let state = tested.save_state().unwrap();
++    let checkpoint = tested.checkpoint().unwrap();
++    tested.fork_sequence(0, 9).unwrap();
++    let forked = tested
++        .decode_batch(&[BatchToken::token(0, 2, 2), BatchToken::token(9, 2, 2)])
++        .unwrap();
++    assert_eq!(forked[0].logits, forked[1].logits);
++    tested.truncate_sequence(0, 1).unwrap();
++    let replay = tested.decode_batch(&[BatchToken::token(0, 1, 1)]).unwrap();
++    assert_eq!(replay[0].logits, first[1].logits);
++    tested.restore_checkpoint(&checkpoint).unwrap();
++    assert_eq!(tested.save_state().unwrap(), state);
++    let mut other = context(model, 1 << 20);
++    other.restore_state(&state).unwrap();
++    assert_eq!(
++        other.decode_batch(&[BatchToken::token(0, 2, 2)]).unwrap()[0].logits,
++        forked[0].logits
++    );
++    for query in [false, true] {
++        let mut weights = native.weights().clone();
++        if query {
++            weights.layers[0].query_norm[0] += 0.25;
++        } else {
++            weights.layers[0].key_norm[0] += 0.25;
++        }
++        let changed = Arc::new(Model::Qwen3(
++            Qwen3Model::new(native.config().clone(), weights).unwrap(),
++        ));
++        let mut different = context(changed, 1 << 20);
++        assert!(matches!(
++            different.restore_state(&state),
++            Err(Error::InvalidState(_))
++        ));
++        assert!(matches!(
++            different.restore_checkpoint(&checkpoint),
++            Err(Error::InvalidState(_))
++        ));
++        assert_eq!(different.reserved_state_bytes(), 0);
++    }
++}
++
++fn finite_weight_overflow() -> Arc<Model> {
++    let c = Qwen3Config {
++        vocabulary: 2,
++        width: 2,
++        feed_forward: 2,
++        heads: 2,
++        head_dim: 4,
++        kv_heads: 1,
++        max_context: 8,
++        rms_epsilon: 1e-5,
++        rope_base: 10000.0,
++    };
++    Arc::new(Model::Qwen3(
++        Qwen3Model::new(
++            c,
++            Qwen3Weights {
++                token_embedding: Matrix::new(2, 2, vec![0.0, 0.0, 1.0, 0.0]).unwrap(),
++                layers: vec![Qwen3Layer {
++                    attention_norm: vec![1.0; 2],
++                    qkv: Qwen3Qkv::Separate {
++                        query: Matrix::zeros(8, 2).unwrap(),
++                        key: Matrix::zeros(4, 2).unwrap(),
++                        value: Matrix::zeros(4, 2).unwrap(),
++                        query_bias: None,
++                        key_bias: None,
++                        value_bias: None,
++                    },
++                    attention_output: Matrix::zeros(2, 8).unwrap(),
++                    query_norm: vec![1.0; 4],
++                    key_norm: vec![1.0; 4],
++                    feed_forward_norm: vec![1.0; 2],
++                    gate: Matrix::zeros(2, 2).unwrap(),
++                    up: Matrix::zeros(2, 2).unwrap(),
++                    down: Matrix::zeros(2, 2).unwrap(),
++                }],
++                output_norm: vec![f32::MAX; 2],
++                output: None,
++            },
++        )
++        .unwrap(),
++    ))
++}
++
++#[test]
++fn finite_weights_with_nonfinite_execution_never_commit_partial_state() {
++    let model = finite_weight_overflow();
++    for preexisting in [false, true] {
++        let mut tested = context(model.clone(), 1 << 20);
++        let position = usize::from(preexisting);
++        if preexisting {
++            tested.decode_batch(&[BatchToken::token(0, 0, 0)]).unwrap();
++        }
++        let before = tested.save_state().unwrap();
++        let reserved = tested.reserved_state_bytes();
++        let result = tested.decode_batch(&[
++            BatchToken::token(0, position, 0),
++            BatchToken::token(7, 0, 0),
++            BatchToken::token(0, position + 1, 1),
++        ]);
++        assert!(matches!(result, Err(Error::NonFinite(_))), "{result:?}");
++        assert_eq!(tested.save_state().unwrap(), before);
++        assert_eq!(tested.reserved_state_bytes(), reserved);
++        assert_eq!(tested.sequence_count(), usize::from(preexisting));
++    }
++}
+--- /dev/null
++++ b/crates/inference/src/qwen3_loader.rs
+@@ -0,0 +1,287 @@
++//! Native dense Qwen3 GGUF graph loading.
++use crate::loader::{
++    bias, details, float, matrix, require_causal, require_unscaled_rope, uint, unsupported, vector,
++};
++use crate::{Error, Executor, LoadOptions, Model, Result};
++use llama_gguf::{GgufSet, Value};
++use llama_model_runtime::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
++use llama_tokenizer::Tokenizer;
++use std::{collections::BTreeSet, path::Path, sync::Arc};
++
++// Frozen GGML binary operations keep the F32 activation as src0. Their CPU
++// mixed-type branches cannot consume a low-precision active norm/bias as src1.
++// Validate these descriptors before decoding any weights. Partial fused bias
++// groups are deliberately ignored by the original graph, so their stored types
++// remain admissible and are decoded only for checked model ownership/identity.
++fn require_f32_if_present(g: &GgufSet, name: &str) -> Result<()> {
++    if let Some(tensor) = g.tensor(name)
++        && tensor.dtype.id() != 0
++    {
++        return Err(unsupported(format!(
++            "Qwen3 active norm/bias tensor {name} requires F32 storage"
++        )));
++    }
++    Ok(())
++}
++
++fn validate_active_vector_storage(g: &GgufSet, layers: usize) -> Result<()> {
++    require_f32_if_present(g, "output_norm.weight")?;
++    for index in 0..layers {
++        let key = |name: &str| format!("blk.{index}.{name}");
++        for name in [
++            "attn_norm.weight",
++            "attn_q_norm.weight",
++            "attn_k_norm.weight",
++            "ffn_norm.weight",
++        ] {
++            require_f32_if_present(g, &key(name))?;
++        }
++        let biases = [key("attn_q.bias"), key("attn_k.bias"), key("attn_v.bias")];
++        if g.tensor(&key("attn_qkv.weight")).is_none() {
++            for name in &biases {
++                require_f32_if_present(g, name)?;
++            }
++        } else if g.tensor(&key("attn_qkv.bias")).is_some() {
++            require_f32_if_present(g, &key("attn_qkv.bias"))?;
++        } else if biases.iter().all(|name| g.tensor(name).is_some()) {
++            for name in &biases {
++                require_f32_if_present(g, name)?;
++            }
++        }
++    }
++    Ok(())
++}
++
++pub(super) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result<Model> {
++    let metadata = g.metadata();
++    match metadata.get("general.type") {
++        None => {}
++        Some(Value::String(kind)) if kind == "model" => {}
++        Some(Value::String(kind)) => return Err(unsupported(format!("GGUF general.type={kind}"))),
++        Some(_) => return Err(Error::Invalid("general.type must be a string".into())),
++    }
++    let tokenizer = Tokenizer::from_metadata(metadata)?;
++    let layers = uint(metadata, "qwen3.block_count", None)?;
++    if layers == 0 || layers > 512 {
++        return Err(Error::Invalid("layer count must be 1..=512".into()));
++    }
++    let train_context = uint(metadata, "qwen3.context_length", None)?;
++    if !metadata.contains_key("qwen3.attention.layer_norm_rms_epsilon") {
++        return Err(Error::Invalid(
++            "missing qwen3.attention.layer_norm_rms_epsilon".into(),
++        ));
++    }
++    for key in [
++        "qwen3.attention.head_count",
++        "qwen3.attention.head_count_kv",
++        "qwen3.feed_forward_length",
++    ] {
++        if matches!(metadata.get(key), Some(Value::Array { .. })) {
++            return Err(unsupported(format!("per-layer array {key}")));
++        }
++    }
++    let heads = uint(metadata, "qwen3.attention.head_count", None)?;
++    let width = uint(metadata, "qwen3.embedding_length", None)?;
++    let default_head = width
++        .checked_div(heads)
++        .ok_or_else(|| Error::Invalid("qwen3 attention head count must be positive".into()))?;
++    let key_length = uint(metadata, "qwen3.attention.key_length", Some(default_head))?;
++    let value_length = uint(metadata, "qwen3.attention.value_length", Some(default_head))?;
++    let config = Qwen3Config {
++        vocabulary: tokenizer.vocabulary_size(),
++        width,
++        feed_forward: uint(metadata, "qwen3.feed_forward_length", None)?,
++        heads,
++        head_dim: key_length,
++        kv_heads: uint(metadata, "qwen3.attention.head_count_kv", Some(heads))?,
++        max_context: train_context.min(options.context_length),
++        rms_epsilon: float(metadata, "qwen3.attention.layer_norm_rms_epsilon", 1e-5)?,
++        rope_base: float(metadata, "qwen3.rope.freq_base", 10000.)?,
++    };
++    config.validate()?;
++    let head_dim = config.head_dim()?;
++    let kv_width = config.kv_width()?;
++    let query_width = config.query_width()?;
++    if value_length != head_dim {
++        return Err(unsupported(
++            "Qwen3 requires equal key and value head lengths",
++        ));
++    }
++    if uint(metadata, "qwen3.rope.dimension_count", Some(head_dim))? != head_dim {
++        return Err(unsupported("Qwen3 requires full-head NeoX RoPE"));
++    }
++    for key in [
++        "qwen3.attention.sliding_window",
++        "qwen3.expert_count",
++        "qwen3.expert_used_count",
++    ] {
++        if uint(metadata, key, Some(0))? != 0 {
++            return Err(unsupported(format!("nonzero {key}")));
++        }
++    }
++    require_causal(metadata, "qwen3", true)?;
++    require_unscaled_rope(metadata, "qwen3")?;
++    if uint(metadata, "qwen3.pooling_type", Some(0))? != 0 {
++        return Err(unsupported("Qwen3 pooled embedding or reranker execution"));
++    }
++    for tensor in g.tensors() {
++        if tensor.name.starts_with("cls.")
++            || tensor.name.starts_with("dense_2.")
++            || tensor.name == "output.bias"
++        {
++            return Err(unsupported(format!(
++                "Qwen3 LM slice does not execute {}",
++                tensor.name
++            )));
++        }
++    }
++    validate_active_vector_storage(&g, layers)?;
++    let (id, template, decoded_weight_bytes) = details(&g, path, options)?;
++    let mut used = BTreeSet::new();
++    let token_embedding = matrix(
++        &mut g,
++        &mut used,
++        "token_embd.weight",
++        config.vocabulary,
++        config.width,
++    )?;
++    let output_norm = vector(&mut g, &mut used, "output_norm.weight", config.width)?;
++    let output = if g.tensor("output.weight").is_some() {
++        Some(matrix(
++            &mut g,
++            &mut used,
++            "output.weight",
++            config.vocabulary,
++            config.width,
++        )?)
++    } else {
++        None
++    };
++    let mut weights = Vec::with_capacity(layers);
++    for index in 0..layers {
++        let key = |name: &str| format!("blk.{index}.{name}");
++        let qkv = if g.tensor(&key("attn_qkv.weight")).is_some() {
++            let projection = matrix(
++                &mut g,
++                &mut used,
++                &key("attn_qkv.weight"),
++                config.qkv_width()?,
++                config.width,
++            )?;
++            let fused_bias = bias(
++                &mut g,
++                &mut used,
++                &key("attn_qkv.bias"),
++                config.qkv_width()?,
++            )?;
++            let (query_bias, key_bias, value_bias) = if fused_bias.is_none() {
++                (
++                    bias(&mut g, &mut used, &key("attn_q.bias"), query_width)?,
++                    bias(&mut g, &mut used, &key("attn_k.bias"), kv_width)?,
++                    bias(&mut g, &mut used, &key("attn_v.bias"), kv_width)?,
++                )
++            } else {
++                (None, None, None)
++            };
++            Qwen3Qkv::Fused {
++                projection,
++                bias: fused_bias,
++                query_bias,
++                key_bias,
++                value_bias,
++            }
++        } else {
++            Qwen3Qkv::Separate {
++                query: matrix(
++                    &mut g,
++                    &mut used,
++                    &key("attn_q.weight"),
++                    query_width,
++                    config.width,
++                )?,
++                key: matrix(
++                    &mut g,
++                    &mut used,
++                    &key("attn_k.weight"),
++                    kv_width,
++                    config.width,
++                )?,
++                value: matrix(
++                    &mut g,
++                    &mut used,
++                    &key("attn_v.weight"),
++                    kv_width,
++                    config.width,
++                )?,
++                query_bias: bias(&mut g, &mut used, &key("attn_q.bias"), query_width)?,
++                key_bias: bias(&mut g, &mut used, &key("attn_k.bias"), kv_width)?,
++                value_bias: bias(&mut g, &mut used, &key("attn_v.bias"), kv_width)?,
++            }
++        };
++        weights.push(Qwen3Layer {
++            attention_norm: vector(&mut g, &mut used, &key("attn_norm.weight"), config.width)?,
++            qkv,
++            attention_output: matrix(
++                &mut g,
++                &mut used,
++                &key("attn_output.weight"),
++                config.width,
++                query_width,
++            )?,
++            query_norm: vector(&mut g, &mut used, &key("attn_q_norm.weight"), head_dim)?,
++            key_norm: vector(&mut g, &mut used, &key("attn_k_norm.weight"), head_dim)?,
++            feed_forward_norm: vector(&mut g, &mut used, &key("ffn_norm.weight"), config.width)?,
++            gate: matrix(
++                &mut g,
++                &mut used,
++                &key("ffn_gate.weight"),
++                config.feed_forward,
++                config.width,
++            )?,
++            up: matrix(
++                &mut g,
++                &mut used,
++                &key("ffn_up.weight"),
++                config.feed_forward,
++                config.width,
++            )?,
++            down: matrix(
++                &mut g,
++                &mut used,
++                &key("ffn_down.weight"),
++                config.width,
++                config.feed_forward,
++            )?,
++        });
++    }
++    let unconsumed: Vec<_> = g
++        .tensors()
++        .iter()
++        .filter(|tensor| !used.contains(&tensor.name))
++        .map(|tensor| tensor.name.as_str())
++        .collect();
++    if !unconsumed.is_empty() {
++        return Err(unsupported(format!(
++            "model contains unimplemented tensors: {}",
++            unconsumed.join(", ")
++        )));
++    }
++    let model = Qwen3Model::new(
++        config,
++        Qwen3Weights {
++            token_embedding,
++            layers: weights,
++            output_norm,
++            output,
++        },
++    )?;
++    Ok(Model {
++        runtime: Executor::Decoder(Arc::new(llama_model_runtime::Model::Qwen3(model))),
++        tokenizer,
++        id,
++        template,
++        decoded_weight_bytes,
++        context_limit: train_context.min(options.context_length),
++        embedding_pooling: None,
++    })
++}
+--- /dev/null
++++ b/crates/inference/tests/qwen3.rs
+@@ -0,0 +1,649 @@
++//! Independent frozen Qwen3 graph, tokenizer and shard captures.
++//! All expected model and numeric bytes were captured through original C/C++
++//! before this Rust comparison; provenance retains both compiler profiles.
++#[path = "support/native_profile.rs"]
++mod native_profile;
++use llama_behavior::json::{self, Value};
++use llama_conformance::digest::{hash_reader, sha256};
++use llama_gguf::GgufSet;
++use llama_inference::{Error, FinishReason, GenerationOptions, LoadOptions, Model};
++use llama_model_runtime::{BatchToken, Context, ContextOptions};
++use native_profile::source_profile;
++use std::{
++    fs::{self, File},
++    path::{Component, Path, PathBuf},
++    sync::atomic::{AtomicU64, Ordering},
++    time::{SystemTime, UNIX_EPOCH},
++};
++
++fn field<'a>(value: &'a Value, key: &str) -> &'a Value {
++    value
++        .get(key)
++        .unwrap_or_else(|| panic!("missing fixture field {key}"))
++}
++fn array(value: &Value) -> &[Value] {
++    value.as_array().expect("fixture array")
++}
++fn number(value: &Value) -> usize {
++    usize::try_from(value.as_u64().expect("fixture integer")).unwrap()
++}
++fn string(value: &Value) -> &str {
++    value.as_str().expect("fixture string")
++}
++fn boolean(value: &Value) -> bool {
++    value.as_bool().expect("fixture boolean")
++}
++fn ids(value: &Value) -> Vec<i32> {
++    array(value)
++        .iter()
++        .map(|v| i32::try_from(v.as_i64().unwrap()).unwrap())
++        .collect()
++}
++fn fixture(name: &str) -> PathBuf {
++    Path::new(env!("CARGO_MANIFEST_DIR"))
++        .join("../../fixtures/inference/qwen3")
++        .join(name)
++}
++fn pinned(name: &str, digest: &str) -> Vec<u8> {
++    let bytes = fs::read(fixture(name)).unwrap();
++    assert_eq!(sha256(&bytes), digest, "{name}");
++    bytes
++}
++fn document(name: &str, digest: &str) -> Value {
++    json::parse(std::str::from_utf8(&pinned(name, digest)).unwrap()).unwrap()
++}
++fn decode_hex(text: &str) -> Vec<u8> {
++    assert!(text.len().is_multiple_of(2));
++    text.as_bytes()
++        .as_chunks::<2>()
++        .0
++        .iter()
++        .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
++        .collect()
++}
++fn values(reference: &Value) -> Vec<u8> {
++    let data = field(reference, "float_data");
++    let bytes = pinned(string(field(data, "path")), string(field(data, "sha256")));
++    assert_eq!(bytes.len(), number(field(data, "bytes")));
++    bytes
++}
++
++struct Corpus {
++    root: PathBuf,
++    document: Value,
++}
++impl Corpus {
++    fn new() -> Self {
++        Self::from_fixture(
++            "tiny-models.json",
++            "898e84c2567d91f1a5ac8132ddb82ca5034fce399a6b0e4645e5774798220b61",
++            "tiny-inputs.bin",
++            "04c331fdf68d9cb2311631904099d674ce1f17def63abf93c908a856147c49bd",
++        )
++    }
++    fn vectors() -> Self {
++        Self::from_fixture(
++            "vectors-models.json",
++            "bfe0d5e18746ad103cc4aac5d75d90cce3eb01ad64e767f7f108f51d1ca6ee24",
++            "vectors-inputs.bin",
++            "69dc2175a31be9be8f28d8cfaa875ab99943071378740f9372079c1eff8184db",
++        )
++    }
++    fn from_fixture(
++        document_name: &str,
++        document_hash: &str,
++        input_name: &str,
++        input_hash: &str,
++    ) -> Self {
++        static NEXT: AtomicU64 = AtomicU64::new(0);
++        let document = document(document_name, document_hash);
++        let data = pinned(input_name, input_hash);
++        let root = std::env::temp_dir().join(format!(
++            "rust-llama-qwen3-{}-{}-{}",
++            std::process::id(),
++            SystemTime::now()
++                .duration_since(UNIX_EPOCH)
++                .unwrap()
++                .as_nanos(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ));
++        fs::create_dir(&root).unwrap();
++        for record in array(field(&document, "files")) {
++            let relative = Path::new(string(field(record, "path")));
++            assert!(
++                relative
++                    .components()
++                    .all(|c| matches!(c, Component::Normal(_)))
++            );
++            let start = number(field(record, "offset"));
++            let end = start.checked_add(number(field(record, "bytes"))).unwrap();
++            let bytes = &data[start..end];
++            assert_eq!(sha256(bytes), string(field(record, "sha256")));
++            let path = root.join(relative);
++            fs::create_dir_all(path.parent().unwrap()).unwrap();
++            fs::write(path, bytes).unwrap();
++        }
++        Self { root, document }
++    }
++    fn cases(&self) -> &[Value] {
++        array(field(&self.document, "cases"))
++    }
++    fn case(&self, name: &str) -> &Value {
++        self.cases()
++            .iter()
++            .find(|c| string(field(c, "name")) == name)
++            .unwrap()
++    }
++    fn paths(&self, case: &Value) -> Vec<PathBuf> {
++        array(field(case, "paths"))
++            .iter()
++            .map(|p| self.root.join(string(p)))
++            .collect()
++    }
++    fn load(&self, case: &Value) -> llama_inference::Result<Model> {
++        let paths = self.paths(case);
++        let options = LoadOptions {
++            context_length: 64,
++            ..LoadOptions::default()
++        };
++        if boolean(field(case, "explicit")) {
++            Model::load_from_splits_with_options(&paths, &options)
++        } else {
++            Model::load_with_options(&paths[0], &options)
++        }
++    }
++}
++impl Drop for Corpus {
++    fn drop(&mut self) {
++        let _ = fs::remove_dir_all(&self.root);
++    }
++}
++
++#[derive(Default)]
++struct Metrics {
++    floats: usize,
++    bitwise: usize,
++    greedy: usize,
++    rows: usize,
++    maximum: f64,
++    fraction: f64,
++}
++fn compare_row(row: &[f32], data: &[u8], offset: usize, label: &str, metrics: &mut Metrics) {
++    let raw = &data[offset..offset.checked_add(row.len() * 4).unwrap()];
++    for (index, (&actual, expected)) in row.iter().zip(raw.as_chunks::<4>().0).enumerate() {
++        let expected = f32::from_le_bytes(*expected);
++        let difference = (f64::from(actual) - f64::from(expected)).abs();
++        let budget = 2e-4 + 2e-5 * f64::from(expected).abs();
++        assert!(
++            actual.is_finite() && expected.is_finite() && difference <= budget,
++            "{label} col={index}: actual={actual:.9e} expected={expected:.9e} difference={difference:.9e} budget={budget:.9e}"
++        );
++        if cfg!(all(
++            target_arch = "x86_64",
++            any(
++                all(target_os = "windows", target_env = "msvc"),
++                all(target_os = "linux", target_env = "gnu")
++            )
++        )) {
++            assert_eq!(
++                actual.to_bits(),
++                expected.to_bits(),
++                "{label} col={index}: measured native profile must match exactly"
++            );
++        }
++        metrics.floats += 1;
++        metrics.bitwise += usize::from(actual.to_bits() == expected.to_bits());
++        metrics.maximum = metrics.maximum.max(difference);
++        metrics.fraction = metrics.fraction.max(difference / budget);
++    }
++    metrics.rows += 1;
++}
++fn check_model(model: &Model, reference: &Value, data: &[u8], label: &str, metrics: &mut Metrics) {
++    assert!(model.supports_generation());
++    assert!(!model.supports_embeddings());
++    assert_eq!(model.runtime_model().unwrap().architecture().name, "qwen3");
++    assert_eq!(model.vocabulary_size(), number(field(reference, "n_vocab")));
++    for case in array(field(reference, "cases")) {
++        let tokens = ids(field(case, "tokens"));
++        let prompt = string(field(case, "prompt"));
++        assert_eq!(
++            model
++                .tokenizer()
++                .tokenize(
++                    prompt,
++                    boolean(field(case, "add_special")),
++                    boolean(field(case, "parse_special"))
++                )
++                .unwrap(),
++            tokens,
++            "{label}"
++        );
++        for (index, &id) in tokens.iter().enumerate() {
++            for (special, name) in [(false, "pieces_hex"), (true, "pieces_special_hex")] {
++                assert_eq!(
++                    model.tokenizer().token_piece(id, special).unwrap(),
++                    decode_hex(string(&array(field(case, name))[index])),
++                    "{label} token {id}"
++                );
++            }
++        }
++        assert_eq!(
++            model
++                .tokenizer()
++                .detokenize_bytes(
++                    &tokens,
++                    boolean(field(reference, "detokenize_remove_special")),
++                    boolean(field(reference, "detokenize_unparse_special"))
++                )
++                .unwrap(),
++            decode_hex(string(field(case, "detokenized_hex"))),
++            "{label}"
++        );
++        let greedy = ids(field(case, "greedy_tokens"));
++        assert!(!greedy.is_empty());
++        let mut sequence = tokens.clone();
++        sequence.extend_from_slice(&greedy[..greedy.len() - 1]);
++        let actual = model.logits_for_tokens(&sequence).unwrap();
++        let prompt_rows = array(field(case, "prompt_rows"));
++        let greedy_rows = array(field(case, "greedy_rows"));
++        assert_eq!(prompt_rows.len(), tokens.len());
++        assert_eq!(greedy_rows.len(), greedy.len());
++        assert_eq!(number(prompt_rows.last().unwrap()), number(&greedy_rows[0]));
++        let expected_rows = prompt_rows.iter().chain(greedy_rows.iter().skip(1));
++        assert_eq!(actual.len(), prompt_rows.len() + greedy_rows.len() - 1);
++        for (row, offset) in actual.iter().zip(expected_rows) {
++            compare_row(row, data, number(offset), label, metrics);
++        }
++        for (step, &expected) in greedy.iter().enumerate() {
++            let row = &actual[tokens.len() - 1 + step];
++            let mut best = 0;
++            for i in 1..row.len() {
++                if row[i] > row[best] {
++                    best = i;
++                }
++            }
++            assert_eq!(best as i32, expected, "{label} greedy {step}");
++            assert_eq!(
++                model.tokenizer().token_piece(expected, false).unwrap(),
++                decode_hex(string(&array(field(case, "greedy_pieces_hex"))[step]))
++            );
++            metrics.greedy += 1;
++        }
++        let generated = decode_hex(string(field(case, "generated_hex")));
++        // Raw byte comparisons above remain exact for any piece; this string API
++        // deliberately uses its documented replacement semantics for invalid UTF-8.
++        let mut emitted = String::new();
++        let stats = model
++            .generate(
++                prompt,
++                &GenerationOptions {
++                    max_tokens: number(field(reference, "max_tokens")),
++                    ..GenerationOptions::default()
++                },
++                &|| false,
++                &mut |piece| {
++                    emitted.push_str(piece);
++                    true
++                },
++            )
++            .unwrap();
++        assert_eq!(
++            emitted,
++            String::from_utf8_lossy(&generated),
++            "{label} emitted"
++        );
++        assert_eq!(stats.prompt_tokens, tokens.len());
++        assert_eq!(stats.completion_tokens, greedy.len());
++        assert_eq!(
++            stats.finish_reason,
++            if boolean(field(case, "finished_eog")) {
++                FinishReason::Eos
++            } else {
++                FinishReason::Length
++            }
++        );
++    }
++}
++fn print_metrics(label: &str, metrics: &Metrics) {
++    eprintln!(
++        "qwen3-native: {label} host={} rows={} floats={} bitwise_equal={} greedy_ids={} maximum_absolute={:.9e} maximum_budget_fraction={:.9e}",
++        source_profile("msvc", "gnu"),
++        metrics.rows,
++        metrics.floats,
++        metrics.bitwise,
++        metrics.greedy,
++        metrics.maximum,
++        metrics.fraction
++    );
++}
++
++#[test]
++fn original_dense_qwen3_heads_norms_biases_storage_and_shards() {
++    let corpus = Corpus::new();
++    let reference = document(
++        source_profile("tiny-msvc-reference.json", "tiny-gnu-reference.json"),
++        source_profile(
++            "a928e0c5e8c8f8cec7448590c8c085384320ba45cf31709d3a44084b171735f5",
++            "6d484698728c52560dafab55714116e8885cff1b16c45ff5b309cd9a23417370",
++        ),
++    );
++    let values = values(&reference);
++    assert_eq!(corpus.cases().len(), 51);
++    let mut supported = 0;
++    let mut unsupported = 0;
++    let mut invalid = 0;
++    let mut numeric = 0;
++    let mut metrics = Metrics::default();
++    for case in corpus.cases() {
++        let name = string(field(case, "name"));
++        let native = array(field(&reference, "cases"))
++            .iter()
++            .find(|c| string(field(c, "name")) == name)
++            .unwrap();
++        let result = corpus.load(case);
++        match string(field(case, "rust_scope")) {
++            "supported" => {
++                let model = result.unwrap_or_else(|e| panic!("{name}: {e}"));
++                assert_eq!(field(native, "exit_code").as_i64(), Some(0));
++                check_model(
++                    &model,
++                    field(native, "reference"),
++                    &values,
++                    name,
++                    &mut metrics,
++                );
++                supported += 1;
++            }
++            "unsupported" => {
++                assert!(
++                    matches!(result, Err(Error::Unsupported(_))),
++                    "{name}: {result:?}"
++                );
++                unsupported += 1;
++            }
++            "invalid" => {
++                assert!(
++                    matches!(result, Err(Error::Invalid(_))),
++                    "{name}: {result:?}"
++                );
++                assert_ne!(field(native, "exit_code").as_i64(), Some(0));
++                invalid += 1;
++            }
++            "numeric-failure" => {
++                let model = result.unwrap();
++                let mut context =
++                    Context::new(model.runtime_model().unwrap(), ContextOptions::default())
++                        .unwrap();
++                let before = context.save_state().unwrap();
++                let result = context.decode_batch(&[BatchToken::token(0, 0, 1)]);
++                assert!(
++                    matches!(result, Err(llama_model_runtime::Error::NonFinite(_))),
++                    "{name}: {result:?}"
++                );
++                assert_eq!(context.save_state().unwrap(), before);
++                assert_eq!(context.reserved_state_bytes(), 0);
++                assert_ne!(field(native, "exit_code").as_i64(), Some(0));
++                numeric += 1;
++            }
++            other => panic!("unknown scope {other}"),
++        }
++    }
++    assert_eq!((supported, unsupported, invalid, numeric), (39, 8, 3, 1));
++    print_metrics(
++        "39 supported / 8 unsupported / 3 invalid / 1 nonfinite",
++        &metrics,
++    );
++}
++
++#[test]
++fn native_qwen3_weight_and_context_boundaries_are_checked_before_execution() {
++    let corpus = Corpus::new();
++    let paths = corpus.paths(corpus.case("fused-q4-k-metadata-first-explicit"));
++    let set = GgufSet::open_splits(&paths).unwrap();
++    assert_eq!(set.shard_info(0).unwrap().tensor_count, 0);
++    let decoded = usize::try_from(set.tensor_elements()).unwrap() * 4;
++    let options = LoadOptions {
++        max_decoded_weight_bytes: decoded - 1,
++        context_length: 64,
++    };
++    assert!(
++        matches!(Model::load_from_gguf(set, &options), Err(Error::Invalid(message)) if message.contains("decoded model requires"))
++    );
++    let mut options = options;
++    options.max_decoded_weight_bytes = decoded;
++    options.context_length = 0;
++    assert!(matches!(
++        Model::load_from_splits_with_options(&paths, &options),
++        Err(Error::Invalid(_))
++    ));
++    options.context_length = 2;
++    let model = Model::load_from_splits_with_options(&paths, &options).unwrap();
++    assert_eq!(model.decoded_weight_bytes(), decoded);
++    assert_eq!(model.context_length(), 2);
++    assert!(matches!(
++        model.logits_for_tokens(&[1, 2, 3]),
++        Err(Error::Invalid(_))
++    ));
++    assert!(matches!(
++        model.logits_for_tokens(&[-1]),
++        Err(Error::Invalid(_))
++    ));
++    assert!(matches!(
++        model.logits_for_tokens(&[512]),
++        Err(Error::Invalid(_))
++    ));
++    assert!(matches!(
++        model.embed("Hello", None, &|| false),
++        Err(Error::Unsupported(_))
++    ));
++}
++
++#[test]
++#[ignore = "requires pinned official Qwen3-0.6B Q8_0 model via LLAMA_TEST_QWEN3_MODEL and 3 GiB decoded weight budget"]
++fn official_qwen3_q8_matches_original_native_profile() {
++    let path = std::env::var_os("LLAMA_TEST_QWEN3_MODEL").expect("set LLAMA_TEST_QWEN3_MODEL");
++    let reference = document(
++        source_profile(
++            "pretrained-msvc-reference.json",
++            "pretrained-gnu-reference.json",
++        ),
++        source_profile(
++            "e0a466acda2e6ab476112e6c300a2a6cc65cc680dd40babd5e730c966a2a3601",
++            "29e14fc25d406e8cc40f80a6a3147f41b1cd9f2d3c862f9f2557f384632cf3fa",
++        ),
++    );
++    let (bytes, hash) = hash_reader(File::open(&path).unwrap()).unwrap();
++    assert_eq!(bytes, field(&reference, "model_bytes").as_u64().unwrap());
++    assert_eq!(hash, string(field(&reference, "model_sha256")));
++    assert!(matches!(Model::load_with_options(&path, &LoadOptions {
++        context_length: 128, ..LoadOptions::default()
++    }), Err(Error::Invalid(message)) if message.contains("decoded model requires")));
++    let model = Model::load_with_options(
++        path,
++        &LoadOptions {
++            max_decoded_weight_bytes: number(field(&reference, "decoded_weight_budget")),
++            context_length: number(field(&reference, "n_ctx")),
++        },
++    )
++    .unwrap();
++    let values = values(&reference);
++    let mut metrics = Metrics::default();
++    check_model(&model, &reference, &values, "Qwen3-0.6B-Q8_0", &mut metrics);
++    assert_eq!(metrics.floats, 5_469_696);
++    assert_eq!(metrics.greedy, 24);
++    print_metrics("official Qwen3-0.6B Q8_0", &metrics);
++}
++
++// Rewriting these files constructs malformed input, never expected numeric
++// output. The unchanged baseline bytes are pinned original-writer fixtures.
++#[test]
++fn qwen3_typed_metadata_and_unsupported_arrays_are_explicit() {
++    use llama_gguf::{Gguf, TensorData, Value as Metadata, write};
++    use std::collections::BTreeMap;
++    let corpus = Corpus::new();
++    let original = corpus.paths(corpus.case("separate-bias-0")).remove(0);
++    let mut gguf = Gguf::open(original).unwrap();
++    let descriptors = gguf.tensors.clone();
++    let payloads: Vec<_> = descriptors
++        .iter()
++        .map(|d| gguf.read_tensor(&d.name).unwrap())
++        .collect();
++    let tensors: Vec<_> = descriptors
++        .iter()
++        .zip(&payloads)
++        .map(|(d, data)| TensorData {
++            name: &d.name,
++            dimensions: &d.dimensions,
++            dtype: d.dtype,
++            data,
++        })
++        .collect();
++    let mut index = 0usize;
++    let mut check = |key: &str, value: Option<Metadata>, unsupported: bool| {
++        let mut metadata: BTreeMap<_, _> = gguf.metadata.clone();
++        if let Some(value) = value {
++            metadata.insert(key.into(), value);
++        } else {
++            assert!(metadata.remove(key).is_some(), "missing original {key}");
++        }
++        index += 1;
++        let path = corpus.root.join(format!("modified-{index}.gguf"));
++        write(File::create(&path).unwrap(), &metadata, &tensors).unwrap();
++        let result = Model::load(path);
++        if unsupported {
++            assert!(
++                matches!(result, Err(Error::Unsupported(_))),
++                "{key}: {result:?}"
++            );
++        } else {
++            assert!(
++                matches!(result, Err(Error::Invalid(_))),
++                "{key}: {result:?}"
++            );
++        }
++    };
++    for key in [
++        "qwen3.block_count",
++        "qwen3.context_length",
++        "qwen3.embedding_length",
++        "qwen3.feed_forward_length",
++        "qwen3.attention.head_count",
++    ] {
++        check(key, None, false);
++        for value in [
++            Metadata::U32(0),
++            Metadata::U8(4),
++            Metadata::U16(4),
++            Metadata::U64(4),
++            Metadata::I32(4),
++        ] {
++            check(key, Some(value), false);
++        }
++    }
++    check("qwen3.attention.layer_norm_rms_epsilon", None, false);
++    for (key, value) in [
++        ("qwen3.block_count", Metadata::U32(513)),
++        ("qwen3.attention.head_count_kv", Metadata::U32(0)),
++        ("qwen3.attention.head_count_kv", Metadata::U32(3)),
++        ("qwen3.attention.key_length", Metadata::U32(0)),
++        ("qwen3.attention.key_length", Metadata::U32(3)),
++        ("qwen3.attention.key_length", Metadata::U64(32)),
++        ("qwen3.attention.value_length", Metadata::U64(32)),
++        ("qwen3.attention.layer_norm_rms_epsilon", Metadata::F32(0.0)),
++        (
++            "qwen3.attention.layer_norm_rms_epsilon",
++            Metadata::F32(f32::NAN),
++        ),
++        (
++            "qwen3.attention.layer_norm_rms_epsilon",
++            Metadata::F64(1e-5),
++        ),
++        ("qwen3.attention.causal", Metadata::U32(1)),
++        ("qwen3.rope.freq_base", Metadata::F32(0.0)),
++        ("qwen3.rope.freq_base", Metadata::F64(10000.0)),
++        ("qwen3.pooling_type", Metadata::F32(0.0)),
++    ] {
++        check(key, Some(value), false);
++    }
++    for key in [
++        "qwen3.attention.head_count",
++        "qwen3.attention.head_count_kv",
++        "qwen3.feed_forward_length",
++    ] {
++        check(
++            key,
++            Some(Metadata::Array {
++                element_type: 4,
++                values: vec![Metadata::U32(4); 2],
++            }),
++            true,
++        );
++    }
++    for (key, value) in [
++        ("qwen3.pooling_type", Metadata::U32(1)),
++        ("qwen3.attention.sliding_window", Metadata::U32(4)),
++        ("qwen3.expert_count", Metadata::U32(4)),
++        ("qwen3.rope.scaling.attn_factor", Metadata::F32(0.5)),
++        ("general.type", Metadata::String("adapter".into())),
++        ("qwen3.nextn_predict_layers", Metadata::U32(1)),
++        ("prism.hadamard.version", Metadata::U32(1)),
++    ] {
++        check(key, Some(value), true);
++    }
++}
++
++#[test]
++fn original_active_vector_storage_and_ignored_fused_bias_types() {
++    let corpus = Corpus::vectors();
++    let reference = document(
++        source_profile("vectors-msvc-reference.json", "vectors-gnu-reference.json"),
++        source_profile(
++            "744bb855ae30eb200c1fc7004dc4e4cc1c358dd784ee826a8f43ee18bfbee605",
++            "605bee2d26918a939b4186c0b6cb21b777d810f164c7b261970980cd3b50b310",
++        ),
++    );
++    let values = values(&reference);
++    assert_eq!(corpus.cases().len(), 17);
++    let mut supported = 0;
++    let mut rejected = 0;
++    let mut mismatches = Vec::new();
++    let mut metrics = Metrics::default();
++    for case in corpus.cases() {
++        let name = string(field(case, "name"));
++        let native = array(field(&reference, "cases"))
++            .iter()
++            .find(|c| string(field(c, "name")) == name)
++            .unwrap();
++        let result = corpus.load(case);
++        if string(field(case, "rust_scope")) == "supported" {
++            assert_eq!(field(native, "exit_code").as_i64(), Some(0));
++            let model = result.unwrap_or_else(|error| panic!("{name}: {error}"));
++            check_model(
++                &model,
++                field(native, "reference"),
++                &values,
++                name,
++                &mut metrics,
++            );
++            supported += 1;
++        } else {
++            assert_ne!(field(native, "exit_code").as_i64(), Some(0));
++            match result {
++                Err(Error::Unsupported(_)) => rejected += 1,
++                Ok(_) => mismatches.push(format!("{name}: incorrectly admitted")),
++                Err(error) => mismatches.push(format!("{name}: {error}")),
++            }
++        }
++    }
++    print_metrics(
++        "active vector storage / ignored partial fused biases",
++        &metrics,
++    );
++    assert!(
++        mismatches.is_empty(),
++        "native vector storage boundaries: {mismatches:?}"
++    );
++    assert_eq!((supported, rejected), (5, 12));
++    assert_eq!(metrics.floats, 15_360);
++    assert_eq!(metrics.greedy, 10);
++}
+--- /dev/null
++++ b/docs/QWEN3_IMPLEMENTATION.md
+@@ -0,0 +1,70 @@
++# Dense causal Qwen3 implementation
++
++This is a bounded CPU implementation of the dense Qwen3 language-model graph in the frozen llama.cpp source archive. It adds Qwen3 to the Rust inference facade and strict transactional Context. It does not close the full architecture, backend, application or full-port requirements.
++
++## Source and model identity
++
++The source oracle is the user's frozen archive, SHA-256 `2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122`. The graph follows `src/models/qwen3.cpp`, the shared `create_tensor_qkv` loading rules, and the original CPU operators. The existing upstream license and notice apply to this translation.
++
++The pretrained reference is the official [Qwen/Qwen3-0.6B-GGUF](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/tree/23749fefcc72300e3a2ad315e1317431b06b590a) file `Qwen3-0.6B-Q8_0.gguf`, pinned to revision `23749fefcc72300e3a2ad315e1317431b06b590a`. Its 639,446,688 bytes have SHA-256 `9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031`. The exact Apache-2.0 license from that revision is preserved in `fixtures/inference/qwen3/LICENSE.Qwen3.txt`. Downloaded pretrained weights remain external to the repository.
++
++## Graph contracts
++
++`Qwen3Config` represents head width independently from embedding width. Query width is `heads * head_dim`; key/value width is `kv_heads * head_dim`. The model therefore supports the official configuration with embedding width 1,024, 16 query heads and head dimension 128: its query projection width is 2,048. Shapes, grouping, integer products and finite configuration values are checked before execution.
++
++Each query and key head is normalized with its learned RMS vector before full-head NeoX RoPE. The attention output projection maps the query width back to embedding width. The graph retains the frozen RMS, matrix, attention and SiLU arithmetic profiles; it does not substitute Qwen2's configuration or omit Q/K normalization.
++
++Separate Q/K/V projections apply each present bias independently. A fused QKV projection uses its own bias when present. When the fused bias is absent, the original graph applies separate Q/K/V biases only if all three exist. Partial bias groups in that fused case remain inactive. Tied and untied output projections are supported.
++
++Active normalization vectors and biases require F32 storage in this CPU graph. The original GGML binary operation keeps the F32 activation as its first operand and does not support a low-precision second operand for these operations. The loader checks active descriptors before weight decoding. Inactive partial fused bias groups retain their original acceptance behavior; the loader still validates their shapes and ownership.
++
++The loader uses the validated `GgufSet` owner, primary-shard metadata and per-shard tensor offsets. Auto-discovered and explicit split lists are covered, including a first shard containing metadata and no tensors. No metadata from later shards is merged into the primary metadata.
++
++## State and resource behavior
++
++The strict Context uses the actual Qwen3 KV width for growth, truncation, sequence copying and serialized state. Its model fingerprint includes the Qwen3 graph tag, head dimension, Q/K normalization vectors, biases and matrix storage identities. Checkpoints and restored states cannot silently cross different Qwen3 model identities.
++
++Cancellation, allocation failures and nonfinite execution leave the committed batch state unchanged. The existing explicit default 1 GiB state payload/copy budget remains a per-context ledger, not a total-process memory cap. It excludes execution scratch, output buffers, allocator overhead and caller-owned serialized input.
++
++The inference facade's default decoded-weight budget remains 2 GiB. The pinned pretrained model needs 2,384,199,680 decoded-weight bytes, so its test explicitly requests a 3 GiB budget. A normal default-budget load is required to reject it before weight decoding. Requested test context sizes are 64 for synthetic models and 128 for the pretrained model; the original runtime may pad its physical allocation.
++
++## Independent regressions
++
++Both expected profiles were captured through the original C/C++ library before Rust comparisons. They are selected by the independently compiled target, not by a runtime option. The compact fixtures retain exact input GGUF bytes, input hashes, original token IDs and pieces, exit status, and round-trip F32 logits. Identical rows and identical input blobs are interned only after exact byte comparison. No expected numeric value is generated by the Rust implementation.
++
++| Corpus | Cases and checks |
++| --- | --- |
++| Dense graph and splits | 51 configurations: 39 admitted, 8 explicitly unsupported, 3 invalid, and 1 checked nonfinite execution. Admitted cases compare 279,552 logits and 390 greedy IDs per profile. |
++| Active vector storage | 17 configurations: 12 native rejection cases, an F32 control, and 4 valid ignored partial fused-bias cases. The valid cases compare 15,360 logits and 10 greedy IDs per profile. |
++| Official pretrained Q8_0 | Three prompts, 5,469,696 nonduplicated logits and 24 greedy IDs per profile. The complete tokenizer pieces, generated bytes and generation statistics are also checked. |
++
++The tiny graph corpus covers independent attention widths, MHA/MQA/GQA, an embedding width not divisible by head count, learned Q/K norms, all separate and fused partial-bias subsets, fused own bias, tied/untied outputs, F32/F16/Q4_0/Q4_K projection cases, and implicit key/value length defaults. Q8_0 projection execution is exercised by the pretrained model.
++
++The original Windows MSVC and Linux GNU profiles have separate expected data. The measured x86_64 targets enforce exact F32 bits, token IDs and piece bytes. Other targets retain the predeclared portable bound `2e-4 + 2e-5 * abs(reference)`; this is not evidence that unmeasured targets have been validated.
++
++The storage rejection regression preserves the initial Rust failure: it previously admitted all 12 active low-precision vector cases that the original CPU graph rejected. The targeted descriptor check closes that discrepancy. Native process failures are converted to checked Rust errors; no original transaction-rollback behavior is inferred from a native abort.
++
++Ordinary runtime tests additionally exercise cancellation at each boundary, multiple sequences, state reservations and copies, fork/truncate/serialization, changed-model identity rejection, late-batch nonfinite rollback and the existing allocation-fault tests with the Qwen3 model variant.
++
++Run ordinary checks:
++
++```sh
++cargo test --offline --locked -p llama-model-runtime -p llama-inference --all-targets
++cargo test --offline --locked --release -p llama-model-runtime -p llama-inference --all-targets
++```
++
++Set `LLAMA_TEST_QWEN3_MODEL` to the external pinned model and run the explicit pretrained test:
++
++```sh
++cargo test --offline --locked --release -p llama-inference --test qwen3 official_qwen3_q8_matches_original_native_profile -- --ignored --nocapture
++```
++
++The fixture test verifies the entire model hash before use. Provenance for the core and storage corpora is in `fixtures/inference/qwen3/provenance.json` and `vectors-provenance.json`.
++
++## Explicit remaining scope
++
++Per-layer dimension arrays, unequal key/value head lengths, partial or scaled RoPE, nonunit attention gain, noncausal attention, sliding-window attention, MoE, classifier/reranker and additional embedding projections are outside this slice and return explicit unsupported errors when encountered. Qwen3 MoE, VL, Next and other separate architectures remain separate port work.
++
++The broader C NativeContext execution path remains Llama-only; adding a Rust inference architecture does not imply C execution parity. GPU execution and the original scheduler's full batching behavior remain separate work. Existing chat-template handling does not establish full Qwen3 thinking, tool-use or Jinja parity.
++
++The new storage preflight is specific to the Qwen3 loader. It does not claim that every other architecture's active vector storage acceptance has been audited.

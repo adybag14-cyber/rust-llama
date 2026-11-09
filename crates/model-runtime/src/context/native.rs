@@ -1,4 +1,4 @@
-//! Frozen dense F32 KV memory semantics, separate from the strict Context API.
+//! Frozen dense F32/F16 KV memory semantics, separate from the strict Context API.
 //!
 //! Physical cache slots and pending copy/shift work are deliberately retained:
 //! native state bytes describe stored data and position metadata, and do not
@@ -10,8 +10,12 @@ use std::sync::Arc;
 #[path = "native_state.rs"]
 mod native_state;
 pub use native_state::NativeState;
+#[path = "native_kv.rs"]
+mod native_kv;
+pub use native_kv::NativeKvType;
+use native_kv::{KvBuffer, StoredKvLayer};
 
-/// Dense F32 compatibility cache configuration.
+/// Dense F32/F16 compatibility cache configuration.
 #[derive(Debug, Clone)]
 pub struct NativeContextOptions {
     pub context_tokens: usize,
@@ -49,15 +53,15 @@ fn copy_values<T: Copy>(source: &[T]) -> Result<Vec<T>> {
     result.extend_from_slice(source);
     Ok(result)
 }
-fn copy_layers(source: &[KvLayer]) -> Result<Vec<KvLayer>> {
+fn copy_layers(source: &[StoredKvLayer]) -> Result<Vec<StoredKvLayer>> {
     let mut result = Vec::new();
     result
         .try_reserve_exact(source.len())
         .map_err(|_| invalid("native layer allocation failed"))?;
     for layer in source {
-        result.push(KvLayer {
-            keys: copy_values(&layer.keys)?,
-            values: copy_values(&layer.values)?,
+        result.push(StoredKvLayer {
+            keys: layer.keys.try_clone()?,
+            values: layer.values.try_clone()?,
         });
     }
     Ok(result)
@@ -167,11 +171,11 @@ impl Cell {
 #[derive(Debug, Clone)]
 struct Stream {
     cells: Vec<Cell>,
-    layers: Vec<KvLayer>,
+    layers: Vec<StoredKvLayer>,
     head: usize,
 }
 
-/// Scalar implementation of the frozen Llama F32 memory contract.
+/// Scalar implementation of the frozen Llama F32/F16 memory contract.
 ///
 /// The strict Context type remains the safe sequential API. This compatibility
 /// executor owns physical cells, can retain holes and duplicate positions after
@@ -185,6 +189,8 @@ pub struct NativeContext {
     pending_copies: Vec<(usize, usize)>,
     capacity: usize,
     width: usize,
+    key_type: NativeKvType,
+    value_type: NativeKvType,
 }
 
 fn invalid(message: impl Into<String>) -> Error {
@@ -193,16 +199,19 @@ fn invalid(message: impl Into<String>) -> Error {
 fn range(p0: i32, p1: i32) -> (i32, i32) {
     (p0.max(0), if p1 < 0 { i32::MAX } else { p1 })
 }
-fn zeroes(count: usize) -> Result<Vec<f32>> {
-    let mut values = Vec::new();
-    values
-        .try_reserve_exact(count)
-        .map_err(|_| invalid("cache allocation failed"))?;
-    values.resize(count, 0.0);
-    Ok(values)
-}
 impl NativeContext {
+    /// Preserve the original safe F32/nonflash compatibility constructor.
     pub fn new(model: Arc<Model>, options: NativeContextOptions) -> Result<Self> {
+        Self::new_with_cache_types(model, options, NativeKvType::F32, NativeKvType::F32)
+    }
+    /// Select the source K/V element types independently. Attention remains
+    /// explicit nonflash: query and probability operands retain F32 precision.
+    pub fn new_with_cache_types(
+        model: Arc<Model>,
+        options: NativeContextOptions,
+        key_type: NativeKvType,
+        value_type: NativeKvType,
+    ) -> Result<Self> {
         if options.maximum_sequences == 0
             || options.maximum_sequences > 256
             || options.context_tokens == 0
@@ -247,7 +256,7 @@ impl NativeContext {
         let bytes = elements
             .checked_mul(llama.layer_count())
             .and_then(|n| n.checked_mul(streams))
-            .and_then(|n| n.checked_mul(8))
+            .and_then(|n| n.checked_mul(key_type.size() + value_type.size()))
             .ok_or_else(|| invalid("cache bytes overflow"))?;
         // A transactional copy is needed for fallible decode/state input. Bound
         // aggregate cache allocation before constructing any individual vector.
@@ -267,7 +276,7 @@ impl NativeContext {
                 n.checked_add(
                     streams
                         .checked_mul(llama.layer_count())?
-                        .checked_mul(std::mem::size_of::<KvLayer>())?,
+                        .checked_mul(std::mem::size_of::<StoredKvLayer>())?,
                 )
             })
             .ok_or_else(|| invalid("native descriptor accounting overflow"))?;
@@ -290,9 +299,9 @@ impl NativeContext {
                 .try_reserve_exact(llama.layer_count())
                 .map_err(|_| invalid("layer allocation failed"))?;
             for _ in 0..llama.layer_count() {
-                layers.push(KvLayer {
-                    keys: zeroes(elements)?,
-                    values: zeroes(elements)?,
+                layers.push(StoredKvLayer {
+                    keys: KvBuffer::new(key_type, elements)?,
+                    values: KvBuffer::new(value_type, elements)?,
                 });
             }
             let mut cells = Vec::new();
@@ -314,6 +323,8 @@ impl NativeContext {
             pending_copies: Vec::new(),
             capacity,
             width,
+            key_type,
+            value_type,
         })
     }
     fn storage_bytes(&self) -> Result<usize> {
@@ -333,19 +344,13 @@ impl NativeContext {
             bytes = bytes
                 .checked_add(stream.cells.capacity() * std::mem::size_of::<Cell>())
                 .and_then(|n| {
-                    n.checked_add(stream.layers.capacity() * std::mem::size_of::<KvLayer>())
+                    n.checked_add(stream.layers.capacity() * std::mem::size_of::<StoredKvLayer>())
                 })
                 .ok_or_else(|| invalid("native metadata accounting overflow"))?;
             for layer in &stream.layers {
                 bytes = bytes
-                    .checked_add(
-                        layer
-                            .keys
-                            .capacity()
-                            .checked_mul(4)
-                            .ok_or_else(|| invalid("key allocation overflow"))?,
-                    )
-                    .and_then(|n| n.checked_add(layer.values.capacity().checked_mul(4)?))
+                    .checked_add(layer.keys.capacity_bytes()?)
+                    .and_then(|n| n.checked_add(layer.values.capacity_bytes().ok()?))
                     .ok_or_else(|| invalid("native tensor accounting overflow"))?;
             }
         }
@@ -387,7 +392,15 @@ impl NativeContext {
             pending_copies: copy_values(&self.pending_copies)?,
             capacity: self.capacity,
             width: self.width,
+            key_type: self.key_type,
+            value_type: self.value_type,
         })
+    }
+    pub fn cache_types(&self) -> (NativeKvType, NativeKvType) {
+        (self.key_type, self.value_type)
+    }
+    pub fn values_are_transposed(&self) -> bool {
+        true
     }
     pub fn model(&self) -> &Arc<Model> {
         &self.model
@@ -452,8 +465,8 @@ impl NativeContext {
             stream.head = 0;
             if data {
                 for layer in &mut stream.layers {
-                    layer.keys.fill(0.0);
-                    layer.values.fill(0.0);
+                    layer.keys.clear();
+                    layer.values.clear();
                 }
             }
         }
@@ -628,8 +641,8 @@ impl NativeContext {
                 (&right[0], &mut left[destination])
             };
             for (from, to) in source.layers.iter().zip(&mut destination.layers) {
-                to.keys.copy_from_slice(&from.keys);
-                to.values.copy_from_slice(&from.values);
+                to.keys.copy_from(&from.keys)?;
+                to.values.copy_from(&from.values)?;
             }
         }
         self.pending_copies.clear();
@@ -644,18 +657,20 @@ impl NativeContext {
                     continue;
                 }
                 for layer in &mut stream.layers {
-                    let row = &mut layer.keys[index * self.width..(index + 1) * self.width];
-                    for head in row.chunks_exact_mut(head_dim) {
+                    let start = index * self.width;
+                    for head in (start..start + self.width).step_by(head_dim) {
                         let mut theta = cell.shift as f32;
-                        for pair in head.as_chunks_mut::<2>().0 {
+                        for pair in (head..head + head_dim).step_by(2) {
                             let (sin, cos) = theta.sin_cos();
-                            let (x, y) = (pair[0], pair[1]);
-                            pair[0] = x * cos - y * sin;
-                            pair[1] = x * sin + y * cos;
+                            let (x, y) = (layer.keys.get(pair), layer.keys.get(pair + 1));
+                            layer.keys.set(pair, x * cos - y * sin);
+                            layer.keys.set(pair + 1, x * sin + y * cos);
                             theta *= theta_scale;
                         }
                     }
-                    math::finite(row, "shifted native keys")?;
+                    if (start..start + self.width).any(|index| !layer.keys.get(index).is_finite()) {
+                        return Err(Error::NonFinite("shifted native keys".into()));
+                    }
                 }
                 cell.shift = 0;
             }
@@ -962,12 +977,9 @@ impl NativeContext {
                         .try_reserve_exact(count)
                         .map_err(|_| invalid("native visible value allocation failed"))?;
                     for &index in &visible {
-                        keys.extend_from_slice(
-                            &layer.keys[index * staged.width..(index + 1) * staged.width],
-                        );
-                        values.extend_from_slice(
-                            &layer.values[index * staged.width..(index + 1) * staged.width],
-                        );
+                        let range = index * staged.width..(index + 1) * staged.width;
+                        layer.keys.extend_f32(range.clone(), &mut keys);
+                        layer.values.extend_f32(range, &mut values);
                     }
                     cache.push(KvLayer { keys, values });
                 }
@@ -988,18 +1000,19 @@ impl NativeContext {
                     &mut cache,
                     insert,
                     layout,
+                    (staged.key_type, staged.value_type),
                     &staged.adapters,
                     &mut cancelled,
                 )?;
                 for (source, destination) in cache.iter().zip(&mut staged.streams[stream].layers) {
-                    destination.keys[slot * staged.width..(slot + 1) * staged.width]
-                        .copy_from_slice(
-                            &source.keys[insert * staged.width..(insert + 1) * staged.width],
-                        );
-                    destination.values[slot * staged.width..(slot + 1) * staged.width]
-                        .copy_from_slice(
-                            &source.values[insert * staged.width..(insert + 1) * staged.width],
-                        );
+                    destination.keys.write_f32(
+                        slot * staged.width,
+                        &source.keys[insert * staged.width..(insert + 1) * staged.width],
+                    );
+                    destination.values.write_f32(
+                        slot * staged.width,
+                        &source.values[insert * staged.width..(insert + 1) * staged.width],
+                    );
                 }
                 if item.output != OutputSelection::None {
                     outputs.push(TokenOutput {
@@ -1041,7 +1054,7 @@ impl NativeContext {
     ) -> Result<usize> {
         native_state::decode(self, bytes, sequence, flags, Some(tensors))
     }
-    /// Source-format bytes for dense F32 memory; separate from Context::save_state.
+    /// Source-format bytes for typed dense memory; separate from Context::save_state.
     /// Pending copy/shift tasks are intentionally not serialized by that format.
     pub fn save_native_state(&self, sequence: Option<i32>, flags: u32) -> Result<Vec<u8>> {
         Ok(native_state::encode(self, sequence, flags)?.bytes)
@@ -1060,6 +1073,12 @@ impl NativeContext {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn address(buffer: &KvBuffer) -> usize {
+        match buffer {
+            KvBuffer::F32(v) => v.as_ptr().addr(),
+            KvBuffer::F16(v) => v.as_ptr().addr(),
+        }
+    }
     fn context(unified: bool) -> NativeContext {
         NativeContext::new(
             Arc::new(Model::Llama(crate::fixtures::tiny_llama().unwrap())),
@@ -1090,8 +1109,10 @@ mod tests {
         let mut context = context(false);
         for (index, stream) in context.streams.iter_mut().enumerate() {
             for layer in &mut stream.layers {
-                layer.keys.fill(index as f32);
-                layer.values.fill((index + 10) as f32);
+                for at in 0..layer.keys.len() {
+                    layer.keys.set(at, index as f32);
+                    layer.values.set(at, (index + 10) as f32);
+                }
             }
         }
         let pointers: Vec<_> = context
@@ -1101,7 +1122,7 @@ mod tests {
                 stream
                     .layers
                     .iter()
-                    .map(|layer| (layer.keys.as_ptr(), layer.values.as_ptr()))
+                    .map(|layer| (address(&layer.keys), address(&layer.values)))
             })
             .collect();
         context.copy_range(2, 0, -1, -1).unwrap();
@@ -1110,8 +1131,8 @@ mod tests {
         context.apply_pending().unwrap();
         for stream in &context.streams {
             for layer in &stream.layers {
-                assert!(layer.keys.iter().all(|f| *f == 2.0));
-                assert!(layer.values.iter().all(|f| *f == 12.0));
+                assert!((0..layer.keys.len()).all(|index| layer.keys.get(index) == 2.0));
+                assert!((0..layer.values.len()).all(|index| layer.values.get(index) == 12.0));
             }
         }
         let after: Vec<_> = context
@@ -1121,7 +1142,7 @@ mod tests {
                 stream
                     .layers
                     .iter()
-                    .map(|layer| (layer.keys.as_ptr(), layer.values.as_ptr()))
+                    .map(|layer| (address(&layer.keys), address(&layer.values)))
             })
             .collect();
         assert_eq!(pointers, after);
@@ -1229,6 +1250,74 @@ mod tests {
                         .len()
                 );
             }
+        }
+    }
+    #[test]
+    fn native_half_state_preserves_raw_payloads_and_rejects_wrong_storage_type_atomically() {
+        let model = Arc::new(Model::Llama(crate::fixtures::tiny_llama().unwrap()));
+        let Model::Llama(llama) = model.as_ref() else {
+            unreachable!()
+        };
+        let width = llama.config().kv_width().unwrap();
+        let options = NativeContextOptions {
+            context_tokens: 65_536usize.div_ceil(width),
+            maximum_sequences: 1,
+            microbatch_tokens: 1,
+            maximum_batch_tokens: 1,
+            unified: true,
+        };
+        let mut original = NativeContext::new_with_cache_types(
+            model.clone(),
+            options.clone(),
+            NativeKvType::F16,
+            NativeKvType::F16,
+        )
+        .unwrap();
+        for (position, cell) in original.streams[0].cells.iter_mut().enumerate() {
+            *cell = Cell {
+                position: position as i32,
+                shift: 0,
+                sequences: [0].into_iter().collect(),
+            };
+        }
+        for layer in &mut original.streams[0].layers {
+            for index in 0..layer.keys.len() {
+                layer.keys.set_bits(index, (index & 0xffff) as u32);
+                layer.values.set_bits(index, ((!index) & 0xffff) as u32);
+            }
+        }
+        let bytes = original.save_native_state(None, 0).unwrap();
+        let mut restored = NativeContext::new_with_cache_types(
+            model.clone(),
+            options.clone(),
+            NativeKvType::F16,
+            NativeKvType::F16,
+        )
+        .unwrap();
+        assert_eq!(
+            restored.restore_native_state(&bytes, None, 0).unwrap(),
+            bytes.len()
+        );
+        assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
+        let device = original.prepare_native_state(Some(0), 2).unwrap();
+        restored.clear(true);
+        restored
+            .restore_native_state_with_tensors(&device.bytes, Some(0), 2, &device.tensors)
+            .unwrap();
+        assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
+        // A type mismatch cannot reinterpret two-byte payloads as F32 or
+        // commit the already parsed metadata in the transactional executor.
+        let mut wrong = NativeContext::new(model, options).unwrap();
+        let before = wrong.save_native_state(None, 0).unwrap();
+        assert!(wrong.restore_native_state(&bytes, None, 0).is_err());
+        assert_eq!(wrong.save_native_state(None, 0).unwrap(), before);
+        for cut in [0, 4, 8, 16, bytes.len() / 2, bytes.len() - 1] {
+            assert!(
+                restored
+                    .restore_native_state(&bytes[..cut], None, 0)
+                    .is_err()
+            );
+            assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
         }
     }
 }

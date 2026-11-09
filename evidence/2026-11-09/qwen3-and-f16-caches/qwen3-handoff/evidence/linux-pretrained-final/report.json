@@ -1,0 +1,41 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "label": "linux-pretrained-final",
+  "mode": "pretrained",
+  "input_count": 255,
+  "input_inventory_sha256": "cec43eb6725ac35faef96170a0d0c78afc94caefd5d1d0e687d65cc94a924f4d",
+  "steps": [
+    {
+      "name": "pretrained-release",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-inference",
+        "--test",
+        "qwen3",
+        "official_qwen3_q8_matches_original_native_profile",
+        "--",
+        "--ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 32.94397396200293,
+      "log_sha256": "c4a5a4065b0bf789e6418eae1be05f61a3d66a8dc033462d5fc4915cbcca8783",
+      "test_counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": [
+        "test official_qwen3_q8_matches_original_native_profile ... qwen3-native: official Qwen3-0.6B Q8_0 host=gnu rows=36 floats=5469696 bitwise_equal=5469696 greedy_ids=24 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+      ]
+    }
+  ],
+  "inputs_unchanged": true,
+  "all_requested_steps_passed": true
+}

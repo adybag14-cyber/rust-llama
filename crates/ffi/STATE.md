@@ -1,6 +1,6 @@
-# Dense F32 native memory and state compatibility
+# Dense F32/F16 native memory and state compatibility
 
-This slice implements the frozen Llama dense F32 cache contract through
+This slice implements the frozen Llama dense F32/F16 cache contract through
 llama-model-runtime::NativeContext and 28 memory/state/session C exports.
 It is separate from the safe sequential Context API, its checkpoints, and its
 versioned Rust state format. No original C/C++ object is linked into the product.
@@ -31,8 +31,10 @@ length. Deferred copies execute in queue order using existing destination
 storage. Deferred shifts run after copies. seq_div retains the source's
 old_position - divided_position accumulated shift.
 
-Only causal dense Llama F32 keys and values are implemented in NativeContext.
-F16/quantized, recurrent/hybrid, SWA and GPU caches remain open. Duplicate
+Causal dense Llama supports independent F32/F16 keys and values in NativeContext
+through new_with_cache_types. The existing new constructor and strict Context
+remain F32. This slice requires explicit nonflash execution and one worker;
+AUTO/ENABLED flash, quantized, recurrent/hybrid, SWA and GPU caches remain open. Duplicate
 positions within one submitted batch require batched layer execution and return
 a diagnostic. Shared-token input is supported in unified mode; coupled input in
 separate mode is not implemented.
@@ -41,7 +43,7 @@ separate mode is not implemented.
 
 | Surface | Frozen encoding |
 |---|---|
-| Full raw state | Architecture string, then stream count, occupied-cell metadata and F32 tensor data. |
+| Full raw state | Architecture string, then stream count, occupied-cell metadata and typed F32/F16 tensor data. |
 | Sequence raw state | 0xaf143cd8, source sequence ID, then selected memory metadata/data. |
 | Full session file | Magic 0x6767736e, version 11, prompt count/IDs, then full raw state. |
 | Sequence session file | Magic 0x67677371, version 4, prompt count/IDs, then selected memory without the raw sequence-I/O prefix. |
@@ -49,8 +51,11 @@ separate mode is not implemented.
 Integer fields are little-endian on tested x64 platforms. Occupied cells
 serialize in physical order. Keys use native row order; values use the frozen
 transposed dimension/cell order. Type, element size, width and layer headers are
-validated before restoration. Raw float bits, including nonfinite payloads,
-are preserved; numerical execution applies separate finite checks.
+validated before restoration and must match the context's independent key/value
+types. F32 data uses four-byte elements; F16 data uses two-byte elements and raw
+u16 storage. Copies, transposition, deferred tensor copies and serialization
+preserve every bit, including signaling NaN payloads. Numerical evaluation alone
+widens and rounds half values according to the source operation.
 
 Size queries calculate the result without constructing a serialized buffer.
 Save operations reproduce original write-chunk boundaries: an insufficient
@@ -96,7 +101,10 @@ ordinary regressions cover these side effects.
 Per-cell membership uses a fixed 32-byte bitset, with no allocation per ID.
 Constructor and transaction checks account for cache tensors, cells, staged
 copies, outputs and temporary state buffers under a two-GiB working budget.
-Large vectors reserve fallibly. Pending tensor copies reuse destination
+Resident storage is charged using each K/V type's actual element size; gathered
+computation remains charged for F32 values even when resident storage is half.
+Restore includes the transaction copy, typed layer copies, descriptors, input
+bytes and temporary transposed V storage. Large vectors reserve fallibly. Pending tensor copies reuse destination
 allocations. CPU-owned snapshots additionally have a one-GiB aggregate storage
 limit. These are explicit implementation limits, not native maximum-size or
 performance claims.
@@ -119,29 +127,38 @@ can retain completed microbatches, so that behavior is outside current parity.
 
 ## Independent validation
 
-The external C++ harness includes the untouched original llama.h and loads the
-original and Rust libraries in separate captures. It exercises the trained
-stories260K model and a small deterministic GGUF with 512 vocabulary entries,
-two dense layers, biases and grouped-query attention. The synthetic model has
-no text-quality claim.
+The external harness includes the frozen llama.h and loads the original and
+Rust libraries in separate captures. Explicit nonflash, single-worker execution
+was compared for all four K/V dtype pairs on both original platform profiles,
+using stories260K and the small deterministic 512-token-vocabulary GGUF. The
+synthetic model has no text-quality claim.
 
-Each model/profile covers 40 memory scenarios, 40 sequence-state/flag scenarios,
-two session suites and 96 short-buffer cases. Its 130 binary artifacts total
-1,329,186 bytes for the trained model and 58,890 for the synthetic model.
-Ordinary tests use committed synthetic expected bytes from independent Windows
-and GNU captures and require original raw restore/reserialize identity on both.
+The ordinary typed-cache replay commits the tiny-model cohort. Per profile it
+covers 160 memory scenarios, 160 sequence-state/flag scenarios, eight session
+suites and 384 short-buffer cases. It compares 258,048 continuation logit words
+and 1,048 state/partial-output buffers totaling 290,328 bytes exactly.
+Every original raw state also restores and reserializes identically before
+evaluation. The 520 original binary artifacts per profile and repeated logit
+rows are stored in a shared lossless byte pool; reconstruction is checked
+against the original hashes. Provenance is in
+fixtures/ffi/f16-context-provenance.json.
 
-Windows generated state data and continuations match bitwise. GNU defines
-__SSE2__ and selects the source vector exponential for SiLU/softmax; the MSVC
-reference uses scalar expf. Both source F32 dot paths use scalar products with
-F64 accumulation. Linux generated float checks retain the established
-2e-4 + 2e-5 * abs(reference) bound. Metadata, IDs, sizes, write boundaries and
-sentinels remain exact. Observed debug maxima were 5.7220458984375e-6 for the
-trained cohort and 1.1920928955078125e-7 for the synthetic cohort. Actual build
-flags, per-profile results and source hashes are recorded under
-evidence/2026-11-09/native-context.
+F32/F32 remains in the typed corpus as a control, and prior F32 tests/budgets
+are unchanged. Earlier native-context evidence records its original
+2e-4 + 2e-5 * abs(reference) GNU bound and initial drift before shared compiler
+profile arithmetic was integrated. Those historical reports remain preserved.
+The new typed cohort compares to its independently captured MSVC or GNU source
+profile bitwise; it does not widen an earlier bound or substitute generated
+Rust expectations.
 
-The preserved core C harness still checks 69 layout entries, every default
-field and 93,248 trained-model values. The full sampler/context corpus also
-passes. These results establish this subset and do not complete every frozen
-export or native cache architecture.
+All 65,536 F16 bit patterns also pass raw storage/state preservation tests,
+including type-mismatch and truncation rejection without mutation. A separate
+original graph corpus checks the F16-by-F32 KQ/PV matmul layouts: 125 cases and
+245,154 output values per host, including strided views and physical padding.
+Explicitly half-rounding the F32 right operand changes 239,587 native output
+values, so storage type is not used to invent an operand conversion.
+
+The original default parameter structure is unchanged and requests AUTO flash
+attention and four workers. Those settings remain rejected; this slice does
+not claim successful untouched default-context initialization, native flash
+dispatch, recurrent cache parity or full frozen-ABI completion.

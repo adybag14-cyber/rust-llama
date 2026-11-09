@@ -1,0 +1,467 @@
+//! Transactional multi-sequence execution with explicit microbatch boundaries.
+use crate::{
+    AdapterSet, Error, Model, Result, check_positive, llama::KvLayer, mamba::RecurrentLayer, math,
+};
+use std::sync::Arc;
+pub(crate) mod owned;
+use owned::{MemoryShape, PlanEntry, StateBudget, StateStorage};
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Input {
+    Token(u32),
+    Embedding(Vec<f32>),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OutputSelection {
+    None,
+    Logits,
+    Embedding,
+    Both,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BatchToken {
+    pub sequence: i32,
+    pub position: usize,
+    pub input: Input,
+    pub output: OutputSelection,
+}
+impl BatchToken {
+    pub fn token(sequence: i32, position: usize, token: u32) -> Self {
+        Self {
+            sequence,
+            position,
+            input: Input::Token(token),
+            output: OutputSelection::Both,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TokenOutput {
+    pub batch_index: usize,
+    pub sequence: i32,
+    pub position: usize,
+    pub logits: Option<Vec<f32>>,
+    pub embedding: Option<Vec<f32>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ContextOptions {
+    pub maximum_sequences: usize,
+    pub microbatch_tokens: usize,
+    pub maximum_batch_tokens: usize,
+    /// Maximum bytes reserved for strict-context state, state plans, staged
+    /// transactions, checkpoints and allocation-time serialized copies.
+    /// Includes sequence/layer record storage and F32 vector capacities. Model
+    /// weights, execution scratch, output logits, caller-owned serialized bytes,
+    /// allocator overhead and small control objects are outside this budget.
+    pub max_state_bytes: usize,
+}
+impl Default for ContextOptions {
+    fn default() -> Self {
+        Self {
+            maximum_sequences: 16,
+            microbatch_tokens: 32,
+            maximum_batch_tokens: 512,
+            max_state_bytes: 1024 * 1024 * 1024,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub(crate) enum SequenceMemory {
+    Attention(Vec<KvLayer>),
+    Recurrent(Vec<RecurrentLayer>),
+}
+#[derive(Debug, PartialEq)]
+pub(crate) struct SequenceState {
+    pub position: usize,
+    pub memory: SequenceMemory,
+}
+
+/// An owned checkpoint holds its state reservation until dropped. Creating or
+/// copying it is fallible, so retaining checkpoints cannot bypass the originating
+/// context state budget. The original context may be dropped before a checkpoint.
+#[derive(Debug)]
+pub struct ContextCheckpoint {
+    model_fingerprint: u64,
+    adapter_fingerprint: u64,
+    sequences: StateStorage,
+}
+
+impl ContextCheckpoint {
+    /// Make an independent owned copy within the originating state budget.
+    pub fn try_clone(&self) -> Result<Self> {
+        Ok(Self {
+            model_fingerprint: self.model_fingerprint,
+            adapter_fingerprint: self.adapter_fingerprint,
+            sequences: self.sequences.try_copy(self.sequences.budget())?,
+        })
+    }
+    pub fn state_bytes(&self) -> usize {
+        self.sequences.bytes()
+    }
+}
+
+#[derive(Debug)]
+pub struct Context {
+    pub(crate) model: Arc<Model>,
+    pub(crate) options: ContextOptions,
+    pub(crate) adapters: AdapterSet,
+    pub(crate) sequences: StateStorage,
+    pub(crate) budget: Arc<StateBudget>,
+    generation: u64,
+}
+impl Context {
+    pub fn new(model: Arc<Model>, options: ContextOptions) -> Result<Self> {
+        check_positive(&[
+            ("maximum_sequences", options.maximum_sequences),
+            ("microbatch_tokens", options.microbatch_tokens),
+            ("maximum_batch_tokens", options.maximum_batch_tokens),
+        ])?;
+        if options.max_state_bytes == 0 {
+            return Err(Error::InvalidConfig(
+                "state byte budget must be nonzero".into(),
+            ));
+        }
+        let shape = MemoryShape::for_model(&model)?;
+        let budget = StateBudget::new(options.max_state_bytes);
+        let sequences = StateStorage::empty(&budget, shape);
+        Ok(Self {
+            model,
+            options,
+            adapters: AdapterSet::default(),
+            sequences,
+            budget,
+            generation: 0,
+        })
+    }
+    pub fn model(&self) -> &Arc<Model> {
+        &self.model
+    }
+    pub fn sequence_count(&self) -> usize {
+        self.sequences.len()
+    }
+    /// Resident strict-context state capacities, excluding separately held checkpoints.
+    pub fn state_bytes(&self) -> usize {
+        self.sequences.bytes()
+    }
+    /// Live reservations in this context's ledger, including its held checkpoints.
+    pub fn reserved_state_bytes(&self) -> usize {
+        self.budget.used()
+    }
+    pub fn peak_reserved_state_bytes(&self) -> usize {
+        self.budget.peak()
+    }
+    pub fn state_budget_bytes(&self) -> usize {
+        self.budget.limit()
+    }
+    pub fn next_position(&self, sequence: i32) -> Option<usize> {
+        self.sequences.get(&sequence).map(|s| s.position)
+    }
+    /// Changes when adapter configuration changes; use in future graph keys.
+    pub fn configuration_generation(&self) -> u64 {
+        self.generation
+    }
+    pub fn reset(&mut self) {
+        self.sequences = StateStorage::empty(&self.budget, self.sequences.shape);
+    }
+    pub fn remove_sequence(&mut self, sequence: i32) -> bool {
+        self.sequences
+            .remove(sequence)
+            .expect("removing validated state cannot increase its allocation")
+    }
+    pub fn fork_sequence(&mut self, source: i32, destination: i32) -> Result<()> {
+        if destination < 0 {
+            return Err(Error::InvalidSequence(destination));
+        }
+        if self.sequences.contains_key(&destination) {
+            return Err(Error::SequenceExists(destination));
+        }
+        if self.sequences.len() >= self.options.maximum_sequences {
+            return Err(Error::SequenceLimit {
+                maximum: self.options.maximum_sequences,
+            });
+        }
+        let position = self
+            .sequences
+            .get(&source)
+            .ok_or(Error::MissingSequence(source))?
+            .position;
+        let capacity = owned::add(self.sequences.len(), 1)?;
+        let mut plan = self.sequences.plan(capacity)?;
+        plan.push(PlanEntry {
+            id: destination,
+            source,
+            position,
+        })?;
+        plan.sort_and_check()?;
+        let staged = StateStorage::copied(
+            &self.budget,
+            self.sequences.shape,
+            &plan,
+            Some(&self.sequences),
+        )?;
+        self.sequences = staged;
+        Ok(())
+    }
+    /// Suffix truncation is exact for dense KV state. Retained vector capacities
+    /// remain charged until the next compacting transaction, removal or reset.
+    /// Recurrent state requires a checkpoint because an SSM update is not reversible.
+    pub fn truncate_sequence(&mut self, sequence: i32, position: usize) -> Result<()> {
+        let state = self
+            .sequences
+            .get_mut(&sequence)
+            .ok_or(Error::MissingSequence(sequence))?;
+        if position > state.position {
+            return Err(Error::InvalidPosition {
+                expected: state.position,
+                actual: position,
+            });
+        }
+        match (&self.model.as_ref(), &mut state.memory) {
+            (Model::Llama(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
+            (Model::Qwen2(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
+            (Model::Mamba(_), SequenceMemory::Recurrent(_)) => {
+                if position == state.position {
+                    Ok(())
+                } else {
+                    Err(Error::Unsupported(
+                        "arbitrary Mamba rewind; restore a ContextCheckpoint instead".into(),
+                    ))
+                }
+            }
+            _ => Err(Error::InvalidState("model/memory mismatch".into())),
+        }
+    }
+    pub fn checkpoint(&self) -> Result<ContextCheckpoint> {
+        Ok(ContextCheckpoint {
+            model_fingerprint: self.model.fingerprint(),
+            adapter_fingerprint: self.adapters.fingerprint(),
+            sequences: self.sequences.try_copy(&self.budget)?,
+        })
+    }
+    pub fn restore_checkpoint(&mut self, checkpoint: &ContextCheckpoint) -> Result<()> {
+        if checkpoint.model_fingerprint != self.model.fingerprint()
+            || checkpoint.adapter_fingerprint != self.adapters.fingerprint()
+        {
+            return Err(Error::InvalidState(
+                "checkpoint belongs to different model weights or adapters".into(),
+            ));
+        }
+        if checkpoint.sequences.len() > self.options.maximum_sequences {
+            return Err(Error::SequenceLimit {
+                maximum: self.options.maximum_sequences,
+            });
+        }
+        let replacement = checkpoint.sequences.try_copy(&self.budget)?;
+        self.sequences = replacement;
+        Ok(())
+    }
+    /// Explicitly clears existing state when replacing adapters. Changing an
+    /// adapter while retaining its old keys/values/SSM state would be incorrect.
+    pub fn replace_adapters_and_reset(&mut self, adapters: AdapterSet) -> Result<()> {
+        adapters.validate(&self.model)?;
+        let generation = self
+            .generation
+            .checked_add(1)
+            .ok_or_else(|| Error::InvalidConfig("adapter generation exhausted".into()))?;
+        self.adapters = adapters;
+        self.sequences = StateStorage::empty(&self.budget, self.sequences.shape);
+        self.generation = generation;
+        Ok(())
+    }
+    pub fn decode_batch(&mut self, batch: &[BatchToken]) -> Result<Vec<TokenOutput>> {
+        self.decode_batch_with_cancel(batch, || false)
+    }
+    /// The entire batch commits atomically after all its microbatches succeed.
+    /// Cancellation is checked before execution, each microbatch, token, layer
+    /// and commit. Failure returns no partial output and leaves state unchanged.
+    pub fn decode_batch_with_cancel(
+        &mut self,
+        batch: &[BatchToken],
+        mut cancelled: impl FnMut() -> bool,
+    ) -> Result<Vec<TokenOutput>> {
+        if batch.len() > self.options.maximum_batch_tokens {
+            return Err(Error::InvalidConfig(format!(
+                "batch of {} exceeds maximum {}",
+                batch.len(),
+                self.options.maximum_batch_tokens
+            )));
+        }
+        if cancelled() {
+            return Err(Error::Cancelled);
+        }
+        if batch.is_empty() {
+            return if cancelled() {
+                Err(Error::Cancelled)
+            } else {
+                Ok(Vec::new())
+            };
+        }
+        // Validate all sequence growth before making any state copy. The plan is
+        // itself charged and fallibly reserved; every destination has enough KV
+        // capacity for the complete batch before any layer executes.
+        let available = self.options.maximum_sequences - self.sequences.len();
+        let capacity = owned::add(self.sequences.len(), batch.len().min(available))?;
+        let mut plan = self.sequences.plan(capacity)?;
+        for item in batch {
+            if item.sequence < 0 {
+                return Err(Error::InvalidSequence(item.sequence));
+            }
+            let index = match plan
+                .entries
+                .binary_search_by_key(&item.sequence, |entry| entry.id)
+            {
+                Ok(index) => index,
+                Err(index) => {
+                    if plan.entries.len() >= self.options.maximum_sequences {
+                        return Err(Error::SequenceLimit {
+                            maximum: self.options.maximum_sequences,
+                        });
+                    }
+                    if plan.entries.len() == plan.entries.capacity() {
+                        return Err(Error::InvalidState(
+                            "sequence plan capacity exhausted".into(),
+                        ));
+                    }
+                    plan.entries.insert(
+                        index,
+                        PlanEntry {
+                            id: item.sequence,
+                            source: item.sequence,
+                            position: 0,
+                        },
+                    );
+                    index
+                }
+            };
+            let entry = &mut plan.entries[index];
+            if item.position != entry.position {
+                return Err(Error::InvalidPosition {
+                    expected: entry.position,
+                    actual: item.position,
+                });
+            }
+            if entry.position >= self.model.max_context() {
+                return Err(Error::ContextFull {
+                    maximum: self.model.max_context(),
+                });
+            }
+            match &item.input {
+                Input::Token(token) if *token as usize >= self.model.vocabulary() => {
+                    return Err(Error::InvalidToken {
+                        token: *token,
+                        vocabulary: self.model.vocabulary(),
+                    });
+                }
+                Input::Embedding(values) => {
+                    math::vector(values, self.model.width(), "external embedding")?
+                }
+                Input::Token(_) => {}
+            }
+            entry.position = owned::add(entry.position, 1)?;
+        }
+        let mut staged = StateStorage::copied(
+            &self.budget,
+            self.sequences.shape,
+            &plan,
+            Some(&self.sequences),
+        )?;
+        drop(plan);
+        // Result records are not persistent state, but their reserve is fallible too.
+        let mut outputs = owned::allocate(batch.len(), "batch result records")?;
+        for (chunk_index, chunk) in batch.chunks(self.options.microbatch_tokens).enumerate() {
+            if cancelled() {
+                return Err(Error::Cancelled);
+            }
+            for (within, item) in chunk.iter().enumerate() {
+                if cancelled() {
+                    return Err(Error::Cancelled);
+                }
+                let state = staged
+                    .get_mut(&item.sequence)
+                    .expect("complete batch was validated before allocation");
+                debug_assert_eq!(state.position, item.position);
+                let input = match &item.input {
+                    Input::Token(token) => self.model.embedding(*token)?,
+                    Input::Embedding(values) => {
+                        let mut copy = owned::allocate(values.len(), "external embedding copy")?;
+                        copy.extend_from_slice(values);
+                        copy
+                    }
+                };
+                let (embedding, logits) = match (self.model.as_ref(), &mut state.memory) {
+                    (Model::Llama(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
+                    (Model::Qwen2(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
+                    (Model::Mamba(model), SequenceMemory::Recurrent(cache)) => {
+                        model.step(input, cache, &self.adapters, &mut cancelled)?
+                    }
+                    _ => return Err(Error::InvalidState("model/memory mismatch".into())),
+                };
+                state.position += 1;
+                if item.output != OutputSelection::None {
+                    outputs.push(TokenOutput {
+                        batch_index: chunk_index * self.options.microbatch_tokens + within,
+                        sequence: item.sequence,
+                        position: item.position,
+                        logits: matches!(
+                            item.output,
+                            OutputSelection::Logits | OutputSelection::Both
+                        )
+                        .then_some(logits),
+                        embedding: matches!(
+                            item.output,
+                            OutputSelection::Embedding | OutputSelection::Both
+                        )
+                        .then_some(embedding),
+                    });
+                }
+            }
+        }
+        if cancelled() {
+            return Err(Error::Cancelled);
+        }
+        self.sequences = staged;
+        Ok(outputs)
+    }
+    /// Versioned, little-endian progress format; not llama's native state ABI.
+    /// The output allocation is checked against live reservations while created.
+    /// After return the Vec is caller-owned and no longer charged to this ledger.
+    pub fn save_state(&self) -> Result<Vec<u8>> {
+        crate::state::encode(self)
+    }
+    /// Fully validates before replacing context state. Checks CRC32 corruption,
+    /// exact dimensions, finite values, bounded counts, IDs and model identity.
+    pub fn restore_state(&mut self, bytes: &[u8]) -> Result<()> {
+        crate::state::decode(self, bytes)
+    }
+}
+
+#[cfg(test)]
+mod allocation_tests;
+
+mod native;
+pub use native::{NativeBatchToken, NativeContext, NativeContextOptions, NativeState};

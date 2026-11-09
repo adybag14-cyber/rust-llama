@@ -6,6 +6,7 @@ use crate::{Error, Result};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExecutionSlice {
     Qwen2DenseF32,
+    Qwen3DenseF32,
     LlamaDenseF32,
     Mamba1F32,
     BertDenseF32,
@@ -252,7 +253,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "qwen3",
         source_factory: Some("llama_model_qwen3"),
         source_files: &["src/models/qwen3.cpp", "src/models/vllm-decision2.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::Qwen3DenseF32),
     },
     Architecture {
         id: 29,

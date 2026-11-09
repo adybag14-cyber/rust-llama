@@ -1,0 +1,83 @@
+from pathlib import Path
+import os,subprocess,json,datetime,time,hashlib,re,sys
+windows=os.name=='nt'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+root=reference/'qwen3-and-f16-integration-v1';repo=root/'rust-draft';platform='windows' if windows else 'linux'
+out=root/'validation/full-v1'/platform;out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_BUILD_JOBS']='2'
+if windows:env['CARGO_TARGET_DIR']=str(root/'windows-target')
+else:
+ rustbin=Path('/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin')
+ env['PATH']=str(rustbin)+':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+ env['RUSTC']=str(rustbin/'rustc');env['RUSTDOC']=str(rustbin/'rustdoc')
+ env['CARGO_TARGET_DIR']='/home/tdamre/.cache/rust-llama-qwen3-and-f16-integration-v1'
+for key,name in {
+ 'LLAMA_TEST_MODEL':'stories260K.gguf',
+ 'LLAMA_TEST_Q4_MODEL':'stories15M-q4_0.gguf',
+ 'LLAMA_TEST_BPE_MODEL':'SmolLM2-135M-Q4_K_M.gguf',
+ 'LLAMA_TEST_MAMBA_MODEL':'mamba-130m-hf.f16.gguf',
+ 'LLAMA_TEST_BERT_MODEL':'bert-bge-small-f16.gguf',
+ 'LLAMA_TEST_BERT_BE_MODEL':'bert-bge-small-f16-big-endian.gguf',
+ 'LLAMA_TEST_QWEN2_MODEL':'qwen2.5-0.5b-instruct-q4_k_m.gguf',
+ 'LLAMA_TEST_QWEN3_MODEL':'qwen3-0.6b-q8_0.gguf',
+}.items():
+ env[key]=str(reference/'models'/name);assert Path(env[key]).is_file(),env[key]
+def input_records():
+ records=[]
+ for path in repo.rglob('*'):
+  rel=path.relative_to(repo)
+  if path.is_file() and 'evidence' not in rel.parts and (path.suffix in ('.rs','.json','.bin','.gguf') or path.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or rel.as_posix() in ('.cargo/config.toml','.github/workflows/ci.yml')):
+   records.append({'path':rel.as_posix(),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+ return sorted(records,key=lambda row:row['path'])
+def fingerprint(records=None):
+ if records is None:records=input_records()
+ lines=[entry['path']+'\0'+entry['sha256'] for entry in records]
+ return {'files':len(lines),'sha256':hashlib.sha256('\n'.join(lines).encode()).hexdigest()}
+inputs=input_records()
+(out/'execution-inputs.json').write_bytes((json.dumps(inputs,indent=2)+'\n').encode())
+drivers={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ['verify-embedding-cli.py','verify-decoder-cli.py','verify-qwen2-http.py','verify-qwen3-http.py','verify-sharded-apps-v2.py','validate-full-v1.py']}
+report={'status':'running','platform':platform,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ 'base_commit':'e0af03a97ca7077c6f2aee680fb84b3fa688f82a',
+ 'qualification':'Full combined dense Qwen3 inference/strict Context and typed F16/F32 nonflash NativeContext. Previous owned GGUF, same-owner C loading and shared scalar/SSE2 math remain exercised. Flash, microbatch geometry and the GGUF split/merge executable are separate unmerged work.',
+ 'fingerprint_scope':'All Rust, Cargo/compiler/CI inputs and JSON/bin/GGUF data outside historical evidence; canonical POSIX relative paths, same ordering on both hosts.',
+ 'execution_inputs_before':fingerprint(inputs),'external_driver_sha256':drivers,'steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+save()
+cargo=['cargo']+(['+1.99.1'] if windows else [])
+steps=[
+ ('fmt',cargo+['fmt','--all','--','--check'],0),
+ ('debug',cargo+['test','--workspace','--all-targets','--offline','--locked'],0),
+ ('release',cargo+['test','--workspace','--all-targets','--release','--offline','--locked'],0),
+ ('clippy',cargo+['clippy','--workspace','--all-targets','--offline','--locked','--','-D','warnings'],0),
+ ('audit',cargo+['run','--offline','--locked','-p','xtask','--','audit'],0),
+ ('math-provider',cargo+['run','--offline','--locked','-p','xtask','--','hash',str(Path(os.environ['SystemRoot'])/'System32/ucrtbase.dll') if windows else '/lib/x86_64-linux-gnu/libm.so.6'],0),
+ ('fixtures',cargo+['run','--offline','--locked','-p','xtask','--','fixtures'],0),
+ ('build',cargo+['build','--workspace','--release','--offline','--locked'],0),
+ ('embedding-cli',[sys.executable,str(root/'verify-embedding-cli.py')],0),
+ ('decoder-cli',[sys.executable,str(root/'verify-decoder-cli.py')],0),
+ ('qwen2-http',[sys.executable,str(root/'verify-qwen2-http.py')],0),
+ ('qwen3-http',[sys.executable,str(root/'verify-qwen3-http.py')],0),
+ ('sharded-applications',[sys.executable,str(root/'verify-sharded-apps-v2.py')],0),
+ ('pretrained',cargo+['test','--release','--offline','--locked','-p','llama-inference','-p','llama-server','--tests','--','--ignored','--nocapture'],0),
+ ('generation-http',cargo+['run','--release','--offline','--locked','-p','llama-server','--example','verify_model_server','--',str(reference/'models/stories260K.gguf')],0),
+ ('source',cargo+['run','--offline','--locked','-p','xtask','--','verify-source',str(reference/'llama.cpp-master')],0),
+ ('release-gate',cargo+['run','--offline','--locked','-p','xtask','--','release-check'],1),
+]
+try:
+ for name,args,expected in steps:
+  assert fingerprint()==report['execution_inputs_before'],('changed execution inputs',name)
+  assert drivers=={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in drivers},('changed external driver',name)
+  started=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:result=subprocess.run(args,cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1800)
+  text=(out/(name+'.log')).read_text(encoding='utf-8',errors='replace')
+  totals=[tuple(map(int,m)) for m in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored',text)]
+  entry={'name':name,'argv':args,'exit_code':result.returncode,'expected_exit_code':expected,'seconds':time.monotonic()-started,'log_sha256':hashlib.sha256((out/(name+'.log')).read_bytes()).hexdigest()}
+  if totals:entry['tests']={'passed':sum(t[0] for t in totals),'failed':sum(t[1] for t in totals),'ignored':sum(t[2] for t in totals),'suites':len(totals)}
+  report['steps'].append(entry);save();print(platform,name,result.returncode,flush=True)
+  if result.returncode!=expected:
+   print(text[-12000:],flush=True);raise RuntimeError(name+' returned unexpected exit')
+ report['execution_inputs_after']=fingerprint();assert report['execution_inputs_after']==report['execution_inputs_before']
+ report['status']='succeeded'
+except BaseException as error:
+ report['status']='failed';report['error']=repr(error);report['execution_inputs_at_failure']=fingerprint();save();raise
+report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save();print(json.dumps(report,indent=2),flush=True)

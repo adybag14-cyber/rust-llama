@@ -1,0 +1,70 @@
+from pathlib import Path
+import os,sys,subprocess,json,hashlib,datetime
+base=Path(__file__).resolve().parent;draft=base/"rust-draft";reference=base.parent
+platform="windows"if os.name=="nt"else"linux";profile=sys.argv[1]if len(sys.argv)>1 else"debug"
+out=base/"validation"/("nonflash-ordinary-v1-"+platform+"-"+profile);out.mkdir(parents=True,exist_ok=False)
+cargo=str(Path.home()/".cargo/bin"/("cargo.exe"if os.name=="nt"else"cargo"))
+env=dict(os.environ);env["CARGO_TARGET_DIR"]=str(base/("target-windows"if os.name=="nt"else"target-linux"))
+def identity(path):
+ data=path.read_bytes();return{"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()}
+source_paths=[item["path"]for item in json.loads((base/"initial-patch.json").read_bytes())]
+source_paths+=["crates/ffi/src/lib.rs","crates/ffi/src/f16_context_reference_tests.rs","crates/ffi/README.md","crates/ffi/STATE.md"]
+source_paths+=[item["path"] for item in json.loads((base/"ordinary-fixture-records.json").read_bytes())]
+source_paths=list(dict.fromkeys(source_paths))
+record={"passed":False,"platform":platform,"profile":profile,"sources":{path:identity(draft/path)for path in source_paths},"steps":[],"cases":[]}
+def save():(out/"status.json").write_bytes((json.dumps(record,indent=2)+"\n").encode())
+flags=["--release"]if profile=="release"else[]
+for name,args in [
+ ("fmt",["fmt","-p","llama-ffi","-p","llama-model-runtime","--","--check"]),
+ ("unit",["test","-p","llama-model-runtime","-p","llama-ffi","--lib",*flags]),
+ ("build",["build","-p","llama-ffi",*flags]),
+ ("clippy",["clippy","-p","llama-model-runtime","-p","llama-ffi","--all-targets",*flags,"--","-D","warnings"])]:
+ print("START",name,flush=True);command=[cargo,*args]
+ result=subprocess.run(command,cwd=draft,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=1800)
+ (out/(name+".stdout.log")).write_bytes(result.stdout);(out/(name+".stderr.log")).write_bytes(result.stderr)
+ record["steps"].append({"name":name,"command":command,"exit_code":result.returncode});save()
+ print(result.stdout.decode(errors="replace")[-7000:]+result.stderr.decode(errors="replace")[-6000:],flush=True)
+ if result.returncode:raise SystemExit(result.returncode)
+library=Path(env["CARGO_TARGET_DIR"])/profile/("llama_ffi.dll"if os.name=="nt"else"libllama_ffi.so")
+harness=base/("build-windows/Release/f16-context-oracle.exe"if os.name=="nt"else"build-linux/f16-context-oracle")
+record["library"]=identity(library);record["harness"]=identity(harness);save()
+def differences(a,b,path="$",found=None):
+ if found is None:found=[]
+ if len(found)>=8:return found
+ if type(a)is not type(b):found.append({"path":path,"expected":str(a)[:160],"actual":str(b)[:160]});return found
+ if isinstance(a,dict):
+  if a.keys()!=b.keys():found.append({"path":path,"expected_keys":list(a),"actual_keys":list(b)});return found
+  for key in a:differences(a[key],b[key],path+"."+key,found)
+ elif isinstance(a,list):
+  if len(a)!=len(b):found.append({"path":path,"expected_length":len(a),"actual_length":len(b)});return found
+  for i,(left,right)in enumerate(zip(a,b)):differences(left,right,path+"["+str(i)+"]",found)
+ elif a!=b:found.append({"path":path,"expected":a,"actual":b})
+ return found
+for model_name,model in [("trained",reference/"models/stories260K.gguf"),("tiny",reference/"context-next-oracle/native-context-model.gguf")]:
+ for k,v in [(0,0),(1,1),(1,0),(0,1)]:
+  label=model_name+f"-k{k}-v{v}";directory=out/label;directory.mkdir()
+  expected=base/"captures"/platform/label
+  command=list(map(str,[harness,library,model,reference/"context-next-oracle/request.json",directory,k,v]))
+  result=subprocess.run(command,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=1800)
+  (out/(label+".stdout.log")).write_bytes(result.stdout);(out/(label+".stderr.log")).write_bytes(result.stderr)
+  item={"name":label,"command":command,"exit_code":result.returncode,"expected_reference":identity(expected/"reference.json")}
+  if result.returncode==0:
+   wanted=json.loads((expected/"reference.json").read_bytes());actual=json.loads((directory/"reference.json").read_bytes())
+   item["json_differences"]=differences(wanted,actual)
+   item["binary_differences"]=[];item["binary_files"]=0;item["binary_bytes"]=0
+   for path in sorted(expected.iterdir()):
+    if not path.is_file()or path.name=="reference.json":continue
+    a=path.read_bytes();b=(directory/path.name).read_bytes();item["binary_files"]+=1;item["binary_bytes"]+=len(a)
+    if a!=b:
+     first=next((i for i,(x,y)in enumerate(zip(a,b))if x!=y),min(len(a),len(b)))
+     item["binary_differences"].append({"file":path.name,"first_difference":first,"expected_size":len(a),"actual_size":len(b),"expected":a[first:first+16].hex(),"actual":b[first:first+16].hex()})
+   item["passed"]=not item["json_differences"]and not item["binary_differences"]
+   item["counts"]={key:len(wanted[key])for key in ["cases","sequence_cases","file_cases","buffer_cases"]}
+  else:item["passed"]=False
+  record["cases"].append(item);save()
+  print(label,item["passed"],json.dumps({key:item.get(key)for key in ["json_differences","binary_differences"]})[:4000],flush=True)
+  if not item["passed"]:
+   print(result.stderr.decode(errors="replace")[-8000:],flush=True);raise SystemExit(1)
+record["sources_unchanged"]=record["sources"]=={path:identity(draft/path)for path in source_paths}
+assert record["sources_unchanged"]
+record["passed"]=True;save();print("PASS",platform,profile,len(record["cases"]),flush=True)

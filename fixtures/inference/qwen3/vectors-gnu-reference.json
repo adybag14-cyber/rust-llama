@@ -1,0 +1,471 @@
+{
+  "schema": 1,
+  "profile": "gnu",
+  "native_capture_sha256": "60c935797a303d07c2cd237f4f83f131018e5890f78fa940d86763ca3b065d1d",
+  "vocabulary": 512,
+  "cases": [
+    {
+      "name": "f32-control",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "stderr_sha256": "88b4a399a653b35581017243a1733e07c769fd96d7bba5a2bc4313085909542e",
+      "native_reference_sha256": "c5db21c072d4fc6056dea44312d5d160af4735eaee7f48b3e6800755ae53526c",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 526080,
+        "model_parameters": 131520,
+        "n_ctx": 64,
+        "max_tokens": 2,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "ascii",
+            "prompt": "Hello!",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414,
+              443
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "detokenized_hex": "2048656c6c6f21",
+            "greedy_tokens": [
+              35,
+              35
+            ],
+            "greedy_pieces_hex": [
+              "20",
+              "20"
+            ],
+            "finished_eog": false,
+            "generated_hex": "2020",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144,
+              8192
+            ],
+            "greedy_rows": [
+              8192,
+              10240
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "q-norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "8510de029ccd2d6ce206aa3a7ec73facbabb56791fdc1e975790e141df8b7232"
+    },
+    {
+      "name": "k-norm-bf16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "87233601d31eb9033db914a3a6bf649a750faefd122cc1ffff45735db34c4444"
+    },
+    {
+      "name": "attention-norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "f16c92c2467d66e58c73d2c3de487348de9167053ee4ba09707de155372eceb7"
+    },
+    {
+      "name": "ffn-norm-bf16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "4514ae2309e3c06466d0baff5fe3e0b6b5011ff173b1b69b5937f415a0a08f0d"
+    },
+    {
+      "name": "output-norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "6999c08f1f25fc189aa80902cc88ad808d058327181359a163c0f6b174b07dfd"
+    },
+    {
+      "name": "q-bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "5996361322dc8731ed9823659c2c83da3e69309fe967d5cb230eea1b6d998a59"
+    },
+    {
+      "name": "k-bias-bf16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "1a56644b960ceb49cbbf98783f3f8a870998ecd60501cf2a6a32feac39106d7f"
+    },
+    {
+      "name": "v-bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "5c6ad333d5cf157f19522bba0d5de17c4e55f28f2ba86d81e932a59de8fc194f"
+    },
+    {
+      "name": "fused-own-bias-bf16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "660d936b4a2ac72c76d9efe5e919e7ddd56d910f854feae7a44a568b8f8864f1"
+    },
+    {
+      "name": "q-norm-q4-0",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "72bbb53c67ec9ef8cb766dbc050e8d85ba16af3c901da77f4959fc9deb04639f"
+    },
+    {
+      "name": "q-bias-q4-0",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "b6f043c57355fc71405409bcb468fe1182415b6c25ecc8170706ed6e0e4182de"
+    },
+    {
+      "name": "fused-all-bias-q-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "stderr_sha256": "68a4e13692f4eb1566ad0fb76e7db42240e3563265fe52ff82532672da88869a"
+    },
+    {
+      "name": "fused-inactive-q-bias-f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "stderr_sha256": "98a79fa4bef4e1a0fe63446ab409dd7667ed471a416d641bc33901adc7185c04",
+      "native_reference_sha256": "8f1ed13ccd5aacc1d2ce4dbde08a045064d4a471c77b4d0cd4ac2524e09300b9",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 526592,
+        "model_parameters": 131776,
+        "n_ctx": 64,
+        "max_tokens": 2,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "ascii",
+            "prompt": "Hello!",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414,
+              443
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "detokenized_hex": "2048656c6c6f21",
+            "greedy_tokens": [
+              27,
+              27
+            ],
+            "greedy_pieces_hex": [
+              "18",
+              "18"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1818",
+            "prompt_rows": [
+              12288,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fused-inactive-k-bias-bf16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "stderr_sha256": "2cd54d825d768bb85b97d555bf26ddaa3fa0266b75f4983a2df1f62bd13f1720",
+      "native_reference_sha256": "ff4dfd858579eac466a462412250c886d95247234604a3bfd73e09a8dc7e160c",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 526336,
+        "model_parameters": 131648,
+        "n_ctx": 64,
+        "max_tokens": 2,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "ascii",
+            "prompt": "Hello!",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414,
+              443
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "detokenized_hex": "2048656c6c6f21",
+            "greedy_tokens": [
+              27,
+              27
+            ],
+            "greedy_pieces_hex": [
+              "18",
+              "18"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1818",
+            "prompt_rows": [
+              12288,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fused-inactive-v-bias-f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "stderr_sha256": "51a9da06166579893e67bb9051c51ca019aad181817e46914bf743c5dda631c4",
+      "native_reference_sha256": "ff4dfd858579eac466a462412250c886d95247234604a3bfd73e09a8dc7e160c",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 526336,
+        "model_parameters": 131648,
+        "n_ctx": 64,
+        "max_tokens": 2,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "ascii",
+            "prompt": "Hello!",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414,
+              443
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "detokenized_hex": "2048656c6c6f21",
+            "greedy_tokens": [
+              27,
+              27
+            ],
+            "greedy_pieces_hex": [
+              "18",
+              "18"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1818",
+            "prompt_rows": [
+              12288,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fused-inactive-q-bias-q4-0",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "stderr_sha256": "d0e96e19777d85b56586647be5b482734fd3c59dfe78bad9189a378e9d535857",
+      "native_reference_sha256": "691326569e9916ff4e349e3e246eb2403e8b3511ba685f74d582466b4af9b8a7",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 526736,
+        "model_parameters": 131904,
+        "n_ctx": 64,
+        "max_tokens": 2,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "ascii",
+            "prompt": "Hello!",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414,
+              443
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f",
+              "21"
+            ],
+            "detokenized_hex": "2048656c6c6f21",
+            "greedy_tokens": [
+              27,
+              27
+            ],
+            "greedy_pieces_hex": [
+              "18",
+              "18"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1818",
+            "prompt_rows": [
+              12288,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "float_data": {
+    "path": "vectors-gnu-logits.f32le.bin",
+    "bytes": 24576,
+    "sha256": "d44fdb2500366235be8d69044e8eddfbee81717e2639c15e4f8a6321603c44d7"
+  },
+  "unique_rows": 12,
+  "row_comparisons": 35,
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05
+  }
+}

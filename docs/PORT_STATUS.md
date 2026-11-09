@@ -18,7 +18,7 @@ The merged workspace has local path dependencies. Optional OS/driver/vendor inte
 | T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 75 executable operation IDs plus NONE leaves and 3,240 distinct native graph cases. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
 | T04: formats/conversion/tokenizers | Bounded GGUF v2/v3 reader, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, little-endian writer, scalar endian conversion, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Checkpoint/Safetensors conversion and ordered streaming split/merge; all converters, metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
-| T05: models/runtime | Typed Llama/Qwen2/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Qwen2 GGUF executes pretrained Q4_K_M generation; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
+| T05: models/runtime | Typed Llama/Qwen2/Qwen3/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Qwen2 GGUF executes pretrained Q4_K_M generation; Qwen3 GGUF executes pretrained Q8_0 generation with independent head width and per-head Q/K normalization; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
 | T06: CUDA/HIP/MUSA | Rust driver interfaces and typed PTX generation; actual CUDA kernels including matvec, stride/broadcast/tail coverage; 138 recorded dispatches on RTX 4090. | Full tensor/backend scheduler integration, upstream operation and dtype coverage, memory/collective modes, optimized kernels; HIP and MUSA hardware execution/parity. |
 | T07: portable GPU | Typed kernel IR; generated OpenCL kernels executed on NVIDIA and AMD; Vulkan/other host foundations. | Complete Metal, Vulkan, OpenCL and WebGPU implementation; full compiler/device/OS matrix, scheduler integration and numerical/performance parity. |
 | T08: specialty/remote | Checked RPC 8.0.1 subset with transactional scalar graph execution; CBLAS interfaces, DSP ELF/SWIV and virtual-device utilities with explicit capability handling. | Complete BLAS, CANN, ET, SYCL, zDNN, Hexagon, ZenDNN, OpenVINO, RPC and VirtGPU backend semantics and actual required device/vendor testing. |
@@ -120,11 +120,17 @@ retain explicit unverified or fallback qualifications.
 
 Automatic shard loading now uses a single validated file-set owner through the C facade as well. The new frozen-header regression checks 96 cases per profile, with 53 accepted and 43 rejected loads, exact aggregate getters and 163,840 exact F32 continuation words. All 184 frozen exports and four diagnostic extensions remain unchanged; explicit C split-list and filename helpers stay open.
 
+## Dense Qwen3 and native F16 cache support
+
+Dense causal Qwen3 now executes through the Rust inference facade and strict Context, with separate or fused Q/K/V, the source bias precedence, independent attention width, learned Q/K RMS vectors and full-head NeoX RoPE. The pinned official Qwen3-0.6B Q8_0 model contributes 5,469,696 exact logits and 24 greedy IDs per native profile. Ordinary dense/split/vector cases compare another 294,912 logits and 400 IDs. Active non-F32 norms/biases rejected by the original CPU graph return checked errors; ignored partial fused-bias groups remain admissible. Qwen3 participates in the strict state/cancellation/allocation regressions. Its 2,384,199,680 decoded-weight bytes require an explicit 3 GiB budget. [QWEN3_IMPLEMENTATION.md](QWEN3_IMPLEMENTATION.md) records model identity, numerical evidence and the remaining graph variants.
+
+The separate Llama NativeContext now owns F32 or raw-u16 F16 K/V independently. Explicit nonflash execution with one generation and one batch worker is admitted. Copies, deferred rotation, transposition and native state/session I/O preserve all 65,536 half bit patterns. Ordinary C regressions cover 258,048 exact logits, 1,048 buffers and all four K/V type pairs per profile. Evaluation retains checked nonfinite-result rejection; raw NaN state preservation does not imply original NaN-logit parity. The original C defaults remain F16/F16, AUTO and four/four workers, and are rejected until the separate flash/worker implementation is complete. The previous manual F32/single-worker AUTO-to-nonflash fallback is also rejected explicitly.
+
 ## Memory and execution qualifications
 
-The high-level model facade loads a single dense Llama, Qwen2, Mamba-1 or BERT GGUF into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
+The high-level model facade loads a dense Llama, Qwen2, Qwen3, Mamba-1 or BERT GGUF file set into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
 
-Llama and Qwen2 decoder context state uses F32 KV. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
+The strict Llama, Qwen2 and Qwen3 decoder Context uses F32 KV. The separate Llama NativeContext admits independent F32/F16 key/value storage only with explicit nonflash single-worker settings. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
 
 The strict Rust Context defaults to a 1 GiB max_state_bytes budget. It reserves
 owned sequence/layer records, KV and recurrent capacities, planning records,
@@ -140,8 +146,9 @@ retained; review additionally accounted for temporary stream/chunk descriptors
 and resident outer-vector storage. A regression rejects the old underestimated
 budget atomically and succeeds at the sufficient budget; removing only that
 descriptor charge makes the regression fail. Neither state budget is an RSS
-limit. Default F16 C-API cache modes and the complete original worker/flash
-configuration remain unimplemented.
+limit. The original default combination of F16/F16 cache, AUTO flash and
+four/four workers remains unimplemented. Explicit nonflash, single-worker
+F16/F32 cache storage is supported by this checkpoint.
 
 The CLI and server accept --ctx-size and --max-weight-mib, and the server
 exposes RuntimeProvider::load_with_options for the same checked limits.
@@ -161,7 +168,7 @@ tests in each profile, plus seven explicit pretrained tests on each host.
 That CI result includes the final native-cache correction and is distinct
 from the earlier complete-run/incremental local evidence above.
 
-Current Qwen2/native-profile integration evidence is recorded separately under
+Earlier Qwen2/native-profile integration evidence is recorded separately under
 evidence/2026-11-09/qwen2-and-native-profiles. Focused server verification passes
 49 ordinary tests in each profile on each host, plus the explicit pretrained
 BGE HTTP test (27 requests, 23,479 numeric comparisons, zero error). Its
@@ -169,6 +176,23 @@ BGE HTTP test (27 requests, 23,479 numeric comparisons, zero error). Its
 01acfdcf20cb878a2ab54444f8194fe782c7720e2b99a00da1a1d187937afd89
 on Windows and GNU. The full integrated run and application results are recorded
 in that evidence directory before checkpoint promotion.
+
+The combined Qwen3/F16 checkpoint passes 451 ordinary Windows tests and 454
+ordinary GNU tests in both debug and release, with 19 prerequisite tests ignored
+in those ordinary runs. Nine explicit pretrained tests pass per host, including
+Qwen3; every measured numeric comparison records zero observed error against
+its corresponding original profile. Formatting, strict Clippy, 458 fixture
+declarations, source verification, release builds, CLI and real HTTP/SSE checks
+also pass. All 17 validation steps retain the same 637 execution inputs with
+SHA-256 89a863d2145bee98206987803404e1551a9edb45c5174a9ff550cae993e42343.
+The release check still fails as required because all twelve global gates are
+open. Complete evidence is in evidence/2026-11-09/qwen3-and-f16-caches.
+
+The previous published e0af03a checkpoint passed GitHub Actions run 42673166488
+on Windows and Ubuntu: 436/439 ordinary tests per profile and eight explicit
+pretrained tests per host. Its first attempt failed before a runner started
+with a GitHub internal server error; the identical commit/workflow passed on
+attempt two. Both attempts and raw successful job logs are retained.
 
 The source audit checks implementation roles and dependency metadata; it reports unsafe review candidates instead of claiming every unsafe block is proven sound. Fixture integrity checks hashes, declared lengths, provenance fields and complete fixture inventory. Numerical tests check semantics separately.
 

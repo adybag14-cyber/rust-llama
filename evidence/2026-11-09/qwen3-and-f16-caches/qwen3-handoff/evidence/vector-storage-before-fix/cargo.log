@@ -1,0 +1,20 @@
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen3-inference-oracle\rust-draft\crates\inference)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running tests\qwen3.rs (target\debug\deps\qwen3-c09159768fb815ec.exe)
+
+running 1 test
+qwen3-native: active vector storage / ignored partial fused biases host=msvc rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0
+
+thread 'original_active_vector_storage_and_ignored_fused_bias_types' (14304) panicked at crates\inference\tests\qwen3.rs:629:5:
+native vector storage boundaries: ["q-norm-f16: incorrectly admitted", "k-norm-bf16: incorrectly admitted", "attention-norm-f16: incorrectly admitted", "ffn-norm-bf16: incorrectly admitted", "output-norm-f16: incorrectly admitted", "q-bias-f16: incorrectly admitted", "k-bias-bf16: incorrectly admitted", "v-bias-f16: incorrectly admitted", "fused-own-bias-bf16: incorrectly admitted", "q-norm-q4-0: incorrectly admitted", "q-bias-q4-0: incorrectly admitted", "fused-all-bias-q-f16: incorrectly admitted"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test original_active_vector_storage_and_ignored_fused_bias_types ... FAILED
+
+failures:
+
+failures:
+    original_active_vector_storage_and_ignored_fused_bias_types
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 1.46s
+
+error: test failed, to rerun pass `-p llama-inference --test qwen3`

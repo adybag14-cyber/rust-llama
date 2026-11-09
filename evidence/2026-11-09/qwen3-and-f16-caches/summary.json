@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T19:13:38.902817+00:00",
+  "base_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "execution_inputs": {
+    "files": 637,
+    "sha256": "89a863d2145bee98206987803404e1551a9edb45c5174a9ff550cae993e42343"
+  },
+  "scope": "Dense causal Qwen3 high-level inference/strict Context; independent F32/F16 Llama NativeContext caches with explicit nonflash and one generation/batch worker. No full-port gate is closed.",
+  "fixture_declarations": 458,
+  "new_fixture_files": 25,
+  "ordinary_tests": {
+    "windows": {
+      "debug": {
+        "passed": 451,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 85
+      },
+      "release": {
+        "passed": 451,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 85
+      }
+    },
+    "linux": {
+      "debug": {
+        "passed": 454,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 85
+      },
+      "release": {
+        "passed": 454,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 85
+      }
+    }
+  },
+  "pretrained_tests": {
+    "windows": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 13
+    },
+    "linux": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 13
+    }
+  },
+  "qwen3_per_native_profile": {
+    "ordinary_logits": 294912,
+    "ordinary_greedy_ids": 400,
+    "pretrained_logits": 5469696,
+    "pretrained_greedy_ids": 24,
+    "observed_maximum_absolute_error": 0
+  },
+  "f16_ordinary_per_native_profile": {
+    "memory_cases": 160,
+    "sequence_state_cases": 160,
+    "session_suites": 8,
+    "short_buffer_cases": 384,
+    "logit_words": 258048,
+    "buffer_comparisons": 1048,
+    "buffer_bytes": 290328,
+    "original_binary_files": 520
+  },
+  "qualifications": [
+    "The Qwen3 corpus preserves distinct original MSVC/GNU expected profiles. Measured targets require exact bits; portable bounds were not widened.",
+    "F16 raw-state preservation covers every half pattern, while execution retains checked nonfinite-result errors. Native NaN-logit parity is not claimed.",
+    "Original C defaults remain F16/F16, AUTO and four/four workers. This checkpoint rejects AUTO/ENABLED and other worker counts; separate source-driven flash/microbatch work remains external.",
+    "Qwen3 C NativeContext, MoE/VL/Next, dimension arrays and scaled/partial RoPE remain open.",
+    "The first root fixture audit failed because the reviewed inference README checksum had not been updated. The corrected declaration changes documentation only; all original numeric/input fixture bytes remain unchanged.",
+    "The failed F16 merge preflight assumed the wrong TSV header and wrote no product/draft source; the guarded retry preserved concurrent shard changes.",
+    "Previous exact-commit CI first failed before runner allocation with GitHub internal server error and then passed unchanged on attempt two.",
+    "Archival source, validation-driver and patch files are stored as .txt documents with exact original bytes; runtime code does not invoke them."
+  ]
+}

@@ -1,5 +1,5 @@
-use super::{Cell, NativeContext, SequenceSet, invalid, zeroes};
-use crate::{Result, llama::KvLayer};
+use super::{Cell, KvBuffer, NativeContext, NativeKvType, SequenceSet, StoredKvLayer, invalid};
+use crate::Result;
 
 /// Raw frozen memory serialization, before sequence-I/O or session headers.
 /// For ON_DEVICE, tensor bytes are held separately in the owning CPU context.
@@ -78,12 +78,20 @@ fn estimate(context: &NativeContext, sequence: Option<i32>, flags: u32) -> Resul
         add(&mut result.boundaries, s.cells, 2)?;
         add(&mut result.boundaries, s.ids, 1)?;
         add(&mut result.boundaries, 1, 4)?;
-        add(&mut result.boundaries, stream.layers.len(), 5)?;
+        add(
+            &mut result.boundaries,
+            stream.layers.len(),
+            if context.values_are_transposed() {
+                5
+            } else {
+                4
+            },
+        )?;
         let tensor = s
             .cells
             .checked_mul(context.width)
             .and_then(|n| n.checked_mul(stream.layers.len()))
-            .and_then(|n| n.checked_mul(8))
+            .and_then(|n| n.checked_mul(context.key_type.size() + context.value_type.size()))
             .ok_or_else(|| invalid("native tensor serialization size overflow"))?;
         if flags & 2 != 0 {
             add(&mut result.tensors, tensor, 1)?;
@@ -91,7 +99,11 @@ fn estimate(context: &NativeContext, sequence: Option<i32>, flags: u32) -> Resul
             add(&mut result.bytes, tensor, 1)?;
             let chunks = s
                 .ranges
-                .checked_mul(context.width + 1)
+                .checked_mul(if context.values_are_transposed() {
+                    context.width + 1
+                } else {
+                    2
+                })
                 .ok_or_else(|| invalid("native tensor chunk count overflow"))?;
             add(&mut result.boundaries, chunks, stream.layers.len())?;
         }
@@ -150,15 +162,18 @@ impl Writer {
     fn u64(&mut self, value: u64) {
         self.raw(&value.to_le_bytes());
     }
-    fn tensor(&mut self, values: impl Iterator<Item = f32>) {
-        if self.device {
-            for value in values {
-                self.state.tensors.extend_from_slice(&value.to_le_bytes());
-            }
+    fn tensor(&mut self, values: &KvBuffer, indices: impl Iterator<Item = usize>) {
+        let width = values.kind().size();
+        let target = if self.device {
+            &mut self.state.tensors
         } else {
-            for value in values {
-                self.state.bytes.extend_from_slice(&value.to_le_bytes());
-            }
+            &mut self.state.bytes
+        };
+        for index in indices {
+            let bytes = values.bits(index).to_le_bytes();
+            target.extend_from_slice(&bytes[..width]);
+        }
+        if !self.device {
             self.state.write_boundaries.push(self.state.bytes.len());
         }
     }
@@ -242,31 +257,39 @@ pub(super) fn encode(
                 out.i32(id);
             }
         }
-        out.u32(1);
+        out.u32(u32::from(context.values_are_transposed()));
         out.u32(stream.layers.len() as u32);
         out.u32(0);
         out.u32(0);
         for layer in &stream.layers {
-            out.i32(0);
-            out.u64((context.width * 4) as u64);
+            out.i32(context.key_type as i32);
+            out.u64((context.width * context.key_type.size()) as u64);
             for range in &ranges {
                 out.tensor(
-                    layer.keys[range.start * context.width..range.end * context.width]
-                        .iter()
-                        .copied(),
+                    &layer.keys,
+                    range.start * context.width..range.end * context.width,
                 );
             }
         }
         for layer in &stream.layers {
-            out.i32(0);
-            out.u32(4);
-            out.u32(context.width as u32);
-            for dimension in 0..context.width {
+            out.i32(context.value_type as i32);
+            if context.values_are_transposed() {
+                out.u32(context.value_type.size() as u32);
+                out.u32(context.width as u32);
+                for dimension in 0..context.width {
+                    for range in &ranges {
+                        out.tensor(
+                            &layer.values,
+                            range.clone().map(|index| index * context.width + dimension),
+                        );
+                    }
+                }
+            } else {
+                out.u64((context.width * context.value_type.size()) as u64);
                 for range in &ranges {
                     out.tensor(
-                        range
-                            .clone()
-                            .map(|index| layer.values[index * context.width + dimension]),
+                        &layer.values,
+                        range.start * context.width..range.end * context.width,
                     );
                 }
             }
@@ -309,9 +332,10 @@ impl<'a> Reader<'a> {
             self.bytes(8)?.try_into().expect("eight bytes"),
         ))
     }
-    fn floats(&mut self, count: usize) -> Result<Vec<f32>> {
+    fn tensor(&mut self, kind: NativeKvType, count: usize) -> Result<KvBuffer> {
+        let width = kind.size();
         let n = count
-            .checked_mul(4)
+            .checked_mul(width)
             .ok_or_else(|| invalid("native tensor byte overflow"))?;
         let raw = if let Some(tensors) = self.tensors {
             let end = self
@@ -325,16 +349,17 @@ impl<'a> Reader<'a> {
         } else {
             self.bytes(n)?
         };
-        let mut values = Vec::new();
-        values
-            .try_reserve_exact(count)
-            .map_err(|_| invalid("native restored tensor allocation failed"))?;
-        values.extend(
-            raw.as_chunks::<4>()
-                .0
-                .iter()
-                .map(|raw| f32::from_le_bytes(*raw)),
-        );
+        let mut values = KvBuffer::new(kind, count)?;
+        // Keep the original stored bits: converting signaling NaNs through
+        // floating-point values would irreversibly change F16 state payloads.
+        for (index, scalar) in raw.chunks_exact(width).enumerate() {
+            let bits = if width == 2 {
+                u32::from(u16::from_le_bytes(scalar.try_into().expect("two bytes")))
+            } else {
+                u32::from_le_bytes(scalar.try_into().expect("four bytes"))
+            };
+            values.set_bits(index, bits);
+        }
         Ok(values)
     }
 }
@@ -399,11 +424,33 @@ pub(super) fn decode(
             Some(id) => staged.stream_id(id)?,
             None => source,
         };
+        // Typed K/V copies, one temporary transposed V, cell records, slot
+        // indices and layer descriptors can coexist during the staged restore.
         let temporary = count
             .checked_mul(staged.width)
-            .and_then(|n| n.checked_mul(4))
-            .and_then(|n| n.checked_mul(staged.model.layer_count() * 2 + 1))
-            .and_then(|n| n.checked_add(count * std::mem::size_of::<Cell>()))
+            .and_then(|n| n.checked_mul(staged.key_type.size() + staged.value_type.size()))
+            .and_then(|n| n.checked_mul(staged.model.layer_count()))
+            .and_then(|n| {
+                n.checked_add(
+                    count
+                        .checked_mul(staged.width)?
+                        .checked_mul(staged.value_type.size())?,
+                )
+            })
+            .and_then(|n| {
+                n.checked_add(
+                    count
+                        .checked_mul(std::mem::size_of::<Cell>() + std::mem::size_of::<usize>())?,
+                )
+            })
+            .and_then(|n| {
+                n.checked_add(
+                    staged
+                        .model
+                        .layer_count()
+                        .checked_mul(std::mem::size_of::<StoredKvLayer>())?,
+                )
+            })
             .ok_or_else(|| invalid("native restore temporary size overflow"))?;
         context.check_work(
             context
@@ -443,7 +490,7 @@ pub(super) fn decode(
                 sequences,
             });
         }
-        if input.u32()? != 1 {
+        if input.u32()? != u32::from(staged.values_are_transposed()) {
             return Err(invalid("native V transposition mismatch"));
         }
         let layers = input.u32()? as usize;
@@ -460,25 +507,41 @@ pub(super) fn decode(
         data.try_reserve_exact(layers)
             .map_err(|_| invalid("native restore layer allocation failed"))?;
         for _ in 0..layers {
-            if input.i32()? != 0 || input.u64()? != (staged.width * 4) as u64 {
+            if input.i32()? != staged.key_type as i32
+                || input.u64()? != (staged.width * staged.key_type.size()) as u64
+            {
                 return Err(invalid("native state key type or row size mismatch"));
             }
-            data.push(KvLayer {
-                keys: input.floats(elements)?,
-                values: Vec::new(),
+            data.push(StoredKvLayer {
+                keys: input.tensor(staged.key_type, elements)?,
+                values: KvBuffer::new(staged.value_type, 0)?,
             });
         }
         for layer in &mut data {
-            if input.i32()? != 0 || input.u32()? != 4 || input.u32()? != staged.width as u32 {
-                return Err(invalid("native state value shape mismatch"));
+            if input.i32()? != staged.value_type as i32 {
+                return Err(invalid("native state value type mismatch"));
             }
-            let transposed = input.floats(elements)?;
-            layer.values = zeroes(elements)?;
-            for dimension in 0..staged.width {
-                for index in 0..count {
-                    layer.values[index * staged.width + dimension] =
-                        transposed[dimension * count + index];
+            if staged.values_are_transposed() {
+                if input.u32()? != staged.value_type.size() as u32
+                    || input.u32()? != staged.width as u32
+                {
+                    return Err(invalid("native state value shape mismatch"));
                 }
+                let transposed = input.tensor(staged.value_type, elements)?;
+                layer.values = KvBuffer::new(staged.value_type, elements)?;
+                for dimension in 0..staged.width {
+                    for index in 0..count {
+                        layer.values.set_bits(
+                            index * staged.width + dimension,
+                            transposed.bits(dimension * count + index),
+                        );
+                    }
+                }
+            } else {
+                if input.u64()? != (staged.width * staged.value_type.size()) as u64 {
+                    return Err(invalid("native state value row size mismatch"));
+                }
+                layer.values = input.tensor(staged.value_type, elements)?;
             }
         }
         let slots = if let Some(id) = wanted {
@@ -496,10 +559,11 @@ pub(super) fn decode(
         for ((index, cell), &slot) in cells.into_iter().enumerate().zip(&slots) {
             stream.cells[slot] = cell;
             for (src, dst) in data.iter().zip(&mut stream.layers) {
-                dst.keys[slot * staged.width..(slot + 1) * staged.width]
-                    .copy_from_slice(&src.keys[index * staged.width..(index + 1) * staged.width]);
-                dst.values[slot * staged.width..(slot + 1) * staged.width]
-                    .copy_from_slice(&src.values[index * staged.width..(index + 1) * staged.width]);
+                let source_range = index * staged.width..(index + 1) * staged.width;
+                dst.keys
+                    .copy_range(slot * staged.width, &src.keys, source_range.clone())?;
+                dst.values
+                    .copy_range(slot * staged.width, &src.values, source_range)?;
             }
         }
         stream.head = if wanted.is_some() {

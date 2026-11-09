@@ -1,0 +1,33 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "llama-inference",
+    "--test",
+    "qwen3",
+    "original_active_vector_storage_and_ignored_fused_bias_types",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 101,
+  "elapsed_seconds": 2.1512632999983907,
+  "source_unchanged": true,
+  "source_inputs": [
+    {
+      "path": "crates/inference/src/qwen3_loader.rs",
+      "sha256": "d4694eebe69c065625cd2a5fc24d16f7f51cac95f707a68e71dd999b15696320"
+    },
+    {
+      "path": "crates/model-runtime/src/qwen3.rs",
+      "sha256": "16c744baed3bb2bc90eecc6028ee76e5434b86211d9d4a380d5fa8a56fa5f473"
+    },
+    {
+      "path": "crates/inference/tests/qwen3.rs",
+      "sha256": "660a11517597a79dfdd792b9a5723e808147fbe81da52526d3ceeb28b5ea0577"
+    }
+  ],
+  "expected_failure": "Original CPU aborts on12 active non-F32 vector cases; uncorrected Rust incorrectly admits all12. Original ignored partial fused biases remain executable."
+}

@@ -1,0 +1,63 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "gnu",
+  "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "reference": "Actual original frozen ggml_mul_mat with F16 left and F32 right, one CPU thread. Full strided source bytes and raw original outputs captured before Rust comparison.",
+  "cases": 125,
+  "output_values": 245154,
+  "independent_scalar_checks": 1368,
+  "independent_scalar_mismatches": 0,
+  "hypothetical_f16_rhs": {
+    "different": 239587,
+    "max_absolute_error": 198.5,
+    "purpose": "Explicit negative control; the native source keeps query/probability activations in F32 for F16 left tensors.",
+    "file": {
+      "name": "hypothetical-f16-rhs.bin",
+      "bytes": 986030,
+      "sha256": "98ec4024eac78a51af35afbe4b1f9816fe1053b5b88f0f9d6add9397eb12136b"
+    }
+  },
+  "file": {
+    "name": "f16-cache-matmul-reference.bin",
+    "bytes": 15682649,
+    "sha256": "bdcb0890b95e1e70fbd1ea2977f394c577a01e8b8d5f3063f2b1d04302dcb84d"
+  },
+  "case_ledger": {
+    "name": "cases.jsonl",
+    "bytes": 70463,
+    "sha256": "aa864fd7d077b11fc106ce2dfdb20a1a9429e42e438050c9dd7a8a9945dffe13"
+  },
+  "sources": {
+    "f16-context-oracle/matmul-graphs/capture.py": {
+      "bytes": 11387,
+      "sha256": "26ded69a1ad98643a82525729a45a13f85e6911078bfa8f8b813c1c957531035"
+    },
+    "build-ggml-linux-llama/bin/libggml-base.so": {
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "build-ggml-linux-llama/bin/libggml-cpu.so": {
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ggml-cpu.c": {
+      "bytes": 133995,
+      "sha256": "aeae3376375667dd84fd35f5d4d413015b3f3c24985eef5399b94c337bdf84bd"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    }
+  },
+  "scope": [
+    "KQ uses actual nonzero head-offset views, cache slot/head-axis permutation, larger physical row strides and GQA broadcasting.",
+    "PV uses transposed-cache orientation with physical KV columns contiguous and row/head capacity padding.",
+    "256/512/768 physical KV widths, widths and tails around 32/64/256/512, multi-token/multi-head/two-sequence batches, sparse masked probabilities and cancellation-sensitive queries.",
+    "MSVC __SSE2__ absent and GNU default SSE2 are distinct source profiles; GGML_SIMD is absent in both frozen builds, so F16 dot uses source F32 products/F64 scalar accumulation.",
+    "This is a tensor-kernel fixture; it does not by itself prove complete context/cache semantics."
+  ]
+}

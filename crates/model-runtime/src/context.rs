@@ -240,6 +240,15 @@ impl Context {
                 state.position = position;
                 Ok(())
             }
+            (Model::Qwen3(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
             (Model::Mamba(_), SequenceMemory::Recurrent(_)) => {
                 if position == state.position {
                     Ok(())
@@ -416,6 +425,9 @@ impl Context {
                     (Model::Qwen2(model), SequenceMemory::Attention(cache)) => {
                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
                     }
+                    (Model::Qwen3(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
                     (Model::Mamba(model), SequenceMemory::Recurrent(cache)) => {
                         model.step(input, cache, &self.adapters, &mut cancelled)?
                     }
@@ -464,4 +476,6 @@ impl Context {
 mod allocation_tests;
 
 mod native;
-pub use native::{NativeBatchToken, NativeContext, NativeContextOptions, NativeState};
+pub use native::{
+    NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType, NativeState,
+};

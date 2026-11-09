@@ -58,6 +58,8 @@ jobs:
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/mamba-130m-hf.f16.gguf" https://huggingface.co/mradermacher/mamba-130m-hf-GGUF/resolve/ecd441bd76c60ebf9c3e71bfc3f83ba64fa1edd1/mamba-130m-hf.f16.gguf
       - name: Fetch pinned Qwen2 Q4_K model data
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/qwen2.5-0.5b-instruct-q4_k_m.gguf" https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q4_k_m.gguf
+      - name: Fetch pinned Qwen3 Q8 model data
+        run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/qwen3-0.6b-q8_0.gguf" https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf
       - name: Pretrained model comparisons with verified SHA-256 inputs
         env:
           LLAMA_TEST_MODEL: ${{ runner.temp }}/stories260K.gguf
@@ -65,6 +67,7 @@ jobs:
           LLAMA_TEST_BPE_MODEL: ${{ runner.temp }}/SmolLM2-135M-Q4_K_M.gguf
           LLAMA_TEST_MAMBA_MODEL: ${{ runner.temp }}/mamba-130m-hf.f16.gguf
           LLAMA_TEST_QWEN2_MODEL: ${{ runner.temp }}/qwen2.5-0.5b-instruct-q4_k_m.gguf
+          LLAMA_TEST_QWEN3_MODEL: ${{ runner.temp }}/qwen3-0.6b-q8_0.gguf
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
         run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture

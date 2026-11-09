@@ -2,6 +2,7 @@
 //! assert observable atomicity and reservation lifetime under real state copies.
 use super::*;
 use crate::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights, fixtures};
+use crate::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
 use owned::AllocationFailure;
 
 fn models() -> Vec<Arc<Model>> {
@@ -47,10 +48,52 @@ fn models() -> Vec<Arc<Model>> {
         },
     )
     .unwrap();
+    let qwen3 = Qwen3Model::new(
+        Qwen3Config {
+            vocabulary: c.vocabulary,
+            width: c.width,
+            feed_forward: c.feed_forward,
+            heads: c.heads,
+            head_dim: c.head_dim().unwrap(),
+            kv_heads: c.kv_heads,
+            max_context: c.max_context,
+            rms_epsilon: c.rms_epsilon,
+            rope_base: c.rope_base,
+        },
+        Qwen3Weights {
+            token_embedding: w.token_embedding.clone(),
+            output_norm: w.output_norm.clone(),
+            output: w.output.clone(),
+            layers: w
+                .layers
+                .iter()
+                .map(|layer| Qwen3Layer {
+                    attention_norm: layer.attention_norm.clone(),
+                    qkv: Qwen3Qkv::Separate {
+                        query: layer.query.clone(),
+                        key: layer.key.clone(),
+                        value: layer.value.clone(),
+                        query_bias: layer.query_bias.clone(),
+                        key_bias: layer.key_bias.clone(),
+                        value_bias: layer.value_bias.clone(),
+                    },
+                    attention_output: layer.attention_output.clone(),
+                    query_norm: vec![1.0; c.head_dim().unwrap()],
+                    key_norm: vec![1.0; c.head_dim().unwrap()],
+                    feed_forward_norm: layer.feed_forward_norm.clone(),
+                    gate: layer.gate.clone(),
+                    up: layer.up.clone(),
+                    down: layer.down.clone(),
+                })
+                .collect(),
+        },
+    )
+    .unwrap();
     vec![
         Arc::new(Model::Llama(llama)),
         Arc::new(Model::Mamba(fixtures::tiny_mamba().unwrap())),
         Arc::new(Model::Qwen2(qwen)),
+        Arc::new(Model::Qwen3(qwen3)),
     ]
 }
 fn context(model: Arc<Model>, limit: usize) -> Context {

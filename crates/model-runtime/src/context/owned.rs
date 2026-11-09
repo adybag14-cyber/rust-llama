@@ -156,6 +156,10 @@ impl MemoryShape {
                 layers: model.layer_count(),
                 width: model.config().kv_width()?,
             },
+            Model::Qwen3(model) => Self::Attention {
+                layers: model.layer_count(),
+                width: model.config().kv_width()?,
+            },
             Model::Mamba(model) => {
                 let config = model.config();
                 Self::Recurrent {

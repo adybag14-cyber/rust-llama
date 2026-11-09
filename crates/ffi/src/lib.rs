@@ -236,3 +236,6 @@ mod context_reference_tests;
 
 #[cfg(test)]
 mod model_shard_tests;
+
+#[cfg(test)]
+mod f16_context_reference_tests;

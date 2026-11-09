@@ -1,0 +1,75 @@
+"""Validate the exact e0af03a-rebased Qwen3 slice without altering inputs."""
+from pathlib import Path
+import hashlib, json, os, re, subprocess, sys, time
+BASE=Path(__file__).resolve().parent
+DRAFT=BASE/'rust-rebased'
+label,mode=sys.argv[1:3]
+OUT=BASE/'validation'/label
+OUT.mkdir(parents=True,exist_ok=False)
+def sha_file(path):
+    h=hashlib.sha256()
+    with path.open('rb') as inp:
+        for chunk in iter(lambda:inp.read(1024*1024),b''):h.update(chunk)
+    return h.hexdigest()
+def inventory():
+    result=[]
+    for current,dirs,files in os.walk(DRAFT):
+        dirs[:]=sorted(d for d in dirs if not d.startswith('target') and d!='.git')
+        for name in sorted(files):
+            path=Path(current)/name
+            rel=path.relative_to(DRAFT).as_posix()
+            if path.suffix in ('.rs','.toml') or name=='Cargo.lock' or rel in ('docs/integration-fixture-manifest.tsv','.github/workflows/ci.yml'):
+                result.append({'path':rel,'bytes':path.stat().st_size,'sha256':sha_file(path)})
+    for row in json.loads((BASE/'rebase-v1/fixture-records.json').read_text(encoding='utf-8')):
+        path=DRAFT/row['path']
+        actual={'path':row['path'],'bytes':path.stat().st_size,'sha256':sha_file(path)}
+        assert actual==row,('fixture changed',row,actual)
+        result.append(actual)
+    return sorted(result,key=lambda r:r['path'])
+def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8',newline='\n')
+before=inventory()
+dump(OUT/'source-and-qwen3-fixture-inputs.json',before)
+environment=os.environ.copy()
+environment['LLAMA_TEST_QWEN3_MODEL']=str(BASE.parent/'models/qwen3-0.6b-q8_0.gguf')
+commands=[]
+if mode=='pretrained':
+    commands=[('pretrained-release',['cargo','test','--offline','--locked','--release','-p','llama-inference','--test','qwen3','official_qwen3_q8_matches_original_native_profile','--','--ignored','--nocapture','--test-threads=1'])]
+elif mode=='focused':
+    commands=[
+      ('format',['cargo','fmt','--all','--','--check']),
+      ('debug',['cargo','test','--offline','--locked','-p','llama-model-runtime','-p','llama-inference','--all-targets','--','--nocapture']),
+      ('release',['cargo','test','--offline','--locked','--release','-p','llama-model-runtime','-p','llama-inference','--all-targets','--','--nocapture']),
+      ('clippy-workspace',['cargo','clippy','--offline','--locked','--workspace','--all-targets','--','-D','warnings']),
+      ('audit',['cargo','run','--offline','--locked','-p','xtask','--','audit']),
+      ('fixtures',['cargo','run','--offline','--locked','-p','xtask','--','fixtures'])
+    ]
+else:raise ValueError(mode)
+report={'baseline_commit':'e0af03a97ca7077c6f2aee680fb84b3fa688f82a','label':label,'mode':mode,
+        'input_count':len(before),'input_inventory_sha256':sha_file(OUT/'source-and-qwen3-fixture-inputs.json'),'steps':[]}
+dump(OUT/'report.json',report)
+failed=0
+for name,command in commands:
+    start=time.monotonic()
+    log_path=OUT/(name+'.log')
+    with log_path.open('w',encoding='utf-8',newline='\n') as output:
+        result=subprocess.run(command,cwd=DRAFT,env=environment,stdout=output,stderr=subprocess.STDOUT)
+    content=log_path.read_text(encoding='utf-8')
+    summaries=re.findall(r'test result: (\w+)\. (\d+) passed; (\d+) failed; (\d+) ignored;',content)
+    step={'name':name,'command':command,'exit_code':result.returncode,'elapsed_seconds':time.monotonic()-start,
+          'log_sha256':sha_file(log_path),
+          'test_counts':{'passed':sum(int(x[1]) for x in summaries),'failed':sum(int(x[2]) for x in summaries),'ignored':sum(int(x[3]) for x in summaries)},
+          'native_metrics':[line.strip() for line in content.splitlines() if 'qwen3-native:' in line]}
+    report['steps'].append(step)
+    unchanged=inventory()==before
+    report['inputs_unchanged']=unchanged
+    dump(OUT/'report.json',report)
+    print(json.dumps(step),flush=True)
+    print(content[-8000:],flush=True)
+    if not unchanged:raise RuntimeError('Input mutation during validation')
+    if result.returncode:
+        failed=result.returncode
+        break
+report['all_requested_steps_passed']=failed==0 and len(report['steps'])==len(commands)
+report['inputs_unchanged']=inventory()==before
+dump(OUT/'report.json',report)
+sys.exit(failed)

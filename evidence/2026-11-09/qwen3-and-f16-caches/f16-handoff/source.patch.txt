@@ -1,0 +1,2207 @@
+--- a/crates/model-runtime/src/context/native.rs
++++ b/crates/model-runtime/src/context/native.rs
+@@ -1,4 +1,4 @@
+-//! Frozen dense F32 KV memory semantics, separate from the strict Context API.
++//! Frozen dense F32/F16 KV memory semantics, separate from the strict Context API.
+ //!
+ //! Physical cache slots and pending copy/shift work are deliberately retained:
+ //! native state bytes describe stored data and position metadata, and do not
+@@ -10,8 +10,12 @@
+ #[path = "native_state.rs"]
+ mod native_state;
+ pub use native_state::NativeState;
++#[path = "native_kv.rs"]
++mod native_kv;
++pub use native_kv::NativeKvType;
++use native_kv::{KvBuffer, StoredKvLayer};
+ 
+-/// Dense F32 compatibility cache configuration.
++/// Dense F32/F16 compatibility cache configuration.
+ #[derive(Debug, Clone)]
+ pub struct NativeContextOptions {
+     pub context_tokens: usize,
+@@ -49,15 +53,15 @@
+     result.extend_from_slice(source);
+     Ok(result)
+ }
+-fn copy_layers(source: &[KvLayer]) -> Result<Vec<KvLayer>> {
++fn copy_layers(source: &[StoredKvLayer]) -> Result<Vec<StoredKvLayer>> {
+     let mut result = Vec::new();
+     result
+         .try_reserve_exact(source.len())
+         .map_err(|_| invalid("native layer allocation failed"))?;
+     for layer in source {
+-        result.push(KvLayer {
+-            keys: copy_values(&layer.keys)?,
+-            values: copy_values(&layer.values)?,
++        result.push(StoredKvLayer {
++            keys: layer.keys.try_clone()?,
++            values: layer.values.try_clone()?,
+         });
+     }
+     Ok(result)
+@@ -167,11 +171,11 @@
+ #[derive(Debug, Clone)]
+ struct Stream {
+     cells: Vec<Cell>,
+-    layers: Vec<KvLayer>,
++    layers: Vec<StoredKvLayer>,
+     head: usize,
+ }
+ 
+-/// Scalar implementation of the frozen Llama F32 memory contract.
++/// Scalar implementation of the frozen Llama F32/F16 memory contract.
+ ///
+ /// The strict Context type remains the safe sequential API. This compatibility
+ /// executor owns physical cells, can retain holes and duplicate positions after
+@@ -185,6 +189,8 @@
+     pending_copies: Vec<(usize, usize)>,
+     capacity: usize,
+     width: usize,
++    key_type: NativeKvType,
++    value_type: NativeKvType,
+ }
+ 
+ fn invalid(message: impl Into<String>) -> Error {
+@@ -193,16 +199,19 @@
+ fn range(p0: i32, p1: i32) -> (i32, i32) {
+     (p0.max(0), if p1 < 0 { i32::MAX } else { p1 })
+ }
+-fn zeroes(count: usize) -> Result<Vec<f32>> {
+-    let mut values = Vec::new();
+-    values
+-        .try_reserve_exact(count)
+-        .map_err(|_| invalid("cache allocation failed"))?;
+-    values.resize(count, 0.0);
+-    Ok(values)
+-}
+ impl NativeContext {
++    /// Preserve the original safe F32/nonflash compatibility constructor.
+     pub fn new(model: Arc<Model>, options: NativeContextOptions) -> Result<Self> {
++        Self::new_with_cache_types(model, options, NativeKvType::F32, NativeKvType::F32)
++    }
++    /// Select the source K/V element types independently. Attention remains
++    /// explicit nonflash: query and probability operands retain F32 precision.
++    pub fn new_with_cache_types(
++        model: Arc<Model>,
++        options: NativeContextOptions,
++        key_type: NativeKvType,
++        value_type: NativeKvType,
++    ) -> Result<Self> {
+         if options.maximum_sequences == 0
+             || options.maximum_sequences > 256
+             || options.context_tokens == 0
+@@ -247,7 +256,7 @@
+         let bytes = elements
+             .checked_mul(llama.layer_count())
+             .and_then(|n| n.checked_mul(streams))
+-            .and_then(|n| n.checked_mul(8))
++            .and_then(|n| n.checked_mul(key_type.size() + value_type.size()))
+             .ok_or_else(|| invalid("cache bytes overflow"))?;
+         // A transactional copy is needed for fallible decode/state input. Bound
+         // aggregate cache allocation before constructing any individual vector.
+@@ -267,7 +276,7 @@
+                 n.checked_add(
+                     streams
+                         .checked_mul(llama.layer_count())?
+-                        .checked_mul(std::mem::size_of::<KvLayer>())?,
++                        .checked_mul(std::mem::size_of::<StoredKvLayer>())?,
+                 )
+             })
+             .ok_or_else(|| invalid("native descriptor accounting overflow"))?;
+@@ -290,9 +299,9 @@
+                 .try_reserve_exact(llama.layer_count())
+                 .map_err(|_| invalid("layer allocation failed"))?;
+             for _ in 0..llama.layer_count() {
+-                layers.push(KvLayer {
+-                    keys: zeroes(elements)?,
+-                    values: zeroes(elements)?,
++                layers.push(StoredKvLayer {
++                    keys: KvBuffer::new(key_type, elements)?,
++                    values: KvBuffer::new(value_type, elements)?,
+                 });
+             }
+             let mut cells = Vec::new();
+@@ -314,6 +323,8 @@
+             pending_copies: Vec::new(),
+             capacity,
+             width,
++            key_type,
++            value_type,
+         })
+     }
+     fn storage_bytes(&self) -> Result<usize> {
+@@ -333,19 +344,13 @@
+             bytes = bytes
+                 .checked_add(stream.cells.capacity() * std::mem::size_of::<Cell>())
+                 .and_then(|n| {
+-                    n.checked_add(stream.layers.capacity() * std::mem::size_of::<KvLayer>())
++                    n.checked_add(stream.layers.capacity() * std::mem::size_of::<StoredKvLayer>())
+                 })
+                 .ok_or_else(|| invalid("native metadata accounting overflow"))?;
+             for layer in &stream.layers {
+                 bytes = bytes
+-                    .checked_add(
+-                        layer
+-                            .keys
+-                            .capacity()
+-                            .checked_mul(4)
+-                            .ok_or_else(|| invalid("key allocation overflow"))?,
+-                    )
+-                    .and_then(|n| n.checked_add(layer.values.capacity().checked_mul(4)?))
++                    .checked_add(layer.keys.capacity_bytes()?)
++                    .and_then(|n| n.checked_add(layer.values.capacity_bytes().ok()?))
+                     .ok_or_else(|| invalid("native tensor accounting overflow"))?;
+             }
+         }
+@@ -387,7 +392,15 @@
+             pending_copies: copy_values(&self.pending_copies)?,
+             capacity: self.capacity,
+             width: self.width,
++            key_type: self.key_type,
++            value_type: self.value_type,
+         })
++    }
++    pub fn cache_types(&self) -> (NativeKvType, NativeKvType) {
++        (self.key_type, self.value_type)
++    }
++    pub fn values_are_transposed(&self) -> bool {
++        true
+     }
+     pub fn model(&self) -> &Arc<Model> {
+         &self.model
+@@ -452,8 +465,8 @@
+             stream.head = 0;
+             if data {
+                 for layer in &mut stream.layers {
+-                    layer.keys.fill(0.0);
+-                    layer.values.fill(0.0);
++                    layer.keys.clear();
++                    layer.values.clear();
+                 }
+             }
+         }
+@@ -628,8 +641,8 @@
+                 (&right[0], &mut left[destination])
+             };
+             for (from, to) in source.layers.iter().zip(&mut destination.layers) {
+-                to.keys.copy_from_slice(&from.keys);
+-                to.values.copy_from_slice(&from.values);
++                to.keys.copy_from(&from.keys)?;
++                to.values.copy_from(&from.values)?;
+             }
+         }
+         self.pending_copies.clear();
+@@ -644,18 +657,20 @@
+                     continue;
+                 }
+                 for layer in &mut stream.layers {
+-                    let row = &mut layer.keys[index * self.width..(index + 1) * self.width];
+-                    for head in row.chunks_exact_mut(head_dim) {
++                    let start = index * self.width;
++                    for head in (start..start + self.width).step_by(head_dim) {
+                         let mut theta = cell.shift as f32;
+-                        for pair in head.as_chunks_mut::<2>().0 {
++                        for pair in (head..head + head_dim).step_by(2) {
+                             let (sin, cos) = theta.sin_cos();
+-                            let (x, y) = (pair[0], pair[1]);
+-                            pair[0] = x * cos - y * sin;
+-                            pair[1] = x * sin + y * cos;
++                            let (x, y) = (layer.keys.get(pair), layer.keys.get(pair + 1));
++                            layer.keys.set(pair, x * cos - y * sin);
++                            layer.keys.set(pair + 1, x * sin + y * cos);
+                             theta *= theta_scale;
+                         }
+                     }
+-                    math::finite(row, "shifted native keys")?;
++                    if (start..start + self.width).any(|index| !layer.keys.get(index).is_finite()) {
++                        return Err(Error::NonFinite("shifted native keys".into()));
++                    }
+                 }
+                 cell.shift = 0;
+             }
+@@ -962,12 +977,9 @@
+                         .try_reserve_exact(count)
+                         .map_err(|_| invalid("native visible value allocation failed"))?;
+                     for &index in &visible {
+-                        keys.extend_from_slice(
+-                            &layer.keys[index * staged.width..(index + 1) * staged.width],
+-                        );
+-                        values.extend_from_slice(
+-                            &layer.values[index * staged.width..(index + 1) * staged.width],
+-                        );
++                        let range = index * staged.width..(index + 1) * staged.width;
++                        layer.keys.extend_f32(range.clone(), &mut keys);
++                        layer.values.extend_f32(range, &mut values);
+                     }
+                     cache.push(KvLayer { keys, values });
+                 }
+@@ -988,18 +1000,19 @@
+                     &mut cache,
+                     insert,
+                     layout,
++                    (staged.key_type, staged.value_type),
+                     &staged.adapters,
+                     &mut cancelled,
+                 )?;
+                 for (source, destination) in cache.iter().zip(&mut staged.streams[stream].layers) {
+-                    destination.keys[slot * staged.width..(slot + 1) * staged.width]
+-                        .copy_from_slice(
+-                            &source.keys[insert * staged.width..(insert + 1) * staged.width],
+-                        );
+-                    destination.values[slot * staged.width..(slot + 1) * staged.width]
+-                        .copy_from_slice(
+-                            &source.values[insert * staged.width..(insert + 1) * staged.width],
+-                        );
++                    destination.keys.write_f32(
++                        slot * staged.width,
++                        &source.keys[insert * staged.width..(insert + 1) * staged.width],
++                    );
++                    destination.values.write_f32(
++                        slot * staged.width,
++                        &source.values[insert * staged.width..(insert + 1) * staged.width],
++                    );
+                 }
+                 if item.output != OutputSelection::None {
+                     outputs.push(TokenOutput {
+@@ -1041,7 +1054,7 @@
+     ) -> Result<usize> {
+         native_state::decode(self, bytes, sequence, flags, Some(tensors))
+     }
+-    /// Source-format bytes for dense F32 memory; separate from Context::save_state.
++    /// Source-format bytes for typed dense memory; separate from Context::save_state.
+     /// Pending copy/shift tasks are intentionally not serialized by that format.
+     pub fn save_native_state(&self, sequence: Option<i32>, flags: u32) -> Result<Vec<u8>> {
+         Ok(native_state::encode(self, sequence, flags)?.bytes)
+@@ -1060,6 +1073,12 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    fn address(buffer: &KvBuffer) -> usize {
++        match buffer {
++            KvBuffer::F32(v) => v.as_ptr().addr(),
++            KvBuffer::F16(v) => v.as_ptr().addr(),
++        }
++    }
+     fn context(unified: bool) -> NativeContext {
+         NativeContext::new(
+             Arc::new(Model::Llama(crate::fixtures::tiny_llama().unwrap())),
+@@ -1090,8 +1109,10 @@
+         let mut context = context(false);
+         for (index, stream) in context.streams.iter_mut().enumerate() {
+             for layer in &mut stream.layers {
+-                layer.keys.fill(index as f32);
+-                layer.values.fill((index + 10) as f32);
++                for at in 0..layer.keys.len() {
++                    layer.keys.set(at, index as f32);
++                    layer.values.set(at, (index + 10) as f32);
++                }
+             }
+         }
+         let pointers: Vec<_> = context
+@@ -1101,7 +1122,7 @@
+                 stream
+                     .layers
+                     .iter()
+-                    .map(|layer| (layer.keys.as_ptr(), layer.values.as_ptr()))
++                    .map(|layer| (address(&layer.keys), address(&layer.values)))
+             })
+             .collect();
+         context.copy_range(2, 0, -1, -1).unwrap();
+@@ -1110,8 +1131,8 @@
+         context.apply_pending().unwrap();
+         for stream in &context.streams {
+             for layer in &stream.layers {
+-                assert!(layer.keys.iter().all(|f| *f == 2.0));
+-                assert!(layer.values.iter().all(|f| *f == 12.0));
++                assert!((0..layer.keys.len()).all(|index| layer.keys.get(index) == 2.0));
++                assert!((0..layer.values.len()).all(|index| layer.values.get(index) == 12.0));
+             }
+         }
+         let after: Vec<_> = context
+@@ -1121,7 +1142,7 @@
+                 stream
+                     .layers
+                     .iter()
+-                    .map(|layer| (layer.keys.as_ptr(), layer.values.as_ptr()))
++                    .map(|layer| (address(&layer.keys), address(&layer.values)))
+             })
+             .collect();
+         assert_eq!(pointers, after);
+@@ -1231,4 +1252,72 @@
+             }
+         }
+     }
+-}
++    #[test]
++    fn native_half_state_preserves_raw_payloads_and_rejects_wrong_storage_type_atomically() {
++        let model = Arc::new(Model::Llama(crate::fixtures::tiny_llama().unwrap()));
++        let Model::Llama(llama) = model.as_ref() else {
++            unreachable!()
++        };
++        let width = llama.config().kv_width().unwrap();
++        let options = NativeContextOptions {
++            context_tokens: 65_536usize.div_ceil(width),
++            maximum_sequences: 1,
++            microbatch_tokens: 1,
++            maximum_batch_tokens: 1,
++            unified: true,
++        };
++        let mut original = NativeContext::new_with_cache_types(
++            model.clone(),
++            options.clone(),
++            NativeKvType::F16,
++            NativeKvType::F16,
++        )
++        .unwrap();
++        for (position, cell) in original.streams[0].cells.iter_mut().enumerate() {
++            *cell = Cell {
++                position: position as i32,
++                shift: 0,
++                sequences: [0].into_iter().collect(),
++            };
++        }
++        for layer in &mut original.streams[0].layers {
++            for index in 0..layer.keys.len() {
++                layer.keys.set_bits(index, (index & 0xffff) as u32);
++                layer.values.set_bits(index, ((!index) & 0xffff) as u32);
++            }
++        }
++        let bytes = original.save_native_state(None, 0).unwrap();
++        let mut restored = NativeContext::new_with_cache_types(
++            model.clone(),
++            options.clone(),
++            NativeKvType::F16,
++            NativeKvType::F16,
++        )
++        .unwrap();
++        assert_eq!(
++            restored.restore_native_state(&bytes, None, 0).unwrap(),
++            bytes.len()
++        );
++        assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
++        let device = original.prepare_native_state(Some(0), 2).unwrap();
++        restored.clear(true);
++        restored
++            .restore_native_state_with_tensors(&device.bytes, Some(0), 2, &device.tensors)
++            .unwrap();
++        assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
++        // A type mismatch cannot reinterpret two-byte payloads as F32 or
++        // commit the already parsed metadata in the transactional executor.
++        let mut wrong = NativeContext::new(model, options).unwrap();
++        let before = wrong.save_native_state(None, 0).unwrap();
++        assert!(wrong.restore_native_state(&bytes, None, 0).is_err());
++        assert_eq!(wrong.save_native_state(None, 0).unwrap(), before);
++        for cut in [0, 4, 8, 16, bytes.len() / 2, bytes.len() - 1] {
++            assert!(
++                restored
++                    .restore_native_state(&bytes[..cut], None, 0)
++                    .is_err()
++            );
++            assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
++        }
++    }
++}
+--- /dev/null
++++ b/crates/model-runtime/src/context/native_kv.rs
+@@ -0,0 +1,183 @@
++//! Typed, owned native cache storage. F16 bits are retained across state I/O.
++use super::{copy_values, invalid};
++use crate::Result;
++use std::ops::Range;
++
++/// Supported source KV element types. These are the frozen GGML numeric IDs.
++#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
++#[repr(u32)]
++pub enum NativeKvType {
++    #[default]
++    F32 = 0,
++    F16 = 1,
++}
++impl NativeKvType {
++    pub const fn size(self) -> usize {
++        match self {
++            Self::F32 => 4,
++            Self::F16 => 2,
++        }
++    }
++    pub(crate) fn round(self, value: f32) -> f32 {
++        match self {
++            Self::F32 => value,
++            Self::F16 => llama_quant::f16_to_f32(llama_quant::f32_to_f16(value)),
++        }
++    }
++}
++
++#[derive(Debug, Clone)]
++pub(super) enum KvBuffer {
++    F32(Vec<f32>),
++    F16(Vec<u16>),
++}
++impl KvBuffer {
++    pub(super) fn new(kind: NativeKvType, count: usize) -> Result<Self> {
++        fn zeroed<T: Default + Clone>(count: usize) -> Result<Vec<T>> {
++            let mut values = Vec::new();
++            values
++                .try_reserve_exact(count)
++                .map_err(|_| invalid("native typed cache allocation failed"))?;
++            values.resize(count, T::default());
++            Ok(values)
++        }
++        Ok(match kind {
++            NativeKvType::F32 => Self::F32(zeroed(count)?),
++            NativeKvType::F16 => Self::F16(zeroed(count)?),
++        })
++    }
++    pub(super) fn kind(&self) -> NativeKvType {
++        match self {
++            Self::F32(_) => NativeKvType::F32,
++            Self::F16(_) => NativeKvType::F16,
++        }
++    }
++    pub(super) fn len(&self) -> usize {
++        match self {
++            Self::F32(v) => v.len(),
++            Self::F16(v) => v.len(),
++        }
++    }
++    pub(super) fn capacity_bytes(&self) -> Result<usize> {
++        let capacity = match self {
++            Self::F32(v) => v.capacity(),
++            Self::F16(v) => v.capacity(),
++        };
++        capacity
++            .checked_mul(self.kind().size())
++            .ok_or_else(|| invalid("native typed cache accounting overflow"))
++    }
++    pub(super) fn try_clone(&self) -> Result<Self> {
++        Ok(match self {
++            Self::F32(v) => Self::F32(copy_values(v)?),
++            Self::F16(v) => Self::F16(copy_values(v)?),
++        })
++    }
++    pub(super) fn clear(&mut self) {
++        match self {
++            Self::F32(v) => v.fill(0.0),
++            Self::F16(v) => v.fill(0),
++        }
++    }
++    pub(super) fn get(&self, index: usize) -> f32 {
++        match self {
++            Self::F32(v) => v[index],
++            Self::F16(v) => llama_quant::f16_to_f32(v[index]),
++        }
++    }
++    pub(super) fn bits(&self, index: usize) -> u32 {
++        match self {
++            Self::F32(v) => v[index].to_bits(),
++            Self::F16(v) => u32::from(v[index]),
++        }
++    }
++    pub(super) fn set_bits(&mut self, index: usize, bits: u32) {
++        match self {
++            Self::F32(v) => v[index] = f32::from_bits(bits),
++            Self::F16(v) => v[index] = bits as u16,
++        }
++    }
++    pub(super) fn set(&mut self, index: usize, value: f32) {
++        match self {
++            Self::F32(v) => v[index] = value,
++            Self::F16(v) => v[index] = llama_quant::f32_to_f16(value),
++        }
++    }
++    pub(super) fn extend_f32(&self, range: Range<usize>, target: &mut Vec<f32>) {
++        match self {
++            Self::F32(v) => target.extend_from_slice(&v[range]),
++            Self::F16(v) => target.extend(v[range].iter().copied().map(llama_quant::f16_to_f32)),
++        }
++    }
++    pub(super) fn write_f32(&mut self, start: usize, source: &[f32]) {
++        match self {
++            Self::F32(v) => v[start..start + source.len()].copy_from_slice(source),
++            Self::F16(v) => {
++                for (destination, source) in v[start..start + source.len()].iter_mut().zip(source) {
++                    *destination = llama_quant::f32_to_f16(*source);
++                }
++            }
++        }
++    }
++    pub(super) fn copy_from(&mut self, source: &Self) -> Result<()> {
++        if self.kind() != source.kind() || self.len() != source.len() {
++            return Err(invalid("native typed cache copy mismatch"));
++        }
++        self.copy_range(0, source, 0..source.len())
++    }
++    pub(super) fn copy_range(
++        &mut self,
++        destination: usize,
++        source: &Self,
++        range: Range<usize>,
++    ) -> Result<()> {
++        if range.start > range.end || range.end > source.len() {
++            return Err(invalid("native cache source range mismatch"));
++        }
++        let end = destination
++            .checked_add(range.len())
++            .filter(|end| *end <= self.len())
++            .ok_or_else(|| invalid("native cache destination range overflow"))?;
++        match (self, source) {
++            (Self::F32(to), Self::F32(from)) => to[destination..end].copy_from_slice(&from[range]),
++            (Self::F16(to), Self::F16(from)) => to[destination..end].copy_from_slice(&from[range]),
++            _ => return Err(invalid("native cache copy element type mismatch")),
++        }
++        Ok(())
++    }
++}
++#[derive(Debug, Clone)]
++pub(super) struct StoredKvLayer {
++    pub(super) keys: KvBuffer,
++    pub(super) values: KvBuffer,
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn half_storage_preserves_every_payload_without_conversion() {
++        let mut original = KvBuffer::new(NativeKvType::F16, 65_536).unwrap();
++        for bits in 0..65_536 {
++            original.set_bits(bits, bits as u32);
++        }
++        let clone = original.try_clone().unwrap();
++        let mut copied = KvBuffer::new(NativeKvType::F16, 65_536).unwrap();
++        copied.copy_from(&clone).unwrap();
++        for bits in 0..65_536 {
++            assert_eq!(copied.bits(bits), bits as u32);
++        }
++        assert_eq!(copied.capacity_bytes().unwrap(), 131_072);
++        copied.clear();
++        assert!((0..65_536).all(|index| copied.bits(index) == 0));
++    }
++    #[test]
++    fn typed_copy_rejects_mismatch_without_writes() {
++        let source = KvBuffer::new(NativeKvType::F32, 8).unwrap();
++        let mut destination = KvBuffer::new(NativeKvType::F16, 8).unwrap();
++        destination.set_bits(0, 0x7c01);
++        assert!(destination.copy_from(&source).is_err());
++        assert!(destination.copy_range(7, &source, 0..2).is_err());
++        assert_eq!(destination.bits(0), 0x7c01);
++    }
++}
+--- a/crates/model-runtime/src/context/native_state.rs
++++ b/crates/model-runtime/src/context/native_state.rs
+@@ -1,5 +1,5 @@
+-use super::{Cell, NativeContext, SequenceSet, invalid, zeroes};
+-use crate::{Result, llama::KvLayer};
++use super::{Cell, KvBuffer, NativeContext, NativeKvType, SequenceSet, StoredKvLayer, invalid};
++use crate::Result;
+ 
+ /// Raw frozen memory serialization, before sequence-I/O or session headers.
+ /// For ON_DEVICE, tensor bytes are held separately in the owning CPU context.
+@@ -78,12 +78,20 @@
+         add(&mut result.boundaries, s.cells, 2)?;
+         add(&mut result.boundaries, s.ids, 1)?;
+         add(&mut result.boundaries, 1, 4)?;
+-        add(&mut result.boundaries, stream.layers.len(), 5)?;
++        add(
++            &mut result.boundaries,
++            stream.layers.len(),
++            if context.values_are_transposed() {
++                5
++            } else {
++                4
++            },
++        )?;
+         let tensor = s
+             .cells
+             .checked_mul(context.width)
+             .and_then(|n| n.checked_mul(stream.layers.len()))
+-            .and_then(|n| n.checked_mul(8))
++            .and_then(|n| n.checked_mul(context.key_type.size() + context.value_type.size()))
+             .ok_or_else(|| invalid("native tensor serialization size overflow"))?;
+         if flags & 2 != 0 {
+             add(&mut result.tensors, tensor, 1)?;
+@@ -91,7 +99,11 @@
+             add(&mut result.bytes, tensor, 1)?;
+             let chunks = s
+                 .ranges
+-                .checked_mul(context.width + 1)
++                .checked_mul(if context.values_are_transposed() {
++                    context.width + 1
++                } else {
++                    2
++                })
+                 .ok_or_else(|| invalid("native tensor chunk count overflow"))?;
+             add(&mut result.boundaries, chunks, stream.layers.len())?;
+         }
+@@ -150,15 +162,18 @@
+     fn u64(&mut self, value: u64) {
+         self.raw(&value.to_le_bytes());
+     }
+-    fn tensor(&mut self, values: impl Iterator<Item = f32>) {
+-        if self.device {
+-            for value in values {
+-                self.state.tensors.extend_from_slice(&value.to_le_bytes());
+-            }
++    fn tensor(&mut self, values: &KvBuffer, indices: impl Iterator<Item = usize>) {
++        let width = values.kind().size();
++        let target = if self.device {
++            &mut self.state.tensors
+         } else {
+-            for value in values {
+-                self.state.bytes.extend_from_slice(&value.to_le_bytes());
+-            }
++            &mut self.state.bytes
++        };
++        for index in indices {
++            let bytes = values.bits(index).to_le_bytes();
++            target.extend_from_slice(&bytes[..width]);
++        }
++        if !self.device {
+             self.state.write_boundaries.push(self.state.bytes.len());
+         }
+     }
+@@ -242,31 +257,39 @@
+                 out.i32(id);
+             }
+         }
+-        out.u32(1);
++        out.u32(u32::from(context.values_are_transposed()));
+         out.u32(stream.layers.len() as u32);
+         out.u32(0);
+         out.u32(0);
+         for layer in &stream.layers {
+-            out.i32(0);
+-            out.u64((context.width * 4) as u64);
++            out.i32(context.key_type as i32);
++            out.u64((context.width * context.key_type.size()) as u64);
+             for range in &ranges {
+                 out.tensor(
+-                    layer.keys[range.start * context.width..range.end * context.width]
+-                        .iter()
+-                        .copied(),
++                    &layer.keys,
++                    range.start * context.width..range.end * context.width,
+                 );
+             }
+         }
+         for layer in &stream.layers {
+-            out.i32(0);
+-            out.u32(4);
+-            out.u32(context.width as u32);
+-            for dimension in 0..context.width {
++            out.i32(context.value_type as i32);
++            if context.values_are_transposed() {
++                out.u32(context.value_type.size() as u32);
++                out.u32(context.width as u32);
++                for dimension in 0..context.width {
++                    for range in &ranges {
++                        out.tensor(
++                            &layer.values,
++                            range.clone().map(|index| index * context.width + dimension),
++                        );
++                    }
++                }
++            } else {
++                out.u64((context.width * context.value_type.size()) as u64);
+                 for range in &ranges {
+                     out.tensor(
+-                        range
+-                            .clone()
+-                            .map(|index| layer.values[index * context.width + dimension]),
++                        &layer.values,
++                        range.start * context.width..range.end * context.width,
+                     );
+                 }
+             }
+@@ -309,9 +332,10 @@
+             self.bytes(8)?.try_into().expect("eight bytes"),
+         ))
+     }
+-    fn floats(&mut self, count: usize) -> Result<Vec<f32>> {
++    fn tensor(&mut self, kind: NativeKvType, count: usize) -> Result<KvBuffer> {
++        let width = kind.size();
+         let n = count
+-            .checked_mul(4)
++            .checked_mul(width)
+             .ok_or_else(|| invalid("native tensor byte overflow"))?;
+         let raw = if let Some(tensors) = self.tensors {
+             let end = self
+@@ -325,16 +349,17 @@
+         } else {
+             self.bytes(n)?
+         };
+-        let mut values = Vec::new();
+-        values
+-            .try_reserve_exact(count)
+-            .map_err(|_| invalid("native restored tensor allocation failed"))?;
+-        values.extend(
+-            raw.as_chunks::<4>()
+-                .0
+-                .iter()
+-                .map(|raw| f32::from_le_bytes(*raw)),
+-        );
++        let mut values = KvBuffer::new(kind, count)?;
++        // Keep the original stored bits: converting signaling NaNs through
++        // floating-point values would irreversibly change F16 state payloads.
++        for (index, scalar) in raw.chunks_exact(width).enumerate() {
++            let bits = if width == 2 {
++                u32::from(u16::from_le_bytes(scalar.try_into().expect("two bytes")))
++            } else {
++                u32::from_le_bytes(scalar.try_into().expect("four bytes"))
++            };
++            values.set_bits(index, bits);
++        }
+         Ok(values)
+     }
+ }
+@@ -399,11 +424,33 @@
+             Some(id) => staged.stream_id(id)?,
+             None => source,
+         };
++        // Typed K/V copies, one temporary transposed V, cell records, slot
++        // indices and layer descriptors can coexist during the staged restore.
+         let temporary = count
+             .checked_mul(staged.width)
+-            .and_then(|n| n.checked_mul(4))
+-            .and_then(|n| n.checked_mul(staged.model.layer_count() * 2 + 1))
+-            .and_then(|n| n.checked_add(count * std::mem::size_of::<Cell>()))
++            .and_then(|n| n.checked_mul(staged.key_type.size() + staged.value_type.size()))
++            .and_then(|n| n.checked_mul(staged.model.layer_count()))
++            .and_then(|n| {
++                n.checked_add(
++                    count
++                        .checked_mul(staged.width)?
++                        .checked_mul(staged.value_type.size())?,
++                )
++            })
++            .and_then(|n| {
++                n.checked_add(
++                    count
++                        .checked_mul(std::mem::size_of::<Cell>() + std::mem::size_of::<usize>())?,
++                )
++            })
++            .and_then(|n| {
++                n.checked_add(
++                    staged
++                        .model
++                        .layer_count()
++                        .checked_mul(std::mem::size_of::<StoredKvLayer>())?,
++                )
++            })
+             .ok_or_else(|| invalid("native restore temporary size overflow"))?;
+         context.check_work(
+             context
+@@ -443,7 +490,7 @@
+                 sequences,
+             });
+         }
+-        if input.u32()? != 1 {
++        if input.u32()? != u32::from(staged.values_are_transposed()) {
+             return Err(invalid("native V transposition mismatch"));
+         }
+         let layers = input.u32()? as usize;
+@@ -460,25 +507,41 @@
+         data.try_reserve_exact(layers)
+             .map_err(|_| invalid("native restore layer allocation failed"))?;
+         for _ in 0..layers {
+-            if input.i32()? != 0 || input.u64()? != (staged.width * 4) as u64 {
++            if input.i32()? != staged.key_type as i32
++                || input.u64()? != (staged.width * staged.key_type.size()) as u64
++            {
+                 return Err(invalid("native state key type or row size mismatch"));
+             }
+-            data.push(KvLayer {
+-                keys: input.floats(elements)?,
+-                values: Vec::new(),
++            data.push(StoredKvLayer {
++                keys: input.tensor(staged.key_type, elements)?,
++                values: KvBuffer::new(staged.value_type, 0)?,
+             });
+         }
+         for layer in &mut data {
+-            if input.i32()? != 0 || input.u32()? != 4 || input.u32()? != staged.width as u32 {
+-                return Err(invalid("native state value shape mismatch"));
+-            }
+-            let transposed = input.floats(elements)?;
+-            layer.values = zeroes(elements)?;
+-            for dimension in 0..staged.width {
+-                for index in 0..count {
+-                    layer.values[index * staged.width + dimension] =
+-                        transposed[dimension * count + index];
++            if input.i32()? != staged.value_type as i32 {
++                return Err(invalid("native state value type mismatch"));
++            }
++            if staged.values_are_transposed() {
++                if input.u32()? != staged.value_type.size() as u32
++                    || input.u32()? != staged.width as u32
++                {
++                    return Err(invalid("native state value shape mismatch"));
+                 }
++                let transposed = input.tensor(staged.value_type, elements)?;
++                layer.values = KvBuffer::new(staged.value_type, elements)?;
++                for dimension in 0..staged.width {
++                    for index in 0..count {
++                        layer.values.set_bits(
++                            index * staged.width + dimension,
++                            transposed.bits(dimension * count + index),
++                        );
++                    }
++                }
++            } else {
++                if input.u64()? != (staged.width * staged.value_type.size()) as u64 {
++                    return Err(invalid("native state value row size mismatch"));
++                }
++                layer.values = input.tensor(staged.value_type, elements)?;
+             }
+         }
+         let slots = if let Some(id) = wanted {
+@@ -496,10 +559,11 @@
+         for ((index, cell), &slot) in cells.into_iter().enumerate().zip(&slots) {
+             stream.cells[slot] = cell;
+             for (src, dst) in data.iter().zip(&mut stream.layers) {
+-                dst.keys[slot * staged.width..(slot + 1) * staged.width]
+-                    .copy_from_slice(&src.keys[index * staged.width..(index + 1) * staged.width]);
+-                dst.values[slot * staged.width..(slot + 1) * staged.width]
+-                    .copy_from_slice(&src.values[index * staged.width..(index + 1) * staged.width]);
++                let source_range = index * staged.width..(index + 1) * staged.width;
++                dst.keys
++                    .copy_range(slot * staged.width, &src.keys, source_range.clone())?;
++                dst.values
++                    .copy_range(slot * staged.width, &src.values, source_range)?;
+             }
+         }
+         stream.head = if wanted.is_some() {
+--- a/crates/model-runtime/src/llama.rs
++++ b/crates/model-runtime/src/llama.rs
+@@ -1,4 +1,5 @@
+ //! Dense F32 Llama graph slice translated from `src/models/llama.cpp`.
++use crate::context::NativeKvType;
+ use crate::{AdapterSet, Error, Fingerprint, Matrix, Result, check_epsilon, check_positive, math};
+ 
+ #[derive(Debug, Clone)]
+@@ -221,7 +222,16 @@
+                 .checked_add(1)
+                 .ok_or_else(|| Error::InvalidState("KV row count overflow".into()))?,
+         )?;
+-        self.step_inserting(hidden, position, cache, insertion, layout, adapters, cancel)
++        self.step_inserting(
++            hidden,
++            position,
++            cache,
++            insertion,
++            layout,
++            (NativeKvType::F32, NativeKvType::F32),
++            adapters,
++            cancel,
++        )
+     }
+     // A physical native KV hole can precede already populated cells. Preserve
+     // source accumulation order by inserting the new row at that exact index.
+@@ -233,6 +243,7 @@
+         cache: &mut [KvLayer],
+         insertion: usize,
+         layout: math::AttentionLayout<'_>,
++        cache_types: (NativeKvType, NativeKvType),
+         adapters: &AdapterSet,
+         cancel: &mut impl FnMut() -> bool,
+     ) -> Result<(Vec<f32>, Vec<f32>)> {
+@@ -270,6 +281,12 @@
+             math::bias(&mut v, &layer.value_bias);
+             math::rope(&mut q, c.head_dim()?, position, c.rope_base);
+             math::rope(&mut k, c.head_dim()?, position, c.rope_base);
++            // Native cache storage rounds at the original graph's copy into
++            // K/V tensors. Nonflash Q and probability operands stay F32.
++            k.iter_mut()
++                .for_each(|value| *value = cache_types.0.round(*value));
++            v.iter_mut()
++                .for_each(|value| *value = cache_types.1.round(*value));
+             kv.keys.splice(offset..offset, k);
+             kv.values.splice(offset..offset, v);
+             let attention = math::attention_with_layout(
+--- a/crates/ffi/src/context.rs
++++ b/crates/ffi/src/context.rs
+@@ -1,6 +1,7 @@
+ use crate::*;
+ use llama_model_runtime::{
+-    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, OutputSelection,
++    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType,
++    OutputSelection,
+ };
+ use std::collections::BTreeMap;
+ use std::ffi::c_void;
+@@ -39,16 +40,20 @@
+     ] {
+         boolean(value)?;
+     }
+-    if p.type_k != 0 || p.type_v != 0 {
+-        return Err("Rust C ABI currently requires type_k = type_v = GGML_TYPE_F32; F16 cache defaults are not yet implemented".into());
+-    }
++    let cache_type = |value| match value {
++        0 => Ok(NativeKvType::F32),
++        1 => Ok(NativeKvType::F16),
++        _ => Err("native CPU cache requires GGML_TYPE_F32 or GGML_TYPE_F16"),
++    };
++    let key_type = cache_type(p.type_k)?;
++    let value_type = cache_type(p.type_v)?;
+     if p.ctx_type != 0
+         || ![-1, 0].contains(&p.rope_scaling_type)
+         || ![-1, 0].contains(&p.pooling_type)
+         || ![-1, 0].contains(&p.attention_type)
+-        || ![-1, 0].contains(&p.flash_attn_type)
+-    {
+-        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and disabled/automatic flash attention are supported".into());
++        || p.flash_attn_type != 0
++    {
++        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and explicitly disabled flash attention are supported; native AUTO/flash arithmetic is not yet available".into());
+     }
+     if !(p.rope_freq_base == 0.0 || p.rope_freq_base == data.rope_base)
+         || !(p.rope_freq_scale == 0.0 || p.rope_freq_scale == 1.0)
+@@ -98,7 +103,7 @@
+         p.n_ubatch
+     })
+     .min(n_batch);
+-    let runtime = NativeContext::new(
++    let runtime = NativeContext::new_with_cache_types(
+         loaded.runtime_model().map_err(|e| e.to_string())?,
+         NativeContextOptions {
+             context_tokens: n_ctx as usize,
+@@ -107,6 +112,8 @@
+             maximum_batch_tokens: n_batch as usize,
+             unified: p.kv_unified != 0,
+         },
++        key_type,
++        value_type,
+     )
+     .map_err(|e| e.to_string())?;
+     let n_ctx = runtime.context_tokens() as u32;
+--- a/crates/ffi/src/state.rs
++++ b/crates/ffi/src/state.rs
+@@ -1,4 +1,4 @@
+-//! Frozen state/session serialization for the supported dense F32 CPU context.
++//! Frozen state/session serialization for the supported dense F32/F16 CPU context.
+ use crate::*;
+ use llama_model_runtime::{Model as RuntimeModel, NativeState};
+ use std::ffi::c_char;
+@@ -269,6 +269,7 @@
+         return Err("unsupported native state model".into());
+     };
+     let width = model.config().kv_width().map_err(|e| e.to_string())?;
++    let (key_type, value_type) = context.runtime.cache_types();
+     let mut reader = LegacyReader { source, at: 0 };
+     if unsafe { reader.u32()? } != 5 {
+         return Err("legacy state architecture length mismatch".into());
+@@ -299,31 +300,46 @@
+             }
+             reader.skip(ids * 4)?;
+         }
+-        if unsafe { reader.u32()? } != 1
++        if unsafe { reader.u32()? } != u32::from(context.runtime.values_are_transposed())
+             || unsafe { reader.u32()? } as usize != model.layer_count()
+             || unsafe { reader.u32()? } != 0
+             || unsafe { reader.u32()? } != 0
+         {
+             return Err("legacy native state tensor layout mismatch".into());
+         }
+-        let tensor_bytes = count
++        let elements = count
+             .checked_mul(width)
+-            .and_then(|n| n.checked_mul(4))
+-            .ok_or("legacy tensor byte overflow")?;
++            .ok_or("legacy tensor shape overflow")?;
+         for _ in 0..model.layer_count() {
+-            if unsafe { reader.u32()? } != 0 || unsafe { reader.u64()? } != (width * 4) as u64 {
++            if unsafe { reader.u32()? } != key_type as u32
++                || unsafe { reader.u64()? } != (width * key_type.size()) as u64
++            {
+                 return Err("legacy state key type/shape mismatch".into());
+             }
+-            reader.skip(tensor_bytes)?;
++            reader.skip(
++                elements
++                    .checked_mul(key_type.size())
++                    .ok_or("legacy key byte overflow")?,
++            )?;
+         }
+         for _ in 0..model.layer_count() {
+-            if unsafe { reader.u32()? } != 0
+-                || unsafe { reader.u32()? } != 4
+-                || unsafe { reader.u32()? } as usize != width
+-            {
+-                return Err("legacy state value type/shape mismatch".into());
++            if unsafe { reader.u32()? } != value_type as u32 {
++                return Err("legacy state value type mismatch".into());
+             }
+-            reader.skip(tensor_bytes)?;
++            if context.runtime.values_are_transposed() {
++                if unsafe { reader.u32()? } != value_type.size() as u32
++                    || unsafe { reader.u32()? } as usize != width
++                {
++                    return Err("legacy state value shape mismatch".into());
++                }
++            } else if unsafe { reader.u64()? } != (width * value_type.size()) as u64 {
++                return Err("legacy state value row size mismatch".into());
++            }
++            reader.skip(
++                elements
++                    .checked_mul(value_type.size())
++                    .ok_or("legacy value byte overflow")?,
++            )?;
+         }
+     }
+     Ok(reader.at)
+--- a/crates/model-runtime/src/context.rs
++++ b/crates/model-runtime/src/context.rs
+@@ -464,4 +464,6 @@
+ mod allocation_tests;
+ 
+ mod native;
+-pub use native::{NativeBatchToken, NativeContext, NativeContextOptions, NativeState};
++pub use native::{
++    NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType, NativeState,
++};
+--- a/crates/model-runtime/src/lib.rs
++++ b/crates/model-runtime/src/lib.rs
+@@ -23,7 +23,7 @@
+ pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
+ pub use context::{
+     BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
+-    NativeContextOptions, NativeState, OutputSelection, TokenOutput,
++    NativeContextOptions, NativeKvType, NativeState, OutputSelection, TokenOutput,
+ };
+ pub use fixtures::{SmokeReport, smoke_demo};
+ pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
+--- /dev/null
++++ b/crates/tensor/tests/native_f16_cache_matmul.rs
+@@ -0,0 +1,150 @@
++use llama_tensor::{DType, Graph, Op, Tensor, TensorDesc};
++
++struct Reader {
++    bytes: &'static [u8],
++    at: usize,
++}
++impl Reader {
++    fn take(&mut self, n: usize) -> &'static [u8] {
++        let out = &self.bytes[self.at..self.at + n];
++        self.at += n;
++        out
++    }
++    fn u32(&mut self) -> u32 {
++        u32::from_le_bytes(self.take(4).try_into().unwrap())
++    }
++    fn u64(&mut self) -> usize {
++        usize::try_from(u64::from_le_bytes(self.take(8).try_into().unwrap())).unwrap()
++    }
++    fn i64(&mut self) -> i64 {
++        i64::from_le_bytes(self.take(8).try_into().unwrap())
++    }
++    fn f32(&mut self) -> f32 {
++        f32::from_le_bytes(self.take(4).try_into().unwrap())
++    }
++    fn string(&mut self) -> &'static str {
++        let n = self.u32() as usize;
++        std::str::from_utf8(self.take(n)).unwrap()
++    }
++    fn tensor(&mut self, strided: bool) -> Tensor {
++        let dtype = DType::from_id(self.u32()).unwrap();
++        let shape = std::array::from_fn(|_| self.u64());
++        let desc = if strided {
++            TensorDesc::with_strides(dtype, shape, std::array::from_fn(|_| self.u64())).unwrap()
++        } else {
++            TensorDesc::contiguous(dtype, shape).unwrap()
++        };
++        let bytes = self.u64();
++        Tensor::from_bytes(desc, self.take(bytes).to_vec()).unwrap()
++    }
++}
++
++fn evaluate(op: Op, inputs: Vec<Tensor>) -> llama_tensor::Result<Tensor> {
++    let mut graph = Graph::new();
++    let ids = inputs
++        .into_iter()
++        .map(|t| graph.input(t))
++        .collect::<Vec<_>>();
++    let target = graph.op(op, &ids)?;
++    graph.evaluate(target)
++}
++
++fn operation(tag: &str, _ints: &[i64], _floats: &[f32]) -> Op {
++    assert_eq!(tag, "mul_mat");
++    Op::MatMul
++}
++fn compare_fixture(bytes: &'static [u8]) {
++    let mut reader = Reader { bytes, at: 0 };
++    assert_eq!(reader.take(8), b"GGTR0002");
++    let cases = reader.u32();
++    let mut total_bytes = 0;
++    let mut bad_cases = 0;
++    let mut bad_values = 0;
++    let mut finite_bad = 0;
++    let mut details = Vec::new();
++    for _ in 0..cases {
++        let name = reader.string();
++        let tag = reader.string();
++        assert_eq!(reader.u32(), 0, "exact native-byte reference");
++        let ni = reader.u32();
++        let ints = (0..ni).map(|_| reader.i64()).collect::<Vec<_>>();
++        let nf = reader.u32();
++        let floats = (0..nf).map(|_| reader.f32()).collect::<Vec<_>>();
++        let nt = reader.u32();
++        let inputs = (0..nt).map(|_| reader.tensor(true)).collect::<Vec<_>>();
++        let expected = reader.tensor(false);
++        let result = match evaluate(operation(tag, &ints, &floats), inputs) {
++            Ok(value) => value,
++            Err(error) => {
++                bad_cases += 1;
++                details.push(format!("{name}: {error}"));
++                continue;
++            }
++        };
++        assert_eq!(result.dtype(), expected.dtype(), "{name}");
++        assert_eq!(result.shape(), expected.shape(), "{name}");
++        let dtype = result.dtype();
++        let actual = result.to_bytes().unwrap();
++        let expected = expected.to_bytes().unwrap();
++        assert_eq!(actual.len(), expected.len(), "{name}");
++        total_bytes += actual.len();
++        let width = if dtype == DType::F32 { 4 } else { 2 };
++        let mut case_bad = 0;
++        let mut case_finite = 0;
++        let mut first = None;
++        for (index, (a, b)) in actual
++            .chunks_exact(width)
++            .zip(expected.chunks_exact(width))
++            .enumerate()
++        {
++            if a == b {
++                continue;
++            }
++            case_bad += 1;
++            let decode = |raw: &[u8]| match dtype {
++                DType::F32 => f32::from_le_bytes(raw.try_into().unwrap()),
++                DType::F16 => llama_quant::f16_to_f32(u16::from_le_bytes(raw.try_into().unwrap())),
++                DType::BF16 => {
++                    llama_quant::bf16_to_f32(u16::from_le_bytes(raw.try_into().unwrap()))
++                }
++                _ => panic!("unexpected native output dtype"),
++            };
++            let av = decode(a);
++            let bv = decode(b);
++            if av.is_finite() && bv.is_finite() {
++                case_finite += 1;
++            }
++            if first.is_none() {
++                first = Some(format!(
++                    "index {index}: Rust {a:02x?} ({av:?}), native {b:02x?} ({bv:?})"
++                ));
++            }
++        }
++        if case_bad > 0 {
++            bad_cases += 1;
++            bad_values += case_bad;
++            finite_bad += case_finite;
++            if details.len() < 80 {
++                details.push(format!(
++                    "{name}: {case_bad} differing values ({case_finite} finite); {}",
++                    first.unwrap()
++                ));
++            }
++        }
++    }
++    assert_eq!(reader.at, bytes.len());
++    assert_eq!(cases, 125);
++    assert_eq!(total_bytes, 980_616);
++    println!(
++        "{cases} source-native F16 cache matmul cases; output bytes {total_bytes}; differing cases {bad_cases}; differing values {bad_values}; finite differing values {finite_bad}"
++    );
++    assert_eq!(bad_cases, 0, "{}", details.join("\n"));
++}
++#[test]
++fn native_cache_matmul_keeps_unrounded_f32_rhs_and_strided_f16_weights() {
++    // Independently captured original MSVC and GNU files are byte-identical.
++    // The two provenance records retain both captures without duplicating data.
++    compare_fixture(include_bytes!(
++        "fixtures/f16-cache/f16-cache-matmul-reference.bin"
++    ));
++}
+--- a/crates/ffi/src/lib.rs
++++ b/crates/ffi/src/lib.rs
+@@ -233,3 +233,6 @@
+ 
+ #[cfg(test)]
+ mod context_reference_tests;
++
++#[cfg(test)]
++mod f16_context_reference_tests;
+--- /dev/null
++++ b/crates/ffi/src/f16_context_reference_tests.rs
+@@ -0,0 +1,752 @@
++//! Exact typed-cache replay of independently captured original native C outputs.
++//! Four K/V dtype pairs, unified/separate physical buffers, state/session bytes,
++//! continuations and failure side effects; see f16-context-provenance.json.
++use crate::{batch::*, context::*, memory::*, model::*, state::*, *};
++use llama_behavior::json::{self, Value};
++use std::collections::BTreeMap;
++use std::path::{Path, PathBuf};
++use std::sync::{
++    OnceLock,
++    atomic::{AtomicUsize, Ordering},
++};
++
++const PROMPT: [i32; 5] = [1, 403, 407, 261, 378];
++const PACKED_DATA: &[u8] = include_bytes!("../../../fixtures/ffi/f16-context-data.bin");
++#[cfg(target_env = "msvc")]
++const PROFILE: &str = "msvc";
++#[cfg(not(target_env = "msvc"))]
++const PROFILE: &str = "gnu";
++static CHECKED_LOGIT_WORDS: AtomicUsize = AtomicUsize::new(0);
++static CHECKED_STATE_BYTES: AtomicUsize = AtomicUsize::new(0);
++static CHECKED_STATE_BLOCKS: AtomicUsize = AtomicUsize::new(0);
++
++struct Fixture {
++    types: (i32, i32),
++    report: Value,
++    files: BTreeMap<String, Vec<u8>>,
++}
++fn packed_bytes(value: &Value) -> &'static [u8] {
++    let start = usize::try_from(number(value, "offset")).unwrap();
++    let bytes = usize::try_from(number(value, "bytes")).unwrap();
++    &PACKED_DATA[start..start.checked_add(bytes).unwrap()]
++}
++fn fixtures() -> &'static [Fixture] {
++    static FIXTURE: OnceLock<Vec<Fixture>> = OnceLock::new();
++    FIXTURE.get_or_init(|| {
++        let document = json::parse(include_str!(
++            "../../../fixtures/ffi/f16-context-reference.json"
++        ))
++        .unwrap();
++        let entries = array(field(field(&document, "profiles"), PROFILE));
++        assert_eq!(entries.len(), 4);
++        entries
++            .iter()
++            .map(|entry| {
++                let mut files = BTreeMap::new();
++                for file in array(field(entry, "files")) {
++                    assert!(
++                        files
++                            .insert(text(file, "name").to_owned(), packed_bytes(file).to_vec())
++                            .is_none()
++                    );
++                }
++                assert_eq!(files.len(), 130);
++                Fixture {
++                    types: (
++                        number(entry, "type_k") as i32,
++                        number(entry, "type_v") as i32,
++                    ),
++                    report: field(entry, "report").clone(),
++                    files,
++                }
++            })
++            .collect()
++    })
++}
++fn field<'a>(value: &'a Value, name: &str) -> &'a Value {
++    value.get(name).unwrap_or_else(|| panic!("missing {name}"))
++}
++fn array(value: &Value) -> &[Value] {
++    value.as_array().unwrap()
++}
++fn integer(value: &Value) -> i64 {
++    value.as_i64().unwrap()
++}
++fn number(value: &Value, name: &str) -> i64 {
++    integer(field(value, name))
++}
++fn text<'a>(value: &'a Value, name: &str) -> &'a str {
++    field(value, name).as_str().unwrap()
++}
++fn flag(value: &Value, name: &str) -> bool {
++    field(value, name).as_bool().unwrap()
++}
++fn clean() {
++    unsafe {
++        llama_rust_clear_error();
++    }
++}
++fn okay() {
++    let error = unsafe { CStr::from_ptr(llama_rust_last_error()) };
++    assert!(error.to_bytes().is_empty(), "{}", error.to_string_lossy());
++}
++fn failed() {
++    assert!(
++        !unsafe { CStr::from_ptr(llama_rust_last_error()) }
++            .to_bytes()
++            .is_empty()
++    );
++}
++fn c_path(path: &Path) -> CString {
++    CString::new(path.to_str().unwrap()).unwrap()
++}
++struct ModelOwner(*mut ModelHandle);
++impl ModelOwner {
++    fn load() -> Self {
++        let path = c_path(Path::new(concat!(
++            env!("CARGO_MANIFEST_DIR"),
++            "/../../fixtures/ffi/native-context-model.gguf"
++        )));
++        let params = LlamaModelParams {
++            n_gpu_layers: 0,
++            load_mode: 0,
++            ..LlamaModelParams::default()
++        };
++        clean();
++        let model = unsafe { llama_model_load_from_file(path.as_ptr(), params) };
++        okay();
++        assert!(!model.is_null());
++        Self(model)
++    }
++}
++impl Drop for ModelOwner {
++    fn drop(&mut self) {
++        unsafe {
++            llama_model_free(self.0);
++        }
++    }
++}
++struct ContextOwner(*mut ContextHandle);
++impl ContextOwner {
++    fn new(model: &ModelOwner, unified: bool, types: (i32, i32)) -> Self {
++        let n_ctx = 512;
++        let p = LlamaContextParams {
++            n_ctx,
++            n_seq_max: 4,
++            n_batch: 128,
++            n_ubatch: 32,
++            kv_unified: u8::from(unified),
++            n_threads: 1,
++            n_threads_batch: 1,
++            type_k: types.0,
++            type_v: types.1,
++            flash_attn_type: 0,
++            offload_kqv: 0,
++            op_offload: 0,
++            no_perf: 1,
++            ..LlamaContextParams::default()
++        };
++        clean();
++        let context = unsafe { llama_init_from_model(model.0, p) };
++        okay();
++        assert!(!context.is_null());
++        Self(context)
++    }
++    fn decode(&self, tokens: &[i32], sequence: i32, start: i32) -> Vec<u32> {
++        clean();
++        unsafe {
++            let mut batch = llama_batch_init(tokens.len() as i32, 0, 1);
++            okay();
++            batch.n_tokens = tokens.len() as i32;
++            for (index, token) in tokens.iter().enumerate() {
++                *batch.token.add(index) = *token;
++                *batch.pos.add(index) = start + index as i32;
++                *batch.n_seq_id.add(index) = 1;
++                **batch.seq_id.add(index) = sequence;
++                *batch.logits.add(index) = i8::from(index + 1 == tokens.len());
++            }
++            let result = llama_decode(self.0, batch);
++            llama_batch_free(batch);
++            okay();
++            assert_eq!(result, 0);
++            let row = llama_get_logits_ith(self.0, -1);
++            okay();
++            assert!(!row.is_null());
++            slice::from_raw_parts(row, 512)
++                .iter()
++                .map(|f| f.to_bits())
++                .collect()
++        }
++    }
++    fn seed(&self) {
++        self.decode(&PROMPT, 0, 0);
++        self.decode(&PROMPT.iter().rev().copied().collect::<Vec<_>>(), 1, 0);
++    }
++    fn positions(&self) -> Vec<Vec<i32>> {
++        unsafe {
++            let mem = llama_get_memory(self.0);
++            (0..4)
++                .map(|id| {
++                    vec![
++                        llama_memory_seq_pos_min(mem, id),
++                        llama_memory_seq_pos_max(mem, id),
++                    ]
++                })
++                .collect()
++        }
++    }
++    fn assert_positions(&self, expected: &Value) {
++        let expected: Vec<Vec<i32>> = array(expected)
++            .iter()
++            .map(|row| array(row).iter().map(|v| integer(v) as i32).collect())
++            .collect();
++        assert_eq!(self.positions(), expected);
++    }
++    fn state(&self) -> Vec<u8> {
++        clean();
++        let size = unsafe { llama_state_get_size(self.0) };
++        okay();
++        assert!(size > 0);
++        let mut bytes = vec![0xA5; size + 16];
++        let result = unsafe { llama_state_get_data(self.0, bytes.as_mut_ptr(), size) };
++        okay();
++        assert_eq!(result, size);
++        assert!(bytes[size..].iter().all(|b| *b == 0xA5));
++        bytes.truncate(size);
++        bytes
++    }
++}
++impl Drop for ContextOwner {
++    fn drop(&mut self) {
++        unsafe {
++            llama_free(self.0);
++        }
++    }
++}
++fn check_logits(actual: &[u32], expected: &Value) {
++    assert_eq!(text(expected, "kind"), "u32");
++    let bytes = packed_bytes(expected);
++    assert_eq!(actual.len() * 4, bytes.len());
++    for (index, (&actual, expected)) in actual.iter().zip(bytes.as_chunks::<4>().0).enumerate() {
++        assert_eq!(
++            actual,
++            u32::from_le_bytes(*expected),
++            "native logit word {index}"
++        );
++    }
++    CHECKED_LOGIT_WORDS.fetch_add(actual.len(), Ordering::Relaxed);
++}
++fn raw_u32(bytes: &[u8], at: usize) -> usize {
++    u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap()) as usize
++}
++fn check_encoded(actual: &[u8], expected: &[u8], _template: &[u8], _flags: u32) {
++    assert_eq!(actual, expected, "exact native typed state bytes");
++    CHECKED_STATE_BYTES.fetch_add(expected.len(), Ordering::Relaxed);
++    CHECKED_STATE_BLOCKS.fetch_add(1, Ordering::Relaxed);
++}
++fn check_state(actual: &[u8], expected: &[u8], flags: u32) {
++    check_encoded(actual, expected, expected, flags)
++}
++
++fn mutate(context: &ContextOwner, operation: &str, case: &Value) {
++    clean();
++    unsafe {
++        let memory = llama_get_memory(context.0);
++        let result = match operation {
++            "unchanged" => None,
++            "remove_suffix" => Some(llama_memory_seq_rm(memory, 0, 2, -1)),
++            "remove_middle" => Some(llama_memory_seq_rm(memory, 0, 1, 3)),
++            "remove_prefix" => Some(llama_memory_seq_rm(memory, 0, -1, 2)),
++            "remove_all_sequence" => Some(llama_memory_seq_rm(memory, 0, -1, -1)),
++            "remove_all_sequences" => Some(llama_memory_seq_rm(memory, -1, 1, 3)),
++            "remove_reversed" => Some(llama_memory_seq_rm(memory, 0, 3, 1)),
++            "copy_full" => {
++                llama_memory_seq_cp(memory, 0, 2, -1, -1);
++                None
++            }
++            "copy_middle" => {
++                llama_memory_seq_cp(memory, 0, 2, 1, 3);
++                None
++            }
++            "copy_into_existing" => {
++                llama_memory_seq_cp(memory, 0, 1, 1, 3);
++                None
++            }
++            "copy_self" => {
++                llama_memory_seq_cp(memory, 0, 0, 1, 3);
++                None
++            }
++            "keep_sequence" => {
++                llama_memory_seq_cp(memory, 0, 2, -1, -1);
++                llama_memory_seq_keep(memory, 2);
++                None
++            }
++            "keep_missing" => {
++                llama_memory_seq_keep(memory, 3);
++                None
++            }
++            "clear_metadata" => {
++                llama_memory_clear(memory, 0);
++                None
++            }
++            "clear_data" => {
++                llama_memory_clear(memory, 1);
++                None
++            }
++            "shift_all" => {
++                llama_memory_seq_add(memory, 0, -1, -1, 3);
++                None
++            }
++            "shift_suffix" => {
++                llama_memory_seq_add(memory, 0, 2, -1, 2);
++                None
++            }
++            "shift_negative" => {
++                llama_memory_seq_add(memory, 0, -1, -1, -2);
++                None
++            }
++            "shift_shared" => {
++                llama_memory_seq_cp(memory, 0, 2, -1, -1);
++                llama_memory_seq_add(memory, 0, -1, -1, 2);
++                None
++            }
++            "divide_all" => {
++                llama_memory_seq_div(memory, 0, -1, -1, 2);
++                None
++            }
++            "divide_suffix" => {
++                llama_memory_seq_div(memory, 0, 2, -1, 2);
++                None
++            }
++            other => panic!("unknown fixture operation {other}"),
++        };
++        if let Some(result) = result {
++            assert_eq!(result, flag(case, "result"));
++        }
++    }
++    okay();
++}
++fn replay_memory_and_sequence_state(expected: &Fixture) {
++    let model = ModelOwner::load();
++    let cases = array(field(&expected.report, "cases"));
++    assert_eq!(cases.len(), 40);
++    for case in cases {
++        let name = text(case, "name");
++        let unified = flag(case, "kv_unified");
++        let context = ContextOwner::new(&model, unified, expected.types);
++        context.seed();
++        context.assert_positions(field(case, "before"));
++        assert_eq!(
++            unsafe { llama_memory_can_shift(llama_get_memory(context.0)) },
++            flag(case, "can_shift")
++        );
++        mutate(&context, name.split_once('_').unwrap().1, case);
++        context.assert_positions(field(case, "after"));
++        let bytes = context.state();
++        let native = &expected.files[&format!("{name}.state.bin")];
++        check_state(&bytes, native, 0);
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        assert_eq!(
++            unsafe { llama_state_set_data(restored.0, native.as_ptr(), native.len()) },
++            bytes.len()
++        );
++        okay();
++        restored.assert_positions(field(case, "after"));
++        check_state(&restored.state(), native, 0);
++        let token = number(case, "follow_token") as i32;
++        let seq = number(case, "follow_sequence") as i32;
++        let pos = number(case, "follow_position") as i32;
++        check_logits(
++            &context.decode(&[token], seq, pos),
++            field(case, "continuation_logit_bits"),
++        );
++        check_logits(
++            &restored.decode(&[token], seq, pos),
++            field(case, "restored_continuation_logit_bits"),
++        );
++        context.assert_positions(field(case, "after_follow"));
++    }
++    let cases = array(field(&expected.report, "sequence_cases"));
++    assert_eq!(cases.len(), 40);
++    for case in cases {
++        let name = text(case, "name");
++        let context = ContextOwner::new(&model, flag(case, "kv_unified"), expected.types);
++        context.seed();
++        context.decode(&PROMPT[..2], 3, 0);
++        let source = number(case, "source") as i32;
++        let destination = number(case, "destination") as i32;
++        let flags = number(case, "flags") as u32;
++        context.assert_positions(field(case, "before"));
++        clean();
++        let size = unsafe { llama_state_seq_get_size_ext(context.0, source, flags) };
++        okay();
++        assert_eq!(size, number(case, "state_bytes") as usize);
++        let mut bytes = vec![0xA5; size + 16];
++        assert_eq!(
++            unsafe {
++                llama_state_seq_get_data_ext(context.0, bytes.as_mut_ptr(), size, source, flags)
++            },
++            size
++        );
++        okay();
++        assert!(bytes[size..].iter().all(|b| *b == 0xA5));
++        bytes.truncate(size);
++        check_state(&bytes, &expected.files[&format!("{name}.state.bin")], flags);
++        assert_eq!(
++            unsafe {
++                llama_state_seq_set_data_ext(context.0, bytes.as_ptr(), size, destination, flags)
++            },
++            number(case, "read_bytes") as usize
++        );
++        okay();
++        context.assert_positions(field(case, "after"));
++        check_state(
++            &context.state(),
++            &expected.files[&format!("{name}.after.bin")],
++            0,
++        );
++        check_logits(
++            &context.decode(
++                &[number(case, "follow_token") as i32],
++                number(case, "follow_sequence") as i32,
++                number(case, "follow_position") as i32,
++            ),
++            field(case, "continuation_logit_bits"),
++        );
++    }
++}
++struct TempDirectory(PathBuf);
++impl TempDirectory {
++    fn new() -> Self {
++        static NEXT: AtomicUsize = AtomicUsize::new(0);
++        let path = std::env::temp_dir().join(format!(
++            "rust-llama-typed-native-state-{}-{}",
++            std::process::id(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ));
++        std::fs::create_dir(&path).unwrap();
++        Self(path)
++    }
++    fn path(&self, name: &str) -> PathBuf {
++        self.0.join(name)
++    }
++    fn cpath(&self, name: &str) -> CString {
++        c_path(&self.path(name))
++    }
++}
++impl Drop for TempDirectory {
++    fn drop(&mut self) {
++        let _ = std::fs::remove_dir_all(&self.0);
++    }
++}
++fn replay_session_files_and_short_buffers(expected: &Fixture) {
++    let model = ModelOwner::load();
++    let directory = TempDirectory::new();
++    for (name, data) in &expected.files {
++        std::fs::write(directory.path(name), data).unwrap();
++    }
++    let cases = array(field(&expected.report, "file_cases"));
++    assert_eq!(cases.len(), 2);
++    for case in cases {
++        let unified = flag(case, "kv_unified");
++        let label = text(case, "name");
++        let context = ContextOwner::new(&model, unified, expected.types);
++        context.seed();
++        assert_eq!(
++            unsafe { llama_n_ctx(context.0) },
++            number(case, "n_ctx") as u32
++        );
++        assert_eq!(
++            unsafe { llama_n_ctx_seq(context.0) },
++            number(case, "n_ctx_seq") as u32
++        );
++        assert_eq!(
++            unsafe { llama_n_batch(context.0) },
++            number(case, "n_batch") as u32
++        );
++        assert_eq!(
++            unsafe { llama_n_ubatch(context.0) },
++            number(case, "n_ubatch") as u32
++        );
++        let session = directory.cpath(&format!("{label}.written"));
++        assert!(unsafe {
++            llama_state_save_file(context.0, session.as_ptr(), PROMPT.as_ptr(), PROMPT.len())
++        });
++        okay();
++        check_state(
++            &std::fs::read(session.to_str().unwrap()).unwrap(),
++            &expected.files[&format!("{label}.session.bin")],
++            0,
++        );
++        let alias = directory.cpath(&format!("{label}.written.alias"));
++        assert!(unsafe {
++            llama_save_session_file(context.0, alias.as_ptr(), PROMPT.as_ptr(), PROMPT.len())
++        });
++        okay();
++        check_state(
++            &std::fs::read(alias.to_str().unwrap()).unwrap(),
++            &expected.files[&format!("{label}.session.bin.alias")],
++            0,
++        );
++        let state = context.state();
++        assert_eq!(unsafe { llama_get_state_size(context.0) }, state.len());
++        let mut copied = vec![0; state.len()];
++        assert_eq!(
++            unsafe { llama_copy_state_data(context.0, copied.as_mut_ptr()) },
++            state.len()
++        );
++        assert_eq!(copied, state);
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        assert_eq!(
++            unsafe { llama_set_state_data(restored.0, copied.as_ptr()) },
++            state.len()
++        );
++        okay();
++        assert_eq!(restored.positions(), context.positions());
++        let mut tokens = [-77; 9];
++        let mut count = 999;
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        assert!(unsafe {
++            llama_state_load_file(
++                restored.0,
++                session.as_ptr(),
++                tokens.as_mut_ptr(),
++                5,
++                &mut count,
++            )
++        });
++        okay();
++        assert_eq!(count, 5);
++        assert_eq!(tokens[..5], PROMPT);
++        assert_eq!(tokens[5..], [-77; 4]);
++        restored.assert_positions(field(case, "loaded_positions"));
++        check_logits(
++            &restored.decode(&[PROMPT[2]], 0, 5),
++            field(case, "session_continuation"),
++        );
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        assert!(unsafe {
++            llama_load_session_file(
++                restored.0,
++                session.as_ptr(),
++                tokens.as_mut_ptr(),
++                5,
++                &mut count,
++            )
++        });
++        okay();
++        restored.assert_positions(field(case, "alias_positions"));
++        let sequence = directory.cpath(&format!("{label}.written.sequence"));
++        assert_eq!(
++            unsafe {
++                llama_state_seq_save_file(context.0, sequence.as_ptr(), 0, PROMPT.as_ptr(), 5)
++            },
++            number(case, "sequence_file_bytes") as usize
++        );
++        okay();
++        check_state(
++            &std::fs::read(sequence.to_str().unwrap()).unwrap(),
++            &expected.files[&format!("{label}.sequence.bin")],
++            0,
++        );
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        restored.decode(&PROMPT.iter().rev().copied().collect::<Vec<_>>(), 1, 0);
++        let prior = restored.positions();
++        count = 999;
++        assert_eq!(
++            unsafe {
++                llama_state_seq_load_file(
++                    restored.0,
++                    sequence.as_ptr(),
++                    3,
++                    ptr::null_mut(),
++                    0,
++                    &mut count,
++                )
++            },
++            12
++        );
++        okay();
++        assert_eq!(count, 5);
++        assert_eq!(restored.positions(), prior);
++        assert_eq!(
++            unsafe {
++                llama_state_seq_load_file(
++                    restored.0,
++                    sequence.as_ptr(),
++                    3,
++                    tokens.as_mut_ptr(),
++                    5,
++                    &mut count,
++                )
++            },
++            number(case, "sequence_file_bytes") as usize
++        );
++        okay();
++        restored.assert_positions(field(case, "sequence_loaded_positions"));
++        check_logits(
++            &restored.decode(&[PROMPT[2]], 3, 5),
++            field(case, "sequence_continuation"),
++        );
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        restored.decode(&PROMPT[..1], 2, 0);
++        count = 999;
++        clean();
++        assert_eq!(
++            unsafe {
++                llama_state_load_file(
++                    restored.0,
++                    session.as_ptr(),
++                    tokens.as_mut_ptr(),
++                    1,
++                    &mut count,
++                )
++            },
++            flag(case, "small_prompt_result")
++        );
++        failed();
++        assert_eq!(count, number(case, "small_prompt_count") as usize);
++        restored.assert_positions(field(case, "small_prompt_positions"));
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        restored.decode(&PROMPT[..1], 2, 0);
++        tokens.fill(-77);
++        count = 999;
++        let trailing = directory.cpath(&format!("{label}.session.bin.trailing"));
++        clean();
++        assert_eq!(
++            unsafe {
++                llama_state_load_file(
++                    restored.0,
++                    trailing.as_ptr(),
++                    tokens.as_mut_ptr(),
++                    5,
++                    &mut count,
++                )
++            },
++            flag(case, "trailing_full_result")
++        );
++        failed();
++        assert_eq!(count, number(case, "trailing_full_count") as usize);
++        assert_eq!(
++            tokens.to_vec(),
++            array(field(case, "trailing_full_tokens"))
++                .iter()
++                .map(|v| integer(v) as i32)
++                .collect::<Vec<_>>()
++        );
++        restored.assert_positions(field(case, "trailing_full_positions"));
++        check_logits(
++            &restored.decode(&[PROMPT[2]], 0, 5),
++            field(case, "trailing_full_continuation"),
++        );
++        let restored = ContextOwner::new(&model, unified, expected.types);
++        let trailing = directory.cpath(&format!("{label}.sequence.bin.trailing"));
++        clean();
++        assert_eq!(
++            unsafe {
++                llama_state_seq_load_file(
++                    restored.0,
++                    trailing.as_ptr(),
++                    3,
++                    tokens.as_mut_ptr(),
++                    5,
++                    &mut count,
++                )
++            },
++            number(case, "trailing_sequence_result") as usize
++        );
++        okay();
++        assert_eq!(count, number(case, "trailing_sequence_count") as usize);
++        restored.assert_positions(field(case, "trailing_sequence_positions"));
++        for row in array(field(&expected.report, "buffer_cases"))
++            .iter()
++            .filter(|row| text(row, "name").starts_with(label))
++        {
++            let capacity = number(row, "capacity") as usize;
++            let mut bytes = vec![0xA5; capacity + 16];
++            clean();
++            let result = unsafe {
++                if let Some((_, parts)) = text(row, "name").split_once("_seq_") {
++                    let parts: Vec<_> = parts.split('_').collect();
++                    llama_state_seq_get_data_ext(
++                        context.0,
++                        bytes.as_mut_ptr(),
++                        capacity,
++                        parts[0].parse().unwrap(),
++                        parts[2].parse().unwrap(),
++                    )
++                } else {
++                    llama_state_get_data(context.0, bytes.as_mut_ptr(), capacity)
++                }
++            };
++            assert_eq!(result, number(row, "result") as usize);
++            let golden = packed_bytes(field(row, "hex"));
++            if let Some((_, parts)) = text(row, "name").split_once("_seq_") {
++                let parts: Vec<_> = parts.split('_').collect();
++                let mode = if unified { "unified" } else { "separate" };
++                let template = &expected.files
++                    [&format!("{mode}_sequence_{}_flags_{}.state.bin", parts[0], parts[2])];
++                check_encoded(&bytes, golden, template, parts[2].parse().unwrap());
++            } else {
++                let file = &expected.files[&format!("{label}.session.bin")];
++                let template = &file[12 + raw_u32(file, 8) * 4..];
++                check_encoded(&bytes, golden, template, 0);
++            }
++            if result == 0 { failed() } else { okay() }
++        }
++    }
++    assert_eq!(array(field(&expected.report, "buffer_cases")).len(), 96);
++}
++
++#[test]
++fn original_four_dtype_pairs_memory_sessions_and_exact_continuations() {
++    CHECKED_LOGIT_WORDS.store(0, Ordering::Relaxed);
++    CHECKED_STATE_BYTES.store(0, Ordering::Relaxed);
++    CHECKED_STATE_BLOCKS.store(0, Ordering::Relaxed);
++    let fixtures = fixtures();
++    assert_eq!(
++        fixtures.iter().map(|f| f.types).collect::<Vec<_>>(),
++        [(0, 0), (1, 1), (1, 0), (0, 1)]
++    );
++    for expected in fixtures {
++        replay_memory_and_sequence_state(expected);
++        replay_session_files_and_short_buffers(expected);
++    }
++    assert_eq!(CHECKED_LOGIT_WORDS.load(Ordering::Relaxed), 258_048);
++    assert_eq!(CHECKED_STATE_BLOCKS.load(Ordering::Relaxed), 1_048);
++    assert_eq!(CHECKED_STATE_BYTES.load(Ordering::Relaxed), 290_328);
++}
++
++#[test]
++fn original_defaults_remain_explicitly_outside_nonflash_single_worker_support() {
++    let model = ModelOwner::load();
++    let defaults = unsafe { llama_context_default_params() };
++    assert_eq!((defaults.type_k, defaults.type_v), (1, 1));
++    assert_eq!((defaults.n_threads, defaults.n_threads_batch), (4, 4));
++    assert_eq!(defaults.flash_attn_type, -1);
++    for (flash, workers, batch_workers, key, value) in [
++        (-1, 4, 4, 1, 1),
++        (-1, 1, 1, 1, 1),
++        (1, 1, 1, 1, 1),
++        (-1, 1, 1, 0, 0),
++        (0, 2, 1, 1, 1),
++        (0, 1, 2, 1, 1),
++        (0, 4, 4, 1, 1),
++        (0, 1, 1, 2, 1),
++        (0, 1, 1, 1, 2),
++    ] {
++        let params = LlamaContextParams {
++            flash_attn_type: flash,
++            n_threads: workers,
++            n_threads_batch: batch_workers,
++            type_k: key,
++            type_v: value,
++            no_perf: 1,
++            ..defaults
++        };
++        clean();
++        let context = unsafe { llama_init_from_model(model.0, params) };
++        assert!(context.is_null());
++        failed();
++    }
++}
+--- a/crates/ffi/README.md
++++ b/crates/ffi/README.md
+@@ -44,7 +44,7 @@
+ formats and explicit architecture restrictions.
+ 
+ Start with the frozen default parameter functions, then select CPU loading,
+-F32 KV caches and causal decoding. For example, a client using the frozen C
++explicit F32 or F16 KV caches and causal decoding. For example, a client using the frozen C
+ header can set:
+ 
+ ```c
+@@ -55,8 +55,8 @@
+ 
+ struct llama_context_params cp = llama_context_default_params();
+ cp.n_ctx = 512;
+-cp.type_k = GGML_TYPE_F32;
+-cp.type_v = GGML_TYPE_F32;
++cp.type_k = GGML_TYPE_F16;
++cp.type_v = GGML_TYPE_F16;
+ cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;
+ cp.n_threads = 1;
+ cp.n_threads_batch = 1;
+@@ -64,19 +64,24 @@
+ cp.op_offload = false;
+ ```
+ 
+-The default structure itself remains source-faithful: it returns F16 cache types.
+-Context creation rejects those unsupported types with a diagnostic; it never
+-substitutes F32 silently. Model default `n_gpu_layers = -1` and automatic
+-attention/offload preferences resolve to CPU because this C ABI registers no
+-GPU backend. Positive GPU-layer requests and forced flash attention fail.
++The default structure itself remains source-faithful: it returns F16 cache
++types, AUTO flash attention and four workers. Untouched default-context creation
++is not supported. This slice accepts independent F32/F16 keys and values only
++with flash attention explicitly DISABLED and thread counts 1/1; AUTO and ENABLED
++return a diagnostic. This also corrects the former manually selected F32/AUTO
++path, which silently executed nonflash attention. Model default
++`n_gpu_layers = -1` resolves to CPU because this C ABI registers no GPU backend.
++Positive GPU-layer requests fail.
+ 
+ The executor runs one worker. Context creation requires thread counts 1/1,
+ and the thread query functions report that actual value.
+ `llama_set_n_threads` accepts 1/1; unsupported changes leave state unchanged
+ and set the diagnostic.
+ 
+-The compatibility executor supports separate and unified physical F32 KV
+-buffers. Context padding, per-stream capacity, metadata holes, sequence sharing,
++The compatibility executor supports separate and unified physical F32/F16 KV
++buffers. Half storage retains raw u16 payloads through copies, state and session
++I/O, including nonfinite bit patterns; numerical K/V writes perform the source
++F16 rounding. Nonflash query and probability operands remain F32. Context padding, per-stream capacity, metadata holes, sequence sharing,
+ queued cross-stream copies and signed position transforms follow the measured
+ frozen cache behavior. Separate mode has the configured sequence streams;
+ unified mode accepts the frozen 256-ID range, with per-token membership bounded
+@@ -100,8 +105,8 @@
+ 
+ ## Unsupported options
+ 
+-Context creation rejects non-F32 KV caches, nondefault context types, custom
+-RoPE/YaRN, pooling, noncausal attention, forced flash attention, evaluator
++Context creation rejects KV types other than F32/F16, nondefault context types,
++custom RoPE/YaRN, pooling, noncausal attention, AUTO or ENABLED flash attention, evaluator
+ callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
+ slots, nondefault output capacity fields and performance counters. SWA preferences have no effect for the supported non-SWA model.
+ All boolean and enum inputs are validated.
+@@ -126,7 +131,7 @@
+ and special IDs, returns empty detokenization, and rejects unavailable token
+ data/pieces/tokenization with a checked diagnostic instead of the native abort.
+ 
+-Dense F32 memory manipulation and frozen state/session formats are implemented
++Dense F32/F16 memory manipulation and frozen state/session formats are implemented
+ as described in STATE.md. Backend-attached sampling, recurrent native caches,
+ adapters, encoder entry points, model saving, split-file loading and performance
+ APIs remain absent. Source custom chat-template lookup
+@@ -242,3 +247,21 @@
+ 
+ These checks establish the stated subset on Windows x64 and Linux x64. They do
+ not close the full ABI, architecture, backend, platform or performance gates.
++
++## Ordinary typed-cache regression
++
++The f16_context_reference_tests module replays independent original MSVC and
++GNU tiny-model captures for F32/F32, F16/F16, F16/F32 and F32/F16 storage.
++Each profile covers 160 memory scenarios, 160 sequence-state/flag scenarios,
++eight session suites and 384 short-buffer cases. It checks 258,048 logit words
++and 1,048 state/partial-output buffers (290,328 bytes) exactly, including
++physical holes, deferred copies, shifts and restore/reserialize without
++evaluation. The original 520 binary artifacts per profile are losslessly
++deduplicated with the continuation rows; no Rust output generates expectations.
++See fixtures/ffi/f16-context-provenance.json for hashes and reconstruction proof.
++
++The independent F16 cache matmul graph corpus additionally checks 125 original
++graphs and 245,154 F32 outputs per platform, including head-offset views, GQA,
++strided K caches and 256/512/768-column V products. Trained-model typed-cache
++execution remains covered by the external C harness, while this ordinary
++state/decode cohort deliberately uses the small deterministic fixture.
+--- a/crates/ffi/STATE.md
++++ b/crates/ffi/STATE.md
+@@ -1,6 +1,6 @@
+-# Dense F32 native memory and state compatibility
++# Dense F32/F16 native memory and state compatibility
+ 
+-This slice implements the frozen Llama dense F32 cache contract through
++This slice implements the frozen Llama dense F32/F16 cache contract through
+ llama-model-runtime::NativeContext and 28 memory/state/session C exports.
+ It is separate from the safe sequential Context API, its checkpoints, and its
+ versioned Rust state format. No original C/C++ object is linked into the product.
+@@ -31,8 +31,10 @@
+ storage. Deferred shifts run after copies. seq_div retains the source's
+ old_position - divided_position accumulated shift.
+ 
+-Only causal dense Llama F32 keys and values are implemented in NativeContext.
+-F16/quantized, recurrent/hybrid, SWA and GPU caches remain open. Duplicate
++Causal dense Llama supports independent F32/F16 keys and values in NativeContext
++through new_with_cache_types. The existing new constructor and strict Context
++remain F32. This slice requires explicit nonflash execution and one worker;
++AUTO/ENABLED flash, quantized, recurrent/hybrid, SWA and GPU caches remain open. Duplicate
+ positions within one submitted batch require batched layer execution and return
+ a diagnostic. Shared-token input is supported in unified mode; coupled input in
+ separate mode is not implemented.
+@@ -41,7 +43,7 @@
+ 
+ | Surface | Frozen encoding |
+ |---|---|
+-| Full raw state | Architecture string, then stream count, occupied-cell metadata and F32 tensor data. |
++| Full raw state | Architecture string, then stream count, occupied-cell metadata and typed F32/F16 tensor data. |
+ | Sequence raw state | 0xaf143cd8, source sequence ID, then selected memory metadata/data. |
+ | Full session file | Magic 0x6767736e, version 11, prompt count/IDs, then full raw state. |
+ | Sequence session file | Magic 0x67677371, version 4, prompt count/IDs, then selected memory without the raw sequence-I/O prefix. |
+@@ -49,8 +51,11 @@
+ Integer fields are little-endian on tested x64 platforms. Occupied cells
+ serialize in physical order. Keys use native row order; values use the frozen
+ transposed dimension/cell order. Type, element size, width and layer headers are
+-validated before restoration. Raw float bits, including nonfinite payloads,
+-are preserved; numerical execution applies separate finite checks.
++validated before restoration and must match the context's independent key/value
++types. F32 data uses four-byte elements; F16 data uses two-byte elements and raw
++u16 storage. Copies, transposition, deferred tensor copies and serialization
++preserve every bit, including signaling NaN payloads. Numerical evaluation alone
++widens and rounds half values according to the source operation.
+ 
+ Size queries calculate the result without constructing a serialized buffer.
+ Save operations reproduce original write-chunk boundaries: an insufficient
+@@ -96,7 +101,10 @@
+ Per-cell membership uses a fixed 32-byte bitset, with no allocation per ID.
+ Constructor and transaction checks account for cache tensors, cells, staged
+ copies, outputs and temporary state buffers under a two-GiB working budget.
+-Large vectors reserve fallibly. Pending tensor copies reuse destination
++Resident storage is charged using each K/V type's actual element size; gathered
++computation remains charged for F32 values even when resident storage is half.
++Restore includes the transaction copy, typed layer copies, descriptors, input
++bytes and temporary transposed V storage. Large vectors reserve fallibly. Pending tensor copies reuse destination
+ allocations. CPU-owned snapshots additionally have a one-GiB aggregate storage
+ limit. These are explicit implementation limits, not native maximum-size or
+ performance claims.
+@@ -119,29 +127,38 @@
+ 
+ ## Independent validation
+ 
+-The external C++ harness includes the untouched original llama.h and loads the
+-original and Rust libraries in separate captures. It exercises the trained
+-stories260K model and a small deterministic GGUF with 512 vocabulary entries,
+-two dense layers, biases and grouped-query attention. The synthetic model has
+-no text-quality claim.
++The external harness includes the frozen llama.h and loads the original and
++Rust libraries in separate captures. Explicit nonflash, single-worker execution
++was compared for all four K/V dtype pairs on both original platform profiles,
++using stories260K and the small deterministic 512-token-vocabulary GGUF. The
++synthetic model has no text-quality claim.
+ 
+-Each model/profile covers 40 memory scenarios, 40 sequence-state/flag scenarios,
+-two session suites and 96 short-buffer cases. Its 130 binary artifacts total
+-1,329,186 bytes for the trained model and 58,890 for the synthetic model.
+-Ordinary tests use committed synthetic expected bytes from independent Windows
+-and GNU captures and require original raw restore/reserialize identity on both.
++The ordinary typed-cache replay commits the tiny-model cohort. Per profile it
++covers 160 memory scenarios, 160 sequence-state/flag scenarios, eight session
++suites and 384 short-buffer cases. It compares 258,048 continuation logit words
++and 1,048 state/partial-output buffers totaling 290,328 bytes exactly.
++Every original raw state also restores and reserializes identically before
++evaluation. The 520 original binary artifacts per profile and repeated logit
++rows are stored in a shared lossless byte pool; reconstruction is checked
++against the original hashes. Provenance is in
++fixtures/ffi/f16-context-provenance.json.
+ 
+-Windows generated state data and continuations match bitwise. GNU defines
+-__SSE2__ and selects the source vector exponential for SiLU/softmax; the MSVC
+-reference uses scalar expf. Both source F32 dot paths use scalar products with
+-F64 accumulation. Linux generated float checks retain the established
+-2e-4 + 2e-5 * abs(reference) bound. Metadata, IDs, sizes, write boundaries and
+-sentinels remain exact. Observed debug maxima were 5.7220458984375e-6 for the
+-trained cohort and 1.1920928955078125e-7 for the synthetic cohort. Actual build
+-flags, per-profile results and source hashes are recorded under
+-evidence/2026-11-09/native-context.
++F32/F32 remains in the typed corpus as a control, and prior F32 tests/budgets
++are unchanged. Earlier native-context evidence records its original
++2e-4 + 2e-5 * abs(reference) GNU bound and initial drift before shared compiler
++profile arithmetic was integrated. Those historical reports remain preserved.
++The new typed cohort compares to its independently captured MSVC or GNU source
++profile bitwise; it does not widen an earlier bound or substitute generated
++Rust expectations.
+ 
+-The preserved core C harness still checks 69 layout entries, every default
+-field and 93,248 trained-model values. The full sampler/context corpus also
+-passes. These results establish this subset and do not complete every frozen
+-export or native cache architecture.
++All 65,536 F16 bit patterns also pass raw storage/state preservation tests,
++including type-mismatch and truncation rejection without mutation. A separate
++original graph corpus checks the F16-by-F32 KQ/PV matmul layouts: 125 cases and
++245,154 output values per host, including strided views and physical padding.
++Explicitly half-rounding the F32 right operand changes 239,587 native output
++values, so storage type is not used to invent an operand conversion.
++
++The original default parameter structure is unchanged and requests AUTO flash
++attention and four workers. Those settings remain rejected; this slice does
++not claim successful untouched default-context initialization, native flash
++dispatch, recurrent cache parity or full frozen-ABI completion.

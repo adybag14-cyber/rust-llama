@@ -1,0 +1,41 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "label": "windows-pretrained-final",
+  "mode": "pretrained",
+  "input_count": 255,
+  "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+  "steps": [
+    {
+      "name": "pretrained-release",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-inference",
+        "--test",
+        "qwen3",
+        "official_qwen3_q8_matches_original_native_profile",
+        "--",
+        "--ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 14.765391300003103,
+      "log_sha256": "c8202cf443099d030d3b5935fa50fc6ac487ddad56417abf953b041ab26745a1",
+      "test_counts": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": [
+        "test official_qwen3_q8_matches_original_native_profile ... qwen3-native: official Qwen3-0.6B Q8_0 host=msvc rows=36 floats=5469696 bitwise_equal=5469696 greedy_ids=24 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+      ]
+    }
+  ],
+  "inputs_unchanged": true,
+  "all_requested_steps_passed": true
+}

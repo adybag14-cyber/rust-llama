@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "run_id": 42673166488,
+  "attempt": 2,
+  "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/42673166488",
+  "status": "completed",
+  "conclusion": "success",
+  "qualification": "Original attempt failed before runner allocation with a GitHub internal server error; retry used the identical commit and workflow. Independent hosted MSVC and GNU validation passed. Raw logs and both attempts are retained; expected values and numerical bounds unchanged.",
+  "jobs": [
+    {
+      "platform": "linux",
+      "job_id": 129352209101,
+      "sections": {
+        "cargo test --workspace --all-targets --offline --locked": {
+          "suites": 82,
+          "passed": 439,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --workspace --all-targets --release --offline --locked": {
+          "suites": 82,
+          "passed": 439,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture": {
+          "suites": 12,
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 73
+        }
+      },
+      "interesting": [
+        "BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)",
+        "native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0",
+        "native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)",
+        "native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)",
+        "native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)",
+        "Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0"
+      ]
+    },
+    {
+      "platform": "windows",
+      "job_id": 129352499102,
+      "sections": {
+        "cargo test --workspace --all-targets --offline --locked": {
+          "suites": 82,
+          "passed": 436,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --workspace --all-targets --release --offline --locked": {
+          "suites": 82,
+          "passed": 436,
+          "failed": 0,
+          "ignored": 18,
+          "measured": 0,
+          "filtered": 0
+        },
+        "cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture": {
+          "suites": 12,
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered": 72
+        }
+      },
+      "interesting": [
+        "BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0",
+        "native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)",
+        "native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0",
+        "native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)",
+        "native qwen2.5-0.5b-instruct conformance: cases=3 rows=34 greedy_ids=24 compared_logits=5165824 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=5165824 (informational; gate uses unchanged declared tolerance)",
+        "native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1709520 (informational; gate uses unchanged declared tolerance)",
+        "Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0"
+      ]
+    }
+  ]
+}

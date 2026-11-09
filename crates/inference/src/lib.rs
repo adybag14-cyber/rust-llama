@@ -1,5 +1,5 @@
 //! Native Rust GGUF -> tokenizer -> model -> sampler integration.
-//! Model paths: dense Llama/Qwen2, Mamba-1 recurrence and dense BERT embeddings.
+//! Model paths: dense Llama/Qwen2/Qwen3, Mamba-1 recurrence and dense BERT embeddings.
 //! Unsupported architectures and configuration modes fail before generation.
 #![forbid(unsafe_code)]
 
@@ -7,6 +7,7 @@ mod bert_loader;
 mod loader;
 mod mamba_loader;
 mod qwen2_loader;
+mod qwen3_loader;
 mod stream;
 use llama_behavior::{
     chat,

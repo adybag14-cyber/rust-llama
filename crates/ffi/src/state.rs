@@ -1,4 +1,4 @@
-//! Frozen state/session serialization for the supported dense F32 CPU context.
+//! Frozen state/session serialization for the supported dense F32/F16 CPU context.
 use crate::*;
 use llama_model_runtime::{Model as RuntimeModel, NativeState};
 use std::ffi::c_char;
@@ -269,6 +269,7 @@ unsafe fn legacy_size(context: &ContextHandle, source: *const u8) -> Result<usiz
         return Err("unsupported native state model".into());
     };
     let width = model.config().kv_width().map_err(|e| e.to_string())?;
+    let (key_type, value_type) = context.runtime.cache_types();
     let mut reader = LegacyReader { source, at: 0 };
     if unsafe { reader.u32()? } != 5 {
         return Err("legacy state architecture length mismatch".into());
@@ -299,31 +300,46 @@ unsafe fn legacy_size(context: &ContextHandle, source: *const u8) -> Result<usiz
             }
             reader.skip(ids * 4)?;
         }
-        if unsafe { reader.u32()? } != 1
+        if unsafe { reader.u32()? } != u32::from(context.runtime.values_are_transposed())
             || unsafe { reader.u32()? } as usize != model.layer_count()
             || unsafe { reader.u32()? } != 0
             || unsafe { reader.u32()? } != 0
         {
             return Err("legacy native state tensor layout mismatch".into());
         }
-        let tensor_bytes = count
+        let elements = count
             .checked_mul(width)
-            .and_then(|n| n.checked_mul(4))
-            .ok_or("legacy tensor byte overflow")?;
+            .ok_or("legacy tensor shape overflow")?;
         for _ in 0..model.layer_count() {
-            if unsafe { reader.u32()? } != 0 || unsafe { reader.u64()? } != (width * 4) as u64 {
+            if unsafe { reader.u32()? } != key_type as u32
+                || unsafe { reader.u64()? } != (width * key_type.size()) as u64
+            {
                 return Err("legacy state key type/shape mismatch".into());
             }
-            reader.skip(tensor_bytes)?;
+            reader.skip(
+                elements
+                    .checked_mul(key_type.size())
+                    .ok_or("legacy key byte overflow")?,
+            )?;
         }
         for _ in 0..model.layer_count() {
-            if unsafe { reader.u32()? } != 0
-                || unsafe { reader.u32()? } != 4
-                || unsafe { reader.u32()? } as usize != width
-            {
-                return Err("legacy state value type/shape mismatch".into());
+            if unsafe { reader.u32()? } != value_type as u32 {
+                return Err("legacy state value type mismatch".into());
             }
-            reader.skip(tensor_bytes)?;
+            if context.runtime.values_are_transposed() {
+                if unsafe { reader.u32()? } != value_type.size() as u32
+                    || unsafe { reader.u32()? } as usize != width
+                {
+                    return Err("legacy state value shape mismatch".into());
+                }
+            } else if unsafe { reader.u64()? } != (width * value_type.size()) as u64 {
+                return Err("legacy state value row size mismatch".into());
+            }
+            reader.skip(
+                elements
+                    .checked_mul(value_type.size())
+                    .ok_or("legacy value byte overflow")?,
+            )?;
         }
     }
     Ok(reader.at)

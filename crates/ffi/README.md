@@ -53,7 +53,7 @@ payload extents fail with a diagnostic. The explicit C split-list and filename
 buffer APIs remain unexported.
 
 Start with the frozen default parameter functions, then select CPU loading,
-F32 KV caches and causal decoding. For example, a client using the frozen C
+explicit F32 or F16 KV caches and causal decoding. For example, a client using the frozen C
 header can set:
 
 ```c
@@ -64,8 +64,8 @@ mp.lazy_mode = LLAMA_LAZY_MODE_OFF;
 
 struct llama_context_params cp = llama_context_default_params();
 cp.n_ctx = 512;
-cp.type_k = GGML_TYPE_F32;
-cp.type_v = GGML_TYPE_F32;
+cp.type_k = GGML_TYPE_F16;
+cp.type_v = GGML_TYPE_F16;
 cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;
 cp.n_threads = 1;
 cp.n_threads_batch = 1;
@@ -73,19 +73,24 @@ cp.offload_kqv = false;
 cp.op_offload = false;
 ```
 
-The default structure itself remains source-faithful: it returns F16 cache types.
-Context creation rejects those unsupported types with a diagnostic; it never
-substitutes F32 silently. Model default `n_gpu_layers = -1` and automatic
-attention/offload preferences resolve to CPU because this C ABI registers no
-GPU backend. Positive GPU-layer requests and forced flash attention fail.
+The default structure itself remains source-faithful: it returns F16 cache
+types, AUTO flash attention and four workers. Untouched default-context creation
+is not supported. This slice accepts independent F32/F16 keys and values only
+with flash attention explicitly DISABLED and thread counts 1/1; AUTO and ENABLED
+return a diagnostic. This also corrects the former manually selected F32/AUTO
+path, which silently executed nonflash attention. Model default
+`n_gpu_layers = -1` resolves to CPU because this C ABI registers no GPU backend.
+Positive GPU-layer requests fail.
 
 The executor runs one worker. Context creation requires thread counts 1/1,
 and the thread query functions report that actual value.
 `llama_set_n_threads` accepts 1/1; unsupported changes leave state unchanged
 and set the diagnostic.
 
-The compatibility executor supports separate and unified physical F32 KV
-buffers. Context padding, per-stream capacity, metadata holes, sequence sharing,
+The compatibility executor supports separate and unified physical F32/F16 KV
+buffers. Half storage retains raw u16 payloads through copies, state and session
+I/O, including nonfinite bit patterns; numerical K/V writes perform the source
+F16 rounding. Nonflash query and probability operands remain F32. Context padding, per-stream capacity, metadata holes, sequence sharing,
 queued cross-stream copies and signed position transforms follow the measured
 frozen cache behavior. Separate mode has the configured sequence streams;
 unified mode accepts the frozen 256-ID range, with per-token membership bounded
@@ -109,8 +114,8 @@ hidden output are implemented. Pooling and noncausal attention are not.
 
 ## Unsupported options
 
-Context creation rejects non-F32 KV caches, nondefault context types, custom
-RoPE/YaRN, pooling, noncausal attention, forced flash attention, evaluator
+Context creation rejects KV types other than F32/F16, nondefault context types,
+custom RoPE/YaRN, pooling, noncausal attention, AUTO or ENABLED flash attention, evaluator
 callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
 slots, nondefault output capacity fields and performance counters. SWA preferences have no effect for the supported non-SWA model.
 All boolean and enum inputs are validated.
@@ -135,7 +140,7 @@ and its count pointer is optional. NONE retains its nominal vocabulary count
 and special IDs, returns empty detokenization, and rejects unavailable token
 data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
-Dense F32 memory manipulation and frozen state/session formats are implemented
+Dense F32/F16 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
 adapters, encoder entry points, model saving, explicit split-list loading and
 performance APIs remain absent. Source custom chat-template lookup
@@ -264,3 +269,21 @@ evidence/2026-11-09/native-context for measured errors and actual build flags.
 
 These checks establish the stated subset on Windows x64 and Linux x64. They do
 not close the full ABI, architecture, backend, platform or performance gates.
+
+## Ordinary typed-cache regression
+
+The f16_context_reference_tests module replays independent original MSVC and
+GNU tiny-model captures for F32/F32, F16/F16, F16/F32 and F32/F16 storage.
+Each profile covers 160 memory scenarios, 160 sequence-state/flag scenarios,
+eight session suites and 384 short-buffer cases. It checks 258,048 logit words
+and 1,048 state/partial-output buffers (290,328 bytes) exactly, including
+physical holes, deferred copies, shifts and restore/reserialize without
+evaluation. The original 520 binary artifacts per profile are losslessly
+deduplicated with the continuation rows; no Rust output generates expectations.
+See fixtures/ffi/f16-context-provenance.json for hashes and reconstruction proof.
+
+The independent F16 cache matmul graph corpus additionally checks 125 original
+graphs and 245,154 F32 outputs per platform, including head-offset views, GQA,
+strided K caches and 256/512/768-column V products. Trained-model typed-cache
+execution remains covered by the external C harness, while this ordinary
+state/decode cohort deliberately uses the small deterministic fixture.

@@ -1,0 +1,31 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,datetime
+windows=os.name=='nt'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+repo=reference/'qwen3-and-f16-integration-v1/rust-draft'
+target=reference/'qwen3-and-f16-integration-v1/windows-target' if windows else Path('/home/tdamre/.cache/rust-llama-qwen3-and-f16-integration-v1')
+executable=target/'release'/('rust-llama.exe' if windows else 'rust-llama')
+reports=[]
+for prefix,filename,expected_hash,budget in [
+ ('smollm2-q4-k-m','SmolLM2-135M-Q4_K_M.gguf','e3131339bf4e8065265593d4fd8f7bb7ff2d3abff1edb5618aa1197b89cad9f5',2048),
+ ('mamba-130m-f16','mamba-130m-hf.f16.gguf','cde77cf92d0fbee2346f342faf7f4992622b28d163277a7e52eefa0331be7e32',2048),
+ ('qwen2-05b-q4-k-m','qwen2.5-0.5b-instruct-q4_k_m.gguf','74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db',3072),
+ ('qwen3','qwen3-0.6b-q8_0.gguf','9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031',3072),
+]:
+ model=reference/'models'/filename
+ assert hashlib.sha256(model.read_bytes()).hexdigest()==expected_hash
+ suffix='-metadata.json' if windows else '-gnu-metadata.json'
+ metadata_path=(repo/'fixtures/inference/qwen3'/('pretrained-msvc-reference.json' if windows else 'pretrained-gnu-reference.json')) if prefix=='qwen3' else repo/'fixtures/inference'/(prefix+suffix)
+ metadata=json.loads(metadata_path.read_text(encoding="utf-8"))
+ cases=metadata['cases'] if prefix.startswith('qwen') else metadata['cases'][:1]
+ for case in cases:
+  command=[str(executable),'generate','--model',str(model),'--prompt',case['prompt'],'--ctx-size','128','--max-weight-mib',str(budget),'--n-predict',str(metadata['max_tokens']),'--temperature','0']
+  result=subprocess.run(command,cwd=repo,capture_output=True,timeout=300)
+  assert result.returncode==0,result.stderr.decode(errors='replace')
+  expected=bytes.fromhex(case['generated_hex'])
+  assert result.stdout==expected,(prefix,case['name'],result.stdout.hex(),case['generated_hex'])
+  stats=json.loads(result.stderr.decode().strip())
+  assert stats['prompt_tokens']==len(case['tokens'])
+  assert stats['completion_tokens']==len(case['greedy_tokens'])
+  reports.append({'model':filename,'sha256':expected_hash,'native_metadata_sha256':hashlib.sha256(metadata_path.read_bytes()).hexdigest(),'case':case['name'],'command':command,'exit_code':result.returncode,'stdout_hex':result.stdout.hex(),'statistics':stats})
+print(json.dumps({'passed':True,'scenarios':len(reports),'executable_sha256':hashlib.sha256(executable.read_bytes()).hexdigest(),'results':reports},indent=2))

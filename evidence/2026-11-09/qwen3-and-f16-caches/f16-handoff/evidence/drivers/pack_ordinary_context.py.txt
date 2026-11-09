@@ -1,0 +1,77 @@
+from pathlib import Path
+import json,hashlib,struct,datetime
+task=Path(__file__).resolve().parent;draft=task/'rust-draft'
+dest=draft/'fixtures/ffi';dest.mkdir(exist_ok=True)
+sha=lambda data:hashlib.sha256(data).hexdigest()
+pool=bytearray();seen={};source_records=[];profiles={};totals={}
+def intern(data,kind=None):
+ digest=sha(data)
+ if digest not in seen:
+  seen[digest]={'offset':len(pool),'bytes':len(data),'sha256':digest}
+  pool.extend(data)
+ else:
+  item=seen[digest];assert pool[item['offset']:item['offset']+item['bytes']]==data
+ result=dict(seen[digest])
+ if kind:result['kind']=kind
+ return result
+def encode(value,counts,key=''):
+ if isinstance(value,dict):return {k:encode(v,counts,k) for k,v in value.items()}
+ if isinstance(value,list):
+  if len(value)==512 and all(isinstance(v,int) and 0<=v<2**32 for v in value):
+   counts['logit_words']+=len(value)
+   return intern(b''.join(struct.pack('<I',v) for v in value),'u32')
+  return [encode(v,counts) for v in value]
+ if key=='hex' and isinstance(value,str):
+  data=bytes.fromhex(value);counts['buffer_bytes']+=len(data)
+  return intern(data,'hex')
+ return value
+def decode(value):
+ if isinstance(value,dict):
+  if value.get('kind') in ['u32','hex']:
+   data=bytes(pool[value['offset']:value['offset']+value['bytes']])
+   assert sha(data)==value['sha256']
+   return list(struct.unpack('<'+'I'*(len(data)//4),data)) if value['kind']=='u32' else data.hex()
+  return {k:decode(v) for k,v in value.items()}
+ if isinstance(value,list):return [decode(v) for v in value]
+ return value
+for host,profile in [('windows','msvc'),('linux','gnu')]:
+ fixtures=[];counts={'memory_cases':0,'sequence_cases':0,'file_cases':0,'buffer_cases':0,'binary_files':0,'binary_bytes':0,'logit_words':0,'buffer_bytes':0,'exact_state_comparisons':0,'exact_state_comparison_bytes':0}
+ for k,v in [(0,0),(1,1),(1,0),(0,1)]:
+  directory=task/'captures'/host/f'tiny-k{k}-v{v}'
+  report_path=directory/'reference.json';raw=report_path.read_bytes();original=json.loads(raw)
+  assert original['type_k']==k and original['type_v']==v and original['n_vocab']==512
+  counts['memory_cases']+=len(original['cases']);counts['sequence_cases']+=len(original['sequence_cases']);counts['file_cases']+=len(original['file_cases']);counts['buffer_cases']+=len(original['buffer_cases'])
+  encoded=encode(original,counts);assert decode(encoded)==original
+  source={'profile':profile,'types':[k,v],'report':{'path':str(report_path),'bytes':len(raw),'sha256':sha(raw)},'files':[]}
+  files=[]
+  for path in sorted(directory.iterdir()):
+   if not path.is_file() or path.name=='reference.json':continue
+   data=path.read_bytes();block=intern(data)
+   files.append({'name':path.name,**block});counts['binary_files']+=1;counts['binary_bytes']+=len(data)
+   source['files'].append({'name':path.name,'bytes':len(data),'sha256':sha(data)})
+  by_name={f['name']:f for f in files}
+  for c in original['cases']:
+   counts['exact_state_comparisons']+=2
+   counts['exact_state_comparison_bytes']+=2*by_name[c['name']+'.state.bin']['bytes']
+  for c in original['sequence_cases']:
+   counts['exact_state_comparisons']+=2
+   counts['exact_state_comparison_bytes']+=by_name[c['name']+'.state.bin']['bytes']+by_name[c['name']+'.after.bin']['bytes']
+  for c in original['file_cases']:
+   counts['exact_state_comparisons']+=3
+   counts['exact_state_comparison_bytes']+=sum(by_name[c['name']+suffix]['bytes'] for suffix in ['.session.bin','.session.bin.alias','.sequence.bin'])
+  for c in original['buffer_cases']:
+   counts['exact_state_comparisons']+=1;counts['exact_state_comparison_bytes']+=len(bytes.fromhex(c['hex']))
+  fixtures.append({'type_k':k,'type_v':v,'report':encoded,'files':files})
+  source_records.append(source)
+ profiles[profile]=fixtures;totals[profile]=counts
+record={'schema':1,'source_archive_sha256':'2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122','model_path':'fixtures/ffi/native-context-model.gguf','model_sha256':sha((draft/'fixtures/ffi/native-context-model.gguf').read_bytes()),'profile_selection':'MSVC target selects original Windows; GNU x86_64 selects original GNU. All raw bytes and every logit word are exact.','profiles':profiles,'counts':totals}
+records=[]
+def emit(name,data):
+ target=dest/name;assert not target.exists();target.write_bytes(data)
+ records.append({'path':str(target.relative_to(draft)).replace('\\','/'),'bytes':len(data),'sha256':sha(data)})
+emit('f16-context-reference.json',(json.dumps(record,separators=(',',':'),ensure_ascii=True)+'\n').encode())
+emit('f16-context-data.bin',pool)
+provenance={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_archive_sha256':record['source_archive_sha256'],'model':{'path':record['model_path'],'sha256':record['model_sha256']},'source_adapter':{'path':str(task/'oracle.cpp'),'bytes':(task/'oracle.cpp').stat().st_size,'sha256':sha((task/'oracle.cpp').read_bytes())},'source_header':{'path':str(task.parent/'llama.cpp-master/include/llama.h'),'sha256':sha((task.parent/'llama.cpp-master/include/llama.h').read_bytes())},'independence':'All expected reports/state/session bytes originate from the original DLL/SO before typed Rust storage implementation. Packing performs only lossless byte deduplication and typed u32/hex factoring; reconstructed report values and every raw file are verified against originals. No Rust output generates expectations.','counts':totals,'unique_blocks':len(seen),'packed_data_bytes':len(pool),'fixtures':list(records),'sources':source_records,'open_scope':['This ordinary cohort uses the synthetic tiny Llama model; trained-model typed-cache proof remains external.','Flash/AUTO and worker counts other than one remain explicitly rejected.','No default-context success claim; the unchanged original default parameter structure requests unsupported AUTO/four workers.']}
+emit('f16-context-provenance.json',(json.dumps(provenance,indent=2)+'\n').encode())
+out=task/'ordinary-fixture-records.json';assert not out.exists();out.write_bytes((json.dumps(records,indent=2)+'\n').encode())
+print(json.dumps({'fixtures':records,'counts':totals,'unique_blocks':len(seen),'pool_bytes':len(pool)},indent=2))

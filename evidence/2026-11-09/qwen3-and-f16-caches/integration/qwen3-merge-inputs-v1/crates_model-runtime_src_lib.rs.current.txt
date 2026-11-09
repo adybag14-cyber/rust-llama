@@ -1,0 +1,236 @@
+//! Owned Llama, Qwen2, Mamba-1 and BERT execution in native Rust.
+//!
+//! Dense and packed quantized matrix paths execute source-derived equations.
+//! The strict sequential Context API and the separately bounded NativeContext
+//! compatibility cache have distinct state contracts. The latter supports the
+//! measured partial C ABI in llama-ffi; neither API claims every architecture,
+//! cache type or backend from the frozen source. No original llama/ggml object
+//! or external numerical library is linked into this crate.
+#![forbid(unsafe_code)]
+
+pub mod adapters;
+pub mod bert;
+pub mod context;
+pub mod fixtures;
+pub mod llama;
+pub mod mamba;
+pub mod math;
+pub mod qwen2;
+pub mod registry;
+mod state;
+
+pub use adapters::{AdapterSet, Lora};
+pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
+pub use context::{
+    BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
+    NativeContextOptions, NativeKvType, NativeState, OutputSelection, TokenOutput,
+};
+pub use fixtures::{SmokeReport, smoke_demo};
+pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
+pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
+pub use math::Matrix;
+pub use qwen2::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
+
+use std::fmt;
+
+pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Error {
+    Shape(String),
+    InvalidConfig(String),
+    NonFinite(String),
+    InvalidToken { token: u32, vocabulary: usize },
+    InvalidPosition { expected: usize, actual: usize },
+    ContextFull { maximum: usize },
+    InvalidSequence(i32),
+    MissingSequence(i32),
+    SequenceLimit { maximum: usize },
+    SequenceExists(i32),
+    UnsupportedArchitecture(String),
+    Unsupported(String),
+    InvalidAdapter(String),
+    InvalidState(String),
+    Cancelled,
+}
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Shape(s) => write!(f, "shape error: {s}"),
+            Self::InvalidConfig(s) => write!(f, "invalid configuration: {s}"),
+            Self::NonFinite(s) => write!(f, "non-finite value: {s}"),
+            Self::InvalidToken { token, vocabulary } => {
+                write!(f, "token {token} is outside vocabulary of {vocabulary}")
+            }
+            Self::InvalidPosition { expected, actual } => {
+                write!(f, "expected sequence position {expected}, got {actual}")
+            }
+            Self::ContextFull { maximum } => write!(f, "context limit {maximum} reached"),
+            Self::InvalidSequence(s) => write!(f, "invalid negative sequence id {s}"),
+            Self::MissingSequence(s) => write!(f, "sequence {s} does not exist"),
+            Self::SequenceLimit { maximum } => write!(f, "sequence limit {maximum} reached"),
+            Self::SequenceExists(s) => write!(f, "sequence {s} already exists"),
+            Self::UnsupportedArchitecture(s) => write!(
+                f,
+                "architecture {s} has no executable implementation in this checkpoint"
+            ),
+            Self::Unsupported(s) => write!(f, "not implemented in this checkpoint: {s}"),
+            Self::InvalidAdapter(s) => write!(f, "invalid adapter: {s}"),
+            Self::InvalidState(s) => write!(f, "invalid state: {s}"),
+            Self::Cancelled => f.write_str("execution cancelled; no sequence changes committed"),
+        }
+    }
+}
+impl std::error::Error for Error {}
+
+/// Validated autoregressive model. BERT is exposed separately as an encoder.
+#[derive(Debug, Clone)]
+pub enum Model {
+    Llama(LlamaModel),
+    Mamba(MambaModel),
+    Qwen2(Qwen2Model),
+}
+impl Model {
+    pub fn architecture(&self) -> &'static registry::Architecture {
+        match self {
+            Self::Llama(_) => &registry::ARCHITECTURES[1],
+            Self::Mamba(_) => &registry::ARCHITECTURES[60],
+            Self::Qwen2(_) => &registry::ARCHITECTURES[24],
+        }
+    }
+    pub fn width(&self) -> usize {
+        match self {
+            Self::Llama(m) => m.config().width,
+            Self::Mamba(m) => m.config().width,
+            Self::Qwen2(m) => m.config().width,
+        }
+    }
+    pub fn vocabulary(&self) -> usize {
+        match self {
+            Self::Llama(m) => m.config().vocabulary,
+            Self::Mamba(m) => m.config().vocabulary,
+            Self::Qwen2(m) => m.config().vocabulary,
+        }
+    }
+    pub fn max_context(&self) -> usize {
+        match self {
+            Self::Llama(m) => m.config().max_context,
+            Self::Mamba(m) => m.config().max_context,
+            Self::Qwen2(m) => m.config().max_context,
+        }
+    }
+    pub fn layer_count(&self) -> usize {
+        match self {
+            Self::Llama(m) => m.layer_count(),
+            Self::Mamba(m) => m.layer_count(),
+            Self::Qwen2(m) => m.layer_count(),
+        }
+    }
+    pub fn fingerprint(&self) -> u64 {
+        match self {
+            Self::Llama(m) => m.fingerprint(),
+            Self::Mamba(m) => m.fingerprint(),
+            Self::Qwen2(m) => m.fingerprint(),
+        }
+    }
+    pub fn weight(&self, name: &str) -> Option<&Matrix> {
+        match self {
+            Self::Llama(m) => m.weight(name),
+            Self::Mamba(m) => m.weight(name),
+            Self::Qwen2(m) => m.weight(name),
+        }
+    }
+    pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
+        match self {
+            Self::Llama(m) => m.embedding(token),
+            Self::Mamba(m) => m.embedding(token),
+            Self::Qwen2(m) => m.embedding(token),
+        }
+    }
+}
+
+pub(crate) fn check_positive(values: &[(&str, usize)]) -> Result<()> {
+    for (name, value) in values {
+        if *value == 0 || *value > u32::MAX as usize {
+            return Err(Error::InvalidConfig(format!(
+                "{name} must be in 1..=u32::MAX"
+            )));
+        }
+    }
+    Ok(())
+}
+pub(crate) fn check_epsilon(epsilon: f32) -> Result<()> {
+    if epsilon.is_finite() && epsilon > 0.0 {
+        Ok(())
+    } else {
+        Err(Error::InvalidConfig(
+            "normalization epsilon must be finite and positive".into(),
+        ))
+    }
+}
+
+pub(crate) fn checked_head_dimension(width: usize, heads: usize) -> Result<usize> {
+    check_positive(&[("width", width), ("heads", heads)])?;
+    if !width.is_multiple_of(heads) {
+        return Err(Error::InvalidConfig(
+            "width must divide evenly into attention heads".into(),
+        ));
+    }
+    width
+        .checked_div(heads)
+        .filter(|value| *value != 0)
+        .ok_or_else(|| Error::InvalidConfig("invalid attention head dimension".into()))
+}
+
+pub(crate) fn checked_kv_width(width: usize, heads: usize, kv_heads: usize) -> Result<usize> {
+    let dimension = checked_head_dimension(width, heads)?;
+    check_positive(&[("kv_heads", kv_heads)])?;
+    if !heads.is_multiple_of(kv_heads) {
+        return Err(Error::InvalidConfig(
+            "attention heads must divide evenly into KV groups".into(),
+        ));
+    }
+    kv_heads
+        .checked_mul(dimension)
+        .ok_or_else(|| Error::InvalidConfig("KV width overflow".into()))
+}
+
+/// Stable, non-cryptographic fingerprint used to reject accidental model/state
+/// mismatches. This is not an authentication tag or an adversarial identity.
+pub(crate) struct Fingerprint(u64);
+impl Fingerprint {
+    pub fn new() -> Self {
+        Self(0xcbf29ce484222325)
+    }
+    pub fn bytes(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.0 ^= *byte as u64;
+            self.0 = self.0.wrapping_mul(0x100000001b3);
+        }
+    }
+    pub fn usize(&mut self, value: usize) {
+        self.bytes(&(value as u64).to_le_bytes());
+    }
+    pub fn floats(&mut self, values: &[f32]) {
+        self.usize(values.len());
+        for value in values {
+            self.bytes(&value.to_bits().to_le_bytes());
+        }
+    }
+    pub fn matrix(&mut self, matrix: &Matrix) {
+        self.usize(matrix.rows());
+        self.usize(matrix.cols());
+        self.floats(matrix.values());
+        // Packed storage changes activation conversion and therefore execution.
+        // Distinguish it from identical decoded values in model/state identity.
+        if let Some((dtype, bytes)) = matrix.storage_identity() {
+            self.bytes(b"packed-matvec-v1");
+            self.bytes(&dtype.to_le_bytes());
+            self.usize(bytes.len());
+            self.bytes(bytes);
+        }
+    }
+    pub fn finish(self) -> u64 {
+        self.0
+    }
+}

@@ -1,0 +1,58 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "label": "windows-focused-final",
+  "mode": "focused",
+  "input_count": 255,
+  "input_inventory_sha256": "cec43eb6725ac35faef96170a0d0c78afc94caefd5d1d0e687d65cc94a924f4d",
+  "steps": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.3403660000039963,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 17.228745599997637,
+      "log_sha256": "d47c1fd92eb6f2aea141771b4fb962176a8d01295796c8d89a4c6702a61cd187",
+      "test_counts": {
+        "passed": 90,
+        "failed": 1,
+        "ignored": 8
+      },
+      "native_metrics": [
+        "qwen3-native: active vector storage / ignored partial fused biases host=msvc rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+        "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=msvc rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+      ]
+    }
+  ],
+  "inputs_unchanged": true,
+  "all_requested_steps_passed": false
+}

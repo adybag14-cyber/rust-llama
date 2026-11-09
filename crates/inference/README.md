@@ -8,16 +8,19 @@ This crate connects checked GGUF loading, native tokenizers and the Rust model r
 | --- | --- | --- |
 | `llama` | Llama SentencePiece or native BPE | Dense autoregressive generation and complete per-token logits, standard adjacent-pair RoPE without scaling, F32 KV state. |
 | `qwen2` | Native BPE | Dense generation and complete logits, half-pair NeoX RoPE without scaling, separate or fused Q/K/V with source bias rules, F32 KV state. |
+| `qwen3` | Native BPE | Dense generation with independent full head width, learned per-head Q/K RMS, full-head NeoX RoPE without scaling, separate or fused Q/K/V and F32 KV state. |
 | `bert` | BERT WordPiece | Dense bidirectional encoding, complete token embeddings and none/mean/first/last pooling. |
 | `mamba` | Native tokenizer metadata; SPM and BPE independently exercised | Mamba-1 causal convolution and selective recurrence, tied or separate output weights, optional unweighted dt/B/C RMS normalization. |
 
 Mamba-1 loading validates source tensor names and dimensions before constructing its owned recurrent state. Convolution and SSM A tensors require the source CPU kernel's F32 storage. The frozen loader does not load optional dt/B/C normalization weight tensors; its metadata flag selects unweighted normalization. Other architectures, unsupported tensor arrangements and unimplemented options return explicit errors. The full upstream architecture and runtime contract remains open.
 
-All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The pretrained corpus exercises F32 and Q4_0 Llama, BPE/Q4_K_M SmolLM2, Q4_K_M Qwen2, F16 Mamba-1 and F16 BERT.
+All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The pretrained corpus exercises F32 and Q4_0 Llama, BPE/Q4_K_M SmolLM2, Q4_K_M Qwen2, Q8_0 Qwen3, F16 Mamba-1 and F16 BERT.
+
+Qwen3 validates independent query/KV widths, per-head Q/K RMS vectors and fused-bias precedence before execution. Active norms and biases require F32 storage in the original CPU graph; ignored partial fused-bias groups retain their original behavior. Its ordinary tests cover automatic and explicit shard sets, state identity and transaction rollback. [Detailed Qwen3 contracts](../../docs/QWEN3_IMPLEMENTATION.md) keep MoE/VL/Next, scaled/partial RoPE, dimension arrays, rerankers and C NativeContext execution explicitly open.
 
 ## Loading and memory
 
-`Model::load` uses a 2 GiB decoded F32 weight budget and a requested context of 1,024 tokens, capped to the training context. `Model::load_with_options` lets the caller set those limits. The pinned Qwen2.5-0.5B Q4_K_M model has a separate output matrix and a decoded cache larger than 2 GiB; its comparisons use a 3 GiB weight budget and context 128.
+`Model::load` uses a 2 GiB decoded F32 weight budget and a requested context of 1,024 tokens, capped to the training context. `Model::load_with_options` lets the caller set those limits. The pinned Qwen2.5-0.5B Q4_K_M model has a separate output matrix and a decoded cache larger than 2 GiB; its comparisons use a 3 GiB weight budget and context 128. The pinned Qwen3-0.6B Q8_0 model needs 2,384,199,680 decoded-weight bytes and also uses an explicit 3 GiB budget; its default-budget rejection is tested.
 
 The single-path APIs automatically discover declared GGUF siblings. The Rust
 `Model::load_from_splits` and `load_from_splits_with_options` APIs take explicit
@@ -79,6 +82,7 @@ The checks against each matching original profile record:
 - BPE/Q4_K_M SmolLM2-135M: three prompts, 1,671,168 unique logits and 24 greedy token IDs, bit-identical on the corresponding Windows and GNU profiles.
 - F16 Mamba-130M: three prompts, 1,709,520 unique logits and 24 greedy token IDs, bit-identical against both original profiles after matching whole-row SiLU.
 - Qwen2.5-0.5B Q4_K_M: three prompts, 5,165,824 unique logits and 24 greedy IDs, bit-identical against each original profile. Twenty-one synthetic variants add 165,888 unique logits and 198 greedy IDs, with metadata, partial-bias and output-bias overflow regressions.
+- Qwen3-0.6B Q8_0: three prompts, 5,469,696 unique logits and 24 greedy IDs, bit-identical against each original profile. Dense/split/vector regressions add 294,912 logits and 400 IDs per profile.
 - F16 BERT: three prompts, 25 token vectors and nine pooled vectors, totaling 13,056 values, bit-identical after preserving attention, pooling and GNU variance order.
 - BERT diagnosis: all 122 captured stages of the first sequence match exactly; a committed independent attention fixture checks 46,080 output values across all 12 layers.
 
@@ -94,7 +98,7 @@ Portable model tests retain the declared tolerance `2e-4 + 2e-5 * abs(reference)
 
 The big-endian BERT regression compares an equivalent independently downloaded encoding with the same little-endian native outputs. The frozen C reader itself rejects that opposite-endian GGUF file, so this check is explicitly a Rust reader capability rather than a claim that the original reader loads it.
 
-Set `LLAMA_TEST_MODEL`, `LLAMA_TEST_Q4_MODEL`, `LLAMA_TEST_BPE_MODEL`, `LLAMA_TEST_MAMBA_MODEL`, `LLAMA_TEST_QWEN2_MODEL`, `LLAMA_TEST_BERT_MODEL` and `LLAMA_TEST_BERT_BE_MODEL` to the pinned files, then run:
+Set `LLAMA_TEST_MODEL`, `LLAMA_TEST_Q4_MODEL`, `LLAMA_TEST_BPE_MODEL`, `LLAMA_TEST_MAMBA_MODEL`, `LLAMA_TEST_QWEN2_MODEL`, `LLAMA_TEST_QWEN3_MODEL`, `LLAMA_TEST_BERT_MODEL` and `LLAMA_TEST_BERT_BE_MODEL` to the pinned files, then run:
 
 ```sh
 cargo test --release --offline --locked -p llama-inference --tests -- --ignored --nocapture

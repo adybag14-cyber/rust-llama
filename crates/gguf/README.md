@@ -144,7 +144,7 @@ weight budget counts every tensor from every shard before decoding any weights.
 ## High-level model integration
 
 The existing Model::load and Model::load_with_options paths automatically use
-GgufSet. Dense Llama, dense Qwen2, Mamba-1 and dense BERT keep their existing
+GgufSet. Dense Llama, dense Qwen2/Qwen3, Mamba-1 and dense BERT keep their existing
 runtime graph and arithmetic paths. CLI and server calls that already use
 Model::load inherit automatic sibling discovery.
 

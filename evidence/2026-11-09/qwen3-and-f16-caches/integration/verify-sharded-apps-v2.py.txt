@@ -1,0 +1,119 @@
+from pathlib import Path
+import os,subprocess,json,hashlib,datetime,time,threading,queue,urllib.request,urllib.error,struct
+windows=os.name=='nt'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+root=reference/'qwen3-and-f16-integration-v1';repo=root/'rust-draft';platform='windows' if windows else 'linux'
+out=root/'validation/applications-v2'/platform/'sharded-details';out.mkdir(parents=True,exist_ok=False)
+target=root/'windows-target' if windows else Path('/home/tdamre/.cache/rust-llama-qwen3-and-f16-integration-v1')
+cli=target/'release'/('rust-llama.exe' if windows else 'rust-llama')
+server=target/'release'/('llama-server.exe' if windows else 'llama-server')
+source=reference/'sharded-gguf-port'
+llama=source/'native-capture/models/metadata-first/llama-00001-of-00002.gguf'
+bert=source/'extended-capture/models/bert-metadata-first/model-00001-of-00002.gguf'
+llama_reference=source/('native-capture' if windows else 'native-capture-gnu')/'cases/metadata-first-auto/inference-native.json'
+bert_reference=source/('extended-capture' if windows else 'extended-capture-gnu')/'cases/bert-metadata-first-auto/inference-native.json'
+ld=json.loads(llama_reference.read_text(encoding='utf-8'));bd=json.loads(bert_reference.read_text(encoding='utf-8'))
+digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+inputs=[llama,llama.with_name('llama-00002-of-00002.gguf'),bert,bert.with_name('model-00002-of-00002.gguf'),llama_reference,bert_reference]
+identities={str(p):{'bytes':p.stat().st_size,'sha256':digest(p)} for p in inputs}
+report={'passed':False,'platform':platform,'input_identities':identities,'executables':{'cli':digest(cli),'server':digest(server)},'cli':[],'http':[],
+ 'qualification':'CLI/server model output against independent original C API shard-generation and BERT captures. This is not a newly captured original HTTP protocol corpus; generic HTTP parity has separate unchanged original fixtures. Both inputs have zero tensors in the primary shard.'}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+def bits(actual,expected,label):
+ if isinstance(expected,list):
+  assert isinstance(actual,list) and len(actual)==len(expected),(label,len(actual),len(expected))
+  for i,(a,e) in enumerate(zip(actual,expected)):bits(a,e,f'{label}[{i}]')
+ else:assert struct.pack('<f',actual)==struct.pack('<f',expected),(label,actual,expected)
+def command(name,args):
+ start=time.monotonic();p=subprocess.run([str(cli),*args],cwd=repo,stdin=subprocess.DEVNULL,capture_output=True,timeout=60)
+ record={'name':name,'argv':args,'exit_code':p.returncode,'seconds':time.monotonic()-start,'stdout_hex':p.stdout.hex(),'stderr_utf8':p.stderr.decode('utf-8','replace')}
+ (out/(name+'.json')).write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+ assert p.returncode==0,(name,p.stderr.decode('utf-8','replace'))
+ report['cli'].append({'name':name,'capture':name+'.json','sha256':digest(out/(name+'.json'))});save()
+ return p
+def request(base,route,body=None):
+ data=None if body is None else json.dumps(body).encode('utf-8')
+ req=urllib.request.Request(base+route,data=data,headers={'Content-Type':'application/json'})
+ try:
+  with urllib.request.urlopen(req,timeout=30) as response:code=response.status;headers=dict(response.headers);raw=response.read(1024*1024+1)
+ except urllib.error.HTTPError as response:code=response.code;headers=dict(response.headers);raw=response.read(1024*1024+1)
+ assert len(raw)<=1024*1024
+ name=f'http-{len(report["http"]):03}.json'
+ (out/name).write_bytes((json.dumps({'route':route,'request':body,'status':code,'headers':headers,'response_utf8':raw.decode('utf-8')},indent=2)+'\n').encode('utf-8'))
+ report['http'].append({'route':route,'status':code,'capture':name,'sha256':digest(out/name)});save()
+ return code,headers,raw
+def json_request(base,route,body=None):
+ code,headers,raw=request(base,route,body);return code,json.loads(raw)
+def start(model,args,label):
+ log=(out/(label+'.stderr.log')).open('wb')
+ p=subprocess.Popen([str(server),'--model',str(model),'--ctx-size','64','--bind','127.0.0.1:0',*args],cwd=repo,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log)
+ q=queue.Queue()
+ def line():
+  data=p.stdout.readline();(out/(label+'.stdout.log')).write_bytes(data);q.put(data.decode('utf-8'))
+ threading.Thread(target=line,daemon=True).start()
+ try:
+  line=q.get(timeout=30);assert line.startswith('Listening on http://'),line
+  return p,line.split(';',1)[0].removeprefix('Listening on '),log
+ except BaseException:
+  if p.poll() is None:p.kill()
+  p.wait(timeout=10);log.close();raise
+def stop(p,log):
+ try:
+  if p.poll() is None:p.stdin.write(b'quit\n');p.stdin.flush()
+  assert p.wait(timeout=20)==0
+ finally:
+  if p.poll() is None:p.kill();p.wait(timeout=10)
+  log.close()
+save()
+try:
+ for c in ld['cases']:
+  p=command('llama-'+c['name'],['generate','--model',str(llama),'--prompt',c['prompt'],'--n-predict',str(ld['max_tokens']),'--temperature','0','--ctx-size','64'])
+  assert p.stdout==bytes.fromhex(c['generated_hex']),(c['name'],p.stdout.hex())
+  stats=json.loads(p.stderr.decode('utf-8'))
+  assert stats['prompt_tokens']==len(c['tokens']) and stats['completion_tokens']==len(c['greedy_tokens'])
+ for c in bd['cases']:
+  for pooling in ['none','mean']:
+   p=command('bert-'+c['name']+'-'+pooling,['embed','--model',str(bert),'--prompt',c['prompt'],'--pooling',pooling])
+   actual=json.loads(p.stdout.decode('utf-8'));assert actual['tokens']==c['tokens'] and actual['normalized'] is False
+   bits(actual['embeddings'],c['embeddings'],'CLI embeddings')
+   if pooling=='none':assert actual['pooled'] is None
+   else:bits(actual['pooled'],c['pooling']['mean'],'CLI mean')
+ p,url,log=start(llama,[],'llama-server')
+ try:
+  code,health=json_request(url,'/health');assert code==200
+  for c in ld['cases']:
+   code,result=json_request(url,'/tokenize',{'content':c['prompt'],'add_special':True});assert code==200 and result['tokens']==c['tokens']
+   body={'prompt':c['prompt'],'max_tokens':ld['max_tokens'],'temperature':0,'stream':False}
+   code,result=json_request(url,'/v1/completions',body)
+   assert code==200 and result['choices'][0]['text'].encode('utf-8')==bytes.fromhex(c['generated_hex'])
+   assert result['usage']['prompt_tokens']==len(c['tokens']) and result['usage']['completion_tokens']==len(c['greedy_tokens'])
+   body['stream']=True;code,headers,raw=request(url,'/v1/completions',body);assert code==200
+   chunks=[];done=0
+   for event in raw.decode('utf-8').split('\n\n'):
+    if not event.startswith('data: '):continue
+    value=event[6:]
+    if value=='[DONE]':done+=1;continue
+    chunk=json.loads(value);assert 'error' not in chunk;chunks.append(chunk['choices'][0]['text'])
+   assert done==1 and ''.join(chunks).encode('utf-8')==bytes.fromhex(c['generated_hex'])
+ finally:stop(p,log)
+ for pooling in ['none','mean']:
+  p,url,log=start(bert,['--embeddings','--pooling',pooling,'--embd-normalize','-1'],'bert-'+pooling+'-server')
+  try:
+   for c in bd['cases']:
+    code,result=json_request(url,'/embeddings',{'input':c['prompt'],'model':'shard-fixture'})
+    assert code==200 and len(result)==1 and result[0]['index']==0
+    expected=c['embeddings'] if pooling=='none' else [c['pooling']['mean']]
+    bits(result[0]['embedding'],expected,'HTTP native '+pooling)
+    code,result=json_request(url,'/v1/embeddings',{'input':c['prompt'],'model':'shard-fixture'})
+    if pooling=='none':assert code==400 and result.get('error')
+    else:
+     assert code==200 and result['usage']=={'prompt_tokens':len(c['tokens']),'total_tokens':len(c['tokens'])}
+     bits(result['data'][0]['embedding'],c['pooling']['mean'],'HTTP OpenAI mean')
+  finally:stop(p,log)
+ for p in inputs:assert digest(p)==identities[str(p)]['sha256']
+ report['passed']=True
+except BaseException as e:
+ report['error']=repr(e);raise
+finally:
+ report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps({'platform':platform,'passed':report['passed'],'cli_cases':len(report['cli']),'http_requests':len(report['http'])}))

@@ -1,0 +1,357 @@
+{
+  "passed": true,
+  "platform": "linux",
+  "profile": "debug",
+  "sources": {
+    "crates/model-runtime/src/context/native.rs": {
+      "bytes": 52403,
+      "sha256": "0bfe38ed312d8261b6293f5b9277a8b83010f9ebcfa39f0c2b7238f3306fa7f6"
+    },
+    "crates/model-runtime/src/context/native_kv.rs": {
+      "bytes": 6334,
+      "sha256": "9c2c057e5028e92b4f11a5ff14844e0ff35e29fe6db8b945916255767e883715"
+    },
+    "crates/model-runtime/src/context/native_state.rs": {
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    "crates/model-runtime/src/llama.rs": {
+      "bytes": 14376,
+      "sha256": "daa3be3520ca60a7c6e6da8943893fe6539d0d2b92947ec743a268c35310e029"
+    },
+    "crates/ffi/src/context.rs": {
+      "bytes": 15481,
+      "sha256": "e1d7a4dc77d9f3d165de3d50dda473e55b08551e01cce37c395c895894b36484"
+    },
+    "crates/ffi/src/state.rs": {
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    "crates/model-runtime/src/context.rs": {
+      "bytes": 17890,
+      "sha256": "78da9d57c82b75db0e45c5131591f879526dd27d8cf74d573dcfbb470d859d34"
+    },
+    "crates/model-runtime/src/lib.rs": {
+      "bytes": 8529,
+      "sha256": "15e491c4ddb51e086d095e5118432f8b10c65272d2bec512bedee489c910c799"
+    },
+    "crates/ffi/src/lib.rs": {
+      "bytes": 8582,
+      "sha256": "344b8456467e1a1ab4c837f87480584e85a49dfa75e78baf2d70bf2b101b6d6c"
+    },
+    "crates/ffi/src/f16_context_reference_tests.rs": {
+      "bytes": 26790,
+      "sha256": "4ae95ad38233f2543323da688fd4a83aa585db35ca04e3cf6409187cac3db67e"
+    },
+    "crates/ffi/README.md": {
+      "bytes": 15643,
+      "sha256": "2b7b1b63484af21f631c451df6f0988f17e65185d6d11c2b7f1aee76af6b61e7"
+    },
+    "crates/ffi/STATE.md": {
+      "bytes": 10034,
+      "sha256": "5fe9d8904e002e67b7f0730b6e009b5153e61f44107d385dbedbd61e5d940dac"
+    },
+    "fixtures/ffi/f16-context-reference.json": {
+      "bytes": 662275,
+      "sha256": "3a96a2a88e6606f052b1fb805f1006b53b2dc35820dd1e89caa4ee3b9b5559f8"
+    },
+    "fixtures/ffi/f16-context-data.bin": {
+      "bytes": 490319,
+      "sha256": "fe456c5cf186231fce32b1c2449d1522373f88b2e78edf3935f38848d6062f70"
+    },
+    "fixtures/ffi/f16-context-provenance.json": {
+      "bytes": 201247,
+      "sha256": "1b17392e185ba0057d26c18a73ff83c48f6d4742b2956b4ab74c9247ed1f606d"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "unit",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--lib"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "build",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "trained-k0-v0",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/trained-k0-v0",
+        "0",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1621465,
+        "sha256": "7a16a1b56934704d3a763fd12df49bbffcbb34884629206f0064250d33862d0b"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1329186,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k1-v1",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/trained-k1-v1",
+        "1",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1506141,
+        "sha256": "0670bc5f7f5d9d4a39d49c54071775229b7843395abf1c13f6f15becb261db44"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 684066,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k1-v0",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/trained-k1-v0",
+        "1",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1563798,
+        "sha256": "668ff825040a0a3ee4061e7a1baee620b16c1691766ddc17998829c542011afa"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1006626,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k0-v1",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/trained-k0-v1",
+        "0",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1563840,
+        "sha256": "f7fcec33569d83863a96ecfea8449d589f73a4f725524996b9c22a6cd8d91f4c"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1006626,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k0-v0",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/tiny-k0-v0",
+        "0",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1394085,
+        "sha256": "d69bc0e807e2dacbfcbebdd6a52d77d69f3ba3df3c93422458d6b93a2bbf4c00"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 58890,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k1-v1",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/tiny-k1-v1",
+        "1",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1391204,
+        "sha256": "de48d16ef9c16a160acd34cc440bf43a569ae197c71bbb195962bf6836c6f0ef"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 42762,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k1-v0",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/tiny-k1-v0",
+        "1",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1392641,
+        "sha256": "dcd0f1a9602d74f8b4be31455a2cbce2f6ad23023a118c435f8a7a19f826dd67"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 50826,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k0-v1",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/build-linux/f16-context-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/target-linux/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/validation/nonflash-ordinary-v1-linux-debug/tiny-k0-v1",
+        "0",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1392640,
+        "sha256": "c8398ff7e7f57593b2011a2a9e83f2cd9450c64eb0460df0c9c750d16ac5b654"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 50826,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    }
+  ],
+  "library": {
+    "bytes": 32119952,
+    "sha256": "cbb9b827e8e64a020873187b973ebea49415200610a102c08c06460f7a391d46"
+  },
+  "harness": {
+    "bytes": 301488,
+    "sha256": "61df9d77ceb9d6bb11a1d81d9340cb7d82367ee86200b75dd794bc560a4bbcba"
+  },
+  "sources_unchanged": true
+}

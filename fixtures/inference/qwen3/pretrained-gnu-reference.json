@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "reference": "frozen-llama.cpp-master-c-api",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "vocab_only": false,
+  "n_vocab": 151936,
+  "model_tensor_bytes": 633495552,
+  "model_parameters": 596049920,
+  "n_ctx": 128,
+  "max_tokens": 8,
+  "threads": 1,
+  "kv_type": "F32",
+  "flash_attention": false,
+  "mmap": false,
+  "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+  "detokenize_remove_special": true,
+  "detokenize_unparse_special": false,
+  "cases": [
+    {
+      "name": "story",
+      "prompt": "Once upon a time",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "pieces_hex": [
+        "4f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "pieces_special_hex": [
+        "4f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "detokenized_hex": "4f6e63652075706f6e20612074696d65",
+      "greedy_tokens": [
+        11,
+        1052,
+        1033,
+        220,
+        18,
+        15,
+        15,
+        15
+      ],
+      "greedy_pieces_hex": [
+        "2c",
+        "207468657265",
+        "2077657265",
+        "20",
+        "33",
+        "30",
+        "30",
+        "30"
+      ],
+      "finished_eog": false,
+      "generated_hex": "2c20746865726520776572652033303030",
+      "prompt_rows": [
+        0,
+        607744,
+        1215488,
+        1823232
+      ],
+      "greedy_rows": [
+        1823232,
+        2430976,
+        3038720,
+        3646464,
+        4254208,
+        4861952,
+        5469696,
+        6077440
+      ]
+    },
+    {
+      "name": "geography",
+      "prompt": "The capital of France is",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        785,
+        6722,
+        315,
+        9625,
+        374
+      ],
+      "pieces_hex": [
+        "546865",
+        "206361706974616c",
+        "206f66",
+        "204672616e6365",
+        "206973"
+      ],
+      "pieces_special_hex": [
+        "546865",
+        "206361706974616c",
+        "206f66",
+        "204672616e6365",
+        "206973"
+      ],
+      "detokenized_hex": "546865206361706974616c206f66204672616e6365206973",
+      "greedy_tokens": [
+        12095,
+        13,
+        576,
+        6722,
+        315,
+        9625,
+        374,
+        1083
+      ],
+      "greedy_pieces_hex": [
+        "205061726973",
+        "2e",
+        "20546865",
+        "206361706974616c",
+        "206f66",
+        "204672616e6365",
+        "206973",
+        "20616c736f"
+      ],
+      "finished_eog": false,
+      "generated_hex": "2050617269732e20546865206361706974616c206f66204672616e636520697320616c736f",
+      "prompt_rows": [
+        6685184,
+        7292928,
+        7900672,
+        8508416,
+        9116160
+      ],
+      "greedy_rows": [
+        9116160,
+        9723904,
+        10331648,
+        10939392,
+        11547136,
+        12154880,
+        12762624,
+        13370368
+      ]
+    },
+    {
+      "name": "code",
+      "prompt": "def add(a, b):",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        750,
+        912,
+        2877,
+        11,
+        293,
+        1648
+      ],
+      "pieces_hex": [
+        "646566",
+        "20616464",
+        "2861",
+        "2c",
+        "2062",
+        "293a"
+      ],
+      "pieces_special_hex": [
+        "646566",
+        "20616464",
+        "2861",
+        "2c",
+        "2062",
+        "293a"
+      ],
+      "detokenized_hex": "6465662061646428612c2062293a",
+      "greedy_tokens": [
+        198,
+        262,
+        470,
+        264,
+        488,
+        293,
+        271,
+        750
+      ],
+      "greedy_pieces_hex": [
+        "0a",
+        "202020",
+        "2072657475726e",
+        "2061",
+        "202b",
+        "2062",
+        "0a0a",
+        "646566"
+      ],
+      "finished_eog": false,
+      "generated_hex": "0a2020202072657475726e2061202b20620a0a646566",
+      "prompt_rows": [
+        13978112,
+        14585856,
+        15193600,
+        15801344,
+        16409088,
+        17016832
+      ],
+      "greedy_rows": [
+        17016832,
+        17624576,
+        18232320,
+        18840064,
+        19447808,
+        20055552,
+        20663296,
+        21271040
+      ]
+    }
+  ],
+  "profile": "gnu",
+  "float_data": {
+    "path": "pretrained-gnu-logits.f32le.bin",
+    "bytes": 21878784,
+    "sha256": "89caafa49677f68a145dd4e6733b70addaf0d5a77b35e527c0f0be08f60453e6"
+  },
+  "unique_rows": 36,
+  "row_comparisons": 39,
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05
+  },
+  "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+  "model_bytes": 639446688,
+  "decoded_weight_budget": 3221225472
+}

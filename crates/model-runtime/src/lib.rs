@@ -1,4 +1,4 @@
-//! Owned Llama, Qwen2, Mamba-1 and BERT execution in native Rust.
+//! Owned Llama, Qwen2, Qwen3, Mamba-1 and BERT execution in native Rust.
 //!
 //! Dense and packed quantized matrix paths execute source-derived equations.
 //! The strict sequential Context API and the separately bounded NativeContext
@@ -16,6 +16,7 @@ pub mod llama;
 pub mod mamba;
 pub mod math;
 pub mod qwen2;
+pub mod qwen3;
 pub mod registry;
 mod state;
 
@@ -23,13 +24,14 @@ pub use adapters::{AdapterSet, Lora};
 pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
 pub use context::{
     BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
-    NativeContextOptions, NativeState, OutputSelection, TokenOutput,
+    NativeContextOptions, NativeKvType, NativeState, OutputSelection, TokenOutput,
 };
 pub use fixtures::{SmokeReport, smoke_demo};
 pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
 pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
 pub use math::Matrix;
 pub use qwen2::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
+pub use qwen3::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
 
 use std::fmt;
 
@@ -89,6 +91,7 @@ pub enum Model {
     Llama(LlamaModel),
     Mamba(MambaModel),
     Qwen2(Qwen2Model),
+    Qwen3(Qwen3Model),
 }
 impl Model {
     pub fn architecture(&self) -> &'static registry::Architecture {
@@ -96,6 +99,7 @@ impl Model {
             Self::Llama(_) => &registry::ARCHITECTURES[1],
             Self::Mamba(_) => &registry::ARCHITECTURES[60],
             Self::Qwen2(_) => &registry::ARCHITECTURES[24],
+            Self::Qwen3(_) => &registry::ARCHITECTURES[28],
         }
     }
     pub fn width(&self) -> usize {
@@ -103,6 +107,7 @@ impl Model {
             Self::Llama(m) => m.config().width,
             Self::Mamba(m) => m.config().width,
             Self::Qwen2(m) => m.config().width,
+            Self::Qwen3(m) => m.config().width,
         }
     }
     pub fn vocabulary(&self) -> usize {
@@ -110,6 +115,7 @@ impl Model {
             Self::Llama(m) => m.config().vocabulary,
             Self::Mamba(m) => m.config().vocabulary,
             Self::Qwen2(m) => m.config().vocabulary,
+            Self::Qwen3(m) => m.config().vocabulary,
         }
     }
     pub fn max_context(&self) -> usize {
@@ -117,6 +123,7 @@ impl Model {
             Self::Llama(m) => m.config().max_context,
             Self::Mamba(m) => m.config().max_context,
             Self::Qwen2(m) => m.config().max_context,
+            Self::Qwen3(m) => m.config().max_context,
         }
     }
     pub fn layer_count(&self) -> usize {
@@ -124,6 +131,7 @@ impl Model {
             Self::Llama(m) => m.layer_count(),
             Self::Mamba(m) => m.layer_count(),
             Self::Qwen2(m) => m.layer_count(),
+            Self::Qwen3(m) => m.layer_count(),
         }
     }
     pub fn fingerprint(&self) -> u64 {
@@ -131,6 +139,7 @@ impl Model {
             Self::Llama(m) => m.fingerprint(),
             Self::Mamba(m) => m.fingerprint(),
             Self::Qwen2(m) => m.fingerprint(),
+            Self::Qwen3(m) => m.fingerprint(),
         }
     }
     pub fn weight(&self, name: &str) -> Option<&Matrix> {
@@ -138,6 +147,7 @@ impl Model {
             Self::Llama(m) => m.weight(name),
             Self::Mamba(m) => m.weight(name),
             Self::Qwen2(m) => m.weight(name),
+            Self::Qwen3(m) => m.weight(name),
         }
     }
     pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
@@ -145,6 +155,7 @@ impl Model {
             Self::Llama(m) => m.embedding(token),
             Self::Mamba(m) => m.embedding(token),
             Self::Qwen2(m) => m.embedding(token),
+            Self::Qwen3(m) => m.embedding(token),
         }
     }
 }

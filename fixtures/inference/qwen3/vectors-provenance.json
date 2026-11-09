@@ -1,0 +1,906 @@
+{
+  "schema": 1,
+  "origin": "Original GGUF writer and quantize_chunk; frozen original CPU C API on both hosts. No Rust expected values.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "sources": [
+    {
+      "path": "tiny-qwen3-vectors.cpp",
+      "sha256": "c9817147dcbb0f4dedef33b6a9b62059f0f8d1b69b9b1915edb1fa05ec32c262"
+    },
+    {
+      "path": "generate_inputs.py",
+      "sha256": "939ea0cd1433cf8f23508b4c7d0f6c92b8afd4510f8316b42d3f8779749d42a1"
+    },
+    {
+      "path": "capture_native.py",
+      "sha256": "5f6027453e490ad8015d745e1a245aca756cc62a9e7e2e917e061bc0635a8355"
+    },
+    {
+      "path": "pack_vectors.py",
+      "sha256": "bc8489d39dacf872e1ee14f3fd75b8c1aab19d988a08a447c9dcb58a21e30141"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "ae912f25c6dafec9e8cbf474037e72a5ee8e0b077a7540519887ec72495d0467"
+    }
+  ],
+  "upstream_sources": [
+    {
+      "path": "src/models/qwen3.cpp",
+      "sha256": "7df64f8b1914a10106dead976a756d796e570ed52f5d638a59f8a4497f35ac34"
+    },
+    {
+      "path": "src/llama-graph.cpp",
+      "sha256": "62418701824f9fc78bbd47b5f8b3fd142c6aa9e243273ff9ef3878761b98048f"
+    },
+    {
+      "path": "ggml/src/ggml.c",
+      "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+    },
+    {
+      "path": "ggml/src/ggml-cpu/binary-ops.cpp",
+      "sha256": "2df261aadce36a20f5e3bf6961d4ca27b8c2d461afc41488361ee6ad09c1730d"
+    }
+  ],
+  "input_manifest": {
+    "schema": 1,
+    "cases": [
+      {
+        "name": "f32-control",
+        "config": {
+          "name": "f32-control",
+          "vector_type_suffix": "attn_q_norm.weight",
+          "vector_type": 0,
+          "scope": "supported"
+        },
+        "rust_scope": "supported",
+        "path": "inputs/f32-control.gguf",
+        "bytes": 539040,
+        "sha256": "bd9487664f74ed83d29c73c4627ca17d4760ab64c6485e9a636e4472f2fdeecb",
+        "request_sha256": "0a591c2d0c8f8c775bfad765de5b185bb3738cb3c69f429e038e86a7ee776872"
+      },
+      {
+        "name": "q-norm-f16",
+        "config": {
+          "name": "q-norm-f16",
+          "vector_type_suffix": "attn_q_norm.weight",
+          "vector_type": 1,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/q-norm-f16.gguf",
+        "bytes": 538912,
+        "sha256": "e80b54910f6e87214f3ae62b863e301112a9435fbba0f1fc2e65ef2179a2fd6b",
+        "request_sha256": "03985cf3cb43c2735b6c5ff124dc3f91937c1e951c5cdf0293fe75d3f38fd993"
+      },
+      {
+        "name": "k-norm-bf16",
+        "config": {
+          "name": "k-norm-bf16",
+          "vector_type_suffix": "attn_k_norm.weight",
+          "vector_type": 30,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/k-norm-bf16.gguf",
+        "bytes": 538912,
+        "sha256": "de9b99aae4a70ee8b97354e4595f4c517ac751c05389a30f601da87fe84f727d",
+        "request_sha256": "3c6aca1454c82a8b27c8dc4f955caa5f940b3ae3db88da8b6459dd6cdd09a728"
+      },
+      {
+        "name": "attention-norm-f16",
+        "config": {
+          "name": "attention-norm-f16",
+          "vector_type_suffix": "attn_norm.weight",
+          "vector_type": 1,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/attention-norm-f16.gguf",
+        "bytes": 538784,
+        "sha256": "bdce5d04aced9050d8bb160b87ff21c669eee320ec002b2debdc09f20f3d8042",
+        "request_sha256": "f4dd9b922d8e35f0b2e8a90444df8c7befb1fbfe7ba78b0e224de9aab5bebf5b"
+      },
+      {
+        "name": "ffn-norm-bf16",
+        "config": {
+          "name": "ffn-norm-bf16",
+          "vector_type_suffix": "ffn_norm.weight",
+          "vector_type": 30,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/ffn-norm-bf16.gguf",
+        "bytes": 538784,
+        "sha256": "0c2588514b63ce7f60fd78b2bcb86d50aec89190c4222a6eda32e3cd40ee2897",
+        "request_sha256": "39fd2ae93b7776742438b5892bf13e73e9c0e3fcd33c7c2d8dcf35e26b2b50e4"
+      },
+      {
+        "name": "output-norm-f16",
+        "config": {
+          "name": "output-norm-f16",
+          "vector_type_suffix": "output_norm.weight",
+          "vector_type": 1,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/output-norm-f16.gguf",
+        "bytes": 538912,
+        "sha256": "c5b5ea3e000fe0262b2b24eb0fa86a72b1e0c37f86f178996ac5ea335e906fb2",
+        "request_sha256": "6711404270bfdafca6ac520d7a213f5c986348dd794455a67e1d40b37b192fbd"
+      },
+      {
+        "name": "q-bias-f16",
+        "config": {
+          "name": "q-bias-f16",
+          "vector_type_suffix": "attn_q.bias",
+          "vector_type": 1,
+          "scope": "unsupported",
+          "bias_mask": 1
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/q-bias-f16.gguf",
+        "bytes": 539648,
+        "sha256": "3d4d20bd0af4f4dc22e0539726da52d9c6a00b58c256079769ecb1f110315498",
+        "request_sha256": "8bc003b676eb604457197766237fdda3745e661422009fbb6e19525c451515aa"
+      },
+      {
+        "name": "k-bias-bf16",
+        "config": {
+          "name": "k-bias-bf16",
+          "vector_type_suffix": "attn_k.bias",
+          "vector_type": 30,
+          "scope": "unsupported",
+          "bias_mask": 2
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/k-bias-bf16.gguf",
+        "bytes": 539392,
+        "sha256": "6cf8b4c7ac22c8b2af559c7673092edada9c2f396c61a9bde97b73e1cde53ca0",
+        "request_sha256": "51969bb361c66a34d1ce31b4cc6004547ec16e1f1d28f5d7450c14ed5294120d"
+      },
+      {
+        "name": "v-bias-f16",
+        "config": {
+          "name": "v-bias-f16",
+          "vector_type_suffix": "attn_v.bias",
+          "vector_type": 1,
+          "scope": "unsupported",
+          "bias_mask": 4
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/v-bias-f16.gguf",
+        "bytes": 539392,
+        "sha256": "46699152555ec9ff3be5f7e09b296969d0509701b390c801dbd80f9d1d620c0f",
+        "request_sha256": "8bbe1a3b8e526f4350a101ec867892359a57daeb6203a15eaf404854f79e9886"
+      },
+      {
+        "name": "fused-own-bias-bf16",
+        "config": {
+          "name": "fused-own-bias-bf16",
+          "vector_type_suffix": "attn_qkv.bias",
+          "vector_type": 30,
+          "scope": "unsupported",
+          "fused": true,
+          "fused_bias": true
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/fused-own-bias-bf16.gguf",
+        "bytes": 539936,
+        "sha256": "ca69244ff4873410d41923b0dc36e9c6258dd5c4130ae2e4f3bcebae4005d644",
+        "request_sha256": "c2472e48a5049bbba3c5cf96e4b2c5b73fe888010965d0c0076595a1fce34cfb"
+      },
+      {
+        "name": "q-norm-q4-0",
+        "config": {
+          "name": "q-norm-q4-0",
+          "vector_type_suffix": "attn_q_norm.weight",
+          "vector_type": 2,
+          "scope": "unsupported"
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/q-norm-q4-0.gguf",
+        "bytes": 538848,
+        "sha256": "72a60198d3741bae1ee96995c9bfcd5ff027f486a446e0b038f31a25ab2fa628",
+        "request_sha256": "d79b0627d69997b0caf0d8db5255fa97d4adb206b953b3765ea28851f06ae407"
+      },
+      {
+        "name": "q-bias-q4-0",
+        "config": {
+          "name": "q-bias-q4-0",
+          "vector_type_suffix": "attn_q.bias",
+          "vector_type": 2,
+          "scope": "unsupported",
+          "bias_mask": 1
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/q-bias-q4-0.gguf",
+        "bytes": 539328,
+        "sha256": "b8ae1db8f8657da41676d5bf02c9e34e438a8a123e339383cbf866808ca96710",
+        "request_sha256": "04047f086c9c0cec5319354caf5c3b06eb1343884232e108d31af2c76e9b0eee"
+      },
+      {
+        "name": "fused-all-bias-q-f16",
+        "config": {
+          "name": "fused-all-bias-q-f16",
+          "vector_type_suffix": "attn_q.bias",
+          "vector_type": 1,
+          "scope": "unsupported",
+          "fused": true,
+          "bias_mask": 7
+        },
+        "rust_scope": "unsupported",
+        "path": "inputs/fused-all-bias-q-f16.gguf",
+        "bytes": 540640,
+        "sha256": "3ce29ba77d9ed6cf90d2ffdb831b0776289f2df44bd3c18bc81d2932f05bd5e4",
+        "request_sha256": "ddf57a7393b4e8bce8667fd02af8d5ba600011a3b4ef4f000d6578870618cb4d"
+      },
+      {
+        "name": "fused-inactive-q-bias-f16",
+        "config": {
+          "name": "fused-inactive-q-bias-f16",
+          "fused": true,
+          "bias_mask": 1,
+          "vector_type_suffix": "attn_q.bias",
+          "vector_type": 1,
+          "scope": "supported"
+        },
+        "rust_scope": "supported",
+        "path": "inputs/fused-inactive-q-bias-f16.gguf",
+        "bytes": 539424,
+        "sha256": "ba86ffc892043ff78b4bf80c53c7af10c90c78935f7a1f31936388e0e80bc3d1",
+        "request_sha256": "a1426e39395fd8b8a8e02b1ed88ce7ef1fab86a19ce933e2536871d4345da2fa"
+      },
+      {
+        "name": "fused-inactive-k-bias-bf16",
+        "config": {
+          "name": "fused-inactive-k-bias-bf16",
+          "fused": true,
+          "bias_mask": 2,
+          "vector_type_suffix": "attn_k.bias",
+          "vector_type": 30,
+          "scope": "supported"
+        },
+        "rust_scope": "supported",
+        "path": "inputs/fused-inactive-k-bias-bf16.gguf",
+        "bytes": 539168,
+        "sha256": "8b994ec20ee765b852cc7f47e23066af096ee7a4bf16acad4ec463af8c1c0d5d",
+        "request_sha256": "e11cd62b6d93b48a24dae1121d7df49a8a9313479788e57dcd81af2dc83bdc86"
+      },
+      {
+        "name": "fused-inactive-v-bias-f16",
+        "config": {
+          "name": "fused-inactive-v-bias-f16",
+          "fused": true,
+          "bias_mask": 4,
+          "vector_type_suffix": "attn_v.bias",
+          "vector_type": 1,
+          "scope": "supported"
+        },
+        "rust_scope": "supported",
+        "path": "inputs/fused-inactive-v-bias-f16.gguf",
+        "bytes": 539168,
+        "sha256": "114adfb21a3b24ed4fed5d8aef38e902f0d743987c27002f20667807f53ad551",
+        "request_sha256": "3973dc3a42b93bbde9288a59a89771f94f114f208990f745b7663e6cb90fd4ef"
+      },
+      {
+        "name": "fused-inactive-q-bias-q4-0",
+        "config": {
+          "name": "fused-inactive-q-bias-q4-0",
+          "fused": true,
+          "bias_mask": 3,
+          "vector_type_suffix": "attn_q.bias",
+          "vector_type": 2,
+          "scope": "supported"
+        },
+        "rust_scope": "supported",
+        "path": "inputs/fused-inactive-q-bias-q4-0.gguf",
+        "bytes": 539712,
+        "sha256": "91fed3fcbc03fc08b9dbf977e87dc4e7819d85a9ec48207d6c7711a244d51e33",
+        "request_sha256": "271b96e1d0d43598c43c4b95d1f2998fec79d8a583e7255ee3a7092602e65c69"
+      }
+    ],
+    "generator_source_sha256": "c9817147dcbb0f4dedef33b6a9b62059f0f8d1b69b9b1915edb1fa05ec32c262",
+    "generator_executable_sha256": "44989cebc022efb7e1de4af9abe041629550b5afb5a53d09dcc0e93c1abe6fcd",
+    "vocabulary_source_sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18",
+    "rust_comparison_started": false
+  },
+  "profiles": {
+    "msvc": {
+      "capture_report_sha256": "4c21b620fba627629594e13661f50daa24a1e34bbeceed68ec09dc12bb6a448e",
+      "capture_report": {
+        "schema": 1,
+        "profile": "msvc",
+        "manifest_sha256": "181f6577a9cecda6cac38e6bc409a25f55cef23ea49bd06316b7f52e71a647f9",
+        "cases": [
+          {
+            "name": "f32-control",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\f32-control.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\f32-control\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\f32-control\\reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.03638709999722778,
+            "stderr_sha256": "aa84e3e40507f7bf8b1d977d5c6eb56eba3a25996eed11e628cbcb85319f0d47",
+            "stderr_tail": "used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.95 ms, sched copies = 1\r\n~llama_context:        CPU compute buffer size is   0.4863 MiB, matches expectation of   0.4863 MiB\r\n",
+            "reference_sha256": "e8903c4fcba8ec7afd923df9a5be00c6b2e37754a49aaad7c723dc929f616a41",
+            "reference_path": "native-msvc/f32-control/reference.json"
+          },
+          {
+            "name": "q-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\q-norm-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-norm-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-norm-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.0963049999991199,
+            "stderr_sha256": "ea2ea8ac77addcbe91ee123f560f1a61310b8bc74783b85261675dc48dc37110",
+            "stderr_tail": "ph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.03 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\r\n\r\n"
+          },
+          {
+            "name": "k-norm-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\k-norm-bf16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\k-norm-bf16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\k-norm-bf16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06181279999873368,
+            "stderr_sha256": "d2e3e7ec6e1a8048c99aaaf30d18ead29b37fa2d239bfc1cb94d99d117df3ef0",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.02 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\r\n\r\n"
+          },
+          {
+            "name": "attention-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\attention-norm-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\attention-norm-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\attention-norm-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06051099999967846,
+            "stderr_sha256": "820da5eb00ab7dacae2884b416d495bc36d8f8a9dee5d1a24e963ad3adcde5fc",
+            "stderr_tail": "ph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 0.99 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\r\n\r\n"
+          },
+          {
+            "name": "ffn-norm-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\ffn-norm-bf16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\ffn-norm-bf16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\ffn-norm-bf16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06043659999704687,
+            "stderr_sha256": "e78c5111e8bac17bcf7fcc3bc283669a0e003baf3bf257fe643686ecc89dec05",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.00 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\r\n\r\n"
+          },
+          {
+            "name": "output-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\output-norm-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\output-norm-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\output-norm-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06214919999911217,
+            "stderr_sha256": "9fd86bc7f4942adb8109752d22cb08d52e51ce662ded9ae435cb169dd558e243",
+            "stderr_tail": "ph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.02 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\r\n\r\n"
+          },
+          {
+            "name": "q-bias-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\q-bias-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-bias-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-bias-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06106350000118255,
+            "stderr_sha256": "c7a8e5f0fb973d759a4734a681b7ed76d5243eb2732b463bdaba0ffa5506fee2",
+            "stderr_tail": "ph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.00 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\r\n\r\n"
+          },
+          {
+            "name": "k-bias-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\k-bias-bf16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\k-bias-bf16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\k-bias-bf16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06053529999917373,
+            "stderr_sha256": "7735dcf7e12a762bfb41c223fd4ab96df064b31df93e373194ec14dae48550d2",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 0.99 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\r\n\r\n"
+          },
+          {
+            "name": "v-bias-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\v-bias-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\v-bias-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\v-bias-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06248779999805265,
+            "stderr_sha256": "6f2928386a806e266d0094e5c747b4fca856cc48376e780e039a06acf346bb1c",
+            "stderr_tail": "ph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.10 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\r\n\r\n"
+          },
+          {
+            "name": "fused-own-bias-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-own-bias-bf16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-own-bias-bf16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-own-bias-bf16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06679900000017369,
+            "stderr_sha256": "1431ebf3189a2366dcd4836e2c631faf40a2bad968ad47521bf506d998dc4cec",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_74' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_75' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_74' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_75' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.52 MiB\r\nsched_reserve: graph: nodes = 87, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.03 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\r\n\r\n"
+          },
+          {
+            "name": "q-norm-q4-0",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\q-norm-q4-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-norm-q4-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-norm-q4-0\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06511899999895832,
+            "stderr_sha256": "14efe8eb5f45035107f8d2df4a3b13a84bdc12d7f5684109a03878a7b446b7be",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.08 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: q4_0\r\n\r\n"
+          },
+          {
+            "name": "q-bias-q4-0",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\q-bias-q4-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-bias-q4-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\q-bias-q4-0\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06563629999800469,
+            "stderr_sha256": "de613eed44c510e86fae533e4e64d8e1fac9d0db404e57e0bfdf0cc6ac04df5a",
+            "stderr_tail": "h_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.49 MiB\r\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.02 ms, sched copies = 1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp:136: binary_op: unsupported types: dst: f32, src0: f32, src1: q4_0\r\n\r\n"
+          },
+          {
+            "name": "fused-all-bias-q-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-all-bias-q-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-all-bias-q-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-all-bias-q-f16\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "seconds": 0.06327849999797763,
+            "stderr_sha256": "14bd5ff27f6851982e422f526aeb2bb49e2156078561e5639f25952070561f29",
+            "stderr_tail": "ttn_norm.weight\r\ncreate_tensor: loading tensor blk.1.attn_qkv.weight\r\ncreate_tensor: loading tensor blk.1.attn_qkv.bias\r\ncreate_tensor: loading tensor blk.1.attn_q.bias\r\ncreate_tensor: loading tensor blk.1.attn_k.bias\r\ncreate_tensor: loading tensor blk.1.attn_v.bias\r\ncreate_tensor: loading tensor blk.1.attn_output.weight\r\ncreate_tensor: loading tensor blk.1.attn_k_norm.weight\r\ncreate_tensor: loading tensor blk.1.attn_q_norm.weight\r\ncreate_tensor: loading tensor blk.1.ffn_norm.weight\r\ncreate_tensor: loading tensor blk.1.ffn_gate.weight\r\ncreate_tensor: loading tensor blk.1.ffn_down.weight\r\ncreate_tensor: loading tensor blk.1.ffn_up.weight\r\ncreate_tensor: loading tensor blk.0.attn_output.scale\r\ncreate_tensor: loading tensor blk.0.attn_qkv.scale\r\ncreate_tensor: loading tensor blk.0.ffn_gate.scale\r\ncreate_tensor: loading tensor blk.0.ffn_down.scale\r\ncreate_tensor: loading tensor blk.0.ffn_up.scale\r\ncreate_tensor: loading tensor blk.0.attn_output.input_scale\r\ncreate_tensor: loading tensor blk.0.attn_qkv.input_scale\r\ncreate_tensor: loading tensor blk.0.ffn_gate.input_scale\r\ncreate_tensor: loading tensor blk.0.ffn_down.input_scale\r\ncreate_tensor: loading tensor blk.0.ffn_up.input_scale\r\ncreate_tensor: loading tensor blk.1.attn_output.scale\r\ncreate_tensor: loading tensor blk.1.attn_qkv.scale\r\ncreate_tensor: loading tensor blk.1.ffn_gate.scale\r\ncreate_tensor: loading tensor blk.1.ffn_down.scale\r\ncreate_tensor: loading tensor blk.1.ffn_up.scale\r\ncreate_tensor: loading tensor blk.1.attn_output.input_scale\r\ncreate_tensor: loading tensor blk.1.attn_qkv.input_scale\r\ncreate_tensor: loading tensor blk.1.ffn_gate.input_scale\r\ncreate_tensor: loading tensor blk.1.ffn_down.input_scale\r\ncreate_tensor: loading tensor blk.1.ffn_up.input_scale\r\nload_tensors:          CPU model buffer size =     0.50 MiB\r\n............\r\nllama_context: constructing llama_context\r\nllama_context: n_seq_max             = 1\r\nllama_context: n_ctx                 = 256\r\nllama_context: n_ctx_seq             = 256\r\nllama_context: n_batch               = 64\r\nllama_context: n_ubatch              = 64\r\nllama_context: causal_attn           = 1\r\nllama_context: flash_attn            = disabled\r\nllama_context: kv_unified            = false\r\nllama_context: freq_base             = 10000.0\r\nllama_context: freq_scale            = 1\r\nllama_context: n_rs_seq              = 0\r\nllama_context: n_outputs_max         = 64\r\nllama_context: n_outputs_max_per_seq = 1\r\nllama_context: n_ctx_seq (256) > n_ctx_train (128) -- possible training context overflow\r\nset_abort_callback: call\r\nllama_context:        CPU  output buffer size =     0.00 MiB\r\nllama_kv_cache: layer   0: dev = CPU\r\nllama_kv_cache: layer   1: dev = CPU\r\nllama_kv_cache:        CPU KV buffer size =     0.25 MiB\r\nllama_kv_cache: size =    0.25 MiB (   256 cells,   2 layers,  1/1 seqs), K (f32):    0.12 MiB, V (f32):    0.12 MiB\r\nllama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 32\r\nllama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 32\r\nllama_context: enumerating backends\r\nllama_context: backend_ptrs.size() = 1\r\nsched_reserve: reserving ...\r\nsched_reserve: max_nodes = 1024\r\nsched_reserve: reserving full memory module\r\nsched_reserve: worst-case: n_tokens = 64, n_seqs = 1, n_outputs = 1\r\nresolve_fused_ops: resolving fused DeepSeek V4 HC support:\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1\r\nC:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml.c:2662: GGML_ASSERT(a->type == b->type) failed\r\n"
+          },
+          {
+            "name": "fused-inactive-q-bias-f16",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-inactive-q-bias-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-q-bias-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-q-bias-f16\\reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.020008599996799603,
+            "stderr_sha256": "1c3346d52b264112138bcc24c1418aad31c5aa9d92942447159a6aa6c30146ef",
+            "stderr_tail": "used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.52 MiB\r\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.04 ms, sched copies = 1\r\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\r\n",
+            "reference_sha256": "471787760848318b427404dd050650a8bf2801c6d95f1edd42ed3d631eb3e941",
+            "reference_path": "native-msvc/fused-inactive-q-bias-f16/reference.json"
+          },
+          {
+            "name": "fused-inactive-k-bias-bf16",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-inactive-k-bias-bf16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-k-bias-bf16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-k-bias-bf16\\reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.020486400000663707,
+            "stderr_sha256": "6c6df44755591e704fb0d639f4529666298c7f1770d3cea10afb3d83bdcd852f",
+            "stderr_tail": "used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.52 MiB\r\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.16 ms, sched copies = 1\r\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\r\n",
+            "reference_sha256": "8d17feb9fdd184dbdbe6ee3bf6b692dab635075b343509d1726ecd933992c32b",
+            "reference_path": "native-msvc/fused-inactive-k-bias-bf16/reference.json"
+          },
+          {
+            "name": "fused-inactive-v-bias-f16",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-inactive-v-bias-f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-v-bias-f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-v-bias-f16\\reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.020133100002567517,
+            "stderr_sha256": "36de08eec7c91ba11a9e73a44925ac164bf7bff746da71c8a3f6f10736c7c846",
+            "stderr_tail": "used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.52 MiB\r\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 1.04 ms, sched copies = 1\r\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\r\n",
+            "reference_sha256": "8d17feb9fdd184dbdbe6ee3bf6b692dab635075b343509d1726ecd933992c32b",
+            "reference_path": "native-msvc/fused-inactive-v-bias-f16/reference.json"
+          },
+          {
+            "name": "fused-inactive-q-bias-q4-0",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\inputs\\fused-inactive-q-bias-q4-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-q-bias-q4-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\vector-storage-oracle\\native-msvc\\fused-inactive-q-bias-q4-0\\reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.12739009999859263,
+            "stderr_sha256": "aa81cd8d8968263ec1dd6df0b6a72f244f02b1c83226e936c1ad0680e832876f",
+            "stderr_tail": "used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\r\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\r\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\r\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\r\nsched_reserve:        CPU compute buffer size =     0.52 MiB\r\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\r\nsched_reserve: reserve took 0.96 ms, sched copies = 1\r\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\r\n",
+            "reference_sha256": "9a8e04cfedd72d1a0b60e4a97026790757c1ffe3e99cfda94465721726cde5dd",
+            "reference_path": "native-msvc/fused-inactive-q-bias-q4-0/reference.json"
+          }
+        ],
+        "oracle_sha256": "4ef70ca22dbf3dc6628391fd8b54fd3f8459f994be86eacdb7c68d5eef4af7b4",
+        "oracle_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "llama.dll",
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          },
+          {
+            "name": "ggml-base.dll",
+            "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+          },
+          {
+            "name": "ggml-cpu.dll",
+            "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+          },
+          {
+            "name": "ggml.dll",
+            "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+          }
+        ],
+        "expected_values_from_rust": false
+      },
+      "unique_rows": 12,
+      "row_comparisons": 35
+    },
+    "gnu": {
+      "capture_report_sha256": "60c935797a303d07c2cd237f4f83f131018e5890f78fa940d86763ca3b065d1d",
+      "capture_report": {
+        "schema": 1,
+        "profile": "gnu",
+        "manifest_sha256": "181f6577a9cecda6cac38e6bc409a25f55cef23ea49bd06316b7f52e71a647f9",
+        "cases": [
+          {
+            "name": "f32-control",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/f32-control.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/f32-control/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/f32-control/reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2204897109986632,
+            "stderr_sha256": "88b4a399a653b35581017243a1733e07c769fd96d7bba5a2bc4313085909542e",
+            "stderr_tail": "' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 15.14 ms, sched copies = 1\n~llama_context:        CPU compute buffer size is   0.4863 MiB, matches expectation of   0.4863 MiB\n",
+            "reference_sha256": "c5db21c072d4fc6056dea44312d5d160af4735eaee7f48b3e6800755ae53526c",
+            "reference_path": "native-gnu/f32-control/reference.json"
+          },
+          {
+            "name": "q-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/q-norm-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-norm-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-norm-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.7209577479989093,
+            "stderr_sha256": "8510de029ccd2d6ce206aa3a7ec73facbabb56791fdc1e975790e141df8b7232",
+            "stderr_tail": "ode 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.52 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\n\n"
+          },
+          {
+            "name": "k-norm-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/k-norm-bf16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/k-norm-bf16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/k-norm-bf16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6720366939989617,
+            "stderr_sha256": "87233601d31eb9033db914a3a6bf649a750faefd122cc1ffff45735db34c4444",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 15.05 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\n\n"
+          },
+          {
+            "name": "attention-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/attention-norm-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/attention-norm-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/attention-norm-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6712597299992922,
+            "stderr_sha256": "f16c92c2467d66e58c73d2c3de487348de9167053ee4ba09707de155372eceb7",
+            "stderr_tail": "ode 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.65 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\n\n"
+          },
+          {
+            "name": "ffn-norm-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/ffn-norm-bf16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/ffn-norm-bf16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/ffn-norm-bf16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.7711228509979264,
+            "stderr_sha256": "4514ae2309e3c06466d0baff5fe3e0b6b5011ff173b1b69b5937f415a0a08f0d",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 17.95 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\n\n"
+          },
+          {
+            "name": "output-norm-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/output-norm-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/output-norm-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/output-norm-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6709466579995933,
+            "stderr_sha256": "6999c08f1f25fc189aa80902cc88ad808d058327181359a163c0f6b174b07dfd",
+            "stderr_tail": "ode 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 15.38 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\n\n"
+          },
+          {
+            "name": "q-bias-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/q-bias-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-bias-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-bias-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.670848706002289,
+            "stderr_sha256": "5996361322dc8731ed9823659c2c83da3e69309fe967d5cb230eea1b6d998a59",
+            "stderr_tail": "ode 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.86 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\n\n"
+          },
+          {
+            "name": "k-bias-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/k-bias-bf16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/k-bias-bf16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/k-bias-bf16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6709005379998416,
+            "stderr_sha256": "1a56644b960ceb49cbbf98783f3f8a870998ecd60501cf2a6a32feac39106d7f",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 17.42 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\n\n"
+          },
+          {
+            "name": "v-bias-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/v-bias-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/v-bias-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/v-bias-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.671324638002261,
+            "stderr_sha256": "5c6ad333d5cf157f19522bba0d5de17c4e55f28f2ba86d81e932a59de8fc194f",
+            "stderr_tail": "ode 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.96 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: f16\n\n"
+          },
+          {
+            "name": "fused-own-bias-bf16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-own-bias-bf16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-own-bias-bf16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-own-bias-bf16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6712759180009016,
+            "stderr_sha256": "660d936b4a2ac72c76d9efe5e919e7ddd56d910f854feae7a44a568b8f8864f1",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_74' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_75' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_74' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_75' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.52 MiB\nsched_reserve: graph: nodes = 87, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.87 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: bf16\n\n"
+          },
+          {
+            "name": "q-norm-q4-0",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/q-norm-q4-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-norm-q4-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-norm-q4-0/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6727255810001225,
+            "stderr_sha256": "72bbb53c67ec9ef8cb766dbc050e8d85ba16af3c901da77f4959fc9deb04639f",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_76' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_77' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 89, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.60 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: q4_0\n\n"
+          },
+          {
+            "name": "q-bias-q4-0",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/q-bias-q4-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-bias-q4-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/q-bias-q4-0/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.7214543670015701,
+            "stderr_sha256": "b6f043c57355fc71405409bcb468fe1182415b6c25ecc8170706ed6e0e4182de",
+            "stderr_tail": "de 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_79' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.49 MiB\nsched_reserve: graph: nodes = 91, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.79 ms, sched copies = 1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml-cpu/binary-ops.cpp:135: binary_op: unsupported types: dst: f32, src0: f32, src1: q4_0\n\n"
+          },
+          {
+            "name": "fused-all-bias-q-f16",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-all-bias-q-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-all-bias-q-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-all-bias-q-f16/reference.json"
+            ],
+            "exit_code": -6,
+            "seconds": 0.6716855790000409,
+            "stderr_sha256": "68a4e13692f4eb1566ad0fb76e7db42240e3563265fe52ff82532672da88869a",
+            "stderr_tail": "ensor blk.0.ffn_up.weight\ncreate_tensor: loading tensor blk.1.attn_norm.weight\ncreate_tensor: loading tensor blk.1.attn_qkv.weight\ncreate_tensor: loading tensor blk.1.attn_qkv.bias\ncreate_tensor: loading tensor blk.1.attn_q.bias\ncreate_tensor: loading tensor blk.1.attn_k.bias\ncreate_tensor: loading tensor blk.1.attn_v.bias\ncreate_tensor: loading tensor blk.1.attn_output.weight\ncreate_tensor: loading tensor blk.1.attn_k_norm.weight\ncreate_tensor: loading tensor blk.1.attn_q_norm.weight\ncreate_tensor: loading tensor blk.1.ffn_norm.weight\ncreate_tensor: loading tensor blk.1.ffn_gate.weight\ncreate_tensor: loading tensor blk.1.ffn_down.weight\ncreate_tensor: loading tensor blk.1.ffn_up.weight\ncreate_tensor: loading tensor blk.0.attn_output.scale\ncreate_tensor: loading tensor blk.0.attn_qkv.scale\ncreate_tensor: loading tensor blk.0.ffn_gate.scale\ncreate_tensor: loading tensor blk.0.ffn_down.scale\ncreate_tensor: loading tensor blk.0.ffn_up.scale\ncreate_tensor: loading tensor blk.0.attn_output.input_scale\ncreate_tensor: loading tensor blk.0.attn_qkv.input_scale\ncreate_tensor: loading tensor blk.0.ffn_gate.input_scale\ncreate_tensor: loading tensor blk.0.ffn_down.input_scale\ncreate_tensor: loading tensor blk.0.ffn_up.input_scale\ncreate_tensor: loading tensor blk.1.attn_output.scale\ncreate_tensor: loading tensor blk.1.attn_qkv.scale\ncreate_tensor: loading tensor blk.1.ffn_gate.scale\ncreate_tensor: loading tensor blk.1.ffn_down.scale\ncreate_tensor: loading tensor blk.1.ffn_up.scale\ncreate_tensor: loading tensor blk.1.attn_output.input_scale\ncreate_tensor: loading tensor blk.1.attn_qkv.input_scale\ncreate_tensor: loading tensor blk.1.ffn_gate.input_scale\ncreate_tensor: loading tensor blk.1.ffn_down.input_scale\ncreate_tensor: loading tensor blk.1.ffn_up.input_scale\nload_tensors:          CPU model buffer size =     0.50 MiB\n............\nllama_context: constructing llama_context\nllama_context: n_seq_max             = 1\nllama_context: n_ctx                 = 256\nllama_context: n_ctx_seq             = 256\nllama_context: n_batch               = 64\nllama_context: n_ubatch              = 64\nllama_context: causal_attn           = 1\nllama_context: flash_attn            = disabled\nllama_context: kv_unified            = false\nllama_context: freq_base             = 10000.0\nllama_context: freq_scale            = 1\nllama_context: n_rs_seq              = 0\nllama_context: n_outputs_max         = 64\nllama_context: n_outputs_max_per_seq = 1\nllama_context: n_ctx_seq (256) > n_ctx_train (128) -- possible training context overflow\nset_abort_callback: call\nllama_context:        CPU  output buffer size =     0.00 MiB\nllama_kv_cache: layer   0: dev = CPU\nllama_kv_cache: layer   1: dev = CPU\nllama_kv_cache:        CPU KV buffer size =     0.25 MiB\nllama_kv_cache: size =    0.25 MiB (   256 cells,   2 layers,  1/1 seqs), K (f32):    0.12 MiB, V (f32):    0.12 MiB\nllama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 32\nllama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 32\nllama_context: enumerating backends\nllama_context: backend_ptrs.size() = 1\nsched_reserve: reserving ...\nsched_reserve: max_nodes = 1024\nsched_reserve: reserving full memory module\nsched_reserve: worst-case: n_tokens = 64, n_seqs = 1, n_outputs = 1\nresolve_fused_ops: resolving fused DeepSeek V4 HC support:\ngraph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1\n/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/src/ggml.c:2662: GGML_ASSERT(a->type == b->type) failed\n"
+          },
+          {
+            "name": "fused-inactive-q-bias-f16",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-inactive-q-bias-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-q-bias-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-q-bias-f16/reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.17011788400122896,
+            "stderr_sha256": "98a79fa4bef4e1a0fe63446ab409dd7667ed471a416d641bc33901adc7185c04",
+            "stderr_tail": "' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.52 MiB\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.96 ms, sched copies = 1\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\n",
+            "reference_sha256": "8f1ed13ccd5aacc1d2ce4dbde08a045064d4a471c77b4d0cd4ac2524e09300b9",
+            "reference_path": "native-gnu/fused-inactive-q-bias-f16/reference.json"
+          },
+          {
+            "name": "fused-inactive-k-bias-bf16",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-inactive-k-bias-bf16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-k-bias-bf16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-k-bias-bf16/reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16975153100065654,
+            "stderr_sha256": "2cd54d825d768bb85b97d555bf26ddaa3fa0266b75f4983a2df1f62bd13f1720",
+            "stderr_tail": "' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.52 MiB\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.87 ms, sched copies = 1\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\n",
+            "reference_sha256": "ff4dfd858579eac466a462412250c886d95247234604a3bfd73e09a8dc7e160c",
+            "reference_path": "native-gnu/fused-inactive-k-bias-bf16/reference.json"
+          },
+          {
+            "name": "fused-inactive-v-bias-f16",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-inactive-v-bias-f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-v-bias-f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-v-bias-f16/reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16999116700026207,
+            "stderr_sha256": "51a9da06166579893e67bb9051c51ca019aad181817e46914bf743c5dda631c4",
+            "stderr_tail": "' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.52 MiB\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.47 ms, sched copies = 1\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\n",
+            "reference_sha256": "ff4dfd858579eac466a462412250c886d95247234604a3bfd73e09a8dc7e160c",
+            "reference_path": "native-gnu/fused-inactive-v-bias-f16/reference.json"
+          },
+          {
+            "name": "fused-inactive-q-bias-q4-0",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/inputs/fused-inactive-q-bias-q4-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-q-bias-q4-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/vector-storage-oracle/native-gnu/fused-inactive-q-bias-q4-0/reference.json"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16999750900140498,
+            "stderr_sha256": "d0e96e19777d85b56586647be5b482734fd3c59dfe78bad9189a378e9d535857",
+            "stderr_tail": "' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\ngraph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-0' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Qcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                         inp_pos' [i32, ne = {    64,     1,     1,     1 }] is used by node 'Kcur-1' (ROPE)\nllama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)\nllama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)\nllama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_72' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_73' (GET_ROWS)\nllama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)\nsched_reserve:        CPU compute buffer size =     0.52 MiB\nsched_reserve: graph: nodes = 85, splits = 1, input objects = 4, input tensors = 9\nsched_reserve: reserve took 14.89 ms, sched copies = 1\n~llama_context:        CPU compute buffer size is   0.5176 MiB, matches expectation of   0.5176 MiB\n",
+            "reference_sha256": "691326569e9916ff4e349e3e246eb2403e8b3511ba685f74d582466b4af9b8a7",
+            "reference_path": "native-gnu/fused-inactive-q-bias-q4-0/reference.json"
+          }
+        ],
+        "oracle_sha256": "5a2ba090dde949d560cdfe3d02cd23e1cd12980f06652195608b60e88539ce2a",
+        "oracle_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "libllama.so",
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          },
+          {
+            "name": "libggml-base.so",
+            "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+          },
+          {
+            "name": "libggml-cpu.so",
+            "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+          },
+          {
+            "name": "libggml.so",
+            "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+          }
+        ],
+        "expected_values_from_rust": false
+      },
+      "unique_rows": 12,
+      "row_comparisons": 35
+    }
+  },
+  "contract": "Active F32-activation norm and bias operands require F32 storage. Native CPU aborts on12 active F16/BF16/Q4_0 variants; Rust must return Unsupported. Four partial fused bias groups of these storage types are ignored by the native graph and remain executable; compare full logits, token IDs and emitted bytes exactly on measured profiles.",
+  "packing": "Whole original GGUF inputs and native F32 rows losslessly interned by SHA256 with byte equality checks; exact duplicate final-prompt/first-greedy rows share offsets. Neither source profile replaces the other.",
+  "artifacts": [
+    {
+      "path": "vectors-gnu-logits.f32le.bin",
+      "bytes": 24576,
+      "sha256": "d44fdb2500366235be8d69044e8eddfbee81717e2639c15e4f8a6321603c44d7"
+    },
+    {
+      "path": "vectors-gnu-reference.json",
+      "bytes": 13405,
+      "sha256": "605bee2d26918a939b4186c0b6cb21b777d810f164c7b261970980cd3b50b310"
+    },
+    {
+      "path": "vectors-inputs.bin",
+      "bytes": 9168000,
+      "sha256": "69dc2175a31be9be8f28d8cfaa875ab99943071378740f9372079c1eff8184db"
+    },
+    {
+      "path": "vectors-models.json",
+      "bytes": 10159,
+      "sha256": "bfe0d5e18746ad103cc4aac5d75d90cce3eb01ad64e767f7f108f51d1ca6ee24"
+    },
+    {
+      "path": "vectors-msvc-logits.f32le.bin",
+      "bytes": 24576,
+      "sha256": "46450fa2e98f84ba72b8655a7a9f230a0738fed0fa784413a6b826d05bae2648"
+    },
+    {
+      "path": "vectors-msvc-reference.json",
+      "bytes": 13503,
+      "sha256": "744bb855ae30eb200c1fc7004dc4e4cc1c358dd784ee826a8f43ee18bfbee605"
+    }
+  ]
+}

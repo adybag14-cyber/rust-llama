@@ -1,0 +1,42 @@
+from pathlib import Path
+import hashlib,json,subprocess,os
+reference=Path(r'C:\Users\adyba\rust-llama-reference')
+base=reference/'qwen3-and-f16-integration-v1';root=base/'rust-draft'
+old=reference/'loading-and-cpu-math-integration-v1'
+manifest=root/'docs/integration-fixture-manifest.tsv'
+before=manifest.read_bytes();lines=before.decode('utf-8').splitlines()
+doc=root/'fixtures/inference/README.md';new_hash=hashlib.sha256(doc.read_bytes()).hexdigest()
+indices=[i for i,s in enumerate(lines) if s.startswith('fixtures/inference/README.md\t')]
+assert len(indices)==1
+i=indices[0];fields=lines[i].split('\t')
+assert fields[1]=='b7abb42491a0a1dccd26383dd0671da47d6c11773929de1fed4333ce8f68e012'
+old_hash=fields[1];fields[1]=new_hash;lines[i]='\t'.join(fields)
+after=('\n'.join(lines)+'\n').encode('utf-8');manifest.write_bytes(after)
+record={'reason':'Reviewed fixture README documentation now includes Qwen3 provenance. Numeric/model/provenance fixture bytes and their declared hashes are unchanged.','path':'fixtures/inference/README.md','previous_sha256':old_hash,'sha256':new_hash,'manifest_previous_sha256':hashlib.sha256(before).hexdigest(),'manifest_sha256':hashlib.sha256(after).hexdigest()}
+(base/'fixture-documentation-update-v2.json').write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+for name in ['verify-embedding-cli.py','verify-decoder-cli.py','verify-qwen2-http.py','verify-sharded-apps-v2.py']:
+ data=(old/name).read_text(encoding='utf-8')
+ data=data.replace('loading-and-cpu-math-integration-v1','qwen3-and-f16-integration-v1')
+ if name=='verify-decoder-cli.py':
+  needle="]:\n model=reference/'models'/filename"
+  assert data.count(needle)==1
+  data=data.replace(needle," ('qwen3','qwen3-0.6b-q8_0.gguf','9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031',3072),\n]:\n model=reference/'models'/filename")
+  needle="metadata_path=repo/'fixtures/inference'/(prefix+suffix)"
+  assert data.count(needle)==1
+  data=data.replace(needle,"metadata_path=(repo/'fixtures/inference/qwen3'/('pretrained-msvc-reference.json' if windows else 'pretrained-gnu-reference.json')) if prefix=='qwen3' else repo/'fixtures/inference'/(prefix+suffix)")
+  data=data.replace("prefix.startswith('qwen2')","prefix.startswith('qwen')")
+ (base/name).write_bytes(data.encode('utf-8'))
+out=base/'validation/preflight-v2';out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'windows-target');env['CARGO_BUILD_JOBS']='2'
+records=[]
+for name,args in [
+ ('fmt',['fmt','--all','--','--check']),
+ ('audit-write',['run','--offline','--locked','-p','xtask','--','audit','--write']),
+ ('fixtures',['run','--offline','--locked','-p','xtask','--','fixtures'])
+]:
+ p=subprocess.run(['cargo','+1.99.1']+args,cwd=root,env=env,capture_output=True)
+ (out/(name+'.stdout.txt')).write_bytes(p.stdout);(out/(name+'.stderr.txt')).write_bytes(p.stderr)
+ records.append({'name':name,'exit_code':p.returncode})
+ (out/'status.json').write_bytes((json.dumps(records,indent=2)+'\n').encode('utf-8'))
+ print(json.dumps(records[-1]),flush=True)
+ if p.returncode:raise SystemExit(p.returncode)

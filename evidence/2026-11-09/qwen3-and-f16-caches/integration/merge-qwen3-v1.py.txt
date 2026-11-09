@@ -1,0 +1,61 @@
+from pathlib import Path
+import hashlib,json,subprocess
+BASE=Path(r'C:\Users\adyba\rust-llama-reference\qwen3-and-f16-integration-v1')
+DRAFT=BASE/'rust-draft'
+HANDOFF=Path(r'C:\Users\adyba\rust-llama-reference\qwen3-inference-oracle\handoff-v1')
+REPO=Path(r'C:\Users\adyba\rust-llama')
+COMMIT='e0af03a97ca7077c6f2aee680fb84b3fa688f82a'
+def sha(b): return hashlib.sha256(b).hexdigest()
+def expect(path,digest):
+    b=path.read_bytes(); assert sha(b)==digest,(str(path),sha(b),digest); return b
+expect(HANDOFF/'handoff.json','2be0a020a366640984b067ee1551d02c447b67db8ed931b7d2f0698346e127bd')
+records=json.loads(expect(HANDOFF/'source-records.json','dac9140422e7867bb361c261bc26ad8af458a3685709772e19d47cb3446413a6'))
+fixtures=json.loads(expect(HANDOFF/'fixture-records.json','3176e041c8201538b4cde828330f6b7fd2570439a497eee42d71389425038a7f'))
+candidate=HANDOFF/'candidate'
+pending=[]
+overlaps={'crates/model-runtime/src/lib.rs','crates/model-runtime/src/context.rs'}
+merge_dir=BASE/'qwen3-merge-inputs-v1'; merge_dir.mkdir(exist_ok=False)
+for r in records:
+    rel=r['path']; target=DRAFT/rel; data=expect(candidate/rel,r['sha256']); assert len(data)==r['bytes']
+    before=target.read_bytes() if target.exists() else None
+    before_sha=sha(before) if before is not None else 'missing'
+    mode='exact preimage'
+    if before_sha!=r['preimage_sha256']:
+        assert rel in overlaps,(rel,before_sha,r['preimage_sha256'])
+        original=subprocess.run(['git','-C',str(REPO),'show',COMMIT+':'+rel],capture_output=True,check=True).stdout
+        assert sha(original)==r['preimage_sha256']
+        stem=rel.replace('/','_')
+        a=merge_dir/(stem+'.current.txt'); b=merge_dir/(stem+'.base.txt'); c=merge_dir/(stem+'.incoming.txt')
+        a.write_bytes(before); b.write_bytes(original); c.write_bytes(data)
+        merged=subprocess.run(['git','merge-file','-p',str(a),str(b),str(c)],capture_output=True)
+        (merge_dir/(stem+'.stderr.txt')).write_bytes(merged.stderr)
+        assert merged.returncode==0,(rel,merged.returncode,merged.stderr.decode('utf-8','replace'))
+        data=merged.stdout; mode='clean three-way merge preserving F16 additions'
+        assert b'<<<<<<<' not in data
+    pending.append((rel,before_sha,data,mode))
+for r in fixtures:
+    target=DRAFT/r['path']; assert not target.exists(),r['path']
+    data=expect(candidate/r['path'],r['sha256']); assert len(data)==r['bytes']
+    pending.append((r['path'],'missing',data,'unchanged independent fixture'))
+manifest=DRAFT/'docs/integration-fixture-manifest.tsv'
+before=manifest.read_bytes()
+assert sha(before)=='48410919d47122dc91400297033a5e2eafaee19c0cbd75cd70ceba0e05421728'
+add=expect(HANDOFF/'fixture-manifest-additions.tsv','b46ba6b13bfba78a40f5d3081cf4733a91d550a1f294f57ef3795b610393e064')
+lines=add.decode('utf-8').splitlines()
+assert lines[0]=='path\tsha256\torigin\tsource_identity'
+oldpaths={l.split('\t',1)[0] for l in before.decode('utf-8').splitlines()[1:]}
+assert len(lines[1:])==len(fixtures)==19
+for line,r in zip(lines[1:],fixtures):
+    fields=line.split('\t'); assert len(fields)==4 and fields[:2]==[r['path'],r['sha256']]
+    assert fields[0] not in oldpaths
+data=before+b''.join((line+'\n').encode('utf-8') for line in lines[1:])
+pending.append(('docs/integration-fixture-manifest.tsv',sha(before),data,'append 19 original fixture declarations'))
+record={'base_commit':COMMIT,'handoff_sha256':'2be0a020a366640984b067ee1551d02c447b67db8ed931b7d2f0698346e127bd','changes':[]}
+for rel,before_sha,data,mode in pending:
+    target=DRAFT/rel
+    assert (sha(target.read_bytes()) if target.exists() else 'missing')==before_sha
+    target.parent.mkdir(parents=True,exist_ok=True); target.write_bytes(data)
+    assert sha(target.read_bytes())==sha(data)
+    record['changes'].append({'path':rel,'before_sha256':before_sha,'after_sha256':sha(data),'bytes':len(data),'mode':mode})
+(BASE/'qwen3-merge-v1.json').write_bytes((json.dumps(record,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'ok':True,'changed_paths':len(pending),'fixtures':len(fixtures),'fixture_bytes':sum(r['bytes'] for r in fixtures),'overlaps':[r for r in record['changes'] if r['mode'].startswith('clean')]}))

@@ -1,6 +1,7 @@
 use crate::*;
 use llama_model_runtime::{
-    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, OutputSelection,
+    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType,
+    OutputSelection,
 };
 use std::collections::BTreeMap;
 use std::ffi::c_void;
@@ -39,16 +40,20 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     ] {
         boolean(value)?;
     }
-    if p.type_k != 0 || p.type_v != 0 {
-        return Err("Rust C ABI currently requires type_k = type_v = GGML_TYPE_F32; F16 cache defaults are not yet implemented".into());
-    }
+    let cache_type = |value| match value {
+        0 => Ok(NativeKvType::F32),
+        1 => Ok(NativeKvType::F16),
+        _ => Err("native CPU cache requires GGML_TYPE_F32 or GGML_TYPE_F16"),
+    };
+    let key_type = cache_type(p.type_k)?;
+    let value_type = cache_type(p.type_v)?;
     if p.ctx_type != 0
         || ![-1, 0].contains(&p.rope_scaling_type)
         || ![-1, 0].contains(&p.pooling_type)
         || ![-1, 0].contains(&p.attention_type)
-        || ![-1, 0].contains(&p.flash_attn_type)
+        || p.flash_attn_type != 0
     {
-        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and disabled/automatic flash attention are supported".into());
+        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and explicitly disabled flash attention are supported; native AUTO/flash arithmetic is not yet available".into());
     }
     if !(p.rope_freq_base == 0.0 || p.rope_freq_base == data.rope_base)
         || !(p.rope_freq_scale == 0.0 || p.rope_freq_scale == 1.0)
@@ -98,7 +103,7 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         p.n_ubatch
     })
     .min(n_batch);
-    let runtime = NativeContext::new(
+    let runtime = NativeContext::new_with_cache_types(
         loaded.runtime_model().map_err(|e| e.to_string())?,
         NativeContextOptions {
             context_tokens: n_ctx as usize,
@@ -107,6 +112,8 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
             maximum_batch_tokens: n_batch as usize,
             unified: p.kv_unified != 0,
         },
+        key_type,
+        value_type,
     )
     .map_err(|e| e.to_string())?;
     let n_ctx = runtime.context_tokens() as u32;

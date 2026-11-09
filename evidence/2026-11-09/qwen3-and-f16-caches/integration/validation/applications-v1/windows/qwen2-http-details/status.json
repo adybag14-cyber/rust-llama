@@ -1,0 +1,150 @@
+{
+  "passed": true,
+  "platform": "windows",
+  "executable_sha256": "6ab994d41fdd02802ce1955203f66fa2c3652b31afc3ac69454ec21b4f796728",
+  "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+  "native_metadata_sha256": "251a33d1f6a51faf83856b69d4bd14832c086d15d83b42fc17e9e8eded36faf0",
+  "qualification": "Application behavior against the corresponding original C API generation/tokenizer corpus; this is not an original Qwen HTTP protocol capture or a performance certification.",
+  "startup_cases": [
+    {
+      "name": "default-weight-budget",
+      "args": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen2.5-0.5b-instruct-q4_k_m.gguf"
+      ],
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "zero-context",
+      "args": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen2.5-0.5b-instruct-q4_k_m.gguf",
+        "--ctx-size",
+        "0"
+      ],
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "invalid-weight",
+      "args": [
+        "--max-weight-mib",
+        "invalid"
+      ],
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "overflow-weight",
+      "args": [
+        "--max-weight-mib",
+        "18446744073709551615"
+      ],
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "explicit-3-GiB-context-128",
+      "args": [
+        "--model",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen2.5-0.5b-instruct-q4_k_m.gguf",
+        "--ctx-size",
+        "128",
+        "--max-weight-mib",
+        "3072",
+        "--bind",
+        "127.0.0.1:0"
+      ],
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "requests": [
+    {
+      "route": "/health",
+      "status": 200,
+      "capture": "request-000.json",
+      "capture_sha256": "dbb00a2b86bfb5887174c1356bd39d9cd7bb1e83cc5e95f73e65d70bb2107d43"
+    },
+    {
+      "route": "/v1/models",
+      "status": 200,
+      "capture": "request-001.json",
+      "capture_sha256": "629632a00c8dc4bc116ce40345101e7154e70f16e7b261273d7cc034bcc2ffcc"
+    },
+    {
+      "route": "/tokenize",
+      "status": 200,
+      "capture": "request-002.json",
+      "capture_sha256": "2435994dd8b0edb7fff176f2fef2ba66b1a40b825034547ba707e56973a264fa"
+    },
+    {
+      "route": "/detokenize",
+      "status": 200,
+      "capture": "request-003.json",
+      "capture_sha256": "fd0f4549e63f696d06ebcf1e34f8ce314689a64d6b25c9d49b12d3ee831541c4"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-004.json",
+      "capture_sha256": "015f75454371a672937d00fb5bcbf2f4287e41fbbca0f93b5534338c64cf2806"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-005.json",
+      "capture_sha256": "82e5750a98ebe19e1ddb87f21f541efe9a0cf5de32d755c3b6fc30a452f2e971"
+    },
+    {
+      "route": "/tokenize",
+      "status": 200,
+      "capture": "request-006.json",
+      "capture_sha256": "fd078e7ca72936d231032955179f171ed23afddd1195a5b35d2c08dbcbc172c2"
+    },
+    {
+      "route": "/detokenize",
+      "status": 200,
+      "capture": "request-007.json",
+      "capture_sha256": "0a1f11a55a5be5ca7950da937466f9d0b366e133efa8ad0039187cab0265db6e"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-008.json",
+      "capture_sha256": "870260282217315935a848a602c67f934e8bf9196b301a009e73419628da75dc"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-009.json",
+      "capture_sha256": "ed953182b04db3aeda46e5e8d487e42f3b238e1660a33020cb90fa06aaddb3c1"
+    },
+    {
+      "route": "/tokenize",
+      "status": 200,
+      "capture": "request-010.json",
+      "capture_sha256": "99c7299deea36e23e4eb0a1977d188131706edafa193b952248ca30808c1fc88"
+    },
+    {
+      "route": "/detokenize",
+      "status": 200,
+      "capture": "request-011.json",
+      "capture_sha256": "449be26ebd102ce01f48228080d5b1d23377a8524b96c62d6484b13f00cf998b"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-012.json",
+      "capture_sha256": "02047d6b697034767c087a8451e1677a6019633c326c903069da51f7db7ca6dd"
+    },
+    {
+      "route": "/v1/completions",
+      "status": 200,
+      "capture": "request-013.json",
+      "capture_sha256": "0ef8530a51f6a24df61b3b1a4165a85c6ddb22db4b2d82405cbda6f7ac3c3ceb"
+    }
+  ],
+  "finished_utc": "2026-11-09T19:02:59.308996+00:00"
+}

@@ -1,0 +1,369 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "path": "vector-storage-inputs/f32-control.gguf",
+      "offset": 0,
+      "bytes": 539040,
+      "sha256": "bd9487664f74ed83d29c73c4627ca17d4760ab64c6485e9a636e4472f2fdeecb"
+    },
+    {
+      "path": "vector-storage-inputs/q-norm-f16.gguf",
+      "offset": 539040,
+      "bytes": 538912,
+      "sha256": "e80b54910f6e87214f3ae62b863e301112a9435fbba0f1fc2e65ef2179a2fd6b"
+    },
+    {
+      "path": "vector-storage-inputs/k-norm-bf16.gguf",
+      "offset": 1077952,
+      "bytes": 538912,
+      "sha256": "de9b99aae4a70ee8b97354e4595f4c517ac751c05389a30f601da87fe84f727d"
+    },
+    {
+      "path": "vector-storage-inputs/attention-norm-f16.gguf",
+      "offset": 1616864,
+      "bytes": 538784,
+      "sha256": "bdce5d04aced9050d8bb160b87ff21c669eee320ec002b2debdc09f20f3d8042"
+    },
+    {
+      "path": "vector-storage-inputs/ffn-norm-bf16.gguf",
+      "offset": 2155648,
+      "bytes": 538784,
+      "sha256": "0c2588514b63ce7f60fd78b2bcb86d50aec89190c4222a6eda32e3cd40ee2897"
+    },
+    {
+      "path": "vector-storage-inputs/output-norm-f16.gguf",
+      "offset": 2694432,
+      "bytes": 538912,
+      "sha256": "c5b5ea3e000fe0262b2b24eb0fa86a72b1e0c37f86f178996ac5ea335e906fb2"
+    },
+    {
+      "path": "vector-storage-inputs/q-bias-f16.gguf",
+      "offset": 3233344,
+      "bytes": 539648,
+      "sha256": "3d4d20bd0af4f4dc22e0539726da52d9c6a00b58c256079769ecb1f110315498"
+    },
+    {
+      "path": "vector-storage-inputs/k-bias-bf16.gguf",
+      "offset": 3772992,
+      "bytes": 539392,
+      "sha256": "6cf8b4c7ac22c8b2af559c7673092edada9c2f396c61a9bde97b73e1cde53ca0"
+    },
+    {
+      "path": "vector-storage-inputs/v-bias-f16.gguf",
+      "offset": 4312384,
+      "bytes": 539392,
+      "sha256": "46699152555ec9ff3be5f7e09b296969d0509701b390c801dbd80f9d1d620c0f"
+    },
+    {
+      "path": "vector-storage-inputs/fused-own-bias-bf16.gguf",
+      "offset": 4851776,
+      "bytes": 539936,
+      "sha256": "ca69244ff4873410d41923b0dc36e9c6258dd5c4130ae2e4f3bcebae4005d644"
+    },
+    {
+      "path": "vector-storage-inputs/q-norm-q4-0.gguf",
+      "offset": 5391712,
+      "bytes": 538848,
+      "sha256": "72a60198d3741bae1ee96995c9bfcd5ff027f486a446e0b038f31a25ab2fa628"
+    },
+    {
+      "path": "vector-storage-inputs/q-bias-q4-0.gguf",
+      "offset": 5930560,
+      "bytes": 539328,
+      "sha256": "b8ae1db8f8657da41676d5bf02c9e34e438a8a123e339383cbf866808ca96710"
+    },
+    {
+      "path": "vector-storage-inputs/fused-all-bias-q-f16.gguf",
+      "offset": 6469888,
+      "bytes": 540640,
+      "sha256": "3ce29ba77d9ed6cf90d2ffdb831b0776289f2df44bd3c18bc81d2932f05bd5e4"
+    },
+    {
+      "path": "vector-storage-inputs/fused-inactive-q-bias-f16.gguf",
+      "offset": 7010528,
+      "bytes": 539424,
+      "sha256": "ba86ffc892043ff78b4bf80c53c7af10c90c78935f7a1f31936388e0e80bc3d1"
+    },
+    {
+      "path": "vector-storage-inputs/fused-inactive-k-bias-bf16.gguf",
+      "offset": 7549952,
+      "bytes": 539168,
+      "sha256": "8b994ec20ee765b852cc7f47e23066af096ee7a4bf16acad4ec463af8c1c0d5d"
+    },
+    {
+      "path": "vector-storage-inputs/fused-inactive-v-bias-f16.gguf",
+      "offset": 8089120,
+      "bytes": 539168,
+      "sha256": "114adfb21a3b24ed4fed5d8aef38e902f0d743987c27002f20667807f53ad551"
+    },
+    {
+      "path": "vector-storage-inputs/fused-inactive-q-bias-q4-0.gguf",
+      "offset": 8628288,
+      "bytes": 539712,
+      "sha256": "91fed3fcbc03fc08b9dbf977e87dc4e7819d85a9ec48207d6c7711a244d51e33"
+    }
+  ],
+  "cases": [
+    {
+      "name": "f32-control",
+      "rust_scope": "supported",
+      "config": {
+        "name": "f32-control",
+        "vector_type_suffix": "attn_q_norm.weight",
+        "vector_type": 0,
+        "scope": "supported"
+      },
+      "paths": [
+        "vector-storage-inputs/f32-control.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "q-norm-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "q-norm-f16",
+        "vector_type_suffix": "attn_q_norm.weight",
+        "vector_type": 1,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/q-norm-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "k-norm-bf16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "k-norm-bf16",
+        "vector_type_suffix": "attn_k_norm.weight",
+        "vector_type": 30,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/k-norm-bf16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "attention-norm-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "attention-norm-f16",
+        "vector_type_suffix": "attn_norm.weight",
+        "vector_type": 1,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/attention-norm-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "ffn-norm-bf16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "ffn-norm-bf16",
+        "vector_type_suffix": "ffn_norm.weight",
+        "vector_type": 30,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/ffn-norm-bf16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "output-norm-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "output-norm-f16",
+        "vector_type_suffix": "output_norm.weight",
+        "vector_type": 1,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/output-norm-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "q-bias-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "q-bias-f16",
+        "vector_type_suffix": "attn_q.bias",
+        "vector_type": 1,
+        "scope": "unsupported",
+        "bias_mask": 1
+      },
+      "paths": [
+        "vector-storage-inputs/q-bias-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "k-bias-bf16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "k-bias-bf16",
+        "vector_type_suffix": "attn_k.bias",
+        "vector_type": 30,
+        "scope": "unsupported",
+        "bias_mask": 2
+      },
+      "paths": [
+        "vector-storage-inputs/k-bias-bf16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "v-bias-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "v-bias-f16",
+        "vector_type_suffix": "attn_v.bias",
+        "vector_type": 1,
+        "scope": "unsupported",
+        "bias_mask": 4
+      },
+      "paths": [
+        "vector-storage-inputs/v-bias-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-own-bias-bf16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "fused-own-bias-bf16",
+        "vector_type_suffix": "attn_qkv.bias",
+        "vector_type": 30,
+        "scope": "unsupported",
+        "fused": true,
+        "fused_bias": true
+      },
+      "paths": [
+        "vector-storage-inputs/fused-own-bias-bf16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "q-norm-q4-0",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "q-norm-q4-0",
+        "vector_type_suffix": "attn_q_norm.weight",
+        "vector_type": 2,
+        "scope": "unsupported"
+      },
+      "paths": [
+        "vector-storage-inputs/q-norm-q4-0.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "q-bias-q4-0",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "q-bias-q4-0",
+        "vector_type_suffix": "attn_q.bias",
+        "vector_type": 2,
+        "scope": "unsupported",
+        "bias_mask": 1
+      },
+      "paths": [
+        "vector-storage-inputs/q-bias-q4-0.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-all-bias-q-f16",
+      "rust_scope": "unsupported",
+      "config": {
+        "name": "fused-all-bias-q-f16",
+        "vector_type_suffix": "attn_q.bias",
+        "vector_type": 1,
+        "scope": "unsupported",
+        "fused": true,
+        "bias_mask": 7
+      },
+      "paths": [
+        "vector-storage-inputs/fused-all-bias-q-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-inactive-q-bias-f16",
+      "rust_scope": "supported",
+      "config": {
+        "name": "fused-inactive-q-bias-f16",
+        "fused": true,
+        "bias_mask": 1,
+        "vector_type_suffix": "attn_q.bias",
+        "vector_type": 1,
+        "scope": "supported"
+      },
+      "paths": [
+        "vector-storage-inputs/fused-inactive-q-bias-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-inactive-k-bias-bf16",
+      "rust_scope": "supported",
+      "config": {
+        "name": "fused-inactive-k-bias-bf16",
+        "fused": true,
+        "bias_mask": 2,
+        "vector_type_suffix": "attn_k.bias",
+        "vector_type": 30,
+        "scope": "supported"
+      },
+      "paths": [
+        "vector-storage-inputs/fused-inactive-k-bias-bf16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-inactive-v-bias-f16",
+      "rust_scope": "supported",
+      "config": {
+        "name": "fused-inactive-v-bias-f16",
+        "fused": true,
+        "bias_mask": 4,
+        "vector_type_suffix": "attn_v.bias",
+        "vector_type": 1,
+        "scope": "supported"
+      },
+      "paths": [
+        "vector-storage-inputs/fused-inactive-v-bias-f16.gguf"
+      ],
+      "explicit": false
+    },
+    {
+      "name": "fused-inactive-q-bias-q4-0",
+      "rust_scope": "supported",
+      "config": {
+        "name": "fused-inactive-q-bias-q4-0",
+        "fused": true,
+        "bias_mask": 3,
+        "vector_type_suffix": "attn_q.bias",
+        "vector_type": 2,
+        "scope": "supported"
+      },
+      "paths": [
+        "vector-storage-inputs/fused-inactive-q-bias-q4-0.gguf"
+      ],
+      "explicit": false
+    }
+  ],
+  "pool": {
+    "path": "vectors-inputs.bin",
+    "bytes": 9168000,
+    "sha256": "69dc2175a31be9be8f28d8cfaa875ab99943071378740f9372079c1eff8184db"
+  },
+  "input_manifest_sha256": "181f6577a9cecda6cac38e6bc409a25f55cef23ea49bd06316b7f52e71a647f9"
+}

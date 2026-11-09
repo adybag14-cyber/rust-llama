@@ -1,0 +1,1991 @@
+{
+  "schema": 1,
+  "origin": "Independent frozen original C API, original GGUF writer and original quantize_chunk; no Rust expected values",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "qwen3_cpp_sha256": "7df64f8b1914a10106dead976a756d796e570ed52f5d638a59f8a4497f35ac34",
+  "source_files": [
+    {
+      "path": "tiny-qwen3.cpp",
+      "sha256": "de05ff231836347ba9a82bb59d1895e4d19ca003bdee753d95338e7c0853596c"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "cd90b2d25ad0cd0d619a5948356a67b0ef0d12e9d3c5c14ab1b2a7229876c695"
+    },
+    {
+      "path": "generate_tiny.py",
+      "sha256": "821979a1b3d7db6a0364c63cb65d229a8a32ee8afcdea362fc7a33e4be5ae5bb"
+    },
+    {
+      "path": "capture_tiny.py",
+      "sha256": "ebdc7c6ad0f1f61d2190621c680f9758dae4900b320ba9777e75dae9408bd0fa"
+    },
+    {
+      "path": "capture_pretrained.py",
+      "sha256": "57c1e1f9bc72c6cdea612c20ca76030d072d71381e46c87018af5ed12be846dc"
+    },
+    {
+      "path": "pack_native.py",
+      "sha256": "5f1282356bdd8a8859e28b4a96a841a715738d094a0c9f20d2df904eb403fcdf"
+    },
+    {
+      "path": "model-origin.json",
+      "sha256": "b06bbbaba834739a35251c72de6a66ac734c3ff7075cdbeec167a39dee60a83f"
+    }
+  ],
+  "model_origin": {
+    "schema": 1,
+    "repository": "Qwen/Qwen3-0.6B-GGUF",
+    "revision": "23749fefcc72300e3a2ad315e1317431b06b590a",
+    "filename": "Qwen3-0.6B-Q8_0.gguf",
+    "download_url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf",
+    "local_path": "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen3-0.6b-q8_0.gguf",
+    "bytes": 639446688,
+    "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "license": "Apache-2.0; actual official LICENSE preserved and hashed",
+    "metadata_artifacts": [
+      {
+        "path": "LICENSE",
+        "bytes": 11544,
+        "sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+        "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/LICENSE"
+      },
+      {
+        "path": "README.md",
+        "bytes": 6236,
+        "sha256": "44adabae2153c3a7bb741b86fbffd48736bc95118831935fdfc4d3cc1854f2f5",
+        "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/README.md"
+      },
+      {
+        "path": "params",
+        "bytes": 270,
+        "sha256": "52610851456960402dc4ce4966dbea0eb83bb1d72c3eeeaefaafe09b4690ad9c",
+        "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/params"
+      }
+    ],
+    "elapsed_seconds": 6.1706390380859375,
+    "captured_utc": "2026-11-09T17:36:35Z",
+    "scope": "External validation weights only. Never copied into maintained Rust product. Frozen native DLL compatibility is checked separately."
+  },
+  "tiny_input_manifest_sha256": "4b41df82c6b2cd3f30e5132a66a8f11289c463bbc8a3c0f7496cc5de6556f3a1",
+  "tiny_generator_cpp_sha256": "de05ff231836347ba9a82bb59d1895e4d19ca003bdee753d95338e7c0853596c",
+  "tiny_generator_executable_sha256": "ecb889361807323cf66b35201bf3fa5d5beb70107bc3b01cca33971551cd04ce",
+  "native_profiles": {
+    "msvc": {
+      "tiny_capture": {
+        "schema": 1,
+        "profile": "msvc",
+        "input_manifest_sha256": "4b41df82c6b2cd3f30e5132a66a8f11289c463bbc8a3c0f7496cc5de6556f3a1",
+        "executable_sha256": "4ef70ca22dbf3dc6628391fd8b54fd3f8459f994be86eacdb7c68d5eef4af7b4",
+        "adapter_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "llama.dll",
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          },
+          {
+            "name": "ggml-base.dll",
+            "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+          },
+          {
+            "name": "ggml-cpu.dll",
+            "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+          },
+          {
+            "name": "ggml.dll",
+            "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+          }
+        ],
+        "cases": [
+          {
+            "name": "separate-bias-0",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.07127904891967773,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "724709f95ba6cff2880c8208ed3299d1ec15fbc78dda6bbdfdd639452f5c77ab",
+            "reference_path": "tiny-native-msvc/separate-bias-0/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "separate-bias-1",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-1.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-1\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-1\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020231008529663086,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "5996984c58398470b80e0cba60cfa9db1372b2ff422565e425057e8401b30808",
+            "reference_path": "tiny-native-msvc/separate-bias-1/reference.json",
+            "reference_sha256": "5ff03314ed177852c857c9b760efd76cc59c346ee0819749119c650d90845272"
+          },
+          {
+            "name": "separate-bias-2",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-2.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-2\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-2\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020451068878173828,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "bd81ebb81ea5fb054e75b273887c778db991d30b657597d6461732e8f28d6e19",
+            "reference_path": "tiny-native-msvc/separate-bias-2/reference.json",
+            "reference_sha256": "99d5fcda087f68cb367d2b12ef3b9eb31e96e0de4895f1a96bf5b5727dcf2424"
+          },
+          {
+            "name": "separate-bias-3",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-3.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-3\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-3\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02016925811767578,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "335f84f4fce09fb46e3a2c9ca86085d624cc0384d8e89f38f22dacd11cab26c0",
+            "reference_path": "tiny-native-msvc/separate-bias-3/reference.json",
+            "reference_sha256": "9bd0a38ec8d6239c8bee613b9dbd42a359869440230aef8fd1ea4e54fcecbfc3"
+          },
+          {
+            "name": "separate-bias-4",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-4.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-4\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-4\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020743608474731445,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "181561a0775adad5e9caed61d506f2ce7861453bc3cb7a847b713babd9c33bc1",
+            "reference_path": "tiny-native-msvc/separate-bias-4/reference.json",
+            "reference_sha256": "19c624dd14e8dbac701b5fe89a3e8f7908e7d59204e211cb33ded0e42173692c"
+          },
+          {
+            "name": "separate-bias-5",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-5.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-5\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-5\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020290136337280273,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "da9f0c6d215369f0ec9fce4cb0cb33929fa73f3e0ecdaa0f3f68498675d44241",
+            "reference_path": "tiny-native-msvc/separate-bias-5/reference.json",
+            "reference_sha256": "5c98f3e60d3990b82f5820b7cd60ae6a793222f7dd7d048105406ac06bb1c1d5"
+          },
+          {
+            "name": "separate-bias-6",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-6.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-6\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-6\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021596670150756836,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "eb6b1a0679c40731126926936fa232f07ec110df5adbcc7a00c4f38502b10b8a",
+            "reference_path": "tiny-native-msvc/separate-bias-6/reference.json",
+            "reference_sha256": "b12d2f523c8e3caa0cc390856ff608de1bc9e6c01be25690b0fe684b824fb006"
+          },
+          {
+            "name": "separate-bias-7",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-7.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-7\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-7\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021226882934570312,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "d9af3dccf18c5fd3155b8cd071a9d5d4e2bf2c04e7acf4cc1dd34306e47efa89",
+            "reference_path": "tiny-native-msvc/separate-bias-7/reference.json",
+            "reference_sha256": "b4359d505cfb9cccdbdc271d5343686bafd36f7c86aca9a41430fe8bb9c6325c"
+          },
+          {
+            "name": "fused-bias-0",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-0\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.050849199295043945,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "66ed28d68d89532b27f346693e62b5fbd9960e975b0f5ced27934dbb696a38f2",
+            "reference_path": "tiny-native-msvc/fused-bias-0/reference.json",
+            "reference_sha256": "d8a8b952b3d3ce460a33e823c54a1654068e2359513b27e6e7d9a92fb6affbf2"
+          },
+          {
+            "name": "fused-bias-1",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-1.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-1\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-1\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.03228926658630371,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "169380284275dc87a455def4842743e7028c68b042b2a60e10b942a0c0936fee",
+            "reference_path": "tiny-native-msvc/fused-bias-1/reference.json",
+            "reference_sha256": "71801aec8569aa0b8c569883cc1e07486d511314c02d9cbf2ebfac0fb5062630"
+          },
+          {
+            "name": "fused-bias-2",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-2.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-2\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-2\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.022583723068237305,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "b471814c73ef92a94591e3106e9da8d951b7cffa5f5d4acc23e02bfe1bd4da77",
+            "reference_path": "tiny-native-msvc/fused-bias-2/reference.json",
+            "reference_sha256": "b7e34d9a8f907656b4c33446db3d1fa75dc06f3324fbba36529c53009a50656d"
+          },
+          {
+            "name": "fused-bias-3",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-3.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-3\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-3\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020296573638916016,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "fe8d41cc97030f33175f8d9eb61857086ae488841b654526db96c89044f1f936",
+            "reference_path": "tiny-native-msvc/fused-bias-3/reference.json",
+            "reference_sha256": "8962897dfed9e92c6eb763d4f0339c700f9eef05f828dcd2b0421970ea937cfe"
+          },
+          {
+            "name": "fused-bias-4",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-4.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-4\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-4\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.039813995361328125,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "ccf24b4835b7fb28a8cacfc3240fc6877e924ee6ad121b02718efcf97db614f9",
+            "reference_path": "tiny-native-msvc/fused-bias-4/reference.json",
+            "reference_sha256": "b7e34d9a8f907656b4c33446db3d1fa75dc06f3324fbba36529c53009a50656d"
+          },
+          {
+            "name": "fused-bias-5",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-5.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-5\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-5\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021419525146484375,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8a2d46f838fb497ff5c2988b8be3d0a9b0189c4855c0b4154b1e08b70fe76e2e",
+            "reference_path": "tiny-native-msvc/fused-bias-5/reference.json",
+            "reference_sha256": "8962897dfed9e92c6eb763d4f0339c700f9eef05f828dcd2b0421970ea937cfe"
+          },
+          {
+            "name": "fused-bias-6",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-6.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-6\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-6\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02116250991821289,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "b7459f9628cf46c621d8d37e8354ab06c33b7b87cb76054313c154e4b64cb6fa",
+            "reference_path": "tiny-native-msvc/fused-bias-6/reference.json",
+            "reference_sha256": "71801aec8569aa0b8c569883cc1e07486d511314c02d9cbf2ebfac0fb5062630"
+          },
+          {
+            "name": "fused-bias-7",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-bias-7.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-7\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-bias-7\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02133798599243164,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "1450aae77ecb7c754644d6a403660104a96a8d1f5ead450290ce8ea53390f17d",
+            "reference_path": "tiny-native-msvc/fused-bias-7/reference.json",
+            "reference_sha256": "f79c75bbe0058b257ec54161043b085cd77c6a9acdd037f8bc2d0427c0ed456f"
+          },
+          {
+            "name": "fused-own-bias",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-own-bias.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-own-bias\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-own-bias\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021251201629638672,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "166949872a230263bd4bbf5eee1891e35d430650dbdf27a76c7c81669344e2b6",
+            "reference_path": "tiny-native-msvc/fused-own-bias/reference.json",
+            "reference_sha256": "2690f0a1566ee9e983f11ed5af93b15f463941c5a3ec4d10f76038f238cc5d37"
+          },
+          {
+            "name": "untied-output",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\untied-output.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.022098779678344727,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "d015996f9ddcfe471922d3bdeb12c03e7a989e3756b561be07c63615ffb30d7f",
+            "reference_path": "tiny-native-msvc/untied-output/reference.json",
+            "reference_sha256": "981824ee2d6286db228fcf8b373d104de343b95f64985f82a6fae0b0ea842783"
+          },
+          {
+            "name": "matching-head-width",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\matching-head-width.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\matching-head-width\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\matching-head-width\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021053314208984375,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "00c1f144482644c42e61105d767cbd0ef1c16413b7f2c63082291b7b88ef3822",
+            "reference_path": "tiny-native-msvc/matching-head-width/reference.json",
+            "reference_sha256": "e450e85f2800efe79667756bc90041a47a1f94c19975c9750b0311b78f9ba04d"
+          },
+          {
+            "name": "mha",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\mha.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\mha\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\mha\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020816564559936523,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "c2b7978c3074baf1a758afb2b845cd82a9ebf30441e058d365768ad4d4690475",
+            "reference_path": "tiny-native-msvc/mha/reference.json",
+            "reference_sha256": "98a52505cbc00b839fff7ba4e8c5cbf641e7f8472e2973733de784ebe4ca24ef"
+          },
+          {
+            "name": "mqa",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\mqa.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\mqa\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\mqa\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02064371109008789,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "23e7e461b533f25123cc30df31ec0eef4d7abf3b08a545294d66deea8b65a5a8",
+            "reference_path": "tiny-native-msvc/mqa/reference.json",
+            "reference_sha256": "24365dfa2792f7e637453377cf500a282499357926150cff5435a8cce5581a20"
+          },
+          {
+            "name": "embedding-not-divisible-by-heads",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\embedding-not-divisible-by-heads.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\embedding-not-divisible-by-heads\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\embedding-not-divisible-by-heads\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02104973793029785,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "f614130118a76712ed247e83218d4cbe138fe2b0d78b9339b01055d12fa8fa9d",
+            "reference_path": "tiny-native-msvc/embedding-not-divisible-by-heads/reference.json",
+            "reference_sha256": "3f577bdb64db1b75929a799fb2b30356b100b6758b6599442947709319656542"
+          },
+          {
+            "name": "f16",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\f16.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\f16\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\f16\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.020816564559936523,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "81ce296c63872fcd83a8cae18347f922e1de12a9d22a9fbd26c35258d1592168",
+            "reference_path": "tiny-native-msvc/f16/reference.json",
+            "reference_sha256": "8534179f7f6b5fdd7b05f09f00a9918fe92c2c014d26e15b0774be726c719589"
+          },
+          {
+            "name": "q4-0",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\q4-0.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\q4-0\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\q4-0\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02105236053466797,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8ac43eb7b84ca6125a5044fe96cefe6518df3554cf70acfb1c95f09c4f50f6d1",
+            "reference_path": "tiny-native-msvc/q4-0/reference.json",
+            "reference_sha256": "cdfddad56446e76e8d821a23b71c517f82f9f9d62b206f3172822d1be83bf71e"
+          },
+          {
+            "name": "q4-k",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\q4-k.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\q4-k\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\q4-k\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.029091358184814453,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "42901c097317758f1ad4bb95d4082d05829f71618d4c5bb5d9c337ed55f3ebcd",
+            "reference_path": "tiny-native-msvc/q4-k/reference.json",
+            "reference_sha256": "e6ed20247eebb116b62f665114b39cda81101bdbe736889291c4f4405ada82c1"
+          },
+          {
+            "name": "fused-q4-k",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-q4-k.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.03504133224487305,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8b8173e89a4937e5574721abbb8bbee5183eeb8c214934db2f1b63cf3dc7e761",
+            "reference_path": "tiny-native-msvc/fused-q4-k/reference.json",
+            "reference_sha256": "06616727c332c349c7d4357e17a0a591966b0b9e7fab1488b64d54cd47b9a7a4"
+          },
+          {
+            "name": "implicit-head-defaults",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\implicit-head-defaults.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\implicit-head-defaults\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\implicit-head-defaults\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02203965187072754,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "ee07f6bd80409cd868d7eec2cde9f62dd613f9a7ac8d839179bb2170df0cbae0",
+            "reference_path": "tiny-native-msvc/implicit-head-defaults/reference.json",
+            "reference_sha256": "98a52505cbc00b839fff7ba4e8c5cbf641e7f8472e2973733de784ebe4ca24ef"
+          },
+          {
+            "name": "noncausal",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\noncausal.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\noncausal\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\noncausal\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.022782325744628906,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "c58071903230b38aebbdec6bf1c828ef8f968c0f83485cd27dd608a50b296f5d",
+            "reference_path": "tiny-native-msvc/noncausal/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "scaled-rope",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\scaled-rope.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\scaled-rope\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\scaled-rope\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02256035804748535,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8e634172a24aff07d2a82731c7ccf344aba9e97d3c14981b36a27aaebdb84a1b",
+            "reference_path": "tiny-native-msvc/scaled-rope/reference.json",
+            "reference_sha256": "44fd061f91ad74d7e307961f765e34b4569072db896cb765bce0883dafab8220"
+          },
+          {
+            "name": "head-array",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\head-array.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\head-array\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\head-array\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.022158384323120117,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "089ef0af6bab69e01104ef3ecf7ed6322cd2fd750d8fb6fd3f4d675e69089c6c",
+            "reference_path": "tiny-native-msvc/head-array/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "classifier",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\classifier.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\classifier\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\classifier\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021870136260986328,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "dcf2f2cf4b41b46b4c21e73565ec9390251c2bab5140ee62a10291e994dce525",
+            "reference_path": "tiny-native-msvc/classifier/reference.json",
+            "reference_sha256": "63c2142a115ba45c6f79b1df34ece5a3e130ed3553eec350f498fcc794fbdec3"
+          },
+          {
+            "name": "embedding-projection",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\embedding-projection.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\embedding-projection\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\embedding-projection\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.022413015365600586,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "d8f8de6edbcd920d7ab9f188e02ceebb61a18d11f44137f5b03cbc60085093fd",
+            "reference_path": "tiny-native-msvc/embedding-projection/reference.json",
+            "reference_sha256": "c1e0a482511ade2e852d1b12cfca48dfcd237cf5b609df8410bdf607f376e72e"
+          },
+          {
+            "name": "missing-qnorm",
+            "rust_scope": "invalid",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\missing-qnorm.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\missing-qnorm\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\missing-qnorm\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.01681375503540039,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8fdeda284a4cb8ca84450d246df51c5c11160938df7ea73cbb24f1519bc369c9"
+          },
+          {
+            "name": "missing-knorm",
+            "rust_scope": "invalid",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\missing-knorm.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\missing-knorm\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\missing-knorm\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.01706552505493164,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "6e1522383ac13fb92a0bf309a6dcfc174174c6ed93206af8d47a1467b897ca39"
+          },
+          {
+            "name": "wrong-qnorm-length",
+            "rust_scope": "invalid",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\wrong-qnorm-length.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\wrong-qnorm-length\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\wrong-qnorm-length\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.016195058822631836,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "88c706553be041b8d8ba75aea04319a1d7fd72d85a068a3136103ed674872dc7"
+          },
+          {
+            "name": "value-head-mismatch",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\value-head-mismatch.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\value-head-mismatch\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\value-head-mismatch\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.0164639949798584,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "829800f88046e0f75c007b32649a40c5cdc326c9e4ecb43f4ef7bf298cc32fa8"
+          },
+          {
+            "name": "partial-rope",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\partial-rope.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\partial-rope\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\partial-rope\\reference.json"
+            ],
+            "exit_code": 3221226505,
+            "elapsed_seconds": 0.08657503128051758,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "3b3078b24bf76cd77fa257dc149cca2dc004b90928656444aeeeaf287a30231c"
+          },
+          {
+            "name": "extra-output-bias",
+            "rust_scope": "unsupported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\extra-output-bias.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\extra-output-bias\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\extra-output-bias\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.015370607376098633,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "7e3a9e5a0759f1f1ed32de465f8dafd58074f4e36e9da475aacd785280691cab"
+          },
+          {
+            "name": "overflow-output-norm",
+            "rust_scope": "numeric-failure",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\overflow-output-norm.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\overflow-output-norm\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\overflow-output-norm\\reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.017333507537841797,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "001695cf68e6fea31ea3a548509f9de7f68c3f42bcd142ce2b06c1debe40adc2"
+          },
+          {
+            "name": "separate-bias-0-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-0-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-sharded-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-sharded-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021752119064331055,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "f7b9aa5e307f2e8d727986dc6c1cf62876cfef49d40001c78dcb47c6249f6dfb",
+            "reference_path": "tiny-native-msvc/separate-bias-0-sharded-auto/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "separate-bias-0-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-0-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-sharded-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-sharded-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021744728088378906,
+            "request_sha256": "0dda01ed9fbfd5a2612e4a4f4d58dc18cf049bd78ef615c9b9583ce29db1318d",
+            "stderr_sha256": "694ba676a6769b1d7909d7e8a89d0854f3d685847345121d82dbfd9ad289f1af",
+            "reference_path": "tiny-native-msvc/separate-bias-0-sharded-explicit/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "separate-bias-0-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-0-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-metadata-first-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-metadata-first-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.02090001106262207,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "6a4200dc42b23666a2e36446992319641a00b5b12c0e5b833e59b84727ca5d31",
+            "reference_path": "tiny-native-msvc/separate-bias-0-metadata-first-auto/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "separate-bias-0-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\separate-bias-0-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-metadata-first-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\separate-bias-0-metadata-first-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.021944284439086914,
+            "request_sha256": "a6b01ad65890a7ae65642e78881e8ab2ac3da0c105f62edf70fb9616f1a9f364",
+            "stderr_sha256": "6b9065b6cbb3160723c58ce933e518830ab433a77120ed4c9862ae09b048b1fb",
+            "reference_path": "tiny-native-msvc/separate-bias-0-metadata-first-explicit/reference.json",
+            "reference_sha256": "d25c4cdd0ca3df80368328ccd50b95d0c65ff0a5f9e2e0979fd1a581e8e13e25"
+          },
+          {
+            "name": "fused-q4-k-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-q4-k-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-sharded-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-sharded-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.14112567901611328,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "5b55ed09cc44f9b47dd7de44db8a81b38374d311b37234b813a561cd284478a9",
+            "reference_path": "tiny-native-msvc/fused-q4-k-sharded-auto/reference.json",
+            "reference_sha256": "06616727c332c349c7d4357e17a0a591966b0b9e7fab1488b64d54cd47b9a7a4"
+          },
+          {
+            "name": "fused-q4-k-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-q4-k-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-sharded-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-sharded-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.03589296340942383,
+            "request_sha256": "f4d9dbb64ff8eb470285e849fc92f56e2f9d74c4956dbfe1d0291f25bbbc6a9c",
+            "stderr_sha256": "ef1b72068b66dff655f89dc8b67eb906c0e5e1950bc4109afe1e1484456502ca",
+            "reference_path": "tiny-native-msvc/fused-q4-k-sharded-explicit/reference.json",
+            "reference_sha256": "06616727c332c349c7d4357e17a0a591966b0b9e7fab1488b64d54cd47b9a7a4"
+          },
+          {
+            "name": "fused-q4-k-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-q4-k-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-metadata-first-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-metadata-first-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.03669118881225586,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "2ae3c62138055e875c1fc1d59f65d328f86b59c3231c7ce0343a58b0a7521b5b",
+            "reference_path": "tiny-native-msvc/fused-q4-k-metadata-first-auto/reference.json",
+            "reference_sha256": "06616727c332c349c7d4357e17a0a591966b0b9e7fab1488b64d54cd47b9a7a4"
+          },
+          {
+            "name": "fused-q4-k-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\fused-q4-k-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-metadata-first-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\fused-q4-k-metadata-first-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.03570389747619629,
+            "request_sha256": "460f3e8aed485c3da29408bffebfe243db3b7b7b2f86c687d4141707492a59cf",
+            "stderr_sha256": "ae2aa34ae68f48b910b84be355231bc4bf82eafff60374c16013b44d015cd8e3",
+            "reference_path": "tiny-native-msvc/fused-q4-k-metadata-first-explicit/reference.json",
+            "reference_sha256": "06616727c332c349c7d4357e17a0a591966b0b9e7fab1488b64d54cd47b9a7a4"
+          },
+          {
+            "name": "untied-output-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\untied-output-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-sharded-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-sharded-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.023408174514770508,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "9d1fb6d7859e0d7276b2438b23d7944c82788f38393145abac1da0c6a0c368d4",
+            "reference_path": "tiny-native-msvc/untied-output-sharded-auto/reference.json",
+            "reference_sha256": "981824ee2d6286db228fcf8b373d104de343b95f64985f82a6fae0b0ea842783"
+          },
+          {
+            "name": "untied-output-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\untied-output-sharded\\model-00001-of-00003.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-sharded-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-sharded-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.028682708740234375,
+            "request_sha256": "e18dd7ca12a2733d40ad65cab36a3f89f93e901df888f3318df26b2400df0be6",
+            "stderr_sha256": "6fde24bbf2d7cac38f9258b681e9e89f9016fdb4460431e352f2fb6cfcc5958c",
+            "reference_path": "tiny-native-msvc/untied-output-sharded-explicit/reference.json",
+            "reference_sha256": "981824ee2d6286db228fcf8b373d104de343b95f64985f82a6fae0b0ea842783"
+          },
+          {
+            "name": "untied-output-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\untied-output-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-metadata-first-auto\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-metadata-first-auto\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.025197267532348633,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "a1f5d33b593937ddbd82241533bcb125307ce87cfd407b779944c404302676c3",
+            "reference_path": "tiny-native-msvc/untied-output-metadata-first-auto/reference.json",
+            "reference_sha256": "981824ee2d6286db228fcf8b373d104de343b95f64985f82a6fae0b0ea842783"
+          },
+          {
+            "name": "untied-output-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-inputs\\untied-output-metadata-first\\model-00001-of-00002.gguf",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-metadata-first-explicit\\request.json",
+              "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\tiny-native-msvc\\untied-output-metadata-first-explicit\\reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.023583650588989258,
+            "request_sha256": "eb8d008ff068b5ab8e8c6374002d111a69f2e4575f848c42ba9d4fc33f1afa87",
+            "stderr_sha256": "a2871deef451eec35ca2af04db3bc5c94339ad2b3fd797499b7ee598410e88be",
+            "reference_path": "tiny-native-msvc/untied-output-metadata-first-explicit/reference.json",
+            "reference_sha256": "981824ee2d6286db228fcf8b373d104de343b95f64985f82a6fae0b0ea842783"
+          }
+        ],
+        "expected_data_from_rust": false
+      },
+      "pretrained_capture": {
+        "schema": 1,
+        "profile": "msvc",
+        "command": [
+          "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+          "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen3-0.6b-q8_0.gguf",
+          "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\pretrained-native-msvc\\request.json",
+          "C:\\Users\\adyba\\rust-llama-reference\\qwen3-inference-oracle\\pretrained-native-msvc\\reference.json"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 9.598794937133789,
+        "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+        "executable_sha256": "4ef70ca22dbf3dc6628391fd8b54fd3f8459f994be86eacdb7c68d5eef4af7b4",
+        "adapter_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "llama.dll",
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          },
+          {
+            "name": "ggml-base.dll",
+            "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+          },
+          {
+            "name": "ggml-cpu.dll",
+            "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+          },
+          {
+            "name": "ggml.dll",
+            "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+          }
+        ],
+        "reference_sha256": "a088b58f91895a6e2057ebe0dd8e59899056f0f43988197ca3ac6e0e315edfa1",
+        "model_tensor_bytes": 633495552,
+        "model_parameters": 596049920,
+        "case_keys": [
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ],
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ],
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ]
+        ]
+      },
+      "tiny_rows": 704,
+      "tiny_unique_rows": 253,
+      "pretrained_rows": 39,
+      "pretrained_unique_rows": 36,
+      "pretrained_greedy_ids": 24
+    },
+    "gnu": {
+      "tiny_capture": {
+        "schema": 1,
+        "profile": "gnu",
+        "input_manifest_sha256": "4b41df82c6b2cd3f30e5132a66a8f11289c463bbc8a3c0f7496cc5de6556f3a1",
+        "executable_sha256": "5a2ba090dde949d560cdfe3d02cd23e1cd12980f06652195608b60e88539ce2a",
+        "adapter_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "libllama.so",
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          },
+          {
+            "name": "libggml-base.so",
+            "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+          },
+          {
+            "name": "libggml-cpu.so",
+            "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+          },
+          {
+            "name": "libggml.so",
+            "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+          }
+        ],
+        "cases": [
+          {
+            "name": "separate-bias-0",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21936535835266113,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "cb207c2aee6a4e0a436cd6ce3b65ab6cd19e25d29a9092150726850630457dd5",
+            "reference_path": "tiny-native-gnu/separate-bias-0/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "separate-bias-1",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-1.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-1/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-1/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2196803092956543,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "a7480b10451d640c01fe2895be61a0e0a5c147688437f1b54cb4fa337ddf5935",
+            "reference_path": "tiny-native-gnu/separate-bias-1/reference.json",
+            "reference_sha256": "924ceff85f9a1a9c0b48446866c3c9d8f09da92ea0d8a93ce0c6d43ec59c85cb"
+          },
+          {
+            "name": "separate-bias-2",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-2.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-2/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-2/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22011852264404297,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "aaa39ef9117655a01d9ee707dee8f016ebb49fe02c2df3861d4a544bf6ca3156",
+            "reference_path": "tiny-native-gnu/separate-bias-2/reference.json",
+            "reference_sha256": "94552c4919a337366942f159cc1133758a89fc61f69dbbf789ab478c70278c47"
+          },
+          {
+            "name": "separate-bias-3",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-3.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-3/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-3/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22118639945983887,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "1851ad07aedbe13eed5c896f033c28a0ebe9575b2b81d685db2dca7edc0defdb",
+            "reference_path": "tiny-native-gnu/separate-bias-3/reference.json",
+            "reference_sha256": "d3c1f206d736ae7b6e6c4a2b8a0410b03fc8d9d75adf23a2c45779c572b2ca1e"
+          },
+          {
+            "name": "separate-bias-4",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-4.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-4/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-4/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22079086303710938,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "7ff118565de15c03c3c07057009a03e4f6ad531e05c9687f0d35bc35ddbd6f39",
+            "reference_path": "tiny-native-gnu/separate-bias-4/reference.json",
+            "reference_sha256": "23e1e7d314be4aefb368d164c57bef1b2b106579cd1aa398d72e551e5b27594e"
+          },
+          {
+            "name": "separate-bias-5",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-5.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-5/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-5/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.169342041015625,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "16c997e0830008ca71d910eeb8cd48e47ec57229e03cb9475f4fb221f192f201",
+            "reference_path": "tiny-native-gnu/separate-bias-5/reference.json",
+            "reference_sha256": "7c2ece50e6ab6fbbda547da37fbadd3a621bcc2b3eaa2b9fa0802ad9a3f04ff9"
+          },
+          {
+            "name": "separate-bias-6",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-6.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-6/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-6/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16927385330200195,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "183fc71a631a110bb3a09c3a9292dbfe2ab8f6eabb71602c8d63b0d11084b519",
+            "reference_path": "tiny-native-gnu/separate-bias-6/reference.json",
+            "reference_sha256": "67cf97aad9e1cbce32b3e4b0e8a8707181d40a827cbe1b1bcf976ff4a31f8f63"
+          },
+          {
+            "name": "separate-bias-7",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-7.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-7/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-7/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21980810165405273,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "cac5d0e71b9809d1f33d58e5f53e107e8286d0378c7e899120ff27187fd13fe1",
+            "reference_path": "tiny-native-gnu/separate-bias-7/reference.json",
+            "reference_sha256": "b77a254cdc7dce5341c7558bee0dc6efb21d935c8215a23aa2a722d31e5fcd96"
+          },
+          {
+            "name": "fused-bias-0",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-0/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.1694355010986328,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "1a3e03871fbf4644046b3e5c779af9d90f338765161979a71829d28c58cf28c0",
+            "reference_path": "tiny-native-gnu/fused-bias-0/reference.json",
+            "reference_sha256": "a0a6ffa848ab5290abf914fd0afab038883f31b8f83f58833d516192f70c6a61"
+          },
+          {
+            "name": "fused-bias-1",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-1.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-1/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-1/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2197263240814209,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "1c33e777fa7f251cafcaa4c90fb7c75bd4421d565dd4b50f4b91ab7d818bfab3",
+            "reference_path": "tiny-native-gnu/fused-bias-1/reference.json",
+            "reference_sha256": "71b74da7dc067499454e5a92f38848bc3331b33dd02f41d58702e063aa116423"
+          },
+          {
+            "name": "fused-bias-2",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-2.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-2/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-2/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22030401229858398,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "6ecfa871dffb7c311f299f3665e547a9ef64ed4f15f172bbbf3b90b174c6afd7",
+            "reference_path": "tiny-native-gnu/fused-bias-2/reference.json",
+            "reference_sha256": "c7f051e028f1a850b7db83931b3b59966e0ff79ae30230ffac8cb80d06d08a2d"
+          },
+          {
+            "name": "fused-bias-3",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-3.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-3/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-3/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2200462818145752,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "ec87d030f4ba5ca11c6548dc2a96e7c9cc2157b13d24c7df0eb48af47c54b96e",
+            "reference_path": "tiny-native-gnu/fused-bias-3/reference.json",
+            "reference_sha256": "6783f6407a408c688b0fc94796089b99ba1a5e87768d7af946076fc9ba044583"
+          },
+          {
+            "name": "fused-bias-4",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-4.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-4/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-4/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21981310844421387,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "fc890c74da94031f94ebb1a6b6e0dcffb47beeb640813ddd1bcaf9093ec4a0d0",
+            "reference_path": "tiny-native-gnu/fused-bias-4/reference.json",
+            "reference_sha256": "c7f051e028f1a850b7db83931b3b59966e0ff79ae30230ffac8cb80d06d08a2d"
+          },
+          {
+            "name": "fused-bias-5",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-5.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-5/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-5/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2202434539794922,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "16fc913e5df960f03abe28dbe68cffb858c8c6d2b530770eb65a3360a7f2039c",
+            "reference_path": "tiny-native-gnu/fused-bias-5/reference.json",
+            "reference_sha256": "6783f6407a408c688b0fc94796089b99ba1a5e87768d7af946076fc9ba044583"
+          },
+          {
+            "name": "fused-bias-6",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-6.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-6/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-6/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2202751636505127,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "6e61a8b2eb6a5206dc23a2a8532defccbe7ca945ff490e1d8bef95e352f630d2",
+            "reference_path": "tiny-native-gnu/fused-bias-6/reference.json",
+            "reference_sha256": "71b74da7dc067499454e5a92f38848bc3331b33dd02f41d58702e063aa116423"
+          },
+          {
+            "name": "fused-bias-7",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-bias-7.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-7/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-bias-7/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2205033302307129,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "2d16fce3af98231546e34317cf77de2dbbd014d428704dedc409c29ced820d81",
+            "reference_path": "tiny-native-gnu/fused-bias-7/reference.json",
+            "reference_sha256": "fcd104cbb6ca96ff36d343df19c722c29e507c5764c9539c87af90058dc6a19d"
+          },
+          {
+            "name": "fused-own-bias",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-own-bias.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-own-bias/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-own-bias/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22083449363708496,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "94e1604c798df46a0698df934d967bbfde179f086f49075f64c4e4d31bd6d4be",
+            "reference_path": "tiny-native-gnu/fused-own-bias/reference.json",
+            "reference_sha256": "d834a646da9ef581da58d47e3cabe9bfe767035961c6c722f7de8772a61de0e5"
+          },
+          {
+            "name": "untied-output",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/untied-output.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22059988975524902,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "a6522ddba2c47ae21a300a391fe4930245023666ef3fef9da3cedd8ce03099c3",
+            "reference_path": "tiny-native-gnu/untied-output/reference.json",
+            "reference_sha256": "c6bc5221c93f82a8ac95fd570aa2a31dc7840164bd2675b4b4a88cc550ec9069"
+          },
+          {
+            "name": "matching-head-width",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/matching-head-width.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/matching-head-width/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/matching-head-width/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2217867374420166,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "24305b0c0a781104786bb46ba8018ce20280cdf77ec23ec96878ed012b3d79ff",
+            "reference_path": "tiny-native-gnu/matching-head-width/reference.json",
+            "reference_sha256": "5d59a5525bb0406e882c185d3df3743c00f274896656fb5f440d9ede5a925e9e"
+          },
+          {
+            "name": "mha",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/mha.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/mha/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/mha/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22052311897277832,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "251ad11081b982333e01dcd2c66e02342ec4d562e620d6e695dd54e04fdcf8ec",
+            "reference_path": "tiny-native-gnu/mha/reference.json",
+            "reference_sha256": "7c4a5a46e513c15e6de35c23eab0855433c4088c7527036dfbfd95bef4b44335"
+          },
+          {
+            "name": "mqa",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/mqa.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/mqa/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/mqa/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22036314010620117,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "06809c900364047a9690ec190c373931a52b3a6b9b8f86c7dd0f35269c3d5d6a",
+            "reference_path": "tiny-native-gnu/mqa/reference.json",
+            "reference_sha256": "e6f36264b5c4ed3f3fdce59323f7ea3fd59859d501d6c2e39b784342031dda91"
+          },
+          {
+            "name": "embedding-not-divisible-by-heads",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/embedding-not-divisible-by-heads.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/embedding-not-divisible-by-heads/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/embedding-not-divisible-by-heads/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2207024097442627,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "93e995fe1f06376f91910eabe16870cae019859f4e1f8d4d3d5a58e9e42c4357",
+            "reference_path": "tiny-native-gnu/embedding-not-divisible-by-heads/reference.json",
+            "reference_sha256": "ef97c15ce922fa3ca334fccef5317be4349d46b2cea7d789e3bf8bef876bd804"
+          },
+          {
+            "name": "f16",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/f16.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/f16/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/f16/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22006821632385254,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "80423cc78726ca38db19f8ace5417e9ffdc4ac80d0158af33d5d199ceaf2109a",
+            "reference_path": "tiny-native-gnu/f16/reference.json",
+            "reference_sha256": "4defba2f71375ed3bc551dc4d97d82e9b07ca64c6dfdd9405e829b45aff83d3e"
+          },
+          {
+            "name": "q4-0",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/q4-0.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/q4-0/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/q4-0/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21982645988464355,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "a16542f149b7b56c696cbcadd21c3a85a8fca50cf2a16bae59775c465cf49d66",
+            "reference_path": "tiny-native-gnu/q4-0/reference.json",
+            "reference_sha256": "cdfddad56446e76e8d821a23b71c517f82f9f9d62b206f3172822d1be83bf71e"
+          },
+          {
+            "name": "q4-k",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/q4-k.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/q4-k/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/q4-k/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21977853775024414,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "1d08227979d51b562da1f6c7cd753472be99251977733591a3f2180cc07e6adc",
+            "reference_path": "tiny-native-gnu/q4-k/reference.json",
+            "reference_sha256": "6529ed98b89266beac49a70e594bc7f3d8580b78de651c6c2c2136cdf763935c"
+          },
+          {
+            "name": "fused-q4-k",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-q4-k.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22072815895080566,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "943c7b19810d3dc18655a6b5cd5f9c5cab6a3277809eba89faa7cd8e30daa73d",
+            "reference_path": "tiny-native-gnu/fused-q4-k/reference.json",
+            "reference_sha256": "f38759fac08244e1367c2301c523fac03b586063f0f6bf4a2fa9203dad87f1ef"
+          },
+          {
+            "name": "implicit-head-defaults",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/implicit-head-defaults.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/implicit-head-defaults/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/implicit-head-defaults/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16952037811279297,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "11ffc6624132a9868d3e5a03c56019c650858335859084a069f5ebe593dddb5e",
+            "reference_path": "tiny-native-gnu/implicit-head-defaults/reference.json",
+            "reference_sha256": "7c4a5a46e513c15e6de35c23eab0855433c4088c7527036dfbfd95bef4b44335"
+          },
+          {
+            "name": "noncausal",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/noncausal.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/noncausal/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/noncausal/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.1693129539489746,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "4ba1aca5e265d194e07c1342a05a9161f7fee723258602c2cf844b97fcbf286c",
+            "reference_path": "tiny-native-gnu/noncausal/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "scaled-rope",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/scaled-rope.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/scaled-rope/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/scaled-rope/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16955947875976562,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "95025f2438d8c3a9d21ed37fc7ed51d5909f9a285fdb5907c2e303890379539e",
+            "reference_path": "tiny-native-gnu/scaled-rope/reference.json",
+            "reference_sha256": "ac3fefac1754edf79fe3b80a80a042cb897b12ab9e0ca8d34e7265f6192ba481"
+          },
+          {
+            "name": "head-array",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/head-array.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/head-array/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/head-array/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16957545280456543,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8973b719b6dfcbe4b5ad98dc784f88590d7182a5c4e1139e6c09690a3c6314d1",
+            "reference_path": "tiny-native-gnu/head-array/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "classifier",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/classifier.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/classifier/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/classifier/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.1693277359008789,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "971f828a708b5935cfc5eaf733295902d81b63e691ee69bff29da1aece8691db",
+            "reference_path": "tiny-native-gnu/classifier/reference.json",
+            "reference_sha256": "a63487e6690093f7687c9f5b9bb667693f24b23bbeab12e4c6ed5853d9534961"
+          },
+          {
+            "name": "embedding-projection",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/embedding-projection.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/embedding-projection/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/embedding-projection/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16925406455993652,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "6f6a0a30eda6136c988137ead9200810a1cf1691a4834dfa654fb5d1f2e3ac6f",
+            "reference_path": "tiny-native-gnu/embedding-projection/reference.json",
+            "reference_sha256": "5035b8c01bd264cc741e643fd589060bda31d5bbc7456b5b3f72ec256e93b25d"
+          },
+          {
+            "name": "missing-qnorm",
+            "rust_scope": "invalid",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/missing-qnorm.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/missing-qnorm/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/missing-qnorm/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.16954588890075684,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "3128a8762393f4642bafb2f70e6588bf9ee0244684ddf712e4038c54f036d37d"
+          },
+          {
+            "name": "missing-knorm",
+            "rust_scope": "invalid",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/missing-knorm.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/missing-knorm/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/missing-knorm/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.16987895965576172,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "fa488a85741b2b7f4dc36999e5747238c9dfd08715705ed1c67d47732c135417"
+          },
+          {
+            "name": "wrong-qnorm-length",
+            "rust_scope": "invalid",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/wrong-qnorm-length.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/wrong-qnorm-length/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/wrong-qnorm-length/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.16979765892028809,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "648838d7bfd7bfeada8dec4830552f1703cda6530dfc5f39541cbdd3bf26d9bf"
+          },
+          {
+            "name": "value-head-mismatch",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/value-head-mismatch.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/value-head-mismatch/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/value-head-mismatch/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.16951608657836914,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "d3d3ed3bcd0080714ed205656c7fb7711eb507391cebce86245572530012d93d"
+          },
+          {
+            "name": "partial-rope",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/partial-rope.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/partial-rope/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/partial-rope/reference.json"
+            ],
+            "exit_code": -6,
+            "elapsed_seconds": 0.6711544990539551,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "e672f0c128fe858153de6f751bfb1b1f58757b8b9ad8cb2e9e2f5c96ec007c22"
+          },
+          {
+            "name": "extra-output-bias",
+            "rust_scope": "unsupported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/extra-output-bias.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/extra-output-bias/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/extra-output-bias/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.17019128799438477,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "a6d05779baf7a1808614ef2ef511bea44572468b8052b340e233433166dd35b3"
+          },
+          {
+            "name": "overflow-output-norm",
+            "rust_scope": "numeric-failure",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/overflow-output-norm.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/overflow-output-norm/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/overflow-output-norm/reference.json"
+            ],
+            "exit_code": 1,
+            "elapsed_seconds": 0.1697077751159668,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "443f1602f776a92d0f2f308721e8a4c8992ab9bc3545b303f851dad97ac0b3ad"
+          },
+          {
+            "name": "separate-bias-0-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-0-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-sharded-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-sharded-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2197718620300293,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "e550a7ed0e0467700bef8026cf89f4c3057fb085e685d9bd7e7ba41b49dec44e",
+            "reference_path": "tiny-native-gnu/separate-bias-0-sharded-auto/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "separate-bias-0-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-0-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-sharded-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-sharded-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.22005105018615723,
+            "request_sha256": "9ed441cb308c6acc707710d5fa12d36f49d6909d846532e3f885c813adc65047",
+            "stderr_sha256": "c0fc32bd05aa150b631be080103232af6adc85803f734b3d9e70f5d5b84c04e3",
+            "reference_path": "tiny-native-gnu/separate-bias-0-sharded-explicit/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "separate-bias-0-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-0-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-metadata-first-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-metadata-first-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.1697847843170166,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "5c0ce76cc31b8403bf17ac720f89047dc15cb9b25cde2eb5dbf688051f1318b7",
+            "reference_path": "tiny-native-gnu/separate-bias-0-metadata-first-auto/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "separate-bias-0-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/separate-bias-0-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-metadata-first-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/separate-bias-0-metadata-first-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.16965627670288086,
+            "request_sha256": "47cc3d6a28dfc71c07dd0fbb24ab821fd5e76139929e76fc47c410f70ed39343",
+            "stderr_sha256": "ebf11c396edd650d59c9fcc72828bc5e3b8961d7dd83003f87d35a6892924b2a",
+            "reference_path": "tiny-native-gnu/separate-bias-0-metadata-first-explicit/reference.json",
+            "reference_sha256": "ae5baa331eed9f2115d77857439c4ff2d9a49382c05e17e83860206c7c2e6c84"
+          },
+          {
+            "name": "fused-q4-k-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-q4-k-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-sharded-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-sharded-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2196519374847412,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "c7ee94c6e260fea68e29d257331f30c36a5c28b30f16eec72db57d24c9165431",
+            "reference_path": "tiny-native-gnu/fused-q4-k-sharded-auto/reference.json",
+            "reference_sha256": "f38759fac08244e1367c2301c523fac03b586063f0f6bf4a2fa9203dad87f1ef"
+          },
+          {
+            "name": "fused-q4-k-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-q4-k-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-sharded-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-sharded-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21973228454589844,
+            "request_sha256": "b9d71f8629e34ae41cb60dd233d0cb459d2d17d59c9bf3d4a42d040d66ed5a17",
+            "stderr_sha256": "cec8ee39be22c56722b6f9747e4ea25dcde38a13405c518004944fbe8a53d59a",
+            "reference_path": "tiny-native-gnu/fused-q4-k-sharded-explicit/reference.json",
+            "reference_sha256": "f38759fac08244e1367c2301c523fac03b586063f0f6bf4a2fa9203dad87f1ef"
+          },
+          {
+            "name": "fused-q4-k-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-q4-k-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-metadata-first-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-metadata-first-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2200002670288086,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "11961947cbb09bf24d4f10c8b49da6fe5896ba0b28025a830785260bd89e9cac",
+            "reference_path": "tiny-native-gnu/fused-q4-k-metadata-first-auto/reference.json",
+            "reference_sha256": "f38759fac08244e1367c2301c523fac03b586063f0f6bf4a2fa9203dad87f1ef"
+          },
+          {
+            "name": "fused-q4-k-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/fused-q4-k-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-metadata-first-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/fused-q4-k-metadata-first-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2198045253753662,
+            "request_sha256": "e145086a972dbe7f455bab08eaac98bfb0d98a1b97deb5861a49991a8827c37a",
+            "stderr_sha256": "879231ca9b84d221f2202c3def71319f6286e08e05039e4130ecd4fda97a3e08",
+            "reference_path": "tiny-native-gnu/fused-q4-k-metadata-first-explicit/reference.json",
+            "reference_sha256": "f38759fac08244e1367c2301c523fac03b586063f0f6bf4a2fa9203dad87f1ef"
+          },
+          {
+            "name": "untied-output-sharded-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/untied-output-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-sharded-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-sharded-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.2198195457458496,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "56ef2b54db960ddc33bc308cfafec980a3cb6f90560c69f6aaaa46b9d198b911",
+            "reference_path": "tiny-native-gnu/untied-output-sharded-auto/reference.json",
+            "reference_sha256": "c6bc5221c93f82a8ac95fd570aa2a31dc7840164bd2675b4b4a88cc550ec9069"
+          },
+          {
+            "name": "untied-output-sharded-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/untied-output-sharded/model-00001-of-00003.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-sharded-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-sharded-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21975445747375488,
+            "request_sha256": "dc8a2a4faccc3f5d451ecd9a2e5e7dc01c74fe27bfc77190d29b1c32d9f66440",
+            "stderr_sha256": "9b11110e2e1fdf425b9ecde6d0fd704946932f07340dec9c8885dbad30cb3a4f",
+            "reference_path": "tiny-native-gnu/untied-output-sharded-explicit/reference.json",
+            "reference_sha256": "c6bc5221c93f82a8ac95fd570aa2a31dc7840164bd2675b4b4a88cc550ec9069"
+          },
+          {
+            "name": "untied-output-metadata-first-auto",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/untied-output-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-metadata-first-auto/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-metadata-first-auto/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21978378295898438,
+            "request_sha256": "df18bb392284e7575387c993c81fab1f2a26d5be236ed004d41897e9c72f2398",
+            "stderr_sha256": "8f30c994395f58780e5c1493249d8a6f0910692de84c76adc95c3c9b2c3393d1",
+            "reference_path": "tiny-native-gnu/untied-output-metadata-first-auto/reference.json",
+            "reference_sha256": "c6bc5221c93f82a8ac95fd570aa2a31dc7840164bd2675b4b4a88cc550ec9069"
+          },
+          {
+            "name": "untied-output-metadata-first-explicit",
+            "rust_scope": "supported",
+            "command": [
+              "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-inputs/untied-output-metadata-first/model-00001-of-00002.gguf",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-metadata-first-explicit/request.json",
+              "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/tiny-native-gnu/untied-output-metadata-first-explicit/reference.json"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.21948957443237305,
+            "request_sha256": "a0bd6e99eff8037ae4279720620025f7c502f1523ac8a0c1172c769eeb72becf",
+            "stderr_sha256": "1caf621ef4befade14e65bc4cf40b4388115f7f94465383569332aded273ed13",
+            "reference_path": "tiny-native-gnu/untied-output-metadata-first-explicit/reference.json",
+            "reference_sha256": "c6bc5221c93f82a8ac95fd570aa2a31dc7840164bd2675b4b4a88cc550ec9069"
+          }
+        ],
+        "expected_data_from_rust": false
+      },
+      "pretrained_capture": {
+        "schema": 1,
+        "profile": "gnu",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/models/qwen3-0.6b-q8_0.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/pretrained-native-gnu/request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/qwen3-inference-oracle/pretrained-native-gnu/reference.json"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 8.090428113937378,
+        "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+        "executable_sha256": "5a2ba090dde949d560cdfe3d02cd23e1cd12980f06652195608b60e88539ce2a",
+        "adapter_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+        "libraries": [
+          {
+            "name": "libllama.so",
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          },
+          {
+            "name": "libggml-base.so",
+            "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+          },
+          {
+            "name": "libggml-cpu.so",
+            "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+          },
+          {
+            "name": "libggml.so",
+            "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+          }
+        ],
+        "reference_sha256": "de64733fdde89e68d2ead4ac1996d83a54365836c02d31eb6785b271d18685ff",
+        "model_tensor_bytes": 633495552,
+        "model_parameters": 596049920,
+        "case_keys": [
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ],
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ],
+          [
+            "name",
+            "prompt",
+            "add_special",
+            "parse_special",
+            "tokens",
+            "pieces_hex",
+            "pieces_special_hex",
+            "detokenized_hex",
+            "prompt_logits",
+            "greedy_tokens",
+            "greedy_pieces_hex",
+            "greedy_logits",
+            "finished_eog",
+            "generated_hex"
+          ]
+        ]
+      },
+      "tiny_rows": 704,
+      "tiny_unique_rows": 253,
+      "pretrained_rows": 39,
+      "pretrained_unique_rows": 36,
+      "pretrained_greedy_ids": 24
+    }
+  },
+  "packing": "Native JSON f32 values rounded back to original f32 bits and serialized little endian; exact equal rows/inputs interned by SHA256 with byte equality assertions. No truncation, quantization or Rust-derived data. Native raw JSON/capture logs remain external.",
+  "comparison_contract_before_rust": {
+    "schema": 1,
+    "absolute_budget": 0.0002,
+    "relative_budget": 2e-05,
+    "comparison": "abs(actual-reference)<=absolute+relative*abs(reference)",
+    "ids_and_pieces": "exact",
+    "expected_data": "original native API only; Rust not run",
+    "supported_scope": "dense causal, uniform scalar heads/FFN, full unscaled head NeoX RoPE, no classifier/projection"
+  },
+  "scope": "Dense causal LM only; noncausal/scaled/array/head graphs remain explicitly rejected. Native abort is recorded for partial RoPE. Overflow norm is a checked atomic runtime failure in Rust.",
+  "artifacts": [
+    {
+      "path": "LICENSE.Qwen3.txt",
+      "bytes": 11544,
+      "sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd"
+    },
+    {
+      "path": "pretrained-gnu-logits.f32le.bin",
+      "bytes": 21878784,
+      "sha256": "89caafa49677f68a145dd4e6733b70addaf0d5a77b35e527c0f0be08f60453e6"
+    },
+    {
+      "path": "pretrained-gnu-reference.json",
+      "bytes": 4852,
+      "sha256": "29e14fc25d406e8cc40f80a6a3147f41b1cd9f2d3c862f9f2557f384632cf3fa"
+    },
+    {
+      "path": "pretrained-msvc-logits.f32le.bin",
+      "bytes": 21878784,
+      "sha256": "e2872c8d35d8583073a0844f35099bbdb9a10baacbed3532a776c4f0756385bb"
+    },
+    {
+      "path": "pretrained-msvc-reference.json",
+      "bytes": 4854,
+      "sha256": "e0a466acda2e6ab476112e6c300a2a6cc65cc680dd40babd5e730c966a2a3601"
+    },
+    {
+      "path": "tiny-gnu-logits.f32le.bin",
+      "bytes": 518144,
+      "sha256": "2fe8d0571271ab64ca4dba5ce82788c4ca51d18300febde1e8ac93c5d8ab0832"
+    },
+    {
+      "path": "tiny-gnu-reference.json",
+      "bytes": 145163,
+      "sha256": "6d484698728c52560dafab55714116e8885cff1b16c45ff5b309cd9a23417370"
+    },
+    {
+      "path": "tiny-inputs.bin",
+      "bytes": 25199968,
+      "sha256": "04c331fdf68d9cb2311631904099d674ce1f17def63abf93c908a856147c49bd"
+    },
+    {
+      "path": "tiny-models.json",
+      "bytes": 26728,
+      "sha256": "898e84c2567d91f1a5ac8132ddb82ca5034fce399a6b0e4645e5774798220b61"
+    },
+    {
+      "path": "tiny-msvc-logits.f32le.bin",
+      "bytes": 518144,
+      "sha256": "c596ad63c372b982bd5a156073dd5333244b3c1769d828b4127447e028c02f9a"
+    },
+    {
+      "path": "tiny-msvc-reference.json",
+      "bytes": 145173,
+      "sha256": "a928e0c5e8c8f8cec7448590c8c085384320ba45cf31709d3a44084b171735f5"
+    }
+  ]
+}

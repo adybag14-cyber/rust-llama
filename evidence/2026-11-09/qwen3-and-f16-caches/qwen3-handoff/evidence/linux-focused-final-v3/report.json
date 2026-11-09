@@ -1,0 +1,154 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "label": "linux-focused-final-v3",
+  "mode": "focused",
+  "input_count": 255,
+  "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+  "steps": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.271561525001744,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.742269154998212,
+      "log_sha256": "2a8813b8d4a7c347042123f2eaee3ae9afb7471661bf287b796db652d11eee32",
+      "test_counts": {
+        "passed": 93,
+        "failed": 0,
+        "ignored": 8
+      },
+      "native_metrics": [
+        "qwen3-native: active vector storage / ignored partial fused biases host=gnu rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+        "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=gnu rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+      ]
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 19.895454589997826,
+      "log_sha256": "8859b732a37d686d80e3cb2afcd1d5ec852842778ded047eaf01d74ecb84df9d",
+      "test_counts": {
+        "passed": 93,
+        "failed": 0,
+        "ignored": 8
+      },
+      "native_metrics": [
+        "qwen3-native: active vector storage / ignored partial fused biases host=gnu rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0",
+        "qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=gnu rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0"
+      ]
+    },
+    {
+      "name": "clippy-workspace",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.415689885001484,
+      "log_sha256": "8e4d091c727059a87786e24427abb94c4b34ba617386073536b27ad9f4ece21b",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "audit",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 36.32579503799934,
+      "log_sha256": "ebccbff3329e43a795690f1e7e66112453be94d3f6e1cd087d4ac0efee94a55e",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 34.817042434999166,
+      "log_sha256": "95c8b94783bbec5663e0584ae1f015e88dbf4a1a4fd99df8ad838101305f735f",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    }
+  ],
+  "inputs_unchanged": true,
+  "all_requested_steps_passed": true
+}

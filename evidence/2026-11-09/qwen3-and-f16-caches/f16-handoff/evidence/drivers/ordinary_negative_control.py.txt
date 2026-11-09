@@ -1,0 +1,23 @@
+from pathlib import Path
+import shutil,json,hashlib,subprocess,os
+task=Path(__file__).resolve().parent;base=task/'rust-draft'
+draft=task/'ordinary-negative-control/rust-draft'
+assert not draft.exists();draft.parent.mkdir(parents=True);shutil.copytree(base,draft)
+path=draft/'crates/ffi/src/context.rs';source=path.read_text(encoding='utf-8')
+assert source.count('let key_type = cache_type(p.type_k)?;')==1
+assert source.count('let value_type = cache_type(p.type_v)?;')==1
+source=source.replace('let key_type = cache_type(p.type_k)?;','let key_type = { cache_type(p.type_k)?; NativeKvType::F32 };')
+source=source.replace('let value_type = cache_type(p.type_v)?;','let value_type = { cache_type(p.type_v)?; NativeKvType::F32 };')
+path.write_text(source,encoding='utf-8',newline='\n')
+out=draft.parent/'validation';out.mkdir()
+env=dict(os.environ);env['CARGO_TARGET_DIR']=str(task/'target-ordinary-negative-windows')
+cargo=str(Path.home()/'.cargo/bin/cargo.exe')
+command=[cargo,'test','-p','llama-ffi','--lib','f16_context_reference_tests::original_four_dtype_pairs_memory_sessions_and_exact_continuations','--','--exact','--nocapture']
+result=subprocess.run(command,cwd=draft,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=1800)
+(out/'stdout.log').write_bytes(result.stdout);(out/'stderr.log').write_bytes(result.stderr)
+output=result.stdout.decode(errors='replace')+result.stderr.decode(errors='replace')
+caught=result.returncode==101 and 'original_four_dtype_pairs_memory_sessions_and_exact_continuations ... FAILED' in output and 'exact native typed state bytes' in output
+report={'schema':1,'negative_control_detected':caught,'deliberate_change':'Parameter validation retained but resident K/V silently forced to F32 for every valid requested type; independent ordinary data must detect the substitution.','candidate_unchanged_sha256':hashlib.sha256((base/'crates/ffi/src/context.rs').read_bytes()).hexdigest(),'negative_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'command':command,'exit_code':result.returncode,'initial_prepare_attempt':'A synchronous prepare call was rejected before execution by a saturated15-second queue; this detached job performs the first mutation.'}
+(out/'report.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+print(output[-5000:],flush=True);print(json.dumps(report),flush=True)
+if not caught:raise SystemExit(1)

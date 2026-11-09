@@ -1,0 +1,55 @@
+{
+  "baseline_commit": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "label": "linux-focused-final-v2",
+  "mode": "focused",
+  "input_count": 255,
+  "input_inventory_sha256": "a41a03428ebe1a844d463ba0658cfc4095c3164d2e65649dce59f2490c5b46cf",
+  "steps": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.230086037001456,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 1.6287385540017567,
+      "log_sha256": "c15084aa828a20723b15638f5b9db203dcd4e910df4507febe1463e8f6f6e575",
+      "test_counts": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      "native_metrics": []
+    }
+  ],
+  "inputs_unchanged": true,
+  "all_requested_steps_passed": false
+}

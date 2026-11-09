@@ -1,4 +1,5 @@
 //! Dense F32 Llama graph slice translated from `src/models/llama.cpp`.
+use crate::context::NativeKvType;
 use crate::{AdapterSet, Error, Fingerprint, Matrix, Result, check_epsilon, check_positive, math};
 
 #[derive(Debug, Clone)]
@@ -221,7 +222,16 @@ impl LlamaModel {
                 .checked_add(1)
                 .ok_or_else(|| Error::InvalidState("KV row count overflow".into()))?,
         )?;
-        self.step_inserting(hidden, position, cache, insertion, layout, adapters, cancel)
+        self.step_inserting(
+            hidden,
+            position,
+            cache,
+            insertion,
+            layout,
+            (NativeKvType::F32, NativeKvType::F32),
+            adapters,
+            cancel,
+        )
     }
     // A physical native KV hole can precede already populated cells. Preserve
     // source accumulation order by inserting the new row at that exact index.
@@ -233,6 +243,7 @@ impl LlamaModel {
         cache: &mut [KvLayer],
         insertion: usize,
         layout: math::AttentionLayout<'_>,
+        cache_types: (NativeKvType, NativeKvType),
         adapters: &AdapterSet,
         cancel: &mut impl FnMut() -> bool,
     ) -> Result<(Vec<f32>, Vec<f32>)> {
@@ -270,6 +281,12 @@ impl LlamaModel {
             math::bias(&mut v, &layer.value_bias);
             math::rope(&mut q, c.head_dim()?, position, c.rope_base);
             math::rope(&mut k, c.head_dim()?, position, c.rope_base);
+            // Native cache storage rounds at the original graph's copy into
+            // K/V tensors. Nonflash Q and probability operands stay F32.
+            k.iter_mut()
+                .for_each(|value| *value = cache_types.0.round(*value));
+            v.iter_mut()
+                .for_each(|value| *value = cache_types.1.round(*value));
             kv.keys.splice(offset..offset, k);
             kv.values.splice(offset..offset, v);
             let attention = math::attention_with_layout(

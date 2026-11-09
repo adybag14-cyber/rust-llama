@@ -144,7 +144,7 @@ no external model download:
 cargo test --locked --offline -p llama-inference --test bert_defaults
 ```
 
-CI additionally supplies all seven pretrained model environment variables and
+CI additionally supplies all eight pretrained model environment variables and
 runs the complete set of explicit ignored model comparisons in release mode.
 Other ignored vendor/hardware tests have separate prerequisites.
 
@@ -292,3 +292,29 @@ target cfg independently of runtime arithmetic dispatch.
 The model runtime preserves source attention padding to 256 columns, masked
 physical slots, whole-row SiLU and the appropriate variance order. These
 verified profiles do not establish every CPU ISA, OS math library or compiler.
+
+## Dense Qwen3 decoder corpus
+
+The external official Qwen3-0.6B Q8_0 model is pinned to revision
+`23749fefcc72300e3a2ad315e1317431b06b590a`. Its 639,446,688 bytes have SHA-256
+`9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031`.
+Set `LLAMA_TEST_QWEN3_MODEL` to that file. The actual Apache-2.0 license from the
+pinned revision is retained in `qwen3/LICENSE.Qwen3.txt`; weights stay external.
+
+The separate GNU/MSVC pretrained fixtures contain 5,469,696 nonduplicated F32
+logits and 24 greedy IDs per profile, together with complete pieces and generated
+bytes. Dense/split/vector corpora compare another 294,912 logits and 400 IDs per
+profile. Input blobs and expected rows were interned only after byte equality;
+none were generated from Rust output. Active non-F32 norm/bias rejection and
+valid ignored partial fused-bias cases retain independent original captures.
+
+~~~sh
+cargo test --offline --locked -p llama-inference --test qwen3
+cargo test --release --offline --locked -p llama-inference --test qwen3 official_qwen3_q8_matches_original_native_profile -- --ignored --nocapture
+~~~
+
+The pretrained test checks the complete input identity, requires default-budget
+rejection, and explicitly selects a 3 GiB decoded-weight budget. Both measured
+x86_64 targets require exact corresponding F32 bits; unmeasured targets retain
+the predeclared portable bound. The graph, model and state qualifications are
+recorded in [QWEN3_IMPLEMENTATION.md](../../docs/QWEN3_IMPLEMENTATION.md).

@@ -1,0 +1,16 @@
+{
+  "reviewer": "parallel quantization agent, read-only review",
+  "runtime_reviewed_sha256": "16c744baed3bb2bc90eecc6028ee76e5434b86211d9d4a380d5fa8a56fa5f473",
+  "loader_reviewed_before_fix_sha256": "d4694eebe69c065625cd2a5fc24d16f7f51cac95f707a68e71dd999b15696320",
+  "finding": "Original F32-activation binary operations cannot execute active F16/BF16/quantized norm or bias vectors as src1; restrict active Qwen3 vectors after independent native negative captures.",
+  "resolution": "12 native rejection cases now return checked Unsupported; F32 control and4 original inactive partial fused-bias cases remain admitted, with exact same-profile outputs. Initial Rust failure preserved.",
+  "other_reviewed_contracts": [
+    "independent query/head and KV widths",
+    "per-head Q/K RMS placement before NeoX",
+    "fused bias precedence",
+    "independent KEY_LENGTH/VALUE_LENGTH defaults",
+    "strict Context actual KV geometry",
+    "Qwen3 state fingerprint"
+  ],
+  "review_scope": "No additional concrete shape/state/fingerprint defect found in reviewed code. This does not broaden explicit unsupported metadata, architecture or dtype scope."
+}

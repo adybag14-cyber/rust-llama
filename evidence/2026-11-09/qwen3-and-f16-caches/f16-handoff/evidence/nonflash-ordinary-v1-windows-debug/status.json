@@ -1,0 +1,357 @@
+{
+  "passed": true,
+  "platform": "windows",
+  "profile": "debug",
+  "sources": {
+    "crates/model-runtime/src/context/native.rs": {
+      "bytes": 52403,
+      "sha256": "0bfe38ed312d8261b6293f5b9277a8b83010f9ebcfa39f0c2b7238f3306fa7f6"
+    },
+    "crates/model-runtime/src/context/native_kv.rs": {
+      "bytes": 6334,
+      "sha256": "9c2c057e5028e92b4f11a5ff14844e0ff35e29fe6db8b945916255767e883715"
+    },
+    "crates/model-runtime/src/context/native_state.rs": {
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    "crates/model-runtime/src/llama.rs": {
+      "bytes": 14376,
+      "sha256": "daa3be3520ca60a7c6e6da8943893fe6539d0d2b92947ec743a268c35310e029"
+    },
+    "crates/ffi/src/context.rs": {
+      "bytes": 15481,
+      "sha256": "e1d7a4dc77d9f3d165de3d50dda473e55b08551e01cce37c395c895894b36484"
+    },
+    "crates/ffi/src/state.rs": {
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    "crates/model-runtime/src/context.rs": {
+      "bytes": 17890,
+      "sha256": "78da9d57c82b75db0e45c5131591f879526dd27d8cf74d573dcfbb470d859d34"
+    },
+    "crates/model-runtime/src/lib.rs": {
+      "bytes": 8529,
+      "sha256": "15e491c4ddb51e086d095e5118432f8b10c65272d2bec512bedee489c910c799"
+    },
+    "crates/ffi/src/lib.rs": {
+      "bytes": 8582,
+      "sha256": "344b8456467e1a1ab4c837f87480584e85a49dfa75e78baf2d70bf2b101b6d6c"
+    },
+    "crates/ffi/src/f16_context_reference_tests.rs": {
+      "bytes": 26790,
+      "sha256": "4ae95ad38233f2543323da688fd4a83aa585db35ca04e3cf6409187cac3db67e"
+    },
+    "crates/ffi/README.md": {
+      "bytes": 15643,
+      "sha256": "2b7b1b63484af21f631c451df6f0988f17e65185d6d11c2b7f1aee76af6b61e7"
+    },
+    "crates/ffi/STATE.md": {
+      "bytes": 10034,
+      "sha256": "5fe9d8904e002e67b7f0730b6e009b5153e61f44107d385dbedbd61e5d940dac"
+    },
+    "fixtures/ffi/f16-context-reference.json": {
+      "bytes": 662275,
+      "sha256": "3a96a2a88e6606f052b1fb805f1006b53b2dc35820dd1e89caa4ee3b9b5559f8"
+    },
+    "fixtures/ffi/f16-context-data.bin": {
+      "bytes": 490319,
+      "sha256": "fe456c5cf186231fce32b1c2449d1522373f88b2e78edf3935f38848d6062f70"
+    },
+    "fixtures/ffi/f16-context-provenance.json": {
+      "bytes": 201247,
+      "sha256": "1b17392e185ba0057d26c18a73ff83c48f6d4742b2956b4ab74c9247ed1f606d"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "unit",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--lib"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "build",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "trained-k0-v0",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\trained-k0-v0",
+        "0",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1691655,
+        "sha256": "6a2b1629169f6ab55c9e3b81687640bf1d6bcb0304661fdad08b0e28cbfa08ee"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1329186,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k1-v1",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\trained-k1-v1",
+        "1",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1576331,
+        "sha256": "5b57073edf494f6b8bb96f8db8cfb6a76da61ab650c01f10aeca52aa21f95ff1"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 684066,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k1-v0",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\trained-k1-v0",
+        "1",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1633988,
+        "sha256": "cddd317f13aa8eceb5a555c93d6aa42aa41e3c4556c328762815795cbdf8d3b5"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1006626,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "trained-k0-v1",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\trained-k0-v1",
+        "0",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1634030,
+        "sha256": "92dc35227c7d2e0e5a65c8c2b42464fb1be75cc429eb2dc7ba508d2f4d35d13f"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 1006626,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k0-v0",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\tiny-k0-v0",
+        "0",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1464276,
+        "sha256": "fa0e603cb74b689e3b60e5330b2afec1f6e1cec66f2f98abcf39fbffd101f855"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 58890,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k1-v1",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\tiny-k1-v1",
+        "1",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1461396,
+        "sha256": "8c2d98b087d8379ea284e756b3a8104d723740404d28c13e981fd6341565008b"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 42762,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k1-v0",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\tiny-k1-v0",
+        "1",
+        "0"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1462836,
+        "sha256": "4ab3ef84563612b6d81123562394dcc8293bf3389a1f5255db9581d597148452"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 50826,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    },
+    {
+      "name": "tiny-k0-v1",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\build-windows\\Release\\f16-context-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\validation\\nonflash-ordinary-v1-windows-debug\\tiny-k0-v1",
+        "0",
+        "1"
+      ],
+      "exit_code": 0,
+      "expected_reference": {
+        "bytes": 1462836,
+        "sha256": "b773597ce04570628ba629990a1bb9aed3f4105527c1419cf7c771201fe5037f"
+      },
+      "json_differences": [],
+      "binary_differences": [],
+      "binary_files": 130,
+      "binary_bytes": 50826,
+      "passed": true,
+      "counts": {
+        "cases": 40,
+        "sequence_cases": 40,
+        "file_cases": 2,
+        "buffer_cases": 96
+      }
+    }
+  ],
+  "library": {
+    "bytes": 4230144,
+    "sha256": "828e0753cad0dedefdcd99a2f8caafbd449797a099bbea25db40e4f1fc68e95d"
+  },
+  "harness": {
+    "bytes": 221184,
+    "sha256": "6c364f2324920db05c5ba3f16a55df62f992deb877ebcb9af817f3e4d34b877f"
+  },
+  "sources_unchanged": true
+}

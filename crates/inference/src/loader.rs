@@ -241,6 +241,9 @@ pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> 
     if architecture == "bert" {
         return crate::bert_loader::load(g, path, options);
     }
+    if architecture == "qwen3" {
+        return crate::qwen3_loader::load(g, path, options);
+    }
     if architecture == "qwen2" {
         return crate::qwen2_loader::load(g, path, options);
     }
@@ -249,7 +252,7 @@ pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> 
     }
     if architecture != "llama" {
         return Err(unsupported(format!(
-            "model architecture {architecture}; this loader currently executes dense llama, qwen2, bert and mamba"
+            "model architecture {architecture}; this loader currently executes dense llama, qwen2, qwen3, bert and mamba"
         )));
     }
     if let Some(t) = m.get("general.type").and_then(Value::as_str)

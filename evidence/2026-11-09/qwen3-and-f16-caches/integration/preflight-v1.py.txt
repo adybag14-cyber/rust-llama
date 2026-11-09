@@ -1,0 +1,22 @@
+from pathlib import Path
+import hashlib,json,subprocess,os
+base=Path(r'C:\Users\adyba\rust-llama-reference\qwen3-and-f16-integration-v1')
+root=base/'rust-draft'
+rows=json.loads((base/'root-docs-payload-v1.json').read_text(encoding='utf-8'))
+for r in rows: assert hashlib.sha256((root/r['path']).read_bytes()).hexdigest()==r['before_sha256'],r['path']
+for r in rows: (root/r['path']).write_bytes(r['text'].encode('utf-8'))
+out=base/'validation/preflight-v1';out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(base/'windows-target');env['CARGO_BUILD_JOBS']='2'
+report=[]
+for name,args in [
+ ('fmt',['fmt','--all']),
+ ('check',['check','--workspace','--all-targets','--offline','--locked']),
+ ('audit-write',['run','--offline','--locked','-p','xtask','--','audit','--write']),
+ ('fixtures',['run','--offline','--locked','-p','xtask','--','fixtures'])
+]:
+ p=subprocess.run(['cargo','+1.99.1']+args,cwd=root,env=env,capture_output=True)
+ (out/(name+'.stdout.txt')).write_bytes(p.stdout);(out/(name+'.stderr.txt')).write_bytes(p.stderr)
+ report.append({'name':name,'exit_code':p.returncode})
+ (out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+ print(json.dumps(report[-1]),flush=True)
+ if p.returncode: raise SystemExit(p.returncode)
