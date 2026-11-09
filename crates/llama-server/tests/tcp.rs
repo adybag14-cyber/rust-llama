@@ -869,22 +869,26 @@ fn connection_admission_limit_rejects_excess_socket() {
     let mut first = TcpStream::connect(server.local_addr()).unwrap();
     first.write_all(b"GET /").unwrap();
     thread::sleep(Duration::from_millis(25));
-    let mut excess = raw_request(server.local_addr(), "GET", "/health", "", "");
-    let head = read_head(&mut excess);
-    assert!(head.starts_with("HTTP/1.1 503"));
-    let length: usize = head
-        .lines()
-        .find_map(|line| line.strip_prefix("Content-Length: "))
-        .unwrap()
-        .parse()
-        .unwrap();
-    let mut body = vec![0; length];
-    excess.read_exact(&mut body).unwrap();
-    assert!(
-        String::from_utf8(body)
+    // Both headers and an in-flight body must not turn a complete 503 into a
+    // Windows TCP reset when the server rejects admission before parsing.
+    for unread_body in ["", "body deliberately unread by the request parser"] {
+        let mut excess = raw_request(server.local_addr(), "GET", "/health", unread_body, "");
+        let head = read_head(&mut excess);
+        assert!(head.starts_with("HTTP/1.1 503"));
+        let length: usize = head
+            .lines()
+            .find_map(|line| line.strip_prefix("Content-Length: "))
             .unwrap()
-            .contains("Connection limit reached")
-    );
+            .parse()
+            .unwrap();
+        let mut body = vec![0; length];
+        excess.read_exact(&mut body).unwrap();
+        assert!(
+            String::from_utf8(body)
+                .unwrap()
+                .contains("Connection limit reached")
+        );
+    }
     drop(first);
     server.shutdown().unwrap();
 }

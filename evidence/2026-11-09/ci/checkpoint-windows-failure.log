@@ -1,0 +1,696 @@
+﻿2026-11-09T11:36:39.8058218Z Current runner version: '2.338.2'
+2026-11-09T11:36:39.8083229Z ##[group]Runner Image Provisioner
+2026-11-09T11:36:39.8084039Z Hosted Compute Agent
+2026-11-09T11:36:39.8084589Z Version: 20261103.629
+2026-11-09T11:36:39.8085197Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-09T11:36:39.8086440Z Build Date: 2026-11-03T17:26:59Z
+2026-11-09T11:36:39.8087181Z Worker ID: {29827034-2a92-4f18-8a0f-4653ee27f438}
+2026-11-09T11:36:39.8087938Z Region: westus2
+2026-11-09T11:36:39.8088482Z Cloud: Azure
+2026-11-09T11:36:39.8089016Z ##[endgroup]
+2026-11-09T11:36:39.8090285Z ##[group]Operating System
+2026-11-09T11:36:39.8091010Z Microsoft Windows Server 2025
+2026-11-09T11:36:39.8091737Z 10.0.26100
+2026-11-09T11:36:39.8092223Z Datacenter
+2026-11-09T11:36:39.8092720Z ##[endgroup]
+2026-11-09T11:36:39.8093207Z ##[group]Runner Image
+2026-11-09T11:36:39.8093812Z Image: windows-2025-vs2026
+2026-11-09T11:36:39.8094362Z Version: 20261103.298.1
+2026-11-09T11:36:39.8095908Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261103.298/images/windows/Windows2025-VS2026-Readme.md
+2026-11-09T11:36:39.8097512Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261103.298
+2026-11-09T11:36:39.8098525Z ##[endgroup]
+2026-11-09T11:36:39.8099530Z ##[group]GITHUB_TOKEN Permissions
+2026-11-09T11:36:39.8101723Z Contents: read
+2026-11-09T11:36:39.8102264Z Metadata: read
+2026-11-09T11:36:39.8102739Z ##[endgroup]
+2026-11-09T11:36:39.8105261Z Secret source: Actions
+2026-11-09T11:36:39.8106097Z Cache mode: write
+2026-11-09T11:36:39.8106961Z Prepare workflow directory
+2026-11-09T11:36:39.8489832Z Prepare all required actions
+2026-11-09T11:36:39.8556985Z Getting action download info
+2026-11-09T11:36:40.1862892Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-09T11:36:40.3795076Z Complete job name: CPU / windows-latest
+2026-11-09T11:36:40.5135195Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-09T11:36:40.5136788Z with:
+2026-11-09T11:36:40.5137320Z   repository: adybag14-cyber/rust-llama
+2026-11-09T11:36:40.5141742Z   token: ***
+2026-11-09T11:36:40.5142207Z   ssh-strict: true
+2026-11-09T11:36:40.5142664Z   ssh-user: git
+2026-11-09T11:36:40.5143145Z   persist-credentials: true
+2026-11-09T11:36:40.5143641Z   clean: true
+2026-11-09T11:36:40.5144110Z   sparse-checkout-cone-mode: true
+2026-11-09T11:36:40.5144641Z   fetch-depth: 1
+2026-11-09T11:36:40.5145070Z   fetch-tags: false
+2026-11-09T11:36:40.5145583Z   show-progress: true
+2026-11-09T11:36:40.5146030Z   lfs: false
+2026-11-09T11:36:40.5146458Z   submodules: false
+2026-11-09T11:36:40.5147002Z   set-safe-directory: true
+2026-11-09T11:36:40.5147497Z   allow-unsafe-pr-checkout: false
+2026-11-09T11:36:40.5148363Z env:
+2026-11-09T11:36:40.5148788Z   CARGO_TERM_COLOR: always
+2026-11-09T11:36:40.5149268Z   RUST_BACKTRACE: 1
+2026-11-09T11:36:40.5149848Z ##[endgroup]
+2026-11-09T11:36:40.7229512Z Syncing repository: adybag14-cyber/rust-llama
+2026-11-09T11:36:40.7231297Z ##[group]Getting Git version info
+2026-11-09T11:36:40.7232175Z Working directory is 'D:\a\rust-llama\rust-llama'
+2026-11-09T11:36:40.7983645Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-09T11:36:41.0425957Z git version 2.56.0.windows.4
+2026-11-09T11:36:41.0479887Z ##[endgroup]
+2026-11-09T11:36:41.0496405Z Temporarily overriding HOME='D:\a\_temp\776f44e0-c1bd-41b5-a899-383050084a96' before making global git config changes
+2026-11-09T11:36:41.0497716Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T11:36:41.0505316Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\rust-llama\rust-llama
+2026-11-09T11:36:41.1112933Z Deleting the contents of 'D:\a\rust-llama\rust-llama'
+2026-11-09T11:36:41.1118178Z ##[group]Determining repository object format
+2026-11-09T11:36:41.1120551Z ##[endgroup]
+2026-11-09T11:36:41.1121321Z ##[group]Initializing the repository
+2026-11-09T11:36:41.1129608Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\rust-llama\rust-llama
+2026-11-09T11:36:41.1847691Z Initialized empty Git repository in D:/a/rust-llama/rust-llama/.git/
+2026-11-09T11:36:41.1900597Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/adybag14-cyber/rust-llama
+2026-11-09T11:36:41.2535531Z ##[endgroup]
+2026-11-09T11:36:41.2536390Z ##[group]Disabling automatic garbage collection
+2026-11-09T11:36:41.2544446Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-11-09T11:36:41.2925297Z ##[endgroup]
+2026-11-09T11:36:41.2926109Z ##[group]Setting up auth
+2026-11-09T11:36:41.2926708Z Removing SSH command configuration
+2026-11-09T11:36:41.2938735Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T11:36:41.3328355Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-09T11:36:42.5081219Z Removing HTTP extra header
+2026-11-09T11:36:42.5092023Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T11:36:42.5468431Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-09T11:36:43.1226857Z Removing includeIf entries pointing to credentials config files
+2026-11-09T11:36:43.1238151Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T11:36:43.1662349Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-09T11:36:43.7127659Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-11-09T11:36:43.7509742Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/rust-llama/rust-llama/.git.path D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:36:43.7878808Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/rust-llama/rust-llama/.git/worktrees/*.path D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:36:43.8289539Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:36:43.8655575Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:36:43.9025275Z ##[endgroup]
+2026-11-09T11:36:43.9025907Z ##[group]Fetching the repository
+2026-11-09T11:36:43.9038002Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7e90479aa11f502907e062071d735bc90b1e5e73:refs/remotes/origin/main
+2026-11-09T11:36:44.8795899Z From https://github.com/adybag14-cyber/rust-llama
+2026-11-09T11:36:44.8797280Z  * [new ref]         7e90479aa11f502907e062071d735bc90b1e5e73 -> origin/main
+2026-11-09T11:36:44.8851559Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/main
+2026-11-09T11:36:44.9297997Z   origin/main
+2026-11-09T11:36:44.9345652Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/main
+2026-11-09T11:36:44.9742142Z 7e90479aa11f502907e062071d735bc90b1e5e73
+2026-11-09T11:36:44.9780024Z ##[endgroup]
+2026-11-09T11:36:44.9780879Z ##[group]Determining the checkout info
+2026-11-09T11:36:44.9782932Z ##[endgroup]
+2026-11-09T11:36:44.9788697Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-11-09T11:36:45.0257360Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-11-09T11:36:45.0636503Z ##[group]Checking out the ref
+2026-11-09T11:36:45.0647476Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+2026-11-09T11:36:45.2512627Z Switched to a new branch 'main'
+2026-11-09T11:36:45.2584389Z branch 'main' set up to track 'origin/main'.
+2026-11-09T11:36:45.2643560Z ##[endgroup]
+2026-11-09T11:36:45.3123594Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-11-09T11:36:45.3471180Z 7e90479aa11f502907e062071d735bc90b1e5e73
+2026-11-09T11:36:45.3889949Z ##[group]Run rustup toolchain install 1.99.1 --profile minimal --component rustfmt,clippy
+2026-11-09T11:36:45.3890940Z [36;1mrustup toolchain install 1.99.1 --profile minimal --component rustfmt,clippy[0m
+2026-11-09T11:36:45.4436420Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-09T11:36:45.4437044Z env:
+2026-11-09T11:36:45.4437413Z   CARGO_TERM_COLOR: always
+2026-11-09T11:36:45.4437760Z   RUST_BACKTRACE: 1
+2026-11-09T11:36:45.4438082Z ##[endgroup]
+2026-11-09T11:36:46.3187653Z info: syncing channel updates for 1.99.1-x86_64-pc-windows-msvc
+2026-11-09T11:36:46.7548299Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-09T11:36:46.7657215Z info: downloading 5 components
+2026-11-09T11:36:58.1638214Z 
+2026-11-09T11:36:58.2025614Z   1.99.1-x86_64-pc-windows-msvc installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-09T11:36:58.2026304Z 
+2026-11-09T11:36:58.3448524Z ##[group]Run cargo fmt --all -- --check
+2026-11-09T11:36:58.3449076Z [36;1mcargo fmt --all -- --check[0m
+2026-11-09T11:36:58.3525882Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-09T11:36:58.3526376Z env:
+2026-11-09T11:36:58.3526689Z   CARGO_TERM_COLOR: always
+2026-11-09T11:36:58.3527045Z   RUST_BACKTRACE: 1
+2026-11-09T11:36:58.3527365Z ##[endgroup]
+2026-11-09T11:37:00.4366797Z ##[group]Run cargo test --workspace --all-targets --offline --locked
+2026-11-09T11:37:00.4367447Z [36;1mcargo test --workspace --all-targets --offline --locked[0m
+2026-11-09T11:37:00.4430963Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-09T11:37:00.4431495Z env:
+2026-11-09T11:37:00.4432323Z   CARGO_TERM_COLOR: always
+2026-11-09T11:37:00.4432725Z   RUST_BACKTRACE: 1
+2026-11-09T11:37:00.4433062Z ##[endgroup]
+2026-11-09T11:37:00.9050357Z [1m[92m   Compiling[0m llama-quant v0.1.0 (D:\a\rust-llama\rust-llama\crates\quant)
+2026-11-09T11:37:00.9051780Z [1m[92m   Compiling[0m llama-platform-loader v0.1.0 (D:\a\rust-llama\rust-llama\crates\platform-loader)
+2026-11-09T11:37:00.9057879Z [1m[92m   Compiling[0m llama-behavior v0.1.0 (D:\a\rust-llama\rust-llama\crates\llama-behavior)
+2026-11-09T11:37:00.9062217Z [1m[92m   Compiling[0m llama-kernel-ir v0.1.0 (D:\a\rust-llama\rust-llama\crates\kernel-ir)
+2026-11-09T11:37:01.2632786Z [1m[92m   Compiling[0m llama-model-runtime v0.1.0 (D:\a\rust-llama\rust-llama\crates\model-runtime)
+2026-11-09T11:37:01.4842161Z [1m[92m   Compiling[0m llama-gguf v0.1.0 (D:\a\rust-llama\rust-llama\crates\gguf)
+2026-11-09T11:37:01.8633016Z [1m[92m   Compiling[0m llama-tokenizer v0.1.0 (D:\a\rust-llama\rust-llama\crates\tokenizer)
+2026-11-09T11:37:03.0046315Z [1m[92m   Compiling[0m llama-inference v0.1.0 (D:\a\rust-llama\rust-llama\crates\inference)
+2026-11-09T11:37:03.5028181Z [1m[92m   Compiling[0m llama-vendor-remote v0.1.0 (D:\a\rust-llama\rust-llama\crates\vendor-remote)
+2026-11-09T11:37:03.5256741Z [1m[92m   Compiling[0m llama-device-family v0.1.0 (D:\a\rust-llama\rust-llama\crates\device-family)
+2026-11-09T11:37:04.2994466Z [1m[92m   Compiling[0m llama-portable-gpu v0.1.0 (D:\a\rust-llama\rust-llama\crates\portable-gpu)
+2026-11-09T11:37:04.5807008Z [1m[92m   Compiling[0m llama-media v0.1.0 (D:\a\rust-llama\rust-llama\crates\llama-media)
+2026-11-09T11:37:04.9368647Z [1m[92m   Compiling[0m llama-server v0.1.0 (D:\a\rust-llama\rust-llama\crates\llama-server)
+2026-11-09T11:37:04.9708234Z [1m[92m   Compiling[0m llama-conformance v0.1.0 (D:\a\rust-llama\rust-llama\crates\llama-conformance)
+2026-11-09T11:37:05.7063771Z [1m[92m   Compiling[0m llama-tensor v0.1.0 (D:\a\rust-llama\rust-llama\crates\tensor)
+2026-11-09T11:37:08.4314839Z [1m[92m   Compiling[0m xtask v0.1.0 (D:\a\rust-llama\rust-llama\xtask)
+2026-11-09T11:37:10.8096402Z [1m[92m   Compiling[0m track-runner v0.1.0 (D:\a\rust-llama\rust-llama\tools\track-runner)
+2026-11-09T11:37:13.4722177Z [1m[92m   Compiling[0m rust-llama-cli v0.1.0 (D:\a\rust-llama\rust-llama\crates\cli)
+2026-11-09T11:37:14.4043874Z [1m[92m   Compiling[0m llama-ffi v0.1.0 (D:\a\rust-llama\rust-llama\crates\ffi)
+2026-11-09T11:37:22.1913819Z [1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 21.42s
+2026-11-09T11:37:22.1975830Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_behavior-9587eeafcee00758.exe)
+2026-11-09T11:37:22.2081580Z 
+2026-11-09T11:37:22.2082343Z running 31 tests
+2026-11-09T11:37:22.2101980Z test chat::tests::chatml_exact_bytes ... ok
+2026-11-09T11:37:22.2102813Z test chat::tests::llama2_history_and_ascii_whitespace_contract ... ok
+2026-11-09T11:37:22.2103647Z test chat::tests::gemma_merges_system_only_into_non_model_turn ... ok
+2026-11-09T11:37:22.2104555Z test chat::tests::malformed_roles_nuls_and_output_limits_are_rejected ... ok
+2026-11-09T11:37:22.2106304Z test chat::tests::native_detection_order_and_unknown_jinja_are_explicit ... ok
+2026-11-09T11:37:22.2107297Z test chat::tests::every_registered_native_name_has_implementation ... ok
+2026-11-09T11:37:22.2108094Z test grammar::tests::nullable_rules_and_repeated_groups ... ok
+2026-11-09T11:37:22.2108770Z test grammar::tests::rejects_invalid_grammars_and_unimplemented_token_terminals ... ok
+2026-11-09T11:37:22.2112133Z test grammar::tests::full_gbnf_character_syntax_and_bounds ... ok
+2026-11-09T11:37:22.2119143Z test grammar::tests::state_budget_failure_is_transactional ... ok
+2026-11-09T11:37:22.2121200Z test grammar::tests::split_utf8_checks_partial_ranges_and_rolls_back ... ok
+2026-11-09T11:37:22.2122341Z test grammar::tests::recursive_nested_json_and_prefix_status ... ok
+2026-11-09T11:37:22.2123063Z test json::tests::deterministic_key_order ... ok
+2026-11-09T11:37:22.2124096Z test grammar::tests::token_piece_filter_uses_bytes_and_end_state ... ok
+2026-11-09T11:37:22.2125999Z test json::tests::enforces_limits_and_handles_negative_zero ... ok
+2026-11-09T11:37:22.2127480Z test json::tests::integers_preserve_identity_beyond_binary64_precision ... ok
+2026-11-09T11:37:22.2128917Z test json::tests::rejects_malformed_ambiguous_or_non_finite_input ... ok
+2026-11-09T11:37:22.2130126Z test json::tests::unicode_surrogates_and_escape_roundtrip ... ok
+2026-11-09T11:37:22.2130953Z test sampling::tests::adaptive_accept_only_commits_matching_pending_token ... ok
+2026-11-09T11:37:22.2131755Z test sampling::tests::chain_order_is_observable ... ok
+2026-11-09T11:37:22.2132508Z test sampling::tests::distribution_clone_reset_singleton_consumption ... ok
+2026-11-09T11:37:22.2133232Z test sampling::tests::dry_source_cases_and_breakers ... ok
+2026-11-09T11:37:22.2134164Z test sampling::tests::errors_do_not_consume_rng_or_mutate_candidates ... ok
+2026-11-09T11:37:22.2135336Z test sampling::tests::mt19937_standard_seed_reference_vector ... ok
+2026-11-09T11:37:22.2137253Z test sampling::tests::penalty_window_positive_negative_and_reset ... ok
+2026-11-09T11:37:22.2138144Z test sampling::tests::reference_sampling_probability_cases ... ok
+2026-11-09T11:37:22.2138824Z test sampling::tests::xtc_source_case ... ok
+2026-11-09T11:37:22.2139603Z test speculative::tests::dropping_or_invalid_commit_leaves_live_state_untouched ... ok
+2026-11-09T11:37:22.2140492Z test speculative::tests::greedy_rejection_and_bonus ... ok
+2026-11-09T11:37:22.2144341Z test speculative::tests::partial_commit_restores_rng_and_history_exactly ... ok
+2026-11-09T11:37:22.2145440Z test speculative::tests::snapshot_budget_rejects_before_unbounded_chain_copying ... ok
+2026-11-09T11:37:22.2146146Z 
+2026-11-09T11:37:22.2146605Z test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+2026-11-09T11:37:22.2147596Z 
+2026-11-09T11:37:22.2167759Z [1m[92m     Running[0m unittests src\bin\llama-behavior.rs (target\debug\deps\llama_behavior-feaa84b84773c94a.exe)
+2026-11-09T11:37:22.2272944Z 
+2026-11-09T11:37:22.2274002Z running 0 tests
+2026-11-09T11:37:22.2274463Z 
+2026-11-09T11:37:22.2274921Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.2275322Z 
+2026-11-09T11:37:22.2291526Z [1m[92m     Running[0m tests\cli.rs (target\debug\deps\cli-a84b9b7b02350dd0.exe)
+2026-11-09T11:37:22.2382317Z 
+2026-11-09T11:37:22.2382625Z running 4 tests
+2026-11-09T11:37:22.2525062Z test chat_cli_preserves_exact_template_bytes ... ok
+2026-11-09T11:37:22.2591991Z test json_cli_preserves_large_integer_and_speculative_cli_bonus ... ok
+2026-11-09T11:37:22.2628714Z test sampler_cli_uses_real_logits_and_rejects_invalid_config ... ok
+2026-11-09T11:37:22.2748593Z test grammar_cli_distinguishes_match_mismatch_and_bad_input ... ok
+2026-11-09T11:37:22.2749084Z 
+2026-11-09T11:37:22.2750445Z test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+2026-11-09T11:37:22.2750854Z 
+2026-11-09T11:37:22.2767545Z [1m[92m     Running[0m tests\reference.rs (target\debug\deps\reference-76599682276c68d2.exe)
+2026-11-09T11:37:22.2858167Z 
+2026-11-09T11:37:22.2858513Z running 5 tests
+2026-11-09T11:37:22.2893759Z test all_eight_bundled_grammar_data_files_compile ... ok
+2026-11-09T11:37:22.2904894Z test original_bundled_json_and_arithmetic_grammar_membership ... ok
+2026-11-09T11:37:22.3037917Z test native_chat_540_original_output_transcripts ... ok
+2026-11-09T11:37:22.3042838Z test sampler_256_original_apply_and_accept_steps ... ok
+2026-11-09T11:37:22.3471133Z test grammar_232_original_prefix_and_completion_decisions ... ok
+2026-11-09T11:37:22.3471629Z 
+2026-11-09T11:37:22.3471945Z test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+2026-11-09T11:37:22.3472799Z 
+2026-11-09T11:37:22.3493665Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_conformance-5f57392855a9f468.exe)
+2026-11-09T11:37:22.3592639Z 
+2026-11-09T11:37:22.3593110Z running 20 tests
+2026-11-09T11:37:22.3599805Z test compare::tests::detects_mutation_and_truncation ... ok
+2026-11-09T11:37:22.3601255Z test benchmark::tests::warmups_are_excluded ... ok
+2026-11-09T11:37:22.3601920Z test compare::tests::numeric_budget_edges ... ok
+2026-11-09T11:37:22.3602798Z test benchmark::tests::statistics_use_sorted_samples_and_population_variance ... ok
+2026-11-09T11:37:22.3603619Z test digest::tests::crc_reference ... ok
+2026-11-09T11:37:22.3606038Z test digest::tests::published_sha_vectors ... ok
+2026-11-09T11:37:22.3609447Z test fixtures::tests::malformed_headers_paths_hashes_and_duplicate_rows_are_rejected ... ok
+2026-11-09T11:37:22.3610405Z test fixtures::tests::drift_wrong_size_missing_data_and_unrecorded_fixtures_fail ... ok
+2026-11-09T11:37:22.3612470Z test fixtures::tests::both_imported_schemas_validate_their_actual_fields ... ok
+2026-11-09T11:37:22.3613635Z test inventory::tests::cmake_test_names_and_multiline_overrides_survive ... ok
+2026-11-09T11:37:22.3614397Z test inventory::tests::hidden_executable_paths_are_rewrite_obligations ... ok
+2026-11-09T11:37:22.3618163Z test inventory::tests::ownership_specific_over_general ... ok
+2026-11-09T11:37:22.3619869Z test inventory::tests::removed_enum_comments_are_ignored ... ok
+2026-11-09T11:37:22.3727554Z test inventory::tests::drift_detection_catches_added_removed_changed_bytes ... ok
+2026-11-09T11:37:22.3750983Z test package::tests::cache_exclusions_require_root_location_and_cargo_signature ... ok
+2026-11-09T11:37:22.3755640Z test package::tests::source_audit_rejects_foreign_code ... ok
+2026-11-09T11:37:22.3757695Z test package::tests::special_data_roles_do_not_allow_arbitrary_foreign_implementations ... ok
+2026-11-09T11:37:22.3824481Z test package::tests::manifest_detects_same_length_corruption_and_extra_files ... ok
+2026-11-09T11:37:22.3843505Z test package::tests::archive_reproducible_and_no_caches ... ok
+2026-11-09T11:37:22.4494726Z test digest::tests::million_a_vector_and_chunk_boundaries ... ok
+2026-11-09T11:37:22.4495227Z 
+2026-11-09T11:37:22.4495574Z test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+2026-11-09T11:37:22.4496018Z 
+2026-11-09T11:37:22.4518683Z [1m[92m     Running[0m tests\cross_track.rs (target\debug\deps\cross_track-bf0d270a83929ed4.exe)
+2026-11-09T11:37:22.4621734Z 
+2026-11-09T11:37:22.4622477Z running 3 tests
+2026-11-09T11:37:22.4635565Z test unicode_chat_survives_json_and_incremental_grammar ... ok
+2026-11-09T11:37:22.4639301Z test accepted_speculative_prefix_preserves_future_sampling ... ok
+2026-11-09T11:37:22.4662133Z test bounded_malformed_corpus_never_panics_across_media_and_json ... ok
+2026-11-09T11:37:22.4662710Z 
+2026-11-09T11:37:22.4663161Z test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.4663783Z 
+2026-11-09T11:37:22.4683942Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_device_family-b250f67cf70c2959.exe)
+2026-11-09T11:37:22.4785757Z 
+2026-11-09T11:37:22.4786324Z running 21 tests
+2026-11-09T11:37:22.4793573Z test driver::tests::zero_and_oversize_allocations_are_rejected ... ok
+2026-11-09T11:37:22.4794625Z test planning::tests::peer_matrix_is_directional_and_staging_explicit ... ok
+2026-11-09T11:37:22.4795654Z test planning::tests::graph_replay_invalidates_each_relevant_change ... ok
+2026-11-09T11:37:22.4798521Z test planning::tests::row_partition_handles_boundaries_without_u64_overflow ... ok
+2026-11-09T11:37:22.4800079Z test planning::tests::bounded_partition_property_grid ... ok
+2026-11-09T11:37:22.4801637Z test planning::tests::row_partition_has_no_gaps_and_preserves_weights ... ok
+2026-11-09T11:37:22.4804784Z test planning::tests::waves_are_not_interchanged ... ok
+2026-11-09T11:37:22.4805699Z test ptx::tests::bad_buffers_and_instruction_budget_fail_explicitly ... ok
+2026-11-09T11:37:22.4806898Z test ptx::tests::f32_matvec_rejects_invalid_storage_and_output_aliasing ... ok
+2026-11-09T11:37:22.4807836Z test ptx::tests::malformed_typed_program_cannot_be_emitted ... ok
+2026-11-09T11:37:22.4816279Z test ptx::tests::noncontiguous_add_preserves_padding_and_handles_tail ... ok
+2026-11-09T11:37:22.4817581Z test ptx::tests::noncontiguous_q4_matvec_matches_independent_dense_dot ... ok
+2026-11-09T11:37:22.4821601Z test ptx::tests::q4_zero_negative_and_subnormal_scales_decode ... ok
+2026-11-09T11:37:22.4822785Z test ptx::tests::rejects_invalid_shapes_overflow_and_aliasing ... ok
+2026-11-09T11:37:22.4834735Z test ptx::tests::scale_emits_exact_float_bits_and_crosses_block_boundary ... ok
+2026-11-09T11:37:22.4838197Z test ptx::tests::sum_runs_generated_loop_with_strided_input ... ok
+2026-11-09T11:37:22.4839551Z test ptx::tests::f32_matvec_strides_broadcast_and_tail_match_independent_dot ... ok
+2026-11-09T11:37:22.4841110Z test ptx::tests::target_version_is_not_inferred_from_device_family ... ok
+2026-11-09T11:37:22.4841861Z test runtime::tests::cuda_is_not_disguised_as_hip_or_musa ... ok
+2026-11-09T11:37:22.4842544Z test tests::ranges_cannot_wrap_or_escape ... ok
+2026-11-09T11:37:22.4956142Z test ptx::tests::q4_nibbles_match_frozen_c_oracle_exactly ... ok
+2026-11-09T11:37:22.4956547Z 
+2026-11-09T11:37:22.4956888Z test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+2026-11-09T11:37:22.4957221Z 
+2026-11-09T11:37:22.4976384Z [1m[92m     Running[0m unittests examples\cuda_conformance.rs (target\debug\examples\cuda_conformance-708dde0b8769874c.exe)
+2026-11-09T11:37:22.5074602Z 
+2026-11-09T11:37:22.5075144Z running 0 tests
+2026-11-09T11:37:22.5075562Z 
+2026-11-09T11:37:22.5076000Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.5076622Z 
+2026-11-09T11:37:22.5093902Z [1m[92m     Running[0m unittests examples\cuda_smoke.rs (target\debug\examples\cuda_smoke-2ec7ead16a3ade2b.exe)
+2026-11-09T11:37:22.5185075Z 
+2026-11-09T11:37:22.5185540Z running 0 tests
+2026-11-09T11:37:22.5185918Z 
+2026-11-09T11:37:22.5186349Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.5186939Z 
+2026-11-09T11:37:22.5204125Z [1m[92m     Running[0m unittests examples\device_probe.rs (target\debug\examples\device_probe-3101468aba1a6ee4.exe)
+2026-11-09T11:37:22.5294046Z 
+2026-11-09T11:37:22.5294595Z running 0 tests
+2026-11-09T11:37:22.5295073Z 
+2026-11-09T11:37:22.5295650Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.5296398Z 
+2026-11-09T11:37:22.5313518Z [1m[92m     Running[0m unittests examples\record_q4_reference.rs (target\debug\examples\record_q4_reference-33ccec7fe387e93a.exe)
+2026-11-09T11:37:22.5406028Z 
+2026-11-09T11:37:22.5406549Z running 0 tests
+2026-11-09T11:37:22.5406975Z 
+2026-11-09T11:37:22.5407403Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.5407951Z 
+2026-11-09T11:37:22.5424144Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_ffi-c7b6eacbc6806f3c.exe)
+2026-11-09T11:37:22.5513409Z 
+2026-11-09T11:37:22.5514058Z running 5 tests
+2026-11-09T11:37:22.5518203Z test abi::tests::frozen_x64_layout ... ok
+2026-11-09T11:37:22.5519329Z test batch::tests::unsafe_allocation_sizes_fail_without_allocating ... ok
+2026-11-09T11:37:22.5520241Z test tests::count_only_and_truncated_buffers_follow_c_conventions ... ok
+2026-11-09T11:37:22.5521220Z test batch::tests::allocated_token_and_embedding_batches_have_native_shape_and_safe_free ... ok
+2026-11-09T11:37:22.6131453Z test tests::panic_is_contained_and_diagnostic_is_thread_local ... ok
+2026-11-09T11:37:22.6131999Z 
+2026-11-09T11:37:22.6132375Z test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+2026-11-09T11:37:22.6132765Z 
+2026-11-09T11:37:22.6171654Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_gguf-c5a486ed5fd22931.exe)
+2026-11-09T11:37:22.6269270Z 
+2026-11-09T11:37:22.6269953Z running 6 tests
+2026-11-09T11:37:22.6278317Z test tests::big_endian_metadata_and_scalar_payload ... ok
+2026-11-09T11:37:22.6279350Z test tests::metadata_budget_and_counts_are_enforced ... ok
+2026-11-09T11:37:22.6281450Z test tests::overlap_is_rejected ... ok
+2026-11-09T11:37:22.6282906Z test tests::roundtrip_preserves_types_and_payload ... ok
+2026-11-09T11:37:22.6283505Z test tests::writer_rejects_invalid_arrays ... ok
+2026-11-09T11:37:22.6284111Z test tests::every_truncated_header_and_payload_is_rejected ... ok
+2026-11-09T11:37:22.6284419Z 
+2026-11-09T11:37:22.6284806Z test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.6285311Z 
+2026-11-09T11:37:22.6303870Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_inference-a4e5dafdaab291e9.exe)
+2026-11-09T11:37:22.6404042Z 
+2026-11-09T11:37:22.6404602Z running 5 tests
+2026-11-09T11:37:22.6410788Z test stream::tests::invalid_utf8_and_tail_are_replaced_once ... ok
+2026-11-09T11:37:22.6411756Z test stream::tests::sink_failure_propagates ... ok
+2026-11-09T11:37:22.6412488Z test stream::tests::unmatched_stop_prefix_is_flushed ... ok
+2026-11-09T11:37:22.6413333Z test stream::tests::stop_spans_tokens_without_leaking_prefix ... ok
+2026-11-09T11:37:22.6414063Z test stream::tests::utf8_is_preserved_across_every_byte_boundary ... ok
+2026-11-09T11:37:22.6414386Z 
+2026-11-09T11:37:22.6414733Z test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.6415462Z 
+2026-11-09T11:37:22.6437203Z [1m[92m     Running[0m tests\native_reference.rs (target\debug\deps\native_reference-af3aefe3203c19a0.exe)
+2026-11-09T11:37:22.6535768Z 
+2026-11-09T11:37:22.6536628Z running 3 tests
+2026-11-09T11:37:22.6538036Z test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories15M-q4_0.gguf; set LLAMA_TEST_Q4_MODEL and run --release --ignored --nocapture
+2026-11-09T11:37:22.6540337Z test trained_stories260k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories260K.gguf; set LLAMA_TEST_MODEL and run --ignored --nocapture
+2026-11-09T11:37:22.7858220Z test original_spm_68_unicode_special_and_empty_cases ... ok
+2026-11-09T11:37:22.7859101Z 
+2026-11-09T11:37:22.7859412Z test result: ok. 1 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.13s
+2026-11-09T11:37:22.7859856Z 
+2026-11-09T11:37:22.7885495Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_kernel_ir-ec4e89c650bcc8a1.exe)
+2026-11-09T11:37:22.7986906Z 
+2026-11-09T11:37:22.7987504Z running 0 tests
+2026-11-09T11:37:22.7987811Z 
+2026-11-09T11:37:22.7988094Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:22.7988489Z 
+2026-11-09T11:37:22.8005431Z [1m[92m     Running[0m tests\semantics.rs (target\debug\deps\semantics-a8e009191b693683.exe)
+2026-11-09T11:37:22.8099930Z 
+2026-11-09T11:37:22.8100580Z running 15 tests
+2026-11-09T11:37:22.8111988Z test empty_kernel_cannot_bypass_dispatch_budget ... ok
+2026-11-09T11:37:22.8133340Z test failures_roll_back_buffers_and_bound_work ... ok
+2026-11-09T11:37:22.8138944Z test changing_outer_loop_bound_is_snapshotted_in_every_emitter ... ok
+2026-11-09T11:37:22.8143284Z test loop_iteration_budget_cannot_underflow_after_body_exhaustion ... ok
+2026-11-09T11:37:22.8153168Z test matmul_transposed_strides_match_scalar_dot_products ... ok
+2026-11-09T11:37:22.8159340Z test half_conversion_exhaustive_matches_integer_normalization ... ok
+2026-11-09T11:37:22.8165879Z test nonlinear_and_scale_kernels_match_direct_formulas ... ok
+2026-11-09T11:37:22.8180942Z test q4_exact_nibble_order_unaligned_scale_and_vector_stride ... ok
+2026-11-09T11:37:22.8186715Z test softmax_stable_at_large_finite_logits ... ok
+2026-11-09T11:37:22.8189211Z test nested_select_validation_visits_each_branch_once ... ok
+2026-11-09T11:37:22.8192570Z test strided_pointwise_preserves_gaps_and_tail ... ok
+2026-11-09T11:37:22.8200996Z test validation_rejects_shape_overflow_type_confusion_and_writes_to_inputs ... ok
+2026-11-09T11:37:22.8202011Z test strided_row_sum_and_rms_match_f64_oracle ... ok
+2026-11-09T11:37:22.8341447Z test all_four_emitters_are_deterministic_and_include_tail_guards ... ok
+2026-11-09T11:37:22.9027795Z test digest_and_cache_keys_have_known_and_distinct_results ... ok
+2026-11-09T11:37:22.9028233Z 
+2026-11-09T11:37:22.9028777Z test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+2026-11-09T11:37:22.9029242Z 
+2026-11-09T11:37:22.9051742Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_media-4117c91c33f83a46.exe)
+2026-11-09T11:37:22.9149644Z 
+2026-11-09T11:37:22.9150118Z running 4 tests
+2026-11-09T11:37:22.9155959Z test png::tests::stored_blocks_checksum_and_expansion_bound ... ok
+2026-11-09T11:37:22.9156832Z test png::tests::standard_checksums ... ok
+2026-11-09T11:37:22.9157448Z test png::tests::corrupt_huffman_tables_are_rejected ... ok
+2026-11-09T11:37:22.9602988Z test png::tests::bounded_malformed_deflate_corpus_has_no_panics ... ok
+2026-11-09T11:37:22.9603390Z 
+2026-11-09T11:37:22.9603778Z test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+2026-11-09T11:37:22.9604172Z 
+2026-11-09T11:37:22.9624958Z [1m[92m     Running[0m tests\png.rs (target\debug\deps\png-da873e04dd19b5a5.exe)
+2026-11-09T11:37:22.9720382Z 
+2026-11-09T11:37:22.9720781Z running 2 tests
+2026-11-09T11:37:22.9774729Z test png_truncation_crc_and_limits_are_enforced ... ok
+2026-11-09T11:37:23.1009326Z test png_color_depths_filters_and_original_fixture_match_stb_bytes ... ok
+2026-11-09T11:37:23.1009783Z 
+2026-11-09T11:37:23.1010089Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+2026-11-09T11:37:23.1010411Z 
+2026-11-09T11:37:23.1034924Z [1m[92m     Running[0m tests\reference.rs (target\debug\deps\reference-52566900f4b35698.exe)
+2026-11-09T11:37:23.1133566Z 
+2026-11-09T11:37:23.1133950Z running 7 tests
+2026-11-09T11:37:23.1141489Z test image_decoders_match_original_stb ... ok
+2026-11-09T11:37:23.1142337Z test normalization_and_smart_size_match_original ... ok
+2026-11-09T11:37:23.1145270Z test image_resampling_matches_original_bytes ... ok
+2026-11-09T11:37:23.1145947Z test streaming_synthesis_matches_original ... ok
+2026-11-09T11:37:23.1148524Z test wav_samples_match_original_miniaudio ... ok
+2026-11-09T11:37:23.1149232Z test filterbanks_and_log_mel_match_original ... ok
+2026-11-09T11:37:23.1154320Z test real_fft_and_windows_match_original ... ok
+2026-11-09T11:37:23.1154765Z 
+2026-11-09T11:37:23.1155162Z test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.1155540Z 
+2026-11-09T11:37:23.1173771Z [1m[92m     Running[0m tests\robustness.rs (target\debug\deps\robustness-aba75b0c69275773.exe)
+2026-11-09T11:37:23.1270141Z 
+2026-11-09T11:37:23.1271002Z running 18 tests
+2026-11-09T11:37:23.1278541Z test crop_composite_and_tile_positions_are_checked ... ok
+2026-11-09T11:37:23.1279401Z test every_codec_fixture_prefix_is_rejected_without_panicking ... ok
+2026-11-09T11:37:23.1281800Z test fixed_count_video_selection_retains_reference_ties_and_repetition ... ok
+2026-11-09T11:37:23.1283070Z test invalid_resampler_input_does_not_change_next_output ... ok
+2026-11-09T11:37:23.1285740Z test istft_reset_and_flush_have_explicit_lifecycle ... ok
+2026-11-09T11:37:23.1289099Z test malformed_headers_and_resource_limits_fail_before_large_allocations ... ok
+2026-11-09T11:37:23.1293149Z test malformed_wav_alignment_compression_and_nonfinite_samples ... ok
+2026-11-09T11:37:23.1294284Z test constant_images_and_identity_are_preserved_by_every_resize_filter ... ok
+2026-11-09T11:37:23.1297419Z test resize_bounds_and_normalization_are_explicit ... ok
+2026-11-09T11:37:23.1300730Z test sequence_cancellation_and_timestamp_order_are_isolated ... ok
+2026-11-09T11:37:23.1303639Z test smart_resize_handles_ties_and_conflicting_bounds ... ok
+2026-11-09T11:37:23.1312956Z test linear_resampler_output_is_chunk_invariant_and_resettable ... ok
+2026-11-09T11:37:23.1317338Z test stft_frame_count_and_spectrogram_layout_are_consistent ... ok
+2026-11-09T11:37:23.1320588Z test wav_roundtrip_and_stereo_downmix_preserve_samples ... ok
+2026-11-09T11:37:23.1323094Z test spectral_validation_and_zero_energy_are_finite ... ok
+2026-11-09T11:37:23.1324083Z test waveform_padding_and_embedding_shape_do_not_fabricate_values ... ok
+2026-11-09T11:37:23.1342736Z test fft_matches_independent_direct_dft_and_roundtrip ... ok
+2026-11-09T11:37:23.2415764Z test rejected_stream_work_preserves_next_successful_output ... ok
+2026-11-09T11:37:23.2416201Z 
+2026-11-09T11:37:23.2416518Z test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+2026-11-09T11:37:23.2416843Z 
+2026-11-09T11:37:23.2443742Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_model_runtime-3736fa5bb7b43e65.exe)
+2026-11-09T11:37:23.2547085Z 
+2026-11-09T11:37:23.2547397Z running 5 tests
+2026-11-09T11:37:23.2552691Z test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+2026-11-09T11:37:23.2555059Z test math::packed_matrix_tests::unsupported_dot_types_are_rejected_at_load ... ok
+2026-11-09T11:37:23.2556300Z test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+2026-11-09T11:37:23.2557991Z test math::packed_matrix_tests::packed_matrix_preserves_storage_and_native_activation_quantization ... ok
+2026-11-09T11:37:23.2558598Z test state::tests::known_crc32_vector ... ok
+2026-11-09T11:37:23.2558802Z 
+2026-11-09T11:37:23.2559093Z test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.2559429Z 
+2026-11-09T11:37:23.2574705Z [1m[92m     Running[0m tests\numerical_reference.rs (target\debug\deps\numerical_reference-0fc8ed8e924be61b.exe)
+2026-11-09T11:37:23.2671256Z 
+2026-11-09T11:37:23.2671640Z running 3 tests
+2026-11-09T11:37:23.2683203Z test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+2026-11-09T11:37:23.2684015Z test llama_outputs_match_frozen_ggml_graph ... ok
+2026-11-09T11:37:23.2684663Z test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+2026-11-09T11:37:23.2685078Z 
+2026-11-09T11:37:23.2685443Z test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.2686169Z 
+2026-11-09T11:37:23.2702331Z [1m[92m     Running[0m tests\runtime.rs (target\debug\deps\runtime-26cf6fa4507023e8.exe)
+2026-11-09T11:37:23.2794734Z 
+2026-11-09T11:37:23.2795203Z running 29 tests
+2026-11-09T11:37:23.2807411Z test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+2026-11-09T11:37:23.2808367Z test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+2026-11-09T11:37:23.2810995Z test bad_adapters_leave_configuration_and_state_unchanged ... ok
+2026-11-09T11:37:23.2815318Z test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+2026-11-09T11:37:23.2817033Z test context_limit_failure_preserves_prior_state ... ok
+2026-11-09T11:37:23.2823730Z test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+2026-11-09T11:37:23.2826519Z test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+2026-11-09T11:37:23.2828487Z test copied_prefix_diverges_without_mutating_original_sequence ... ok
+2026-11-09T11:37:23.2832550Z test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+2026-11-09T11:37:23.2836515Z test batching_and_microbatch_boundaries_preserve_decode ... ok
+2026-11-09T11:37:23.2837313Z test kv_suffix_truncation_matches_recomputed_prefix ... ok
+2026-11-09T11:37:23.2838048Z test interleaved_sequences_remain_independent ... ok
+2026-11-09T11:37:23.2841562Z test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+2026-11-09T11:37:23.2842710Z test malformed_model_shapes_and_norms_fail_before_execution ... ok
+2026-11-09T11:37:23.2845394Z test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+2026-11-09T11:37:23.2846636Z test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+2026-11-09T11:37:23.2848096Z test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+2026-11-09T11:37:23.2849105Z test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+2026-11-09T11:37:23.2850914Z test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+2026-11-09T11:37:23.2853234Z test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+2026-11-09T11:37:23.2856265Z test requested_outputs_are_selected_without_dropping_state_updates ... ok
+2026-11-09T11:37:23.2857748Z test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+2026-11-09T11:37:23.2859108Z test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+2026-11-09T11:37:23.2864548Z test state_rejects_different_model_weights_or_adapters ... ok
+2026-11-09T11:37:23.2865526Z test supplied_embeddings_match_tokens_and_validate_shape ... ok
+2026-11-09T11:37:23.2867074Z test smoke_demo_is_real_execution_with_reproducible_state ... ok
+2026-11-09T11:37:23.2869991Z test valid_control_vector_resets_cache_and_changes_model_output ... ok
+2026-11-09T11:37:23.2876369Z test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+2026-11-09T11:37:23.3017284Z test truncated_or_corrupted_state_never_mutates_context ... ok
+2026-11-09T11:37:23.3018240Z 
+2026-11-09T11:37:23.3018626Z test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+2026-11-09T11:37:23.3019126Z 
+2026-11-09T11:37:23.3038947Z [1m[92m     Running[0m unittests examples\build_reference.rs (target\debug\examples\build_reference-ea8e763f9308593a.exe)
+2026-11-09T11:37:23.3132091Z 
+2026-11-09T11:37:23.3132664Z running 0 tests
+2026-11-09T11:37:23.3133188Z 
+2026-11-09T11:37:23.3133542Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3133982Z 
+2026-11-09T11:37:23.3151138Z [1m[92m     Running[0m unittests examples\reference_oracle.rs (target\debug\examples\reference_oracle-0651fdb7ed24b805.exe)
+2026-11-09T11:37:23.3242451Z 
+2026-11-09T11:37:23.3242843Z running 0 tests
+2026-11-09T11:37:23.3243091Z 
+2026-11-09T11:37:23.3243539Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3244116Z 
+2026-11-09T11:37:23.3260528Z [1m[92m     Running[0m unittests examples\registry_audit.rs (target\debug\examples\registry_audit-98ebcaa00b217e6b.exe)
+2026-11-09T11:37:23.3350906Z 
+2026-11-09T11:37:23.3351269Z running 0 tests
+2026-11-09T11:37:23.3351535Z 
+2026-11-09T11:37:23.3351944Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3352331Z 
+2026-11-09T11:37:23.3367955Z [1m[92m     Running[0m unittests examples\smoke.rs (target\debug\examples\smoke-18d5af6d41a177fd.exe)
+2026-11-09T11:37:23.3455435Z 
+2026-11-09T11:37:23.3456081Z running 0 tests
+2026-11-09T11:37:23.3456339Z 
+2026-11-09T11:37:23.3456650Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3457128Z 
+2026-11-09T11:37:23.3472754Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_platform_loader-ad8df9799e27af36.exe)
+2026-11-09T11:37:23.3565964Z 
+2026-11-09T11:37:23.3566574Z running 2 tests
+2026-11-09T11:37:23.3585899Z test tests::loads_real_windows_symbol_and_rejects_missing ... ok
+2026-11-09T11:37:23.3587092Z test tests::missing_library_is_an_error ... ok
+2026-11-09T11:37:23.3587386Z 
+2026-11-09T11:37:23.3587649Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3588152Z 
+2026-11-09T11:37:23.3604457Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_portable_gpu-80a4f2760c241916.exe)
+2026-11-09T11:37:23.3696301Z 
+2026-11-09T11:37:23.3696768Z running 0 tests
+2026-11-09T11:37:23.3697093Z 
+2026-11-09T11:37:23.3697972Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3698334Z 
+2026-11-09T11:37:23.3714085Z [1m[92m     Running[0m tests\compiler_validation.rs (target\debug\deps\compiler_validation-86bab66edd119092.exe)
+2026-11-09T11:37:23.3808435Z 
+2026-11-09T11:37:23.3808881Z running 2 tests
+2026-11-09T11:37:23.3809942Z test glsl_corpus_compiles_to_real_spirv ... ignored, requires a separately installed shaderc compiler; run explicitly for compiler evidence
+2026-11-09T11:37:23.3828218Z test non_glsl_input_is_rejected_before_compilation_when_compiler_present ... ok
+2026-11-09T11:37:23.3828847Z 
+2026-11-09T11:37:23.3829262Z test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3829652Z 
+2026-11-09T11:37:23.3846316Z [1m[92m     Running[0m tests\frozen_quant_oracle.rs (target\debug\deps\frozen_quant_oracle-423107bbaa11f5fa.exe)
+2026-11-09T11:37:23.3941838Z 
+2026-11-09T11:37:23.3942241Z running 1 test
+2026-11-09T11:37:23.3943840Z test q4_and_half_match_frozen_ggml_symbols ... ignored, requires LLAMA_REFERENCE_LIBRARY pointing at an isolated frozen GGML reference build
+2026-11-09T11:37:23.3944753Z 
+2026-11-09T11:37:23.3945037Z test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.3945739Z 
+2026-11-09T11:37:23.3963357Z [1m[92m     Running[0m unittests examples\opencl_conformance.rs (target\debug\examples\opencl_conformance-d34d4579d107d264.exe)
+2026-11-09T11:37:23.4057065Z 
+2026-11-09T11:37:23.4057563Z running 0 tests
+2026-11-09T11:37:23.4058307Z 
+2026-11-09T11:37:23.4059336Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.4059764Z 
+2026-11-09T11:37:23.4075543Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_quant-4613be6d4261c9b7.exe)
+2026-11-09T11:37:23.4166371Z 
+2026-11-09T11:37:23.4167855Z running 0 tests
+2026-11-09T11:37:23.4168460Z 
+2026-11-09T11:37:23.4168945Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.4169362Z 
+2026-11-09T11:37:23.4184379Z [1m[92m     Running[0m tests\matvec.rs (target\debug\deps\matvec-46851d9554f5f568.exe)
+2026-11-09T11:37:23.4274437Z 
+2026-11-09T11:37:23.4274869Z running 3 tests
+2026-11-09T11:37:23.4280141Z test matvec_rejects_unimplemented_paths_and_malformed_rows ... ok
+2026-11-09T11:37:23.4281545Z test activation_quantization_is_not_replaced_with_a_dense_dot ... ok
+2026-11-09T11:37:23.4427251Z test native_matvec_matches_generic_c_and_real_ggml_graphs ... ok
+2026-11-09T11:37:23.4427762Z 
+2026-11-09T11:37:23.4428868Z test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+2026-11-09T11:37:23.4429610Z 
+2026-11-09T11:37:23.4448948Z [1m[92m     Running[0m tests\reference.rs (target\debug\deps\reference-6fd73f9dc6a83789.exe)
+2026-11-09T11:37:23.4542218Z 
+2026-11-09T11:37:23.4542605Z running 8 tests
+2026-11-09T11:37:23.4548359Z test bf16_and_fp8_edge_cases_are_ieee_correct ... ok
+2026-11-09T11:37:23.4550061Z test malformed_rows_are_rejected_before_output_is_changed ... ok
+2026-11-09T11:37:23.4551570Z test multiblock_decode_does_not_interleave_or_bleed_rows ... ok
+2026-11-09T11:37:23.4553992Z test numeric_ids_preserve_every_reserved_hole ... ok
+2026-11-09T11:37:23.4554799Z test quantizer_fails_clearly_without_mutating_the_destination ... ok
+2026-11-09T11:37:23.4575864Z test half_ieee_boundaries_and_ties_are_explicit ... ok
+2026-11-09T11:37:23.4646242Z test reference_encoders_match_frozen_c_bytes ... ok
+2026-11-09T11:37:23.4743837Z test all_active_decoders_match_independent_frozen_c_reference ... ok
+2026-11-09T11:37:23.4744388Z 
+2026-11-09T11:37:23.4744907Z test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+2026-11-09T11:37:23.4745286Z 
+2026-11-09T11:37:23.4772174Z [1m[92m     Running[0m unittests src\lib.rs (target\debug\deps\llama_server-5691d2a02baebf2e.exe)
+2026-11-09T11:37:23.4869065Z 
+2026-11-09T11:37:23.4869522Z running 18 tests
+2026-11-09T11:37:23.4877982Z test client::tests::html_text_is_escaped ... ok
+2026-11-09T11:37:23.4879362Z test http::tests::duplicate_query_and_bad_percent_are_errors ... ok
+2026-11-09T11:37:23.4880697Z test http::tests::enforces_limits_before_body_allocation ... ok
+2026-11-09T11:37:23.4882043Z test http::tests::arbitrary_public_limits_cannot_overflow_and_bad_headers_write_nothing ... ok
+2026-11-09T11:37:23.4883281Z test http::tests::rejects_smuggling_and_malformed_headers ... ok
+2026-11-09T11:37:23.4884251Z test runtime::tests::aliases_seed_and_temperature_never_silently_truncate ... ok
+2026-11-09T11:37:23.4887172Z test runtime::tests::invalid_stop_and_token_budgets_are_errors ... ok
+2026-11-09T11:37:23.4888432Z test runtime::tests::options_preserve_limits_stops_and_deterministic_seed ... ok
+2026-11-09T11:37:23.4890300Z test runtime::tests::unimplemented_sampling_and_message_options_are_rejected ... ok
+2026-11-09T11:37:23.4891947Z test stream::tests::completed_replay_expires_but_active_does_not ... ok
+2026-11-09T11:37:23.4899061Z test http::tests::request_at_every_split_boundary ... ok
+2026-11-09T11:37:23.4901028Z test stream::tests::blocked_sender_observes_cancel_and_disconnect ... ok
+2026-11-09T11:37:23.4902641Z test stream::tests::queue_timeout_and_oversize_are_explicit ... ok
+2026-11-09T11:37:23.4904366Z test stream::tests::replay_overflow_preserves_raw_suffix_and_absolute_offsets ... ok
+2026-11-09T11:37:23.4905846Z test stream::tests::replay_replacement_lookup_cancel_and_future_offset ... ok
+2026-11-09T11:37:23.4906669Z test stream::tests::concurrent_queue_never_exceeds_byte_budget ... ok
+2026-11-09T11:37:23.4907331Z test stream::tests::sse_multiline_framing ... ok
+2026-11-09T11:37:23.4908024Z test stream::tests::utf8_decoder_handles_every_byte_boundary ... ok
+2026-11-09T11:37:23.4908467Z 
+2026-11-09T11:37:23.4908851Z test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.4909469Z 
+2026-11-09T11:37:23.4925036Z [1m[92m     Running[0m unittests src\main.rs (target\debug\deps\llama_server-7421010a42279271.exe)
+2026-11-09T11:37:23.5018820Z 
+2026-11-09T11:37:23.5019204Z running 0 tests
+2026-11-09T11:37:23.5019443Z 
+2026-11-09T11:37:23.5019892Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-09T11:37:23.5020412Z 
+2026-11-09T11:37:23.5038564Z [1m[92m     Running[0m tests\tcp.rs (target\debug\deps\tcp-b845e73be8c9d8ef.exe)
+2026-11-09T11:37:23.5132547Z 
+2026-11-09T11:37:23.5132821Z running 20 tests
+2026-11-09T11:37:23.5218660Z test disconnect_cancels_ordinary_stream_and_releases_admission ... ok
+2026-11-09T11:37:23.5460879Z test completed_replay_returns_exact_byte_suffix_and_lookup_metadata ... ok
+2026-11-09T11:37:23.5501648Z test auth_cors_preflight_and_typed_failures ... ok
+2026-11-09T11:37:23.5563462Z test malformed_framing_is_rejected_on_the_wire ... ok
+2026-11-09T11:37:23.5788743Z test native_and_openai_completion_shapes_and_usage ... ok
+2026-11-09T11:37:23.6000581Z test connection_admission_limit_rejects_excess_socket ... FAILED
+2026-11-09T11:37:23.6092123Z test invalid_json_unsupported_features_and_tokens_are_explicit ... ok
+2026-11-09T11:37:23.6233744Z test provider_error_and_panic_are_typed_without_a_second_status_line ... ok
+2026-11-09T11:37:23.6368966Z test disconnected_replay_generation_still_has_an_absolute_deadline ... ok
+2026-11-09T11:37:23.6393807Z test replay_overflow_is_explicit_and_delete_is_idempotent ... ok
+2026-11-09T11:37:23.6399539Z test runtime_preflight_rejects_before_stream_or_replay_creation ... ok
+2026-11-09T11:37:23.6425592Z test replay_survives_disconnect_then_resumes_and_explicit_delete_cancels ... ok
+2026-11-09T11:37:23.6512681Z test simultaneous_generation_admission_is_bounded ... ok
+2026-11-09T11:37:23.6579803Z test streaming_chat_emits_role_deltas_finish_and_done ... ok
+2026-11-09T11:37:23.6591126Z test shutdown_interrupts_incomplete_request_without_waiting_full_timeout ... ok
+2026-11-09T11:37:23.6600295Z test slow_network_reader_applies_backpressure_with_a_bounded_wait ... ok
+2026-11-09T11:37:23.6872449Z test tokenizer_never_ignores_unimplemented_modes ... ok
+2026-11-09T11:37:23.6878110Z test unavailable_binary_contract_over_tcp ... ok
+2026-11-09T11:37:23.7293513Z test template_endpoint_matches_independent_chatml_transcripts ... ok
+2026-11-09T11:37:23.7676003Z test slow_drip_cannot_extend_absolute_request_deadline ... ok
+2026-11-09T11:37:23.7676824Z 
+2026-11-09T11:37:23.7677380Z failures:
+2026-11-09T11:37:23.7677537Z 
+2026-11-09T11:37:23.7677794Z ---- connection_admission_limit_rejects_excess_socket stdout ----
+2026-11-09T11:37:23.7678335Z 
+2026-11-09T11:37:23.7678825Z thread 'connection_admission_limit_rejects_excess_socket' (2232) panicked at crates\llama-server\tests\tcp.rs:178:38:
+2026-11-09T11:37:23.7680181Z called `Result::unwrap()` on an `Err` value: Os { code: 10054, kind: ConnectionReset, message: "An existing connection was forcibly closed by the remote host." }
+2026-11-09T11:37:23.7681140Z stack backtrace:
+2026-11-09T11:37:23.7681568Z    0: std::panicking::panic_handler
+2026-11-09T11:37:23.7682241Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\std\src\panicking.rs:679
+2026-11-09T11:37:23.7682857Z    1: core::panicking::panic_fmt
+2026-11-09T11:37:23.7683799Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\panicking.rs:80
+2026-11-09T11:37:23.7684296Z    2: core::result::unwrap_failed
+2026-11-09T11:37:23.7684733Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\result.rs:1871
+2026-11-09T11:37:23.7685350Z    3: enum2$<core::result::Result<tuple$<>,core::io::error::Error> >::unwrap
+2026-11-09T11:37:23.7685905Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\result.rs:1232
+2026-11-09T11:37:23.7686571Z    4: tcp::read_head
+2026-11-09T11:37:23.7686997Z              at .\tests\tcp.rs:178
+2026-11-09T11:37:23.7687477Z    5: tcp::connection_admission_limit_rejects_excess_socket
+2026-11-09T11:37:23.7687887Z              at .\tests\tcp.rs:873
+2026-11-09T11:37:23.7688290Z    6: tcp::connection_admission_limit_rejects_excess_socket::closure$0
+2026-11-09T11:37:23.7688692Z              at .\tests\tcp.rs:862
+2026-11-09T11:37:23.7689299Z    7: core::ops::function::FnOnce::call_once<tcp::connection_admission_limit_rejects_excess_socket::closure_env$0,tuple$<> >
+2026-11-09T11:37:23.7690046Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\ops\function.rs:250
+2026-11-09T11:37:23.7690585Z    8: core::ops::function::FnOnce::call_once
+2026-11-09T11:37:23.7691069Z              at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library\core\src\ops\function.rs:250
+2026-11-09T11:37:23.7691659Z note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+2026-11-09T11:37:23.7692030Z 
+2026-11-09T11:37:23.7692034Z 
+2026-11-09T11:37:23.7692132Z failures:
+2026-11-09T11:37:23.7692443Z     connection_admission_limit_rejects_excess_socket
+2026-11-09T11:37:23.7692692Z 
+2026-11-09T11:37:23.7692962Z test result: FAILED. 19 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+2026-11-09T11:37:23.7693610Z 
+2026-11-09T11:37:23.7720493Z [1m[91merror[0m: test failed, to rerun pass `-p llama-server --test tcp`
+2026-11-09T11:37:23.8672861Z ##[error]Process completed with exit code 1.
+2026-11-09T11:37:23.8949242Z Post job cleanup.
+2026-11-09T11:37:24.0674249Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-09T11:37:24.1105388Z git version 2.56.0.windows.4
+2026-11-09T11:37:24.1177745Z Temporarily overriding HOME='D:\a\_temp\74c7d092-0227-4825-b514-8658d800f5e7' before making global git config changes
+2026-11-09T11:37:24.1179056Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T11:37:24.1188642Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\rust-llama\rust-llama
+2026-11-09T11:37:24.1616698Z Removing SSH command configuration
+2026-11-09T11:37:24.1630274Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T11:37:24.2028713Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-09T11:37:24.7722741Z Removing HTTP extra header
+2026-11-09T11:37:24.7734090Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T11:37:24.8122371Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-09T11:37:25.3686176Z Removing includeIf entries pointing to credentials config files
+2026-11-09T11:37:25.3697665Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T11:37:25.4026084Z includeif.gitdir:D:/a/rust-llama/rust-llama/.git.path
+2026-11-09T11:37:25.4026993Z includeif.gitdir:D:/a/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-09T11:37:25.4028097Z includeif.gitdir:/github/workspace/.git.path
+2026-11-09T11:37:25.4028613Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-09T11:37:25.4076418Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/rust-llama/rust-llama/.git.path
+2026-11-09T11:37:25.4407931Z D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:37:25.4464707Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/rust-llama/rust-llama/.git.path D\:\\a\\_temp\\git\-credentials\-b0163100\-f75d\-49fe\-8677\-f174a51a3df9\.config
+2026-11-09T11:37:25.4892858Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-09T11:37:25.5217634Z D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:37:25.5264712Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/rust-llama/rust-llama/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-b0163100\-f75d\-49fe\-8677\-f174a51a3df9\.config
+2026-11-09T11:37:25.5634153Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-09T11:37:25.5958745Z /github/runner_temp/git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:37:25.6002966Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-b0163100\-f75d\-49fe\-8677\-f174a51a3df9\.config
+2026-11-09T11:37:25.6380833Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-09T11:37:25.6706820Z /github/runner_temp/git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config
+2026-11-09T11:37:25.6752196Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-b0163100\-f75d\-49fe\-8677\-f174a51a3df9\.config
+2026-11-09T11:37:25.7127550Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-09T11:37:26.2488865Z Removing credentials config 'D:\a\_temp\git-credentials-b0163100-f75d-49fe-8677-f174a51a3df9.config'
+2026-11-09T11:37:26.2704413Z Cleaning up orphan processes
+2026-11-09T11:37:26.3425537Z Terminate orphan process: pid (7928) (vctip)

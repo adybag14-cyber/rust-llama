@@ -5,7 +5,7 @@ use crate::stream::*;
 use llama_behavior::json::{self, Value};
 use std::collections::BTreeMap;
 use std::io::{self, Read, Write};
-use std::net::{SocketAddr, TcpListener, TcpStream};
+use std::net::{Shutdown, SocketAddr, TcpListener, TcpStream};
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread::{self, JoinHandle};
@@ -220,6 +220,41 @@ fn reap(handles: &mut Vec<JoinHandle<()>>) {
     }
 }
 
+/// Finish a normal overload response before releasing the socket. In particular,
+/// Winsock can replace an immediate close with a reset when request bytes remain
+/// unread, preventing the peer from observing the already-written HTTP response.
+fn reject_connection(socket: &mut TcpStream) -> io::Result<()> {
+    socket.set_write_timeout(Some(Duration::from_millis(100)))?;
+    write_error(
+        socket,
+        &ProviderError::new(503, "server_busy", "Connection limit reached"),
+        &[],
+    )?;
+    socket.shutdown(Shutdown::Write)?;
+    // This executes on the accept loop: neither a slow sender nor an oversized
+    // upload may hold it indefinitely. Drain ordinary requests, then close.
+    let deadline = Instant::now() + Duration::from_millis(50);
+    let mut remaining = 8192usize;
+    let mut buffer = [0u8; 1024];
+    while remaining != 0 {
+        let Some(left) = deadline.checked_duration_since(Instant::now()) else {
+            break;
+        };
+        if left.is_zero() {
+            break;
+        }
+        socket.set_read_timeout(Some(left))?;
+        let count = remaining.min(buffer.len());
+        match socket.read(&mut buffer[..count]) {
+            Ok(0) => break,
+            Ok(n) => remaining -= n,
+            Err(e) if e.kind() == io::ErrorKind::Interrupted => {}
+            Err(_) => break,
+        }
+    }
+    Ok(())
+}
+
 fn serve(listener: TcpListener, shared: Arc<Shared>) -> io::Result<()> {
     let mut workers = Vec::new();
     while !shared.shutdown.is_cancelled() {
@@ -236,12 +271,7 @@ fn serve(listener: TcpListener, shared: Arc<Shared>) -> io::Result<()> {
                 socket.set_write_timeout(Some(shared.config.write_timeout))?;
                 socket.set_nodelay(true)?;
                 if !acquire(&shared.connections, shared.config.max_connections) {
-                    socket.set_write_timeout(Some(Duration::from_millis(100)))?;
-                    let _ = write_error(
-                        &mut socket,
-                        &ProviderError::new(503, "server_busy", "Connection limit reached"),
-                        &[],
-                    );
+                    let _ = reject_connection(&mut socket);
                     continue;
                 }
                 let state = shared.clone();
