@@ -1,0 +1,60 @@
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\model-runtime)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-behavior)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama\crates\inference)
+   Compiling llama-ffi v0.1.0 (C:\Users\adyba\rust-llama\crates\ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.72s
+     Running unittests src\lib.rs (target\debug\deps\llama_behavior-9587eeafcee00758.exe)
+
+running 31 tests
+test chat::tests::chatml_exact_bytes ... ok
+test chat::tests::gemma_merges_system_only_into_non_model_turn ... ok
+test chat::tests::llama2_history_and_ascii_whitespace_contract ... ok
+test chat::tests::native_detection_order_and_unknown_jinja_are_explicit ... ok
+test json::tests::enforces_limits_and_handles_negative_zero ... ok
+test chat::tests::malformed_roles_nuls_and_output_limits_are_rejected ... ok
+test json::tests::deterministic_key_order ... ok
+test json::tests::unicode_surrogates_and_escape_roundtrip ... ok
+test json::tests::rejects_malformed_ambiguous_or_non_finite_input ... ok
+test sampling::tests::adaptive_accept_only_commits_matching_pending_token ... ok
+test sampling::tests::reference_sampling_probability_cases ... ok
+test sampling::tests::dry_source_cases_and_breakers ... ok
+test json::tests::integers_preserve_identity_beyond_binary64_precision ... ok
+test grammar::tests::state_budget_failure_is_transactional ... ok
+test grammar::tests::token_piece_filter_uses_bytes_and_end_state ... ok
+test grammar::tests::split_utf8_checks_partial_ranges_and_rolls_back ... ok
+test sampling::tests::errors_do_not_consume_rng_or_mutate_candidates ... ok
+test sampling::tests::chain_order_is_observable ... ok
+test sampling::tests::mt19937_standard_seed_reference_vector ... ok
+test sampling::tests::penalty_window_positive_negative_and_reset ... ok
+test sampling::tests::xtc_source_case ... ok
+test chat::tests::every_registered_native_name_has_implementation ... ok
+test speculative::tests::greedy_rejection_and_bonus ... ok
+test grammar::tests::nullable_rules_and_repeated_groups ... ok
+test grammar::tests::rejects_invalid_grammars_and_unimplemented_token_terminals ... ok
+test grammar::tests::full_gbnf_character_syntax_and_bounds ... ok
+test speculative::tests::dropping_or_invalid_commit_leaves_live_state_untouched ... ok
+test grammar::tests::recursive_nested_json_and_prefix_status ... ok
+test sampling::tests::distribution_clone_reset_singleton_consumption ... ok
+test speculative::tests::partial_commit_restores_rng_and_history_exactly ... ok
+test speculative::tests::snapshot_budget_rejects_before_unbounded_chain_copying ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\llama_ffi-79a352e9b2e13766.exe)
+
+running 12 tests
+test abi::tests::frozen_x64_layout ... ok
+test batch::tests::unsafe_allocation_sizes_fail_without_allocating ... ok
+test sampler::tests::sampler_layout_matches_frozen_x64_contract ... ok
+test batch::tests::allocated_token_and_embedding_batches_have_native_shape_and_safe_free ... ok
+test tests::count_only_and_truncated_buffers_follow_c_conventions ... ok
+test sampler::tests::penalty_accept_rejects_out_of_vocabulary_before_history_mutation ... ok
+test sampler::tests::chain_owns_children_rejects_cycles_and_remove_transfers_ownership ... ok
+test sampler::tests::malformed_candidates_do_not_advance_builtin_rng ... ok
+test sampler::tests::native_filter_retains_selection_and_xtc_advances_pointer ... ok
+test tests::panic_is_contained_and_diagnostic_is_thread_local ... ok
+test sampler::tests::cloned_distribution_and_copy_preserve_rng_and_reset ... ok
+test sampler::tests::frozen_windows_tied_sort_regressions ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

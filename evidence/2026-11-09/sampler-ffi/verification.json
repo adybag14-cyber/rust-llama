@@ -1,0 +1,520 @@
+{
+  "schema": 1,
+  "verified_at_utc": "2026-11-09T12:32:10.931205+00:00",
+  "scope": "Partial frozen llama C ABI: CPU sampler path, existing model/context regression, vocabulary-only SPM/WordPiece",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+  "target": "x86_64-pc-windows-msvc",
+  "native_msvc_macro": 1951,
+  "msvc_headers": "14.51.36231",
+  "export_counts": {
+    "frozen": 255,
+    "implemented": 137,
+    "missing": 118,
+    "extensions": 4,
+    "new_frozen": 30
+  },
+  "layout_checks": {
+    "existing_model_context_batch": 69,
+    "new_sampler": 36
+  },
+  "unit_tests": {
+    "debug": {
+      "llama_behavior": 31,
+      "llama_ffi": 12
+    },
+    "release": {
+      "llama_behavior": 31,
+      "llama_ffi": 12
+    }
+  },
+  "strict_clippy": true,
+  "native_runs": {
+    "debug": {
+      "sampler": {
+        "passed": true,
+        "fixture_steps": 224,
+        "candidate_apply_comparisons": 1401,
+        "candidate_rows": 45949,
+        "floating_values": 122388,
+        "max_absolute_error": 0.0,
+        "lifecycle_checks": 89,
+        "generated_tokens": 192,
+        "vocabulary_rows": 30522
+      },
+      "wordpiece": {
+        "vocabulary": 30522,
+        "cases": 192,
+        "description": "",
+        "model_info": {
+          "llama_model_n_ctx_train": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_n_embd": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_n_layer": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_rope_type": {
+            "native": 2,
+            "rust": 2
+          },
+          "llama_model_has_encoder": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_has_decoder": {
+            "native": 1,
+            "rust": 1
+          }
+        },
+        "native_head_queries": "not called: original aborts for vocabulary-only models"
+      },
+      "core": {
+        "passed": true,
+        "logit_or_embedding_values_compared": 93248,
+        "maximum_absolute_error": 0.0,
+        "model_default_fields": 17,
+        "context_default_fields": 39,
+        "vocabulary": 512
+      }
+    },
+    "release": {
+      "sampler": {
+        "passed": true,
+        "fixture_steps": 224,
+        "candidate_apply_comparisons": 1401,
+        "candidate_rows": 45949,
+        "floating_values": 122388,
+        "max_absolute_error": 0.0,
+        "lifecycle_checks": 89,
+        "generated_tokens": 192,
+        "vocabulary_rows": 30522
+      },
+      "wordpiece": {
+        "vocabulary": 30522,
+        "cases": 192,
+        "description": "",
+        "model_info": {
+          "llama_model_n_ctx_train": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_n_embd": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_n_layer": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_rope_type": {
+            "native": 2,
+            "rust": 2
+          },
+          "llama_model_has_encoder": {
+            "native": 0,
+            "rust": 0
+          },
+          "llama_model_has_decoder": {
+            "native": 1,
+            "rust": 1
+          }
+        },
+        "native_head_queries": "not called: original aborts for vocabulary-only models"
+      },
+      "core": {
+        "passed": true,
+        "logit_or_embedding_values_compared": 93248,
+        "maximum_absolute_error": 0.0,
+        "model_default_fields": 17,
+        "context_default_fields": 39,
+        "vocabulary": 512
+      }
+    }
+  },
+  "product_imports": {
+    "debug": [
+      "bcrypt.dll",
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "KERNEL32.dll",
+      "ntdll.dll",
+      "VCRUNTIME140.dll",
+      "api-ms-win-crt-string-l1-1-0.dll",
+      "api-ms-win-crt-math-l1-1-0.dll",
+      "api-ms-win-crt-runtime-l1-1-0.dll",
+      "api-ms-win-crt-heap-l1-1-0.dll"
+    ],
+    "release": [
+      "bcrypt.dll",
+      "api-ms-win-core-synch-l1-2-0.dll",
+      "KERNEL32.dll",
+      "ntdll.dll",
+      "VCRUNTIME140.dll",
+      "api-ms-win-crt-math-l1-1-0.dll",
+      "api-ms-win-crt-string-l1-1-0.dll",
+      "api-ms-win-crt-runtime-l1-1-0.dll",
+      "api-ms-win-crt-heap-l1-1-0.dll"
+    ]
+  },
+  "same_debug_release_exports": true,
+  "no_original_llama_ggml_imports": true,
+  "standalone_behavior_license": "MIT AND (Apache-2.0 WITH LLVM-exception)",
+  "standalone_license_files": [
+    "LICENSE-MICROSOFT-STL.txt",
+    "LICENSE-MIT.txt",
+    "LICENSE-LLAMA-CPP.txt",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "source_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\ABI_LAYOUT.md",
+      "bytes": 5746,
+      "sha256": "3d53d22eb99db8db7920ed00435d3d429be40ab5473d209947913a49eaf30a33"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\Cargo.toml",
+      "bytes": 469,
+      "sha256": "5dadf6db23b37ddabd32b9a1f844db0abbe9b9f7a281d65805738498251e84b9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\COVERAGE.md",
+      "bytes": 8497,
+      "sha256": "6c4496f9783f062ea47a77cb2912ef96fa863ffb6d3a0c847752d888dc042f64"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\README.md",
+      "bytes": 12095,
+      "sha256": "2a2e6287bf2edeeee3039f57c786ea96edc505268d64393301b6c836d59273bd"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\SAMPLERS.md",
+      "bytes": 10087,
+      "sha256": "e585a26445473c0a5be661fcdbfa45d4a7ec617486a19463d155aaab182d7d50"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\abi.rs",
+      "bytes": 10726,
+      "sha256": "be0ccba265fa265dd460c9987839280b971bcd68f0bf868e27d7268e827cfe1e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\batch.rs",
+      "bytes": 6439,
+      "sha256": "c77300e45bab5615ba2605142ba056a9dd7d09329cd630d6647aea6b0cd543f0"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\context.rs",
+      "bytes": 15668,
+      "sha256": "ee10326fb43d21cf217d6f5d4d6e6be1b234722c82ef22233cacbc43f87f21d5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\lib.rs",
+      "bytes": 8611,
+      "sha256": "306eb36bfdd293bb3dcfae466f96356d1cdf009e3fb1302dcc6823927595c50b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\model.rs",
+      "bytes": 17528,
+      "sha256": "da1b60bd4824fcf242291596a8f85aa2a2a5426f61a49051ab160c833a000a04"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\sampler.rs",
+      "bytes": 45071,
+      "sha256": "3c0e27ba3e8cb415a4f5aa2b42e5c3643f3f650f7b434f9691acd26dd59cb6b5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\src\\vocab.rs",
+      "bytes": 9768,
+      "sha256": "3b4e8d9564eea729cfaadabd2cce6cbf72c85e30b17a24a219de3520d21f3b33"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\THIRD_PARTY_LICENSES.md",
+      "bytes": 13139,
+      "sha256": "f833c5b9f219047f4f3b808bb0b970493e2ca72be1162fde08767fa02cbba1e3"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\Cargo.toml",
+      "bytes": 191,
+      "sha256": "209107f560be2531622be9a406fdcd21bd4890ea7543d6f3e22e78d29db3bc01"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\LICENSE-LLAMA-CPP.txt",
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\LICENSE-MICROSOFT-STL.txt",
+      "bytes": 12550,
+      "sha256": "1fc6b6db121d4555d8f661937d7f6013693cd8fd67495d5e5d98c1d18fb83eda"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\LICENSE-MIT.txt",
+      "bytes": 1071,
+      "sha256": "86be3abfe4ca1f3a10498e185023d24da731ac6bb5c30fef95423f5cb30d2110"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\src\\sampling.rs",
+      "bytes": 67878,
+      "sha256": "d72473f586435781ac54695a3235ce9b0a2866f08072d0ded1f14eb35dbb478a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\llama-behavior\\THIRD_PARTY_NOTICES.md",
+      "bytes": 1139,
+      "sha256": "f363d57dd3ecbc916454d3076f68353b105cef26c83bd2ffcd1107c8dba3c682"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\NOTICE",
+      "bytes": 731,
+      "sha256": "ea383fe2df5cd60080a5ae7127decddec886b44a59347a0261d33fde7bfdde4b"
+    }
+  ],
+  "external_reference_and_harness": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\sampler-oracle\\oracle.cpp",
+      "bytes": 33098,
+      "sha256": "77241a06180cb56b77f176e4e0c3315cc90c13270a5197b8d068bdf7c4f77f4a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\sampler-oracle\\CMakeLists.txt",
+      "bytes": 397,
+      "sha256": "22c88e3a1979cc5a9c0ccb7f09d9f4a4fdc5970e0dcf08545e9d7133f0470380"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\sampler-oracle\\build\\Release\\sampler-oracle.exe",
+      "bytes": 318976,
+      "sha256": "32fae4809f6055962a3855dfc1c87c5b5283f8a01bcacddc996923b604da4ac0"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\ffi-oracle\\oracle.cpp",
+      "bytes": 41158,
+      "sha256": "be70ef0e3634f66b0dc9b619296951ddce3ecd765ff0efa2861dda79de1636df"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\ffi-oracle\\build\\Release\\ffi-oracle.exe",
+      "bytes": 222208,
+      "sha256": "9d6788d768b0f007864b19d7fef5aa0f9263ac856bf800dea2fd3568d92c91fb"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\include\\llama.h",
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\llama-sampler.cpp",
+      "bytes": 153277,
+      "sha256": "6313214bf0a4146036f3d62846299cba4fa9804757c353140a04de52130cf496"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\llama-vocab.cpp",
+      "bytes": 208197,
+      "sha256": "ac6fd43eca27c67a213a98e27b87e8ca1f26d8d82a63e79543a06ca64ef10a95"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\llama-model.cpp",
+      "bytes": 197576,
+      "sha256": "9956da154d2a34fdb2ae627a4c70ef34f046b86c145039de754a7ad7a4b67667"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+      "bytes": 3211264,
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml-base.dll",
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml-cpu.dll",
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml.dll",
+      "bytes": 62464,
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+      "bytes": 1185376,
+      "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+    },
+    {
+      "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\include\\algorithm",
+      "bytes": 576016,
+      "sha256": "37280fad4a6522ecaac9307f2e0daeafe5d5e25a40a994d61b744181d669dd38"
+    },
+    {
+      "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\include\\random",
+      "bytes": 164316,
+      "sha256": "b1addcd96d1d89fbcb8100c81d8dbfe8c92c064c9f6814ab3246bd226fe25744"
+    },
+    {
+      "path": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\include\\__msvc_heap_algorithms.hpp",
+      "bytes": 5973,
+      "sha256": "56c6be67b7c0ff9b3ffb7d48943c1ec01728f41f0663dca2c49c296f492bf619"
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\t10\\sampling-reference.jsonl",
+      "bytes": 78051,
+      "sha256": "aa7f1f278f80b746927b976a807998b33977e93a023fffd84ab8051e417825d5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\stories260k-reference.json",
+      "bytes": 1216459,
+      "sha256": "3d3ea303bfdcd99f9987e1dee026fb715635ebad00ce7f564ec2f88777dd4711"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\tokenizer\\ggml-vocab-bert-bge.gguf",
+      "bytes": 627549,
+      "sha256": "fbcbe22278fb302694d5f4a41bfe48c5f90e8e3554eab1c0435387dff654a854"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\tokenizer\\wordpiece-reference.json",
+      "bytes": 3196336,
+      "sha256": "69006eeff40958a66de69d9bbb13988efea90958b8b22b6cb6d3cb63939e35ff"
+    }
+  ],
+  "built_product": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+      "bytes": 2484736,
+      "sha256": "9caa403bcde5b9c2e9685cf7770d0441ce241a3ed7ca4827e7b659e46f27a6e6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.lib",
+      "bytes": 64879824,
+      "sha256": "9f08d862fdecb17244d01a924e000b44a3dd7ec89d38528ff5129026ba3f2fd6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\libllama_ffi.rlib",
+      "bytes": 16599106,
+      "sha256": "4387637183ab0efe759a1fb8b67a69be6a0dac0af2699eddefeaf0d19f8ed44c"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll.lib",
+      "bytes": 33622,
+      "sha256": "ed4f96c0deef15a1ddffe41def137336e498e98e08544f580649915f468566a5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+      "bytes": 1103872,
+      "sha256": "e11453191758aa96f6d7107df3eb585358cca14c9503c508f181d67487d580b7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.lib",
+      "bytes": 20815530,
+      "sha256": "9ad8f21a637b02a2285c5532161a383086f11f642f4e7cb8b8e04324e8a4664d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\libllama_ffi.rlib",
+      "bytes": 2478868,
+      "sha256": "8a3684337db2e15dc6f5f04cef91e40db7a4c9a0a794c79fabc7fad0c35f1c4c"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll.lib",
+      "bytes": 33622,
+      "sha256": "ed4f96c0deef15a1ddffe41def137336e498e98e08544f580649915f468566a5"
+    }
+  ],
+  "jobs": {
+    "final_native_debug_release_core_and_sampler": "job-1794227068733-58536831-7db",
+    "focused_release_tests_build_clippy": "job-1794227002503-a2a72c2c-677",
+    "focused_debug_tests_and_clippy": "job-1794227477423-a3c825fe-568"
+  },
+  "limitations": [
+    "No cross-platform claim for C++ library random-distribution mapping or tied-token ordering; native sampler oracle ran on Windows MSVC only.",
+    "C context execution remains scalar dense Llama/F32 KV; BERT C execution, graph/backend sampling, performance counters, grammar/DRY/adaptive-p/infill initializers are absent.",
+    "The source aborts on attention-head queries for vocabulary-only models; Rust returns a diagnostic and those native calls are deliberately excluded.",
+    "Invalid foreign allocation boundaries, stale-pointer address reuse, caller contract violations and foreign unwinding cannot be validated or recovered.",
+    "Core unit/regression source line-ending normalization and license/comment-only packaging changes do not alter tested execution. Whole-workspace final gates are maintained by integration."
+  ],
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\clippy.log",
+      "bytes": 401,
+      "sha256": "e710650ad6d5153dd59c93659152f7c1a88995c654e62340d4afe411d6342fa6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\core-debug.json",
+      "bytes": 9025,
+      "sha256": "4daad29e20a33bd6e4c204289b43f14d5388e6f0a60a5c246041d903bbf1b30a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\core-debug.log",
+      "bytes": 282856,
+      "sha256": "d529059309ed4bc6d9c9951fc444b222fcc120e587ceabece7ee5a0456ee1cf8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\core-release.json",
+      "bytes": 9025,
+      "sha256": "4daad29e20a33bd6e4c204289b43f14d5388e6f0a60a5c246041d903bbf1b30a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\core-release.log",
+      "bytes": 282856,
+      "sha256": "ce15c0c7ec6e41995d73a5c538c7199256dd2d5a1c3bba19d49a2891a12b797d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\debug-build.log",
+      "bytes": 143,
+      "sha256": "dd0528d429d6d521f1e410c1d78c432011d213683094aef27fc00f252a836047"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\debug-tests.log",
+      "bytes": 3934,
+      "sha256": "74ac95b40b42927f6826c765a79ca22c104b4428c4c265bac156f43056e7bf8a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\exports.json",
+      "bytes": 8386,
+      "sha256": "61a6aef68ac62681b55dee4b90d16fe78b5443f486190925d3079d5ee0a551f9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\exports.tsv",
+      "bytes": 9353,
+      "sha256": "1db3f3cab32bf850ad9682c0493dafc034bf4aae10263eaed7468304aadd306a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\native-debug.json",
+      "bytes": 5511,
+      "sha256": "c98c7b3c14dac24d63e22329062cf3a513aa9ac1e2cb46ab1c3e74e615e29cd1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\native-debug.log",
+      "bytes": 417004,
+      "sha256": "b31b06df0b44f8c18277a371b48a990747ca06931c194a52b63dd86163dfa52b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\native-release.json",
+      "bytes": 5511,
+      "sha256": "c98c7b3c14dac24d63e22329062cf3a513aa9ac1e2cb46ab1c3e74e615e29cd1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\native-release.log",
+      "bytes": 417004,
+      "sha256": "a1071d6335487b6a9a20d5c0011f352123d7d60ad259aff9bbf711b76d6879dd"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\README.md",
+      "bytes": 9946,
+      "sha256": "8b06b1c3d07da11a5e3b79a981bdf48ba6b8b50c002ff514f0c359f423bfc1b6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\release-build.log",
+      "bytes": 133,
+      "sha256": "2bc3ffe01887a7f406d644a84fc38ed68d9eb608e39aab9a0e802c1cd19e59e2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-09\\sampler-ffi\\release-tests.log",
+      "bytes": 3755,
+      "sha256": "cbc9b47d3daf73d4223b23c0d25420972a40e822d91cac3043d01907d5880dc3"
+    }
+  ]
+}

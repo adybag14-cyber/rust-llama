@@ -184,8 +184,8 @@ fn quantizer_fails_clearly_without_mutating_the_destination() {
     );
     assert_eq!(out, original);
     assert!(matches!(
-        quantize(DType::Q2_K, &[0.0; 256]),
-        Err(QuantError::UnsupportedQuantization(DType::Q2_K))
+        quantize(DType::I64, &[0.0; 256]),
+        Err(QuantError::UnsupportedQuantization(DType::I64))
     ));
 }
 #[test]

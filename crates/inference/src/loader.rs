@@ -1,4 +1,4 @@
-use crate::{Error, LoadOptions, Model, Result};
+use crate::{Error, Executor, LoadOptions, Model, Result};
 use llama_gguf::{Gguf, Value};
 use llama_model_runtime::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights, Matrix};
 use llama_tokenizer::Tokenizer;
@@ -9,7 +9,11 @@ use std::{
     sync::Arc,
 };
 
-fn uint(m: &BTreeMap<String, Value>, key: &str, default: Option<usize>) -> Result<usize> {
+pub(super) fn uint(
+    m: &BTreeMap<String, Value>,
+    key: &str,
+    default: Option<usize>,
+) -> Result<usize> {
     match m.get(key) {
         Some(v) => v
             .as_u64()
@@ -18,7 +22,7 @@ fn uint(m: &BTreeMap<String, Value>, key: &str, default: Option<usize>) -> Resul
         None => default.ok_or_else(|| Error::Invalid(format!("missing {key}"))),
     }
 }
-fn float(m: &BTreeMap<String, Value>, key: &str, default: f32) -> Result<f32> {
+pub(super) fn float(m: &BTreeMap<String, Value>, key: &str, default: f32) -> Result<f32> {
     match m.get(key) {
         None => Ok(default),
         Some(v) => {
@@ -33,8 +37,115 @@ fn float(m: &BTreeMap<String, Value>, key: &str, default: f32) -> Result<f32> {
         }
     }
 }
-fn unsupported(s: impl Into<String>) -> Error {
+pub(super) fn unsupported(s: impl Into<String>) -> Error {
     Error::Unsupported(s.into())
+}
+
+pub(super) fn vector(
+    g: &mut Gguf<File>,
+    used: &mut BTreeSet<String>,
+    name: &str,
+    n: usize,
+) -> Result<Vec<f32>> {
+    let t = g
+        .tensor(name)
+        .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
+    if t.dimensions != [n as u64] {
+        return Err(Error::Invalid(format!(
+            "tensor {name} expected shape [{n}], found {:?}",
+            t.dimensions
+        )));
+    }
+    used.insert(name.into());
+    Ok(g.read_f32(name)?)
+}
+pub(super) fn matrix(
+    g: &mut Gguf<File>,
+    used: &mut BTreeSet<String>,
+    name: &str,
+    rows: usize,
+    cols: usize,
+) -> Result<Matrix> {
+    let t = g
+        .tensor(name)
+        .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
+    if t.dimensions != [cols as u64, rows as u64] {
+        return Err(Error::Invalid(format!(
+            "tensor {name} expected GGML shape [{cols},{rows}], found {:?}",
+            t.dimensions
+        )));
+    }
+    let dtype = t.dtype;
+    used.insert(name.into());
+    if dtype.id() == 0 {
+        return Ok(Matrix::new(rows, cols, g.read_f32(name)?)?);
+    }
+    let mut bytes = g.read_tensor(name)?;
+    if g.endian == llama_gguf::Endian::Big {
+        if matches!(dtype.id(), 1 | 30) {
+            for word in bytes.as_chunks_mut::<2>().0 {
+                word.reverse();
+            }
+        } else if dtype.id() != 43 {
+            return Err(unsupported("big-endian packed matrix arithmetic"));
+        }
+    }
+    Ok(Matrix::from_quantized(rows, cols, dtype, bytes)?)
+}
+pub(super) fn bias(
+    g: &mut Gguf<File>,
+    used: &mut BTreeSet<String>,
+    name: &str,
+    n: usize,
+) -> Result<Option<Vec<f32>>> {
+    if g.tensor(name).is_some() {
+        Ok(Some(vector(g, used, name, n)?))
+    } else {
+        Ok(None)
+    }
+}
+
+pub(super) fn details(
+    g: &Gguf<File>,
+    path: &Path,
+    options: &LoadOptions,
+) -> Result<(String, Option<String>, usize)> {
+    let m = &g.metadata;
+    let id = m
+        .get("general.name")
+        .and_then(Value::as_str)
+        .filter(|s| !s.is_empty())
+        .map(str::to_owned)
+        .unwrap_or_else(|| {
+            path.file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .into_owned()
+        });
+    let template = match m.get("tokenizer.chat_template") {
+        Some(Value::String(s)) => Some(s.clone()),
+        Some(_) => return Err(unsupported("multiple/nonstrings chat templates")),
+        None => None,
+    };
+    let mut decoded_weight_bytes = 0usize;
+    for tensor in &g.tensors {
+        decoded_weight_bytes = decoded_weight_bytes
+            .checked_add(
+                tensor
+                    .elements()?
+                    .checked_mul(4)
+                    .ok_or_else(|| Error::Invalid("decoded tensor byte count overflow".into()))?,
+            )
+            .ok_or_else(|| Error::Invalid("decoded model byte count overflow".into()))?;
+    }
+    if decoded_weight_bytes > options.max_decoded_weight_bytes {
+        return Err(Error::Invalid(format!(
+            "decoded model requires {decoded_weight_bytes} bytes, exceeding configured budget {}; the decoded F32 row cache exceeds the limit (packed bytes are additional)",
+            options.max_decoded_weight_bytes
+        )));
+    }
+
+    Ok((id, template, decoded_weight_bytes))
 }
 
 pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
@@ -49,9 +160,12 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         .get("general.architecture")
         .and_then(Value::as_str)
         .ok_or_else(|| Error::Invalid("missing general.architecture".into()))?;
+    if architecture == "bert" {
+        return crate::bert_loader::load(g, path, options);
+    }
     if architecture != "llama" {
         return Err(unsupported(format!(
-            "model architecture {architecture}; this loader currently executes dense llama"
+            "model architecture {architecture}; this loader currently executes dense llama and bert"
         )));
     }
     if let Some(t) = m.get("general.type").and_then(Value::as_str)
@@ -125,103 +239,8 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         },
     };
     let kv_width = config.kv_width()?;
-    let id = m
-        .get("general.name")
-        .and_then(Value::as_str)
-        .filter(|s| !s.is_empty())
-        .map(str::to_owned)
-        .unwrap_or_else(|| {
-            path.file_stem()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .into_owned()
-        });
-    let template = match m.get("tokenizer.chat_template") {
-        Some(Value::String(s)) => Some(s.clone()),
-        Some(_) => return Err(unsupported("multiple/nonstrings chat templates")),
-        None => None,
-    };
-    let mut decoded_weight_bytes = 0usize;
-    for tensor in &g.tensors {
-        decoded_weight_bytes = decoded_weight_bytes
-            .checked_add(
-                tensor
-                    .elements()?
-                    .checked_mul(4)
-                    .ok_or_else(|| Error::Invalid("decoded tensor byte count overflow".into()))?,
-            )
-            .ok_or_else(|| Error::Invalid("decoded model byte count overflow".into()))?;
-    }
-    if decoded_weight_bytes > options.max_decoded_weight_bytes {
-        return Err(Error::Invalid(format!(
-            "decoded model requires {decoded_weight_bytes} bytes, exceeding configured budget {}; weights are expanded to F32 by this scalar executor",
-            options.max_decoded_weight_bytes
-        )));
-    }
+    let (id, template, decoded_weight_bytes) = details(&g, path, options)?;
     let mut used = BTreeSet::new();
-    fn vector(
-        g: &mut Gguf<File>,
-        used: &mut BTreeSet<String>,
-        name: &str,
-        n: usize,
-    ) -> Result<Vec<f32>> {
-        let t = g
-            .tensor(name)
-            .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
-        if t.dimensions != [n as u64] {
-            return Err(Error::Invalid(format!(
-                "tensor {name} expected shape [{n}], found {:?}",
-                t.dimensions
-            )));
-        }
-        used.insert(name.into());
-        Ok(g.read_f32(name)?)
-    }
-    fn matrix(
-        g: &mut Gguf<File>,
-        used: &mut BTreeSet<String>,
-        name: &str,
-        rows: usize,
-        cols: usize,
-    ) -> Result<Matrix> {
-        let t = g
-            .tensor(name)
-            .ok_or_else(|| Error::Invalid(format!("missing tensor {name}")))?;
-        if t.dimensions != [cols as u64, rows as u64] {
-            return Err(Error::Invalid(format!(
-                "tensor {name} expected GGML shape [{cols},{rows}], found {:?}",
-                t.dimensions
-            )));
-        }
-        let dtype = t.dtype;
-        used.insert(name.into());
-        if dtype.id() == 0 {
-            return Ok(Matrix::new(rows, cols, g.read_f32(name)?)?);
-        }
-        let mut bytes = g.read_tensor(name)?;
-        if g.endian == llama_gguf::Endian::Big {
-            if matches!(dtype.id(), 1 | 30) {
-                for word in bytes.as_chunks_mut::<2>().0 {
-                    word.reverse();
-                }
-            } else if dtype.id() != 43 {
-                return Err(unsupported("big-endian packed matrix arithmetic"));
-            }
-        }
-        Ok(Matrix::from_quantized(rows, cols, dtype, bytes)?)
-    }
-    fn bias(
-        g: &mut Gguf<File>,
-        used: &mut BTreeSet<String>,
-        name: &str,
-        n: usize,
-    ) -> Result<Option<Vec<f32>>> {
-        if g.tensor(name).is_some() {
-            Ok(Some(vector(g, used, name, n)?))
-        } else {
-            Ok(None)
-        }
-    }
     let token_embedding = matrix(
         &mut g,
         &mut used,
@@ -311,10 +330,12 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         },
     )?;
     Ok(Model {
-        runtime: Arc::new(llama_model_runtime::Model::Llama(llama)),
+        runtime: Executor::Decoder(Arc::new(llama_model_runtime::Model::Llama(llama))),
         tokenizer,
         id,
         template,
         decoded_weight_bytes,
+        context_limit: train_context.min(options.context_length),
+        embedding_pooling: None,
     })
 }

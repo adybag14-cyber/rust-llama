@@ -84,10 +84,10 @@ fn activation_quantization_is_not_replaced_with_a_dense_dot() {
     );
 }
 #[test]
-fn matvec_rejects_unimplemented_paths_and_malformed_rows() {
+fn matvec_rejects_non_weight_types_and_malformed_rows() {
     assert_eq!(
-        matvec_activation_dtype(DType::Q4_K),
-        Err(QuantError::UnsupportedMatVec(DType::Q4_K))
+        matvec_activation_dtype(DType::Q8_K),
+        Err(QuantError::UnsupportedMatVec(DType::Q8_K))
     );
     assert!(matches!(
         matvec(DType::Q4_0, &[0; 18], 1, 32, &[1.; 31]),

@@ -1,0 +1,16 @@
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+    Checking llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\model-runtime)
+    Checking llama-inference v0.1.0 (C:\Users\adyba\rust-llama\crates\inference)
+error: using `chunks_exact` with a constant chunk size
+   --> crates\model-runtime\src\math.rs:432:18
+    |
+432 |                 .chunks_exact(4)
+    |                  ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+    Checking rust-llama-cli v0.1.0 (C:\Users\adyba\rust-llama\crates\cli)
+error: could not compile `llama-model-runtime` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

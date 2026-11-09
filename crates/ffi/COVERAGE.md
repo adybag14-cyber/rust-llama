@@ -1,8 +1,8 @@
 # Frozen C ABI export coverage
 
-The frozen header declares 255 llama functions; the independently built reference DLL exports 255 llama symbols. Their union contains 255 symbols. The Rust DLL implements 107 of them, leaves 148 unexported, and adds 3 diagnostic/layout extensions. This count is symbol coverage, not a claim of complete behavior for any broad subsystem. See README.md for every accepted configuration and explicit restriction.
+The frozen header declares 255 llama functions; the independently built reference DLL exports 255 llama symbols. Their union contains 255 symbols. The Rust DLL implements 137 of them, leaves 118 unexported, and adds 4 diagnostic/layout extensions. This count is symbol coverage, not a claim of complete behavior for any broad subsystem. See README.md for every accepted configuration and explicit restriction.
 
-The inventory is generated from the actual PE export tables and frozen header, rather than inferred from Rust source names. Machine-readable evidence is in evidence/2026-11-09/ffi/exports.json and exports.tsv.
+The inventory is generated from the actual PE export tables and frozen header, rather than inferred from Rust source names. Machine-readable evidence is in evidence/2026-11-09/sampler-ffi/exports.json and exports.tsv.
 
 ## Implemented frozen exports
 
@@ -72,6 +72,36 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_n_vocab` |
 | `llama_new_context_with_model` |
 | `llama_pooling_type` |
+| `llama_sampler_accept` |
+| `llama_sampler_apply` |
+| `llama_sampler_chain_add` |
+| `llama_sampler_chain_default_params` |
+| `llama_sampler_chain_get` |
+| `llama_sampler_chain_init` |
+| `llama_sampler_chain_n` |
+| `llama_sampler_chain_remove` |
+| `llama_sampler_clone` |
+| `llama_sampler_copy` |
+| `llama_sampler_free` |
+| `llama_sampler_get_seed` |
+| `llama_sampler_init` |
+| `llama_sampler_init_dist` |
+| `llama_sampler_init_greedy` |
+| `llama_sampler_init_logit_bias` |
+| `llama_sampler_init_min_p` |
+| `llama_sampler_init_mirostat` |
+| `llama_sampler_init_mirostat_v2` |
+| `llama_sampler_init_penalties` |
+| `llama_sampler_init_temp` |
+| `llama_sampler_init_temp_ext` |
+| `llama_sampler_init_top_k` |
+| `llama_sampler_init_top_n_sigma` |
+| `llama_sampler_init_top_p` |
+| `llama_sampler_init_typical` |
+| `llama_sampler_init_xtc` |
+| `llama_sampler_name` |
+| `llama_sampler_reset` |
+| `llama_sampler_sample` |
 | `llama_set_abort_callback` |
 | `llama_set_causal_attn` |
 | `llama_set_embeddings` |
@@ -123,6 +153,7 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_rust_abi_layout` |
 | `llama_rust_clear_error` |
 | `llama_rust_last_error` |
+| `llama_rust_sampler_abi_layout` |
 
 ## Not implemented / not exported
 
@@ -206,42 +237,12 @@ The inventory is generated from the actual PE export tables and frozen header, r
 | `llama_perf_sampler_reset` |
 | `llama_print_system_info` |
 | `llama_process` |
-| `llama_sampler_accept` |
-| `llama_sampler_apply` |
-| `llama_sampler_chain_add` |
-| `llama_sampler_chain_default_params` |
-| `llama_sampler_chain_get` |
-| `llama_sampler_chain_init` |
-| `llama_sampler_chain_n` |
-| `llama_sampler_chain_remove` |
-| `llama_sampler_clone` |
-| `llama_sampler_copy` |
-| `llama_sampler_free` |
-| `llama_sampler_get_seed` |
-| `llama_sampler_init` |
 | `llama_sampler_init_adaptive_p` |
-| `llama_sampler_init_dist` |
 | `llama_sampler_init_dry` |
 | `llama_sampler_init_grammar` |
 | `llama_sampler_init_grammar_lazy` |
 | `llama_sampler_init_grammar_lazy_patterns` |
-| `llama_sampler_init_greedy` |
 | `llama_sampler_init_infill` |
-| `llama_sampler_init_logit_bias` |
-| `llama_sampler_init_min_p` |
-| `llama_sampler_init_mirostat` |
-| `llama_sampler_init_mirostat_v2` |
-| `llama_sampler_init_penalties` |
-| `llama_sampler_init_temp` |
-| `llama_sampler_init_temp_ext` |
-| `llama_sampler_init_top_k` |
-| `llama_sampler_init_top_n_sigma` |
-| `llama_sampler_init_top_p` |
-| `llama_sampler_init_typical` |
-| `llama_sampler_init_xtc` |
-| `llama_sampler_name` |
-| `llama_sampler_reset` |
-| `llama_sampler_sample` |
 | `llama_save_session_file` |
 | `llama_set_adapter_cvec` |
 | `llama_set_adapters_lora` |

@@ -1,0 +1,14 @@
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.30s
+     Running tests\native_reference.rs (target\debug\deps\native_reference-6ede3289e09df8e4.exe)
+frozen UTF-8: 65,809 cases, every one/two-byte input plus boundary, surrogate and malformed sequences
+frozen Unicode: 15,957 normalization sequences and all 256 byte mappings/lead lengths
+
+thread 'original_bert_vocabulary_and_all_wordpiece_variants' (24092) panicked at crates\tokenizer\tests\native_reference.rs:345:17:
+assertion `left == right` failed: vocab EOG 0
+  left: false
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+frozen UTF-8: all 1,114,112 codepoints, including source surrogate encodings
+frozen Unicode: all 1,114,112 codepoints, flags/case/NFD/Han and single-codepoint NFC; four out-of-range inputs
+error: test failed, to rerun pass `-p llama-tokenizer --test native_reference`

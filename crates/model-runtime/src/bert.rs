@@ -202,13 +202,15 @@ impl BertModel {
                 });
             }
             let mut embedding = self.weights.token_embedding.row(token as usize)?.to_vec();
+            // Preserve the frozen graph's grouping: token + type, then position.
+            // Reordering three F32 additions can change a pretrained model output.
+            if let Some(types) = &self.weights.token_type_embedding {
+                math::add(&mut embedding, types.row(0)?);
+            }
             math::add(
                 &mut embedding,
                 self.weights.position_embedding.row(position)?,
             );
-            if let Some(types) = &self.weights.token_type_embedding {
-                math::add(&mut embedding, types.row(0)?);
-            }
             hidden.push(math::layer_norm(
                 &embedding,
                 &self.weights.embedding_norm,
@@ -287,20 +289,17 @@ impl BertModel {
             Pooling::First => Some(hidden[0].clone()),
             Pooling::Last => Some(hidden[hidden.len() - 1].clone()),
             Pooling::Mean => {
-                // A finite arithmetic mean must not overflow merely because
-                // its intermediate F32 sum does. F64 safely covers the sum of
-                // these bounded-count F32 token vectors before one narrowing.
+                // The frozen pooling graph multiplies by a repeated F32
+                // reciprocal, then uses the scalar F32 dot product's F64 sum.
+                // Summing first and dividing afterward changes rounding.
+                let reciprocal = 1.0f32 / hidden.len() as f32;
                 let mut sum = vec![0.0f64; c.width];
                 for token in &hidden {
                     for (sum, value) in sum.iter_mut().zip(token) {
-                        *sum += *value as f64;
+                        *sum += f64::from(*value * reciprocal);
                     }
                 }
-                Some(
-                    sum.into_iter()
-                        .map(|value| (value / hidden.len() as f64) as f32)
-                        .collect(),
-                )
+                Some(sum.into_iter().map(|value| value as f32).collect())
             }
         };
         if let Some(values) = &pooled {

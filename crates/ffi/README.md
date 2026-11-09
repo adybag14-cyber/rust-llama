@@ -2,7 +2,7 @@
 
 This crate builds a cdylib, staticlib and rlib. The Windows DLL is
 `target/release/llama_ffi.dll`; the import library is `llama_ffi.dll.lib`.
-It executes the Rust GGUF loader, SPM tokenizer and scalar decoder from this
+It executes the Rust GGUF loader, SPM/WordPiece tokenizers, CPU samplers and scalar decoder from this
 workspace. No original llama/ggml library is linked or loaded by the product.
 
 **This is an operational subset, not full llama.cpp ABI compatibility.**
@@ -28,7 +28,14 @@ workspace builds additionally check compilation on supported Rust targets.
 ## Operational configuration
 
 The currently accepted execution path is dense Llama with a llama/SPM tokenizer,
-as supported by `llama-inference`. Vocabulary-only loading is supported.
+as supported by `llama-inference`. Vocabulary-only Llama/SPM and BERT/WordPiece loading is supported. BERT context execution is explicitly rejected in this C layer.
+Vocabulary-only loading retains the source's unloaded model-info defaults:
+context/embedding/layer dimensions are zero, description is empty and file type
+is F32. Attention-head queries return a diagnostic because the native source
+aborts when no model layers were loaded. BERT's public architecture routing
+flags and RoPE enum follow the frozen header/source values even though C context
+execution is unavailable.
+
 Weights use the same validated GGUF loader and its memory budget, numerical
 formats and explicit architecture restrictions.
 
@@ -105,10 +112,18 @@ out-of-range ID retains the source default, including UINT32_MAX padding IDs.
 The frozen misspelling `tokenizer.ggml.seperator_token_id` is intentional.
 Ambiguous auto-detected EOT spellings require an explicit metadata ID.
 
-Broader tokenizer families, sampler ABI, grammar ABI, state/session formats,
+Broader tokenizer families, remaining sampler/grammar ABI, state/session formats,
 memory manipulation, adapters, encoder entry points, model saving, split-file
 loading and performance APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
+
+## CPU sampling
+
+SAMPLERS.md documents the 14 supported sampler constructors, generic/custom
+interfaces, owning chains, seeded clone/reset/copy behavior and actual-context
+sampling. The sampler ABI has an independent 36-entry layout check. Grammar,
+DRY preprocessing, adaptive-p, infill, backend sampling and sampler performance
+collection remain explicitly unavailable.
 
 ## Memory, lifetime and error contract
 
@@ -150,7 +165,10 @@ foreign memory are not recoverable. Pointer-returning failures return NULL;
 count-based tokenizer failures return INT32_MIN, while insufficient capacity
 returns the negative required size. String description functions follow snprintf
 length/truncation/NUL-termination semantics. No token-piece or detokenization
-terminator is appended.
+terminator is appended. Detokenize count-only and insufficient-buffer returns
+use the native pre-cleanup byte count; a successful WordPiece call can return
+fewer bytes after space cleanup. Insufficient detokenize buffers retain the
+complete token pieces that fitted before the first capacity failure.
 
 The Rust extensions are:
 
@@ -159,6 +177,8 @@ The Rust extensions are:
 - `void llama_rust_clear_error(void)`: clears that thread's diagnostic.
 - `size_t llama_rust_abi_layout(size_t index)`: sizes/offsets in ABI_LAYOUT.md;
   SIZE_MAX beyond the final index.
+- size_t llama_rust_sampler_abi_layout(size_t index): sampler sizes/offsets;
+  SIZE_MAX beyond its 36-entry table.
 
 Successful calls do not erase an earlier diagnostic. Void APIs report rejected
 changes through this extension.
@@ -168,7 +188,9 @@ changes through this extension.
 Run `cargo test -p llama-ffi`, `cargo test -p llama-ffi --release` and
 `cargo clippy -p llama-ffi --all-targets -- -D warnings`.
 The unit tests cover panic containment, thread-local diagnostics, checked
-buffer conventions, allocation limits and owned token/embedding batch frees.
+buffer conventions, allocation limits, owned token/embedding batch frees,
+sampler ownership and cycles, checked history, native tied-sort regressions,
+XTC pointer semantics and RNG clone/reset/error behavior.
 
 The native MSVC harness is intentionally outside the product at
 `C:/Users/adyba/rust-llama-reference/ffi-oracle`. It includes the untouched frozen
@@ -184,6 +206,9 @@ description, six trained prompt/greedy cases, contiguous/sparse/negative output
 indexing, independent interleaved sequences, mid-batch rollback, abort rollback,
 embedding input/output, model ownership after handle release, vocabulary-only
 loading and explicit rejection of unsupported settings.
+
+The additional sampler and WordPiece C harness, source-specific fixes and
+measurements are documented in SAMPLERS.md and evidence/2026-11-09/sampler-ffi.
 
 These checks establish the stated subset on Windows x64. They do not close the
 full ABI, architecture, backend, platform or performance release gates.

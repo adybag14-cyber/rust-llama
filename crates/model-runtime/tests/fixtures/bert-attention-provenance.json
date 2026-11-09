@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "purpose": "Independent scalar attention reductions from twelve frozen BERT graph layers",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "unmodified frozen llama.cpp llama/ggml CPU DLL graph outputs",
+  "model_sha256": "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999",
+  "model_name": "bge-small-en-v1.5",
+  "prompt": "Rust ports should preserve exact numerical behavior.",
+  "threads": 1,
+  "flash_attention": false,
+  "layers": 12,
+  "heads": 12,
+  "kv_heads": 12,
+  "head_dimension": 32,
+  "tokens": 10,
+  "observed_tensors": [
+    "Qcur (RESHAPE)",
+    "Kcur (RESHAPE)",
+    "Vcur (RESHAPE)",
+    "kqv_out (CONT, before output projection)"
+  ],
+  "callback_does_not_change_model_outputs": true,
+  "values_compared": 46080,
+  "scalar_arithmetic": "F32 products accumulated in F64, then one F32 narrowing for QK and probability-times-V",
+  "absolute_tolerance": 1e-06,
+  "relative_tolerance": 1e-06,
+  "dll_sha256": {
+    "llama.dll": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3",
+    "ggml-cpu.dll": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f",
+    "ggml-base.dll": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+  },
+  "harness_sha256": "00aeb05cec9fb0aec762b8d94f17a88ee8602b5916c1874c84b1d0005e52b97a",
+  "payload": {
+    "path": "crates/model-runtime/tests/fixtures/bert-attention-reference.bin",
+    "bytes": 737484,
+    "sha256": "a0e64a14480f86b006a80a0cdd7fa3cb7d61bdc84b4b1ea6db9aecf3bef4494a"
+  }
+}

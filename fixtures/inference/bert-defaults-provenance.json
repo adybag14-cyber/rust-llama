@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "captured_at_utc": "2026-11-09T12:30:33.484104+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "model_description": "Synthetic deterministic one-layer dense BERT; F32 weights; vocabulary 108; width 4; feed-forward 6; 2 heads; token types 2; context 8; 21 tensors. bert.pooling_type is omitted.",
+  "qualification": "This model tests optional metadata and API defaults; it is not a pretrained-model parity claim. Expected embeddings and default pooling come only from the original native C API.",
+  "compiler": "MSVC 19.51.36260.0, Visual Studio 18 2026 x64, Release",
+  "oracle_files": {
+    "make-model.py": {
+      "bytes": 3211,
+      "sha256": "fc14f0f032c20e153b78f6fe1c07d6bd66d8d7bbc135a77f9a6a378279f3320b"
+    },
+    "oracle.cpp": {
+      "bytes": 3712,
+      "sha256": "59429a92b3e433eb4a4c41453d5ec26707bd4e1cc2e9258099cbfbc2cfa8e341"
+    },
+    "CMakeLists.txt": {
+      "bytes": 651,
+      "sha256": "7aad0c2c1773d55168771ab54eb7ad3eb399696ad3a931ecfc1fe3a35ef564b1"
+    }
+  },
+  "oracle_executable": {
+    "bytes": 141312,
+    "sha256": "ebe8b26d4cdd58c2f740c3cd290c8eabb75c57ae9170373442a708f90f5beabb"
+  },
+  "source_files": {
+    "src/llama-hparams.h": {
+      "bytes": 22052,
+      "sha256": "de9d9cf71aeb691ffba5016a66e79df8c647fe358bf1805d98298b464454e010"
+    },
+    "src/llama-context.cpp": {
+      "bytes": 181137,
+      "sha256": "4a6a7b8cac76b79aa067d2aa393158ffd2dce97b06048a1d206ccad3edd0357d"
+    },
+    "src/llama-model.cpp": {
+      "bytes": 197576,
+      "sha256": "9956da154d2a34fdb2ae627a4c70ef34f046b86c145039de754a7ad7a4b67667"
+    },
+    "src/models/bert.cpp": {
+      "bytes": 9226,
+      "sha256": "9173dc75465a3a86f3ca5c5983d9496dcfd9512a3b913d7613581aa1c5b86300"
+    },
+    "include/llama.h": {
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    }
+  },
+  "reference_libraries": {
+    "llama.dll": {
+      "bytes": 3211264,
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    },
+    "ggml.dll": {
+      "bytes": 62464,
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    },
+    "ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    }
+  },
+  "configuration": {
+    "threads": 1,
+    "n_ctx_requested": 8,
+    "n_batch": 8,
+    "n_ubatch": 8,
+    "embeddings": true,
+    "flash_attention": false,
+    "kv_dtype": "F32",
+    "normalization": false,
+    "pooling_modes": [
+      -1,
+      0,
+      1
+    ],
+    "default_pooling_parameter_untouched": true
+  },
+  "coverage": {
+    "prompts": 3,
+    "token_vectors": 11,
+    "explicit_mean_vectors": 3,
+    "compared_floats": 56
+  },
+  "comparison": {
+    "absolute": 2e-06,
+    "relative": 2e-06,
+    "token_ids": "exact",
+    "default_pooling": "exact original NONE"
+  },
+  "fixtures": {
+    "tiny-bert-missing-pooling.gguf": {
+      "bytes": 6832,
+      "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+    },
+    "bert-defaults-request.json": {
+      "bytes": 310,
+      "sha256": "bee43093207ed5fb5e80b20bd1983d71fa8385433ed969d5ca5e13c5091cfc22"
+    },
+    "bert-defaults-reference.json": {
+      "bytes": 6647,
+      "sha256": "8d9fdfcbe9a7893cce5a2415433b16b941b8f5aa18fe6ce62d22f8881670d884"
+    }
+  }
+}

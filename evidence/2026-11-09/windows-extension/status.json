@@ -1,0 +1,266 @@
+{
+  "status": "succeeded",
+  "remediation": "Exact reviewed license roles; intentional fixture README hash; whitespace check honors the repository existing CRLF files while retaining trailing-space checks. Initial findings remain recorded.",
+  "results": [
+    {
+      "step": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.6720740795135498
+    },
+    {
+      "step": "format-check",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.6628201007843018
+    },
+    {
+      "step": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 8.091850996017456,
+      "tests": {
+        "passed": 311,
+        "failed": 0,
+        "ignored": 11
+      }
+    },
+    {
+      "step": "release",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 99.47291707992554,
+      "tests": {
+        "passed": 311,
+        "failed": 0,
+        "ignored": 11
+      }
+    },
+    {
+      "step": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 1.3817365169525146
+    },
+    {
+      "step": "source-audit",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit",
+        "--write"
+      ],
+      "exit": 1,
+      "expected_exit": 0,
+      "seconds": 2.1530516147613525
+    },
+    {
+      "step": "audit-remediation-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 1.3541803359985352
+    },
+    {
+      "step": "audit-remediation-release",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 7.36456036567688
+    },
+    {
+      "step": "audit-remediation-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.42384862899780273
+    },
+    {
+      "step": "format-final",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.6831715106964111
+    },
+    {
+      "step": "source-audit-final",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit",
+        "--write"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.4763147830963135
+    },
+    {
+      "step": "fixtures",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit": 1,
+      "expected_exit": 0,
+      "seconds": 2.201873779296875
+    },
+    {
+      "step": "fixtures-final",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 2.0631752014160156
+    },
+    {
+      "step": "build-release",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 16.65026617050171
+    },
+    {
+      "step": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 2,
+      "expected_exit": 0,
+      "seconds": 0.10228824615478516
+    },
+    {
+      "step": "diff-check-final",
+      "command": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "seconds": 0.08838510513305664
+    },
+    {
+      "step": "release-check",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit": 1,
+      "expected_exit": 1,
+      "seconds": 0.09004878997802734
+    }
+  ]
+}

@@ -11,15 +11,21 @@
 //! imply complete optimized CPU kernels or complete encoder coverage.
 #![forbid(unsafe_code)]
 
+mod activation;
+mod conversion;
 mod decode;
+pub use conversion::{convert_f32_to_integer, convert_f32_to_integer_into};
 mod encode;
+mod encode_k;
+mod encode_simple;
 mod matvec;
+mod matvec_extra;
 mod tables;
 pub use matvec::{dot_packed, matvec, matvec_activation_dtype};
 
 pub use encode::{quantize, quantize_into};
 
-/// A malformed layout or unsupported encoder, never an implicit fallback.
+/// A malformed layout, unrepresentable input or unsupported capability, never an implicit fallback.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum QuantError {
     InvalidType(u32),
@@ -31,6 +37,8 @@ pub enum QuantError {
     InvalidLength { expected: usize, actual: usize },
     AllocationFailed,
     UnsupportedQuantization(DType),
+    UnsupportedIntegerConversion(DType),
+    IntegerOutOfRange { dtype: DType, index: usize },
     NonFiniteInput { index: usize },
     UnrepresentableScale { block: usize },
 }
@@ -40,7 +48,7 @@ impl std::fmt::Display for QuantError {
         match self {
             Self::UnsupportedMatVec(dtype) => write!(
                 f,
-                "native matrix-vector dot for {dtype:?} has not been ported"
+                "GGML CPU does not define a matrix-vector weight dot for {dtype:?}"
             ),
             Self::InvalidVectorLength { expected, actual } => {
                 write!(f, "expected {expected} vector elements, got {actual}")
@@ -48,6 +56,14 @@ impl std::fmt::Display for QuantError {
             Self::InvalidMatrixShape { rows, cols } => {
                 write!(f, "matrix dimensions must be positive, got {rows} x {cols}")
             }
+            Self::UnsupportedIntegerConversion(dtype) => write!(
+                f,
+                "source F32 integer assignment is not defined for {dtype:?}"
+            ),
+            Self::IntegerOutOfRange { dtype, index } => write!(
+                f,
+                "element {index} is outside the representable range of {dtype:?}"
+            ),
             Self::InvalidType(id) => write!(f, "GGML type {id} is unknown or reserved"),
             Self::NonMultiple {
                 elements,
@@ -333,6 +349,42 @@ pub fn f32_to_bf16(value: f32) -> u16 {
         return ((bits >> 16) as u16) | 0x40;
     }
     (bits.wrapping_add(0x7fff + ((bits >> 16) & 1)) >> 16) as u16
+}
+
+/// OCP E4M3 with ties-to-even rounding, finite saturation and canonical NaN.
+/// Matches the frozen ggml_fp32_to_f8_e4m3 helper, including signed zero.
+pub fn f32_to_f8_e4m3(value: f32) -> u8 {
+    let bits = value.to_bits();
+    let sign = ((bits >> 24) & 128) as u8;
+    let magnitude = bits & 0x7fff_ffff;
+    if magnitude > 0x7f80_0000 {
+        return 0x7f;
+    }
+    if magnitude == 0 {
+        return sign;
+    }
+    let x = f32::from_bits(magnitude);
+    if x >= 448.0 {
+        return sign | 0x7e;
+    }
+    if x < 0.015625 {
+        return sign | (x * 512.0).round_ties_even() as u8;
+    }
+    let mut exponent = ((magnitude >> 23) & 255) - 120;
+    let fraction = magnitude & 0x7f_ffff;
+    let mut mantissa = fraction >> 20;
+    let rest = fraction & 0x0f_ffff;
+    if rest > 0x08_0000 || (rest == 0x08_0000 && mantissa & 1 != 0) {
+        mantissa += 1;
+    }
+    if mantissa == 8 {
+        mantissa = 0;
+        exponent += 1;
+    }
+    if exponent > 15 || (exponent == 15 && mantissa > 6) {
+        return sign | 0x7e;
+    }
+    sign | ((exponent as u8) << 3) | mantissa as u8
 }
 
 /// OCP E4M3 scalar: both 0x7f and 0xff are NaNs, no infinities.

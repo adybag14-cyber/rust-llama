@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "full_port_complete": false,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "parent_commit": "fdfeda09bbc72fa61a25218cf93a9ca5807527c1",
+  "recorded_utc": "2026-11-09T12:44:00.189441+00:00",
+  "windows": {
+    "debug": {
+      "passed": 311,
+      "failed": 0,
+      "ignored": 11
+    },
+    "release": {
+      "passed": 311,
+      "failed": 0,
+      "ignored": 11
+    },
+    "strict_clippy": true,
+    "release_build": true,
+    "audit": true,
+    "fixture_integrity": true
+  },
+  "linux": {
+    "debug": {
+      "passed": 313,
+      "failed": 0,
+      "ignored": 11
+    },
+    "release": {
+      "passed": 313,
+      "failed": 0,
+      "ignored": 11
+    },
+    "strict_clippy": true,
+    "release_build": true,
+    "audit": true,
+    "fixture_integrity": true
+  },
+  "fixtures": {
+    "files": 113,
+    "declarations": 113,
+    "manifests": 4
+  },
+  "quantization": {
+    "active_decoders": 36,
+    "verified_codec_encoders_including_scalar_conversions": 23,
+    "checked_integer_setters": 3,
+    "native_cpu_weight_dot_types": 29,
+    "new_encoder_cases": 525,
+    "integer_conversion_inputs": 12329,
+    "additional_f16_graphs": 68,
+    "additional_f16_outputs": 6168
+  },
+  "tokenizer": {
+    "spm_cases": 68,
+    "wordpiece_cases": 1728,
+    "wordpiece_metadata_variants": 9,
+    "wordpiece_vocabulary_entries": 30522,
+    "special_id_fallback_cases": 72,
+    "unicode_codepoints": 1114112,
+    "normalization_sequences": 15957,
+    "utf8_cases": 65809
+  },
+  "pretrained_windows": {
+    "f32_logits": 62976,
+    "f32_max_abs": 0,
+    "q4_logits": 640000,
+    "q4_max_abs": 0,
+    "bert_values_per_endian_encoding": 13056,
+    "bert_max_abs": 0
+  },
+  "pretrained_linux": {
+    "f32_max_abs": 5.722045898e-06,
+    "q4_max_abs": 0,
+    "bert_max_abs": 0.0001348853111,
+    "unchanged_tolerance": "2e-4 + 2e-5 * abs(reference)"
+  },
+  "bert": {
+    "diagnostic_stages_bit_exact_windows": 122,
+    "ordinary_attention_output_values": 46080,
+    "ordinary_missing_pooling_values": 56,
+    "cli_exact_float_values": 16512,
+    "http_requests": 5,
+    "default_pooling_missing_key": "none",
+    "output_l2_normalized": false
+  },
+  "c_api": {
+    "frozen_exports": 255,
+    "implemented_exports": 137,
+    "absent_exports": 118,
+    "rust_extensions": 4,
+    "native_profiles": [
+      "debug",
+      "release"
+    ],
+    "sampler_layout_checks": 36,
+    "original_layout_checks": 69,
+    "sampler_apply_comparisons_per_profile": 1401,
+    "candidate_rows_per_profile": 45949,
+    "sampler_and_wpm_floats_per_profile": 122388,
+    "sampler_max_abs": 0,
+    "lifecycle_error_checks_per_profile": 89,
+    "generated_tokens_per_profile": 192,
+    "original_core_values_per_profile": 93248,
+    "original_core_max_abs": 0
+  },
+  "remaining_ignored_tests": "Each ordinary profile reports 11 ignored tests; the four pretrained-model tests were explicitly executed separately. Other vendor/reference-service prerequisites remain separate.",
+  "full_release_check": {
+    "exit": 1,
+    "expected": true,
+    "reason": "Mandatory full-port architecture/backend/tool/UI and performance gates remain open"
+  },
+  "source_identities": [
+    {
+      "path": "crates/inference/src/lib.rs",
+      "bytes": 15309,
+      "sha256": "60aed40f0f47637dfc4cc9eab853f102162c68972b2a8ea2d47ec7801ebe1910"
+    },
+    {
+      "path": "crates/inference/src/loader.rs",
+      "bytes": 11882,
+      "sha256": "59397bd02ba225f2cc769455133cc17e186a623114350e84e21d6f9ed6c27f75"
+    },
+    {
+      "path": "crates/inference/src/bert_loader.rs",
+      "bytes": 7115,
+      "sha256": "378bc5d123758bd26b4440a3a804233156a9313f946ae1d26e09fb71106a9030"
+    },
+    {
+      "path": "crates/model-runtime/src/math.rs",
+      "bytes": 17610,
+      "sha256": "a67b6818818d0aaa591a440ff1ac35f6b9d3f2da60db52fe2bee0a65e383c448"
+    },
+    {
+      "path": "crates/model-runtime/src/bert.rs",
+      "bytes": 11368,
+      "sha256": "fdf7faeadb86e40e779ae1cad3f4f9f034f96d533fbc7fec85e6ced941482c3a"
+    },
+    {
+      "path": "crates/tokenizer/src/lib.rs",
+      "bytes": 31702,
+      "sha256": "21cfa5a169cb7be67fc186a63a08c4f2e74a4265ce0bb057912cfc11a22abd3a"
+    },
+    {
+      "path": "crates/tokenizer/src/unicode.rs",
+      "bytes": 10502,
+      "sha256": "ff95a5d0916abc85e0b967031bc7df692012f14eae1c1e8873a03fbc1528e6f2"
+    },
+    {
+      "path": "crates/quant/src/lib.rs",
+      "bytes": 12853,
+      "sha256": "e48989a4ae921f7d3ca3a836be442c5b5fe5593eead329bc39c23e3889641b8f"
+    },
+    {
+      "path": "crates/ffi/src/sampler.rs",
+      "bytes": 45071,
+      "sha256": "3c0e27ba3e8cb415a4f5aa2b42e5c3643f3f650f7b434f9691acd26dd59cb6b5"
+    },
+    {
+      "path": "crates/llama-behavior/src/sampling.rs",
+      "bytes": 67878,
+      "sha256": "d72473f586435781ac54695a3235ce9b0a2866f08072d0ded1f14eb35dbb478a"
+    },
+    {
+      "path": "docs/integration-fixture-manifest.tsv",
+      "bytes": 13698,
+      "sha256": "7c96daa66ba6cda5ab4c0a3ce78ffe762c0785f4064929e773221a9af217f3f6"
+    }
+  ]
+}

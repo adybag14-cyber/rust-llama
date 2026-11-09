@@ -1,0 +1,186 @@
+{
+  "status": "succeeded",
+  "remediation": "Exact reviewed license-file roles and intentional fixture README hash refreshed; initial failures retained.",
+  "results": [
+    {
+      "step": "format-check",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 3.2222344875335693
+    },
+    {
+      "step": "debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "seconds": 8.93065071105957,
+      "tests": {
+        "passed": 313,
+        "failed": 0,
+        "ignored": 11
+      }
+    },
+    {
+      "step": "release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "seconds": 64.07385563850403,
+      "tests": {
+        "passed": 313,
+        "failed": 0,
+        "ignored": 11
+      }
+    },
+    {
+      "step": "clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "seconds": 3.2211461067199707
+    },
+    {
+      "step": "source-audit",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit": 1,
+      "seconds": 5.3321919441223145
+    },
+    {
+      "step": "audit-remediation-tests",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance"
+      ],
+      "exit": 0,
+      "seconds": 1.388657808303833
+    },
+    {
+      "step": "audit-remediation-clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "seconds": 0.7877602577209473
+    },
+    {
+      "step": "format-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 3.07696533203125
+    },
+    {
+      "step": "source-audit-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit": 0,
+      "seconds": 5.418683290481567
+    },
+    {
+      "step": "fixtures",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit": 1,
+      "seconds": 4.796669006347656
+    },
+    {
+      "step": "fixtures-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit": 0,
+      "seconds": 5.4862000942230225
+    },
+    {
+      "step": "build-release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit": 0,
+      "seconds": 12.439746379852295
+    }
+  ]
+}

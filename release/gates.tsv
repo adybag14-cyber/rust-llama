@@ -1,20 +1,23 @@
 gate	owner	status	evidence_or_blocker
 baseline-ownership	T12	validated	ledger/baseline-files.tsv contains all 4082 frozen files with owner/hash/size; semantic completion remains separate
 baseline-source-identity	T12	validated	evidence/2026-11-09/integration verifies the complete extracted frozen source against the ledger
-workspace-build-and-tests	T12	validated	evidence/2026-11-09/windows and linux: debug/release tests strict Clippy and release builds passed
+workspace-build-and-tests	T12	validated	evidence/2026-11-09/windows-extension and linux-extension-final: 311/313 ordinary tests per debug/release profile; strict Clippy and release builds passed
 language-and-dependency-audit	T12	validated	Rust audit passes on the integrated workspace; unsafe candidates are an inventory rather than blanket proof
-fixture-integrity	T12	validated	86 fixture files with 86 complete declarations; evidence/2026-11-09/integration and platform captures
-pretrained-f32-reference	T04,T05	validated	62976 logits within predefined tolerance and 96 greedy IDs equal; evidence/2026-11-09/server and fixtures/inference
+fixture-integrity	T12	validated	Complete declared fixture inventory; original integration and extension captures under evidence/2026-11-09
+pretrained-f32-reference	T04,T05	validated	62976 logits now exactly equal on Windows; Linux within original fixed tolerance; 96 greedy IDs equal; evidence/2026-11-09/bert and linux-extension
 pretrained-q4-reference	T03,T05	validated	640000 logits exactly equal in exercised Windows build; evidence/2026-11-09/inference/stories15m-q4-packed-validation.json
+pretrained-bert-reference	T04,T05	validated	13056 values exact on Windows; Linux within unchanged native bound; equivalent big-endian encoding checked; evidence/2026-11-09/bert and linux-extension
+unicode-wordpiece-reference	T04	validated	All Unicode codepoints core normalization UTF8 cases and original WordPiece corpus checked; BPE regex/pretokenizers remain open; evidence/2026-11-09/tokenizer
+scalar-weight-dot-inventory	T03	validated	All 29 source CPU weight-dot types independently checked; ISA and full backend coverage remain separate; crates/quant/tests/fixtures
 cuda-kernel-subset	T06	validated	138 actual RTX 4090 dispatches; evidence/2026-11-09/gpu; not complete model/backend parity
 opencl-kernel-subset	T07	validated	Actual NVIDIA and AMD cases; evidence/2026-11-09/gpu; not complete backend parity
 real-model-server-subset	T11	validated	38 ordinary tests and 37 real-model requests; evidence/2026-11-09/server
 file-disposition-closure	ALL	planned	Every baseline path requires reviewed capability-linked replacement and evidence
 complete-public-abi	T01	implementing	Source-compatible native subset under independent header/model checks; all remaining exports and semantics open
 complete-tensor-engine	T02	implementing	Full operators scheduler allocation events autograd and optimizers remain open
-complete-cpu-and-quantization	T03	implementing	All decoders implemented; remaining encoders dots operators and ISA paths remain open
-formats-tokenizers-conversion-parity	T04	implementing	Other tokenizer families checkpoint and converter support sharding and metadata tools remain open
-all-model-architectures	T05	implementing	Only selected typed graphs and dense Llama GGUF are executable; full 172 named-entry architecture scope remains
+complete-cpu-and-quantization	T03	implementing	All decoders and 29 scalar CPU weight dots implemented; remaining IQ/weighted encoders general operators and ISA paths remain open
+formats-tokenizers-conversion-parity	T04	implementing	SPM WPM and core Unicode independently checked; remaining tokenizer/pretokenizer families checkpoint/converter support sharding and metadata tools remain open
+all-model-architectures	T05	implementing	Selected typed graphs plus dense Llama and BERT GGUF execute; full 172 named-entry architecture scope remains
 all-eighteen-backends	T03,T06-T08	implementing	Full operation memory scheduling compiler hardware and vendor parity remains open across 18 families
 multimodal-model-embeddings	T09	planned	All 58 modality graph builders require complete runtime/model execution and independent fixtures
 media-codec-completeness	T09	implementing	Selected formats only; full frozen codec/container and preprocessing scope remains open

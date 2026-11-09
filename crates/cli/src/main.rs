@@ -2,7 +2,7 @@
 #![forbid(unsafe_code)]
 use llama_behavior::json::{self, Value};
 use llama_gguf::Gguf;
-use llama_inference::{GenerationOptions, LoadOptions, Model};
+use llama_inference::{GenerationOptions, LoadOptions, Model, Pooling};
 use llama_tokenizer::Tokenizer;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -16,7 +16,7 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 fn bad(s: impl Into<String>) -> Box<dyn Error> {
     io::Error::new(io::ErrorKind::InvalidInput, s.into()).into()
 }
-const HELP: &str = "rust-llama: native Rust GGUF inference\n\nCommands:\n  generate    Load a supported model and stream generated text (default)\n  inspect     Validate GGUF and print metadata/tensor descriptors as JSON\n  tokenize    Print token IDs and byte-exact pieces (supports vocabulary-only GGUF)\n  detokenize  Decode --tokens 1,2,3 as UTF-8 text\n  logits      Print full per-token logits for conformance\n\nOptions:\n  -m, --model PATH          GGUF model or vocabulary file (required)\n  -p, --prompt TEXT         Prompt text\n      --prompt-file PATH   Read a UTF-8 prompt, at most 4 MiB\n  -n, --n-predict N         Maximum generated tokens (default 128)\n      --temperature T      Zero is greedy (default 0)\n      --seed N             Explicit MT19937 u32 seed (default 0)\n      --stop TEXT          Stop string; repeatable\n  -c, --ctx-size N          Context bound (default 1024, capped to training limit)\n      --max-weight-mib N   Decoded F32 weight budget (default 2048)\n      --no-special         Do not insert BOS/EOS in tokenize/logits\n      --literal-special    Do not parse control strings in tokenize/logits\n      --render-special     Render control tokens in detokenize\n      --tokens IDS         Comma-separated token IDs for detokenize/logits\n  -h, --help               Show this help\n\nModel support: dense Llama, unscaled adjacent-pair RoPE, SPM tokenizer.\nPacked matrix arithmetic preserves source activation conversion; decoded F32 row caches are retained.\nOther model modes fail explicitly.\nGeneration text goes to stdout; timing/token statistics go to stderr.\n";
+const HELP: &str = "rust-llama: native Rust GGUF inference\n\nCommands:\n  generate    Load a supported model and stream generated text (default)\n  inspect     Validate GGUF and print metadata/tensor descriptors as JSON\n  tokenize    Print token IDs and byte-exact pieces (supports vocabulary-only GGUF)\n  detokenize  Decode --tokens 1,2,3 as UTF-8 text\n  logits      Print full per-token logits for conformance\n  embed       Encode a dense BERT sequence and print raw embeddings as JSON\n\nOptions:\n  -m, --model PATH          GGUF model or vocabulary file (required)\n  -p, --prompt TEXT         Prompt text\n      --prompt-file PATH   Read a UTF-8 prompt, at most 4 MiB\n  -n, --n-predict N         Maximum generated tokens (default 128)\n      --temperature T      Zero is greedy (default 0)\n      --seed N             Explicit MT19937 u32 seed (default 0)\n      --stop TEXT          Stop string; repeatable\n  -c, --ctx-size N          Context bound (default 1024, capped to training limit)\n      --max-weight-mib N   Decoded F32 weight budget (default 2048)\n      --no-special         Do not insert special tokens in tokenize/logits/embed\n      --literal-special    Do not parse control strings in tokenize/logits/embed\n      --render-special     Render control tokens in detokenize\n      --tokens IDS         Comma-separated token IDs for detokenize/logits/embed\n      --pooling MODE       embed: model (default), none, mean, first, last\n  -h, --help               Show this help\n\nModel support: dense Llama/SPM generation and dense BERT/WordPiece embeddings.\nPacked matrix arithmetic preserves source activation conversion; decoded F32 row caches are retained.\nOther model modes fail explicitly.\nGeneration text goes to stdout; timing/token statistics go to stderr.\n";
 #[derive(Default)]
 struct Args {
     command: String,
@@ -64,6 +64,7 @@ impl Args {
                     | "--ctx-size"
                     | "--max-weight-mib"
                     | "--tokens"
+                    | "--pooling"
             ) {
                 return Err(bad(format!("unknown option {key}")));
             }
@@ -179,6 +180,21 @@ fn run() -> Result<()> {
         print!("{HELP}");
         return Ok(());
     }
+    if a.command != "embed" && a.value("--pooling").is_some() {
+        return Err(bad("--pooling is only supported by embed"));
+    }
+    if a.command == "embed" {
+        if a.flags.contains("--render-special") {
+            return Err(bad("--render-special is only supported by detokenize"));
+        }
+        if ["--n-predict", "--temperature", "--seed"]
+            .iter()
+            .any(|key| a.value(key).is_some())
+            || !a.stops.is_empty()
+        {
+            return Err(bad("generation options are not supported by embed"));
+        }
+    }
     let path = PathBuf::from(
         a.value("--model")
             .ok_or_else(|| bad("--model is required; use --help"))?,
@@ -248,7 +264,7 @@ fn run() -> Result<()> {
                 ]))
             }
         }
-        "generate" | "logits" => {
+        "generate" | "logits" | "embed" => {
             let budget: usize = a.number("--max-weight-mib", 2048usize)?;
             let options = LoadOptions {
                 max_decoded_weight_bytes: budget
@@ -259,6 +275,47 @@ fn run() -> Result<()> {
             let start = Instant::now();
             let model = Model::load_with_options(path, &options)?;
             let load_seconds = start.elapsed().as_secs_f64();
+            if a.command == "embed" {
+                let pooling = match a.value("--pooling").unwrap_or("model") {
+                    "model" => model.default_embedding_pooling().unwrap_or(Pooling::None),
+                    "none" => Pooling::None,
+                    "mean" => Pooling::Mean,
+                    "first" => Pooling::First,
+                    "last" => Pooling::Last,
+                    other => return Err(bad(format!("unknown pooling mode {other}"))),
+                };
+                let tokens = a.tokens(model.tokenizer())?;
+                let encoded = model.embed_tokens(&tokens, pooling, &|| false)?;
+                let floats = |values: Vec<f32>| {
+                    Value::Array(
+                        values
+                            .into_iter()
+                            .map(|v| Value::Number(v as f64))
+                            .collect(),
+                    )
+                };
+                return print_json(&Value::object([
+                    ("model", Value::from(model.model_id())),
+                    (
+                        "tokens",
+                        Value::Array(tokens.into_iter().map(Value::from).collect()),
+                    ),
+                    (
+                        "dimensions",
+                        Value::from(model.embedding_dimensions() as u64),
+                    ),
+                    (
+                        "pooling",
+                        Value::from(format!("{pooling:?}").to_lowercase()),
+                    ),
+                    ("normalized", Value::Bool(false)),
+                    (
+                        "embeddings",
+                        Value::Array(encoded.tokens.into_iter().map(floats).collect()),
+                    ),
+                    ("pooled", encoded.pooled.map(floats).unwrap_or(Value::Null)),
+                ]));
+            }
             if a.command == "logits" {
                 let tokens = a.tokens(model.tokenizer())?;
                 let logits = model.logits_for_tokens(&tokens)?;

@@ -1,8 +1,9 @@
 //! Native Rust GGUF -> tokenizer -> model -> sampler integration.
-//! The implemented model path is dense Llama with unscaled adjacent-pair RoPE.
+//! Model paths: dense Llama with unscaled adjacent-pair RoPE and dense BERT embeddings.
 //! Unsupported architectures and configuration modes fail before generation.
 #![forbid(unsafe_code)]
 
+mod bert_loader;
 mod loader;
 mod stream;
 use llama_behavior::{
@@ -10,6 +11,7 @@ use llama_behavior::{
     sampling::{Chain, Config},
 };
 use llama_model_runtime::{BatchToken, Context, ContextOptions, Input, OutputSelection};
+pub use llama_model_runtime::{Encoded, Pooling};
 use llama_tokenizer::Tokenizer;
 use std::{fmt, path::Path, sync::Arc};
 
@@ -121,12 +123,20 @@ pub struct GenerationStats {
 }
 
 #[derive(Debug, Clone)]
+pub(crate) enum Executor {
+    Decoder(Arc<llama_model_runtime::Model>),
+    Bert(Arc<llama_model_runtime::BertModel>),
+}
+
+#[derive(Debug, Clone)]
 pub struct Model {
-    pub(crate) runtime: Arc<llama_model_runtime::Model>,
+    pub(crate) runtime: Executor,
     pub(crate) tokenizer: Tokenizer,
     pub(crate) id: String,
     pub(crate) template: Option<String>,
     pub(crate) decoded_weight_bytes: usize,
+    pub(crate) context_limit: usize,
+    pub(crate) embedding_pooling: Option<Pooling>,
 }
 impl Model {
     pub fn load(path: impl AsRef<Path>) -> Result<Self> {
@@ -142,7 +152,67 @@ impl Model {
         self.tokenizer.vocabulary_size()
     }
     pub fn context_length(&self) -> usize {
-        self.runtime.max_context()
+        self.context_limit
+    }
+    /// Whether the loaded architecture supports autoregressive logits/generation.
+    pub fn supports_generation(&self) -> bool {
+        matches!(self.runtime, Executor::Decoder(_))
+    }
+    pub fn supports_embeddings(&self) -> bool {
+        matches!(self.runtime, Executor::Bert(_))
+    }
+    pub fn embedding_dimensions(&self) -> usize {
+        match &self.runtime {
+            Executor::Decoder(model) => model.width(),
+            Executor::Bert(model) => model.config().width,
+        }
+    }
+    pub fn default_embedding_pooling(&self) -> Option<Pooling> {
+        self.embedding_pooling
+    }
+    /// Raw final-layer token embeddings, with optional raw pooling.
+    /// No normalization is applied. The complete sequence is encoded together.
+    pub fn embed_tokens(
+        &self,
+        tokens: &[i32],
+        pooling: Pooling,
+        cancel: &dyn Fn() -> bool,
+    ) -> Result<Encoded> {
+        if cancel() {
+            return Err(Error::Cancelled);
+        }
+        let Executor::Bert(model) = &self.runtime else {
+            return Err(Error::Unsupported(
+                "embedding API currently requires a dense BERT model".into(),
+            ));
+        };
+        if tokens.len() > self.context_length() {
+            return Err(Error::Invalid(
+                "token sequence exceeds model context".into(),
+            ));
+        }
+        let ids: Vec<u32> = tokens
+            .iter()
+            .map(|&id| u32::try_from(id).map_err(|_| Error::Invalid("negative token ID".into())))
+            .collect::<Result<_>>()?;
+        let positions: Vec<usize> = (0..ids.len()).collect();
+        Ok(model.encode_positions_with_cancel(&ids, &positions, pooling, cancel)?)
+    }
+    pub fn embed(
+        &self,
+        text: &str,
+        pooling: Option<Pooling>,
+        cancel: &dyn Fn() -> bool,
+    ) -> Result<Encoded> {
+        if cancel() {
+            return Err(Error::Cancelled);
+        }
+        let tokens = self.tokenize(text, true)?;
+        self.embed_tokens(
+            &tokens,
+            pooling.or(self.embedding_pooling).unwrap_or(Pooling::None),
+            cancel,
+        )
     }
     pub fn decoded_weight_bytes(&self) -> usize {
         self.decoded_weight_bytes
@@ -151,8 +221,13 @@ impl Model {
         &self.tokenizer
     }
     /// Share immutable model weights with a separately owned runtime context.
-    pub fn runtime_model(&self) -> Arc<llama_model_runtime::Model> {
-        self.runtime.clone()
+    pub fn runtime_model(&self) -> Result<Arc<llama_model_runtime::Model>> {
+        match &self.runtime {
+            Executor::Decoder(model) => Ok(model.clone()),
+            Executor::Bert(_) => Err(Error::Unsupported(
+                "BERT requires complete-sequence encoding, not a decoder context".into(),
+            )),
+        }
     }
     /// Native server default: parse special strings, independent of BOS/EOS insertion.
     pub fn tokenize(&self, text: &str, add_special: bool) -> Result<Vec<i32>> {
@@ -181,7 +256,7 @@ impl Model {
     }
     fn context(&self) -> Result<Context> {
         Ok(Context::new(
-            self.runtime.clone(),
+            self.runtime_model()?,
             ContextOptions {
                 maximum_sequences: 1,
                 microbatch_tokens: 32,
@@ -191,6 +266,11 @@ impl Model {
     }
     /// Observable full logits for conformance and embedding/runtime integration.
     pub fn logits_for_tokens(&self, tokens: &[i32]) -> Result<Vec<Vec<f32>>> {
+        if !self.supports_generation() {
+            return Err(Error::Unsupported(
+                "BERT produces embeddings, not autoregressive logits".into(),
+            ));
+        }
         if tokens.len() > self.context_length() {
             return Err(Error::Invalid(
                 "token sequence exceeds model context".into(),
@@ -226,6 +306,11 @@ impl Model {
     ) -> Result<GenerationStats> {
         if cancel() {
             return Err(Error::Cancelled);
+        }
+        if !self.supports_generation() {
+            return Err(Error::Unsupported(
+                "BERT is an embedding model; generation is unavailable".into(),
+            ));
         }
         if !options.temperature.is_finite() || options.temperature < 0. {
             return Err(Error::Invalid(

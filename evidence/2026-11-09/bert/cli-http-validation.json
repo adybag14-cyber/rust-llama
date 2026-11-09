@@ -1,0 +1,140 @@
+{
+  "model_sha256": "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999",
+  "cli_float_values_compared": 16512,
+  "checks": [
+    {
+      "command": "embed",
+      "pooling": "model",
+      "exit": 0,
+      "tokens": 10,
+      "exact": true
+    },
+    {
+      "command": "embed",
+      "pooling": "none",
+      "exit": 0,
+      "tokens": 10,
+      "exact": true
+    },
+    {
+      "command": "embed",
+      "pooling": "mean",
+      "exit": 0,
+      "tokens": 10,
+      "exact": true
+    },
+    {
+      "command": "embed",
+      "pooling": "last",
+      "exit": 0,
+      "tokens": 10,
+      "exact": true
+    },
+    {
+      "command": "embed",
+      "options": [
+        "--pooling",
+        "bad"
+      ],
+      "exit": 1,
+      "error": "rust-llama: unknown pooling mode bad"
+    },
+    {
+      "command": "embed",
+      "options": [
+        "--n-predict",
+        "2"
+      ],
+      "exit": 1,
+      "error": "rust-llama: generation options are not supported by embed"
+    },
+    {
+      "server_requests": [
+        {
+          "method": "GET",
+          "path": "/health",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "status": "ok"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/v1/models",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "data": [
+              {
+                "created": 0,
+                "id": "bge-small-en-v1.5",
+                "object": "model",
+                "owned_by": "rust-llama"
+              }
+            ],
+            "object": "list"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/tokenize",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "tokens": [
+              101,
+              18399,
+              8831,
+              2323,
+              7969,
+              6635,
+              15973,
+              5248,
+              1012,
+              102
+            ]
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/v1/completions",
+          "status": 501,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "error": {
+              "code": 501,
+              "message": "loaded model provides embeddings; text generation is unavailable",
+              "type": "not_implemented"
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/v1/completions",
+          "status": 501,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "error": {
+              "code": 501,
+              "message": "loaded model provides embeddings; text generation is unavailable",
+              "type": "not_implemented"
+            }
+          }
+        }
+      ],
+      "shutdown_exit": 0
+    },
+    {
+      "command": "embed",
+      "options": [
+        "--model",
+        "missing-for-option-validation.gguf",
+        "--render-special"
+      ],
+      "exit": 1,
+      "rejected_before_model_io": true,
+      "error": "rust-llama: --render-special is only supported by detokenize"
+    }
+  ]
+}

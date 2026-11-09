@@ -47,6 +47,9 @@ pub fn role(path: &str) -> Option<&'static str> {
             | "docs/imports/t05-t08/LICENSE"
             | "docs/imports/t09-t12/LICENSE"
             | "docs/imports/t09-t12/NOTICE"
+            | "crates/llama-behavior/LICENSE-MIT.txt"
+            | "crates/llama-behavior/LICENSE-LLAMA-CPP.txt"
+            | "crates/llama-behavior/LICENSE-MICROSOFT-STL.txt"
     ) || path.ends_with(".md")
     {
         return Some("documentation or license");
@@ -531,6 +534,9 @@ mod tests {
             "LICENSE-UPSTREAM",
             "docs/imports/t05-t08/LICENSE",
             "docs/imports/t09-t12/NOTICE",
+            "crates/llama-behavior/LICENSE-MIT.txt",
+            "crates/llama-behavior/LICENSE-LLAMA-CPP.txt",
+            "crates/llama-behavior/LICENSE-MICROSOFT-STL.txt",
             ".github/workflows/ci.yml",
             "fixtures/inference/ggml-vocab-llama-spm.gguf",
             "crates/vendor-remote/tests/fixtures/hexagon32-input.elf",
@@ -543,6 +549,7 @@ mod tests {
             "fixtures/old.dll",
             ".github/workflows/unknown.yml",
             "docs/imports/old/LICENSE.cpp",
+            "crates/llama-behavior/LICENSE-UNREVIEWED.txt",
         ] {
             assert!(role(path).is_none(), "{path}");
         }

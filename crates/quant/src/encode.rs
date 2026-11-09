@@ -1,11 +1,15 @@
 use crate::{DType, QuantError, f32_to_bf16, f32_to_f16};
 
-/// Encode reference scalar formats and Q1_0/Q2_0/Q4_0/Q4_1/Q5_0/Q5_1/Q8_0/Q8_1.
+/// Encode reference scalar, legacy, K, ternary and FP4 formats.
+/// IQ encoders and importance-weighted encoding remain separate capabilities.
 /// Other encoders return an explicit error. Quantized inputs must be finite and
 /// their scale calculation must not overflow; IEEE scalar encoders permit NaNs.
 pub fn quantize(dtype: DType, values: &[f32]) -> Result<Vec<u8>, QuantError> {
     let bytes = dtype.row_bytes(values.len())?;
     supported(dtype)?;
+    if crate::encode_k::supports(dtype) {
+        return crate::encode_k::encode(dtype, values);
+    }
     let mut out = Vec::new();
     out.try_reserve_exact(bytes)
         .map_err(|_| QuantError::AllocationFailed)?;
@@ -18,22 +22,36 @@ pub fn quantize(dtype: DType, values: &[f32]) -> Result<Vec<u8>, QuantError> {
 pub fn quantize_into(dtype: DType, values: &[f32], out: &mut [u8]) -> Result<(), QuantError> {
     crate::validate(dtype, out.len(), values.len())?;
     supported(dtype)?;
-    let scalar = matches!(dtype, DType::F32 | DType::F16 | DType::BF16 | DType::F64);
+    if crate::encode_k::supports(dtype) {
+        let staged = crate::encode_k::encode(dtype, values)?;
+        out.copy_from_slice(&staged);
+        return Ok(());
+    }
+    let scalar = matches!(
+        dtype,
+        DType::F32 | DType::F16 | DType::BF16 | DType::F64 | DType::F8_E4M3
+    );
     if !scalar {
         for (index, &value) in values.iter().enumerate() {
             if !value.is_finite() {
                 return Err(QuantError::NonFiniteInput { index });
             }
         }
-        for (block, v) in values.chunks_exact(dtype.block_size()).enumerate() {
-            let (d, m) = scales(dtype, v);
-            if !d.is_finite()
-                || !m.is_finite()
-                || (d != 0.0 && !(1.0 / d).is_finite())
-                || (f32_to_f16(d) & 0x7c00) == 0x7c00
-                || (f32_to_f16(m) & 0x7c00) == 0x7c00
-            {
-                return Err(QuantError::UnrepresentableScale { block });
+        if dtype == DType::Q8_K {
+            crate::activation::preflight_q8k(values)?;
+        } else if dtype == DType::MXFP4 {
+            crate::encode_simple::preflight_mxfp4(values)?;
+        } else if dtype != DType::NVFP4 {
+            for (block, v) in values.chunks_exact(dtype.block_size()).enumerate() {
+                let (d, m) = scales(dtype, v);
+                if !d.is_finite()
+                    || !m.is_finite()
+                    || (d != 0.0 && !(1.0 / d).is_finite())
+                    || (f32_to_f16(d) & 0x7c00) == 0x7c00
+                    || (f32_to_f16(m) & 0x7c00) == 0x7c00
+                {
+                    return Err(QuantError::UnrepresentableScale { block });
+                }
             }
         }
     }
@@ -49,7 +67,8 @@ pub fn quantize_into(dtype: DType, values: &[f32], out: &mut [u8]) -> Result<(),
 fn supported(t: DType) -> Result<(), QuantError> {
     use DType::*;
     match t {
-        F32 | F16 | BF16 | F64 | Q1_0 | Q2_0 | Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 => Ok(()),
+        F32 | F16 | BF16 | F64 | Q2_K | Q3_K | Q4_K | Q5_K | Q6_K | F8_E4M3 | TQ1_0 | TQ2_0
+        | MXFP4 | NVFP4 | Q8_K | Q1_0 | Q2_0 | Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 => Ok(()),
         _ => Err(QuantError::UnsupportedQuantization(t)),
     }
 }
@@ -61,6 +80,7 @@ fn scales(t: DType, x: &[f32]) -> (f32, f32) {
             x.iter().fold(0.0, |sum, v| sum + v.abs()) / x.len() as f32,
             0.0,
         ),
+        TQ1_0 | TQ2_0 => (x.iter().fold(0.0_f32, |a, v| a.max(v.abs())), 0.0),
         Q2_0 | Q8_0 | Q8_1 => {
             let amax = x.iter().fold(0.0_f32, |a, v| a.max(v.abs()));
             (if t == Q2_0 { amax } else { amax / 127.0 }, 0.0)
@@ -92,6 +112,10 @@ fn put_half(b: &mut [u8], p: usize, v: f32) {
 fn block(t: DType, x: &[f32], b: &mut [u8]) {
     use DType::*;
     match t {
+        Q8_K => crate::activation::encode_q8k(x, b),
+        TQ1_0 | TQ2_0 => crate::encode_simple::ternary(t, x, b),
+        MXFP4 | NVFP4 => crate::encode_simple::fp4(t, x, b),
+        F8_E4M3 => b[0] = crate::f32_to_f8_e4m3(x[0]),
         F32 => b.copy_from_slice(&x[0].to_le_bytes()),
         F16 => b.copy_from_slice(&f32_to_f16(x[0]).to_le_bytes()),
         BF16 => b.copy_from_slice(&f32_to_bf16(x[0]).to_le_bytes()),

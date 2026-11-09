@@ -53,6 +53,11 @@ impl RuntimeProvider {
     }
 
     fn options(&self, request: &GenerationRequest) -> Result<GenerationOptions, ProviderError> {
+        if !self.model.supports_generation() {
+            return Err(ProviderError::unsupported(
+                "loaded model provides embeddings; text generation is unavailable",
+            ));
+        }
         if request
             .model
             .as_deref()

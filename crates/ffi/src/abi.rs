@@ -265,3 +265,95 @@ mod tests {
         }
     }
 }
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaTokenData {
+    pub id: i32,
+    pub logit: f32,
+    pub p: f32,
+}
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaTokenDataArray {
+    pub data: *mut LlamaTokenData,
+    pub size: usize,
+    pub selected: i64,
+    pub sorted: u8,
+}
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaLogitBias {
+    pub token: i32,
+    pub bias: f32,
+}
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaSamplerChainParams {
+    pub no_perf: u8,
+}
+#[repr(C)]
+pub struct LlamaSampler {
+    pub iface: *mut LlamaSamplerI,
+    pub ctx: *mut c_void,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct LlamaSamplerI {
+    pub name: Option<unsafe extern "C" fn(*const LlamaSampler) -> *const std::ffi::c_char>,
+    pub accept: Option<unsafe extern "C" fn(*mut LlamaSampler, i32)>,
+    pub apply: Option<unsafe extern "C" fn(*mut LlamaSampler, *mut LlamaTokenDataArray)>,
+    pub reset: Option<unsafe extern "C" fn(*mut LlamaSampler)>,
+    pub clone: Option<unsafe extern "C" fn(*const LlamaSampler) -> *mut LlamaSampler>,
+    pub free: Option<unsafe extern "C" fn(*mut LlamaSampler)>,
+    pub backend_init: Option<unsafe extern "C" fn(*mut LlamaSampler, *mut c_void, u32) -> bool>,
+    pub backend_accept:
+        Option<unsafe extern "C" fn(*mut LlamaSampler, *mut c_void, *mut c_void, *mut c_void)>,
+    pub backend_apply:
+        Option<unsafe extern "C" fn(*mut LlamaSampler, *mut c_void, *mut c_void, *mut c_void)>,
+    pub backend_set_input: Option<unsafe extern "C" fn(*mut LlamaSampler)>,
+    pub backend_reset: Option<unsafe extern "C" fn(*mut LlamaSampler)>,
+    pub copy_state: Option<unsafe extern "C" fn(*const LlamaSampler, *mut LlamaSampler)>,
+}
+
+pub fn sampler_layout(index: usize) -> usize {
+    let values = [
+        size_of::<LlamaTokenData>(),
+        align_of::<LlamaTokenData>(),
+        offset_of!(LlamaTokenData, id),
+        offset_of!(LlamaTokenData, logit),
+        offset_of!(LlamaTokenData, p),
+        size_of::<LlamaTokenDataArray>(),
+        align_of::<LlamaTokenDataArray>(),
+        offset_of!(LlamaTokenDataArray, data),
+        offset_of!(LlamaTokenDataArray, size),
+        offset_of!(LlamaTokenDataArray, selected),
+        offset_of!(LlamaTokenDataArray, sorted),
+        size_of::<LlamaLogitBias>(),
+        align_of::<LlamaLogitBias>(),
+        offset_of!(LlamaLogitBias, token),
+        offset_of!(LlamaLogitBias, bias),
+        size_of::<LlamaSamplerChainParams>(),
+        align_of::<LlamaSamplerChainParams>(),
+        offset_of!(LlamaSamplerChainParams, no_perf),
+        size_of::<LlamaSampler>(),
+        align_of::<LlamaSampler>(),
+        offset_of!(LlamaSampler, iface),
+        offset_of!(LlamaSampler, ctx),
+        size_of::<LlamaSamplerI>(),
+        align_of::<LlamaSamplerI>(),
+        offset_of!(LlamaSamplerI, name),
+        offset_of!(LlamaSamplerI, accept),
+        offset_of!(LlamaSamplerI, apply),
+        offset_of!(LlamaSamplerI, reset),
+        offset_of!(LlamaSamplerI, clone),
+        offset_of!(LlamaSamplerI, free),
+        offset_of!(LlamaSamplerI, backend_init),
+        offset_of!(LlamaSamplerI, backend_accept),
+        offset_of!(LlamaSamplerI, backend_apply),
+        offset_of!(LlamaSamplerI, backend_set_input),
+        offset_of!(LlamaSamplerI, backend_reset),
+        offset_of!(LlamaSamplerI, copy_state),
+    ];
+    values.get(index).copied().unwrap_or(usize::MAX)
+}

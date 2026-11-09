@@ -496,17 +496,79 @@ impl Sampler {
         candidates.validate()?;
         let mut next = self.clone();
         let mut values = candidates.clone();
-        next.apply_inner(&mut values)?;
+        next.apply_inner(&mut values, false)?;
         values.validate()?;
         *self = next;
         *candidates = values;
         Ok(())
     }
-    fn apply_inner(&mut self, c: &mut Candidates) -> Result<()> {
+    /// Execute the frozen public C sampler contract without changing the stable
+    /// Rust API's documented defaults. Preserves nonterminal selection and source
+    /// sorted flags. Returned rows were removed from the *front* by XTC; a C
+    /// adapter must advance its data pointer by that count after writing them.
+    ///
+    /// Native Windows draws use the MSVC 19.51 canonical conversion; other
+    /// targets use the existing libstdc++ conversion. Invalid logits and source
+    /// undefined numeric cases remain checked errors.
+    pub fn apply_native(&mut self, candidates: &mut Candidates) -> Result<Vec<TokenData>> {
+        let mut values = candidates.clone();
+        let selected = values.selected.take();
+        let sorted = std::mem::replace(&mut values.sorted, false);
+        values.validate()?;
+        values.selected = selected;
+        values.sorted = sorted;
+        let mut next = self.clone();
+        let prefix = next.apply_inner(&mut values, true)?;
+        let selected = values.selected.take();
+        let sorted = std::mem::replace(&mut values.sorted, false);
+        values.validate()?;
+        values.selected = selected;
+        values.sorted = sorted;
+        *self = next;
+        *candidates = values;
+        Ok(prefix)
+    }
+
+    /// Frozen adaptive-p clone resets its RNG rather than copying it. Its
+    /// original clone also omits the pending probability buffer; cloning while a
+    /// token awaits acceptance would permit an invalid read in the reference.
+    /// Reject that case explicitly, while reproducing defined post-accept clones.
+    pub fn clone_native(&self) -> Result<Self> {
+        let mut result = self.clone();
+        if let Config::AdaptiveP { seed, .. } = self.config {
+            if self.pending.is_some() {
+                return Err(Error::new(
+                    "native adaptive-p clone requires pending token acceptance or reset",
+                ));
+            }
+            result.rng = Some(Mt19937::new(seed));
+        }
+        Ok(result)
+    }
+
+    fn apply_inner(&mut self, c: &mut Candidates, native: bool) -> Result<Vec<TokenData>> {
         // A prior terminal selection cannot survive subsequent reordering.
-        c.selected = None;
+        if !native {
+            c.selected = None;
+        }
+        let mut prefix = Vec::new();
         if c.data.is_empty() {
-            return Ok(());
+            if native {
+                match self.config {
+                    Config::Greedy => c.selected = Some(0),
+                    Config::Dist { .. } => c.selected = None,
+                    Config::TopP { p, .. } | Config::Typical { p, .. } if p < 1.0 => {
+                        return Err(Error::new("native sampler requires nonempty candidates"));
+                    }
+                    Config::Mirostat { .. }
+                    | Config::MirostatV2 { .. }
+                    | Config::AdaptiveP { .. } => {
+                        return Err(Error::new("native sampler requires nonempty candidates"));
+                    }
+                    _ => {}
+                }
+            }
+            return Ok(prefix);
         }
         match &self.config {
             Config::Greedy => {
@@ -516,27 +578,58 @@ impl Sampler {
                         best = i;
                     }
                 }
-                if c.data[best].logit == f32::NEG_INFINITY {
+                if !native && c.data[best].logit == f32::NEG_INFINITY {
                     return Err(Error::new("all candidate logits are masked"));
                 }
                 c.selected = Some(best);
             }
-            Config::Dist { .. } => sample_logits(c, self.rng.as_mut().expect("distribution RNG"))?,
-            Config::TopK { k } => top_k(c, *k),
+            Config::Dist { .. } => {
+                sample_logits(c, self.rng.as_mut().expect("distribution RNG"), native)?
+            }
+            Config::TopK { k } => top_k(c, *k, native),
             Config::TopP { p, min_keep } => {
                 if *p < 1.0 {
-                    softmax(c, false)?;
-                    c.sort();
-                    let mut sum = 0.0f32;
-                    let mut keep = c.data.len();
-                    for (i, token) in c.data.iter().enumerate() {
-                        sum += token.p;
-                        if sum >= *p && i + 1 >= *min_keep {
-                            keep = i + 1;
-                            break;
+                    softmax_mode(c, false, native)?;
+                    if native && !c.sorted && c.data.len() > 1024 {
+                        // The frozen source first sorts 256 items into a separate
+                        // buffer. A boundary tied logit can have a different token
+                        // order than a full sort, so this optimization is observable.
+                        let mut ordered = Candidates {
+                            data: c.data.clone(),
+                            selected: None,
+                            sorted: false,
+                        };
+                        sort_mode(&mut ordered, 256, true);
+                        let mut sum = 0.0f32;
+                        let mut keep = c.data.len();
+                        for i in 0..c.data.len() {
+                            sum += ordered.data[i].p;
+                            if sum >= *p && i + 1 >= *min_keep {
+                                keep = i + 1;
+                                break;
+                            }
+                            if i == 255 {
+                                ordered.data = c.data.clone();
+                                ordered.sorted = false;
+                                sort_mode(&mut ordered, c.data.len(), true);
+                            }
                         }
+                        ordered.data.truncate(keep);
+                        c.data = ordered.data;
+                        c.sorted = true;
+                    } else {
+                        sort_mode(c, c.data.len(), native);
+                        let mut sum = 0.0f32;
+                        let mut keep = c.data.len();
+                        for (i, token) in c.data.iter().enumerate() {
+                            sum += token.p;
+                            if sum >= *p && i + 1 >= *min_keep {
+                                keep = i + 1;
+                                break;
+                            }
+                        }
+                        c.data.truncate(keep);
                     }
-                    c.data.truncate(keep);
                 }
             }
             Config::MinP { p, min_keep } => {
@@ -551,7 +644,7 @@ impl Sampler {
                     if !c.sorted && enough > 0 && enough >= *min_keep {
                         c.data.retain(|x| x.logit >= threshold);
                     } else {
-                        c.sort();
+                        sort_mode(c, c.data.len(), native);
                         let threshold = c.data[0].logit + p.ln();
                         let keep = (1..c.data.len())
                             .find(|&i| c.data[i].logit < threshold && i >= *min_keep)
@@ -562,7 +655,12 @@ impl Sampler {
             }
             Config::Typical { p, min_keep } => {
                 if *p < 1.0 {
-                    softmax(c, true)?;
+                    softmax_mode(c, true, native)?;
+                    if native && c.data.iter().any(|x| x.p == 0.0) {
+                        return Err(Error::new(
+                            "native typical entropy is undefined for zero probabilities",
+                        ));
+                    }
                     // 0 log 0 is defined as zero; the C++ source propagates NaN
                     // on an underflowed p here. This is an intentional correction.
                     let entropy: f32 = c
@@ -574,7 +672,11 @@ impl Sampler {
                     let scores: Vec<f32> =
                         c.data.iter().map(|x| (-x.p.ln() - entropy).abs()).collect();
                     let mut indices: Vec<usize> = (0..c.data.len()).collect();
-                    indices.sort_by(|&a, &b| scores[a].total_cmp(&scores[b]));
+                    if native {
+                        native_unstable_sort(&mut indices, |&i| scores[i]);
+                    } else {
+                        indices.sort_by(|&a, &b| scores[a].total_cmp(&scores[b]));
+                    }
                     let mut sum = 0.0f32;
                     let mut keep = indices.len();
                     for (i, &index) in indices.iter().enumerate() {
@@ -602,7 +704,7 @@ impl Sampler {
                     if max < 0.0 {
                         return Err(Error::new("dynamic temperature range is negative"));
                     }
-                    softmax(c, true)?;
+                    softmax_mode(c, true, native)?;
                     let max_entropy = -(1.0f32 / c.data.len() as f32).ln();
                     let entropy: f32 = c
                         .data
@@ -636,9 +738,9 @@ impl Sampler {
                 if *probability > 0.0
                     && *threshold <= 0.5
                     && c.data.len() >= 2
-                    && self.rng.as_mut().expect("XTC RNG").uniform_f32() <= *probability
+                    && draw_f32(self.rng.as_mut().expect("XTC RNG"), native) <= *probability
                 {
-                    softmax(c, true)?;
+                    softmax_mode(c, true, native)?;
                     let mut last = 0;
                     for (i, t) in c.data.iter().enumerate() {
                         if t.p >= *threshold {
@@ -648,7 +750,11 @@ impl Sampler {
                         }
                     }
                     if last > 0 && c.data.len() - last >= *min_keep {
-                        c.data.drain(..last);
+                        if native {
+                            prefix.extend(c.data.drain(..last));
+                        } else {
+                            c.data.drain(..last);
+                        }
                     }
                 }
             }
@@ -718,7 +824,7 @@ impl Sampler {
                 m,
                 ..
             } => {
-                softmax(c, true)?;
+                softmax_mode(c, true, native)?;
                 if c.data.len() > 1 {
                     let mut numerator = 0.0f32;
                     let mut denominator = 0.0f32;
@@ -740,15 +846,15 @@ impl Sampler {
                             "Mirostat v1 slope is degenerate or outside supported range",
                         ));
                     }
-                    top_k(c, (k as i32).max(1));
+                    top_k(c, (k as i32).max(1), native);
                 }
-                softmax(c, true)?;
-                let selected = sample_probs(c, self.rng.as_mut().expect("Mirostat RNG"))?;
+                softmax_mode(c, true, native)?;
+                let selected = sample_probs(c, self.rng.as_mut().expect("Mirostat RNG"), native)?;
                 c.selected = Some(selected);
                 self.mu -= eta * (-c.data[selected].p.log2() - tau);
             }
             Config::MirostatV2 { tau, eta, .. } => {
-                softmax(c, true)?;
+                softmax_mode(c, true, native)?;
                 let keep = c
                     .data
                     .iter()
@@ -756,16 +862,20 @@ impl Sampler {
                     .unwrap_or(c.data.len())
                     .max(1);
                 c.data.truncate(keep);
-                softmax(c, true)?;
-                let selected = sample_probs(c, self.rng.as_mut().expect("Mirostat RNG"))?;
+                softmax_mode(c, true, native)?;
+                let selected = sample_probs(c, self.rng.as_mut().expect("Mirostat RNG"), native)?;
                 c.selected = Some(selected);
                 self.mu -= eta * (-c.data[selected].p.log2() - tau);
             }
             Config::AdaptiveP { target, .. } => {
-                softmax(c, false)?;
+                softmax_mode(c, false, native)?;
                 self.pending = None;
                 if *target < 0.0 {
-                    c.selected = Some(sample_probs(c, self.rng.as_mut().expect("adaptive RNG"))?);
+                    c.selected = Some(sample_probs(
+                        c,
+                        self.rng.as_mut().expect("adaptive RNG"),
+                        native,
+                    )?);
                 } else {
                     let probs: Vec<f32> = c.data.iter().map(|x| x.p).collect();
                     let target = target.clamp(0.0, 1.0);
@@ -781,10 +891,12 @@ impl Sampler {
                             t.logit = 5.0 - 10.0 * distance * distance / (1.0 + distance);
                         }
                     }
-                    // The transform need not preserve the order by logit.
-                    c.sorted = false;
-                    softmax(c, false)?;
-                    let index = sample_probs(c, self.rng.as_mut().expect("adaptive RNG"))?;
+                    // Rust API repairs stale ordering; the C contract retains it.
+                    if !native {
+                        c.sorted = false;
+                    }
+                    softmax_mode(c, false, native)?;
+                    let index = sample_probs(c, self.rng.as_mut().expect("adaptive RNG"), native)?;
                     c.selected = Some(index);
                     self.pending = Some((c.data[index].id, probs[index]));
                 }
@@ -797,12 +909,12 @@ impl Sampler {
                 }
                 // Source leaves the sorted bit unchanged; clearing it prevents
                 // using a stale maximum after a bias reverses rank order.
-                if !biases.is_empty() {
+                if !native && !biases.is_empty() {
                     c.sorted = false;
                 }
             }
         }
-        Ok(())
+        Ok(prefix)
     }
 }
 
@@ -932,9 +1044,282 @@ fn validate_config(config: &Config) -> Result<()> {
     }
 }
 
-fn top_k(c: &mut Candidates, k: i32) {
-    if k > 0 {
+/// Match the current MSVC canonical bit extraction without changing the Rust
+/// API's established libstdc++ stream. Both consume two MT words for f64.
+fn draw_f64(rng: &mut Mt19937, native: bool) -> f64 {
+    if native && cfg!(target_env = "msvc") {
+        let low = rng.next_u32() as u64;
+        let high = rng.next_u32() as u64;
+        (((low >> 11) + (high << 21)) as f64) * (1.0 / 9007199254740992.0)
+    } else {
+        rng.uniform_f64()
+    }
+}
+fn draw_f32(rng: &mut Mt19937, native: bool) -> f32 {
+    if native && cfg!(target_env = "msvc") {
+        ((rng.next_u32() >> 8) as f32) * (1.0 / 16777216.0)
+    } else {
+        rng.uniform_f32()
+    }
+}
+
+// A minimum heap retains the largest k logits. Choosing the right child on
+// equal keys reproduces the tested native partial-sort tie order. Comparison
+// deliberately uses >, so signed zero remains a tie as in the C++ comparator.
+fn heap_repair(data: &mut [TokenData], start: usize, end: usize, value: TokenData) {
+    let mut hole = start;
+    while hole * 2 + 1 < end {
+        let left = hole * 2 + 1;
+        let right = left + 1;
+        let child = if right < end && data[right].logit <= data[left].logit {
+            right
+        } else {
+            left
+        };
+        data[hole] = data[child];
+        hole = child;
+    }
+    while hole > start {
+        let parent = (hole - 1) / 2;
+        if data[parent].logit <= value.logit {
+            break;
+        }
+        data[hole] = data[parent];
+        hole = parent;
+    }
+    data[hole] = value;
+}
+fn native_partial_sort(data: &mut [TokenData], k: usize) {
+    if k == 0 {
+        return;
+    }
+    for root in (0..k / 2).rev() {
+        let value = data[root];
+        heap_repair(data, root, k, value);
+    }
+    for candidate in k..data.len() {
+        if data[candidate].logit > data[0].logit {
+            let value = data[candidate];
+            data[candidate] = data[0];
+            heap_repair(data, 0, k, value);
+        }
+    }
+    for end in (1..k).rev() {
+        let value = data[end];
+        data[end] = data[0];
+        heap_repair(data, 0, end, value);
+    }
+}
+
+// Ordering compatibility with the pinned MSVC 14.51 std::sort implementation.
+// This independently expressed Rust adaptation preserves its median selection,
+// three-way partition and insertion cutoff because tied token IDs are observable.
+// Algorithm provenance: Microsoft STL (Apache-2.0 WITH LLVM-exception); see
+// this crate's THIRD_PARTY_NOTICES.md. The rest of this file keeps its own license.
+fn native_unstable_sort<T: Copy>(values: &mut [T], key: impl Fn(&T) -> f32 + Copy) {
+    if cfg!(target_env = "msvc") {
+        msvc_sort_range(values, 0, values.len(), values.len(), key);
+    } else {
+        // Tie ordering of the C++ standard library is platform dependent.
+        // Non-MSVC native ordering remains separately unverified.
+        values.sort_by(|a, b| {
+            key(a)
+                .partial_cmp(&key(b))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+    }
+}
+fn median_three<T: Copy>(v: &mut [T], a: usize, b: usize, c: usize, key: impl Fn(&T) -> f32) {
+    if key(&v[b]) < key(&v[a]) {
+        v.swap(a, b);
+    }
+    if key(&v[c]) < key(&v[b]) {
+        v.swap(b, c);
+        if key(&v[b]) < key(&v[a]) {
+            v.swap(a, b);
+        }
+    }
+}
+fn sort_heap_repair<T: Copy>(
+    v: &mut [T],
+    root: usize,
+    end: usize,
+    item: T,
+    key: impl Fn(&T) -> f32,
+) {
+    let mut hole = root;
+    while hole * 2 + 1 < end {
+        let left = hole * 2 + 1;
+        let right = left + 1;
+        let child = if right < end && key(&v[right]) >= key(&v[left]) {
+            right
+        } else {
+            left
+        };
+        v[hole] = v[child];
+        hole = child;
+    }
+    while hole > root {
+        let parent = (hole - 1) / 2;
+        if key(&v[parent]) >= key(&item) {
+            break;
+        }
+        v[hole] = v[parent];
+        hole = parent;
+    }
+    v[hole] = item;
+}
+fn msvc_sort_range<T: Copy>(
+    v: &mut [T],
+    mut lo: usize,
+    mut hi: usize,
+    mut budget: usize,
+    key: impl Fn(&T) -> f32 + Copy,
+) {
+    loop {
+        if hi - lo <= 32 {
+            for next in lo + usize::from(lo < hi)..hi {
+                let item = v[next];
+                let mut at = next;
+                while at > lo && key(&item) < key(&v[at - 1]) {
+                    v[at] = v[at - 1];
+                    at -= 1;
+                }
+                v[at] = item;
+            }
+            return;
+        }
+        if budget == 0 {
+            let part = &mut v[lo..hi];
+            for root in (0..part.len() / 2).rev() {
+                let item = part[root];
+                sort_heap_repair(part, root, part.len(), item, key);
+            }
+            for end in (1..part.len()).rev() {
+                let item = part[end];
+                part[end] = part[0];
+                sort_heap_repair(part, 0, end, item, key);
+            }
+            return;
+        }
+        let mid = lo + (hi - lo) / 2;
+        let last = hi - 1;
+        if last - lo > 40 {
+            let step = (hi - lo) / 8;
+            median_three(v, lo, lo + step, lo + 2 * step, key);
+            median_three(v, mid - step, mid, mid + step, key);
+            median_three(v, last - 2 * step, last - step, last, key);
+            median_three(v, lo + step, mid, last - step, key);
+        } else {
+            median_three(v, lo, mid, last, key);
+        }
+        let mut equal_lo = mid;
+        let mut equal_hi = mid + 1;
+        while equal_lo > lo && key(&v[equal_lo - 1]) == key(&v[equal_lo]) {
+            equal_lo -= 1;
+        }
+        while equal_hi < hi && key(&v[equal_hi]) == key(&v[equal_lo]) {
+            equal_hi += 1;
+        }
+        let mut scan_hi = equal_hi;
+        let mut scan_lo = equal_lo;
+        loop {
+            while scan_hi < hi {
+                if key(&v[equal_lo]) < key(&v[scan_hi]) {
+                    scan_hi += 1;
+                } else if key(&v[scan_hi]) < key(&v[equal_lo]) {
+                    break;
+                } else {
+                    v.swap(equal_hi, scan_hi);
+                    equal_hi += 1;
+                    scan_hi += 1;
+                }
+            }
+            while scan_lo > lo {
+                let prev = scan_lo - 1;
+                if key(&v[prev]) < key(&v[equal_lo]) {
+                    scan_lo -= 1;
+                } else if key(&v[equal_lo]) < key(&v[prev]) {
+                    break;
+                } else {
+                    equal_lo -= 1;
+                    v.swap(equal_lo, prev);
+                    scan_lo -= 1;
+                }
+            }
+            if scan_lo == lo && scan_hi == hi {
+                break;
+            }
+            if scan_lo == lo {
+                if equal_hi != scan_hi {
+                    v.swap(equal_lo, equal_hi);
+                }
+                equal_hi += 1;
+                v.swap(equal_lo, scan_hi);
+                equal_lo += 1;
+                scan_hi += 1;
+            } else if scan_hi == hi {
+                scan_lo -= 1;
+                equal_lo -= 1;
+                v.swap(scan_lo, equal_lo);
+                equal_hi -= 1;
+                v.swap(equal_lo, equal_hi);
+            } else {
+                scan_lo -= 1;
+                v.swap(scan_hi, scan_lo);
+                scan_hi += 1;
+            }
+        }
+        budget = (budget / 2) + (budget / 4);
+        if equal_lo - lo < hi - equal_hi {
+            msvc_sort_range(v, lo, equal_lo, budget, key);
+            lo = equal_hi;
+        } else {
+            msvc_sort_range(v, equal_hi, hi, budget, key);
+            hi = equal_lo;
+        }
+    }
+}
+
+fn sort_mode(c: &mut Candidates, k: usize, native: bool) {
+    if !native {
         c.sort();
+        return;
+    }
+    if c.sorted {
+        return;
+    }
+    if k <= 128 {
+        native_partial_sort(&mut c.data, k);
+    } else {
+        // Frozen llama.cpp groups larger sorts into 128 logarithmic buckets.
+        // Bucket insertion preserves source input order.
+        let mut buckets: Vec<Vec<TokenData>> = (0..128).map(|_| Vec::new()).collect();
+        for &item in &c.data {
+            let bucket = ((6.4f32 * item.logit + 64.0f32) as i32).clamp(0, 127) as usize;
+            buckets[bucket].push(item);
+        }
+        let mut output = Vec::with_capacity(k);
+        for bucket in buckets.iter_mut().rev() {
+            if output.len() + bucket.len() < k {
+                native_unstable_sort(bucket, |t| -t.logit);
+                output.extend_from_slice(bucket);
+            } else {
+                let needed = k - output.len();
+                native_partial_sort(bucket, needed);
+                output.extend_from_slice(&bucket[..needed]);
+                break;
+            }
+        }
+        c.data[..k].copy_from_slice(&output);
+    }
+    c.data.truncate(k);
+    c.sorted = true;
+}
+
+fn top_k(c: &mut Candidates, k: i32, native: bool) {
+    if k > 0 {
+        sort_mode(c, (k as usize).min(c.data.len()), native);
         c.data.truncate(k as usize);
     }
 }
@@ -960,11 +1345,14 @@ fn temperature_impl(c: &mut Candidates, t: f32) {
 }
 
 fn softmax(c: &mut Candidates, sort: bool) -> Result<()> {
+    softmax_mode(c, sort, false)
+}
+fn softmax_mode(c: &mut Candidates, sort: bool, native: bool) -> Result<()> {
     if c.data.is_empty() {
         return Err(Error::new("cannot normalize an empty candidate set"));
     }
     if sort {
-        c.sort();
+        sort_mode(c, c.data.len(), native);
     }
     let max = if c.sorted {
         c.data[0].logit
@@ -991,21 +1379,24 @@ fn softmax(c: &mut Candidates, sort: bool) -> Result<()> {
     Ok(())
 }
 
-fn sample_logits(c: &mut Candidates, rng: &mut Mt19937) -> Result<()> {
+fn sample_logits(c: &mut Candidates, rng: &mut Mt19937, native: bool) -> Result<()> {
     if c.data.len() == 1 {
         if c.data[0].logit == f32::NEG_INFINITY {
             return Err(Error::new("all candidate logits are masked"));
         }
-        let _ = rng.uniform_f64();
+        let _ = draw_f64(rng, native);
         c.data[0].p = 1.0;
         c.selected = Some(0);
         return Ok(());
     }
-    let max = c
-        .data
-        .iter()
-        .map(|x| x.logit)
-        .fold(f32::NEG_INFINITY, f32::max);
+    let max = if native && c.sorted {
+        c.data[0].logit
+    } else {
+        c.data
+            .iter()
+            .map(|x| x.logit)
+            .fold(f32::NEG_INFINITY, f32::max)
+    };
     if !max.is_finite() {
         return Err(Error::new("all candidate logits are masked"));
     }
@@ -1014,7 +1405,7 @@ fn sample_logits(c: &mut Candidates, rng: &mut Mt19937) -> Result<()> {
         t.p = (t.logit - max).exp();
         sum += t.p as f64;
     }
-    let target = sum * rng.uniform_f64();
+    let target = sum * draw_f64(rng, native);
     let mut running = 0.0f64;
     let mut selected = None;
     for (i, t) in c.data.iter_mut().enumerate() {
@@ -1031,18 +1422,21 @@ fn sample_logits(c: &mut Candidates, rng: &mut Mt19937) -> Result<()> {
 }
 
 /// Mirrors libstdc++'s discrete-distribution draw after a float softmax.
-fn sample_probs(c: &Candidates, rng: &mut Mt19937) -> Result<usize> {
+fn sample_probs(c: &Candidates, rng: &mut Mt19937, native: bool) -> Result<usize> {
     if c.data.is_empty() {
         return Err(Error::new("empty discrete distribution"));
     }
     if c.data.len() == 1 {
+        if native && cfg!(target_env = "msvc") {
+            let _ = draw_f64(rng, true);
+        }
         return Ok(0);
     }
     let sum: f64 = c.data.iter().map(|x| x.p as f64).sum();
     if sum <= 0.0 || !sum.is_finite() {
         return Err(Error::new("invalid probability sum"));
     }
-    let target = rng.uniform_f64();
+    let target = draw_f64(rng, native);
     let mut running = 0.0f64;
     for (i, t) in c.data.iter().enumerate() {
         running += t.p as f64 / sum;
@@ -1227,7 +1621,7 @@ impl Chain {
         let mut next = self.clone();
         let mut values = candidates.clone();
         for sampler in &mut next.samplers {
-            sampler.apply_inner(&mut values)?;
+            sampler.apply_inner(&mut values, false)?;
             values.validate()?;
         }
         *self = next;

@@ -9,10 +9,7 @@ fn token_index(vocab: &VocabHandle, token: i32) -> Result<usize> {
     Ok(index)
 }
 ffi!(llama_vocab_type(vocab: *const VocabHandle) -> i32, 0, {
-    unsafe {
-        reference(vocab)?;
-    }
-    Ok(1)
+    Ok(unsafe { reference(vocab)? }.tokenizer.vocab_type() as i32)
 });
 ffi!(llama_vocab_n_tokens(vocab: *const VocabHandle) -> i32, 0, {
     i32::try_from(unsafe { reference(vocab)? }.texts.len())
@@ -249,6 +246,70 @@ ffi!(
         unsafe { copy_buffer(&piece[skip..], buf.cast(), length) }
     }
 );
+
+unsafe fn detokenize_to_buffer(
+    vocab: &VocabHandle,
+    tokens: &[i32],
+    text: *mut c_char,
+    capacity: i32,
+    remove_special: bool,
+    unparse_special: bool,
+) -> Result<i32> {
+    let cap = count(capacity)?;
+    let tokenizer = &vocab.tokenizer;
+    // Validate the complete input before exposing writes. This also applies the
+    // tokenizer's output budget and supplies the final space-cleaned bytes.
+    let final_bytes = tokenizer
+        .detokenize_bytes(tokens, remove_special, unparse_special)
+        .map_err(|e| e.to_string())?;
+    let mut tokens = tokens;
+    let mut remove_space = tokenizer.add_space_prefix;
+    if remove_special && tokenizer.add_bos && tokens.first() == Some(&tokenizer.bos_id) {
+        remove_space = false;
+        tokens = &tokens[1..];
+    }
+    if remove_special && tokenizer.add_eos && tokens.last() == Some(&tokenizer.eos_id) {
+        tokens = &tokens[..tokens.len() - 1];
+    }
+    let mut available = cap;
+    let mut written = 0usize;
+    let mut total = 0usize;
+    for &token in tokens {
+        let piece = tokenizer
+            .token_piece(token, unparse_special)
+            .map_err(|e| e.to_string())?;
+        let skip = usize::from(remove_space && piece.first() == Some(&b' '));
+        remove_space = false;
+        let piece = &piece[skip..];
+        total = total
+            .checked_add(piece.len())
+            .ok_or("detokenized length overflow")?;
+        if piece.len() > available {
+            available = 0;
+        } else if !piece.is_empty() {
+            // The original only writes complete pieces that fit before the first
+            // failed piece, and retains those prefix bytes on a capacity failure.
+            unsafe {
+                reference_mut(text)?;
+                ptr::copy_nonoverlapping(
+                    piece.as_ptr(),
+                    text.cast::<u8>().add(written),
+                    piece.len(),
+                );
+            }
+            written += piece.len();
+            available -= piece.len();
+        }
+    }
+    let raw_size = i32::try_from(total).map_err(|_| "detokenized result exceeds INT32_MAX")?;
+    if total > cap {
+        return Ok(-raw_size);
+    }
+    // Native cleanup happens only after all uncleaned pieces fit. In particular,
+    // a count-only probe can require more space than the successful return size.
+    unsafe { copy_buffer(&final_bytes, text.cast(), capacity) }
+}
+
 ffi!(
     llama_detokenize(
         vocab: *const VocabHandle,
@@ -263,10 +324,15 @@ ffi!(
     {
         let v = unsafe { reference(vocab)? };
         let tokens = unsafe { input_slice(tokens, count(n_tokens)?)? };
-        let result = v
-            .tokenizer
-            .detokenize_bytes(tokens, boolean(remove_special)?, boolean(unparse_special)?)
-            .map_err(|e| e.to_string())?;
-        unsafe { copy_buffer(&result, text.cast(), capacity) }
+        unsafe {
+            detokenize_to_buffer(
+                v,
+                tokens,
+                text,
+                capacity,
+                boolean(remove_special)?,
+                boolean(unparse_special)?,
+            )
+        }
     }
 );

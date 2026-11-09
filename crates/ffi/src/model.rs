@@ -20,6 +20,7 @@ pub struct ModelHandle {
 }
 pub(crate) struct ModelData {
     pub model: Option<Model>,
+    pub architecture: String,
     pub vocab: VocabHandle,
     pub train_context: i32,
     pub width: i32,
@@ -40,18 +41,6 @@ fn integer(meta: &BTreeMap<String, Value>, key: &str, default: i32) -> Result<i3
             .as_i64()
             .and_then(|v| i32::try_from(v).ok())
             .ok_or_else(|| format!("invalid integer metadata: {key}")),
-    }
-}
-fn attr(kind: i32) -> Result<i32> {
-    match kind {
-        0 => Ok(0),
-        1 => Ok(4),
-        2 => Ok(1),
-        3 => Ok(8),
-        4 => Ok(16),
-        5 => Ok(2),
-        6 => Ok(32),
-        _ => Err("invalid tokenizer token type".into()),
     }
 }
 fn nul_bytes(value: &str) -> Vec<u8> {
@@ -201,26 +190,30 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     }
     let file = Gguf::open(path).map_err(|e| e.to_string())?;
     let m = &file.metadata;
-    if !vocab_only && m.get("general.architecture").and_then(Value::as_str) != Some("llama") {
-        return Err("this C ABI model loader currently supports dense Llama only".into());
+    let architecture = m
+        .get("general.architecture")
+        .and_then(Value::as_str)
+        .unwrap_or("llama");
+    if !["llama", "bert"].contains(&architecture) {
+        return Err("this C ABI model loader supports Llama and vocabulary-only BERT".into());
+    }
+    if !vocab_only && architecture != "llama" {
+        return Err(
+            "BERT execution is not yet available through this C ABI; use vocabulary-only loading"
+                .into(),
+        );
     }
     let tokenizer = Tokenizer::from_metadata(m).map_err(|e| e.to_string())?;
     let mut texts = Vec::with_capacity(tokenizer.vocabulary_size());
     let mut scores = Vec::with_capacity(texts.capacity());
     let mut attrs = Vec::with_capacity(texts.capacity());
-    let original_kinds = m.get("tokenizer.ggml.token_type").and_then(Value::as_array);
     for id in 0..tokenizer.vocabulary_size() {
-        let (text, score, kind) = tokenizer
+        let (text, score, _) = tokenizer
             .token_info(id as i32)
             .ok_or("missing vocabulary item")?;
-        let original = original_kinds
-            .and_then(|v| v.get(id))
-            .and_then(Value::as_i64)
-            .unwrap_or(1);
-        let mut bits = attr(i32::try_from(original).map_err(|_| "invalid token type")?)?;
-        if kind == 3 {
-            bits |= 8;
-        }
+        let bits = tokenizer
+            .token_attributes(id as i32)
+            .ok_or("missing token attributes")? as i32;
         texts.push(nul_bytes(text));
         scores.push(score);
         attrs.push(bits);
@@ -228,34 +221,30 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     let mut special = BTreeMap::new();
     special.insert("bos", tokenizer.bos_id);
     special.insert("eos", tokenizer.eos_id);
-    for (name, key) in [
-        ("eot", "tokenizer.ggml.eot_token_id"),
-        ("sep", "tokenizer.ggml.seperator_token_id"),
-        ("pad", "tokenizer.ggml.padding_token_id"),
-        ("mask", "tokenizer.ggml.mask_token_id"),
-    ] {
-        // Native loading retains the default when a metadata id is out of range,
-        // including the UINT32_MAX sentinel used by stories260K.
-        let value = match m.get(key) {
-            None => -1,
-            Some(value) => {
-                let id = value
-                    .as_u64()
-                    .ok_or_else(|| format!("special id must be unsigned: {key}"))?;
-                if id < tokenizer.vocabulary_size() as u64 {
-                    id as i32
-                } else {
-                    -1
-                }
+    special.insert("sep", tokenizer.sep_id);
+    special.insert("pad", tokenizer.pad_id);
+    special.insert("mask", tokenizer.mask_id);
+    let eot = match m.get("tokenizer.ggml.eot_token_id") {
+        None => -1,
+        Some(value) => {
+            let id = value.as_u64().ok_or("EOT id must be unsigned")?;
+            if id < tokenizer.vocabulary_size() as u64 {
+                id as i32
+            } else {
+                -1
             }
-        };
-        special.insert(name, value);
-    }
+        }
+    };
+    special.insert("eot", eot);
     // Native SPM byte_to_token uses the literal byte token, falling back to PAD.
-    let nl = texts
-        .iter()
-        .position(|t| t.as_slice() == b"<0x0A>\0")
-        .map_or(special["pad"], |i| i as i32);
+    let nl = if tokenizer.vocab_type() == llama_tokenizer::VocabType::Wpm {
+        0
+    } else {
+        texts
+            .iter()
+            .position(|t| t.as_slice() == b"<0x0A>\0")
+            .map_or(special["pad"], |i| i as i32)
+    };
     special.insert("nl", nl);
     // The source auto-detects EOT spellings. Multiple matching spellings have no
     // stable precedence in its unordered map; reject ambiguity rather than guess.
@@ -283,11 +272,31 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
             special.insert("eot", id as i32);
         }
     }
-    let train_context = integer(m, "llama.context_length", 0)?;
-    let width = integer(m, "llama.embedding_length", 0)?;
-    let layers = integer(m, "llama.block_count", 0)?;
-    let heads = integer(m, "llama.attention.head_count", 0)?;
-    let kv_heads = integer(m, "llama.attention.head_count_kv", heads)?;
+    let train_context = if vocab_only {
+        0
+    } else {
+        integer(m, &format!("{architecture}.context_length"), 0)?
+    };
+    let width = if vocab_only {
+        0
+    } else {
+        integer(m, &format!("{architecture}.embedding_length"), 0)?
+    };
+    let layers = if vocab_only {
+        0
+    } else {
+        integer(m, &format!("{architecture}.block_count"), 0)?
+    };
+    let heads = if vocab_only {
+        0
+    } else {
+        integer(m, &format!("{architecture}.attention.head_count"), 0)?
+    };
+    let kv_heads = if vocab_only {
+        0
+    } else {
+        integer(m, &format!("{architecture}.attention.head_count_kv"), heads)?
+    };
     let rope_base = m
         .get("llama.rope.freq_base")
         .and_then(Value::as_f64)
@@ -308,22 +317,41 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
             .checked_add(tensor.elements().map_err(|e| e.to_string())? as u64)
             .ok_or("parameter count overflow")?;
     }
-    let ftype = integer(m, "general.file_type", guess_ftype(&file))?;
-    let family = match layers {
-        16 | 22 => "1B",
-        26 | 28 => "3B",
-        30 => "256M",
-        32 if tokenizer.vocabulary_size() == 49152 => "3B",
-        32 if tokenizer.vocabulary_size() < 40000 => "7B",
-        32 | 36 => "8B",
-        40 => "13B",
-        48 => "34B",
-        60 => "30B",
-        80 if heads == kv_heads => "65B",
-        80 => "70B",
-        _ => "?B",
+    let ftype = if vocab_only {
+        0
+    } else {
+        integer(m, "general.file_type", guess_ftype(&file))?
     };
-    let description = format!("llama {family} {}", file_type_name(ftype));
+    let family = if architecture == "bert" {
+        match (layers, width) {
+            (3, _) => "17M",
+            (6, _) => "22M",
+            (12, 384) => "33M",
+            (12, 768) => "109M",
+            (24, _) => "335M",
+            _ => "?B",
+        }
+    } else {
+        match layers {
+            16 | 22 => "1B",
+            26 | 28 => "3B",
+            30 => "256M",
+            32 if tokenizer.vocabulary_size() == 49152 => "3B",
+            32 if tokenizer.vocabulary_size() < 40000 => "7B",
+            32 | 36 => "8B",
+            40 => "13B",
+            48 => "34B",
+            60 => "30B",
+            80 if heads == kv_heads => "65B",
+            80 => "70B",
+            _ => "?B",
+        }
+    };
+    let description = if vocab_only {
+        String::new()
+    } else {
+        format!("{architecture} {family} {}", file_type_name(ftype))
+    };
     let strings = m
         .iter()
         .filter_map(|(key, value)| value.as_str().map(|v| (key.clone(), nul_bytes(v))))
@@ -350,11 +378,9 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     }
     let data = Arc::new(ModelData {
         model,
+        architecture: architecture.to_owned(),
         vocab: VocabHandle {
-            add_sep: m
-                .get("tokenizer.ggml.add_sep_token")
-                .and_then(Value::as_bool)
-                .unwrap_or(false),
+            add_sep: tokenizer.add_sep,
             tokenizer,
             texts,
             scores,
@@ -422,12 +448,27 @@ dimension!(llama_model_n_embd, width);
 dimension!(llama_model_n_embd_inp, width);
 dimension!(llama_model_n_embd_out, width);
 dimension!(llama_model_n_layer, layers);
-dimension!(llama_model_n_head, heads);
-dimension!(llama_model_n_head_kv, kv_heads);
+
 dimension!(llama_n_ctx_train, train_context);
 dimension!(llama_n_embd, width);
 dimension!(llama_n_layer, layers);
-dimension!(llama_n_head, heads);
+
+macro_rules! attention_dimension {
+    ($name:ident,$field:ident) => {
+        ffi!($name(model: *const ModelHandle) -> i32, 0, {
+            let data = &unsafe { reference(model)? }.data;
+            if data.model.is_none() {
+                return Err(
+                    "attention head dimensions are unavailable on a vocabulary-only model".into(),
+                );
+            }
+            Ok(data.$field)
+        });
+    };
+}
+attention_dimension!(llama_model_n_head, heads);
+attention_dimension!(llama_n_head, heads);
+attention_dimension!(llama_model_n_head_kv, kv_heads);
 ffi!(
     llama_model_n_layer_nextn(model: *const ModelHandle) -> i32,
     0,
@@ -448,20 +489,24 @@ ffi!(
     llama_model_rope_type(model: *const ModelHandle) -> i32,
     -1,
     {
-        unsafe {
-            reference(model)?;
-        }
-        Ok(0)
+        Ok(
+            if unsafe { reference(model)? }.data.architecture == "bert" {
+                2
+            } else {
+                0
+            },
+        )
     }
 );
 ffi!(
     llama_model_rope_freq_scale_train(model: *const ModelHandle) -> f32,
     0.0,
     {
-        unsafe {
-            reference(model)?;
-        }
-        Ok(1.0)
+        Ok(if unsafe { reference(model)? }.data.model.is_none() {
+            0.0
+        } else {
+            1.0
+        })
     }
 );
 ffi!(
@@ -504,6 +549,8 @@ macro_rules! flag {
         });
     };
 }
+// Frozen public has_encoder/has_decoder flags describe encode/decode API routing:
+// BERT runs through decode in the original and reports false/true like Llama.
 flag!(llama_model_has_encoder, false);
 flag!(llama_model_has_decoder, true);
 flag!(llama_model_is_recurrent, false);

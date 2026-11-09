@@ -103,7 +103,7 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     let n_batch = p.n_batch.min(n_ctx);
     let n_ubatch = p.n_ubatch.min(n_batch);
     let runtime = Context::new(
-        loaded.runtime_model(),
+        loaded.runtime_model().map_err(|e| e.to_string())?,
         ContextOptions {
             maximum_sequences: p.n_seq_max as usize,
             microbatch_tokens: n_ubatch as usize,
@@ -479,3 +479,19 @@ ffi!(
         Ok(unsafe { c.embeddings.as_mut_ptr().add(offset) })
     }
 );
+
+pub(crate) unsafe fn sampling_values(context: *mut ContextHandle, index: i32) -> Result<Vec<f32>> {
+    let c = unsafe { reference(context)? };
+    let row = output_index(c, index)?;
+    let width = c.model_handle.data.vocab.texts.len();
+    let offset = row
+        .checked_mul(width)
+        .ok_or("sampling logit offset overflow")?;
+    let end = offset
+        .checked_add(width)
+        .ok_or("sampling logit length overflow")?;
+    c.logits
+        .get(offset..end)
+        .map(|v| v.to_vec())
+        .ok_or_else(|| "requested logits are unavailable".into())
+}

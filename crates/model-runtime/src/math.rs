@@ -121,7 +121,12 @@ impl Matrix {
         } else {
             self.values
                 .chunks_exact(self.cols)
-                .map(|row| row.iter().zip(input).map(|(a, b)| a * b).sum())
+                .map(|row| {
+                    row.iter()
+                        .zip(input)
+                        .map(|(a, b)| f64::from(a * b))
+                        .sum::<f64>() as f32
+                })
                 .collect()
         };
         finite(&output, "matrix output")?;
@@ -294,28 +299,32 @@ pub(crate) fn attention(
     let count = keys.len() / kv_width;
     debug_assert_eq!(keys.len(), values.len());
     debug_assert_eq!(query.len(), heads * head_dim);
-    let mut output = vec![0.0; query.len()];
+    // Frozen scalar ggml_vec_dot_f32 rounds each product to F32, then sums
+    // in ggml_float (F64). Attention uses that dot operation for both QK
+    // and probability-times-V; F32 accumulation can cross GELU table bins.
+    let mut output = vec![0.0f64; query.len()];
     for head in 0..heads {
         let kv_head = head / (heads / kv_heads);
         let q = &query[head * head_dim..(head + 1) * head_dim];
         let mut scores = Vec::with_capacity(count);
         for token in 0..count {
             let offset = token * kv_width + kv_head * head_dim;
-            let dot: f32 = q
+            let dot = q
                 .iter()
                 .zip(&keys[offset..offset + head_dim])
-                .map(|(a, b)| a * b)
-                .sum();
+                .map(|(a, b)| f64::from(a * b))
+                .sum::<f64>() as f32;
             scores.push(dot * scale);
         }
         softmax(&mut scores)?;
         for (token, probability) in scores.iter().enumerate() {
             let offset = token * kv_width + kv_head * head_dim;
             for d in 0..head_dim {
-                output[head * head_dim + d] += probability * values[offset + d];
+                output[head * head_dim + d] += f64::from(probability * values[offset + d]);
             }
         }
     }
+    let output: Vec<f32> = output.into_iter().map(|x| x as f32).collect();
     finite(&output, "attention output")?;
     Ok(output)
 }
@@ -371,12 +380,97 @@ mod packed_matrix_tests {
         assert_eq!(packed.clone(), packed);
     }
     #[test]
+    fn every_source_cpu_weight_type_loads_and_executes_through_matrix() {
+        let mut supported = 0;
+        for dtype in DType::ALL {
+            if llama_quant::matvec_activation_dtype(dtype).is_err() {
+                continue;
+            }
+            let cols = dtype.block_size();
+            let matrix =
+                Matrix::from_quantized(1, cols, dtype, vec![0; dtype.type_size()]).unwrap();
+            assert_eq!(matrix.storage_dtype(), dtype);
+            assert_eq!(
+                matrix.multiply(&vec![1.0; cols]).unwrap(),
+                vec![0.0],
+                "{dtype:?}"
+            );
+            supported += 1;
+        }
+        assert_eq!(supported, 29);
+    }
+    #[test]
     fn unsupported_dot_types_are_rejected_at_load() {
         assert!(matches!(
-            Matrix::from_quantized(1, 256, DType::Q4_K, vec![0; 144]),
+            Matrix::from_quantized(1, 256, DType::Q8_K, vec![0; 292]),
             Err(Error::Unsupported(_))
         ));
         assert!(Matrix::from_quantized(1, 31, DType::Q4_0, vec![0; 18]).is_err());
         assert!(Matrix::from_quantized(1, 32, DType::Q4_0, vec![0; 17]).is_err());
+    }
+}
+
+#[cfg(test)]
+mod native_attention_tests {
+    use super::attention;
+
+    /// Captured from the original DLL's unmodified BERT graph. Inputs and
+    /// expected results come from the reference, including later-layer inputs,
+    /// so an earlier Rust error cannot contaminate the fixture.
+    #[test]
+    fn twelve_bert_layers_match_original_scalar_attention() {
+        let bytes = include_bytes!("../tests/fixtures/bert-attention-reference.bin");
+        assert_eq!(&bytes[..8], b"RLAATTN1");
+        let mut offset = 8usize;
+        let read_u32 = |offset: &mut usize| {
+            let value = u32::from_le_bytes(bytes[*offset..*offset + 4].try_into().unwrap());
+            *offset += 4;
+            value as usize
+        };
+        let read_floats = |offset: &mut usize, count: usize| {
+            let values: Vec<f32> = bytes[*offset..*offset + count * 4]
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|b| f32::from_le_bytes(*b))
+                .collect();
+            *offset += count * 4;
+            values
+        };
+        let layers = read_u32(&mut offset);
+        assert_eq!(layers, 12);
+        let mut compared = 0usize;
+        for layer in 0..layers {
+            let heads = read_u32(&mut offset);
+            let kv_heads = read_u32(&mut offset);
+            let head_dim = read_u32(&mut offset);
+            let count = read_u32(&mut offset);
+            assert_eq!((heads, kv_heads, head_dim, count), (12, 12, 32, 10));
+            let width = heads * head_dim;
+            let q = read_floats(&mut offset, count * width);
+            let k = read_floats(&mut offset, count * kv_heads * head_dim);
+            let v = read_floats(&mut offset, count * kv_heads * head_dim);
+            let expected = read_floats(&mut offset, count * width);
+            let scale = (head_dim as f32).sqrt().recip();
+            for (token, query) in q.chunks_exact(width).enumerate() {
+                let actual = attention(query, &k, &v, heads, kv_heads, head_dim, scale)
+                    .expect("valid reference attention");
+                for (dimension, (&a, &e)) in actual
+                    .iter()
+                    .zip(&expected[token * width..(token + 1) * width])
+                    .enumerate()
+                {
+                    let error = (f64::from(a) - f64::from(e)).abs();
+                    let tolerance = 1e-6 + 1e-6 * f64::from(e).abs();
+                    assert!(
+                        a.is_finite() && error <= tolerance,
+                        "layer {layer}, token {token}, dimension {dimension}: {a} vs {e}"
+                    );
+                    compared += 1;
+                }
+            }
+        }
+        assert_eq!(offset, bytes.len());
+        assert_eq!(compared, 46_080);
     }
 }

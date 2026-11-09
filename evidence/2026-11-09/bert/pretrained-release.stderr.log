@@ -1,0 +1,19 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\quant)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-behavior)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama\crates\gguf)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\model-runtime)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama\crates\inference)
+    Finished `release` profile [optimized] target(s) in 12.70s
+     Running unittests src\lib.rs (target\release\deps\llama_inference-aedee68e4f602e78.exe)
+     Running tests\bert_reference.rs (target\release\deps\bert_reference-0e713c1d9216ebaa.exe)
+native BERT conformance: cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=0.000000000e0
+     Running tests\native_reference.rs (target\release\deps\native_reference-c228bd18d88b7912.exe)
+
+thread 'trained_stories260k_full_logits_greedy_ids_and_text' (4020) panicked at crates\inference\tests\native_reference.rs:155:36:
+called `Result::unwrap()` on an `Err` value: Invalid("invalid tokenizer: tokenizer.ggml.seperator_token_id is outside vocabulary")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'trained_stories15m_q4_full_logits_greedy_ids_and_text' (9016) panicked at crates\inference\tests\native_reference.rs:288:36:
+called `Result::unwrap()` on an `Err` value: Invalid("invalid tokenizer: tokenizer.ggml.seperator_token_id is outside vocabulary")
+error: test failed, to rerun pass `-p llama-inference --test native_reference`

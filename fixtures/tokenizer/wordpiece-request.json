@@ -1,0 +1,1220 @@
+{
+  "variants": [
+    {
+      "name": "default",
+      "overrides": {},
+      "dump_vocab": true
+    },
+    {
+      "name": "case_sensitive",
+      "overrides": {
+        "tokenizer.ggml.normalizer.lowercase": false
+      }
+    },
+    {
+      "name": "keep_marks",
+      "overrides": {
+        "tokenizer.ggml.normalizer.strip_accents": false
+      }
+    },
+    {
+      "name": "strip_only",
+      "overrides": {
+        "tokenizer.ggml.normalizer.lowercase": false,
+        "tokenizer.ggml.normalizer.strip_accents": true
+      }
+    },
+    {
+      "name": "nfc_flag",
+      "overrides": {
+        "tokenizer.ggml.normalizer.lowercase": false,
+        "tokenizer.ggml.normalizer.strip_accents": false,
+        "tokenizer.ggml.normalizer.nfc": true
+      }
+    },
+    {
+      "name": "no_cleanup",
+      "overrides": {
+        "tokenizer.ggml.clean_spaces": false
+      }
+    },
+    {
+      "name": "special_flags",
+      "overrides": {
+        "tokenizer.ggml.add_bos_token": false,
+        "tokenizer.ggml.add_eos_token": true,
+        "tokenizer.ggml.add_sep_token": false,
+        "tokenizer.ggml.add_space_prefix": true
+      }
+    },
+    {
+      "name": "modern_mask",
+      "overrides": {
+        "general.name": "modern-bert"
+      }
+    },
+    {
+      "name": "special_ids",
+      "overrides": {
+        "tokenizer.ggml.bos_token_id": 100,
+        "tokenizer.ggml.separator_token_id": 104,
+        "tokenizer.ggml.padding_token_id": 10,
+        "tokenizer.ggml.seperator_token_id": 103
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "empty_00",
+      "prompt": "",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "empty_01",
+      "prompt": "",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "empty_10",
+      "prompt": "",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "empty_11",
+      "prompt": "",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "spaces_00",
+      "prompt": "  \t\n\r\u000b\f  ",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "spaces_01",
+      "prompt": "  \t\n\r\u000b\f  ",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "spaces_10",
+      "prompt": "  \t\n\r\u000b\f  ",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "spaces_11",
+      "prompt": "  \t\n\r\u000b\f  ",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "ascii_00",
+      "prompt": "Hello, WORLD!",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "ascii_01",
+      "prompt": "Hello, WORLD!",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "ascii_10",
+      "prompt": "Hello, WORLD!",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "ascii_11",
+      "prompt": "Hello, WORLD!",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "words_00",
+      "prompt": "hello world",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "words_01",
+      "prompt": "hello world",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "words_10",
+      "prompt": "hello world",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "words_11",
+      "prompt": "hello world",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "accents_00",
+      "prompt": "  HéLLo Café café café Ångström Å ",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "accents_01",
+      "prompt": "  HéLLo Café café café Ångström Å ",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "accents_10",
+      "prompt": "  HéLLo Café café café Ångström Å ",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "accents_11",
+      "prompt": "  HéLLo Café café café Ångström Å ",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "casing_00",
+      "prompt": "İ ı I i Σ σ ς Straße STRAẞE",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "casing_01",
+      "prompt": "İ ı I i Σ σ ς Straße STRAẞE",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "casing_10",
+      "prompt": "İ ı I i Σ σ ς Straße STRAẞE",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "casing_11",
+      "prompt": "İ ı I i Σ σ ς Straße STRAẞE",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "scripts_00",
+      "prompt": "مرحبا שלום Привет Ελληνικά हिन्दी ภาษาไทย 한국어",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "scripts_01",
+      "prompt": "مرحبا שלום Привет Ελληνικά हिन्दी ภาษาไทย 한국어",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "scripts_10",
+      "prompt": "مرحبا שלום Привет Ελληνικά हिन्दी ภาษาไทย 한국어",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "scripts_11",
+      "prompt": "مرحبا שלום Привет Ελληνικά हिन्दी ภาษาไทย 한국어",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "chinese_00",
+      "prompt": "日本語 中国 你好 abc中def",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "chinese_01",
+      "prompt": "日本語 中国 你好 abc中def",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "chinese_10",
+      "prompt": "日本語 中国 你好 abc中def",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "chinese_11",
+      "prompt": "日本語 中国 你好 abc中def",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "symbols_00",
+      "prompt": "a+b=c $100 @mail #tag ^x |y ~z <ok>",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "symbols_01",
+      "prompt": "a+b=c $100 @mail #tag ^x |y ~z <ok>",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "symbols_10",
+      "prompt": "a+b=c $100 @mail #tag ^x |y ~z <ok>",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "symbols_11",
+      "prompt": "a+b=c $100 @mail #tag ^x |y ~z <ok>",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "punctuation_00",
+      "prompt": "word—word… word！ word？ word。 a,b.c!d?",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "punctuation_01",
+      "prompt": "word—word… word！ word？ word。 a,b.c!d?",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "punctuation_10",
+      "prompt": "word—word… word！ word？ word。 a,b.c!d?",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "punctuation_11",
+      "prompt": "word—word… word！ word？ word。 a,b.c!d?",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "apostrophes_00",
+      "prompt": "I ' m we ' re they ' ve she ' s I ' d we ' ll can ' t a ' b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "apostrophes_01",
+      "prompt": "I ' m we ' re they ' ve she ' s I ' d we ' ll can ' t a ' b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "apostrophes_10",
+      "prompt": "I ' m we ' re they ' ve she ' s I ' d we ' ll can ' t a ' b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "apostrophes_11",
+      "prompt": "I ' m we ' re they ' ve she ' s I ' d we ' ll can ' t a ' b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "emoji_00",
+      "prompt": "hello🦀world 👩‍💻 😀❤️",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "emoji_01",
+      "prompt": "hello🦀world 👩‍💻 😀❤️",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "emoji_10",
+      "prompt": "hello🦀world 👩‍💻 😀❤️",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "emoji_11",
+      "prompt": "hello🦀world 👩‍💻 😀❤️",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "controls_00",
+      "prompt": "a\u0000b\u001fc�d​e‍f",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "controls_01",
+      "prompt": "a\u0000b\u001fc�d​e‍f",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "controls_10",
+      "prompt": "a\u0000b\u001fc�d​e‍f",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "controls_11",
+      "prompt": "a\u0000b\u001fc�d​e‍f",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "whitespace_00",
+      "prompt": "ab c d e f g h i j　k",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "whitespace_01",
+      "prompt": "ab c d e f g h i j　k",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "whitespace_10",
+      "prompt": "ab c d e f g h i j　k",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "whitespace_11",
+      "prompt": "ab c d e f g h i j　k",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "specials_00",
+      "prompt": "[CLS]Hello[SEP][PAD][MASK][UNK]",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "specials_01",
+      "prompt": "[CLS]Hello[SEP][PAD][MASK][UNK]",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "specials_10",
+      "prompt": "[CLS]Hello[SEP][PAD][MASK][UNK]",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "specials_11",
+      "prompt": "[CLS]Hello[SEP][PAD][MASK][UNK]",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "mask_whitespace_00",
+      "prompt": "hello  \t[MASK] \nworld",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "mask_whitespace_01",
+      "prompt": "hello  \t[MASK] \nworld",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "mask_whitespace_10",
+      "prompt": "hello  \t[MASK] \nworld",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "mask_whitespace_11",
+      "prompt": "hello  \t[MASK] \nworld",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "unused_00",
+      "prompt": "[unused0] [unused99] [unused999]",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "unused_01",
+      "prompt": "[unused0] [unused99] [unused999]",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "unused_10",
+      "prompt": "[unused0] [unused99] [unused999]",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "unused_11",
+      "prompt": "[unused0] [unused99] [unused999]",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "rollback_00",
+      "prompt": "hello🦀trailing known🦀suffix zzunknownword🦀",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "rollback_01",
+      "prompt": "hello🦀trailing known🦀suffix zzunknownword🦀",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "rollback_10",
+      "prompt": "hello🦀trailing known🦀suffix zzunknownword🦀",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "rollback_11",
+      "prompt": "hello🦀trailing known🦀suffix zzunknownword🦀",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "hangul_00",
+      "prompt": "각 각 각 가 한국어",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "hangul_01",
+      "prompt": "각 각 각 가 한국어",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "hangul_10",
+      "prompt": "각 각 각 가 한국어",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "hangul_11",
+      "prompt": "각 각 각 가 한국어",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "marks_00",
+      "prompt": "̧́Á̧ ẍ́ z⃝",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "marks_01",
+      "prompt": "̧́Á̧ ẍ́ z⃝",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "marks_10",
+      "prompt": "̧́Á̧ ẍ́ z⃝",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "marks_11",
+      "prompt": "̧́Á̧ ẍ́ z⃝",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "compatibility_00",
+      "prompt": "ﬁ ① Ⅰ Ⅳ ﬃ ㎏ ＡＢＣ 𝒜𝓫",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "compatibility_01",
+      "prompt": "ﬁ ① Ⅰ Ⅳ ﬃ ㎏ ＡＢＣ 𝒜𝓫",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "compatibility_10",
+      "prompt": "ﬁ ① Ⅰ Ⅳ ﬃ ㎏ ＡＢＣ 𝒜𝓫",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "compatibility_11",
+      "prompt": "ﬁ ① Ⅰ Ⅳ ﬃ ㎏ ＡＢＣ 𝒜𝓫",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "long_101_00",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "long_101_01",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "long_101_10",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "long_101_11",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "long_256_00",
+      "prompt": "unununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununun",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "long_256_01",
+      "prompt": "unununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununun",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "long_256_10",
+      "prompt": "unununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununun",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "long_256_11",
+      "prompt": "unununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununununun",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "long_512_00",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "long_512_01",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "long_512_10",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "long_512_11",
+      "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_33ff_00",
+      "prompt": "a㏿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_33ff_01",
+      "prompt": "a㏿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_33ff_10",
+      "prompt": "a㏿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_33ff_11",
+      "prompt": "a㏿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_3400_00",
+      "prompt": "a㐀b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_3400_01",
+      "prompt": "a㐀b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_3400_10",
+      "prompt": "a㐀b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_3400_11",
+      "prompt": "a㐀b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dbf_00",
+      "prompt": "a䶿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dbf_01",
+      "prompt": "a䶿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dbf_10",
+      "prompt": "a䶿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dbf_11",
+      "prompt": "a䶿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dc0_00",
+      "prompt": "a䷀b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dc0_01",
+      "prompt": "a䷀b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dc0_10",
+      "prompt": "a䷀b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dc0_11",
+      "prompt": "a䷀b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dff_00",
+      "prompt": "a䷿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dff_01",
+      "prompt": "a䷿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4dff_10",
+      "prompt": "a䷿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4dff_11",
+      "prompt": "a䷿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4e00_00",
+      "prompt": "a一b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4e00_01",
+      "prompt": "a一b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_4e00_10",
+      "prompt": "a一b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_4e00_11",
+      "prompt": "a一b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_9fff_00",
+      "prompt": "a鿿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_9fff_01",
+      "prompt": "a鿿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_9fff_10",
+      "prompt": "a鿿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_9fff_11",
+      "prompt": "a鿿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_a000_00",
+      "prompt": "aꀀb",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_a000_01",
+      "prompt": "aꀀb",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_a000_10",
+      "prompt": "aꀀb",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_a000_11",
+      "prompt": "aꀀb",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_f8ff_00",
+      "prompt": "ab",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_f8ff_01",
+      "prompt": "ab",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_f8ff_10",
+      "prompt": "ab",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_f8ff_11",
+      "prompt": "ab",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_f900_00",
+      "prompt": "a豈b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_f900_01",
+      "prompt": "a豈b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_f900_10",
+      "prompt": "a豈b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_f900_11",
+      "prompt": "a豈b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_faff_00",
+      "prompt": "a﫿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_faff_01",
+      "prompt": "a﫿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_faff_10",
+      "prompt": "a﫿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_faff_11",
+      "prompt": "a﫿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_fb00_00",
+      "prompt": "aﬀb",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_fb00_01",
+      "prompt": "aﬀb",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_fb00_10",
+      "prompt": "aﬀb",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_fb00_11",
+      "prompt": "aﬀb",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_1ffff_00",
+      "prompt": "a🿿b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_1ffff_01",
+      "prompt": "a🿿b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_1ffff_10",
+      "prompt": "a🿿b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_1ffff_11",
+      "prompt": "a🿿b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_20000_00",
+      "prompt": "a𠀀b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_20000_01",
+      "prompt": "a𠀀b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_20000_10",
+      "prompt": "a𠀀b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_20000_11",
+      "prompt": "a𠀀b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2a6df_00",
+      "prompt": "a𪛟b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2a6df_01",
+      "prompt": "a𪛟b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2a6df_10",
+      "prompt": "a𪛟b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2a6df_11",
+      "prompt": "a𪛟b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2a6e0_00",
+      "prompt": "a𪛠b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2a6e0_01",
+      "prompt": "a𪛠b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2a6e0_10",
+      "prompt": "a𪛠b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2a6e0_11",
+      "prompt": "a𪛠b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b81f_00",
+      "prompt": "a𫠟b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b81f_01",
+      "prompt": "a𫠟b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b81f_10",
+      "prompt": "a𫠟b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b81f_11",
+      "prompt": "a𫠟b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b820_00",
+      "prompt": "a𫠠b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b820_01",
+      "prompt": "a𫠠b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b820_10",
+      "prompt": "a𫠠b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b820_11",
+      "prompt": "a𫠠b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b91f_00",
+      "prompt": "a𫤟b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b91f_01",
+      "prompt": "a𫤟b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b91f_10",
+      "prompt": "a𫤟b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b91f_11",
+      "prompt": "a𫤟b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b920_00",
+      "prompt": "a𫤠b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b920_01",
+      "prompt": "a𫤠b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2b920_10",
+      "prompt": "a𫤠b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2b920_11",
+      "prompt": "a𫤠b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2ceaf_00",
+      "prompt": "a𬺯b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2ceaf_01",
+      "prompt": "a𬺯b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2ceaf_10",
+      "prompt": "a𬺯b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2ceaf_11",
+      "prompt": "a𬺯b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2ceb0_00",
+      "prompt": "a𬺰b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2ceb0_01",
+      "prompt": "a𬺰b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2ceb0_10",
+      "prompt": "a𬺰b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2ceb0_11",
+      "prompt": "a𬺰b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2fa1f_00",
+      "prompt": "a𯨟b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2fa1f_01",
+      "prompt": "a𯨟b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2fa1f_10",
+      "prompt": "a𯨟b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2fa1f_11",
+      "prompt": "a𯨟b",
+      "add_special": true,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2fa20_00",
+      "prompt": "a𯨠b",
+      "add_special": false,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2fa20_01",
+      "prompt": "a𯨠b",
+      "add_special": false,
+      "parse_special": true
+    },
+    {
+      "name": "cjk_2fa20_10",
+      "prompt": "a𯨠b",
+      "add_special": true,
+      "parse_special": false
+    },
+    {
+      "name": "cjk_2fa20_11",
+      "prompt": "a𯨠b",
+      "add_special": true,
+      "parse_special": true
+    }
+  ]
+}

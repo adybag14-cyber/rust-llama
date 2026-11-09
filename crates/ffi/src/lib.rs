@@ -19,6 +19,7 @@ pub mod abi;
 mod batch;
 mod context;
 mod model;
+mod sampler;
 mod vocab;
 pub use abi::*;
 pub use context::ContextHandle;

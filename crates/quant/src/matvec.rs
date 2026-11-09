@@ -7,8 +7,10 @@ use crate::{DType, QuantError, dequantize, half, quantize, u32le};
 pub fn matvec_activation_dtype(weights: DType) -> Result<DType, QuantError> {
     use DType::*;
     match weights {
-        Q4_0 | Q5_0 | Q8_0 => Ok(Q8_0),
+        Q1_0 | Q2_0 | Q4_0 | Q5_0 | Q8_0 | MXFP4 | NVFP4 | IQ4_NL => Ok(Q8_0),
         Q4_1 | Q5_1 => Ok(Q8_1),
+        Q2_K | Q3_K | Q4_K | Q5_K | Q6_K | IQ2_XXS | IQ2_XS | IQ2_S | IQ3_XXS | IQ3_S | IQ1_S
+        | IQ1_M | IQ4_XS | TQ1_0 | TQ2_0 => Ok(Q8_K),
         F32 | F16 | F8_E4M3 => Ok(F32),
         BF16 => Ok(BF16),
         _ => Err(QuantError::UnsupportedMatVec(weights)),
@@ -16,7 +18,8 @@ pub fn matvec_activation_dtype(weights: DType) -> Result<DType, QuantError> {
 }
 
 /// Row-major GGML matrix-vector multiplication with its native activation dtype.
-/// Supported packed weights: Q4_0/Q4_1/Q5_0/Q5_1/Q8_0; scalar F32/F16/BF16/F8.
+/// Supports every weight dtype with a CPU vec_dot in the frozen source: 25
+/// packed formats and scalar F32/F16/BF16/F8_E4M3.
 /// This is the scalar arithmetic path, not a claim of ISA-specific accumulation.
 pub fn matvec(
     weights_type: DType,
@@ -100,6 +103,16 @@ pub fn dot_packed(
 }
 
 fn dot_packed_unchecked(t: DType, x: &[u8], y: &[u8]) -> f32 {
+    if matches!(
+        t,
+        DType::Q4_0 | DType::Q4_1 | DType::Q5_0 | DType::Q5_1 | DType::Q8_0
+    ) {
+        dot_legacy(t, x, y)
+    } else {
+        crate::matvec_extra::dot(t, x, y)
+    }
+}
+fn dot_legacy(t: DType, x: &[u8], y: &[u8]) -> f32 {
     let affine = matches!(t, DType::Q4_1 | DType::Q5_1);
     let five = matches!(t, DType::Q5_0 | DType::Q5_1);
     let ysize = if affine { 36 } else { 34 };

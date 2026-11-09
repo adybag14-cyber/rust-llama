@@ -38,16 +38,17 @@ Set `LLAMA_TEST_MODEL` to the external model path, then explicitly execute its
 ignored-by-default test:
 
 ```text
-cargo test --locked --offline -p llama-inference --test native_reference trained_stories -- --ignored --nocapture
+cargo test --locked --offline -p llama-inference --test native_reference trained_stories260k -- --ignored --nocapture
 cargo run --locked --offline -p llama-server --example verify_model_server -- PATH/stories260K.gguf
 ```
 
 The numerical gate was fixed before comparing Rust results:
 `abs(actual-reference) <= 2e-4 + 2e-5 * abs(reference)`.
 This gate applies to this model and CPU path. Tokens and text use exact equality.
-An explicit 9 November 2026 Windows execution compared 62,976 logit values and
-observed maximum absolute error `1.764297485e-5`, with all 96 greedy IDs and all
-six complete outputs exact. The compared-row count includes the final prompt row
+The initial 9 November 2026 Windows execution compared 62,976 logits with
+maximum absolute error `1.764297485e-5`. Matching the source's F32-product/F64-sum
+reduction now makes all those Windows logits exact; Linux records maximum error
+`5.722045898e-6`. All 96 greedy IDs and six complete outputs remain exact. The compared-row count includes the final prompt row
 again as the initial greedy prediction row.
 
 The real-model server check executes HTTP requests, SSE, replay, tokenizer
@@ -96,3 +97,50 @@ reference uses one CPU thread, F32 KV and disabled flash attention.
 
 This is one trained quantized model and one prompt; it is not a completeness
 claim for every quantized format, model architecture, processor or backend.
+
+## Pretrained BERT and equivalent big-endian input
+
+`bert-bge-request.json`, `bert-bge-reference.json` and
+`bert-bge-provenance.json` capture the original dense BERT encoder for three
+prompts, 25 token vectors and nine pooled vectors. The 384-dimensional results
+contain 13,056 unique expected floats. They include every raw token vector and
+mean, first/CLS and last pooling.
+
+| External model input | Bytes | SHA-256 | Environment variable |
+| --- | ---: | --- | --- |
+| BGE-small F16, little endian | 67,308,128 | `f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999` | `LLAMA_TEST_BERT_MODEL` |
+| Equivalent big-endian GGUF | 67,308,128 | `0e68255af91c707227f4840603bcbd0555054b921f757d79efdb2652ae8bb952` | `LLAMA_TEST_BERT_BE_MODEL` |
+
+```text
+cargo test --release --locked --offline -p llama-inference --test bert_reference -- --ignored --nocapture
+```
+
+The original C reader rejects the opposite-endian model. The second test
+therefore checks the Rust reader against the independently captured outputs of
+the equivalent little-endian model; it does not imply native big-endian support.
+
+After matching source attention and pooling reduction, Windows compares every
+value exactly. Linux maximum absolute error is `1.348853111e-4`, within the
+same predeclared `2e-4 + 2e-5 * abs(reference)` limit. The initial numerical
+failure, per-stage diagnosis and permanent 12-layer attention fixture are
+documented under `evidence/2026-11-09/bert`.
+
+## Missing pooling metadata
+
+The 6,832-byte `tiny-bert-missing-pooling.gguf` is generated synthetic test data
+with one small F32 BERT layer and no `bert.pooling_type` key. It contains no
+pretrained weights. Its original request, native results and provenance are
+recorded in `bert-defaults-*`.
+
+An untouched native default context resolves to no pooling. The ordinary
+`bert_defaults` regression checks this default, explicit None and Mean controls,
+token IDs and 56 native-derived floats across three prompts. This check needs
+no external model download:
+
+```text
+cargo test --locked --offline -p llama-inference --test bert_defaults
+```
+
+CI additionally supplies all four pretrained model environment variables and
+runs the complete set of explicit ignored model comparisons in release mode.
+Other ignored vendor/hardware tests have separate prerequisites.

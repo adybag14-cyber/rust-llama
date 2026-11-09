@@ -73,3 +73,48 @@
 | 66 | `offsetof(llama_batch, n_seq_id)` |
 | 67 | `offsetof(llama_batch, seq_id)` |
 | 68 | `offsetof(llama_batch, logits)` |
+
+## Sampler layout extension
+
+llama_rust_sampler_abi_layout(index) has its own index space; the original
+69-entry llama_rust_abi_layout table remains unchanged. SIZE_MAX marks the end.
+The values below were checked against the frozen header on Windows x64.
+
+| Index | Native item | Observed value |
+|---|---|---|
+| 0 | sizeof(llama_token_data) | 12 |
+| 1 | alignof(llama_token_data) | 4 |
+| 2 | llama_token_data.id | 0 |
+| 3 | llama_token_data.logit | 4 |
+| 4 | llama_token_data.p | 8 |
+| 5 | sizeof(llama_token_data_array) | 32 |
+| 6 | alignof(llama_token_data_array) | 8 |
+| 7 | llama_token_data_array.data | 0 |
+| 8 | llama_token_data_array.size | 8 |
+| 9 | llama_token_data_array.selected | 16 |
+| 10 | llama_token_data_array.sorted | 24 |
+| 11 | sizeof(llama_logit_bias) | 8 |
+| 12 | alignof(llama_logit_bias) | 4 |
+| 13 | llama_logit_bias.token | 0 |
+| 14 | llama_logit_bias.bias | 4 |
+| 15 | sizeof(llama_sampler_chain_params) | 1 |
+| 16 | alignof(llama_sampler_chain_params) | 1 |
+| 17 | llama_sampler_chain_params.no_perf | 0 |
+| 18 | sizeof(llama_sampler) | 16 |
+| 19 | alignof(llama_sampler) | 8 |
+| 20 | llama_sampler.iface | 0 |
+| 21 | llama_sampler.ctx | 8 |
+| 22 | sizeof(llama_sampler_i) | 96 |
+| 23 | alignof(llama_sampler_i) | 8 |
+| 24 | llama_sampler_i.name | 0 |
+| 25 | llama_sampler_i.accept | 8 |
+| 26 | llama_sampler_i.apply | 16 |
+| 27 | llama_sampler_i.reset | 24 |
+| 28 | llama_sampler_i.clone | 32 |
+| 29 | llama_sampler_i.free | 40 |
+| 30 | llama_sampler_i.backend_init | 48 |
+| 31 | llama_sampler_i.backend_accept | 56 |
+| 32 | llama_sampler_i.backend_apply | 64 |
+| 33 | llama_sampler_i.backend_set_input | 72 |
+| 34 | llama_sampler_i.backend_reset | 80 |
+| 35 | llama_sampler_i.copy_state | 88 |
