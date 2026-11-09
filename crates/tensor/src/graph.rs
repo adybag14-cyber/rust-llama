@@ -69,6 +69,14 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Inputs: Q, K, V, then enabled mask, sinks and I32 row map.
+    /// Calls the shared native-profile kernel with actual scoped workers.
+    FlashAttnExt {
+        options: crate::FlashAttentionOptions,
+        with_mask: bool,
+        with_sinks: bool,
+        with_rows: bool,
+    },
     /// Inputs: kernel metadata, image. Preserves the frozen CPU address policy.
     Im2col {
         params: Conv2dParams,
@@ -335,6 +343,7 @@ impl Op {
         use Op::*;
         match self {
             Dup => OpCode::DUP,
+            FlashAttnExt { .. } => OpCode::FLASH_ATTN_EXT,
 
             Im2col { .. } => OpCode::IM2COL,
             Im2colBack { .. } => OpCode::IM2COL_BACK,
@@ -421,6 +430,12 @@ impl Op {
     fn arity(&self) -> usize {
         match self {
             Self::Arange { .. } => 0,
+            Self::FlashAttnExt {
+                with_mask,
+                with_sinks,
+                with_rows,
+                ..
+            } => 3 + usize::from(*with_mask) + usize::from(*with_sinks) + usize::from(*with_rows),
             Self::AddId | Self::MatMulId | Self::SetRows => 3,
             Self::TopKMask {
                 with_scores,

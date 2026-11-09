@@ -1,0 +1,64 @@
+from pathlib import Path
+import os,sys,json,hashlib,subprocess,time,datetime,re
+sys.dont_write_bytecode=True
+windows=os.name=='nt';platform='windows' if windows else 'linux'
+reference=Path(r'C:\Users\adyba\rust-llama-reference') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference')
+base=reference/'gguf-byte-strings';repo=base/'rust-draft-v1'
+out=base/'validation/focused-v1'/platform;out.mkdir(parents=True,exist_ok=False)
+env=os.environ.copy();env['CARGO_BUILD_JOBS']='2';env['PYTHONDONTWRITEBYTECODE']='1'
+if windows:env['CARGO_TARGET_DIR']=str(base/'target-windows')
+else:
+ rustbin=Path('/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin')
+ env['PATH']=str(rustbin)+':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+ env['RUSTC']=str(rustbin/'rustc');env['RUSTDOC']=str(rustbin/'rustdoc')
+ env['CARGO_TARGET_DIR']='/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1'
+def identity(path):
+ h=hashlib.sha256()
+ with path.open('rb') as stream:
+  while chunk:=stream.read(1048576):h.update(chunk)
+ return {'bytes':path.stat().st_size,'sha256':h.hexdigest()}
+def inputs():
+ result=[]
+ explicit={'.cargo/config.toml','.github/workflows/ci.yml','docs/fixture-manifest.tsv','docs/integration-fixture-manifest.tsv','crates/model-runtime/tests/data/ggml_reference.tsv'}
+ for path in repo.rglob('*'):
+  rel=path.relative_to(repo);name=rel.as_posix()
+  if path.is_file() and not any(x in rel.parts for x in ('evidence','.git','target')) and (path.suffix in ('.rs','.json','.bin','.gguf','.zlib') or 'fixtures' in rel.parts or path.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or name in explicit):
+   result.append({'path':name,**identity(path)})
+ return sorted(result,key=lambda r:r['path'])
+def fingerprint(rows=None):
+ rows=inputs() if rows is None else rows
+ return {'files':len(rows),'sha256':hashlib.sha256('\n'.join(r['path']+'\0'+r['sha256'] for r in rows).encode('utf-8')).hexdigest()}
+rows=inputs();before=fingerprint(rows)
+(out/'execution-inputs.json').write_bytes((json.dumps(rows,indent=2)+'\n').encode('utf-8'))
+report={'status':'running','platform':platform,'base_commit':'40a4ee7deb59e5823dd6d242231592d0c9923168','execution_inputs_before':before,'driver':identity(Path(__file__)),'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Raw GGUF reader/getters/native serialization, lossless raw v3 writer, native split/merge byte and NUL semantics; 1605 original reader cases, 3196 original tool cases, 22 original NUL tool cases, plus existing 103 CLI cases. All source/fixture inputs including both declarations are frozen. Not full T04 or full-port completion.','steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+cargo=['cargo']+(['+1.99.1'] if windows else [])
+packages=['-p','llama-gguf','-p','rust-llama-cli','-p','llama-inference','-p','llama-tokenizer']
+steps=[
+ ('fmt',cargo+['fmt','--all','--','--check']),
+ ('workspace-check',cargo+['check','--offline','--locked','--workspace','--all-targets']),
+ ('debug',cargo+['test','--offline','--locked',*packages,'--all-targets','--','--nocapture']),
+ ('release',cargo+['test','--offline','--locked','--release',*packages,'--all-targets','--','--nocapture']),
+ ('clippy',cargo+['clippy','--offline','--locked',*packages,'--all-targets','--','-D','warnings']),
+ ('audit',cargo+['run','--offline','--locked','-p','xtask','--','audit']),
+ ('fixtures',cargo+['run','--offline','--locked','-p','xtask','--','fixtures']),
+]
+try:
+ for name,args in steps:
+  assert inputs()==rows,('changed execution input',name)
+  started=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:p=subprocess.run(args,cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=2400)
+  log=(out/(name+'.log')).read_bytes();text=log.decode('utf-8','replace')
+  matches=[tuple(map(int,m)) for m in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored',text)]
+  row={'name':name,'argv':args,'exit_code':p.returncode,'seconds':time.monotonic()-started,'log':identity(out/(name+'.log'))}
+  if matches:row['tests']={'passed':sum(m[0] for m in matches),'failed':sum(m[1] for m in matches),'ignored':sum(m[2] for m in matches),'suites':len(matches)}
+  row['native_metrics']=[line for line in text.splitlines() if any(x in line for x in ('gguf-split-native:','Independent original GGUF','Original input raw writer:','original GGUF tool'))]
+  report['steps'].append(row);save();print(platform,name,p.returncode,flush=True)
+  if p.returncode:print(text[-16000:],flush=True);raise RuntimeError(name+' failed')
+ assert inputs()==rows
+ report['execution_inputs_after']=fingerprint();report['status']='succeeded'
+except BaseException as error:
+ report['status']='failed';report['error']=repr(error);report['execution_inputs_at_failure']=fingerprint();report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save();raise
+report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2),flush=True)

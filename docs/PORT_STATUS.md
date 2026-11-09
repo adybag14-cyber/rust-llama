@@ -15,9 +15,9 @@ The merged workspace has local path dependencies. Optional OS/driver/vendor inte
 | Track | Current implementation and evidence | Requirements still open |
 | --- | --- | --- |
 | T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 184/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 71 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
-| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 75 executable operation IDs plus NONE leaves and 3,240 distinct native graph cases. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
+| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 76 executable operation IDs plus NONE leaves, including the checked shared CPU FLASH_ATTN_EXT adapter; the earlier 3,240-graph corpus remains preserved. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
-| T04: formats/conversion/tokenizers | Bounded GGUF v2/v3 reader, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Checkpoint/Safetensors conversion; arbitrary-byte GGUF strings, NUL keys/names and noncanonical boolean bytes; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
+| T04: formats/conversion/tokenizers | Bounded shared raw/text GGUF v2/v3 reader, native byte/NUL alias and nonzero-boolean semantics, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, byte-preserving ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, raw/indexed Safetensors reading with retained capabilities, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Architecture checkpoint conversion; arbitrary-byte metadata across every high-level model/vocabulary consumer; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
 | T05: models/runtime | Typed Llama/Qwen2/Qwen3/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Qwen2 GGUF executes pretrained Q4_K_M generation; Qwen3 GGUF executes pretrained Q8_0 generation with independent head width and per-head Q/K normalization; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
 | T06: CUDA/HIP/MUSA | Rust driver interfaces and typed PTX generation; actual CUDA kernels including matvec, stride/broadcast/tail coverage; 138 recorded dispatches on RTX 4090. | Full tensor/backend scheduler integration, upstream operation and dtype coverage, memory/collective modes, optimized kernels; HIP and MUSA hardware execution/parity. |
 | T07: portable GPU | Typed kernel IR; generated OpenCL kernels executed on NVIDIA and AMD; Vulkan/other host foundations. | Complete Metal, Vulkan, OpenCL and WebGPU implementation; full compiler/device/OS matrix, scheduler integration and numerical/performance parity. |
@@ -109,8 +109,8 @@ Twenty overlapping backward-gradient cases preserve native MSVC/GNU NaN
 operand selection; the earlier GNU mismatch in ten cases and 66 F32 words is
 retained in the evidence.
 Shape, stride and parameter/error behavior are tested separately. Tensor
-coverage is now 75 executable IDs plus NONE, with 26 operation IDs still
-pending. Across the tensor corpus there are 3,240 distinct graph inputs and
+coverage before the flash adapter was 75 executable IDs plus NONE. The adapter
+raises this to 76 executable IDs plus NONE, with 25 operation IDs still pending. Across the tensor corpus there are 3,240 distinct graph inputs and
 6,118 native captures; repeated platform executions are not counted as new
 graph cases. Shared scalar/SSE2 row math now serves model-runtime and tensor;
 1,007 additional original graphs require exact matching-profile bytes. The
@@ -149,18 +149,60 @@ inputs deleted and the complete merged output available. Destructive cleanup
 requires stable, exclusively managed paths. The source's earlier deletion timing
 and undefined parser inputs are retained in original evidence and qualified.
 
-The inherited Rust reader still requires UTF-8 metadata and rejects NUL keys
-and tensor names. A separate original-only 22-case corpus per host captures
-native byte-string/NUL alias behavior for subsequent work. An additional 512-case
-original corpus per host confirms every nonzero boolean byte is true; the current
-reader still admits only 0/1 boolean encodings. This checkpoint does not claim
-full arbitrary-byte GGUF or T04 completion.
+The [raw GGUF extension](GGUF_BYTE_STRINGS.md) now preserves complete byte
+strings in the shared parser and raw writer. Native lookups retain first-prefix
+matching; split/merge setters retain last-contribution ordering and first-prefix
+tensor shape/payload selection. Every nonzero boolean byte is true, and writers
+emit canonical 0/1 values. Independent per-profile coverage comprises 1,605
+reader/getter cases, 269,184 exact native serialization bytes, 1,073 public-writer
+inputs and 3,218 byte-string/NUL tool cases. The published 103-case streaming
+corpus and its output/deletion/undefined-behavior qualifications remain intact.
+
+Gguf, GgufSet and the current high-level model/vocabulary loaders retain checked
+UTF-8 metadata and reject NUL keys/names. Extending those consumers to the entire
+raw byte domain, checkpoint conversion and the rest of T04 remain open. All
+twenty mandatory release gates remain open.
+
+## Native CPU flash and checkpoint foundation
+
+The shared Rust flash kernel preserves one-chunk, tiled and split-KV execution,
+original query geometry, physical masks, unified row maps and measured compiler
+NaN operand rules. Both compiler profiles independently pass 3,746 original
+graphs and 7,060,000 raw default/forced output words. The tensor adapter adds
+114 admitted original graphs and reuses 896 sealed cases, with 3,032,980 exact
+output words per profile. Nine native-success adapter domains remain explicitly
+unsupported. Worker stacks, scratch and owned results are checked before
+execution; the tensor DAG still lacks an aggregate retained-memory budget.
+
+The native C microbatch cohort has 228 requested cases: 226 source-return cases
+match exactly, while two original initialization assertions become checked
+errors. Per-profile comparisons cover 2,917,888 exact logit words and 14,171,045
+binary bytes. Separate trained/tiny state replay covers all four K/V type pairs
+under flash/nonflash, including 640 memory scenarios, 640 sequence states, 32
+file suites and 1,536 short-buffer checks; all 8,459,616 binary bytes match. The
+consumer rejects nonfinite computed model logits rather than claiming the
+shared kernel raw-NaN domain as a model-level contract. Cancellation remains
+whole-batch transactional. Decode sequence IDs follow n_seq_max; the measured
+memory API retains its separate 256-ID domain.
+
+The checkpoint crate provides raw Safetensors parsing, bounded positioned
+reads and indexed composition over retained file capabilities. Original file
+and index corpora retain platform behavior and safe checked path-policy
+differences. Architecture conversion and the remainder of T04 stay open.
+
+The combined guard includes every file outside historical evidence and
+recognized Git/build caches, including prose, licenses, release policy, source
+ledgers, declarations and all fixture types. Earlier 648/744/823/849-file subsets
+retain their original meaning and are not described as complete guards. The
+actual release list has twenty open rows across twelve ownership tracks.
+Historical statements that called the track count a gate count are preserved
+with a recorded erratum; no gate status changes with this wording correction.
 
 ## Memory and execution qualifications
 
 The high-level model facade loads a dense Llama, Qwen2, Qwen3, Mamba-1 or BERT GGUF file set into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
 
-The strict Llama, Qwen2 and Qwen3 decoder Context uses F32 KV. The separate Llama NativeContext admits independent F32/F16 key/value storage only with explicit nonflash single-worker settings. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
+The strict Llama, Qwen2 and Qwen3 decoder Context uses F32 KV. The separate Llama NativeContext admits independent F32/F16 key/value storage, native flash/AUTO resolution and actual configured workers for admitted dense-Llama CPU graphs; explicit nonflash execution remains single-worker. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
 
 The strict Rust Context defaults to a 1 GiB max_state_bytes budget. It reserves
 owned sequence/layer records, KV and recurrent capacities, planning records,
@@ -177,8 +219,11 @@ and resident outer-vector storage. A regression rejects the old underestimated
 budget atomically and succeeds at the sufficient budget; removing only that
 descriptor charge makes the regression fail. Neither state budget is an RSS
 limit. The original default combination of F16/F16 cache, AUTO flash and
-four/four workers remains unimplemented. Explicit nonflash, single-worker
-F16/F32 cache storage is supported by this checkpoint.
+four/four workers is now admitted for supported dense-Llama CPU configurations.
+AUTO follows the frozen CPU capability resolution, and workers execute real
+partitions. NativeContext keeps full physical K/V, complete logical masks and
+unified row maps through per-layer microbatches. Nonflash multiple workers,
+other native C context architectures and remaining backend modes stay open.
 
 The CLI and server accept --ctx-size and --max-weight-mib, and the server
 exposes RuntimeProvider::load_with_options for the same checked limits.
@@ -215,7 +260,7 @@ its corresponding original profile. Formatting, strict Clippy, 458 fixture
 declarations, source verification, release builds, CLI and real HTTP/SSE checks
 also pass. All 17 validation steps retain the same 637 execution inputs with
 SHA-256 89a863d2145bee98206987803404e1551a9edb45c5174a9ff550cae993e42343.
-The release check still fails as required because all twelve global gates are
+The release check still fails as required because all twenty mandatory gates are
 open. Complete evidence is in evidence/2026-11-09/qwen3-and-f16-caches.
 
 The previous published e0af03a checkpoint passed GitHub Actions run 42673166488
@@ -232,7 +277,7 @@ cover the same 648 execution inputs, SHA-256
 abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c,
 including strict Clippy, 465 fixture declarations, release builds, CLI,
 HTTP/SSE and verification of all 4,082 frozen source files. The required release
-check still fails because all twelve global gates remain open.
+check still fails because all twenty mandatory gates remain open.
 
 Windows source verification first reported two generated Python cache files
 from an independent reference import. Those files were archived outside the

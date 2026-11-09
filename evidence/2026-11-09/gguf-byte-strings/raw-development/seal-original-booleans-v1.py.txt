@@ -1,0 +1,27 @@
+from pathlib import Path
+import hashlib,json,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings')
+sha=lambda b:hashlib.sha256(b).hexdigest()
+reports={p:json.loads((base/'original-booleans-v1'/p/'report.json').read_text(encoding='utf-8')) for p in ('windows','linux')}
+assert all(r['status']=='succeeded' for r in reports.values())
+assert reports['windows']['cases']==reports['linux']['cases']
+assert reports['windows']['summary']==reports['linux']['summary']
+pools={p:(base/'original-booleans-v1'/p/'data.bin').read_bytes() for p in reports}
+assert pools['windows']==pools['linux']
+for p,r in reports.items():
+ pool=pools[p];assert r['pool']['bytes']==len(pool) and r['pool']['sha256']==sha(pool)
+ for c in r['cases']:
+  for key in ('input','native_serialized_header'):
+   if key not in c:continue
+   b=c[key];v=pool[b['offset']:b['offset']+b['bytes']]
+   assert len(v)==b['bytes'] and sha(v)==b['sha256'],(p,c['name'],key)
+ expected_source={'gguf.cpp':'51bd966ab0494aa20d4087975f17d8b9b8ed9c4b63d7cbffe9315ed45de5dd78','gguf.h':'e56714aab702e5ce62ee587a409643c08f7e93e8fbb77f48ef7cc85075f96fa4'}
+ for source in r['sources']:
+  name=source['path'].replace('\\','/').rsplit('/',1)[-1]
+  if name in expected_source:assert source['sha256']==expected_source[name]
+result={'status':'succeeded','sealed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'independence':'Both original profiles were complete and equal before any boolean normalization Rust correction or comparison. This review verifies captures, not a Rust implementation.','summary':reports['windows']['summary'],'exact_native_cases_across_profiles':True,'exact_native_pools_across_profiles':True,'rejected_names':[c['name'] for c in reports['windows']['cases'] if not c['accepted']],'files':[]}
+for platform in reports:
+ for name in ('report.json','data.bin','status.json'):
+  p=base/'original-booleans-v1'/platform/name;b=p.read_bytes();result['files'].append({'path':p.relative_to(base).as_posix(),'bytes':len(b),'sha256':sha(b)})
+out=base/'original-booleans-v1/sealed-review.json';assert not out.exists();out.write_bytes((json.dumps(result,indent=2)+'\n').encode('utf-8'))
+print(json.dumps(result,indent=2))

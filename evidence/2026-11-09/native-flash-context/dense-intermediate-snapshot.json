@@ -1,0 +1,726 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T19:26:00.532085+00:00",
+  "purpose": "Preserved dense non-unified microbatch/flash checkpoint before the separately verified unified row-map extension. No product integration.",
+  "published_base": "e0af03a97ca7077c6f2aee680fb84b3fa688f82a",
+  "typed_nonflash_dependency": "../nonflash-checkpoint-v2/handoff.json",
+  "shared_flash_dependency": {
+    "path": "../flash-kernel/handoff/manifest.json",
+    "sha256": "ef9d404ba3f3a61e8c08b4e9cc12153bc6c549701fc4373a1c1267874c496281"
+  },
+  "sources": {
+    "Cargo.lock": {
+      "bytes": 2175,
+      "sha256": "9798a24c359c25d133ef0e80dfb77b96fe8e6d1eae6814d6ecf4068e5afd5c73"
+    },
+    "Cargo.toml": {
+      "bytes": 297,
+      "sha256": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c"
+    },
+    "crates/ffi/Cargo.toml": {
+      "bytes": 469,
+      "sha256": "5dadf6db23b37ddabd32b9a1f844db0abbe9b9f7a281d65805738498251e84b9"
+    },
+    "crates/ffi/src/abi.rs": {
+      "bytes": 10726,
+      "sha256": "be0ccba265fa265dd460c9987839280b971bcd68f0bf868e27d7268e827cfe1e"
+    },
+    "crates/ffi/src/batch.rs": {
+      "bytes": 6439,
+      "sha256": "c77300e45bab5615ba2605142ba056a9dd7d09329cd630d6647aea6b0cd543f0"
+    },
+    "crates/ffi/src/context.rs": {
+      "bytes": 16372,
+      "sha256": "f50d1d76efbfc36b22ade87dc53f131813e84f4655e8dafb73520a91c697356c"
+    },
+    "crates/ffi/src/context_reference_tests.rs": {
+      "bytes": 36378,
+      "sha256": "d113732919d01a37321723de02a48681d34773f080e79e605eb0b9a44a1b5f54"
+    },
+    "crates/ffi/src/f16_context_reference_tests.rs": {
+      "bytes": 26670,
+      "sha256": "dd6677a9a692b57301dc987fb03cf7dfec306dfba058c8fdd6ef05b48d2ea2a4"
+    },
+    "crates/ffi/src/lib.rs": {
+      "bytes": 8784,
+      "sha256": "fec9abfd89863fc7754a26040bc9b7e1884d47b631d89d1dd152832d6ac7bfb6"
+    },
+    "crates/ffi/src/memory.rs": {
+      "bytes": 2568,
+      "sha256": "34037f594e285ede4dc21f3e6f231870d6e7a5d58429c4311666410c125cc6f1"
+    },
+    "crates/ffi/src/model.rs": {
+      "bytes": 16725,
+      "sha256": "3974819e417e8ced416ec2da4f61c3269706a9245ac0552450d87e6ac8d4a783"
+    },
+    "crates/ffi/src/model_shard_tests.rs": {
+      "bytes": 16415,
+      "sha256": "41169838d4ca4bf3d4684035e08b6ba05aa1fac680e10c74982733a00603c6ad"
+    },
+    "crates/ffi/src/sampler.rs": {
+      "bytes": 50736,
+      "sha256": "2a67fefb55dddcd93e892a380c0594ab47735961c6000ba06192b4ac69b801eb"
+    },
+    "crates/ffi/src/sampler_grammar.rs": {
+      "bytes": 9794,
+      "sha256": "d5bcac15f46998536cc3b67f206c6fc590bc67a19e3008dfd7c82e1df66ef7a7"
+    },
+    "crates/ffi/src/sampler_reference_tests.rs": {
+      "bytes": 17817,
+      "sha256": "a81bc49f0649fc9f4d9bdfe5afff13894e6cb4caa1503fbedbb4760e6bde01e2"
+    },
+    "crates/ffi/src/sampler_vocab.rs": {
+      "bytes": 5771,
+      "sha256": "7a9d1bad7bdc3d8973762aba199dc303f4dc09c4cbb914a4dbb264611581c5de"
+    },
+    "crates/ffi/src/state.rs": {
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    "crates/ffi/src/vocab.rs": {
+      "bytes": 12340,
+      "sha256": "162efe3c5489688a9d1448ab11de179c5303078582e0ed3515f835b3d8d8d588"
+    },
+    "crates/model-runtime/Cargo.toml": {
+      "bytes": 313,
+      "sha256": "f34cf87596889d08d688a8c3baf8e221f39ebf7c9571c02ab70aeaa444fe4e82"
+    },
+    "crates/model-runtime/examples/build_reference.rs": {
+      "bytes": 4243,
+      "sha256": "3a36ad7621515f55e616db039c9882efbcaf4462c26532adf80e4d17406a1a05"
+    },
+    "crates/model-runtime/examples/reference_oracle.rs": {
+      "bytes": 25068,
+      "sha256": "d8e4138bdebb0177c1531b34d36fe114652e406d1d65daef64d2dd89ac59e9e1"
+    },
+    "crates/model-runtime/examples/registry_audit.rs": {
+      "bytes": 486,
+      "sha256": "58db8564d69caccab7556b124af4841c98e24523b7c1b721b6e9fd88e9591f7d"
+    },
+    "crates/model-runtime/examples/smoke.rs": {
+      "bytes": 126,
+      "sha256": "5c9db86c433063d5f5e769f5b487320185916868e3bd71ec2023471720cd2d14"
+    },
+    "crates/model-runtime/src/adapters.rs": {
+      "bytes": 3277,
+      "sha256": "882671e1add412c5bc95063caa9fd15b0fe7273e593b5414b5ff9d3ac47a9efb"
+    },
+    "crates/model-runtime/src/bert.rs": {
+      "bytes": 11368,
+      "sha256": "fdf7faeadb86e40e779ae1cad3f4f9f034f96d533fbc7fec85e6ced941482c3a"
+    },
+    "crates/model-runtime/src/context.rs": {
+      "bytes": 17940,
+      "sha256": "7dc6101213e7202be14e64b8cedccd9d5c410393807e6b7c908f4dc2e44a96bc"
+    },
+    "crates/model-runtime/src/context/allocation_tests.rs": {
+      "bytes": 15128,
+      "sha256": "032f86ea16d7303d4caeefaa82a4f5d97ab2f57ec07696be09afc87fb47fbd4c"
+    },
+    "crates/model-runtime/src/context/native.rs": {
+      "bytes": 44803,
+      "sha256": "bdf904f07bead77e31e33a947f5aba2e042657875c0dc2ea3f0d0ff3c630bb7f"
+    },
+    "crates/model-runtime/src/context/native_batch.rs": {
+      "bytes": 10451,
+      "sha256": "69022f994e32daaba06acbd0612270cd28e1c4153f373add8e8bb0037dc70ef4"
+    },
+    "crates/model-runtime/src/context/native_decode.rs": {
+      "bytes": 24972,
+      "sha256": "2742b03e70cb6eed517995a45c3c329701a5f17236bb5d021e12c48d6636481a"
+    },
+    "crates/model-runtime/src/context/native_kv.rs": {
+      "bytes": 6052,
+      "sha256": "397f50d500c13a5304e568000364d8758f5f858ea04088517d8abb3bedb8ed5d"
+    },
+    "crates/model-runtime/src/context/native_state.rs": {
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    "crates/model-runtime/src/context/owned.rs": {
+      "bytes": 16432,
+      "sha256": "79a9157af282f9dd308896f5164a4281d6f7507e9ff863f7e518d10a31f2f17e"
+    },
+    "crates/model-runtime/src/fixtures.rs": {
+      "bytes": 7517,
+      "sha256": "2b8efc548dcf71be748146f71b1f5bccbcd4570c8b89871273dcafe8d4df5db1"
+    },
+    "crates/model-runtime/src/lib.rs": {
+      "bytes": 8579,
+      "sha256": "ff4e3628dd7a59180bfe7b5bb381a24acc64ea6150c39e3a4b87206ca5710bd0"
+    },
+    "crates/model-runtime/src/llama.rs": {
+      "bytes": 15925,
+      "sha256": "754395ebdb42778421a9bb7360d767327a58ba5c902a1b4ad30cfd2fb3cfc6d8"
+    },
+    "crates/model-runtime/src/mamba.rs": {
+      "bytes": 12825,
+      "sha256": "8f2517e0d16d201bef6857485dce7aa7c81877413165241848114e5240cc760b"
+    },
+    "crates/model-runtime/src/math.rs": {
+      "bytes": 24790,
+      "sha256": "dc173a5453cefe94faffc72980da3ba9257ba01f2bb16265ef9f7b2236062128"
+    },
+    "crates/model-runtime/src/math/native_rows.rs": {
+      "bytes": 243,
+      "sha256": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90"
+    },
+    "crates/model-runtime/src/qwen2.rs": {
+      "bytes": 15274,
+      "sha256": "d87be80dc22d048ca2af9386580dffd6674eb8b44eed380f4ffe21fc141708c2"
+    },
+    "crates/model-runtime/src/registry.rs": {
+      "bytes": 159978,
+      "sha256": "68b551e235e86b5290fe3469b14ab3161ffda684d54bbd1bdaec866fb082b527"
+    },
+    "crates/model-runtime/src/state.rs": {
+      "bytes": 9741,
+      "sha256": "608a9e953256829ed9baea306b4a4e8ed987c158b81b160b532ee26b7e881115"
+    },
+    "crates/model-runtime/tests/fixtures/native-microbatch-order-provenance.json": {
+      "bytes": 1852,
+      "sha256": "d626fe67d00b8316e50cc09b21c98eab72b12d5d4bded16e03bec134f118ba3c"
+    },
+    "crates/model-runtime/tests/fixtures/native-microbatch-order.bin": {
+      "bytes": 1340,
+      "sha256": "5b791e3953d43eac3fd2547fc3fbcc0f54cc90b6414c80535510eee4e9a853ff"
+    },
+    "crates/model-runtime/tests/native_rows_graphs.rs": {
+      "bytes": 4413,
+      "sha256": "9b147da9d7b039125923c8b26be5e130b8465d04974257ee37e52a36f1722433"
+    },
+    "crates/model-runtime/tests/native_rows_native.rs": {
+      "bytes": 4603,
+      "sha256": "22468ee5029f43816e9c9c9f266d4d9f71f855340ddd7c8197736858330092b9"
+    },
+    "crates/model-runtime/tests/native_rows_variance.rs": {
+      "bytes": 6523,
+      "sha256": "e2da0dec649cd72a11e68d342dff0315213b1681ca96f7622ce0273da405c195"
+    },
+    "crates/model-runtime/tests/numerical_reference.rs": {
+      "bytes": 2391,
+      "sha256": "1cbf5db254317e5b7afd3ba19a3b969c18df0e4322a9145f34abc65a19405d32"
+    },
+    "crates/model-runtime/tests/qwen2.rs": {
+      "bytes": 2741,
+      "sha256": "51347a6efd9736dc89efa6d37fabafc5a90fa68777bf1115c6532045c7835bfe"
+    },
+    "crates/model-runtime/tests/runtime.rs": {
+      "bytes": 24495,
+      "sha256": "0b366893061ea950398e701cf003e92b2fafeaac794c9880ddec2f6d35cbbc03"
+    },
+    "crates/quant/Cargo.toml": {
+      "bytes": 162,
+      "sha256": "93c8167d42197441e97a6a1725a3117560df0874bf22e6d1ebca07e333be41dc"
+    },
+    "crates/quant/FLASH_ATTENTION.md": {
+      "bytes": 9814,
+      "sha256": "4df40b8093261c60655c420804f10d17ef156093926e9f27f7966736615c5a22"
+    },
+    "crates/quant/src/cpu_math.rs": {
+      "bytes": 7901,
+      "sha256": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5"
+    },
+    "crates/quant/src/flash_attention.rs": {
+      "bytes": 47035,
+      "sha256": "796620f9d39d3f5ed81b0064a7ee0b0ded69ab5dfee9afe3ee1a4f2def6930ed"
+    },
+    "crates/quant/src/flash_attention/tests.rs": {
+      "bytes": 10038,
+      "sha256": "ca072c12a70bede1bf5258967bc2270c587ed8e227d8338204db8fb77090d642"
+    },
+    "crates/quant/src/lib.rs": {
+      "bytes": 14160,
+      "sha256": "b2d1d8ebeccd0a118de4aab473334bbfd35312d72a017847a2e6ca1e4dd6d5ea"
+    },
+    "crates/quant/tests/common/flash_fixture.rs": {
+      "bytes": 5295,
+      "sha256": "65cbff31c2bab0686dd28b5bae4cf7cfbe85ab6c6feba721932b4865558e9ffb"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/compaction-provenance.json": {
+      "bytes": 4035,
+      "sha256": "fc0c2f6b8491f002a52631917eb861fb837d38384447b57a3c181e0fa6dba49c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/gnu-reference.bin": {
+      "bytes": 205704,
+      "sha256": "42065bff89488f51de9e0882f7b930a0504088331914d8e8610dbc557eda977c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/inputs.bin": {
+      "bytes": 7050960,
+      "sha256": "144c16e10daf27b77111082c33b983daf9d1876735c98c6a10867880c518e3ae"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/msvc-reference.bin": {
+      "bytes": 205704,
+      "sha256": "c13639ea1a1fe3021bd9ea355b5fb6f4d349d0f2be2aac87888cdc643491afa7"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-gnu-provenance.json": {
+      "bytes": 2170,
+      "sha256": "5525077a0231455accacda43cc84d49f5205d14c9a8b89901976abf2c87b5a2e"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-msvc-provenance.json": {
+      "bytes": 2220,
+      "sha256": "f1d49130354344b674b5d2569f226e8a6bd611e1cdcfe25e6e3a57c9fb32d23b"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/compaction-provenance.json": {
+      "bytes": 10845,
+      "sha256": "516b5fd22a7a889ff029fcdd00eecbdf621150619759221ac04bbce305e8817c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/gnu-reference.bin": {
+      "bytes": 949686,
+      "sha256": "5deb3b6e9b7d9ed31e04b66a4fc025ff51dbf5d695045f14761f9362e6ce837e"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/inputs.bin": {
+      "bytes": 530768,
+      "sha256": "dbfeb9f9196ce75fb2792a51a5d23c316de77c92d149c193a9808e4e4b6a6ac3"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/msvc-reference.bin": {
+      "bytes": 949686,
+      "sha256": "72126a0f60b4e5b2d44735b85f8b8c80b59fa1cdcfeb055b2287d600e60f63af"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-gnu-provenance.json": {
+      "bytes": 1710,
+      "sha256": "2250454b037cd05cb20edbd4b93b80ce8441582720755cf572746d6aac1595af"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-msvc-provenance.json": {
+      "bytes": 1718,
+      "sha256": "8b82382e4a68089eb8945ad56dc5cdcb8608da6893a5162b15882194c1b7823b"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-gnu-provenance.json": {
+      "bytes": 1998,
+      "sha256": "24e035f6717c4bc02348c2cbf77bf1dd8c24fa989652398b578b72b7feade983"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-msvc-provenance.json": {
+      "bytes": 2028,
+      "sha256": "4c44e4360d233a5638e93b0b17c3f4907765123f0be65f288595552abc15f0fe"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-gnu-provenance.json": {
+      "bytes": 2108,
+      "sha256": "7862ff36c56a8ab2be68cdeb5b912f7d675754f1fb963aa98c87cc1e8b0df3a5"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-msvc-provenance.json": {
+      "bytes": 2153,
+      "sha256": "01b04aa29075b33a18fc844f7f12fb207e18c4761343f47826b69469f34ada83"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-gnu-provenance.json": {
+      "bytes": 1899,
+      "sha256": "0bf67957c747e67e4f11139fd7517ec8a0a96aa1e6a1b44e4ed5a9968153e8e1"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-msvc-provenance.json": {
+      "bytes": 1921,
+      "sha256": "e3235f55ec2f447bcc6cb54c6fae40fb6c99ea50d8114da1b3c4a2dab231cb46"
+    },
+    "crates/quant/tests/fixtures/flash/base-gnu-provenance.json": {
+      "bytes": 3520,
+      "sha256": "f6ca849cf044003dce859813b570d79e0783dba4b149d0c782690c95b14a2fe6"
+    },
+    "crates/quant/tests/fixtures/flash/base-msvc-provenance.json": {
+      "bytes": 3295,
+      "sha256": "b15a7f1c9e867499cf4b5d3b2f5087bc531413efb7579b96e4b50afca1e85335"
+    },
+    "crates/quant/tests/fixtures/flash/compaction-provenance.json": {
+      "bytes": 8450,
+      "sha256": "53371445e5c4bca5da6717b5053bb4b7aa2e6232dcea6e942e68edb7a6c86dac"
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-gnu-provenance.json": {
+      "bytes": 3053,
+      "sha256": "41bd562fe18abc71cb97df22bd21c390f743ea7a67597d8c9ede9cef4f013bfa"
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-msvc-provenance.json": {
+      "bytes": 2824,
+      "sha256": "4c121aa6fc0d66ee631a4e79b56d7dd7b990d5cd97beff5056ed6ae4da427af3"
+    },
+    "crates/quant/tests/fixtures/flash/gnu-reference.bin": {
+      "bytes": 10128525,
+      "sha256": "e017b789df86029148dc885e1dcde13f02eb30948b4eab9316ace2aa3fc4491f"
+    },
+    "crates/quant/tests/fixtures/flash/inputs.bin": {
+      "bytes": 36676256,
+      "sha256": "999ac0ed4283c7a656758f326c41b48eb2bd48c2806627568f556fe034e1d96e"
+    },
+    "crates/quant/tests/fixtures/flash/msvc-reference.bin": {
+      "bytes": 10128525,
+      "sha256": "ce9cff995b074e2155079f9f14ea3c86054fcb599af316d80e55313b0da27b5d"
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-gnu-provenance.json": {
+      "bytes": 3593,
+      "sha256": "a87a775c123e14d7787a8317e6f8c9e63bd605c2b05c4c63afdb26382093cce9"
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-msvc-provenance.json": {
+      "bytes": 3369,
+      "sha256": "5b5932b70c160abe4c0c2697c387a2d0b8f7a934aa9b9dbd26f3c490c76f015f"
+    },
+    "crates/quant/tests/flash_attention.rs": {
+      "bytes": 7217,
+      "sha256": "228a7c405c594bfec02f76a3e8bc537ddc23708a1aaf5dda6779598b1fda1093"
+    },
+    "fixtures/ffi/f16-context-data.bin": {
+      "bytes": 490319,
+      "sha256": "fe456c5cf186231fce32b1c2449d1522373f88b2e78edf3935f38848d6062f70"
+    },
+    "fixtures/ffi/f16-context-provenance.json": {
+      "bytes": 201247,
+      "sha256": "1b17392e185ba0057d26c18a73ff83c48f6d4742b2956b4ab74c9247ed1f606d"
+    },
+    "fixtures/ffi/f16-context-reference.json": {
+      "bytes": 662275,
+      "sha256": "3a96a2a88e6606f052b1fb805f1006b53b2dc35820dd1e89caa4ee3b9b5559f8"
+    },
+    "rust-toolchain.toml": {
+      "bytes": 90,
+      "sha256": "d8c420f9c9a2fc00c09cf07b7bb570c92a09137ef1559cb9ef5b12c76f7557cc"
+    }
+  },
+  "copied_files": [
+    {
+      "path": "crates/ffi/src/abi.rs",
+      "bytes": 10726,
+      "sha256": "be0ccba265fa265dd460c9987839280b971bcd68f0bf868e27d7268e827cfe1e"
+    },
+    {
+      "path": "crates/ffi/src/batch.rs",
+      "bytes": 6439,
+      "sha256": "c77300e45bab5615ba2605142ba056a9dd7d09329cd630d6647aea6b0cd543f0"
+    },
+    {
+      "path": "crates/ffi/src/context.rs",
+      "bytes": 16372,
+      "sha256": "f50d1d76efbfc36b22ade87dc53f131813e84f4655e8dafb73520a91c697356c"
+    },
+    {
+      "path": "crates/ffi/src/context_reference_tests.rs",
+      "bytes": 36378,
+      "sha256": "d113732919d01a37321723de02a48681d34773f080e79e605eb0b9a44a1b5f54"
+    },
+    {
+      "path": "crates/ffi/src/f16_context_reference_tests.rs",
+      "bytes": 26670,
+      "sha256": "dd6677a9a692b57301dc987fb03cf7dfec306dfba058c8fdd6ef05b48d2ea2a4"
+    },
+    {
+      "path": "crates/ffi/src/lib.rs",
+      "bytes": 8784,
+      "sha256": "fec9abfd89863fc7754a26040bc9b7e1884d47b631d89d1dd152832d6ac7bfb6"
+    },
+    {
+      "path": "crates/ffi/src/memory.rs",
+      "bytes": 2568,
+      "sha256": "34037f594e285ede4dc21f3e6f231870d6e7a5d58429c4311666410c125cc6f1"
+    },
+    {
+      "path": "crates/ffi/src/model.rs",
+      "bytes": 16725,
+      "sha256": "3974819e417e8ced416ec2da4f61c3269706a9245ac0552450d87e6ac8d4a783"
+    },
+    {
+      "path": "crates/ffi/src/model_shard_tests.rs",
+      "bytes": 16415,
+      "sha256": "41169838d4ca4bf3d4684035e08b6ba05aa1fac680e10c74982733a00603c6ad"
+    },
+    {
+      "path": "crates/ffi/src/sampler.rs",
+      "bytes": 50736,
+      "sha256": "2a67fefb55dddcd93e892a380c0594ab47735961c6000ba06192b4ac69b801eb"
+    },
+    {
+      "path": "crates/ffi/src/sampler_grammar.rs",
+      "bytes": 9794,
+      "sha256": "d5bcac15f46998536cc3b67f206c6fc590bc67a19e3008dfd7c82e1df66ef7a7"
+    },
+    {
+      "path": "crates/ffi/src/sampler_reference_tests.rs",
+      "bytes": 17817,
+      "sha256": "a81bc49f0649fc9f4d9bdfe5afff13894e6cb4caa1503fbedbb4760e6bde01e2"
+    },
+    {
+      "path": "crates/ffi/src/sampler_vocab.rs",
+      "bytes": 5771,
+      "sha256": "7a9d1bad7bdc3d8973762aba199dc303f4dc09c4cbb914a4dbb264611581c5de"
+    },
+    {
+      "path": "crates/ffi/src/state.rs",
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    {
+      "path": "crates/ffi/src/vocab.rs",
+      "bytes": 12340,
+      "sha256": "162efe3c5489688a9d1448ab11de179c5303078582e0ed3515f835b3d8d8d588"
+    },
+    {
+      "path": "crates/model-runtime/examples/build_reference.rs",
+      "bytes": 4243,
+      "sha256": "3a36ad7621515f55e616db039c9882efbcaf4462c26532adf80e4d17406a1a05"
+    },
+    {
+      "path": "crates/model-runtime/examples/reference_oracle.rs",
+      "bytes": 25068,
+      "sha256": "d8e4138bdebb0177c1531b34d36fe114652e406d1d65daef64d2dd89ac59e9e1"
+    },
+    {
+      "path": "crates/model-runtime/examples/registry_audit.rs",
+      "bytes": 486,
+      "sha256": "58db8564d69caccab7556b124af4841c98e24523b7c1b721b6e9fd88e9591f7d"
+    },
+    {
+      "path": "crates/model-runtime/examples/smoke.rs",
+      "bytes": 126,
+      "sha256": "5c9db86c433063d5f5e769f5b487320185916868e3bd71ec2023471720cd2d14"
+    },
+    {
+      "path": "crates/model-runtime/src/adapters.rs",
+      "bytes": 3277,
+      "sha256": "882671e1add412c5bc95063caa9fd15b0fe7273e593b5414b5ff9d3ac47a9efb"
+    },
+    {
+      "path": "crates/model-runtime/src/bert.rs",
+      "bytes": 11368,
+      "sha256": "fdf7faeadb86e40e779ae1cad3f4f9f034f96d533fbc7fec85e6ced941482c3a"
+    },
+    {
+      "path": "crates/model-runtime/src/context.rs",
+      "bytes": 17940,
+      "sha256": "7dc6101213e7202be14e64b8cedccd9d5c410393807e6b7c908f4dc2e44a96bc"
+    },
+    {
+      "path": "crates/model-runtime/src/context/allocation_tests.rs",
+      "bytes": 15128,
+      "sha256": "032f86ea16d7303d4caeefaa82a4f5d97ab2f57ec07696be09afc87fb47fbd4c"
+    },
+    {
+      "path": "crates/model-runtime/src/context/native.rs",
+      "bytes": 44803,
+      "sha256": "bdf904f07bead77e31e33a947f5aba2e042657875c0dc2ea3f0d0ff3c630bb7f"
+    },
+    {
+      "path": "crates/model-runtime/src/context/native_batch.rs",
+      "bytes": 10451,
+      "sha256": "69022f994e32daaba06acbd0612270cd28e1c4153f373add8e8bb0037dc70ef4"
+    },
+    {
+      "path": "crates/model-runtime/src/context/native_decode.rs",
+      "bytes": 24972,
+      "sha256": "2742b03e70cb6eed517995a45c3c329701a5f17236bb5d021e12c48d6636481a"
+    },
+    {
+      "path": "crates/model-runtime/src/context/native_kv.rs",
+      "bytes": 6052,
+      "sha256": "397f50d500c13a5304e568000364d8758f5f858ea04088517d8abb3bedb8ed5d"
+    },
+    {
+      "path": "crates/model-runtime/src/context/native_state.rs",
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    {
+      "path": "crates/model-runtime/src/context/owned.rs",
+      "bytes": 16432,
+      "sha256": "79a9157af282f9dd308896f5164a4281d6f7507e9ff863f7e518d10a31f2f17e"
+    },
+    {
+      "path": "crates/model-runtime/src/fixtures.rs",
+      "bytes": 7517,
+      "sha256": "2b8efc548dcf71be748146f71b1f5bccbcd4570c8b89871273dcafe8d4df5db1"
+    },
+    {
+      "path": "crates/model-runtime/src/lib.rs",
+      "bytes": 8579,
+      "sha256": "ff4e3628dd7a59180bfe7b5bb381a24acc64ea6150c39e3a4b87206ca5710bd0"
+    },
+    {
+      "path": "crates/model-runtime/src/llama.rs",
+      "bytes": 15925,
+      "sha256": "754395ebdb42778421a9bb7360d767327a58ba5c902a1b4ad30cfd2fb3cfc6d8"
+    },
+    {
+      "path": "crates/model-runtime/src/mamba.rs",
+      "bytes": 12825,
+      "sha256": "8f2517e0d16d201bef6857485dce7aa7c81877413165241848114e5240cc760b"
+    },
+    {
+      "path": "crates/model-runtime/src/math.rs",
+      "bytes": 24790,
+      "sha256": "dc173a5453cefe94faffc72980da3ba9257ba01f2bb16265ef9f7b2236062128"
+    },
+    {
+      "path": "crates/model-runtime/src/math/native_rows.rs",
+      "bytes": 243,
+      "sha256": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90"
+    },
+    {
+      "path": "crates/model-runtime/src/qwen2.rs",
+      "bytes": 15274,
+      "sha256": "d87be80dc22d048ca2af9386580dffd6674eb8b44eed380f4ffe21fc141708c2"
+    },
+    {
+      "path": "crates/model-runtime/src/registry.rs",
+      "bytes": 159978,
+      "sha256": "68b551e235e86b5290fe3469b14ab3161ffda684d54bbd1bdaec866fb082b527"
+    },
+    {
+      "path": "crates/model-runtime/src/state.rs",
+      "bytes": 9741,
+      "sha256": "608a9e953256829ed9baea306b4a4e8ed987c158b81b160b532ee26b7e881115"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-microbatch-order-provenance.json",
+      "bytes": 1852,
+      "sha256": "d626fe67d00b8316e50cc09b21c98eab72b12d5d4bded16e03bec134f118ba3c"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-microbatch-order.bin",
+      "bytes": 1340,
+      "sha256": "5b791e3953d43eac3fd2547fc3fbcc0f54cc90b6414c80535510eee4e9a853ff"
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_graphs.rs",
+      "bytes": 4413,
+      "sha256": "9b147da9d7b039125923c8b26be5e130b8465d04974257ee37e52a36f1722433"
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_native.rs",
+      "bytes": 4603,
+      "sha256": "22468ee5029f43816e9c9c9f266d4d9f71f855340ddd7c8197736858330092b9"
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_variance.rs",
+      "bytes": 6523,
+      "sha256": "e2da0dec649cd72a11e68d342dff0315213b1681ca96f7622ce0273da405c195"
+    },
+    {
+      "path": "crates/model-runtime/tests/numerical_reference.rs",
+      "bytes": 2391,
+      "sha256": "1cbf5db254317e5b7afd3ba19a3b969c18df0e4322a9145f34abc65a19405d32"
+    },
+    {
+      "path": "crates/model-runtime/tests/qwen2.rs",
+      "bytes": 2741,
+      "sha256": "51347a6efd9736dc89efa6d37fabafc5a90fa68777bf1115c6532045c7835bfe"
+    },
+    {
+      "path": "crates/model-runtime/tests/runtime.rs",
+      "bytes": 24495,
+      "sha256": "0b366893061ea950398e701cf003e92b2fafeaac794c9880ddec2f6d35cbbc03"
+    }
+  ],
+  "validation": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-v2-windows-debug-build",
+      "status": {
+        "bytes": 16440,
+        "sha256": "0c15acd5a8acb1b2169f8d17ef20f12e780642d8f40114974f6b8eabb7577b8b"
+      },
+      "platform": "windows",
+      "profile": "debug",
+      "mode": "build",
+      "library": {
+        "bytes": 4473344,
+        "sha256": "4d74de0d84881f441f4b5e2d09c9a2f98a6d40c4b615ea9fb284400b29e5143c"
+      },
+      "cases": 0,
+      "logit_words": 0,
+      "binary_files": 0,
+      "binary_bytes": 0,
+      "pending_unified_flash_request_entries": 0
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-v2-windows-debug-native",
+      "status": {
+        "bytes": 257553,
+        "sha256": "ee37380f216517105e0d388876955fcb3009e7fef744ea2b8ebcd2996b6f136c"
+      },
+      "platform": "windows",
+      "profile": "debug",
+      "mode": "native",
+      "library": {
+        "bytes": 4473344,
+        "sha256": "4d74de0d84881f441f4b5e2d09c9a2f98a6d40c4b615ea9fb284400b29e5143c"
+      },
+      "cases": 134,
+      "logit_words": 1562624,
+      "binary_files": 392,
+      "binary_bytes": 7419811,
+      "pending_unified_flash_request_entries": 63
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-dense-v3-windows-release-both",
+      "status": {
+        "bytes": 259739,
+        "sha256": "cc387f9ceb581210718bf60c23f8f28d4964b74129903f6332e27b18bd3fe2a4"
+      },
+      "platform": "windows",
+      "profile": "release",
+      "mode": "both",
+      "library": {
+        "bytes": 1942528,
+        "sha256": "dab9906b373726d66b7762a88767daedc507ebf6c57db9bbb078fa4626e2aff3"
+      },
+      "cases": 134,
+      "logit_words": 1562624,
+      "binary_files": 392,
+      "binary_bytes": 7419811,
+      "pending_unified_flash_request_entries": 63
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-v2-linux-debug-build",
+      "status": {
+        "bytes": 16395,
+        "sha256": "1b4c641f4b861b66a75275eb9d15e7e623c41017bb07aac9664b71e011a02f04"
+      },
+      "platform": "linux",
+      "profile": "debug",
+      "mode": "build",
+      "library": {
+        "bytes": 33228944,
+        "sha256": "537bbf53629241921fb93240dc9f90db431b47689eaea55865c5f50f47773f69"
+      },
+      "cases": 0,
+      "logit_words": 0,
+      "binary_files": 0,
+      "binary_bytes": 0,
+      "pending_unified_flash_request_entries": 0
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-v2-linux-debug-native",
+      "status": {
+        "bytes": 253002,
+        "sha256": "81c0bd40d7047e413f950aef365eefc7158e42183dccc1bbb8a61cf22fb6dc79"
+      },
+      "platform": "linux",
+      "profile": "debug",
+      "mode": "native",
+      "library": {
+        "bytes": 33228944,
+        "sha256": "537bbf53629241921fb93240dc9f90db431b47689eaea55865c5f50f47773f69"
+      },
+      "cases": 134,
+      "logit_words": 1562624,
+      "binary_files": 392,
+      "binary_bytes": 7419811,
+      "pending_unified_flash_request_entries": 63
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\microbatch-port-v1\\validation\\microbatch-dense-v3-linux-release-both",
+      "status": {
+        "bytes": 255143,
+        "sha256": "bd820fb48b3781c65bc9b27550a5e0de1c80af663333f1c79a902e279ef33bad"
+      },
+      "platform": "linux",
+      "profile": "release",
+      "mode": "both",
+      "library": {
+        "bytes": 2284576,
+        "sha256": "a4a9b012e340172f1580834c852074854488d963e8411228f5a6623b96c48c17"
+      },
+      "cases": 134,
+      "logit_words": 1562624,
+      "binary_files": 392,
+      "binary_bytes": 7419811,
+      "pending_unified_flash_request_entries": 63
+    }
+  ],
+  "remaining_scope": [
+    "unified flash with fused kv_rows remains a checked error",
+    "ordinary microbatch replay fixture pending",
+    "independent full flash session/sequence-state replay pending"
+  ]
+}

@@ -1,0 +1,153 @@
+from pathlib import Path
+import os,sys,json,hashlib,datetime,shutil,subprocess
+sys.dont_write_bytecode=True
+reference=Path(r'C:\Users\adyba\rust-llama-reference');base=reference/'gguf-byte-strings';draft=base/'rust-draft-v1';product=Path(r'C:\Users\adyba\rust-llama')
+out=base/'handoff-v1'
+def ident(path):
+ h=hashlib.sha256()
+ with path.open('rb') as f:
+  while b:=f.read(1048576):h.update(b)
+ return {'bytes':path.stat().st_size,'sha256':h.hexdigest()}
+def write_json(path,value):
+ path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((json.dumps(value,indent=2)+'\n').encode('utf-8'))
+head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=product,text=True).strip()
+assert head=='40a4ee7deb59e5823dd6d242231592d0c9923168',head
+assert subprocess.check_output(['git','status','--porcelain'],cwd=product,text=True).strip()==''
+validation={}
+inputs={}
+for platform in ('windows','linux'):
+ p=base/'validation/focused-v2'/platform/'status.json';s=json.loads(p.read_text(encoding='utf-8'))
+ assert s['status']=='succeeded',s
+ assert s['execution_inputs_before']==s['execution_inputs_after']
+ assert all(step['exit_code']==0 for step in s['steps'])
+ validation[platform]={'path':str(p),**ident(p)}
+ inputs[platform]=json.loads((p.parent/'execution-inputs.json').read_text(encoding='utf-8'))
+ assert s['execution_inputs_before']=={'files':744,'sha256':'d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e'}
+ n=base/'validation/negative-controls-v1'/platform/'status.json'
+ v=json.loads(n.read_text(encoding='utf-8'));assert v['status']=='succeeded' and len(v['cases'])==3 and all(c['detected_by_assertion'] for c in v['cases'])
+ validation[platform]['negative_controls']={'path':str(n),**ident(n)}
+assert inputs['windows']==inputs['linux']
+for row in inputs['windows']:assert ident(draft/row['path'])=={k:row[k] for k in ('bytes','sha256')},row['path']
+production={
+ 'crates/gguf/src/lib.rs':'c98d56a231d3465411ee0846bb4af6480550a89daaad475dc61838c2927836f0',
+ 'crates/gguf/src/raw.rs':'a8a8d510f1a8d2e8cf284eb9e26e693e6afad6a8f81e26a0e8f957e86cdf8b38',
+ 'crates/gguf/src/writer.rs':'ee71be04bb179334f5d4ed7f90ae53320d82c3503e4d937d980eaca7e4d783a2',
+ 'crates/gguf/src/split.rs':'34f5450eb6749057f89f7ec9c4c7453ec8c48c255ddade66e81fa0fd1f4b2d07',
+ 'crates/gguf/tests/raw_native.rs':'5eab4bd827c1669701bf52fdb166dc622531c32f20e19ed0a4f6dc93949d57f3',
+ 'crates/gguf/tests/raw_tools.rs':'f1aa1448405c6a42dd57c4070a194daa39a2d2a488040135d8f666b7f45b6e63',
+}
+for path,sha in production.items():assert ident(draft/path)['sha256']==sha,path
+fixture_records=[]
+for name in ('reader-adapter-v1','tool-adapter-v1','nul-tool-adapter-v1'):
+ fixture_records.extend(json.loads((base/name/'fixture-records.json').read_text(encoding='utf-8')))
+assert len(fixture_records)==len({r['path'] for r in fixture_records})==23
+for row in fixture_records:assert ident(draft/row['path'])=={k:row[k] for k in ('bytes','sha256')},row['path']
+manifest='docs/fixture-manifest.tsv';before=(product/manifest).read_bytes();after=(draft/manifest).read_bytes()
+assert after.startswith(before)
+append=after[len(before):];lines=append.decode('utf-8').splitlines()
+assert len(lines)==23 and {line.split('\t')[0] for line in lines}=={r['path'] for r in fixture_records}
+out.mkdir(exist_ok=False)
+paths=list(production)+['crates/gguf/README.md','docs/GGUF_BYTE_STRINGS.md']+[r['path'] for r in fixture_records]
+files=[]
+for path in paths:
+ dst=out/'candidate'/path;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(draft/path,dst)
+ pre=ident(product/path) if (product/path).exists() else None
+ post=ident(dst);assert pre!=post,path
+ files.append({'path':path,'preimage':pre,'candidate':post})
+(out/'fixture-declarations.tsv').write_bytes(append)
+write_json(out/'fixture-records.json',fixture_records)
+write_json(out/'files.json',files)
+write_json(out/'execution-inputs.json',inputs['windows'])
+write_json(out/'fixture-manifest-merge.json',{'path':manifest,'preimage':ident(product/manifest),'raw_draft_postimage':ident(draft/manifest),'append_file':'fixture-declarations.tsv','append_identity':ident(out/'fixture-declarations.tsv'),'rule':'Preserve all existing declarations and add these exact 23 unique declarations; do not replace independently added integration declarations.'})
+# Evidence copies are immutable text. Binary originals already stored verbatim
+# in the new fixtures are referenced by identity rather than duplicated.
+fixture_by_hash={}
+for row in fixture_records:fixture_by_hash.setdefault(row['sha256'],[]).append(row['path'])
+mapping=[];excluded=[]
+def archive(src,logical):
+ identity=ident(src)
+ if src.name in ('data.bin','report.json') and identity['sha256'] in fixture_by_hash:
+  mapping.append({'source':str(src),'identity':identity,'fixture_copies':fixture_by_hash[identity['sha256']]});return
+ parts=['fixture-snapshots' if x=='fixtures' else x for x in Path(logical).parts]
+ rel=Path(*parts)
+ encoded=src.suffix.lower() in ('.bin','.gguf','.dll','.exe','.so','.a','.o','.zlib')
+ if encoded:rel=Path(str(rel)+'.hex.txt')
+ elif src.suffix.lower() in ('.rs','.py','.c','.cc','.cpp','.h','.hpp','.toml','.lock','.yml','.yaml','.tsv','.sh','.ps1'):rel=Path(str(rel)+'.txt')
+ dst=out/'evidence'/rel;dst.parent.mkdir(parents=True,exist_ok=True)
+ assert not dst.exists(),str(dst)
+ if encoded:
+  b=src.read_bytes();dst.write_bytes((''.join(b[i:i+64].hex()+'\n' for i in range(0,len(b),64))).encode('ascii'))
+ else:shutil.copyfile(src,dst)
+ entry={'source':str(src),'identity':identity,'archived_path':rel.as_posix(),'archived_identity':ident(dst)}
+ if encoded:entry['encoding']='lowercase hex, 64 source bytes per line; join lines and hex-decode'
+ mapping.append(entry)
+for current,dirs,names in os.walk(base):
+ parent=Path(current)
+ keep=[]
+ for d in dirs:
+  if d in ('candidate','cases','rust-draft-v1','handoff-v1') or d.startswith(('target-','negative-control-draft-')) or d=='.git':
+   excluded.append({'path':str(parent/d),'reason':'build/cache or derivative draft/case material; source expected bytes and raw outcomes remain in sealed fixtures, reports, fingerprints and mutation records'});continue
+  keep.append(d)
+ dirs[:]=keep
+ for name in sorted(names):
+  p=parent/name;archive(p,Path('raw-development')/p.relative_to(base))
+review=reference/'native-flash-integration-v1/reviews/raw-gguf-core-v1.json'
+assert ident(review)['sha256']=='c27c54a5b3ce7b88ff54ddab00dcd11bc806fe468c559248ca447ae1327aacbc'
+archive(review,'independent-review/raw-gguf-core-v1.json')
+for p in sorted((reference/'ci-40a4ee7').iterdir()):
+ if p.is_file():archive(p,Path('previous-published-ci')/p.name)
+write_json(out/'evidence/source-to-archive.json',mapping)
+write_json(out/'evidence/excluded-derived-trees.json',excluded)
+readme=r'''# Raw GGUF handoff
+
+Base: published 40a4ee7deb59e5823dd6d242231592d0c9923168.
+All 31 candidate files are guarded by exact base identities or required absence.
+Append the 23 fixture declarations; no Cargo/dependency change is involved.
+The six Rust source/test files and 23 new fixtures are the only executable-input
+changes. The public text facade keeps its UTF-8/NUL key/name boundary; raw
+reader/writer and split/merge APIs implement the independent native byte domain.
+
+Final frozen input set: 744 files,
+d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e.
+Original native expected bytes were captured and sealed before Rust comparisons.
+
+Windows v1 selected debug/release: 73 passed, 11 external prerequisites ignored.
+Strict Clippy then rejected chunks_exact(2) in the test-only hex decoder. The
+v2 completion changes exactly that helper to as_chunks::<2>(), reruns all 22
+GGUF tests in debug/release, and passes fmt, strict Clippy, source audit and
+488 fixture declarations. Production sources and fixtures are unchanged.
+GNU v2 runs all focused checks on the exact final input set. Its test results,
+logs and final statuses are retained without aggregation across repeated runs.
+
+Three independent negative controls per host modify only an isolated code copy:
+boolean-only-one truth, last-prefix tensor lookup and later-alias tool payload.
+Each compiles and fails the unchanged native comparison through a test assertion.
+Both the frozen source and fixture identities remain unchanged after controls.
+
+All original assertions, raw failed observations and implementation/driver
+failures remain evidence. The invalid direct WSL launcher failed before child
+creation; its correction uses the same explicit Python-to-WSL execution route
+as the other pinned Linux checks. It changes no oracle or product source.
+
+When merging concurrent documentation changes, update the GGUF portions of the
+root README and PORT_STATUS to point to docs/GGUF_BYTE_STRINGS.md. Replace the
+old whole-reader non-UTF8/NUL restriction with the exact remaining high-level
+text-model boundary. Nonzero boolean byte compatibility is now implemented.
+Retain the published 103-case streaming corpus and all prior timing/deletion/
+undefined-behavior qualifications. Do not imply T04/full-port completion.
+All twelve release gates remain open.
+
+Original binary pools/reports already stored as new fixtures are referenced by
+exact identity. Other binary evidence uses lossless hex text with decoded and
+encoded identities. Archive paths named fixtures become fixture-snapshots;
+historical implementation/config sources receive .txt to keep them data.
+No original reference file, expected value or tolerance is altered.
+'''
+(out/'README.md').write_bytes(readme.encode('utf-8'))
+inventory=[]
+for p in sorted(out.rglob('*')):
+ if p.is_file():inventory.append({'path':p.relative_to(out).as_posix(),**ident(p)})
+write_json(out/'inventory.json',inventory)
+report={'schema':1,'status':'ready','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base_commit':head,'files':'files.json','file_count':len(files),'file_manifest_identity':ident(out/'files.json'),'fixtures':{'count':23,'bytes':sum(r['bytes'] for r in fixture_records),'records_identity':ident(out/'fixture-records.json'),'declarations_identity':ident(out/'fixture-declarations.tsv')},'execution_inputs':{'files':744,'sha256':'d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e'},'validation':validation,'inventory':{'path':'inventory.json',**ident(out/'inventory.json')},'scope':'Raw GGUF wire strings, native getters/serialization, boolean normalization and split/merge alias semantics; high-level model text facade and all global release gates remain explicitly qualified.'}
+write_json(out/'handoff.json',report)
+print(json.dumps({'handoff':report,'handoff_identity':ident(out/'handoff.json'),'evidence_files':sum(1 for p in (out/'evidence').rglob('*') if p.is_file())},indent=2))

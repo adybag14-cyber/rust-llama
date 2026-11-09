@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T21:06:02.123406+00:00",
+  "external_driver_copies": [
+    {
+      "path": "verify-embedding-cli.py",
+      "before": {
+        "bytes": 5511,
+        "sha256": "2e4a290873bdf11516a3ecbe4e7580bd3db51ab0cb7453b719e03fd7e3f48f04"
+      },
+      "after": {
+        "bytes": 5511,
+        "sha256": "50f3b38ac9e3cf772429c3f314e532ab3d6329aea86db70e06c138454e96d390"
+      },
+      "change": "output directory only"
+    },
+    {
+      "path": "verify-decoder-cli.py",
+      "before": {
+        "bytes": 2625,
+        "sha256": "703c5095e08f1abae545cb1573c847d83942bf2d1ba8009033145c127bf6cbf5"
+      },
+      "after": {
+        "bytes": 2625,
+        "sha256": "703c5095e08f1abae545cb1573c847d83942bf2d1ba8009033145c127bf6cbf5"
+      },
+      "change": "exact unchanged external driver"
+    },
+    {
+      "path": "verify-qwen2-http.py",
+      "before": {
+        "bytes": 6434,
+        "sha256": "6a55547ad4fa17b733f8a58688bf6d593135ddec9da2cc427ea412793d63fe7f"
+      },
+      "after": {
+        "bytes": 6434,
+        "sha256": "fc708a80a1f108b56fa27af11e65feb1b032ef7e7542ff16a535f80d3abaf0af"
+      },
+      "change": "output directory only"
+    },
+    {
+      "path": "verify-qwen3-http.py",
+      "before": {
+        "bytes": 6423,
+        "sha256": "8b4e18668a94cd75dd08267c922cee29a24e2b5a66664fcc343ef9014edd0a18"
+      },
+      "after": {
+        "bytes": 6423,
+        "sha256": "dba9587a8494b6a65da248ae888b9774721be6467bcf4f4ac7beebe92ecb6cee"
+      },
+      "change": "output directory only"
+    },
+    {
+      "path": "verify-sharded-apps-v2.py",
+      "before": {
+        "bytes": 8116,
+        "sha256": "f16e38c6ef184b97e0d6ecfc91fac7c992023352255f8172e2f20cfc36190ab5"
+      },
+      "after": {
+        "bytes": 8116,
+        "sha256": "8eb8c87658a5c8f241d6aedd5ed1301a805242eea80e8b8cdb45aa0c1df4b094"
+      },
+      "change": "output directory only"
+    },
+    {
+      "path": "verify_rows_microbatch.py",
+      "before": {
+        "bytes": 8029,
+        "sha256": "6ae1d4ef317d65d70a9a61feacafc77b0f06bc3f559fa1b3466fa56bd4ce8f1f"
+      },
+      "after": {
+        "bytes": 8029,
+        "sha256": "6ae1d4ef317d65d70a9a61feacafc77b0f06bc3f559fa1b3466fa56bd4ce8f1f"
+      },
+      "change": "exact unchanged external driver"
+    },
+    {
+      "path": "verify_state_profiles.py",
+      "before": {
+        "bytes": 4652,
+        "sha256": "5e366ba3c389bfe6425081cd032cfdb4852e0b67075bb467d217b5046361aa44"
+      },
+      "after": {
+        "bytes": 4652,
+        "sha256": "5e366ba3c389bfe6425081cd032cfdb4852e0b67075bb467d217b5046361aa44"
+      },
+      "change": "exact unchanged external driver"
+    },
+    {
+      "path": "verify_exports_v1.py",
+      "before": {
+        "bytes": 2917,
+        "sha256": "b49b1e33e8f16fb23487d728ce6d249b89ff66fe02de4b4e8861f354ca6689da"
+      },
+      "after": {
+        "bytes": 2917,
+        "sha256": "b49b1e33e8f16fb23487d728ce6d249b89ff66fe02de4b4e8861f354ca6689da"
+      },
+      "change": "exact unchanged external driver"
+    }
+  ],
+  "release_contract_negative_controls": [
+    {
+      "name": "zero-exit",
+      "rejected": true,
+      "reason": "('release-check exit', 0)"
+    },
+    {
+      "name": "unrelated-error",
+      "rejected": true,
+      "reason": "('unexpected open gate rows', [])"
+    },
+    {
+      "name": "missing-open-row",
+      "rejected": true,
+      "reason": "('unexpected open gate rows', ['OPEN complete-public-abi [implementing]: 184 of 255 frozen exports implemented plus 4 diagnostic extensions; 71 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md', 'OPEN complete-tensor-engine [implementing]: 62 executable operation IDs plus NONE checked against 1252 distinct original graphs; 39 operation IDs plus scheduler allocation events a"
+    },
+    {
+      "name": "changed-status",
+      "rejected": true,
+      "reason": "('unexpected open gate rows', ['OPEN file-disposition-closure [blocked]: Every baseline path requires reviewed capability-linked replacement and evidence', 'OPEN complete-public-abi [implementing]: 184 of 255 frozen exports implemented plus 4 diagnostic extensions; 71 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md', 'OPEN complete-tensor-engine [implementing]: 62 executab"
+    },
+    {
+      "name": "wrong-count",
+      "rejected": true,
+      "reason": "('unexpected release failure', ['xtask: 12 mandatory gates remain open; full rewrite release is blocked'])"
+    },
+    {
+      "name": "extra-error",
+      "rejected": true,
+      "reason": "unrelated release failure"
+    }
+  ],
+  "no_product_code_or_fixture_change": true
+}

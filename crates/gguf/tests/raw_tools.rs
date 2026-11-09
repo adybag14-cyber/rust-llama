@@ -1,0 +1,182 @@
+//! Byte-exact file operations against frozen original CLI captures on both hosts.
+use llama_gguf::ShardLimits;
+use llama_gguf::split::{MergeOptions, SplitLimit, SplitOptions, merge, split};
+use std::collections::BTreeMap;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static NEXT: AtomicU64 = AtomicU64::new(0);
+struct Directory(PathBuf);
+impl Directory {
+    fn new() -> Self {
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!(
+            "gguf-byte-native-{}-{stamp}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&path).unwrap();
+        Self(path)
+    }
+}
+impl Drop for Directory {
+    fn drop(&mut self) {
+        // Retain failing actual files for diagnosis; every path is created by this test.
+        if !std::thread::panicking() {
+            fs::remove_dir_all(&self.0).unwrap();
+        }
+    }
+}
+fn slice(data: &[u8], offset: &str, length: &str) -> Vec<u8> {
+    let offset: usize = offset.parse().unwrap();
+    let length: usize = length.parse().unwrap();
+    data[offset..offset + length].to_vec()
+}
+fn files(path: &Path) -> BTreeMap<String, Vec<u8>> {
+    fs::read_dir(path)
+        .unwrap()
+        .map(|entry| {
+            let entry = entry.unwrap();
+            assert!(entry.file_type().unwrap().is_file());
+            (
+                entry.file_name().into_string().unwrap(),
+                fs::read(entry.path()).unwrap(),
+            )
+        })
+        .collect()
+}
+
+fn corpus(rows: &str, data: &[u8], expected: (usize, usize, usize)) {
+    let root = Directory::new();
+    let mut description: Vec<&str> = Vec::new();
+    let mut before = BTreeMap::new();
+    let mut after = BTreeMap::new();
+    let mut count = 0;
+    let mut successful = 0;
+    let mut exact_bytes = 0;
+    for row in rows.lines().filter(|row| !row.starts_with('#')) {
+        let fields: Vec<_> = row.split('\t').collect();
+        match fields[0] {
+            "C" => {
+                assert!(description.is_empty());
+                description = fields;
+            }
+            "I" => {
+                assert!(
+                    before
+                        .insert(fields[1].to_owned(), slice(data, fields[2], fields[3]))
+                        .is_none()
+                );
+            }
+            "A" => {
+                assert!(
+                    after
+                        .insert(fields[1].to_owned(), slice(data, fields[2], fields[3]))
+                        .is_none()
+                );
+            }
+            "E" => {
+                assert_eq!(description.len(), 7);
+                let name = description[1];
+                let work = root.0.join(format!("case-{count:04}"));
+                fs::create_dir(&work).unwrap();
+                for (filename, data) in &before {
+                    fs::write(work.join(filename), data).unwrap();
+                }
+                let input = work.join(description[4]);
+                let output = work.join(description[5]);
+                let mut stdout = Vec::new();
+                let mut stderr = Vec::new();
+                let limits = ShardLimits::default();
+                let result = match description[3] {
+                    "split" => split(
+                        &input,
+                        &output,
+                        SplitOptions {
+                            limit: SplitLimit::Tensors(description[6].parse().unwrap()),
+                            ..SplitOptions::default()
+                        },
+                        &limits,
+                        &mut stdout,
+                        &mut stderr,
+                    ),
+                    "merge" => merge(
+                        &input,
+                        &output,
+                        MergeOptions::default(),
+                        &limits,
+                        &mut stderr,
+                    ),
+                    _ => panic!("unrecognized source operation"),
+                };
+                assert_eq!(
+                    result.is_ok(),
+                    description[2] == "1",
+                    "{name}: source admission; Rust error: {:?}; actual files retained in {}",
+                    result.as_ref().err(),
+                    work.display()
+                );
+                let actual = files(&work);
+                if result.is_ok() {
+                    assert_eq!(
+                        actual.keys().collect::<Vec<_>>(),
+                        after.keys().collect::<Vec<_>>(),
+                        "{name}: complete native file set"
+                    );
+                    for (filename, expected) in &after {
+                        assert_eq!(
+                            &actual[filename],
+                            expected,
+                            "{name}: exact native file {filename}; actual files retained in {}",
+                            work.display()
+                        );
+                        exact_bytes += expected.len();
+                    }
+                    successful += 1;
+                } else {
+                    // Source assertions become ordinary errors. The checked tool
+                    // retains its input bytes; native failures remain archived.
+                    for (filename, expected) in &before {
+                        assert_eq!(
+                            &actual[filename], expected,
+                            "{name}: input changed on checked error"
+                        );
+                    }
+                }
+                fs::remove_dir_all(work).unwrap();
+                before.clear();
+                after.clear();
+                description.clear();
+                count += 1;
+            }
+            _ => panic!("unrecognized fixture row"),
+        }
+    }
+    assert!(description.is_empty());
+    assert_eq!((count, successful, exact_bytes), expected);
+    let errors = count - successful;
+    println!(
+        "Independent original raw GGUF tools: {count} cases; {successful} successes; {errors} checked errors; {exact_bytes} exact successful post-operation file bytes"
+    );
+}
+
+#[test]
+fn original_raw_strings_and_booleans_split_and_merge() {
+    corpus(
+        include_str!("../../../fixtures/gguf-bytes/tools-reference.tsv"),
+        include_bytes!("../../../fixtures/gguf-bytes/tools-data.bin"),
+        (3196, 3176, 1_438_016),
+    );
+}
+#[test]
+fn original_reserved_key_aliases_and_tensor_prefix_collisions() {
+    corpus(
+        include_str!("../../../fixtures/gguf-bytes/nul-tools-reference.tsv"),
+        include_bytes!("../../../fixtures/gguf-bytes/nul-tools-data.bin"),
+        (22, 17, 8288),
+    );
+}

@@ -1,0 +1,337 @@
+
+running 6 tests
+test flash_attention::tests::actual_workers_and_serial_partitions_are_distinguished_and_failures_join ... ok
+test flash_attention::tests::allocation_and_work_preflights_are_atomic_and_categories_do_not_overlap ... ok
+test flash_attention::tests::checked_views_preserve_offsets_and_raw_bits_and_reject_invalid_extents ... ok
+test flash_attention::tests::huge_borrowed_broadcast_geometry_cannot_bypass_work_or_overflow_checks ... ok
+test flash_attention::tests::plan_rejects_unsupported_geometry_and_parameters_before_execution ... ok
+test iq_sort::tests::equal_value_order_matches_original_iq1_native_sort ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 1 test
+test scalar_quick_gelu_matches_original_inline_function_on_this_host ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 4 tests
+test extended_packed_validation_is_atomic ... ok
+test extended_reference_encoders_match_original_c_bytes ... ok
+test integer_assignment_matches_original_c_in_its_defined_domain ... ok
+test integer_conversion_rejects_undefined_source_assignments_atomically ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+
+running 1 test
+test f16_reduction_matches_original_batched_graphs_bit_for_bit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+
+running 4 tests
+test original_default_and_reference_flash_graphs_match_with_real_workers ... FAILED
+test original_nan_lane_boundaries_match_exactly ... FAILED
+test selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions ... FAILED
+test typed_f32_and_raw_half_views_match_original_graph_words ... FAILED
+
+failures:
+
+---- original_default_and_reference_flash_graphs_match_with_real_workers stdout ----
+552 original flash graphs, default and forced-reference: 2510640 F32 words, 112 failing cases, 37944 changed words, 0 finite changes
+
+thread 'original_default_and_reference_flash_graphs_match_with_real_workers' (313458) panicked at crates/quant/tests/flash_attention.rs:76:5:
+assertion `left == right` failed: exceptional flash_exception_004_q_nan_type0_q1_kv513_workers1 force=false: 18 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_004_q_nan_type0_q1_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_004_q_nan_type0_q1_kv513_workers3 force=false: 18 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_004_q_nan_type0_q1_kv513_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_004_q_nan_type0_q1_kv513_workers7 force=false: 18 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_004_q_nan_type0_q1_kv513_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_005_k_nan_type0_q1_kv513_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_016_q_nan_type0_q2_kv65_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers1 force=false: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers1 force=true: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers3 force=false: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers3 force=true: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers7 force=false: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_017_k_nan_type0_q2_kv65_workers7 force=true: 42 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_028_q_nan_type0_q64_kv65_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers1 force=false: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers1 force=true: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers3 force=false: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers3 force=true: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers7 force=false: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_029_k_nan_type0_q64_kv65_workers7 force=true: 1344 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_040_q_nan_type0_q65_kv513_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers1 force=false: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers1 force=true: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers3 force=false: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers3 force=true: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers7 force=false: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_041_k_nan_type0_q65_kv513_workers7 force=true: 1365 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers1 force=false: 18 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers3 force=false: 18 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers7 force=false: 18 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_052_q_nan_type1_q1_kv513_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers1 force=false: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers1 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers3 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers7 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_064_q_nan_type1_q2_kv65_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers1 force=false: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers1 force=true: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers3 force=false: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers3 force=true: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers7 force=false: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_065_k_nan_type1_q2_kv65_workers7 force=true: 42 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers1 force=false: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers1 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers3 force=false: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers3 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers7 force=false: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_066_mask_nan_type1_q2_kv65_workers7 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers3 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_076_q_nan_type1_q64_kv65_workers7 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers1 force=false: 1344 differing (0 finite), first Some((00000000, ffc12000, 7fc2a000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers1 force=true: 1344 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers3 force=false: 1344 differing (0 finite), first Some((00000000, ffc12000, 7fc2a000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers3 force=true: 1344 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers7 force=false: 1344 differing (0 finite), first Some((00000000, ffc12000, 7fc2a000))
+exceptional flash_exception_077_k_nan_type1_q64_kv65_workers7 force=true: 1344 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_078_mask_nan_type1_q64_kv65_workers1 force=true: 576 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_078_mask_nan_type1_q64_kv65_workers3 force=true: 576 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_078_mask_nan_type1_q64_kv65_workers7 force=true: 576 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+exceptional flash_exception_088_q_nan_type1_q65_kv513_workers1 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+exceptional flash_exception_088_q_nan_type1_q65_kv513_workers1 force=true: 21 differing (0 finite), first Some((00000000, ffc00000, 7fc00000))
+exceptional flash_exception_088_q_nan_type1_q65_kv513_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00321, 7fc12345))
+  left: 112
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- original_nan_lane_boundaries_match_exactly stdout ----
+390 original flash graphs, default and forced-reference: 36384 F32 words, 193 failing cases, 10149 changed words, 0 finite changes
+
+thread 'original_nan_lane_boundaries_match_exactly' (319358) panicked at crates/quant/tests/flash_attention.rs:76:5:
+assertion `left == right` failed: nan-lanes flash_nan_lanes_196_mad_nan_type1_dv1_workers1 force=false: 2 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_196_mad_nan_type1_dv1_workers1 force=true: 2 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_199_split_vnan_type1_dv1_workers3 force=true: 1 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_201_mad_nan_type1_dv2_workers1 force=false: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_201_mad_nan_type1_dv2_workers1 force=true: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_202_sum_nan_type1_dv2_workers1 force=false: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_202_sum_nan_type1_dv2_workers1 force=true: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_204_split_vnan_type1_dv2_workers3 force=true: 2 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_206_mad_nan_type1_dv3_workers1 force=false: 6 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_206_mad_nan_type1_dv3_workers1 force=true: 6 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_207_sum_nan_type1_dv3_workers1 force=false: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_207_sum_nan_type1_dv3_workers1 force=true: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_209_split_vnan_type1_dv3_workers3 force=true: 3 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_211_mad_nan_type1_dv4_workers1 force=false: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_211_mad_nan_type1_dv4_workers1 force=true: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_212_sum_nan_type1_dv4_workers1 force=false: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_212_sum_nan_type1_dv4_workers1 force=true: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_214_split_vnan_type1_dv4_workers3 force=true: 4 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_216_mad_nan_type1_dv5_workers1 force=false: 10 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_216_mad_nan_type1_dv5_workers1 force=true: 10 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_217_sum_nan_type1_dv5_workers1 force=false: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_217_sum_nan_type1_dv5_workers1 force=true: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_219_split_vnan_type1_dv5_workers3 force=true: 5 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_221_mad_nan_type1_dv6_workers1 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_221_mad_nan_type1_dv6_workers1 force=true: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_222_sum_nan_type1_dv6_workers1 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_222_sum_nan_type1_dv6_workers1 force=true: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_224_split_vnan_type1_dv6_workers3 force=true: 6 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_226_mad_nan_type1_dv7_workers1 force=false: 14 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_226_mad_nan_type1_dv7_workers1 force=true: 14 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_227_sum_nan_type1_dv7_workers1 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_227_sum_nan_type1_dv7_workers1 force=true: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_229_split_vnan_type1_dv7_workers3 force=true: 7 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_231_mad_nan_type1_dv8_workers1 force=false: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_231_mad_nan_type1_dv8_workers1 force=true: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_232_sum_nan_type1_dv8_workers1 force=false: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_232_sum_nan_type1_dv8_workers1 force=true: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_234_split_vnan_type1_dv8_workers3 force=true: 8 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_236_mad_nan_type1_dv9_workers1 force=false: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_236_mad_nan_type1_dv9_workers1 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_237_sum_nan_type1_dv9_workers1 force=false: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_237_sum_nan_type1_dv9_workers1 force=true: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_239_split_vnan_type1_dv9_workers3 force=true: 9 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_241_mad_nan_type1_dv10_workers1 force=false: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_241_mad_nan_type1_dv10_workers1 force=true: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_242_sum_nan_type1_dv10_workers1 force=false: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_242_sum_nan_type1_dv10_workers1 force=true: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_244_split_vnan_type1_dv10_workers3 force=true: 10 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_246_mad_nan_type1_dv11_workers1 force=false: 22 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_246_mad_nan_type1_dv11_workers1 force=true: 22 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_247_sum_nan_type1_dv11_workers1 force=false: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_247_sum_nan_type1_dv11_workers1 force=true: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_249_split_vnan_type1_dv11_workers3 force=true: 11 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_251_mad_nan_type1_dv12_workers1 force=false: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_251_mad_nan_type1_dv12_workers1 force=true: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_252_sum_nan_type1_dv12_workers1 force=false: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_252_sum_nan_type1_dv12_workers1 force=true: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_254_split_vnan_type1_dv12_workers3 force=true: 12 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_256_mad_nan_type1_dv13_workers1 force=false: 26 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_256_mad_nan_type1_dv13_workers1 force=true: 26 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_257_sum_nan_type1_dv13_workers1 force=false: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_257_sum_nan_type1_dv13_workers1 force=true: 24 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_259_split_vnan_type1_dv13_workers3 force=true: 13 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_261_mad_nan_type1_dv14_workers1 force=false: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_261_mad_nan_type1_dv14_workers1 force=true: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_262_sum_nan_type1_dv14_workers1 force=false: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_262_sum_nan_type1_dv14_workers1 force=true: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_264_split_vnan_type1_dv14_workers3 force=true: 14 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_266_mad_nan_type1_dv15_workers1 force=false: 30 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_266_mad_nan_type1_dv15_workers1 force=true: 30 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_267_sum_nan_type1_dv15_workers1 force=false: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_267_sum_nan_type1_dv15_workers1 force=true: 28 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_269_split_vnan_type1_dv15_workers3 force=true: 15 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_271_mad_nan_type1_dv16_workers1 force=false: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_271_mad_nan_type1_dv16_workers1 force=true: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_272_sum_nan_type1_dv16_workers1 force=false: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_272_sum_nan_type1_dv16_workers1 force=true: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_274_split_vnan_type1_dv16_workers3 force=true: 16 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_276_mad_nan_type1_dv17_workers1 force=false: 34 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_276_mad_nan_type1_dv17_workers1 force=true: 34 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_277_sum_nan_type1_dv17_workers1 force=false: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_277_sum_nan_type1_dv17_workers1 force=true: 32 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_279_split_vnan_type1_dv17_workers3 force=true: 17 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_281_mad_nan_type1_dv18_workers1 force=false: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_281_mad_nan_type1_dv18_workers1 force=true: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_282_sum_nan_type1_dv18_workers1 force=false: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_282_sum_nan_type1_dv18_workers1 force=true: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_284_split_vnan_type1_dv18_workers3 force=true: 18 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_286_mad_nan_type1_dv19_workers1 force=false: 38 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_286_mad_nan_type1_dv19_workers1 force=true: 38 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_287_sum_nan_type1_dv19_workers1 force=false: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_287_sum_nan_type1_dv19_workers1 force=true: 36 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_289_split_vnan_type1_dv19_workers3 force=true: 19 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_291_mad_nan_type1_dv20_workers1 force=false: 40 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_291_mad_nan_type1_dv20_workers1 force=true: 40 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_292_sum_nan_type1_dv20_workers1 force=false: 40 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_292_sum_nan_type1_dv20_workers1 force=true: 40 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_294_split_vnan_type1_dv20_workers3 force=true: 20 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_296_mad_nan_type1_dv21_workers1 force=false: 42 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+nan-lanes flash_nan_lanes_296_mad_nan_type1_dv21_workers1 force=true: 42 differing (0 finite), first Some((00000000, 7fc00000, ffc00000))
+  left: 193
+ right: 0
+
+---- selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions stdout ----
+Selected-row native output comparisons: 24066
+
+thread 'selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions' (320295) panicked at crates/quant/tests/flash_attention.rs:113:5:
+flash_exception_004_q_nan_type0_q1_kv513_workers1 (0,0,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers1 (0,2,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers1 (0,1,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers3 (0,0,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers3 (0,2,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers3 (0,1,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers7 (0,0,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers7 (0,2,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_004_q_nan_type0_q1_kv513_workers7 (0,1,0): 6 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers1 (0,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers1 (0,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers3 (0,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers3 (0,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers7 (0,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_005_k_nan_type0_q1_kv513_workers7 (0,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_016_q_nan_type0_q2_kv65_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_016_q_nan_type0_q2_kv65_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_016_q_nan_type0_q2_kv65_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers1 (1,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers1 (1,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers3 (1,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers3 (1,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers7 (1,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_017_k_nan_type0_q2_kv65_workers7 (1,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_028_q_nan_type0_q64_kv65_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_028_q_nan_type0_q64_kv65_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_028_q_nan_type0_q64_kv65_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers1 (63,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers1 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers3 (63,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers3 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers7 (63,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_029_k_nan_type0_q64_kv65_workers7 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_040_q_nan_type0_q65_kv513_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_040_q_nan_type0_q65_kv513_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_040_q_nan_type0_q65_kv513_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers1 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers1 (64,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers1 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers3 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers3 (64,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers3 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers7 (0,0,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers7 (64,2,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_041_k_nan_type0_q65_kv513_workers7 (32,1,0): 7 changed; Some((00000000, ffc00321, 7fc12345))
+flash_exception_052_q_nan_type1_q1_kv513_workers1 (0,0,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+flash_exception_052_q_nan_type1_q1_kv513_workers1 (0,2,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+flash_exception_052_q_nan_type1_q1_kv513_workers1 (0,1,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+flash_exception_052_q_nan_type1_q1_kv513_workers3 (0,0,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+flash_exception_052_q_nan_type1_q1_kv513_workers3 (0,2,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+flash_exception_052_q_nan_type1_q1_kv513_workers3 (0,1,0): 6 changed; Some((00000000, ffc00000, 7fc00000))
+
+---- typed_f32_and_raw_half_views_match_original_graph_words stdout ----
+
+thread 'typed_f32_and_raw_half_views_match_original_graph_words' (320300) panicked at crates/quant/tests/flash_attention.rs:178:9:
+assertion `left == right` failed: flash_exception_053_k_nan_type1_q1_kv513_workers7
+  left: 21
+ right: 0
+
+
+failures:
+    original_default_and_reference_flash_graphs_match_with_real_workers
+    original_nan_lane_boundaries_match_exactly
+    selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions
+    typed_f32_and_raw_half_views_match_original_graph_words
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 369.32s
+

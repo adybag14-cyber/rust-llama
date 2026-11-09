@@ -1,0 +1,18 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\f16-context-oracle\flash-kernel\rust-draft\crates\quant)
+error[E0521]: borrowed data escapes outside of closure
+   --> crates\quant\src\flash_attention.rs:675:39
+    |
+654 |             let mut handles = reserved(self.params.workers)?;
+    |                 ----------- `handles` declared here, outside of the closure body
+655 |             thread::scope(|scope| -> Result<()> {
+    |                            ----- `scope` is a reference that is only valid in the closure body
+...
+675 |                         Ok(handle) => handles.push(handle),
+    |                                       ^^^^^^^^^^^^^^^^^^^^ `scope` escapes the closure body here
+    |
+    = note: requirement occurs because of a mutable reference to `Vec<ScopedJoinHandle<'_, WorkerResult>>`
+    = note: mutable references are invariant over their type parameter
+    = help: see <https://doc.rust-lang.org/nomicon/subtyping.html> for more information about variance
+
+For more information about this error, try `rustc --explain E0521`.
+error: could not compile `llama-quant` (lib) due to 1 previous error

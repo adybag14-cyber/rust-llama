@@ -1,6 +1,12 @@
 # Rust tensor layouts and scalar CPU graphs
 
-This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **75 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
+This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **76 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
+
+## Flash attention through the CPU DAG
+
+Operation 74 now executes through the single maintained `llama_quant::flash_attention` kernel. It retains physical strided Q/K/V, F16 masks, the source flat-prefix sink addressing, I32 row maps, query-batch geometry and `[DV, heads, queries, batches]` output order. Configured multiple workers execute on real scoped threads. Precision/hint slots, empty-output dispatch, explicit unsupported domains, byte/work limits and cancellation boundaries are documented in [FLASH_ATTENTION.md](FLASH_ATTENTION.md).
+
+New original captures provide 153 contract cases per host, including 114 admitted graphs with 689,820 exact default/forced F32 words, 30 asserted contracts and nine retained unsupported native domains. Another 896 sealed original kernel graphs are replayed through the tensor boundary without recapturing expected results. The combined matching-host adapter gate compares 3,032,980 raw F32 words, including NaN payloads. This does not make a general scheduler, device or full T02 parity claim.
 
 ## Storage and graph contract
 
@@ -221,7 +227,7 @@ Focused validation commands:
 - `cargo clippy -p llama-tensor --all-targets --offline -- -D warnings`
 - `cargo fmt -p llama-tensor --check`
 
-Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call uses one CPU thread. GNU's default `__SSE2__` enables original SiLU/quick-GELU/softmax exponential and NORM variance paths that MSVC does not select. The new row-policy corpus checks those matching native profiles separately; it does not require GNU and Windows outputs to equal each other. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
+Windows and GNU/Linux validation use Rust 1.99.1. The Windows native reference uses MSVC 19.51.36260.0 and STL 14.51.36231; the Linux reference uses GNU 11.4.0. Actual CMake option values and library/header hashes are recorded in the indexing provenance files. The build configurations are not asserted to be identical, and each original graph call in those historical cohorts uses one CPU thread. GNU's default `__SSE2__` enables original SiLU/quick-GELU/softmax exponential and NORM variance paths that MSVC does not select. The new row-policy corpus checks those matching native profiles separately; it does not require GNU and Windows outputs to equal each other. Focused debug/release/strict-Clippy results are recorded against the current source hashes; previous checkpoint results are not reused as proof.
 
 ## Shared row-policy evidence
 
@@ -246,6 +252,6 @@ mathematical ERF checks remain independent of the new platform boundary.
 
 ## Open T02 gates
 
-The remaining 26 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+The remaining 25 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
 
 Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.

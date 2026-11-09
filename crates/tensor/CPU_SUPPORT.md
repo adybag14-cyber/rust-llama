@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **75 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **26 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **76 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **25 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -80,7 +80,7 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 71 | `LEAKY_RELU` | Implemented slice | F32 / F16 | Explicit slope or fill value. |
 | 72 | `TRI` | Implemented slice | F32 | Square batched matrices; four exact native triangle IDs. |
 | 73 | `FILL` | Implemented slice | F32 / F16 | Explicit slope or fill value. |
-| 74 | `FLASH_ATTN_EXT` | Pending | — | No executable Op constructor; no fallback result. |
+| 74 | `FLASH_ATTN_EXT` | Implemented slice | F32 Q; F32/F16 K/V; optional F16 mask, F32 sinks, I32 row map → F32 | Shared native-profile kernel, physical views, actual scoped workers, source precision/hint fields and empty-output dispatcher behavior; local byte/work limits. See FLASH_ATTENTION.md. |
 | 75 | `FLASH_ATTN_BACK` | Pending | — | No executable Op constructor; no fallback result. |
 | 76 | `SSM_CONV` | Pending | — | No executable Op constructor; no fallback result. |
 | 77 | `SSM_SCAN` | Pending | — | No executable Op constructor; no fallback result. |
@@ -180,3 +180,7 @@ infinities and subnormals; no numerical tolerance is used for this gate.
 The platform-loader OS-erff boundary independently matches 502,058 raw words
 per host. See README for runtime versions, fallback proof and preserved prior
 failures. MathPolicy changes vector grouping but keeps the target's scalar CRT.
+
+## Flash attention DAG execution
+
+Operation 74 uses the single maintained llama_quant::flash_attention module. The adapter preserves source masks, physical sink-prefix reads, row maps, source query geometry and output permutation. It compares 3,032,980 default/forced F32 words per matching host, including reused sealed NaN corpora. The local allocation/work and cancellation boundaries, exact source controls and remaining dtype/empty-input restrictions are described in [FLASH_ATTENTION.md](FLASH_ATTENTION.md). This adds scoped workers to this operator; general DAG parallel scheduling and aggregate memory planning remain open.

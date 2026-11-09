@@ -3,8 +3,13 @@
 //! ordering, 32-byte physical output layout and rank canonicalization are
 //! retained, including its documented custom-alignment/zero-dimension quirks.
 //! Resource limits, arithmetic errors and original assertion failures are checked.
-use crate::writer::{self, HeaderPolicy, TensorDescriptor, WriteLayout};
-use crate::{Endian, Error, Gguf, HeaderUsage, Limits, Result, ShardLimits, Value, align, invalid};
+use crate::raw::c_string;
+use crate::writer::{self, HeaderPolicy, RawTensorDescriptor as TensorDescriptor, WriteLayout};
+use crate::{
+    Endian, Error, HeaderUsage, Limits, RawGguf as Gguf, RawValue as Value, Result, ShardLimits,
+    align, invalid,
+};
+use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufWriter, Read, Seek, SeekFrom, Write};
@@ -42,20 +47,73 @@ pub struct Summary {
     pub tensors: usize,
 }
 
-fn descriptors(file: &Gguf<File>, range: Range<usize>) -> Result<Vec<TensorDescriptor<'_>>> {
-    let tensors = file
-        .tensors
-        .get(range)
-        .ok_or_else(|| invalid("tensor range exceeds input"))?;
+/// The frozen tool gets ggml tensors and input offsets by the first C-string
+/// name match. A later distinct wire name with that prefix therefore selects
+/// the first descriptor's shape and payload, even when split into another file.
+fn native_tensor_indices(file: &Gguf<File>) -> Result<Vec<usize>> {
+    let mut first = HashMap::new();
+    first
+        .try_reserve(file.tensors.len())
+        .map_err(|_| Error::Limit("native tensor lookup allocation".into()))?;
+    let mut indices = Vec::new();
+    indices
+        .try_reserve_exact(file.tensors.len())
+        .map_err(|_| Error::Limit("native tensor index allocation".into()))?;
+    for (index, tensor) in file.tensors.iter().enumerate() {
+        indices.push(*first.entry(tensor.native_name()).or_insert(index));
+    }
+    Ok(indices)
+}
+fn descriptors<'a>(file: &'a Gguf<File>, indices: &[usize]) -> Result<Vec<TensorDescriptor<'a>>> {
     let mut result = Vec::new();
     result
-        .try_reserve_exact(tensors.len())
+        .try_reserve_exact(indices.len())
         .map_err(|_| Error::Limit("tool tensor descriptor allocation".into()))?;
-    result.extend(tensors.iter().map(|tensor| TensorDescriptor {
-        name: &tensor.name,
-        dimensions: &tensor.dimensions,
-        dtype: tensor.dtype,
-    }));
+    for &index in indices {
+        let tensor = file
+            .tensors
+            .get(index)
+            .ok_or_else(|| invalid("native tensor index exceeds input"))?;
+        result.push(TensorDescriptor {
+            name: tensor.native_name(),
+            dimensions: &tensor.dimensions,
+            dtype: tensor.dtype,
+        });
+    }
+    Ok(result)
+}
+
+/// gguf_set_kv copies C-string keys. Each setter removes its preceding prefix
+/// match and appends the replacement. Last values therefore occupy their last
+/// contribution positions. Validate every setter, including overwritten keys.
+fn normalized_metadata(file: &Gguf<File>) -> Result<Vec<(&[u8], &Value)>> {
+    let mut last = HashMap::new();
+    last.try_reserve(file.metadata.len())
+        .map_err(|_| Error::Limit("native metadata lookup allocation".into()))?;
+    for (index, key) in file.metadata_order().enumerate() {
+        let native = c_string(key);
+        if native.is_empty() {
+            return Err(invalid("metadata key has an empty native C-string prefix"));
+        }
+        if native == b"general.alignment"
+            && !matches!(file.metadata.get(key), Some(Value::U32(value)) if value.is_power_of_two())
+        {
+            return Err(invalid(
+                "native copied general.alignment must be a power-of-two UINT32",
+            ));
+        }
+        last.insert(native, index);
+    }
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(last.len())
+        .map_err(|_| Error::Limit("native metadata order allocation".into()))?;
+    for (index, key) in file.metadata_order().enumerate() {
+        let native = c_string(key);
+        if last.get(native) == Some(&index) {
+            result.push((native, &file.metadata[key]));
+        }
+    }
     Ok(result)
 }
 fn original_header(path: &Path, limits: Limits) -> Result<Gguf<File>> {
@@ -81,7 +139,7 @@ fn split_metadata<T>(
     index: usize,
     count: usize,
     total: usize,
-    action: impl FnOnce(&[(&str, &Value)]) -> Result<T>,
+    action: impl FnOnce(&[(&[u8], &Value)]) -> Result<T>,
 ) -> Result<T> {
     let split_no =
         Value::U16(u16::try_from(index).map_err(|_| invalid("split index exceeds UINT16"))?);
@@ -99,32 +157,38 @@ fn split_metadata<T>(
         )
         .map_err(|_| Error::Limit("tool metadata index allocation".into()))?;
     if index == 0 {
-        for key in file.metadata_order() {
-            if !matches!(key, "split.no" | "split.count" | "split.tensors.count") {
-                metadata.push((key, &file.metadata[key]));
+        for (key, value) in normalized_metadata(file)? {
+            if !matches!(key, b"split.no" | b"split.count" | b"split.tensors.count") {
+                metadata.push((key, value));
             }
         }
     }
     // gguf_set_val removes the old entry and appends it. The final count
     // replacement therefore follows split.tensors.count, even on existing keys.
     metadata.extend([
-        ("split.no", &split_no),
-        ("split.tensors.count", &total),
-        ("split.count", &split_count),
+        (&b"split.no"[..], &split_no),
+        (&b"split.tensors.count"[..], &total),
+        (&b"split.count"[..], &split_count),
     ]);
     action(&metadata)
 }
 fn split_header(
     file: &Gguf<File>,
+    native_indices: &[usize],
     range: Range<usize>,
     index: usize,
     count: usize,
     limits: &Limits,
     out: &mut impl Write,
 ) -> Result<WriteLayout> {
-    let tensors = descriptors(file, range)?;
+    let tensors = descriptors(
+        file,
+        native_indices
+            .get(range)
+            .ok_or_else(|| invalid("tensor range exceeds input"))?,
+    )?;
     split_metadata(file, index, count, file.tensors.len(), |metadata| {
-        writer::header_with_policy(out, metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
+        writer::raw_header_with_policy(out, metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
     })
 }
 fn buffer(limits: &Limits, any_payload: bool) -> Result<Vec<u8>> {
@@ -258,6 +322,7 @@ pub fn split<W: Write, E: Write>(
 ) -> Result<Summary> {
     let mut file = original_header(input, limits.gguf.clone())?;
     let count = file.tensors.len();
+    let native_indices = native_tensor_indices(&file)?;
     if count > i32::MAX as usize {
         return Err(invalid("tensor count exceeds source INT32 field"));
     }
@@ -281,7 +346,8 @@ pub fn split<W: Write, E: Write>(
     }
     let mut start = 0;
     let mut bytes = 0u64;
-    for (index, tensor) in file.tensors.iter().enumerate() {
+    for (index, &native_index) in native_indices.iter().enumerate() {
+        let tensor = &file.tensors[native_index];
         let padded = align(tensor.byte_len, 32)?;
         let next = bytes
             .checked_add(padded)
@@ -318,6 +384,7 @@ pub fn split<W: Write, E: Write>(
     for (index, range) in ranges.iter().enumerate() {
         let header = split_header(
             &file,
+            &native_indices,
             range.clone(),
             index,
             ranges.len(),
@@ -326,10 +393,10 @@ pub fn split<W: Write, E: Write>(
         )?;
         let path = split_path(output_prefix, index, ranges.len())?;
         reject_same_path(input, &path)?;
-        let raw_bytes = file.tensors[range.clone()]
+        let raw_bytes = native_indices[range.clone()]
             .iter()
-            .try_fold(0u64, |sum, tensor| {
-                sum.checked_add(tensor.byte_len)
+            .try_fold(0u64, |sum, &index| {
+                sum.checked_add(file.tensors[index].byte_len)
                     .ok_or_else(|| invalid("display byte count overflow"))
             })?;
         let displayed_mb = header
@@ -351,7 +418,9 @@ pub fn split<W: Write, E: Write>(
     if !options.dry_run {
         let mut copy_buffer = buffer(
             &limits.gguf,
-            file.tensors.iter().any(|tensor| tensor.byte_len != 0),
+            native_indices
+                .iter()
+                .any(|&index| file.tensors[index].byte_len != 0),
         )?;
         for (index, (range, (path, expected, _))) in ranges.iter().zip(&plans).enumerate() {
             write!(stdout, "Writing file {} ... ", path.display())?;
@@ -360,6 +429,7 @@ pub fn split<W: Write, E: Write>(
             let mut output = BufWriter::with_capacity(64 * 1024, destination);
             let actual = split_header(
                 &file,
+                &native_indices,
                 range.clone(),
                 index,
                 ranges.len(),
@@ -370,7 +440,7 @@ pub fn split<W: Write, E: Write>(
                 return Err(invalid("split plan changed before writing"));
             }
             for tensor_index in range.clone() {
-                let tensor = &file.tensors[tensor_index];
+                let tensor = &file.tensors[native_indices[tensor_index]];
                 let offset = file
                     .data_offset
                     .checked_add(tensor.offset)
@@ -448,12 +518,12 @@ fn merge_header(
     metadata
         .try_reserve_exact(first.metadata.len())
         .map_err(|_| Error::Limit("merge metadata index allocation".into()))?;
-    for key in first.metadata_order() {
-        if key != "split.count" {
-            metadata.push((key, &first.metadata[key]));
+    for (key, value) in normalized_metadata(first)? {
+        if key != b"split.count" {
+            metadata.push((key, value));
         }
     }
-    metadata.push(("split.count", &count));
+    metadata.push((&b"split.count"[..], &count));
     let total = files.iter().try_fold(0usize, |sum, file| {
         sum.checked_add(file.tensors.len())
             .ok_or_else(|| invalid("merged tensor count overflow"))
@@ -463,9 +533,9 @@ fn merge_header(
         .try_reserve_exact(total)
         .map_err(|_| Error::Limit("merge descriptor allocation".into()))?;
     for file in files {
-        tensors.extend(descriptors(file, 0..file.tensors.len())?);
+        tensors.extend(descriptors(file, &native_tensor_indices(file)?)?);
     }
-    writer::header_with_policy(out, &metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
+    writer::raw_header_with_policy(out, &metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
 }
 
 /// Merge numbered shards. Primary split.no is deliberately not consulted;
@@ -500,7 +570,7 @@ pub fn merge<W: Write>(
         )));
     }
     let first = original_header(input, limits.gguf.clone())?;
-    let count = match first.metadata.get("split.count") {
+    let count = match first.metadata_native(b"split.count") {
         Some(Value::U16(count)) if *count != 0 => usize::from(*count),
         _ => return Err(invalid("input requires a positive UINT16 split.count")),
     };
@@ -533,8 +603,8 @@ pub fn merge<W: Write>(
             path.display()
         )?;
         let file = original_header(&path, remaining_limits(&limits.gguf, used)?)?;
-        if !matches!(file.metadata.get("split.no"), Some(Value::U16(number)) if usize::from(*number)==index)
-            || !matches!(file.metadata.get("split.count"), Some(Value::U16(number)) if usize::from(*number)==count)
+        if !matches!(file.metadata_native(b"split.no"), Some(Value::U16(number)) if usize::from(*number)==index)
+            || !matches!(file.metadata_native(b"split.count"), Some(Value::U16(number)) if usize::from(*number)==count)
         {
             return Err(invalid(format!(
                 "{} is not split {} of {count}",
@@ -547,7 +617,7 @@ pub fn merge<W: Write>(
         paths.push(path);
         writeln!(stderr, "\x1b[3Ddone")?;
     }
-    if !matches!(files[0].metadata.get("split.tensors.count"), Some(Value::I32(total)) if *total >= 0 && *total as usize == used.tensors)
+    if !matches!(files[0].metadata_native(b"split.tensors.count"), Some(Value::I32(total)) if *total >= 0 && *total as usize == used.tensors)
     {
         return Err(invalid(
             "split tensor total does not match primary INT32 split.tensors.count",

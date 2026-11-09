@@ -1,0 +1,15 @@
+{
+  "reviewer": "/root",
+  "source": "crates/tensor/src/cpu_flash.rs",
+  "sha256": "314232268bd5614a42ab7d45601ff321e7705436bbfa592e9eb6de2a54a68d1f",
+  "scope": "Read-only source constructor, physical sink prefix, empty output, execution precision, error mapping, allocation/work and cancellation review",
+  "conclusion": "No blocking issue found in reviewed scope",
+  "observations": [
+    "Constructor checks match frozen ggml_flash_attn_ext_impl, sinks setter and n_kv_max setter; signed-I64 dimensions checked before empty-node bypass.",
+    "Flat-prefix sinks use retained physical Arc backing plus checked offset/end, including logically empty sink views.",
+    "Nonempty precision 0/10/15 forwards to the single shared kernel implementation; other values remain explicit errors.",
+    "max(kernel peak, 2*output+64), drop(values) before Arc conversion, checked work subtraction and cancellation/drop paths are coherent under the documented operator-local logical bound.",
+    "Error category mapping preserves overflow, allocation and thread details."
+  ],
+  "remaining": "Nonempty zero-DK/KV and graph-wide retained-memory limitations remain explicit."
+}

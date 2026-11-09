@@ -1,0 +1,61 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "gnu",
+  "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "reference": "Independent original FLASH_ATTN_EXT tiled accumulation and normalization operand controls, captured before comparing this cohort with Rust.",
+  "cases": 78,
+  "widths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    15,
+    16,
+    17,
+    31,
+    32,
+    33
+  ],
+  "patterns": [
+    "tile_normalization",
+    "cross_first",
+    "cross_late"
+  ],
+  "output_values": 66816,
+  "files": {
+    "flash-attn-reference.bin": {
+      "bytes": 1748252,
+      "sha256": "1af724d0dcda34281ccca3b0e4236dd2c9e588b130c0d385cfc73a912a0019ab"
+    },
+    "forced-use-ref-diagnostic.bin": {
+      "bytes": 272304,
+      "sha256": "b6d9d5fac1be6cedf19fd01c6d64ef41b13e302ffa2bc996b937db0e60e861cf"
+    }
+  },
+  "sources": {
+    "f16-context-oracle/flash-graphs/nan-stage-addon/capture.py": {
+      "bytes": 7433,
+      "sha256": "e0467fb57b7c92a1a9c18c8fec0a32d018b61ecc546a1f5bb29a76d3b4ab962a"
+    },
+    "build-ggml-linux-llama/bin/libggml-base.so": {
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "build-ggml-linux-llama/bin/libggml-cpu.so": {
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    }
+  },
+  "purpose": "Distinguish initial GEMM accumulation, subsequent columns, tiled normalization and F64 compound sum using separate NaN payloads."
+}

@@ -1,0 +1,52 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-flash-adapter\rust-draft\crates\quant)
+    Checking llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-flash-adapter\rust-draft\crates\platform-loader)
+    Checking llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-flash-adapter\rust-draft\crates\tensor)
+error: using `chunks_exact` with a constant chunk size
+  --> crates\tensor\tests\flash_attention.rs:92:22
+   |
+92 |                     .chunks_exact(4)
+   |                      ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+  --> crates\tensor\tests\flash_attention.rs:93:35
+   |
+93 |                     .zip(expected.chunks_exact(4))
+   |                                   ^^^^^^^^^^^^^^^
+   |
+help: consider using `as_chunks::<4>()` instead
+  --> crates\tensor\tests\flash_attention.rs:93:35
+   |
+93 |                     .zip(expected.chunks_exact(4))
+   |                                   ^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+  --> crates\tensor\tests\flash_attention_existing.rs:69:14
+   |
+69 |             .chunks_exact(4)
+   |              ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+  --> crates\tensor\tests\flash_attention_existing.rs:70:27
+   |
+70 |             .zip(expected.chunks_exact(4))
+   |                           ^^^^^^^^^^^^^^^
+   |
+help: consider using `as_chunks::<4>()` instead
+  --> crates\tensor\tests\flash_attention_existing.rs:70:27
+   |
+70 |             .zip(expected.chunks_exact(4))
+   |                           ^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `llama-tensor` (test "flash_attention") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-tensor` (test "flash_attention_existing") due to 2 previous errors

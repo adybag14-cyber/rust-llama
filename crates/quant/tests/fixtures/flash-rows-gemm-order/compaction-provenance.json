@@ -1,0 +1,120 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "purpose": "Lossless exact-byte deduplication of original graph inputs repeated across worker configurations and hosts; no Rust output is used.",
+  "compactor": {
+    "bytes": 7501,
+    "sha256": "55b76658808c8604c7000b66ab06912c5ebee537de1064abeba1020242c1eb70"
+  },
+  "input_tensors": 549,
+  "counts": {
+    "msvc": {
+      "cases": 552,
+      "default_output_words": 362358,
+      "forced_output_words": 362358
+    },
+    "gnu": {
+      "cases": 552,
+      "default_output_words": 362358,
+      "forced_output_words": 362358
+    }
+  },
+  "additional_dense_graphs_per_host": 552,
+  "output_files": {
+    "inputs.bin": {
+      "bytes": 1234092,
+      "sha256": "ecec1e8b24089365a3e51ae965ab3b7154577ea5b888018348f37c55ca598a36"
+    },
+    "msvc-reference.bin": {
+      "bytes": 2991032,
+      "sha256": "c56c8c86c6b739fe88b6b7c2051b10a47734e879726342ef652f0c51963bafdd"
+    },
+    "gnu-reference.bin": {
+      "bytes": 2991032,
+      "sha256": "f6e9fb6f431a36e230e4edfc550f8aa0cd959b15b3091f739d586f602362e49c"
+    }
+  },
+  "source_files": {
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\flash-rows-reference.bin": {
+      "bytes": 8772448,
+      "sha256": "8c582b89e031d9f6b0ef66e6008c82899e1273647f9be45143f7682933c0017f"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\forced-use-ref-diagnostic.bin": {
+      "bytes": 1483088,
+      "sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\dense-default-control.bin": {
+      "bytes": 1483088,
+      "sha256": "af69c8e565e4e96b87ae3018c4f5e18cd273ba57c0e318d2a6de0522a93853d7"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\dense-forced-control.bin": {
+      "bytes": 1483088,
+      "sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\flash-rows-reference.bin": {
+      "bytes": 8772448,
+      "sha256": "26b21c637dce1d8aff2d6ffdc6b8dc67fefe2352a24a25c6607361ec937addf9"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\forced-use-ref-diagnostic.bin": {
+      "bytes": 1483088,
+      "sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\dense-default-control.bin": {
+      "bytes": 1483088,
+      "sha256": "aeccaff889373f562ec84d7768161ef3fbfca9622f19fd9268d3a58c14969591"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\dense-forced-control.bin": {
+      "bytes": 1483088,
+      "sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0"
+    }
+  },
+  "exact_original_reconstruction": [
+    {
+      "platform": "msvc",
+      "cohort": "gemm-nan-order",
+      "cases": 552,
+      "default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\flash-rows-reference.bin",
+      "default_sha256": "8c582b89e031d9f6b0ef66e6008c82899e1273647f9be45143f7682933c0017f",
+      "forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\forced-use-ref-diagnostic.bin",
+      "forced_sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0",
+      "reconstruction_exact": true
+    },
+    {
+      "platform": "msvc",
+      "cohort": "gemm-nan-order",
+      "dense_cases": 552,
+      "dense_default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\dense-default-control.bin",
+      "dense_default_sha256": "af69c8e565e4e96b87ae3018c4f5e18cd273ba57c0e318d2a6de0522a93853d7",
+      "dense_forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\msvc\\dense-forced-control.bin",
+      "dense_forced_sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0",
+      "identity_rows_equal_dense_exact": true,
+      "reconstruction_exact": true
+    },
+    {
+      "platform": "gnu",
+      "cohort": "gemm-nan-order",
+      "cases": 552,
+      "default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\flash-rows-reference.bin",
+      "default_sha256": "26b21c637dce1d8aff2d6ffdc6b8dc67fefe2352a24a25c6607361ec937addf9",
+      "forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\forced-use-ref-diagnostic.bin",
+      "forced_sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0",
+      "reconstruction_exact": true
+    },
+    {
+      "platform": "gnu",
+      "cohort": "gemm-nan-order",
+      "dense_cases": 552,
+      "dense_default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\dense-default-control.bin",
+      "dense_default_sha256": "aeccaff889373f562ec84d7768161ef3fbfca9622f19fd9268d3a58c14969591",
+      "dense_forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-rows-graphs\\gemm-nan-order-addon\\gnu\\dense-forced-control.bin",
+      "dense_forced_sha256": "c8fbbb1f2ef58aef61bd598394e1f7cc1a6b0984fb00050eb0ecbb775701d0a0",
+      "identity_rows_equal_dense_exact": true,
+      "reconstruction_exact": true
+    }
+  ],
+  "notes": [
+    "Every original default-reference and forced-use_ref diagnostic file is reconstructed in full and required to have its original SHA256.",
+    "Both hosts have exactly the same input IDs, parameters, geometry and case order. Their distinct original output words remain separate.",
+    "FAIN0001 holds encoded dtype/shape/byte-strides/raw input tensor payloads. FARW0001 holds cohort/name/worker/mask/sink metadata, three rawF32 params, input IDs (the last input is the I32 row map), output shape, default raw output bytes and forced-reference raw output bytes.",
+    "Original oracle code and binaries remain external to the Rust product."
+  ]
+}

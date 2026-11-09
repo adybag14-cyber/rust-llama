@@ -1,0 +1,81 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "purpose": "Lossless exact-byte deduplication of original graph inputs repeated across worker configurations and hosts; no Rust output is used.",
+  "compactor": {
+    "bytes": 6438,
+    "sha256": "dbc7aff1fd2e4c71446f29582bbef57b22c013fdd95891faa6f211868d8b1e24"
+  },
+  "input_tensors": 316,
+  "counts": {
+    "msvc": {
+      "cases": 390,
+      "default_output_words": 18192,
+      "forced_output_words": 18192
+    },
+    "gnu": {
+      "cases": 390,
+      "default_output_words": 18192,
+      "forced_output_words": 18192
+    }
+  },
+  "output_files": {
+    "inputs.bin": {
+      "bytes": 7050960,
+      "sha256": "144c16e10daf27b77111082c33b983daf9d1876735c98c6a10867880c518e3ae"
+    },
+    "msvc-reference.bin": {
+      "bytes": 205704,
+      "sha256": "c13639ea1a1fe3021bd9ea355b5fb6f4d349d0f2be2aac87888cdc643491afa7"
+    },
+    "gnu-reference.bin": {
+      "bytes": 205704,
+      "sha256": "42065bff89488f51de9e0882f7b930a0504088331914d8e8610dbc557eda977c"
+    }
+  },
+  "source_files": {
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\msvc\\flash-attn-reference.bin": {
+      "bytes": 7536798,
+      "sha256": "26b67584634b59d1a91975aaf285d0ff7261b1f34e373f8934ac63edd47f72fd"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\msvc\\forced-use-ref-diagnostic.bin": {
+      "bytes": 96354,
+      "sha256": "6c419d0078a12bdff4fd66a7aac026f4758e3e0deb961cbc6feb98bdf76f801c"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\gnu\\flash-attn-reference.bin": {
+      "bytes": 7536798,
+      "sha256": "6f772a9cbc0bd1d82b5ed4935c787538fff21f2bfa363eac0071b0f69c39a28a"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\gnu\\forced-use-ref-diagnostic.bin": {
+      "bytes": 96354,
+      "sha256": "8f95fb5691e22703e9afe7d1021ca30bb8fe6b40f9b1bc46f9b56fade7134efe"
+    }
+  },
+  "exact_original_reconstruction": [
+    {
+      "platform": "msvc",
+      "cohort": "nan-lanes",
+      "cases": 390,
+      "default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\msvc\\flash-attn-reference.bin",
+      "default_sha256": "26b67584634b59d1a91975aaf285d0ff7261b1f34e373f8934ac63edd47f72fd",
+      "forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\msvc\\forced-use-ref-diagnostic.bin",
+      "forced_sha256": "6c419d0078a12bdff4fd66a7aac026f4758e3e0deb961cbc6feb98bdf76f801c",
+      "reconstruction_exact": true
+    },
+    {
+      "platform": "gnu",
+      "cohort": "nan-lanes",
+      "cases": 390,
+      "default_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\gnu\\flash-attn-reference.bin",
+      "default_sha256": "6f772a9cbc0bd1d82b5ed4935c787538fff21f2bfa363eac0071b0f69c39a28a",
+      "forced_source": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-graphs\\nan-lanes-addon\\gnu\\forced-use-ref-diagnostic.bin",
+      "forced_sha256": "8f95fb5691e22703e9afe7d1021ca30bb8fe6b40f9b1bc46f9b56fade7134efe",
+      "reconstruction_exact": true
+    }
+  ],
+  "notes": [
+    "Every original default-reference and forced-use_ref diagnostic file is reconstructed in full and required to have its original SHA256.",
+    "Both hosts have exactly the same input IDs, parameters, geometry and case order. Their distinct original output words remain separate.",
+    "FAIN0001 holds encoded dtype/shape/byte-strides/raw input tensor payloads. FACA0001 holds cohort/name/worker/mask/sink metadata, three rawF32 params, input IDs, output shape, default raw output bytes and forced-reference raw output bytes.",
+    "Original oracle code and binaries remain external to the Rust product."
+  ]
+}

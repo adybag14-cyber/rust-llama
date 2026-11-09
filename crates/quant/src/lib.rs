@@ -14,6 +14,7 @@
 #![forbid(unsafe_code)]
 
 pub mod cpu_math;
+pub mod flash_attention;
 
 mod activation;
 mod conversion;

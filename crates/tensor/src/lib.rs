@@ -4,10 +4,12 @@
 mod cpu;
 mod cpu_conv;
 mod cpu_extra;
+mod cpu_flash;
 mod cpu_index;
 mod graph;
 mod native_sort;
 mod registry;
+pub use cpu_flash::{FlashAttentionError, FlashAttentionOptions};
 pub use graph::{
     Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode, SortOrder,
     Triangle,
@@ -30,6 +32,7 @@ pub enum TensorError {
     Parameters(&'static str),
     Cancelled,
     Quant(llama_quant::QuantError),
+    FlashAttention(FlashAttentionError),
 }
 impl std::fmt::Display for TensorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -47,6 +50,7 @@ impl std::fmt::Display for TensorError {
             }
             Self::Cancelled => f.write_str("graph execution cancelled"),
             Self::Quant(e) => e.fmt(f),
+            Self::FlashAttention(e) => e.fmt(f),
         }
     }
 }

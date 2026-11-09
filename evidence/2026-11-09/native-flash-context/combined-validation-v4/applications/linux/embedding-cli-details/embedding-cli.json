@@ -1,0 +1,132 @@
+{
+  "platform": "linux",
+  "executable_sha256": "9054313dbce41e3e26ec245e28502fcbea605732501fb385e3886ae91ff47552",
+  "model_sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3",
+  "cases": [
+    {
+      "name": "model",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "model",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "none",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "none",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "mean",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embedding",
+        "--pooling",
+        "mean",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "cls",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "cls",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "last",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "last",
+        "--embd-normalize",
+        "2"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "cls_norm1",
+      "argv": [
+        "--model",
+        "/mnt/c/Users/adyba/rust-llama-reference/native-flash-integration-v1/rust-draft/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--bind",
+        "127.0.0.1:0",
+        "--embeddings",
+        "--pooling",
+        "cls",
+        "--embd-normalize",
+        "1"
+      ],
+      "native_http_cases": 2,
+      "passed": true
+    },
+    {
+      "name": "missing-model",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "bad-pooling",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "missing-pooling-value",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "incompatible-generation-model",
+      "exit_code": 1,
+      "passed": true
+    },
+    {
+      "name": "stdin-eof",
+      "health_status": 200,
+      "embedding_status": 200,
+      "remained_running": true,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "finished_at_utc": "2026-11-09T21:29:38.609257+00:00"
+}

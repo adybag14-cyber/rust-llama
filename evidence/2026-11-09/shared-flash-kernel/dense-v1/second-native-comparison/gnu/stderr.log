@@ -1,0 +1,35 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/f16-context-oracle/flash-kernel/rust-draft/crates/quant)
+    Finished `release` profile [optimized] target(s) in 6.04s
+     Running tests/flash_attention.rs (/tmp/rust-llama-flash-kernel/release/deps/flash_attention-b1040108dd74ee96)
+
+thread 'original_default_and_reference_flash_graphs_match_with_real_workers' (302784) panicked at crates/quant/tests/flash_attention.rs:76:5:
+assertion `left == right` failed: exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers1 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers3 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers7 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers1 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers3 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers7 force=false: 3 differing (0 finite), first Some((00000006, ffc4e000, 7fc2a000))
+  left: 6
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions' (306914) panicked at crates/quant/tests/flash_attention.rs:113:5:
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,0,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,2,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,1,0): 1 changed; Some((00000006, ffc4e000, 7fc2a000))
+error: test failed, to rerun pass `-p llama-quant --test flash_attention`

@@ -1,0 +1,31 @@
+from pathlib import Path
+import json,hashlib,re
+base=Path(r'C:\Users\adyba\rust-llama-reference\ci-40a4ee7')
+run=json.loads((base/'run.json').read_text(encoding='utf-8'));jobs=json.loads((base/'jobs.json').read_text(encoding='utf-8'))['jobs']
+assert run['head_sha']=='40a4ee7deb59e5823dd6d242231592d0c9923168' and run['status']=='completed' and run['conclusion']=='success' and run['run_attempt']==1
+records=[];profiles={}
+for platform,total in (('windows',460),('linux',464)):
+ text=(base/(platform+'.log')).read_text(encoding='utf-8')
+ suites={k:[] for k in ('debug','release','pretrained')};phase=None;metrics=[]
+ for line in text.splitlines():
+  if '##[group]Run ' in line:
+   phase=None
+   if 'cargo test --workspace --all-targets' in line:phase='release' if '--release' in line else 'debug'
+   elif 'cargo test --release' in line and '--ignored --nocapture' in line:phase='pretrained'
+  match=re.search(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored',line)
+  if match and phase:suites[phase].append(tuple(map(int,match.groups())))
+  if phase=='pretrained' and any(k in line for k in ('max_abs=','maximum_absolute=')):
+   metrics.append(line)
+   values=re.findall(r'(?:max_abs|maximum_absolute)=([0-9.eE+-]+)',line)
+   assert values and all(float(v)==0 for v in values),line
+ counts={k:{'passed':sum(v[0] for v in a),'failed':sum(v[1] for v in a),'ignored':sum(v[2] for v in a),'suites':len(a)} for k,a in suites.items()}
+ assert counts['debug']['passed']==counts['release']['passed']==total,counts
+ assert counts['debug']['ignored']==counts['release']['ignored']==19,counts
+ assert counts['pretrained']['passed']==9 and counts['pretrained']['ignored']==0 and len(metrics)>0,counts
+ assert all(v['failed']==0 for v in counts.values())
+ profiles[platform]={'tests':counts,'numeric_metrics':metrics,'all_measured_maximum_absolute_errors_zero':True}
+for name in ('run.json','jobs.json','windows.log','linux.log'):
+ b=(base/name).read_bytes();records.append({'path':name,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()})
+report={'commit':run['head_sha'],'run_id':run['id'],'url':run['html_url'],'attempt':run['run_attempt'],'conclusion':run['conclusion'],'updated_at':run['updated_at'],'jobs':[{'id':j['id'],'name':j['name'],'conclusion':j['conclusion']} for j in jobs],'files':records,'profiles':profiles,'scope':'Exact first-attempt published checkpoint CI; no full-port release gate is closed by this result.'}
+(base/'report-v2.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'profiles':{k:v['tests'] for k,v in profiles.items()},'report_sha256':hashlib.sha256((base/'report-v2.json').read_bytes()).hexdigest()},indent=2))

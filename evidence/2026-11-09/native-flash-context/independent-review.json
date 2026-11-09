@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "reviewer": "/root/quantization",
+  "mode": "read-only independent review",
+  "reviewed_sources": {
+    "crates/model-runtime/src/context/native.rs": "b2bccf202d9bc165a776035e3a1095684a2334c5dc4c684c73398630d5a33daa",
+    "crates/model-runtime/src/context/native_decode.rs": "c7debc063de439d063f3272925e5ca3fb1d088aa2243845a0115dcf37f962495",
+    "crates/model-runtime/src/context/native_row_map.rs": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71",
+    "crates/model-runtime/src/context/native_batch.rs": "69022f994e32daaba06acbd0612270cd28e1c4153f373add8e8bb0037dc70ef4"
+  },
+  "conclusion": "No concrete blocker found in the reviewed consumer delta.",
+  "findings": [
+    "Unified RowMap retains source membership counts before physical-used minimum and 256 padding, unique ascending physical maps, and complete query-batch geometry.",
+    "Every current-layer K/V write precedes attention; physical casts retain holes and nonfinite hidden lanes and source mask columns.",
+    "Map capacity times maximum slices, query/hidden buffers, physical casts/mask, transactional storage, retained outputs, and shared-kernel remaining peak are separate charges.",
+    "Returned attention replaces the dropped query allowance. Errors and cancellation preserve original context and execution stats."
+  ],
+  "postreview_test_delta": {
+    "schema": 1,
+    "kind": "test-only fixed independent ceiling; non-test executable prefix identical",
+    "before": "c7debc063de439d063f3272925e5ca3fb1d088aa2243845a0115dcf37f962495",
+    "after": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835",
+    "negative_control_report": "9857617e47e001644810861e24f22d0297bd1f67dff203de36978384f5fe7ff6"
+  },
+  "fixed_negative_control": "The fixed 2 MiB regression rejects a 16,384-cell workload whose independent live-payload floor is 132 bytes per cell; removing the map charge makes that regression fail. Adequate 4 MiB execution succeeds."
+}

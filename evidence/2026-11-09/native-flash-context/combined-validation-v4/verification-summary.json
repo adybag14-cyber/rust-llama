@@ -1,0 +1,627 @@
+{
+  "schema": 3,
+  "status": "validated via guarded continuation; final archive audit pending",
+  "created_utc": "2026-11-09T21:46:44.756796+00:00",
+  "base_commit": "40a4ee7deb59e5823dd6d242231592d0c9923168",
+  "source_inputs": {
+    "files": 952,
+    "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+  },
+  "scope": "Native dense-Llama CPU flash/microbatch/row-map consumer, shared quant flash kernel and tensor adapter, raw/indexed Safetensors foundation, raw GGUF reader/writer/split semantics. No complete-port closure.",
+  "profiles": {
+    "windows": {
+      "retained_full_v2_status": "failed",
+      "retained_successful_steps": 21,
+      "completed_full_steps": 22,
+      "new_direct_release_checks": 1,
+      "final_continuation": "native-continuation-v2",
+      "test_counts": {
+        "debug": {
+          "passed": 515,
+          "failed": 0,
+          "ignored": 19,
+          "suites": 96
+        },
+        "release": {
+          "passed": 515,
+          "failed": 0,
+          "ignored": 19,
+          "suites": 96
+        },
+        "pretrained": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 13
+        }
+      },
+      "artifacts": {
+        "debug": {
+          "bytes": 4604928,
+          "sha256": "38fed94c3e128e490e835edb142a19063c77f8481b6d4de31101fe36250da195"
+        },
+        "release": {
+          "bytes": 2018304,
+          "sha256": "3de755aecae51eb776f1fe710813c99124b48c23a34018d92abe3045e73e334f"
+        }
+      },
+      "native_profiles": {
+        "debug": {
+          "artifact": {
+            "bytes": 4604928,
+            "sha256": "38fed94c3e128e490e835edb142a19063c77f8481b6d4de31101fe36250da195"
+          },
+          "microbatch": {
+            "requested_cases": 228,
+            "exact_native_return_cases": 226,
+            "source_assertions_checked_errors": 2,
+            "logit_words": 2917888,
+            "binary_files": 710,
+            "binary_bytes": 14171045
+          },
+          "state": {
+            "cohorts": 16,
+            "memory_scenarios": 640,
+            "sequence_state_scenarios": 640,
+            "file_suites": 32,
+            "short_buffer_cases": 1536,
+            "binary_files": 2080,
+            "binary_bytes": 8459616
+          },
+          "microbatch_status": {
+            "bytes": 528228,
+            "sha256": "0b772c63e70d31d83a001dbc685466f13ab5e162f6795f2ba2589309a6a7efcc"
+          },
+          "state_status": {
+            "bytes": 181756,
+            "sha256": "c5e13697eac1ed18929a00a5d34e3b287914000dfb2adcae57fc1dbd012a4f64"
+          }
+        },
+        "release": {
+          "artifact": {
+            "bytes": 2018304,
+            "sha256": "3de755aecae51eb776f1fe710813c99124b48c23a34018d92abe3045e73e334f"
+          },
+          "microbatch": {
+            "requested_cases": 228,
+            "exact_native_return_cases": 226,
+            "source_assertions_checked_errors": 2,
+            "logit_words": 2917888,
+            "binary_files": 710,
+            "binary_bytes": 14171045
+          },
+          "state": {
+            "cohorts": 16,
+            "memory_scenarios": 640,
+            "sequence_state_scenarios": 640,
+            "file_suites": 32,
+            "short_buffer_cases": 1536,
+            "binary_files": 2080,
+            "binary_bytes": 8459616
+          },
+          "microbatch_status": {
+            "bytes": 529142,
+            "sha256": "a1cc47d38b9cec4946d8b3294ccb75c39016d6e7ffaadc54b2e9b0963fa15219"
+          },
+          "state_status": {
+            "bytes": 181822,
+            "sha256": "130be917e637724857a32c5ba4954368ca257cf297de5650e4c89ba31236c933"
+          }
+        }
+      },
+      "release_contract": {
+        "passed": true,
+        "expected_exit_code": 1,
+        "open_rows": [
+          {
+            "gate": "file-disposition-closure",
+            "owner": "ALL",
+            "status": "planned",
+            "reason": "Every baseline path requires reviewed capability-linked replacement and evidence"
+          },
+          {
+            "gate": "complete-public-abi",
+            "owner": "T01",
+            "status": "implementing",
+            "reason": "184 of 255 frozen exports implemented plus 4 diagnostic extensions; 71 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md"
+          },
+          {
+            "gate": "complete-tensor-engine",
+            "owner": "T02",
+            "status": "implementing",
+            "reason": "62 executable operation IDs plus NONE checked against 1252 distinct original graphs; 39 operation IDs plus scheduler allocation events autograd optimizers and remaining modes stay open"
+          },
+          {
+            "gate": "complete-cpu-and-quantization",
+            "owner": "T03",
+            "status": "implementing",
+            "reason": "All 36 decoders 29 CPU weight dots and 29 defined scalar model quantizers including weighted paths implemented; general operators ISA optimization and full CPU/backend closure remain open"
+          },
+          {
+            "gate": "formats-tokenizers-conversion-parity",
+            "owner": "T04",
+            "status": "implementing",
+            "reason": "All frozen tokenizer families have native Rust implementations and independent corpora; checkpoint/converter support sharding metadata tools native override arrays and remaining platform contracts stay open"
+          },
+          {
+            "gate": "all-model-architectures",
+            "owner": "T05",
+            "status": "implementing",
+            "reason": "Selected typed graphs plus dense Llama Mamba-1 and BERT GGUF execute; full 172 named-entry architecture scope remains"
+          },
+          {
+            "gate": "all-eighteen-backends",
+            "owner": "T03,T06-T08",
+            "status": "implementing",
+            "reason": "Full operation memory scheduling compiler hardware and vendor parity remains open across 18 families"
+          },
+          {
+            "gate": "multimodal-model-embeddings",
+            "owner": "T09",
+            "status": "planned",
+            "reason": "All 58 modality graph builders require complete runtime/model execution and independent fixtures"
+          },
+          {
+            "gate": "media-codec-completeness",
+            "owner": "T09",
+            "status": "implementing",
+            "reason": "Selected formats only; full frozen codec/container and preprocessing scope remains open"
+          },
+          {
+            "gate": "speech-generation",
+            "owner": "T09",
+            "status": "planned",
+            "reason": "Acoustic model execution and waveform quality validation remain open"
+          },
+          {
+            "gate": "sampler-grammar-chat-completeness",
+            "owner": "T10",
+            "status": "implementing",
+            "reason": "Native CPU sampler constructors and token-aware grammar checked against original CPU behavior; full Jinja PEG backend sampling and remaining semantics stay open"
+          },
+          {
+            "gate": "all-cli-tools-and-updater",
+            "owner": "T10",
+            "status": "implementing",
+            "reason": "Core inference CLI exists; remaining tools examples unified app and installer contract remain open"
+          },
+          {
+            "gate": "server-protocol-parity",
+            "owner": "T11",
+            "status": "implementing",
+            "reason": "Dense Llama and Mamba-1 generation plus dense BERT embedding HTTP integrated; complete protocols routing production scheduling tools reranking and decoder embeddings remain open"
+          },
+          {
+            "gate": "browser-feature-and-migration-parity",
+            "owner": "T11",
+            "status": "planned",
+            "reason": "Diagnostics renderer is not complete browser application parity"
+          },
+          {
+            "gate": "native-clients-and-connect",
+            "owner": "T11",
+            "status": "planned",
+            "reason": "Native platform applications target SDKs and pinned connect contract require implementation and validation"
+          },
+          {
+            "gate": "independent-conformance-suite",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Selected original fixtures and pretrained/device/server cases pass; exhaustive scope remains open"
+          },
+          {
+            "gate": "platform-isa-ci",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Windows/Linux x64 checks do not establish other operating systems ISAs or devices"
+          },
+          {
+            "gate": "performance-quality-memory-gates",
+            "owner": "ALL",
+            "status": "planned",
+            "reason": "No complete original-versus-Rust throughput quality peak memory or long-context closure"
+          },
+          {
+            "gate": "reproducible-distribution",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Rust deterministic packager exists; final clean-clone/distribution evidence remains open"
+          },
+          {
+            "gate": "complete-release",
+            "owner": "ALL",
+            "status": "blocked",
+            "reason": "All mandatory full-port gates must close; this repository is not yet a complete llama.cpp replacement"
+          }
+        ],
+        "open_count": 20,
+        "ownership_tracks": 12,
+        "terminal": "xtask: 20 mandatory gates remain open; full rewrite release is blocked"
+      },
+      "all_steps_passed_expected_result": true
+    },
+    "linux": {
+      "retained_full_v2_status": "succeeded",
+      "retained_successful_steps": 22,
+      "completed_full_steps": 22,
+      "new_direct_release_checks": 0,
+      "final_continuation": "native-continuation-v1",
+      "test_counts": {
+        "debug": {
+          "passed": 520,
+          "failed": 0,
+          "ignored": 19,
+          "suites": 96
+        },
+        "release": {
+          "passed": 520,
+          "failed": 0,
+          "ignored": 19,
+          "suites": 96
+        },
+        "pretrained": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 13
+        }
+      },
+      "artifacts": {
+        "debug": {
+          "bytes": 34269416,
+          "sha256": "a3c01211589b529766081aaa713b1e31da42025b2ec9b04961e516b861955409"
+        },
+        "release": {
+          "bytes": 2363920,
+          "sha256": "2ee58d42f7e31d1c61b062dd75a2a49126d0ed23522a291162e16b3d9d2df318"
+        }
+      },
+      "native_profiles": {
+        "debug": {
+          "artifact": {
+            "bytes": 34269416,
+            "sha256": "a3c01211589b529766081aaa713b1e31da42025b2ec9b04961e516b861955409"
+          },
+          "microbatch": {
+            "requested_cases": 228,
+            "exact_native_return_cases": 226,
+            "source_assertions_checked_errors": 2,
+            "logit_words": 2917888,
+            "binary_files": 710,
+            "binary_bytes": 14171045
+          },
+          "state": {
+            "cohorts": 16,
+            "memory_scenarios": 640,
+            "sequence_state_scenarios": 640,
+            "file_suites": 32,
+            "short_buffer_cases": 1536,
+            "binary_files": 2080,
+            "binary_bytes": 8459616
+          },
+          "microbatch_status": {
+            "bytes": 515935,
+            "sha256": "7acafc7f1e1c8364391422f8b7c6ec0fb832ba32da3360ca912909f75b30bbe6"
+          },
+          "state_status": {
+            "bytes": 180947,
+            "sha256": "b11173091b64121e5e3497a34b70339f007c254f9bac0150f3cdb955f1cd49df"
+          }
+        },
+        "release": {
+          "artifact": {
+            "bytes": 2363920,
+            "sha256": "2ee58d42f7e31d1c61b062dd75a2a49126d0ed23522a291162e16b3d9d2df318"
+          },
+          "microbatch": {
+            "requested_cases": 228,
+            "exact_native_return_cases": 226,
+            "source_assertions_checked_errors": 2,
+            "logit_words": 2917888,
+            "binary_files": 710,
+            "binary_bytes": 14171045
+          },
+          "state": {
+            "cohorts": 16,
+            "memory_scenarios": 640,
+            "sequence_state_scenarios": 640,
+            "file_suites": 32,
+            "short_buffer_cases": 1536,
+            "binary_files": 2080,
+            "binary_bytes": 8459616
+          },
+          "microbatch_status": {
+            "bytes": 516848,
+            "sha256": "9bde9915093650e3a5b08c2955b46a3e095904dd5f4bd8aff7678289e0abce24"
+          },
+          "state_status": {
+            "bytes": 181012,
+            "sha256": "9024e146c6ee157779de60215e5affacb6716b141e0b3000bc101188afd91e8c"
+          }
+        }
+      },
+      "release_contract": {
+        "passed": true,
+        "expected_exit_code": 1,
+        "open_rows": [
+          {
+            "gate": "file-disposition-closure",
+            "owner": "ALL",
+            "status": "planned",
+            "reason": "Every baseline path requires reviewed capability-linked replacement and evidence"
+          },
+          {
+            "gate": "complete-public-abi",
+            "owner": "T01",
+            "status": "implementing",
+            "reason": "184 of 255 frozen exports implemented plus 4 diagnostic extensions; 71 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md"
+          },
+          {
+            "gate": "complete-tensor-engine",
+            "owner": "T02",
+            "status": "implementing",
+            "reason": "62 executable operation IDs plus NONE checked against 1252 distinct original graphs; 39 operation IDs plus scheduler allocation events autograd optimizers and remaining modes stay open"
+          },
+          {
+            "gate": "complete-cpu-and-quantization",
+            "owner": "T03",
+            "status": "implementing",
+            "reason": "All 36 decoders 29 CPU weight dots and 29 defined scalar model quantizers including weighted paths implemented; general operators ISA optimization and full CPU/backend closure remain open"
+          },
+          {
+            "gate": "formats-tokenizers-conversion-parity",
+            "owner": "T04",
+            "status": "implementing",
+            "reason": "All frozen tokenizer families have native Rust implementations and independent corpora; checkpoint/converter support sharding metadata tools native override arrays and remaining platform contracts stay open"
+          },
+          {
+            "gate": "all-model-architectures",
+            "owner": "T05",
+            "status": "implementing",
+            "reason": "Selected typed graphs plus dense Llama Mamba-1 and BERT GGUF execute; full 172 named-entry architecture scope remains"
+          },
+          {
+            "gate": "all-eighteen-backends",
+            "owner": "T03,T06-T08",
+            "status": "implementing",
+            "reason": "Full operation memory scheduling compiler hardware and vendor parity remains open across 18 families"
+          },
+          {
+            "gate": "multimodal-model-embeddings",
+            "owner": "T09",
+            "status": "planned",
+            "reason": "All 58 modality graph builders require complete runtime/model execution and independent fixtures"
+          },
+          {
+            "gate": "media-codec-completeness",
+            "owner": "T09",
+            "status": "implementing",
+            "reason": "Selected formats only; full frozen codec/container and preprocessing scope remains open"
+          },
+          {
+            "gate": "speech-generation",
+            "owner": "T09",
+            "status": "planned",
+            "reason": "Acoustic model execution and waveform quality validation remain open"
+          },
+          {
+            "gate": "sampler-grammar-chat-completeness",
+            "owner": "T10",
+            "status": "implementing",
+            "reason": "Native CPU sampler constructors and token-aware grammar checked against original CPU behavior; full Jinja PEG backend sampling and remaining semantics stay open"
+          },
+          {
+            "gate": "all-cli-tools-and-updater",
+            "owner": "T10",
+            "status": "implementing",
+            "reason": "Core inference CLI exists; remaining tools examples unified app and installer contract remain open"
+          },
+          {
+            "gate": "server-protocol-parity",
+            "owner": "T11",
+            "status": "implementing",
+            "reason": "Dense Llama and Mamba-1 generation plus dense BERT embedding HTTP integrated; complete protocols routing production scheduling tools reranking and decoder embeddings remain open"
+          },
+          {
+            "gate": "browser-feature-and-migration-parity",
+            "owner": "T11",
+            "status": "planned",
+            "reason": "Diagnostics renderer is not complete browser application parity"
+          },
+          {
+            "gate": "native-clients-and-connect",
+            "owner": "T11",
+            "status": "planned",
+            "reason": "Native platform applications target SDKs and pinned connect contract require implementation and validation"
+          },
+          {
+            "gate": "independent-conformance-suite",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Selected original fixtures and pretrained/device/server cases pass; exhaustive scope remains open"
+          },
+          {
+            "gate": "platform-isa-ci",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Windows/Linux x64 checks do not establish other operating systems ISAs or devices"
+          },
+          {
+            "gate": "performance-quality-memory-gates",
+            "owner": "ALL",
+            "status": "planned",
+            "reason": "No complete original-versus-Rust throughput quality peak memory or long-context closure"
+          },
+          {
+            "gate": "reproducible-distribution",
+            "owner": "T12",
+            "status": "implementing",
+            "reason": "Rust deterministic packager exists; final clean-clone/distribution evidence remains open"
+          },
+          {
+            "gate": "complete-release",
+            "owner": "ALL",
+            "status": "blocked",
+            "reason": "All mandatory full-port gates must close; this repository is not yet a complete llama.cpp replacement"
+          }
+        ],
+        "open_count": 20,
+        "ownership_tracks": 12,
+        "terminal": "xtask: 20 mandatory gates remain open; full rewrite release is blocked"
+      },
+      "all_steps_passed_expected_result": true
+    }
+  },
+  "native_exports": {
+    "implemented": 184,
+    "source_total": 255,
+    "pending": 71,
+    "diagnostic_extensions": 4
+  },
+  "open_release_gate_rows": 20,
+  "ownership_tracks": 12,
+  "retained_failures": "Initial full-v1 attempts were cancelled during debug compilation to expand policy/prose/fixture guard. External guard preflight failures preserve missing output lists on original assertions and original GNU SONAME link handling. Windows full-v2 retains its final Cargo-wrapper predicate failure after 21 successful steps. The guarded Windows v2 continuation validates that exact failure receipt, executes built xtask directly for the same twenty-row expected-negative result, then validates all native outputs/exports and final inputs. GNU full-v2 passed all 22 steps without a Cargo wrapper; its unchanged reviewed v1 continuation independently verifies all native output/coverage and final input guards. No Rust expected output or compiled source changed for those corrections.",
+  "historical_input_subsets": [
+    648,
+    744,
+    823,
+    849
+  ],
+  "continuation": "Sealed pre-replay original inventory and independent exact post-replay output/coverage check close the two reviewed full-v2 guard gaps without repeating successful builds or model tests.",
+  "external_original_inputs": {
+    "files": 6367,
+    "directories": 484,
+    "manifest_sha256": "98cbe8c76c3bc381c97f0b4d4f296458aca40f3d291f9b8b3b0aa8b672b41450"
+  },
+  "empty_log_policy": "Empty logs are retained externally and identified by size/hash in empty-logs.json; their canonical empty contents are not duplicated as thousands of zero-byte repository files. All nonempty selected logs are archived.",
+  "external_reproduction_drivers": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\integration_common.py",
+      "bytes": 2605,
+      "sha256": "9fcff8b698f6c5d69c792bdc1314975f91b324636136517cc6ffd87e667227b2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\release-expected.json",
+      "bytes": 5091,
+      "sha256": "460fe4ded9a6c035c4f37b1feba377839d0a861b5ceb2abe91f0c0fccafd05f6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\release_contract.py",
+      "bytes": 1120,
+      "sha256": "5a151c2ada7e5e153a62c569a902145df76fa360215aba7e409cb1136ec68043"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\validate_full_v2.py",
+      "bytes": 7408,
+      "sha256": "39962e80a85f5e3ea522195710e2b9a2ad6da1aa89ff52b738464f9a6680e6d9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-decoder-cli.py",
+      "bytes": 2625,
+      "sha256": "703c5095e08f1abae545cb1573c847d83942bf2d1ba8009033145c127bf6cbf5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-embedding-cli.py",
+      "bytes": 5511,
+      "sha256": "50f3b38ac9e3cf772429c3f314e532ab3d6329aea86db70e06c138454e96d390"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen2-http.py",
+      "bytes": 6434,
+      "sha256": "fc708a80a1f108b56fa27af11e65feb1b032ef7e7542ff16a535f80d3abaf0af"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen3-http.py",
+      "bytes": 6423,
+      "sha256": "dba9587a8494b6a65da248ae888b9774721be6467bcf4f4ac7beebe92ecb6cee"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-sharded-apps-v2.py",
+      "bytes": 8116,
+      "sha256": "8eb8c87658a5c8f241d6aedd5ed1301a805242eea80e8b8cdb45aa0c1df4b094"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_exports_v1.py",
+      "bytes": 2917,
+      "sha256": "b49b1e33e8f16fb23487d728ce6d249b89ff66fe02de4b4e8861f354ca6689da"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_rows_microbatch.py",
+      "bytes": 8029,
+      "sha256": "6ae1d4ef317d65d70a9a61feacafc77b0f06bc3f559fa1b3466fa56bd4ce8f1f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_state_profiles.py",
+      "bytes": 4652,
+      "sha256": "5e366ba3c389bfe6425081cd032cfdb4852e0b67075bb467d217b5046361aa44"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\native-continuation-v1\\reference_inventory.py",
+      "bytes": 11587,
+      "sha256": "c6d4879650f2d476b039a72cd2b21856bc64a102bf7aebae833e8dd3f7ff3e7e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\native-continuation-v1\\verify_final.py",
+      "bytes": 9384,
+      "sha256": "0620ef37891b97ef13994d56da5762d3c5ac23b2b043eaf13dde353a0db659dc"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\native-continuation-v2\\reference_inventory.py",
+      "bytes": 11587,
+      "sha256": "c6d4879650f2d476b039a72cd2b21856bc64a102bf7aebae833e8dd3f7ff3e7e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\native-continuation-v2\\verify_final.py",
+      "bytes": 14334,
+      "sha256": "c2bdd3720d451181b4f2c3d0be45175200a19804192c489f28a251ac9f0f8888"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\launch_linux_full_v1.py",
+      "bytes": 208,
+      "sha256": "7eecb5f403b0386af1f3c8fd12e7e997c4cb0074da653f45695962976806a085"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\launch_linux_full_v2.py",
+      "bytes": 228,
+      "sha256": "937f16dc18a55d64b9b4a456b189dc3b58013ab15ce4d619b7f039797d425dfb"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\launch_linux_native_continuation_v1.py",
+      "bytes": 235,
+      "sha256": "1b9782b93e90522baa1c5c3c15ef99547a18560d8c3cbd068810bc7244e7a3d9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\launch_linux_native_continuation_v2.py",
+      "bytes": 253,
+      "sha256": "31dbb6ab0db2b356f55658dcd1706b1438a5031cdf7372de17c49a8ee6b83e34"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\archive_combined_validation_v2.py",
+      "bytes": 9929,
+      "sha256": "9db94a60f77574798608135e7aa3a41986303bf74c266c1315966fb535fc90e1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\archive_combined_validation_v3.py",
+      "bytes": 12638,
+      "sha256": "7bd8660c800f9a37801783ba984a380a0b44783624c7fd20286b0b8380c935c0"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\archive_combined_validation_v4.py",
+      "bytes": 15155,
+      "sha256": "1009989921cd42d26290b1cbbb1b221aa5b038b729a3fedd6f2760ca67e7f135"
+    }
+  ],
+  "archive_only_correction": {
+    "retained_partial_v3_files": 47,
+    "original_application_files": 192,
+    "losslessly_renamed_stdout_stderr_logs": 40,
+    "failure": {
+      "bytes": 12046,
+      "sha256": "c35283110a868c9e7f19e39df32fca7cca40239ffe854143d07cb72d69931fcb"
+    },
+    "application_inventory": {
+      "bytes": 55909,
+      "sha256": "c439b8e1b759853b70358a3530bb97f7ee8bf3c551c5ca001b1947587b1affef"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+"""Independent original byte-string split/merge observations before Rust tool migration."""
+from pathlib import Path
+import os,json,hashlib,subprocess,time,datetime
+win=os.name=='nt';platform='windows' if win else 'linux'
+ref=Path(r'C:\Users\adyba\rust-llama-reference') if win else Path('/mnt/c/Users/adyba/rust-llama-reference')
+base=ref/'gguf-byte-strings';out=base/'original-tools-v1'/platform;out.mkdir(parents=True,exist_ok=False)
+if not win:
+ import resource
+ resource.setrlimit(resource.RLIMIT_CORE,(0,0))
+sha=lambda b:hashlib.sha256(b).hexdigest()
+identity=lambda p:{'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())}
+native=ref/('sharded-gguf-port/native-build/Release/native-gguf-split.exe' if win else 'gguf-split-port/native-bin-linux/original-gguf-split')
+expected='56df1b56a3d12b8181f1d146447ef2c4efcd4c9541e7a7d38710ffd0efed86f6' if win else '0cf6408c2349a12dd5601c02205262158bbae876fdee6d99440cb71f04646fe8'
+assert sha(native.read_bytes())==expected
+env=os.environ.copy()
+if win:env['PATH']=str(ref/'build/bin/Release')+os.pathsep+env['PATH']
+pool=bytearray();blobs={}
+def blob(data):
+ h=sha(data)
+ if h not in blobs:blobs[h]={'offset':len(pool),'bytes':len(data),'sha256':h};pool.extend(data)
+ return blobs[h]
+def jsonput(p,obj):p.write_bytes((json.dumps(obj,indent=2)+'\n').encode('utf-8'))
+report={'schema':1,'status':'running','platform':platform,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+'source_archive_sha256':'2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122',
+'independence':'All inputs reuse the already sealed original-only reader/boolean corpus. Only the frozen native tool supplies outputs, admissions, transcripts and failed partial files. Capture precedes the Rust byte-string tool migration and all Rust comparisons for this tool corpus; the separate Rust raw reader has already been compared.',
+'sources':[identity(p) for p in [native,ref/'llama.cpp-master/tools/gguf-split/gguf-split.cpp',ref/'llama.cpp-master/ggml/src/gguf.cpp',Path(__file__).resolve()]],'input_reports':[],'cases':[]}
+def save():
+ (out/'data.bin').write_bytes(pool)
+ jsonput(out/'report.json',report)
+ jsonput(out/'status.json',{'status':report['status'],'cases':len(report['cases']),'pool_bytes':len(pool),'last_case':report['cases'][-1]['name'] if report['cases'] else None})
+def run(name,args,files):
+ directory=out/'cases'/name;directory.mkdir(parents=True,exist_ok=False)
+ for filename,data in files.items():(directory/filename).write_bytes(data)
+ before=[{'name':n,**blob(b)} for n,b in sorted(files.items())]
+ start=time.monotonic();timeout=False
+ try:
+  p=subprocess.run([str(native),*args],cwd=directory,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=15)
+  code=p.returncode;stdout=p.stdout;stderr=p.stderr
+ except subprocess.TimeoutExpired as e:
+  timeout=True;code=None;stdout=e.stdout or b'';stderr=e.stderr or b''
+ (directory/'stdout.log').write_bytes(stdout);(directory/'stderr.log').write_bytes(stderr)
+ after={}
+ for path in sorted(directory.glob('*.gguf')):after[path.name]=path.read_bytes()
+ row={'name':name,'args':args,'input_files':before,'after_files':[{'name':n,**blob(b),'existed_before':n in files} for n,b in sorted(after.items())],
+ 'exit_code':code,'timed_out':timeout,'elapsed_seconds':time.monotonic()-start,'stdout':blob(stdout),'stderr':blob(stderr)}
+ report['cases'].append(row)
+ if len(report['cases'])%128==0:save()
+ return row,after
+save()
+try:
+ for family in ['reader','booleans']:
+  source=base/('original-'+family+'-v1')/platform/'report.json'
+  r=json.loads(source.read_text(encoding='utf-8'));assert r['status']=='succeeded'
+  data=(source.parent/'data.bin').read_bytes();assert sha(data)==r['pool']['sha256']
+  report['input_reports'].append(identity(source))
+  for c in r['cases']:
+   b=c['input'];input_data=data[b['offset']:b['offset']+b['bytes']]
+   assert len(input_data)==b['bytes'] and sha(input_data)==b['sha256']
+   modes=[('split-one',['--split-max-tensors','1','input.gguf','result'])]
+   if len(c.get('tensors',[]))>1:modes.append(('split-all',['--split-max-tensors','128','input.gguf','result']))
+   for mode,args in modes:
+    name=family+'/'+c['name']+'/'+mode
+    row,after=run(name,args,{'input.gguf':input_data})
+    if row['exit_code']==0:
+     output={n:b for n,b in after.items() if n.startswith('result-')}
+     if output:run(family+'/'+c['name']+'/'+mode+'-merge',['--merge',sorted(output)[0],'merged.gguf'],output)
+ report['status']='succeeded'
+ report['summary']={'cases':len(report['cases']),'successful':sum(c['exit_code']==0 for c in report['cases']),'nonzero':sum(c['exit_code'] not in (0,None) for c in report['cases']),'timeouts':sum(c['timed_out'] for c in report['cases']),'pool_bytes':len(pool),'unique_blobs':len(blobs),'successful_after_bytes':sum(f['bytes'] for c in report['cases'] if c['exit_code']==0 for f in c['after_files'])}
+ assert report['summary']['timeouts']==0
+except BaseException as error:
+ report['status']='failed';report['error']=repr(error);raise
+finally:
+ report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save();report['pool']=identity(out/'data.bin');jsonput(out/'report.json',report)
+print(json.dumps(report.get('summary',{}),indent=2))

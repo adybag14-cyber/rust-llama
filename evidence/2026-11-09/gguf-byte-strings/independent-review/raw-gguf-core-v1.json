@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "reviewer": "/root/audit_core_progress",
+  "mode": "read-only independent review; no frozen candidate edits",
+  "source_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\rust-draft-v1\\crates\\gguf\\src\\raw.rs",
+      "bytes": 18819,
+      "sha256": "a8a8d510f1a8d2e8cf284eb9e26e693e6afad6a8f81e26a0e8f957e86cdf8b38"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\rust-draft-v1\\crates\\gguf\\src\\lib.rs",
+      "bytes": 29504,
+      "sha256": "c98d56a231d3465411ee0846bb4af6480550a89daaad475dc61838c2927836f0"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\rust-draft-v1\\crates\\gguf\\src\\writer.rs",
+      "bytes": 22376,
+      "sha256": "ee71be04bb179334f5d4ed7f90ae53320d82c3503e4d937d980eaca7e4d783a2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\rust-draft-v1\\crates\\gguf\\src\\split.rs",
+      "bytes": 26336,
+      "sha256": "34f5450eb6749057f89f7ec9c4c7453ec8c48c255ddade66e81fa0fd1f4b2d07"
+    }
+  ],
+  "conclusion": "No concrete blocking byte/NUL alias, conversion, or bounded-parser finding within the reviewed parser/tool domain.",
+  "checks": [
+    {
+      "area": "Native key lookup",
+      "reference": "frozen ggml/src/gguf.cpp:1058-1076",
+      "finding": "gguf_find_key uses first strcmp match; RawGguf metadata_native preserves original order and c_string prefix semantics."
+    },
+    {
+      "area": "Tool metadata copy ordering",
+      "reference": "frozen ggml/src/gguf.cpp:1238-1255,1324-1406",
+      "finding": "Each setter checks reserved keys, removes the prior prefix match and appends the replacement; normalized_metadata validates every original setter and emits only last contributions at their last positions."
+    },
+    {
+      "area": "Wire strings and typed conversion",
+      "finding": "Raw keys, values, and tensor names retain complete bytes. Native header mode truncates tensor names but preserves serialized metadata bytes. Frozen-tool policy truncates copied scalar/array strings explicitly. into_text moves the retained owner and string buffers through checked UTF-8 conversion; key/tensor NUL rejection remains explicit and UTF-8 value strings keep prior NUL behavior."
+    },
+    {
+      "area": "Parser resources",
+      "finding": "Header read-ahead is capped by physical remainder and encoded metadata budget; count/array minimums are checked before large reserves; nested wire arrays reject; position and payload offset arithmetic is checked; read-ahead is synchronized on success and failure."
+    },
+    {
+      "area": "Index and tool owner use",
+      "finding": "Original-order byte keys and borrowed native prefix slices remain tied to retained owners. No lossy conversion enters an index or writer; lossy names appear only in error text."
+    }
+  ],
+  "independent_second_review": {
+    "reviewer": "/root/quantization",
+    "writer_sha256": "ee71be04bb179334f5d4ed7f90ae53320d82c3503e4d937d980eaca7e4d783a2",
+    "split_sha256": "34f5450eb6749057f89f7ec9c4c7453ec8c48c255ddade66e81fa0fd1f4b2d07",
+    "conclusion": "No new blocking byte-preservation/allocation issue found; fallible borrowed index vectors and prewrite encoded/count validation are consistent."
+  },
+  "qualifications": [
+    "Logical encoded-byte, count and tensor-read limits are not an aggregate process memory budget or universal recoverable-OOM promise; bounded BTreeMap/BTreeSet and existing path/BufWriter allocations retain standard infallible allocation behavior.",
+    "Review covers parser-produced records and the frozen tool's admitted domain; arbitrary externally mutated public metadata is not a new unbounded-input parsing claim.",
+    "No native expectation was generated from Rust, widened or edited during this review."
+  ]
+}

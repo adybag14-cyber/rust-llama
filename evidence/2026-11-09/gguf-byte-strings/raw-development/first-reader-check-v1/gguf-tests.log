@@ -1,0 +1,33 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\rust-draft-v1\crates\quant)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\rust-draft-v1\crates\gguf)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.14s
+     Running unittests src\lib.rs (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\target-windows\debug\deps\llama_gguf-c5a486ed5fd22931.exe)
+
+running 14 tests
+test writer::tests::impossible_header_budget_rejects_before_tensor_layout_reservations ... ok
+test writer::tests::all_header_validation_precedes_output_and_enforces_padding_budget ... ok
+test tests::writer_rejects_invalid_arrays ... ok
+test tests::overlap_is_rejected ... ok
+test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... ok
+test writer::tests::ordered_streaming_header_preserves_order_nan_bits_and_custom_alignment ... ok
+test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... ok
+test tests::big_endian_metadata_and_scalar_payload ... ok
+test tests::metadata_budget_and_counts_are_enforced ... ok
+test tests::roundtrip_preserves_types_and_payload ... ok
+test tests::buffered_headers_preserve_short_reads_io_errors_and_payload_seeks ... ok
+test tests::every_truncated_header_and_payload_is_rejected ... ok
+test tests::header_read_ahead_never_exceeds_the_remaining_byte_budget ... ok
+test tests::large_metadata_uses_bounded_batched_reads_and_preserves_reader_position ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\split_limits.rs (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\target-windows\debug\deps\split_limits-636cdc73b1c695b8.exe)
+
+running 4 tests
+test split_resource_failures_precede_file_mutation ... ok
+test split_cannot_truncate_input_through_a_hard_link ... ok
+test minimal_streaming_buffer_keeps_payload_bytes ... ok
+test merge_cumulative_limits_and_zero_buffer_preserve_inputs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+

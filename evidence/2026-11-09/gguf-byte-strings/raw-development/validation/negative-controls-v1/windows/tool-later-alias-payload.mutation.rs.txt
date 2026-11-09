@@ -1,0 +1,713 @@
+//! Safe Rust port of the frozen tools/gguf-split file operations.
+//! Payloads are copied in bounded chunks. The original producer's metadata
+//! ordering, 32-byte physical output layout and rank canonicalization are
+//! retained, including its documented custom-alignment/zero-dimension quirks.
+//! Resource limits, arithmetic errors and original assertion failures are checked.
+use crate::raw::c_string;
+use crate::writer::{self, HeaderPolicy, RawTensorDescriptor as TensorDescriptor, WriteLayout};
+use crate::{
+    Endian, Error, HeaderUsage, Limits, RawGguf as Gguf, RawValue as Value, Result, ShardLimits,
+    align, invalid,
+};
+use std::collections::HashMap;
+use std::ffi::OsString;
+use std::fs::{self, File, OpenOptions};
+use std::io::{self, BufWriter, Read, Seek, SeekFrom, Write};
+use std::ops::Range;
+use std::path::{Path, PathBuf};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SplitLimit {
+    Tensors(i32),
+    Bytes(u64),
+}
+#[derive(Debug, Clone, Copy)]
+pub struct SplitOptions {
+    pub limit: SplitLimit,
+    pub no_tensor_first_split: bool,
+    pub dry_run: bool,
+}
+impl Default for SplitOptions {
+    fn default() -> Self {
+        Self {
+            limit: SplitLimit::Tensors(128),
+            no_tensor_first_split: false,
+            dry_run: false,
+        }
+    }
+}
+#[derive(Debug, Clone, Copy, Default)]
+pub struct MergeOptions {
+    pub dry_run: bool,
+    pub delete_splits: bool,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Summary {
+    pub shards: usize,
+    pub tensors: usize,
+}
+
+/// The frozen tool gets ggml tensors and input offsets by the first C-string
+/// name match. A later distinct wire name with that prefix therefore selects
+/// the first descriptor's shape and payload, even when split into another file.
+fn native_tensor_indices(file: &Gguf<File>) -> Result<Vec<usize>> {
+    let mut first = HashMap::new();
+    first
+        .try_reserve(file.tensors.len())
+        .map_err(|_| Error::Limit("native tensor lookup allocation".into()))?;
+    let mut indices = Vec::new();
+    indices
+        .try_reserve_exact(file.tensors.len())
+        .map_err(|_| Error::Limit("native tensor index allocation".into()))?;
+    for (index, tensor) in file.tensors.iter().enumerate() {
+        indices.push(*first.entry(tensor.native_name()).and_modify(|old| *old = index).or_insert(index));
+    }
+    Ok(indices)
+}
+fn descriptors<'a>(file: &'a Gguf<File>, indices: &[usize]) -> Result<Vec<TensorDescriptor<'a>>> {
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(indices.len())
+        .map_err(|_| Error::Limit("tool tensor descriptor allocation".into()))?;
+    for &index in indices {
+        let tensor = file
+            .tensors
+            .get(index)
+            .ok_or_else(|| invalid("native tensor index exceeds input"))?;
+        result.push(TensorDescriptor {
+            name: tensor.native_name(),
+            dimensions: &tensor.dimensions,
+            dtype: tensor.dtype,
+        });
+    }
+    Ok(result)
+}
+
+/// gguf_set_kv copies C-string keys. Each setter removes its preceding prefix
+/// match and appends the replacement. Last values therefore occupy their last
+/// contribution positions. Validate every setter, including overwritten keys.
+fn normalized_metadata(file: &Gguf<File>) -> Result<Vec<(&[u8], &Value)>> {
+    let mut last = HashMap::new();
+    last.try_reserve(file.metadata.len())
+        .map_err(|_| Error::Limit("native metadata lookup allocation".into()))?;
+    for (index, key) in file.metadata_order().enumerate() {
+        let native = c_string(key);
+        if native.is_empty() {
+            return Err(invalid("metadata key has an empty native C-string prefix"));
+        }
+        if native == b"general.alignment"
+            && !matches!(file.metadata.get(key), Some(Value::U32(value)) if value.is_power_of_two())
+        {
+            return Err(invalid(
+                "native copied general.alignment must be a power-of-two UINT32",
+            ));
+        }
+        last.insert(native, index);
+    }
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(last.len())
+        .map_err(|_| Error::Limit("native metadata order allocation".into()))?;
+    for (index, key) in file.metadata_order().enumerate() {
+        let native = c_string(key);
+        if last.get(native) == Some(&index) {
+            result.push((native, &file.metadata[key]));
+        }
+    }
+    Ok(result)
+}
+fn original_header(path: &Path, limits: Limits) -> Result<Gguf<File>> {
+    let mut open = OpenOptions::new();
+    open.read(true);
+    // Deny write/delete while the input handle is retained on Windows. This
+    // prevents truncation through hard-link aliases without unsafe file-ID APIs.
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::OpenOptionsExt;
+        open.share_mode(1); // FILE_SHARE_READ
+    }
+    let file = Gguf::read_header(open.open(path)?, limits)?;
+    if file.endian != Endian::Little {
+        return Err(Error::Unsupported(
+            "the frozen x86_64 gguf-split tool requires a little-endian header".into(),
+        ));
+    }
+    Ok(file)
+}
+fn split_metadata<T>(
+    file: &Gguf<File>,
+    index: usize,
+    count: usize,
+    total: usize,
+    action: impl FnOnce(&[(&[u8], &Value)]) -> Result<T>,
+) -> Result<T> {
+    let split_no =
+        Value::U16(u16::try_from(index).map_err(|_| invalid("split index exceeds UINT16"))?);
+    let total =
+        Value::I32(i32::try_from(total).map_err(|_| invalid("tensor count exceeds INT32"))?);
+    let split_count =
+        Value::U16(u16::try_from(count).map_err(|_| invalid("split count exceeds UINT16"))?);
+    let mut metadata = Vec::new();
+    let capacity = if index == 0 { file.metadata.len() } else { 0 };
+    metadata
+        .try_reserve_exact(
+            capacity
+                .checked_add(3)
+                .ok_or_else(|| invalid("metadata index overflow"))?,
+        )
+        .map_err(|_| Error::Limit("tool metadata index allocation".into()))?;
+    if index == 0 {
+        for (key, value) in normalized_metadata(file)? {
+            if !matches!(key, b"split.no" | b"split.count" | b"split.tensors.count") {
+                metadata.push((key, value));
+            }
+        }
+    }
+    // gguf_set_val removes the old entry and appends it. The final count
+    // replacement therefore follows split.tensors.count, even on existing keys.
+    metadata.extend([
+        (&b"split.no"[..], &split_no),
+        (&b"split.tensors.count"[..], &total),
+        (&b"split.count"[..], &split_count),
+    ]);
+    action(&metadata)
+}
+fn split_header(
+    file: &Gguf<File>,
+    native_indices: &[usize],
+    range: Range<usize>,
+    index: usize,
+    count: usize,
+    limits: &Limits,
+    out: &mut impl Write,
+) -> Result<WriteLayout> {
+    let tensors = descriptors(
+        file,
+        native_indices
+            .get(range)
+            .ok_or_else(|| invalid("tensor range exceeds input"))?,
+    )?;
+    split_metadata(file, index, count, file.tensors.len(), |metadata| {
+        writer::raw_header_with_policy(out, metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
+    })
+}
+fn buffer(limits: &Limits, any_payload: bool) -> Result<Vec<u8>> {
+    let size = limits.max_tensor_read_bytes.min(64 * 1024);
+    if any_payload && size == 0 {
+        return Err(Error::Limit(
+            "streaming payload buffer budget is zero".into(),
+        ));
+    }
+    let mut data = Vec::new();
+    data.try_reserve_exact(size)
+        .map_err(|_| Error::Limit("streaming payload buffer allocation".into()))?;
+    data.resize(size, 0);
+    Ok(data)
+}
+fn copy_exact<R: Read + Seek, W: Write>(
+    input: &mut R,
+    out: &mut W,
+    offset: u64,
+    mut bytes: u64,
+    buffer: &mut [u8],
+) -> Result<()> {
+    if bytes != 0 && buffer.is_empty() {
+        return Err(Error::Limit("streaming payload buffer is empty".into()));
+    }
+    input.seek(SeekFrom::Start(offset))?;
+    while bytes != 0 {
+        let length = bytes.min(buffer.len() as u64) as usize;
+        input.read_exact(&mut buffer[..length])?;
+        out.write_all(&buffer[..length])?;
+        bytes -= length as u64;
+    }
+    Ok(())
+}
+fn reject_same_path(input: &Path, output: &Path) -> Result<()> {
+    if output.exists() && fs::canonicalize(input)? == fs::canonicalize(output)? {
+        return Err(invalid("output aliases an input file"));
+    }
+    #[cfg(unix)]
+    if output.exists() {
+        use std::os::unix::fs::MetadataExt;
+        let a = fs::metadata(input)?;
+        let b = fs::metadata(output)?;
+        if a.dev() == b.dev() && a.ino() == b.ino() {
+            return Err(invalid("output is a hard link to an input file"));
+        }
+    }
+    Ok(())
+}
+fn open_split_output(input: &File, path: &Path) -> Result<File> {
+    // Opening without truncation retains the exact destination handle across
+    // the identity check. A symlink/path swap after the earlier preflight
+    // cannot turn set_len or subsequent writes into input-file truncation.
+    let destination = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(path)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let source = input.metadata()?;
+        let target = destination.metadata()?;
+        if source.dev() == target.dev() && source.ino() == target.ino() {
+            return Err(invalid("output handle aliases the retained input file"));
+        }
+    }
+    #[cfg(not(unix))]
+    let _ = input;
+    // Windows inputs deny write sharing while retained, so opening an alias
+    // above fails before any truncation. See original_header.
+    destination.set_len(0)?;
+    Ok(destination)
+}
+pub fn split_path(prefix: &Path, index: usize, count: usize) -> Result<PathBuf> {
+    if count == 0 || count > u16::MAX as usize || index >= count {
+        return Err(invalid("split index/count outside UINT16 range"));
+    }
+    let mut name = prefix.as_os_str().to_os_string();
+    name.push(format!("-{:05}-of-{count:05}.gguf", index + 1));
+    Ok(PathBuf::from(name))
+}
+fn split_prefix(path: &Path, count: usize) -> Result<PathBuf> {
+    let suffix = format!("-00001-of-{count:05}.gguf");
+    #[cfg(unix)]
+    let prefix = {
+        use std::os::unix::ffi::{OsStrExt, OsStringExt};
+        let bytes = path.as_os_str().as_bytes();
+        let prefix = bytes
+            .strip_suffix(suffix.as_bytes())
+            .ok_or_else(|| invalid("unexpected first split filename"))?;
+        OsString::from_vec(prefix.to_vec())
+    };
+    #[cfg(windows)]
+    let prefix = {
+        use std::os::windows::ffi::{OsStrExt, OsStringExt};
+        let bytes: Vec<u16> = path.as_os_str().encode_wide().collect();
+        let suffix: Vec<u16> = suffix.encode_utf16().collect();
+        let prefix = bytes
+            .strip_suffix(suffix.as_slice())
+            .ok_or_else(|| invalid("unexpected first split filename"))?;
+        OsString::from_wide(prefix)
+    };
+    #[cfg(not(any(unix, windows)))]
+    let prefix = {
+        let path = path
+            .to_str()
+            .ok_or_else(|| Error::Unsupported("native path encoding".into()))?;
+        OsString::from(
+            path.strip_suffix(&suffix)
+                .ok_or_else(|| invalid("unexpected first split filename"))?,
+        )
+    };
+    if prefix.is_empty() {
+        return Err(invalid("split filename has an empty prefix"));
+    }
+    Ok(PathBuf::from(prefix))
+}
+
+/// Split one GGUF. The first output contains primary metadata; later files
+/// contain only the three split keys. Dry-run validates/plans headers without
+/// requiring complete tensor payloads, as in the original tool. Bounded header
+/// read-ahead can still prefetch a payload prefix.
+pub fn split<W: Write, E: Write>(
+    input: &Path,
+    output_prefix: &Path,
+    options: SplitOptions,
+    limits: &ShardLimits,
+    stdout: &mut W,
+    stderr: &mut E,
+) -> Result<Summary> {
+    let mut file = original_header(input, limits.gguf.clone())?;
+    let count = file.tensors.len();
+    let native_indices = native_tensor_indices(&file)?;
+    if count > i32::MAX as usize {
+        return Err(invalid("tensor count exceeds source INT32 field"));
+    }
+    match options.limit {
+        SplitLimit::Tensors(0) if count > 1 => {
+            return Err(invalid("zero tensor split limit would divide by zero"));
+        }
+        SplitLimit::Bytes(0) => return Err(invalid("size must be a positive value")),
+        _ => {}
+    }
+    let max_shards = limits.max_shards.min(u16::MAX as usize);
+    if max_shards == 0 {
+        return Err(Error::Limit("split file budget is zero".into()));
+    }
+    let mut ranges = Vec::new();
+    ranges
+        .try_reserve_exact((count + 2).min(max_shards))
+        .map_err(|_| Error::Limit("split plan allocation".into()))?;
+    if options.no_tensor_first_split {
+        ranges.push(0..0);
+    }
+    let mut start = 0;
+    let mut bytes = 0u64;
+    for (index, &native_index) in native_indices.iter().enumerate() {
+        let tensor = &file.tensors[native_index];
+        let padded = align(tensor.byte_len, 32)?;
+        let next = bytes
+            .checked_add(padded)
+            .ok_or_else(|| invalid("split byte count overflow"))?;
+        let boundary = match options.limit {
+            SplitLimit::Tensors(number) => index > 0 && index % number.unsigned_abs() as usize == 0,
+            SplitLimit::Bytes(limit) => next > limit,
+        };
+        if boundary {
+            if index == start {
+                return Err(invalid(
+                    "one split would contain zero tensors; size limit is too small",
+                ));
+            }
+            if ranges.len() + 1 >= max_shards {
+                return Err(Error::Limit("split count exceeds file budget".into()));
+            }
+            ranges.push(start..index);
+            start = index;
+            bytes = padded;
+        } else {
+            bytes = next;
+        }
+    }
+    if ranges.len() >= max_shards {
+        return Err(Error::Limit("split count exceeds file budget".into()));
+    }
+    ranges.push(start..count);
+    // Every output header and path is checked before the first file is opened.
+    let mut plans = Vec::new();
+    plans
+        .try_reserve_exact(ranges.len())
+        .map_err(|_| Error::Limit("split output plan allocation".into()))?;
+    for (index, range) in ranges.iter().enumerate() {
+        let header = split_header(
+            &file,
+            &native_indices,
+            range.clone(),
+            index,
+            ranges.len(),
+            &limits.gguf,
+            &mut io::sink(),
+        )?;
+        let path = split_path(output_prefix, index, ranges.len())?;
+        reject_same_path(input, &path)?;
+        let raw_bytes = native_indices[range.clone()]
+            .iter()
+            .try_fold(0u64, |sum, &index| {
+                sum.checked_add(file.tensors[index].byte_len)
+                    .ok_or_else(|| invalid("display byte count overflow"))
+            })?;
+        let displayed_mb = header
+            .data_offset
+            .checked_add(raw_bytes)
+            .ok_or_else(|| invalid("display size overflow"))?
+            / 1_000_000;
+        plans.push((path, header, displayed_mb));
+    }
+    writeln!(stdout, "n_split: {}", ranges.len())?;
+    for (index, (range, (_, _, size))) in ranges.iter().zip(&plans).enumerate() {
+        writeln!(
+            stdout,
+            "split {:05}: n_tensors = {}, total_size = {size}M",
+            index + 1,
+            range.len()
+        )?;
+    }
+    if !options.dry_run {
+        let mut copy_buffer = buffer(
+            &limits.gguf,
+            native_indices
+                .iter()
+                .any(|&index| file.tensors[index].byte_len != 0),
+        )?;
+        for (index, (range, (path, expected, _))) in ranges.iter().zip(&plans).enumerate() {
+            write!(stdout, "Writing file {} ... ", path.display())?;
+            stdout.flush()?;
+            let destination = open_split_output(&file.reader, path)?;
+            let mut output = BufWriter::with_capacity(64 * 1024, destination);
+            let actual = split_header(
+                &file,
+                &native_indices,
+                range.clone(),
+                index,
+                ranges.len(),
+                &limits.gguf,
+                &mut output,
+            )?;
+            if &actual != expected {
+                return Err(invalid("split plan changed before writing"));
+            }
+            for tensor_index in range.clone() {
+                let tensor = &file.tensors[native_indices[tensor_index]];
+                let offset = file
+                    .data_offset
+                    .checked_add(tensor.offset)
+                    .ok_or_else(|| invalid("input offset overflow"))?;
+                copy_exact(
+                    &mut file.reader,
+                    &mut output,
+                    offset,
+                    tensor.byte_len,
+                    &mut copy_buffer,
+                )?;
+                writer::zeros(&mut output, align(tensor.byte_len, 32)? - tensor.byte_len)?;
+            }
+            output.flush()?;
+            writeln!(stdout, "done")?;
+        }
+    }
+    writeln!(
+        stderr,
+        "gguf_split: {} gguf split written with a total of {count} tensors.",
+        ranges.len()
+    )?;
+    Ok(Summary {
+        shards: ranges.len(),
+        tensors: count,
+    })
+}
+fn remaining_limits(limits: &Limits, used: HeaderUsage) -> Result<Limits> {
+    let mut remaining = limits.clone();
+    remaining.max_metadata_bytes = limits
+        .max_metadata_bytes
+        .checked_sub(used.bytes)
+        .ok_or_else(|| Error::Limit("combined header byte budget".into()))?;
+    remaining.max_metadata_entries = limits
+        .max_metadata_entries
+        .checked_sub(used.metadata_entries)
+        .ok_or_else(|| Error::Limit("combined metadata entry budget".into()))?;
+    remaining.max_total_values = limits
+        .max_total_values
+        .checked_sub(used.metadata_values)
+        .ok_or_else(|| Error::Limit("combined metadata value budget".into()))?;
+    remaining.max_tensors = limits
+        .max_tensors
+        .checked_sub(used.tensors)
+        .ok_or_else(|| Error::Limit("combined tensor budget".into()))?;
+    Ok(remaining)
+}
+fn charge(used: &mut HeaderUsage, new: HeaderUsage) -> Result<()> {
+    used.bytes = used
+        .bytes
+        .checked_add(new.bytes)
+        .ok_or_else(|| invalid("combined header bytes overflow"))?;
+    used.metadata_entries = used
+        .metadata_entries
+        .checked_add(new.metadata_entries)
+        .ok_or_else(|| invalid("combined metadata entries overflow"))?;
+    used.metadata_values = used
+        .metadata_values
+        .checked_add(new.metadata_values)
+        .ok_or_else(|| invalid("combined metadata values overflow"))?;
+    used.tensors = used
+        .tensors
+        .checked_add(new.tensors)
+        .ok_or_else(|| invalid("combined tensor count overflow"))?;
+    Ok(())
+}
+fn merge_header(
+    files: &[Gguf<File>],
+    limits: &Limits,
+    out: &mut impl Write,
+) -> Result<WriteLayout> {
+    let first = files.first().ok_or_else(|| invalid("empty merge input"))?;
+    let count = Value::U16(0);
+    let mut metadata = Vec::new();
+    metadata
+        .try_reserve_exact(first.metadata.len())
+        .map_err(|_| Error::Limit("merge metadata index allocation".into()))?;
+    for (key, value) in normalized_metadata(first)? {
+        if key != b"split.count" {
+            metadata.push((key, value));
+        }
+    }
+    metadata.push((&b"split.count"[..], &count));
+    let total = files.iter().try_fold(0usize, |sum, file| {
+        sum.checked_add(file.tensors.len())
+            .ok_or_else(|| invalid("merged tensor count overflow"))
+    })?;
+    let mut tensors = Vec::new();
+    tensors
+        .try_reserve_exact(total)
+        .map_err(|_| Error::Limit("merge descriptor allocation".into()))?;
+    for file in files {
+        tensors.extend(descriptors(file, &native_tensor_indices(file)?)?);
+    }
+    writer::raw_header_with_policy(out, &metadata, &tensors, limits, HeaderPolicy::FROZEN_TOOL)
+}
+
+/// Merge numbered shards. Primary split.no is deliberately not consulted;
+/// subsidiary split.no and split.count must match, and the primary signed
+/// tensor total must match the complete directory. This differs from model
+/// shard discovery and therefore does not reuse its acceptance policy.
+///
+/// Existing output files are refused even during dry-run. With delete_splits,
+/// source deletion starts only after the complete output is flushed and synced.
+/// This strengthens the original tool's failure safety; successful bytes and
+/// deletions are the same. Failures before a complete flushed/synced output
+/// preserve every input. Cleanup can fail after removing some shards; the
+/// completed output remains. Destructive cleanup requires stable, exclusively
+/// managed paths: standard Rust has no atomic identity-check-and-unlink API.
+pub fn merge<W: Write>(
+    input: &Path,
+    output: &Path,
+    options: MergeOptions,
+    limits: &ShardLimits,
+    stderr: &mut W,
+) -> Result<Summary> {
+    writeln!(
+        stderr,
+        "gguf_merge: {} -> {}",
+        input.display(),
+        output.display()
+    )?;
+    if output.exists() {
+        return Err(invalid(format!(
+            "output file {} already exists",
+            output.display()
+        )));
+    }
+    let first = original_header(input, limits.gguf.clone())?;
+    let count = match first.metadata_native(b"split.count") {
+        Some(Value::U16(count)) if *count != 0 => usize::from(*count),
+        _ => return Err(invalid("input requires a positive UINT16 split.count")),
+    };
+    if count > limits.max_shards {
+        return Err(Error::Limit("merge exceeds owned file budget".into()));
+    }
+    let prefix = split_prefix(input, count)?;
+    let mut used = first.header_usage();
+    let mut files = Vec::new();
+    let mut paths = Vec::new();
+    files
+        .try_reserve_exact(count)
+        .map_err(|_| Error::Limit("merge file owner allocation".into()))?;
+    paths
+        .try_reserve_exact(count)
+        .map_err(|_| Error::Limit("merge path allocation".into()))?;
+    write!(
+        stderr,
+        "gguf_merge: reading metadata {} ...",
+        input.display()
+    )?;
+    files.push(first);
+    paths.push(input.to_path_buf());
+    writeln!(stderr, "\x1b[3Ddone")?;
+    for index in 1..count {
+        let path = split_path(&prefix, index, count)?;
+        write!(
+            stderr,
+            "gguf_merge: reading metadata {} ...",
+            path.display()
+        )?;
+        let file = original_header(&path, remaining_limits(&limits.gguf, used)?)?;
+        if !matches!(file.metadata_native(b"split.no"), Some(Value::U16(number)) if usize::from(*number)==index)
+            || !matches!(file.metadata_native(b"split.count"), Some(Value::U16(number)) if usize::from(*number)==count)
+        {
+            return Err(invalid(format!(
+                "{} is not split {} of {count}",
+                path.display(),
+                index + 1
+            )));
+        }
+        charge(&mut used, file.header_usage())?;
+        files.push(file);
+        paths.push(path);
+        writeln!(stderr, "\x1b[3Ddone")?;
+    }
+    if !matches!(files[0].metadata_native(b"split.tensors.count"), Some(Value::I32(total)) if *total >= 0 && *total as usize == used.tensors)
+    {
+        return Err(invalid(
+            "split tensor total does not match primary INT32 split.tensors.count",
+        ));
+    }
+    let plan = merge_header(&files, &limits.gguf, &mut io::sink())?;
+    let mut copy_buffer = buffer(
+        &limits.gguf,
+        files
+            .iter()
+            .any(|file| file.tensors.iter().any(|tensor| tensor.byte_len != 0)),
+    )?;
+    let mut destination = if options.dry_run {
+        None
+    } else {
+        let file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(output)?;
+        let mut out = BufWriter::with_capacity(64 * 1024, file);
+        writer::zeros(&mut out, plan.data_offset)?;
+        Some(out)
+    };
+    for (file, path) in files.iter_mut().zip(&paths) {
+        write!(stderr, "gguf_merge: writing tensors {} ...", path.display())?;
+        for tensor in &file.tensors {
+            let offset = file
+                .data_offset
+                .checked_add(tensor.offset)
+                .ok_or_else(|| invalid("input tensor offset overflow"))?;
+            if let Some(out) = &mut destination {
+                copy_exact(
+                    &mut file.reader,
+                    out,
+                    offset,
+                    tensor.byte_len,
+                    &mut copy_buffer,
+                )?;
+                writer::zeros(out, align(tensor.byte_len, 32)? - tensor.byte_len)?;
+            } else {
+                copy_exact(
+                    &mut file.reader,
+                    &mut io::sink(),
+                    offset,
+                    tensor.byte_len,
+                    &mut copy_buffer,
+                )?;
+            }
+        }
+        writeln!(stderr, "\x1b[3Ddone")?;
+    }
+    if let Some(out) = &mut destination {
+        out.seek(SeekFrom::Start(0))?;
+        let actual = merge_header(&files, &limits.gguf, out)?;
+        if actual != plan {
+            return Err(invalid("merge plan changed before writing"));
+        }
+        out.flush()?;
+        if options.delete_splits {
+            out.get_ref().sync_all()?;
+        }
+    }
+    // Close all input/output handles before optional deletion (also on Windows).
+    drop(files);
+    drop(destination);
+    let mut deletion_error = None;
+    if !options.dry_run && options.delete_splits {
+        for path in &paths {
+            match fs::remove_file(path) {
+                Ok(()) => writeln!(stderr, "gguf_merge: deleted file {}", path.display())?,
+                Err(error) => {
+                    writeln!(stderr, "error: failed to delete {}", path.display())?;
+                    if deletion_error.is_none() {
+                        deletion_error = Some(error);
+                    }
+                }
+            }
+        }
+    }
+    writeln!(
+        stderr,
+        "gguf_merge: {} merged from {count} split with {} tensors.",
+        output.display(),
+        used.tensors
+    )?;
+    if let Some(error) = deletion_error {
+        return Err(Error::Io(error));
+    }
+    Ok(Summary {
+        shards: count,
+        tensors: used.tensors,
+    })
+}

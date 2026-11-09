@@ -94,6 +94,17 @@ pub fn role(path: &str) -> Option<&'static str> {
     {
         return Some("test input or independent golden data");
     }
+    // Only these four hash-declared original reports use lossless compression.
+    // Arbitrary compressed files remain outside the source-package allowlist.
+    if matches!(
+        path,
+        "crates/checkpoint/tests/fixtures/original-edges-linux-report.json.zlib"
+            | "crates/checkpoint/tests/fixtures/original-edges-windows-report.json.zlib"
+            | "crates/checkpoint/tests/fixtures/original-linux-report.json.zlib"
+            | "crates/checkpoint/tests/fixtures/original-windows-report.json.zlib"
+    ) {
+        return Some("pinned compressed independent checkpoint reference data");
+    }
     if path == "crates/model-runtime/tests/data/ggml_reference.tsv" {
         return Some("frozen GGML synthetic model graph numerical reference data");
     }
@@ -546,6 +557,10 @@ mod tests {
             ".github/workflows/ci.yml",
             "fixtures/inference/ggml-vocab-llama-spm.gguf",
             "crates/vendor-remote/tests/fixtures/hexagon32-input.elf",
+            "crates/checkpoint/tests/fixtures/original-edges-linux-report.json.zlib",
+            "crates/checkpoint/tests/fixtures/original-edges-windows-report.json.zlib",
+            "crates/checkpoint/tests/fixtures/original-linux-report.json.zlib",
+            "crates/checkpoint/tests/fixtures/original-windows-report.json.zlib",
         ] {
             assert!(role(path).is_some(), "{path}");
         }
@@ -553,6 +568,11 @@ mod tests {
             "crates/runtime/runtime.cpp",
             "fixtures/unreviewed.elf",
             "fixtures/old.dll",
+            "fixtures/unreviewed.json.zlib",
+            "crates/checkpoint/tests/fixtures/unreviewed-report.json.zlib",
+            "crates/checkpoint/tests/fixtures/original-linux-report.json.zlib.extra",
+            "crates/other/tests/fixtures/original-linux-report.json.zlib",
+            "crates/checkpoint/src/original-linux-report.json.zlib",
             ".github/workflows/unknown.yml",
             "docs/imports/old/LICENSE.cpp",
             "crates/llama-behavior/LICENSE-UNREVIEWED.txt",

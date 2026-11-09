@@ -1,0 +1,186 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "base_commit": "40a4ee7deb59e5823dd6d242231592d0c9923168",
+  "execution_inputs_before": {
+    "files": 744,
+    "sha256": "d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e"
+  },
+  "driver": {
+    "bytes": 6416,
+    "sha256": "1a8efe90eb83e209d49337864810a998a79f9c375ec743bbc614734821a2e46f"
+  },
+  "started_utc": "2026-11-09T20:46:45.899493+00:00",
+  "scope": "Raw GGUF reader/getters/native serialization, lossless raw v3 writer, native split/merge byte and NUL semantics; 1605 original reader cases, 3196 original tool cases, 22 original NUL tool cases, plus existing 103 CLI cases. All source/fixture inputs including both declarations are frozen. Not full T04 or full-port completion.",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9795119000045815,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "debug-gguf",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 6.698563499994634,
+      "log": {
+        "bytes": 3429,
+        "sha256": "68dedd1e92fd18ea3b07c380cc2bb78f73a3e192d76f8b580b0be8f50a74cd57"
+      },
+      "tests": {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 4
+      },
+      "native_metrics": [
+        "Original input raw writer: 0 headers; 0 exact header bytes",
+        "Independent original GGUF reader: 512 cases; 512 accepted; 57344 exact serialized header bytes; all observed C getter values agree",
+        "Original input raw writer: 1073 headers; 211424 exact header bytes",
+        "Independent original GGUF reader: 1093 cases; 1080 accepted; 211840 exact serialized header bytes; all observed C getter values agree"
+      ]
+    },
+    {
+      "name": "release-gguf",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-gguf",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 9.376545999999507,
+      "log": {
+        "bytes": 3426,
+        "sha256": "c051e4e9cea13943d333307c63d3a06d5c0fb192e7667ddf54eca4de6a7b84a6"
+      },
+      "tests": {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 4
+      },
+      "native_metrics": [
+        "Original input raw writer: 0 headers; 0 exact header bytes",
+        "Independent original GGUF reader: 512 cases; 512 accepted; 57344 exact serialized header bytes; all observed C getter values agree",
+        "Original input raw writer: 1073 headers; 211424 exact header bytes",
+        "Independent original GGUF reader: 1093 cases; 1080 accepted; 211840 exact serialized header bytes; all observed C getter values agree"
+      ]
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4785205999942264,
+      "log": {
+        "bytes": 547,
+        "sha256": "c9e71afa99bbc46c9c7b7c92a12706cacaa6d801cf3d9ee3cb861b2e537d132b"
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 22.056760800005577,
+      "log": {
+        "bytes": 38709,
+        "sha256": "ac7dcd741452de276228652168806a9aa0b34e6c05c1fb913e7bffa323c274d0"
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 21.478682000000845,
+      "log": {
+        "bytes": 377,
+        "sha256": "6d7a0384ea552ffc9e9f870971ac8d19ca920ad21e90d728d85709a9b563f6a9"
+      },
+      "native_metrics": []
+    }
+  ],
+  "same_production_inputs_as_v1": true,
+  "prior_successful_debug_release": {
+    "bytes": 4939,
+    "sha256": "9132c80f1586f35e3cd9f6eda77674b53e8031bd5af379f903b88aa5de44dd21"
+  },
+  "test_only_delta": [
+    "crates/gguf/tests/raw_native.rs"
+  ],
+  "execution_inputs_after": {
+    "files": 744,
+    "sha256": "d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e"
+  },
+  "finished_utc": "2026-11-09T20:47:55.616224+00:00"
+}

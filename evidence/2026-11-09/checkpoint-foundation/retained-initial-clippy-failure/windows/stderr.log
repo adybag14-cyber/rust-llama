@@ -1,0 +1,32 @@
+    Checking llama-checkpoint v0.1.0 (C:\Users\adyba\rust-llama-reference\safetensors-port\rust-draft\crates\checkpoint)
+error: manual implementation of `.is_multiple_of()`
+   --> crates\checkpoint\src\platform.rs:590:20
+    |
+590 |                 if length % 2 != 0 {
+    |                    ^^^^^^^^^^^^^^^ help: replace with: `!length.is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: manual implementation of `.is_multiple_of()`
+   --> crates\checkpoint\src\platform.rs:617:42
+    |
+617 |                 if next < 12 + length || next % 4 != 0 {
+    |                                          ^^^^^^^^^^^^^ help: replace with: `!next.is_multiple_of(4)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> crates\checkpoint\src\platform.rs:146:23
+    |
+146 |     static OPEN_HOOK: std::cell::RefCell<Option<Box<dyn FnMut(usize)>>> =
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: could not compile `llama-checkpoint` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-checkpoint` (lib test) due to 3 previous errors

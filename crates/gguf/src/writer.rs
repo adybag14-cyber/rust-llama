@@ -1,15 +1,51 @@
 //! Ordered GGUF headers and bounded streaming payload layout.
 //! Validation precedes the first output byte; metadata values stay borrowed.
-use crate::{DType, Error, Limits, Result, TensorData, Value, align, dimension_elements, invalid};
+use crate::raw::c_string;
+use crate::{
+    DType, Error, Limits, MetadataValue, RawValue, Result, TensorData, Value, align,
+    dimension_elements, invalid,
+};
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 
 /// A borrowed tensor description; its payload need not be resident in memory.
-#[derive(Debug, Clone, Copy)]
-pub struct TensorDescriptor<'a> {
-    pub name: &'a str,
+#[derive(Debug)]
+pub struct TensorDescription<'a, N: ?Sized> {
+    pub name: &'a N,
     pub dimensions: &'a [u64],
     pub dtype: DType,
+}
+impl<N: ?Sized> Copy for TensorDescription<'_, N> {}
+impl<N: ?Sized> Clone for TensorDescription<'_, N> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+pub type TensorDescriptor<'a> = TensorDescription<'a, str>;
+pub type RawTensorDescriptor<'a> = TensorDescription<'a, [u8]>;
+
+pub(crate) trait WireBytes {
+    fn wire_bytes(&self) -> &[u8];
+}
+impl WireBytes for str {
+    fn wire_bytes(&self) -> &[u8] {
+        self.as_bytes()
+    }
+}
+impl WireBytes for String {
+    fn wire_bytes(&self) -> &[u8] {
+        self.as_bytes()
+    }
+}
+impl WireBytes for [u8] {
+    fn wire_bytes(&self) -> &[u8] {
+        self
+    }
+}
+impl WireBytes for Vec<u8> {
+    fn wire_bytes(&self) -> &[u8] {
+        self
+    }
 }
 
 /// Checked offsets for streaming payloads after an independently written header.
@@ -24,24 +60,55 @@ pub struct WriteLayout {
 
 #[derive(Clone, Copy)]
 pub(crate) struct HeaderPolicy {
-    pub(crate) frozen_tool: bool,
+    frozen_tool: bool,
+    native_header: bool,
+    raw_strings: bool,
+    version: u32,
+    physical_alignment: Option<u32>,
 }
 impl HeaderPolicy {
-    const STANDARD: Self = Self { frozen_tool: false };
-    /// Frozen gguf-split creates a fresh alignment-32 context and copies keys
-    /// without updating context alignment. It also serializes ggml_n_dims and
-    /// copies strings through C strings. Keep these measured producer behaviors
-    /// distinct from the valid-layout public writer.
-    pub(crate) const FROZEN_TOOL: Self = Self { frozen_tool: true };
-    fn string(self, value: &str) -> &str {
+    const STANDARD: Self = Self {
+        frozen_tool: false,
+        native_header: false,
+        raw_strings: false,
+        version: 3,
+        physical_alignment: None,
+    };
+    const RAW: Self = Self {
+        raw_strings: true,
+        ..Self::STANDARD
+    };
+    pub(crate) const FROZEN_TOOL: Self = Self {
+        frozen_tool: true,
+        raw_strings: true,
+        physical_alignment: Some(32),
+        ..Self::STANDARD
+    };
+    fn native(version: u32, alignment: u32) -> Self {
+        Self {
+            native_header: true,
+            raw_strings: true,
+            version,
+            physical_alignment: Some(alignment),
+            ..Self::STANDARD
+        }
+    }
+    fn string(self, value: &[u8]) -> &[u8] {
         if self.frozen_tool {
-            value.split('\0').next().unwrap_or("")
+            c_string(value)
+        } else {
+            value
+        }
+    }
+    fn name(self, value: &[u8]) -> &[u8] {
+        if self.frozen_tool || self.native_header {
+            c_string(value)
         } else {
             value
         }
     }
     fn rank(self, dimensions: &[u64]) -> usize {
-        if self.frozen_tool {
+        if self.frozen_tool || self.native_header {
             dimensions
                 .iter()
                 .enumerate()
@@ -65,7 +132,7 @@ fn add(total: &mut u64, count: u64, limit: u64) -> Result<()> {
     }
     Ok(())
 }
-fn string_size(text: &str, limits: &Limits, policy: HeaderPolicy) -> Result<u64> {
+fn string_size(text: &[u8], limits: &Limits, policy: HeaderPolicy) -> Result<u64> {
     let text = policy.string(text);
     if text.len() > limits.max_string_bytes {
         return Err(Error::Limit(
@@ -76,8 +143,8 @@ fn string_size(text: &str, limits: &Limits, policy: HeaderPolicy) -> Result<u64>
         .checked_add(8)
         .ok_or_else(|| Error::Limit("encoded string size overflow".into()))
 }
-fn value_size(
-    value: &Value,
+fn value_size<S: WireBytes>(
+    value: &MetadataValue<S>,
     limits: &Limits,
     policy: HeaderPolicy,
     total_values: &mut usize,
@@ -87,12 +154,12 @@ fn value_size(
         .filter(|count| *count <= limits.max_total_values)
         .ok_or_else(|| Error::Limit("encoded metadata value budget".into()))?;
     Ok(match value {
-        Value::U8(_) | Value::I8(_) | Value::Bool(_) => 1,
-        Value::U16(_) | Value::I16(_) => 2,
-        Value::U32(_) | Value::I32(_) | Value::F32(_) => 4,
-        Value::U64(_) | Value::I64(_) | Value::F64(_) => 8,
-        Value::String(text) => string_size(text, limits, policy)?,
-        Value::Array {
+        MetadataValue::U8(_) | MetadataValue::I8(_) | MetadataValue::Bool(_) => 1,
+        MetadataValue::U16(_) | MetadataValue::I16(_) => 2,
+        MetadataValue::U32(_) | MetadataValue::I32(_) | MetadataValue::F32(_) => 4,
+        MetadataValue::U64(_) | MetadataValue::I64(_) | MetadataValue::F64(_) => 8,
+        MetadataValue::String(text) => string_size(text.wire_bytes(), limits, policy)?,
+        MetadataValue::Array {
             element_type,
             values,
         } => {
@@ -120,7 +187,7 @@ fn value_size(
     })
 }
 
-pub(crate) fn tensor_bytes(tensor: &TensorDescriptor<'_>) -> Result<u64> {
+pub(crate) fn tensor_bytes<N: ?Sized>(tensor: &TensorDescription<'_, N>) -> Result<u64> {
     if tensor.dimensions.len() > 4 {
         return Err(invalid("tensor has more than four dimensions"));
     }
@@ -140,9 +207,9 @@ pub(crate) fn tensor_bytes(tensor: &TensorDescriptor<'_>) -> Result<u64> {
     )
 }
 
-pub(crate) fn layout(
-    metadata: &[(&str, &Value)],
-    tensors: &[TensorDescriptor<'_>],
+fn layout_inner<N: WireBytes + ?Sized, S: WireBytes>(
+    metadata: &[(&N, &MetadataValue<S>)],
+    tensors: &[TensorDescription<'_, N>],
     limits: &Limits,
     policy: HeaderPolicy,
 ) -> Result<WriteLayout> {
@@ -151,25 +218,36 @@ pub(crate) fn layout(
             "encoded metadata or tensor count budget".into(),
         ));
     }
-    let metadata_alignment = match metadata.iter().find(|(key, _)| *key == "general.alignment") {
+    let metadata_alignment = match metadata
+        .iter()
+        .find(|(key, _)| c_string(key.wire_bytes()) == b"general.alignment")
+    {
         None => 32,
-        Some((_, Value::U32(value))) => *value,
+        Some((_, MetadataValue::U32(value))) => *value,
         _ => return Err(invalid("general.alignment must be UINT32")),
     };
     if !metadata_alignment.is_power_of_two() || metadata_alignment > 1024 * 1024 {
         return Err(invalid("invalid alignment"));
     }
-    let alignment = if policy.frozen_tool {
-        32
-    } else {
-        metadata_alignment
-    };
+    let alignment = policy.physical_alignment.unwrap_or(metadata_alignment);
+    if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
+        return Err(invalid("invalid physical alignment"));
+    }
+    if !matches!(policy.version, 2 | 3) {
+        return Err(Error::Unsupported(
+            "writer supports GGUF versions 2 and 3".into(),
+        ));
+    }
     let mut header = 0;
     add(&mut header, 24, limits.max_metadata_bytes)?;
     let mut keys = BTreeSet::new();
     let mut values = 0;
     for &(key, value) in metadata {
-        if key.is_empty() || key.contains('\0') || !keys.insert(key) {
+        let key = key.wire_bytes();
+        if key.is_empty()
+            || (!policy.raw_strings && key.contains(&0))
+            || !keys.insert(policy.string(key))
+        {
             return Err(invalid("empty, NUL or duplicated metadata key"));
         }
         add(
@@ -208,14 +286,24 @@ pub(crate) fn layout(
     let mut names = BTreeSet::new();
     let mut offset = 0u64;
     for tensor in tensors {
-        if tensor.name.len() >= 64 || tensor.name.contains('\0') || !names.insert(tensor.name) {
+        let original_name = tensor.name.wire_bytes();
+        let name = policy.name(original_name);
+        let duplicate_key = if policy.frozen_tool {
+            name
+        } else {
+            original_name
+        };
+        if original_name.len() >= 64
+            || (!policy.raw_strings && original_name.contains(&0))
+            || !names.insert(duplicate_key)
+        {
             return Err(invalid("invalid or duplicated tensor name"));
         }
         let bytes = tensor_bytes(tensor)?;
         let rank = policy.rank(tensor.dimensions);
         add(
             &mut header,
-            string_size(tensor.name, limits, policy)?,
+            string_size(name, limits, policy)?,
             limits.max_metadata_bytes,
         )?;
         add(&mut header, 16 + rank as u64 * 8, limits.max_metadata_bytes)?;
@@ -266,26 +354,26 @@ impl<W: Write> Encoder<'_, W> {
             .ok_or_else(|| invalid("encoded byte count overflow"))?;
         Ok(())
     }
-    fn string(&mut self, value: &str) -> Result<()> {
+    fn string(&mut self, value: &[u8]) -> Result<()> {
         let value = self.policy.string(value);
         self.raw(&(value.len() as u64).to_le_bytes())?;
-        self.raw(value.as_bytes())
+        self.raw(value)
     }
-    fn value(&mut self, value: &Value) -> Result<()> {
+    fn value<S: WireBytes>(&mut self, value: &MetadataValue<S>) -> Result<()> {
         match value {
-            Value::U8(value) => self.raw(&[*value]),
-            Value::I8(value) => self.raw(&[*value as u8]),
-            Value::U16(value) => self.raw(&value.to_le_bytes()),
-            Value::I16(value) => self.raw(&value.to_le_bytes()),
-            Value::U32(value) => self.raw(&value.to_le_bytes()),
-            Value::I32(value) => self.raw(&value.to_le_bytes()),
-            Value::F32(value) => self.raw(&value.to_le_bytes()),
-            Value::Bool(value) => self.raw(&[u8::from(*value)]),
-            Value::String(value) => self.string(value),
-            Value::U64(value) => self.raw(&value.to_le_bytes()),
-            Value::I64(value) => self.raw(&value.to_le_bytes()),
-            Value::F64(value) => self.raw(&value.to_le_bytes()),
-            Value::Array {
+            MetadataValue::U8(value) => self.raw(&[*value]),
+            MetadataValue::I8(value) => self.raw(&[*value as u8]),
+            MetadataValue::U16(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::I16(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::U32(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::I32(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::F32(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::Bool(value) => self.raw(&[u8::from(*value)]),
+            MetadataValue::String(value) => self.string(value.wire_bytes()),
+            MetadataValue::U64(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::I64(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::F64(value) => self.raw(&value.to_le_bytes()),
+            MetadataValue::Array {
                 element_type,
                 values,
             } => {
@@ -299,30 +387,30 @@ impl<W: Write> Encoder<'_, W> {
         }
     }
 }
-pub(crate) fn header_with_policy<W: Write>(
+fn header_with_policy_inner<W: Write, N: WireBytes + ?Sized, S: WireBytes>(
     out: &mut W,
-    metadata: &[(&str, &Value)],
-    tensors: &[TensorDescriptor<'_>],
+    metadata: &[(&N, &MetadataValue<S>)],
+    tensors: &[TensorDescription<'_, N>],
     limits: &Limits,
     policy: HeaderPolicy,
 ) -> Result<WriteLayout> {
-    let layout = layout(metadata, tensors, limits, policy)?;
+    let layout = layout_inner(metadata, tensors, limits, policy)?;
     let mut encoder = Encoder {
         out,
         bytes: 0,
         policy,
     };
     encoder.raw(b"GGUF")?;
-    encoder.raw(&3u32.to_le_bytes())?;
+    encoder.raw(&policy.version.to_le_bytes())?;
     encoder.raw(&(tensors.len() as u64).to_le_bytes())?;
     encoder.raw(&(metadata.len() as u64).to_le_bytes())?;
     for &(key, value) in metadata {
-        encoder.string(key)?;
+        encoder.string(key.wire_bytes())?;
         encoder.raw(&value.type_id().to_le_bytes())?;
         encoder.value(value)?;
     }
     for (tensor, &offset) in tensors.iter().zip(&layout.tensor_offsets) {
-        encoder.string(tensor.name)?;
+        encoder.string(policy.name(tensor.name.wire_bytes()))?;
         let rank = policy.rank(tensor.dimensions);
         encoder.raw(&(rank as u32).to_le_bytes())?;
         for dimension in 0..rank {
@@ -344,6 +432,51 @@ pub(crate) fn header_with_policy<W: Write>(
         .ok_or_else(|| invalid("header preflight and encoding disagree"))?;
     zeros(encoder.out, padding)?;
     Ok(layout)
+}
+
+pub(crate) fn header_with_policy<W: Write>(
+    out: &mut W,
+    metadata: &[(&str, &Value)],
+    tensors: &[TensorDescriptor<'_>],
+    limits: &Limits,
+    policy: HeaderPolicy,
+) -> Result<WriteLayout> {
+    header_with_policy_inner(out, metadata, tensors, limits, policy)
+}
+pub(crate) fn raw_header_with_policy<W: Write>(
+    out: &mut W,
+    metadata: &[(&[u8], &RawValue)],
+    tensors: &[RawTensorDescriptor<'_>],
+    limits: &Limits,
+    policy: HeaderPolicy,
+) -> Result<WriteLayout> {
+    header_with_policy_inner(out, metadata, tensors, limits, policy)
+}
+/// Write ordered byte strings without UTF-8 conversion or C-string truncation.
+/// Names and dimensions retain their supplied wire representation.
+pub fn write_raw_header<W: Write>(
+    out: &mut W,
+    metadata: &[(&[u8], &RawValue)],
+    tensors: &[RawTensorDescriptor<'_>],
+    limits: &Limits,
+) -> Result<WriteLayout> {
+    raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::RAW)
+}
+pub(crate) fn native_raw_header<W: Write>(
+    out: &mut W,
+    metadata: &[(&[u8], &RawValue)],
+    tensors: &[RawTensorDescriptor<'_>],
+    limits: &Limits,
+    version: u32,
+    alignment: u32,
+) -> Result<WriteLayout> {
+    raw_header_with_policy(
+        out,
+        metadata,
+        tensors,
+        limits,
+        HeaderPolicy::native(version, alignment),
+    )
 }
 
 /// Write a little-endian v3 header in the caller's metadata order, without

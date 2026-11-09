@@ -1,0 +1,32 @@
+{
+  "id": "job-1794253854244-1b711330-7b0",
+  "status": "failed",
+  "stdout": "\r\n   Compiling llama-checkpoint v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/safetensors-port/rust-draft/crates/checkpoint)\r\nwarning: unused variable: `budget`\r\n   --> crates/checkpoint/src/index.rs:265:48\r\n    |\r\n265 | ...], budget: &...\r\n    |       ^^^^^^ help: if this is intentional, prefix it with an underscore: `_budget`\r\n    |\r\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\r\n\r\nerror: implementation of `FnOnce` is not general enough\r\n   --> crates/checkpoint/src/platform.rs:197:22\r\n    |\r\n197 | ...in fd_pa..._dir)? {\r\n    |       ^^^^^...^^^^^ implementation of `FnOnce` is not general enough\r\n    |\r\n    = note: `fn(&'2 Path) -> _ {read_dir::<&'2 Path>}` must implement `FnOnce<(&'1 std::path::Path,)>`, for any lifetime `'1`...\r\n    = note: ...but it actually implements `FnOnce<(&'2 std::path::Path,)>`, for some specific lifetime `'2`\r\n\r\nerror: implementation of `FnOnce` is not general enough\r\n   --> crates/checkpoint/src/platform.rs:233:32\r\n    |\r\n233 | ... = fd_pa...open)?;\r\n    |       ^^^^^...^^^^^ implementation of `FnOnce` is not general enough\r\n    |\r\n    = note: `fn(&'2 Path) -> _ {File::open::<&'2 Path>}` must implement `FnOnce<(&'1 std::path::Path,)>`, for any lifetime `'1`...\r\n    = note: ...but it actually implements `FnOnce<(&'2 std::path::Path,)>`, for some specific lifetime `'2`\r\n\r\nwarning: `llama-checkpoint` (lib) generated 1 warning\r\nerror: could not compile `llama-checkpoint` (lib) due to 2 previous errors; 1 warning emitted\r\n\r\n",
+  "stderr": "",
+  "maxChars": 20000,
+  "logs": {
+    "stdout": {
+      "totalBytes": 1512,
+      "segments": [
+        {
+          "index": 0,
+          "bytes": 1512
+        }
+      ],
+      "rotated": false
+    },
+    "stderr": {
+      "totalBytes": 0,
+      "segments": [
+        {
+          "index": 0,
+          "bytes": 0
+        }
+      ],
+      "rotated": false
+    },
+    "maxBytesPerSegment": 33554432,
+    "rotations": 2,
+    "truncated": false
+  }
+}

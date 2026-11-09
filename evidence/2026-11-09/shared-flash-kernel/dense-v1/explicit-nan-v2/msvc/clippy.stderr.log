@@ -1,0 +1,50 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\f16-context-oracle\flash-kernel\rust-draft\crates\quant)
+error: this `if` statement can be collapsed
+   --> crates\quant\src\flash_attention.rs:498:9
+    |
+498 | /         if let Some(sinks) = inputs.sinks {
+499 | |             if sinks.dtype != DType::F32 || sinks.shape[0] != heads || sinks.strides[0] != 4 {
+500 | |                 return Err(Error::Invalid(
+501 | |                     "sinks must expose one contiguous F32 per query head",
+...   |
+504 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+498 ~         if let Some(sinks) = inputs.sinks
+499 ~             && (sinks.dtype != DType::F32 || sinks.shape[0] != heads || sinks.strides[0] != 4) {
+500 |                 return Err(Error::Invalid(
+501 |                     "sinks must expose one contiguous F32 per query head",
+502 |                 ));
+503 ~             }
+    |
+
+error: this `if` statement can be collapsed
+    --> crates\quant\src\flash_attention.rs:1050:9
+     |
+1050 | /         if begin == 0 {
+1051 | |             if let Some(sinks) = self.inputs.sinks {
+1052 | |                 let sink = sinks.value([head, 0, 0, 0]);
+1053 | |                 let mut rescale = 1.0;
+...    |
+1068 | |         }
+     | |_________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+1050 ~         if begin == 0
+1051 ~             && let Some(sinks) = self.inputs.sinks {
+1052 |                 let sink = sinks.value([head, 0, 0, 0]);
+ ...
+1066 |                 sum = source_sum(sum, rescale, probability, sum_policy);
+1067 ~             }
+     |
+
+error: could not compile `llama-quant` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-quant` (lib test) due to 2 previous errors

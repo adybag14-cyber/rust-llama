@@ -1,0 +1,69 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "reference": "Actual original FLASH_ATTN_EXT graph with use_ref=false; forced-use_ref is separately stored diagnostic, never the expected default output.",
+  "configs": 82,
+  "cases": 246,
+  "output_values": 1053144,
+  "forced_use_ref_different_values": 685652,
+  "worker_different_values": 1595,
+  "q_tile": 64,
+  "kv_tile": 64,
+  "files": {
+    "flash-attn-reference.bin": {
+      "bytes": 110186553,
+      "sha256": "c4064b6cae059fa83929d9e5319f34c75348befde232c5200f20d1f53661baa7"
+    },
+    "forced-use-ref-diagnostic.bin": {
+      "bytes": 4225797,
+      "sha256": "d95b71d5c08ff4c6e97d1308c9f8c2e6f2997113981b0a683273cea899900739"
+    }
+  },
+  "sources": {
+    "f16-context-oracle\\flash-graphs\\capture.py": {
+      "bytes": 11483,
+      "sha256": "8b7e023ba067741191080b6e37b0d30c6e2de7f40a792be6ba9bd06273eba921"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml.c": {
+      "bytes": 267312,
+      "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\common.h": {
+      "bytes": 2742,
+      "sha256": "930571eeed494c868a3b8feee79d6364278f22ac27d2586c9278663c393d5c21"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\simd-gemm.h": {
+      "bytes": 8796,
+      "sha256": "03648e89ad588e6329bf72c6bfafff394d1030bbe04622d27260bb03b2658604"
+    }
+  },
+  "notes": [
+    "Q stays F32 for F16/F32 K CPU dot types. Default query tiling and split KV are separately source-selected numerical paths, not mere cache conversions.",
+    "Frozen MSVC build has no __SSE2__ macro; GNU has __SSE2__. Both lack GGML_SIMD and use scalar simd-gemm fallback; GNU tiled softmax uses its SSE2 exponential prefix.",
+    "Workers 1/2/4 are explicit plan.n_threads. Default expected and forced-use_ref outputs share exact raw input bytes.",
+    "Masks include holes, entire masked KV tiles, fully masked query rows, padded query rows and mask-head/batch broadcasting. Finite inputs and mask -Inf only; exceptional floating-environment behavior is not claimed here.",
+    "Nonzero K/V head view offsets, permuted cache-like layouts and GQA preserve source byte strides.",
+    "Default rounding and gradual underflow are assumed as in prior verified profiles; no altered FP environment is set."
+  ]
+}

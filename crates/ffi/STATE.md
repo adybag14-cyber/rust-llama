@@ -31,13 +31,22 @@ length. Deferred copies execute in queue order using existing destination
 storage. Deferred shifts run after copies. seq_div retains the source's
 old_position - divided_position accumulated shift.
 
-Causal dense Llama supports independent F32/F16 keys and values in NativeContext
-through new_with_cache_types. The existing new constructor and strict Context
-remain F32. This slice requires explicit nonflash execution and one worker;
-AUTO/ENABLED flash, quantized, recurrent/hybrid, SWA and GPU caches remain open. Duplicate
-positions within one submitted batch require batched layer execution and return
-a diagnostic. Shared-token input is supported in unified mode; coupled input in
-separate mode is not implemented.
+Causal dense Llama supports independent F32/F16 keys and values. The existing
+new and new_with_cache_types constructors retain their single-worker nonflash
+semantics. The additive new_with_execution constructor selects explicit native
+flash and worker configuration; the strict Context API is unchanged. The C
+facade resolves AUTO through the frozen CPU support rule and supports untouched
+context defaults on the two measured x64 profiles.
+
+Native microbatches write every current-layer K/V row before attention.
+Repeated nondecreasing positions within a submitted sequence are supported,
+including repeats across internal microbatches. Unified shared-token input is
+implemented. Separate-mode coupled multi-sequence tokens, quantized caches,
+recurrent/hybrid memory, SWA and GPU cache execution remain outside this slice.
+
+Unified memory operations retain IDs 0..255; decode IDs must also be below
+configured n_seq_max. This distinction permits source-compatible memory copies
+without admitting a C batch that the original allocator rejects.
 
 ## State and file formats
 
@@ -49,8 +58,11 @@ separate mode is not implemented.
 | Sequence session file | Magic 0x67677371, version 4, prompt count/IDs, then selected memory without the raw sequence-I/O prefix. |
 
 Integer fields are little-endian on tested x64 platforms. Occupied cells
-serialize in physical order. Keys use native row order; values use the frozen
-transposed dimension/cell order. Type, element size, width and layer headers are
+serialize in physical order. Keys use native row order. Nonflash values use the
+frozen transposed dimension/cell order (v_trans=1); flash values use physical
+row order (v_trans=0). Restore validates that layout against the destination
+execution mode and rejects a cross-layout state before mutation. Type, element
+size, width and layer headers are
 validated before restoration and must match the context's independent key/value
 types. F32 data uses four-byte elements; F16 data uses two-byte elements and raw
 u16 storage. Copies, transposition, deferred tensor copies and serialization
@@ -101,8 +113,14 @@ ordinary regressions cover these side effects.
 Per-cell membership uses a fixed 32-byte bitset, with no allocation per ID.
 Constructor and transaction checks account for cache tensors, cells, staged
 copies, outputs and temporary state buffers under a two-GiB working budget.
-Resident storage is charged using each K/V type's actual element size; gathered
-computation remains charged for F32 values even when resident storage is half.
+Resident storage is charged using each K/V type's actual element size. Native
+decode separately accounts two resident copies, planner/slot metadata, complete
+hidden/query matrices, physical F16 K/V casts, masks, all logical I32 row maps,
+projection/output temporaries and the shared flash kernel's peak worker/scratch
+requirements. Physical holes never reduce those buffer bounds. The independent
+two-MiB regression rejects a configuration whose simultaneous payloads alone
+exceed its limit; removing the row-map charge makes the retained negative
+control fail.
 Restore includes the transaction copy, typed layer copies, descriptors, input
 bytes and temporary transposed V storage. Large vectors reserve fallibly. Pending tensor copies reuse destination
 allocations. CPU-owned snapshots additionally have a one-GiB aggregate storage
@@ -158,7 +176,18 @@ original graph corpus checks the F16-by-F32 KQ/PV matmul layouts: 125 cases and
 Explicitly half-rounding the F32 right operand changes 239,587 native output
 values, so storage type is not used to invent an operand conversion.
 
-The original default parameter structure is unchanged and requests AUTO flash
-attention and four workers. Those settings remain rejected; this slice does
-not claim successful untouched default-context initialization, native flash
-dispatch, recurrent cache parity or full frozen-ABI completion.
+The original default parameter structure is unchanged and requests F16 K/V,
+AUTO flash and four workers. The native microbatch extension now accepts that
+configuration for admitted dense Llama models on the measured x64 profiles.
+It preserves the earlier explicit nonflash cohort and adds independently
+captured enabled-flash state/session expectations for both hosts.
+
+Per flash mode and profile, ordinary tests check all four K/V pairs:
+258,048 continuation logit words and 1,048 exact state/partial-output buffers
+(290,328 bytes), including the original raw state before evaluation. Across
+both modes those totals are 516,096 words and 2,096 buffers (580,656 bytes).
+The external C harness additionally runs the pretrained model with identical
+requests for both modes and all storage pairs. NativeContext rejects nonfinite
+computed outputs while preserving raw payloads during non-arithmetic state
+operations. Recurrent memory, other C execution architectures and full frozen
+ABI completion remain open.

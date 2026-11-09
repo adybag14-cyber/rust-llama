@@ -8,7 +8,9 @@ called at runtime.
 
 This is a formats, loading and streaming-tool slice of T04. It includes the
 native Rust `llama-gguf-split` executable and checked ordered header writing.
-Checkpoint converters and arbitrary-byte metadata compatibility remain open.
+The raw format and split/merge APIs preserve arbitrary-byte strings and native
+C-string lookup behavior. The text model facade retains checked UTF-8 boundaries;
+architecture-specific checkpoint conversion remains separate work.
 
 ## Single files and shard sets
 
@@ -110,12 +112,14 @@ The frozen original C reader rejects the opposite-endian file, so that extension
 is not described as native reader acceptance. Packed matrix endian support
 remains limited to the forms explicitly handled by the inference loader.
 
-The metadata representation currently requires UTF-8 strings and rejects NUL
-keys/names. The current reader also rejects boolean bytes outside 0 and 1,
-while the frozen source normalizes every nonzero byte to true. Arbitrary-byte
-metadata and this boolean-encoding difference remain open in this checkpoint.
-Separate original-only byte-string and exhaustive boolean captures are retained
-for the next reader slice; they are not included in the implemented scope here.
+The shared wire parser now produces `RawGguf<R>`, which preserves every byte of
+metadata keys, scalar/array strings and tensor names. Full serialized names govern
+duplicate validation; native lookup APIs use the first matching C-string prefix.
+Every nonzero boolean byte is true, matching the frozen reader. The ordinary
+`Gguf<R>` facade converts that result to checked text and retains its UTF-8 and
+NUL-key/name restrictions. `GgufSet` and high-level models use that text facade.
+See [raw strings and native lookup](../../docs/GGUF_BYTE_STRINGS.md) for the exact
+reader/writer/tool contracts, independent captures and remaining boundaries.
 
 ## Resource limits
 
@@ -308,8 +312,10 @@ ones and trailing zero dimensions; scalar/array string values pass through
 C-string truncation at NUL. Certain custom-alignment and zero-dimension inputs
 therefore produce the same original-invalid output files. The normal public
 writer uses valid metadata-selected alignment and preserves supplied dimensions
-and string lengths. The inherited parser boundary for NUL keys/names and
-non-UTF-8 metadata remains explicit.
+and string lengths. `write_raw_header` provides the same bounded ordered layout
+for borrowed byte-string keys, values and names. The split/merge implementation
+uses the raw parser and the frozen tool's first-match tensor lookup, metadata
+setter replacement order and C-string truncation rules.
 
 Payload copies use a fallibly allocated buffer of at most 64 KiB, further
 bounded by `max_tensor_read_bytes`. Split plans and validates all headers before
@@ -340,11 +346,13 @@ after preflight. See [the corpus provenance](../../fixtures/gguf-split/README.md
 
 ## Remaining format and conversion work
 
-Local Safetensors/index loading, architecture-specific checkpoint conversion,
-tokenizer/config translation, quantization application policy, PyTorch inputs,
-LoRA and multimodal conversion, remote range loading and remaining metadata
-utilities are still separate full-port requirements. Sharded model execution
-does not close T04 or the overall port.
+Raw GGUF byte strings do not automatically make the high-level text model facade
+accept arbitrary-byte vocabulary metadata. Architecture-specific checkpoint
+conversion, tokenizer/config translation, quantization application policy,
+PyTorch inputs, LoRA and multimodal conversion, remote range loading and remaining
+metadata utilities retain their separately documented implementation status.
+Sharded model execution and the raw reader/writer do not close T04 or the overall
+port.
 
 Implementation follows the supplied llama.cpp/ggml MIT-licensed source. Preserve
 LICENSE-UPSTREAM and NOTICE; fixture provenance identifies inherited model

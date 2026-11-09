@@ -1,0 +1,261 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/quant)
+   Compiling llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/llama-behavior)
+   Compiling llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/gguf)
+   Compiling llama-tokenizer v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/tokenizer)
+   Compiling llama-conformance v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/llama-conformance)
+   Compiling llama-model-runtime v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/model-runtime)
+   Compiling llama-inference v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/inference)
+   Compiling rust-llama-cli v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings/rust-draft-v1/crates/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.26s
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/llama_gguf-8709b8f53f25b664)
+
+running 14 tests
+test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... ok
+test tests::big_endian_metadata_and_scalar_payload ... ok
+test tests::buffered_headers_preserve_short_reads_io_errors_and_payload_seeks ... ok
+test tests::metadata_budget_and_counts_are_enforced ... ok
+test tests::every_truncated_header_and_payload_is_rejected ... ok
+test tests::overlap_is_rejected ... ok
+test tests::roundtrip_preserves_types_and_payload ... ok
+test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... ok
+test tests::writer_rejects_invalid_arrays ... ok
+test writer::tests::all_header_validation_precedes_output_and_enforces_padding_budget ... ok
+test writer::tests::impossible_header_budget_rejects_before_tensor_layout_reservations ... ok
+test writer::tests::ordered_streaming_header_preserves_order_nan_bits_and_custom_alignment ... ok
+test tests::header_read_ahead_never_exceeds_the_remaining_byte_budget ... ok
+test tests::large_metadata_uses_bounded_batched_reads_and_preserves_reader_position ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/raw_native.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/raw_native-99bca8e12dfb9788)
+
+running 2 tests
+Original input raw writer: 0 headers; 0 exact header bytes
+Independent original GGUF reader: 512 cases; 512 accepted; 57344 exact serialized header bytes; all observed C getter values agree
+test original_all_boolean_encodings_scalar_and_array ... ok
+Original input raw writer: 1073 headers; 211424 exact header bytes
+Independent original GGUF reader: 1093 cases; 1080 accepted; 211840 exact serialized header bytes; all observed C getter values agree
+test original_all_byte_values_keys_names_strings_and_aliases ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/raw_tools.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/raw_tools-848ffa8a6c2bf493)
+
+running 2 tests
+Independent original raw GGUF tools: 22 cases; 17 successes; 5 checked errors; 8288 exact successful post-operation file bytes
+test original_reserved_key_aliases_and_tensor_prefix_collisions ... ok
+Independent original raw GGUF tools: 3196 cases; 3176 successes; 20 checked errors; 1438016 exact successful post-operation file bytes
+test original_raw_strings_and_booleans_split_and_merge ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.31s
+
+     Running tests/split_limits.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/split_limits-a5ba9cf2083188bf)
+
+running 5 tests
+test split_cannot_truncate_input_through_a_hard_link ... ok
+test merge_cumulative_limits_and_zero_buffer_preserve_inputs ... ok
+test minimal_streaming_buffer_keeps_payload_bytes ... ok
+test split_checks_retained_handles_after_path_preflight ... ok
+test split_resource_failures_precede_file_mutation ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/llama_inference-ad4dad07b1546a0c)
+
+running 5 tests
+test stream::tests::sink_failure_propagates ... ok
+test stream::tests::invalid_utf8_and_tail_are_replaced_once ... ok
+test stream::tests::utf8_is_preserved_across_every_byte_boundary ... ok
+test stream::tests::stop_spans_tokens_without_leaking_prefix ... ok
+test stream::tests::unmatched_stop_prefix_is_flushed ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/bert_defaults.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/bert_defaults-37f0c1f82abfc463)
+
+running 1 test
+native missing-pooling default: 3 prompts, 11 token embeddings, 3 explicit mean vectors, 56 floats, max_abs=1.192092896e-7
+test missing_pooling_metadata_keeps_original_unpooled_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/bert_reference.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/bert_reference-d44696a9a0b7d12c)
+
+running 2 tests
+test big_endian_bert_preserves_the_same_native_model_outputs ... ignored, requires hash-pinned big-endian BERT model; set LLAMA_TEST_BERT_BE_MODEL and run --release --ignored --nocapture
+test trained_bert_full_sequence_and_all_pooling_modes ... ignored, requires hash-pinned external BERT model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mamba_loader.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/mamba_loader-db2c605ad35b8c01)
+
+running 3 tests
+test cancellation_and_restore_keep_recurrent_state_transactional ... ok
+test required_shapes_unused_tensors_and_weight_budget_are_enforced ... ok
+test missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/native_reference.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/native_reference-77fa1d25e9eaa111)
+
+running 8 tests
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external mamba-130m-hf.f16.gguf; set LLAMA_TEST_MAMBA_MODEL and run --release --ignored --nocapture
+test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external SmolLM2-135M-Q4_K_M.gguf; set LLAMA_TEST_BPE_MODEL and run --release --ignored --nocapture
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories15M-q4_0.gguf; set LLAMA_TEST_Q4_MODEL and run --release --ignored --nocapture
+test trained_stories260k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories260K.gguf; set LLAMA_TEST_MODEL and run --ignored --nocapture
+native tiny-mamba-default conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-mamba-rms conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-no-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-mamba-untied conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+test tiny_mamba_native_default_rms_and_untied_output ... ok
+native tiny-qwen2-fused-partial-k conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native SPM: 68 cases, 312 pieces in both special modes, exact IDs and bytes
+test original_spm_68_unicode_special_and_empty_cases ... ok
+native tiny-qwen2-fused-partial-kv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-partial-q conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-partial-qk conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-partial-qv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-partial-v conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-q4 conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-fused-separate-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-no-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-output-bias conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-k conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-kv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-q conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-qk conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-qv conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate-partial-v conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-separate conformance: cases=3 rows=15 greedy_ids=9 compared_logits=7680 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=7680 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-untied-output-bias conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+native tiny-qwen2-untied-output conformance: cases=3 rows=18 greedy_ids=12 compared_logits=9216 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=9216 (informational; gate uses unchanged declared tolerance)
+test tiny_qwen2_separate_fused_partial_bias_and_output_graphs ... ok
+
+test result: ok. 3 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests/qwen2_loader.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/qwen2_loader-77999b61399403fa)
+
+running 4 tests
+test qwen2_unimplemented_model_modes_are_explicit ... ok
+test source_rope_defaults_factor_precedence_and_single_file_counts_are_preserved ... ok
+test missing_mis_shaped_or_unimplemented_qwen2_tensors_fail_explicitly ... ok
+test qwen2_source_typed_dimensions_and_limits_reject_malformed_files ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/qwen3.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/qwen3-bb5bad8a4024b36d)
+
+running 5 tests
+test official_qwen3_q8_matches_original_native_profile ... ignored, requires pinned official Qwen3-0.6B Q8_0 model via LLAMA_TEST_QWEN3_MODEL and 3 GiB decoded weight budget
+qwen3-native: active vector storage / ignored partial fused biases host=gnu rows=30 floats=15360 bitwise_equal=15360 greedy_ids=10 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0
+test original_active_vector_storage_and_ignored_fused_bias_types ... ok
+test native_qwen3_weight_and_context_boundaries_are_checked_before_execution ... ok
+test qwen3_typed_metadata_and_unsupported_arrays_are_explicit ... ok
+qwen3-native: 39 supported / 8 unsupported / 3 invalid / 1 nonfinite host=gnu rows=546 floats=279552 bitwise_equal=279552 greedy_ids=390 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0
+test original_dense_qwen3_heads_norms_biases_storage_and_shards ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 7.95s
+
+     Running tests/shards.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/shards-1a37d28bfae31700)
+
+running 8 tests
+test automatic_discovery_preserves_unicode_file_paths ... ok
+test reads_keep_the_validated_file_handles_after_path_replacement ... ok
+test model_weight_budget_counts_all_shards_before_decoding ... ok
+test automatic_discovery_preserves_non_utf8_unix_file_paths ... ok
+test cumulative_limits_include_every_shard_and_reads_remain_lazy ... ok
+shard-native-format: valid_files=182 compared_payload_bytes=1189704
+shard-native-index: cases=90 accepted=65 rejected=25 compared_tensors=1837
+test original_reader_headers_shapes_offsets_and_payloads ... ok
+test original_model_shard_admission_primary_metadata_and_file_origins ... ok
+shard-native-models: host=gnu configurations=90 executed=64 logits_and_embeddings=464272 greedy_ids=590 bitwise_equal=464272 maximum_absolute=0.000000000e0 maximum_budget_fraction=0.000000000e0
+test all_four_architectures_execute_original_sharded_native_corpora ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/llama_tokenizer-fbcc8c918ce0a6b7)
+
+running 9 tests
+test tests::pieces_preserve_partial_utf8_and_reject_invalid_ids ... ok
+test tests::bos_detokenize_follows_reference_space_policy ... ok
+test tests::score_and_left_tie_break_match_spm ... ok
+test tests::special_flags_are_independent ... ok
+test tests::unknown_unicode_uses_exact_utf8_bytes ... ok
+test vocab_order::tests::native_reserve_hash_and_iteration_order ... ok
+test unicode_regex::native_reference::exhaustive_source_platform_wide_regex_classes ... ok
+Unigram: 4,067,668 exact native normalization outputs, including every codepoint, every XCDA prefix, all one/two-byte strings and NFC/NFD sequence cases
+test ugm_reference::all_codepoints_xcda_keys_raw_prefixes_and_nfc_match_original_unigram ... ok
+native regex: 126,896 exact splits; 40 pipelines, 48 expressions, 1,442 focused/random inputs
+test unicode_regex::native_reference::all_frozen_regex_pipelines_and_expressions_match_native_platform ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.37s
+
+     Running tests/bpe_reference.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/bpe_reference-6ca20a3571732c96)
+
+running 7 tests
+test every_original_bpe_vocabulary_and_merge_corpus ... ignored, requires LLAMA_TEST_BPE_VOCAB_DIR containing the original frozen source models directory
+test original_gpt2_merges_across_all_99_metadata_aliases ... ignored, full 99-profile original GPT-2 merge corpus; run explicitly for tokenizer changes
+test unsupported_profiles_and_source_rejected_settings_fail_explicitly ... ok
+native EOT/FIM inference: all 51 candidate spellings, 10 variants, 5680 attribute/piece/EOG records, metadata sentinel and deprecated-key precedence
+test ambiguous_special_inference_and_metadata_override_precedence ... ok
+frozen GPT-2: all 50,257 vocabulary records, 364 exact token/piece/detokenize cases
+test complete_original_gpt2_vocabulary_and_real_merge_corpus ... ok
+raw-byte input: 22,518 native cases, including all 256 bytes, malformed/surrogate UTF-8, special fragments and 40-byte DRY cut points
+test malformed_utf8_and_byte_truncation_match_all_tokenizer_families ... ok
+BPE: 64 profiles / 99 metadata aliases plus 12 configuration/session variants; 23,754 native cases and 18,381 exact vocabulary records
+test all_64_profiles_99_aliases_and_source_session_options ... ok
+
+test result: ok. 5 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 4.09s
+
+     Running tests/families_reference.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/families_reference-24c5bab68cae9f95)
+
+running 3 tests
+test all_original_unigram_and_remaining_spm_vocabularies ... ignored, requires LLAMA_TEST_TOKENIZER_VOCAB_DIR (or LLAMA_TEST_BPE_VOCAB_DIR) containing the frozen source models directory
+176 independent metadata cases: 70 native loads, 103 native errors, 2 native assertions and 1 native non-progress loop; all Rust failure paths are checked
+test typed_metadata_sentinels_and_native_failure_cases_are_bounded ... ok
+remaining families: 91,476 native token/piece/detokenization cases and 3,507 vocabulary records
+test unigram_rwkv_plamo_and_test_match_frozen_native_sessions ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 3.65s
+
+     Running tests/native_reference.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/native_reference-c5f0b20a661d35e5)
+
+running 6 tests
+frozen UTF-8: 65,809 cases, every one/two-byte input plus boundary, surrogate and malformed sequences
+test native_utf8_malformed_and_valid_sequences_preserve_offsets ... ok
+frozen Unicode: 15,957 normalization sequences and all 256 byte mappings/lead lengths
+test complete_native_normalization_pairs_hangul_and_combining_order ... ok
+native special metadata: 72 SPM/WPM cases; all special ID UINT32_MAX and vocabulary-boundary overrides retain original defaults
+test original_special_metadata_sentinels_retain_defaults ... ok
+frozen UTF-8: all 1,114,112 codepoints, including source surrogate encodings
+test every_codepoint_utf8_encoding_matches_native_chunk_hashes ... ok
+native WordPiece: 1728 cases / nine variants; 30522 complete vocabulary entries; 25936 case tokens with both piece modes and four detokenization modes
+test original_bert_vocabulary_and_all_wordpiece_variants ... ok
+frozen Unicode: all 1,114,112 codepoints, flags/case/NFD/Han and single-codepoint NFC; four out-of-range inputs
+test exhaustive_frozen_properties_case_nfd_and_single_nfc ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.48s
+
+     Running unittests src/gguf_split.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/llama_gguf_split-88c58022dc8770a1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/rust_llama-6f46f4e152f84c3a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gguf_split_native.rs (/home/tdamre/.cache/rust-llama-gguf-byte-strings-v1/debug/deps/gguf_split_native-6a7d52b8a49da63e)
+
+running 2 tests
+test failed_delete_merge_preserves_every_original_split ... ok
+gguf-split-native: cases=103 success=63 checked_errors=40 exact_after_file_bytes=12179168
+test frozen_original_split_merge_cli_cases ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.61s
+

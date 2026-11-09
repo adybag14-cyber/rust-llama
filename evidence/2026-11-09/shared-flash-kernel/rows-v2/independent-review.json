@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "reviewer": "/root/audit_core_progress",
+  "scope": "Independent read-only safety, storage bounds, work/byte preflight and actual scoped-worker ownership review; no source edits.",
+  "initial_row_revision": "6eba4741cc81da3c57d378696a12a54e21824f2bb2d45b5257a70cf1e7663031",
+  "row_map_module": "8d773deb4502d4a1521b3b5d5c3d355724e4a63e513531be9b4ac8a98d545d3f",
+  "findings": [
+    "KvRows prechecks offset/alignment, signed extents and checked contiguous byte end; its private len/value arithmetic follows those invariants.",
+    "Complete-map work is charged even for Selection::Row, then positive indices are checked against both physical extents after byte/work limits and before output/worker allocation.",
+    "Kernel accesses use the validated physical index and batch0; negative rows preserve one-chunk skip versus tiled row0. Dense entry-point behavior remains separately covered.",
+    "No new concrete bounds or ownership blocker identified in the row-map revision."
+  ],
+  "pv_review": {
+    "sha256": "19abf092c97b5040e23ec80444d18f77bdcd59c3e52cbd10ed159826115ec2a6",
+    "conclusion": "The only executable delta replaces offset==0 with offset.is_multiple_of(16) in the MSVC tiled PV selector. All row storage/index checks, budgets, view lifetimes, dispatch and worker ownership paths remain unchanged. Bounds review approval carries forward."
+  },
+  "qk_review": {
+    "sha256": "f58cc7552796ee1094dbe35278a7ee0988bded8327bae8c9df35b4350ae45ec7",
+    "conclusion": "The only executable delta adds source_prefix=dk/4*4 and MSVC product-first addition at channel multiples of4 strictly below that prefix in the tiled QK loop. Scalar/forced score, row validation, indexing, budgets and worker ownership are unchanged. Bounds review approval carries forward."
+  }
+}

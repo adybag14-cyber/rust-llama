@@ -1,0 +1,15 @@
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\rust-draft-v1\crates\gguf)
+    Checking llama-conformance v0.1.0 (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\rust-draft-v1\crates\llama-conformance)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\gguf-byte-strings\rust-draft-v1\crates\tokenizer)
+error: using `chunks_exact` with a constant chunk size
+ --> crates\gguf\tests\raw_native.rs:8:10
+  |
+8 |         .chunks_exact(2)
+  |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+  = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `llama-gguf` (test "raw_native") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

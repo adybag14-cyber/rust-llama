@@ -1,0 +1,247 @@
+//! Independent frozen original C getters and serialization, captured before this port.
+use llama_gguf::{Limits, RawGguf, RawValue};
+use std::io::Cursor;
+
+fn hex(text: &str) -> Vec<u8> {
+    assert_eq!(text.len() % 2, 0);
+    text.as_bytes()
+        .chunks_exact(2)
+        .map(|pair| {
+            let byte = |n: u8| match n {
+                b'0'..=b'9' => n - b'0',
+                b'a'..=b'f' => n - b'a' + 10,
+                _ => panic!("invalid fixture hex"),
+            };
+            byte(pair[0]) * 16 + byte(pair[1])
+        })
+        .collect()
+}
+fn prefix(bytes: &[u8]) -> &[u8] {
+    &bytes[..bytes.iter().position(|&v| v == 0).unwrap_or(bytes.len())]
+}
+fn numeric(value: &RawValue) -> Vec<u8> {
+    match value {
+        RawValue::U8(v) => vec![*v],
+        RawValue::I8(v) => vec![*v as u8],
+        RawValue::U16(v) => v.to_le_bytes().to_vec(),
+        RawValue::I16(v) => v.to_le_bytes().to_vec(),
+        RawValue::U32(v) => v.to_le_bytes().to_vec(),
+        RawValue::I32(v) => v.to_le_bytes().to_vec(),
+        RawValue::F32(v) => v.to_bits().to_le_bytes().to_vec(),
+        RawValue::Bool(v) => vec![u8::from(*v)],
+        RawValue::U64(v) => v.to_le_bytes().to_vec(),
+        RawValue::I64(v) => v.to_le_bytes().to_vec(),
+        RawValue::F64(v) => v.to_bits().to_le_bytes().to_vec(),
+        RawValue::Array { values, .. } => values.iter().flat_map(numeric).collect(),
+        RawValue::String(_) => panic!("numeric getter used on string"),
+    }
+}
+fn number(text: &str) -> usize {
+    text.parse().unwrap()
+}
+
+fn corpus(rows: &str, data: &[u8], expected_cases: usize, expected_success: usize) {
+    let mut current = None;
+    let mut name = "";
+    let mut metadata_seen = 0;
+    let mut tensors_seen = 0;
+    let mut cases = 0;
+    let mut accepted = 0;
+    let mut serialized_bytes = 0;
+    for row in rows.lines().filter(|row| !row.starts_with('#')) {
+        let columns: Vec<_> = row.split('\t').collect();
+        match columns[0] {
+            "C" => {
+                assert!(current.is_none());
+                name = columns[1];
+                let start = number(columns[3]);
+                let bytes = number(columns[4]);
+                let parsed = RawGguf::read_header(
+                    Cursor::new(&data[start..start + bytes]),
+                    Limits::default(),
+                );
+                assert_eq!(
+                    parsed.is_ok(),
+                    columns[2] == "1",
+                    "{name}: native parser admission: {}",
+                    parsed
+                        .as_ref()
+                        .err()
+                        .map_or(String::new(), ToString::to_string)
+                );
+                cases += 1;
+                metadata_seen = 0;
+                tensors_seen = 0;
+                if let Ok(raw) = parsed {
+                    accepted += 1;
+                    assert_eq!(raw.version as usize, number(columns[7]), "{name}: version");
+                    assert_eq!(
+                        raw.alignment as usize,
+                        number(columns[8]),
+                        "{name}: alignment"
+                    );
+                    assert_eq!(
+                        raw.data_offset as usize,
+                        number(columns[9]),
+                        "{name}: data offset"
+                    );
+                    let offset = number(columns[5]);
+                    let bytes = number(columns[6]);
+                    let mut output = Vec::new();
+                    let layout = raw
+                        .write_native_header(&mut output)
+                        .unwrap_or_else(|error| panic!("{name}: native serialization: {error}"));
+                    assert_eq!(
+                        output,
+                        data[offset..offset + bytes],
+                        "{name}: exact frozen gguf_get_meta_data bytes"
+                    );
+                    assert_eq!(
+                        layout.data_offset as usize, bytes,
+                        "{name}: encoded header length"
+                    );
+                    serialized_bytes += bytes;
+                    current = Some(raw);
+                }
+            }
+            "M" => {
+                let raw = current.as_ref().expect("metadata row after failed parse");
+                let index = number(columns[1]);
+                assert_eq!(index, metadata_seen);
+                let keys: Vec<_> = raw.metadata_order().collect();
+                let key = keys[index];
+                assert_eq!(
+                    prefix(key),
+                    hex(columns[2]),
+                    "{name}: native key getter {index}"
+                );
+                let value = &raw.metadata[key];
+                assert_eq!(
+                    value.type_id() as usize,
+                    number(columns[3]),
+                    "{name}: metadata type {index}"
+                );
+                let native = raw
+                    .metadata_native(&hex(columns[2]))
+                    .expect("native key lookup");
+                assert!(
+                    std::ptr::eq(native, &raw.metadata[keys[number(columns[4])]]),
+                    "{name}: first native key lookup {index}"
+                );
+                match columns[5] {
+                    "n" => assert_eq!(
+                        numeric(value),
+                        hex(columns[6]),
+                        "{name}: scalar getter bits {index}"
+                    ),
+                    "s" => assert_eq!(
+                        value.as_c_string().unwrap(),
+                        hex(columns[6]),
+                        "{name}: scalar string getter {index}"
+                    ),
+                    "a" => {
+                        let RawValue::Array {
+                            element_type,
+                            values,
+                        } = value
+                        else {
+                            panic!("{name}: expected array")
+                        };
+                        assert_eq!(*element_type as usize, number(columns[6]));
+                        assert_eq!(values.len(), number(columns[7]));
+                        if *element_type == 8 {
+                            let expected: Vec<_> = if values.is_empty() {
+                                vec![]
+                            } else {
+                                columns[8].split(',').map(hex).collect()
+                            };
+                            let actual: Vec<_> =
+                                values.iter().map(|v| v.as_c_string().unwrap()).collect();
+                            assert_eq!(actual, expected, "{name}: array string getters {index}");
+                        } else {
+                            assert_eq!(
+                                numeric(value),
+                                hex(columns[8]),
+                                "{name}: array raw getter bits {index}"
+                            );
+                        }
+                    }
+                    _ => panic!("unknown getter fixture"),
+                }
+                metadata_seen += 1;
+            }
+            "T" => {
+                let raw = current.as_ref().expect("tensor row after failed parse");
+                let index = number(columns[1]);
+                assert_eq!(index, tensors_seen);
+                let tensor = &raw.tensors[index];
+                let native_name = hex(columns[2]);
+                assert_eq!(
+                    tensor.native_name(),
+                    native_name,
+                    "{name}: native tensor name {index}"
+                );
+                assert_eq!(
+                    raw.find_tensor(&native_name),
+                    Some(number(columns[3])),
+                    "{name}: first native tensor lookup {index}"
+                );
+                let mut dimensions = [1; 4];
+                dimensions[..tensor.dimensions.len()].copy_from_slice(&tensor.dimensions);
+                let expected: Vec<u64> =
+                    columns[4].split(',').map(|v| v.parse().unwrap()).collect();
+                assert_eq!(
+                    dimensions.as_slice(),
+                    expected,
+                    "{name}: tensor dimensions {index}"
+                );
+                assert_eq!(tensor.dtype.id() as usize, number(columns[5]));
+                assert_eq!(tensor.offset as usize, number(columns[6]));
+                assert_eq!(tensor.byte_len as usize, number(columns[7]));
+                tensors_seen += 1;
+            }
+            "E" => {
+                if let Some(raw) = current.take() {
+                    assert_eq!(
+                        raw.metadata.len(),
+                        metadata_seen,
+                        "{name}: complete metadata observations"
+                    );
+                    assert_eq!(
+                        raw.tensors.len(),
+                        tensors_seen,
+                        "{name}: complete tensor observations"
+                    );
+                } else {
+                    assert_eq!((metadata_seen, tensors_seen), (0, 0));
+                }
+            }
+            _ => panic!("unknown fixture row"),
+        }
+    }
+    assert!(current.is_none());
+    assert_eq!(cases, expected_cases);
+    assert_eq!(accepted, expected_success);
+    println!(
+        "Independent original GGUF reader: {cases} cases; {accepted} accepted; {serialized_bytes} exact serialized header bytes; all observed C getter values agree"
+    );
+}
+
+#[test]
+fn original_all_byte_values_keys_names_strings_and_aliases() {
+    corpus(
+        include_str!("../../../fixtures/gguf-bytes/reader-reference.tsv"),
+        include_bytes!("../../../fixtures/gguf-bytes/reader-data.bin"),
+        1093,
+        1080,
+    );
+}
+#[test]
+fn original_all_boolean_encodings_scalar_and_array() {
+    corpus(
+        include_str!("../../../fixtures/gguf-bytes/booleans-reference.tsv"),
+        include_bytes!("../../../fixtures/gguf-bytes/booleans-data.bin"),
+        512,
+        512,
+    );
+}

@@ -1,0 +1,477 @@
+{
+  "status": "failed",
+  "platform": "windows",
+  "started_utc": "2026-11-09T21:08:12.325455+00:00",
+  "base_commit": "40a4ee7deb59e5823dd6d242231592d0c9923168",
+  "qualification": "Coherent native CPU flash context/shared tensor-kernel integration, raw/indexed Safetensors foundation and raw GGUF byte-string tools over published Qwen3/F16 and GGUF streaming. Full-port release remains open; native C context architecture and execution limits remain explicit.",
+  "fingerprint_scope": "Every file outside the three explicit historical evidence roots and recognized root Git/Cargo caches, including prose, licenses, release/ledger policies, declarations and every fixture extension. Canonical path/raw-byte SHA ordering is identical on both hosts; previous subset guards remain historical.",
+  "execution_inputs_before": {
+    "files": 952,
+    "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+  },
+  "external_driver_identities": {
+    "integration_common.py": {
+      "bytes": 2605,
+      "sha256": "9fcff8b698f6c5d69c792bdc1314975f91b324636136517cc6ffd87e667227b2"
+    },
+    "validate_full_v2.py": {
+      "bytes": 7408,
+      "sha256": "39962e80a85f5e3ea522195710e2b9a2ad6da1aa89ff52b738464f9a6680e6d9"
+    },
+    "verify-embedding-cli.py": {
+      "bytes": 5511,
+      "sha256": "50f3b38ac9e3cf772429c3f314e532ab3d6329aea86db70e06c138454e96d390"
+    },
+    "verify-decoder-cli.py": {
+      "bytes": 2625,
+      "sha256": "703c5095e08f1abae545cb1573c847d83942bf2d1ba8009033145c127bf6cbf5"
+    },
+    "verify-qwen2-http.py": {
+      "bytes": 6434,
+      "sha256": "fc708a80a1f108b56fa27af11e65feb1b032ef7e7542ff16a535f80d3abaf0af"
+    },
+    "verify-qwen3-http.py": {
+      "bytes": 6423,
+      "sha256": "dba9587a8494b6a65da248ae888b9774721be6467bcf4f4ac7beebe92ecb6cee"
+    },
+    "verify-sharded-apps-v2.py": {
+      "bytes": 8116,
+      "sha256": "8eb8c87658a5c8f241d6aedd5ed1301a805242eea80e8b8cdb45aa0c1df4b094"
+    },
+    "verify_rows_microbatch.py": {
+      "bytes": 8029,
+      "sha256": "6ae1d4ef317d65d70a9a61feacafc77b0f06bc3f559fa1b3466fa56bd4ce8f1f"
+    },
+    "verify_state_profiles.py": {
+      "bytes": 4652,
+      "sha256": "5e366ba3c389bfe6425081cd032cfdb4852e0b67075bb467d217b5046361aa44"
+    },
+    "verify_exports_v1.py": {
+      "bytes": 2917,
+      "sha256": "b49b1e33e8f16fb23487d728ce6d249b89ff66fe02de4b4e8861f354ca6689da"
+    },
+    "release_contract.py": {
+      "bytes": 1120,
+      "sha256": "5a151c2ada7e5e153a62c569a902145df76fa360215aba7e409cb1136ec68043"
+    },
+    "release-expected.json": {
+      "bytes": 5091,
+      "sha256": "460fe4ded9a6c035c4f37b1feba377839d0a861b5ceb2abe91f0c0fccafd05f6"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0480532000001404,
+      "log_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 266.22001810000074,
+      "log_identity": {
+        "bytes": 67282,
+        "sha256": "f4be8e2edad8755560c0a4cf6c18b0640d543aa358e74aebb71aa44e4cb08626"
+      },
+      "tests": {
+        "passed": 515,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 96
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 536.5498088000022,
+      "log_identity": {
+        "bytes": 69940,
+        "sha256": "4015965b65a60d7beda452ca2184094f8e26221acfa9843c2fbb20e93fb8446d"
+      },
+      "tests": {
+        "passed": 515,
+        "failed": 0,
+        "ignored": 19,
+        "suites": 96
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 9.860339899998507,
+      "log_identity": {
+        "bytes": 2663,
+        "sha256": "d402aa2c4430ba24e858a1d7cc578c6ab6e9593e1e287e7626c3e1eae10958e1"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 32.41860219999944,
+      "log_identity": {
+        "bytes": 40235,
+        "sha256": "1ad4e4ccf3eed0483053ad6912e816798f56bc8e72cacb7961f745d55baef32f"
+      }
+    },
+    {
+      "name": "math-provider",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "hash",
+        "C:\\Windows\\System32\\ucrtbase.dll"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.1759161000009044,
+      "log_identity": {
+        "bytes": 335,
+        "sha256": "a7f56b3256e039dfb77d54c83361853c149299a5fe9e79feac2ae656b65459cf"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 32.709616600004665,
+      "log_identity": {
+        "bytes": 387,
+        "sha256": "9fe9a44967e82aa1b6467d855b163a472e9607dcfd8a5ee755b52dd34d729037"
+      }
+    },
+    {
+      "name": "build-debug-ffi",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.8537404999951832,
+      "log_identity": {
+        "bytes": 190,
+        "sha256": "c03bf6343902fafd4ed0d6ee96df58646cff2637d9ed172467d35587de80b990"
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 45.38769599999796,
+      "log_identity": {
+        "bytes": 1570,
+        "sha256": "fe669125c51f9dcb09ed4610e8b3559ba0c82647633b2ec9a796a754f045cba3"
+      }
+    },
+    {
+      "name": "native-context-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_rows_microbatch.py",
+        "debug",
+        "full-v2",
+        "native"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 31.830053800003952,
+      "log_identity": {
+        "bytes": 40224,
+        "sha256": "320f1278797021b2824b6b6b3f13d0d5d71b00b08e77033540af1d8f1ea68322"
+      }
+    },
+    {
+      "name": "native-state-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_state_profiles.py",
+        "debug",
+        "full-v2"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 48.63481250000041,
+      "log_identity": {
+        "bytes": 2313,
+        "sha256": "3d4a0ecf85f8dcea6fbf2221314814c300c1d40007a3e9ef92f367ad711419d9"
+      }
+    },
+    {
+      "name": "native-context-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_rows_microbatch.py",
+        "release",
+        "full-v2",
+        "native"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 8.842994100006763,
+      "log_identity": {
+        "bytes": 40226,
+        "sha256": "4a8c33ab3ccde9ccbc87bcf2ec82f110eac37dd997e40d23f8fb9cb9b878c494"
+      }
+    },
+    {
+      "name": "native-state-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_state_profiles.py",
+        "release",
+        "full-v2"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 12.7387652000034,
+      "log_identity": {
+        "bytes": 2315,
+        "sha256": "ea5b22cf1eea79f1798e7c59054e89b07909b15bc0dc229037b3ae369bee75d3"
+      }
+    },
+    {
+      "name": "embedding-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-embedding-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.435011299996404,
+      "log_identity": {
+        "bytes": 83,
+        "sha256": "a55b819ce2ceb36ba0b3b09e23b76714d605678905e167b8eda0f8768783a93d"
+      }
+    },
+    {
+      "name": "decoder-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-decoder-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 51.23060280000209,
+      "log_identity": {
+        "bytes": 9429,
+        "sha256": "4294c911dbe92b86ad7fe53eadf96fc582469232b5000baca85617b1dd38ede0"
+      }
+    },
+    {
+      "name": "qwen2-http",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen2-http.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 31.80799300000217,
+      "log_identity": {
+        "bytes": 141,
+        "sha256": "9d632d2e6897348840426f30955bb89543565ed24bd8456a5e61149ce037cef6"
+      }
+    },
+    {
+      "name": "qwen3-http",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen3-http.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 13.191936800001713,
+      "log_identity": {
+        "bytes": 141,
+        "sha256": "9d632d2e6897348840426f30955bb89543565ed24bd8456a5e61149ce037cef6"
+      }
+    },
+    {
+      "name": "sharded-applications",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-sharded-apps-v2.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.49972239999624435,
+      "log_identity": {
+        "bytes": 78,
+        "sha256": "9f2b1a0fe39d7d52716889f71038069815e057f39e0cc18775809b68ab69cde1"
+      }
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 153.3140679000062,
+      "log_identity": {
+        "bytes": 6083,
+        "sha256": "d8adde3087b0d431b6c3bc2febf206afac104a711806c823be1936d7ef46ddd1"
+      },
+      "tests": {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 13
+      }
+    },
+    {
+      "name": "generation-http",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-server",
+        "--example",
+        "verify_model_server",
+        "--",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 10.119654000001901,
+      "log_identity": {
+        "bytes": 670,
+        "sha256": "94143efd358ac95cad88a6e698a8435f5600155b472ad97bb38a421aa62b1bb9"
+      }
+    },
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 11.846970300000976,
+      "log_identity": {
+        "bytes": 315,
+        "sha256": "8122b17cb2f1f1e53ac1955b733a2383a602afd325a53008400c1251612d66fb"
+      }
+    }
+  ],
+  "active_step": "release-gate",
+  "error": "AssertionError('unrelated release failure')",
+  "execution_inputs_at_failure": {
+    "files": 952,
+    "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+  }
+}

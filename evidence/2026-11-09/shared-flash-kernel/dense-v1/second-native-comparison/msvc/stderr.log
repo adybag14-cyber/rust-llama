@@ -1,0 +1,52 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\f16-context-oracle\flash-kernel\rust-draft\crates\quant)
+    Finished `release` profile [optimized] target(s) in 6.16s
+     Running tests\flash_attention.rs (target\release\deps\flash_attention-fa0d5114b1f7c4e4.exe)
+
+thread 'original_default_and_reference_flash_graphs_match_with_real_workers' (25140) panicked at crates\quant\tests\flash_attention.rs:76:5:
+assertion `left == right` failed: exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers1 force=false: 12 differing (0 finite), first Some((00000000, ffc4e000, 7fc2a000))
+exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers3 force=false: 9 differing (0 finite), first Some((00000004, 7fc2a000, ffc4e000))
+exceptional flash_exception_006_mask_nan_type0_q1_kv513_workers7 force=false: 9 differing (0 finite), first Some((00000004, 7fc2a000, ffc4e000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers1 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, 7fc2a000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers3 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, 7fc2a000))
+exceptional flash_exception_053_k_nan_type1_q1_kv513_workers7 force=false: 12 differing (0 finite), first Some((00000000, 7fc00000, 7fc2a000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers1 force=false: 12 differing (0 finite), first Some((00000000, ffc00000, 7fc2a000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers3 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, ffc4e000))
+exceptional flash_exception_054_mask_nan_type1_q1_kv513_workers7 force=false: 21 differing (0 finite), first Some((00000000, ffc00000, ffc4e000))
+  left: 9
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions' (16932) panicked at crates\quant\tests\flash_attention.rs:113:5:
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,0,0): 4 changed; Some((00000000, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,2,0): 4 changed; Some((00000000, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers1 (0,1,0): 4 changed; Some((00000000, ffc4e000, 7fc2a000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,0,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,2,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers3 (0,1,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,0,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,2,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_006_mask_nan_type0_q1_kv513_workers7 (0,1,0): 3 changed; Some((00000004, 7fc2a000, ffc4e000))
+flash_exception_053_k_nan_type1_q1_kv513_workers1 (0,0,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers1 (0,2,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers1 (0,1,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers3 (0,0,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers3 (0,2,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers3 (0,1,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers7 (0,0,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers7 (0,2,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_053_k_nan_type1_q1_kv513_workers7 (0,1,0): 4 changed; Some((00000000, 7fc00000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,0,0): 4 changed; Some((00000000, ffc00000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,2,0): 4 changed; Some((00000000, ffc00000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers1 (0,1,0): 4 changed; Some((00000000, ffc00000, 7fc2a000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,0,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,2,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers3 (0,1,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,0,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,2,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+flash_exception_054_mask_nan_type1_q1_kv513_workers7 (0,1,0): 7 changed; Some((00000000, ffc00000, ffc4e000))
+
+thread 'typed_f32_and_raw_half_views_match_original_graph_words' (41420) panicked at crates\quant\tests\flash_attention.rs:178:9:
+assertion `left == right` failed: flash_exception_053_k_nan_type1_q1_kv513_workers7
+  left: 12
+ right: 0
+error: test failed, to rerun pass `-p llama-quant --test flash_attention`

@@ -2,7 +2,7 @@
 
 This crate builds a cdylib, staticlib and rlib. The Windows DLL is
 `target/release/llama_ffi.dll`; the import library is `llama_ffi.dll.lib`.
-It executes the Rust GGUF loader, all nine frozen vocabulary family identifiers, CPU samplers and scalar decoder from this
+It executes the Rust GGUF loader, all nine frozen vocabulary family identifiers, CPU samplers and the dense CPU decoder from this
 workspace. No original llama/ggml library is linked or loaded by the product.
 
 **This is an operational subset, not full llama.cpp ABI compatibility.**
@@ -52,9 +52,9 @@ Missing siblings, malformed headers, duplicate tensor names, invalid indices or
 payload extents fail with a diagnostic. The explicit C split-list and filename
 buffer APIs remain unexported.
 
-Start with the frozen default parameter functions, then select CPU loading,
-explicit F32 or F16 KV caches and causal decoding. For example, a client using the frozen C
-header can set:
+Start with the frozen parameter functions and select CPU model loading. On the
+qualified Windows x64/MSVC and Linux x64/GNU CPU profiles, an admitted dense
+Llama model now accepts the untouched context defaults:
 
 ```c
 struct llama_model_params mp = llama_model_default_params();
@@ -63,59 +63,66 @@ mp.load_mode = LLAMA_LOAD_MODE_NONE;
 mp.lazy_mode = LLAMA_LAZY_MODE_OFF;
 
 struct llama_context_params cp = llama_context_default_params();
-cp.n_ctx = 512;
-cp.type_k = GGML_TYPE_F16;
-cp.type_v = GGML_TYPE_F16;
-cp.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;
-cp.n_threads = 1;
-cp.n_threads_batch = 1;
-cp.offload_kqv = false;
-cp.op_offload = false;
+/* F16 K/V, AUTO flash, four generation/batch workers, separate cache. */
 ```
 
-The default structure itself remains source-faithful: it returns F16 cache
-types, AUTO flash attention and four workers. Untouched default-context creation
-is not supported. This slice accepts independent F32/F16 keys and values only
-with flash attention explicitly DISABLED and thread counts 1/1; AUTO and ENABLED
-return a diagnostic. This also corrects the former manually selected F32/AUTO
-path, which silently executed nonflash attention. Model default
-`n_gpu_layers = -1` resolves to CPU because this C ABI registers no GPU backend.
-Positive GPU-layer requests fail.
+| Context selection | Accepted execution |
+|---|---|
+| Untouched context defaults | Source CPU AUTO resolution enables flash; the configured four workers execute. |
+| AUTO or ENABLED flash, independent F32/F16 K/V | Source one-chunk, tiled or split-KV dispatch, with unified row maps where selected by the source. Worker counts are independently configurable in 1..=256. |
+| DISABLED flash, independent F32/F16 K/V | Source nonflash attention with worker counts 1/1. |
+| Other cache types, nonflash multiple workers, unqualified flash target | Checked error; no silent conversion or fallback. |
 
-The executor runs one worker. Context creation requires thread counts 1/1,
-and the thread query functions report that actual value.
-`llama_set_n_threads` accepts 1/1; unsupported changes leave state unchanged
-and set the diagnostic.
+Model default n_gpu_layers=-1 resolves to CPU because this C ABI registers no
+GPU backend. Positive GPU-layer requests fail. Automatic CPU attention dispatch
+is backed by the frozen device-support probe and separate native AUTO, ENABLED
+and DISABLED captures; a caller's ENABLED request never silently runs nonflash.
 
-The compatibility executor supports separate and unified physical F32/F16 KV
-buffers. Half storage retains raw u16 payloads through copies, state and session
-I/O, including nonfinite bit patterns; numerical K/V writes perform the source
-F16 rounding. Nonflash query and probability operands remain F32. Context padding, per-stream capacity, metadata holes, sequence sharing,
-queued cross-stream copies and signed position transforms follow the measured
-frozen cache behavior. Separate mode has the configured sequence streams;
-unified mode accepts the frozen 256-ID range, with per-token membership bounded
-by n_seq_max. Both modes pad cache capacity to the source's 256-cell boundary.
-Batch limits are bounded to 65,536 tokens. A zero n_ctx resolves to the model
-training context. STATE.md documents precise memory and serialization behavior.
+The shared safe flash kernel executes actual scoped OS workers. A one-worker
+configuration executes on the caller; a larger configuration starts the stated
+number of worker threads and joins them before returning. Thread query and
+setter functions reflect the actual configuration. The microbatch's token count
+selects generation versus batch workers. Unsupported changes fail atomically.
+This reproduces the captured worker arithmetic and dispatch, without claiming
+the original persistent threadpool topology or equivalent throughput.
 
-A newly empty sequence may begin at any nonnegative position. Existing sequences
-resume after their stored maximum; positions within a batch must advance
-consecutively. Null positions compute the next position for each sequence.
-Null sequence arrays mean sequence 0. Both sequence arrays must otherwise be
-provided. Token and embedding inputs are mutually exclusive. Duplicate positions
-inside one batch and coupled multi-sequence token input in separate-buffer mode
-are explicitly unsupported; unified shared-token input is implemented.
+Separate and unified caches retain independent F32/F16 key/value storage.
+Half storage preserves raw u16 payloads through copies and state/session I/O,
+including nonfinite payloads. Numerical writes perform the source F16 rounding.
+Nonflash query/probability operands remain F32; the source flash graph casts
+physical K/V to F16 even when their resident storage is F32. Complete current-layer
+K/V writes precede attention for every native microbatch.
 
-Logit and embedding rows follow the requested batch flags. Positive
-`llama_get_logits_ith` and `llama_get_embeddings_ith` indices refer to original
-batch token positions; negative indices count backward through output rows.
+Cache capacity follows the source 256-cell padding. Physical holes, sequence
+sharing, queued copies and signed position transforms remain observable.
+Unified memory APIs retain their measured 256-ID domain; submitted decode IDs
+must additionally be below configured n_seq_max. Invalid IDs preserve both
+previous output buffers and serialized state. n_seq_max must fit the default
+output-row ceiling, min(n_batch, resolved n_ctx); source-asserting configurations
+return a checked initialization error. Batch size remains bounded to 65,536.
+A zero n_ctx resolves to the model's training context.
+
+Newly empty sequences may begin at a nonnegative position. Existing sequences
+resume after their stored maximum. Within each submitted sequence, positions
+may repeat or advance by one, including across internal microbatches. Null
+positions compute the next position; null sequence arrays select sequence 0.
+Token and embedding inputs remain mutually exclusive. Unified shared-token
+input is supported; coupled multi-sequence input in separate mode remains a
+checked error.
+
+Logit and embedding rows follow the original output flags and embeddings mode:
+when embeddings are enabled, every input row is emitted. Positive indexed
+getters use original caller batch positions, even when native sequence splitting
+changes execution order; negative indices count backward through emitted rows.
 Invalid or unrequested rows return NULL. External embedding input and normalized
-hidden output are implemented. Pooling and noncausal attention are not.
+hidden output are implemented. Pooling and noncausal decoding are outside this
+C executor. EXECUTION.md details row maps, workers and resource accounting;
+STATE.md documents the raw cache and session contracts.
 
 ## Unsupported options
 
 Context creation rejects KV types other than F32/F16, nondefault context types,
-custom RoPE/YaRN, pooling, noncausal attention, AUTO or ENABLED flash attention, evaluator
+custom RoPE/YaRN, pooling, noncausal attention, nonflash multiple-worker execution, evaluator
 callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
 slots, nondefault output capacity fields and performance counters. SWA preferences have no effect for the supported non-SWA model.
 All boolean and enum inputs are validated.
@@ -262,10 +269,12 @@ source. Ordinary tests replay all 40 memory cases, 40 sequence-state cases and 9
 short-buffer cases against committed synthetic-model fixtures. Session files,
 legacy aliases, trailing-file side effects and malformed-state atomicity are
 covered. Original raw buffers restore and reserialize bitwise exactly. Generated
-Windows state floats/logits are bitwise exact in the external cohort; Linux
-generated floats use the predeclared model conformance bound because the frozen
-GNU source selects a different vector exponential path. See STATE.md and
-evidence/2026-11-09/native-context for measured errors and actual build flags.
+Windows state floats/logits were bitwise exact in that initial external cohort;
+its GNU report retains the original predeclared bound and initial arithmetic
+drift. Subsequent compiler-profile arithmetic, typed-cache and flash cohorts
+compare independently captured native outputs bitwise on each qualified host.
+Historical expectations and failure logs remain intact. See STATE.md and the
+corresponding evidence directories for exact scope and source/build identities.
 
 These checks establish the stated subset on Windows x64 and Linux x64. They do
 not close the full ABI, architecture, backend, platform or performance gates.
@@ -287,3 +296,37 @@ graphs and 245,154 F32 outputs per platform, including head-offset views, GQA,
 strided K caches and 256/512/768-column V products. Trained-model typed-cache
 execution remains covered by the external C harness, while this ordinary
 state/decode cohort deliberately uses the small deterministic fixture.
+
+## Native microbatch and flash regression
+
+The ordinary native_microbatch_reference_tests replay covers 205 independent
+tiny/generated-model configurations per measured profile. It checks 2,398,720
+logit words, 588 embedding words, 319 exact serialized states (1,098,603 bytes),
+default parameter fields, worker setters, native input/output ordering, all four
+K/V storage pairs, duplicate positions, shared sequence membership, physical
+holes and shifts. Two additional inputs that assert in the original context
+constructor must produce checked initialization errors.
+
+The full external C adapter retains 228 requested configurations per host:
+226 compare original return values and bytes, and two compare the documented
+checked replacement for the original initialization assertion. Its successful
+comparisons cover 2,917,888 logit words and 14,171,045 binary bytes, including
+pretrained stories260K. The compact ordinary replay excludes external weights
+and deduplicates identical inputs only after comparing the original results.
+
+Both nonflash and enabled-flash state/session suites are replayed for each of
+the four K/V storage pairs. Each mode retains the 258,048-logit and 1,048-buffer
+tiny-model checks described above. The flash suite independently verifies
+untransposed V state, host/device sequence flags, all short-buffer write
+boundaries and continuation behavior. Original expected bytes are in
+fixtures/ffi/{native-microbatch,flash-context}-provenance.json and their adjacent
+reference/data files. No Rust execution generates expected numerical output.
+
+The model-runtime row-map regression separately compares source-5 I32 buffers
+and Q/mask geometry. It includes 768 logical columns caused by shared sequence
+memberships even though only 261 unique rows are selected. Retained negative
+controls show that unique-row padding, omitted row-map memory accounting and
+omitted decode-ID bounds are each detected. Qualified flash arithmetic lives in
+llama_quant::flash_attention; its own independent graph corpus is documented in
+crates/quant/FLASH_ATTENTION.md. NativeContext continues to reject nonfinite
+computed results and makes no exceptional-logit parity claim.

@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "status": "runtime/native verification and post-archive audit/fixture gates passed",
+  "created_utc": "2026-11-09T21:55:55.691714+00:00",
+  "execution_inputs": {
+    "files": 952,
+    "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+  },
+  "archived_evidence_snapshot": {
+    "files": 8110,
+    "sha256": "b0bea90604c0c8456679243001243349930628f7b0c65e248467e473509faaa7"
+  },
+  "profiles": {
+    "windows": {
+      "status": {
+        "bytes": 1613,
+        "sha256": "55d5ecad8ec4b086073f5cfea5c976b9803e7ac45414ef6c3cd41a61518190cd"
+      },
+      "steps": [
+        {
+          "name": "audit",
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\target-windows\\debug\\xtask.exe",
+            "audit"
+          ],
+          "exit_code": 0,
+          "seconds": 42.858448099999805,
+          "log": {
+            "bytes": 40047,
+            "sha256": "f5a4269168be65046bac9c355a2829cdf8a0ae02d96263a171efd0b4bc5e867d"
+          }
+        },
+        {
+          "name": "fixtures",
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\target-windows\\debug\\xtask.exe",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "seconds": 32.82631810000021,
+          "log": {
+            "bytes": 196,
+            "sha256": "145c0fbc70507f32aab41a843704bd75db5e831cba0eb0fb673800eb7052579b"
+          }
+        }
+      ]
+    },
+    "linux": {
+      "status": {
+        "bytes": 1549,
+        "sha256": "55cb7aacf97ba7f74c2904683211ff19fc4602a578fcd9a7bd36e52e0c6baea2"
+      },
+      "steps": [
+        {
+          "name": "audit",
+          "argv": [
+            "/home/tdamre/.cache/rust-llama-native-flash-integration-v1/debug/xtask",
+            "audit"
+          ],
+          "exit_code": 0,
+          "seconds": 86.12123655199684,
+          "log": {
+            "bytes": 40047,
+            "sha256": "f5a4269168be65046bac9c355a2829cdf8a0ae02d96263a171efd0b4bc5e867d"
+          }
+        },
+        {
+          "name": "fixtures",
+          "argv": [
+            "/home/tdamre/.cache/rust-llama-native-flash-integration-v1/debug/xtask",
+            "fixtures"
+          ],
+          "exit_code": 0,
+          "seconds": 86.92360577599902,
+          "log": {
+            "bytes": 196,
+            "sha256": "145c0fbc70507f32aab41a843704bd75db5e831cba0eb0fb673800eb7052579b"
+          }
+        }
+      ]
+    }
+  },
+  "archived_files": [
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/windows/status.json",
+      "identity": {
+        "bytes": 1613,
+        "sha256": "55d5ecad8ec4b086073f5cfea5c976b9803e7ac45414ef6c3cd41a61518190cd"
+      }
+    },
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/windows/audit.log",
+      "identity": {
+        "bytes": 40047,
+        "sha256": "f5a4269168be65046bac9c355a2829cdf8a0ae02d96263a171efd0b4bc5e867d"
+      }
+    },
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/windows/fixtures.log",
+      "identity": {
+        "bytes": 196,
+        "sha256": "145c0fbc70507f32aab41a843704bd75db5e831cba0eb0fb673800eb7052579b"
+      }
+    },
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/linux/status.json",
+      "identity": {
+        "bytes": 1549,
+        "sha256": "55cb7aacf97ba7f74c2904683211ff19fc4602a578fcd9a7bd36e52e0c6baea2"
+      }
+    },
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/linux/audit.log",
+      "identity": {
+        "bytes": 40047,
+        "sha256": "f5a4269168be65046bac9c355a2829cdf8a0ae02d96263a171efd0b4bc5e867d"
+      }
+    },
+    {
+      "path": "evidence/2026-11-09/native-flash-context/combined-validation-v4/final-audit/linux/fixtures.log",
+      "identity": {
+        "bytes": 196,
+        "sha256": "145c0fbc70507f32aab41a843704bd75db5e831cba0eb0fb673800eb7052579b"
+      }
+    }
+  ],
+  "qualification": "This receipt resolves the earlier archive report pending-audit state. All runtime/build/model/source/numerical validations are complete with their platform-distinct receipts retained. A final source classification audit also runs after adding these JSON/log receipts; its immutable results and complete candidate preimage manifest are provided in the external promotion handoff. Twenty full-port release gate rows remain open across twelve tracks."
+}

@@ -239,3 +239,13 @@ mod model_shard_tests;
 
 #[cfg(test)]
 mod f16_context_reference_tests;
+
+#[cfg(all(
+    test,
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+mod native_microbatch_reference_tests;

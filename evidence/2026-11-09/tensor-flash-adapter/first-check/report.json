@@ -1,0 +1,44 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "cargo",
+      "fmt",
+      "-p",
+      "llama-tensor"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "test",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "llama-tensor",
+      "--lib",
+      "--test",
+      "flash_attention",
+      "--test",
+      "flash_attention_existing",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "llama-tensor",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 101
+  }
+]

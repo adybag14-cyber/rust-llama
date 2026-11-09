@@ -1,0 +1,441 @@
+{
+  "platform": "msvc",
+  "commands": [
+    {
+      "name": "release-native",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "-p",
+        "llama-quant",
+        "--test",
+        "flash_attention",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 16.972892199999478
+    },
+    {
+      "name": "debug-nan",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-quant",
+        "--test",
+        "flash_attention",
+        "nan_",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 3.782354100003431
+    },
+    {
+      "name": "resource-unit",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-quant",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8005857999960426
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-quant",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 0.7842804999963846
+    }
+  ],
+  "source_and_fixture_guard": {
+    "crates/quant/Cargo.toml": {
+      "bytes": 162,
+      "sha256": "93c8167d42197441e97a6a1725a3117560df0874bf22e6d1ebca07e333be41dc"
+    },
+    "crates/quant/README.md": {
+      "bytes": 12376,
+      "sha256": "1bd2dd13c5429cbf5e636882bf2a0a1e2421d8c1ff3bba99b76a37ce586cc8d5"
+    },
+    "crates/quant/src/activation.rs": {
+      "bytes": 1577,
+      "sha256": "b6c5906f028e21c34d450d8aa6c962f42558e6853dcc69f2efd0e6af26637bb5"
+    },
+    "crates/quant/src/conversion.rs": {
+      "bytes": 2163,
+      "sha256": "ccc3ce8a7475c301d95512b33de25c8cb87b8f239fed20af97b07413c0961ec8"
+    },
+    "crates/quant/src/cpu_math.rs": {
+      "bytes": 7901,
+      "sha256": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5"
+    },
+    "crates/quant/src/decode.rs": {
+      "bytes": 13859,
+      "sha256": "6f544cdc5cb1ed758e88e10c79468dd641f38cb7b25bda33c7213a5b0d38771b"
+    },
+    "crates/quant/src/encode.rs": {
+      "bytes": 8768,
+      "sha256": "a87c61a2ee10306c615e50daedb3d247dcfdf1a7c43a688b21c3e1957d74b787"
+    },
+    "crates/quant/src/encode_iq1.rs": {
+      "bytes": 12916,
+      "sha256": "d35c5d1b505ac88a6adbb878322004185fdc7d0aa5154dec2bb1f10b6ac05c25"
+    },
+    "crates/quant/src/encode_iq2.rs": {
+      "bytes": 9767,
+      "sha256": "67509569a2dd4600be6f9ab4a9f3228547ad920a655a10cd6dc8ef2f13700e4c"
+    },
+    "crates/quant/src/encode_iq3.rs": {
+      "bytes": 17285,
+      "sha256": "fea42fbd6f597303c860cdfb5932f4c499fc11bffb36ec89a52deaa886809b96"
+    },
+    "crates/quant/src/encode_iq4.rs": {
+      "bytes": 6075,
+      "sha256": "698bbf815c2a6620f8fb9e37f7360baa316dc60c4e2e2333f8033d1ca335cb8f"
+    },
+    "crates/quant/src/encode_k.rs": {
+      "bytes": 18063,
+      "sha256": "cefc475d9dc3c1e576294236cf68254f762d3a64d4478008230050709050b5ab"
+    },
+    "crates/quant/src/encode_simple.rs": {
+      "bytes": 4713,
+      "sha256": "d120f09e29232abb598ec944414faaa501cbce9da749860fc078affdcaa3bac9"
+    },
+    "crates/quant/src/flash_attention/tests.rs": {
+      "bytes": 10038,
+      "sha256": "ca072c12a70bede1bf5258967bc2270c587ed8e227d8338204db8fb77090d642"
+    },
+    "crates/quant/src/flash_attention.rs": {
+      "bytes": 46726,
+      "sha256": "04dacd8ec51a96f2150dedb764880984cb61a89faa2be7dfc7049e5b7d3bf125"
+    },
+    "crates/quant/src/iq_lattice.rs": {
+      "bytes": 31600,
+      "sha256": "85679dca0d52e1a9fbfe0425e7c91ed785a1f5ff5012ac919e1d7d78569fa32b"
+    },
+    "crates/quant/src/iq_sort.rs": {
+      "bytes": 3429,
+      "sha256": "e23a26f05b8369ef39908f4a6c5382acef1f60b111092ce1bb94a65d66595cdd"
+    },
+    "crates/quant/src/lib.rs": {
+      "bytes": 14608,
+      "sha256": "1b4dbe4bff8a9827f25a9835e85774753ac80bec41885371801ef527c6d80868"
+    },
+    "crates/quant/src/matvec.rs": {
+      "bytes": 6071,
+      "sha256": "642c8259350aa68214fd83c74b8620366bf3d108f8bdd31c95cd39dcaa3e27f1"
+    },
+    "crates/quant/src/matvec_extra.rs": {
+      "bytes": 18493,
+      "sha256": "3d25a8b9c644e4d53d56452ac468b387855bd9da8ebb801a3f45de2eeb024a9e"
+    },
+    "crates/quant/src/tables.rs": {
+      "bytes": 92936,
+      "sha256": "eb75d5277bf1dffc52942ac2ca9fa9bdb7ebd61c73c676dcc4db8133a5cc4015"
+    },
+    "crates/quant/src/weighted.rs": {
+      "bytes": 16023,
+      "sha256": "8f376c8c809c9fd62dadb7945e1917d4b19db21b23c685f156cac7aaed9750cc"
+    },
+    "crates/quant/tests/common/flash_fixture.rs": {
+      "bytes": 5295,
+      "sha256": "65cbff31c2bab0686dd28b5bae4cf7cfbe85ab6c6feba721932b4865558e9ffb"
+    },
+    "crates/quant/tests/cpu_math_scalar.rs": {
+      "bytes": 1875,
+      "sha256": "80a17eb6837b022063036067a099cf81d7a92068f8a5f9daa054faeeaf7d3b09"
+    },
+    "crates/quant/tests/encoders_extended.rs": {
+      "bytes": 5907,
+      "sha256": "daf4949acbbd78d8bea9b9d8b7ca92c95064bb06af6da8b984a3b411c0751f28"
+    },
+    "crates/quant/tests/f16_matmul.rs": {
+      "bytes": 2455,
+      "sha256": "b16a39330618ea82062864db6bb788986deb141977f09290661e83150221542d"
+    },
+    "crates/quant/tests/fixtures/dequant-reference.bin": {
+      "bytes": 1178644,
+      "sha256": "fa82642f3a67d8bd3e68e97e1940a8bde2145cfab109771f92a6175845c86f45"
+    },
+    "crates/quant/tests/fixtures/encoder-extended-provenance.json": {
+      "bytes": 50106,
+      "sha256": "22a78e05c33e478cc80ed0ee01ba95769b711ecd766fe4c1a7e7f031aefc4426"
+    },
+    "crates/quant/tests/fixtures/encoder-extended-reference.bin": {
+      "bytes": 2281480,
+      "sha256": "70366ded25723c31d49790bed5033b86980ce78b74e459c86a6e7fe108eb0fb8"
+    },
+    "crates/quant/tests/fixtures/f16-matmul-provenance.json": {
+      "bytes": 8272,
+      "sha256": "630b7b8de10f0067f391c23e76edf7cd321b8c52f9a53a4acaea8136738a650f"
+    },
+    "crates/quant/tests/fixtures/f16-matmul-reference.bin": {
+      "bytes": 1896236,
+      "sha256": "879883caabd39c68fcf9fabb8ef9c2a0664bd53b9d37f55044fd833e74a50dd6"
+    },
+    "crates/quant/tests/fixtures/flash/base-gnu-provenance.json": {
+      "bytes": 3520,
+      "sha256": "f6ca849cf044003dce859813b570d79e0783dba4b149d0c782690c95b14a2fe6"
+    },
+    "crates/quant/tests/fixtures/flash/base-msvc-provenance.json": {
+      "bytes": 3295,
+      "sha256": "b15a7f1c9e867499cf4b5d3b2f5087bc531413efb7579b96e4b50afca1e85335"
+    },
+    "crates/quant/tests/fixtures/flash/compaction-provenance.json": {
+      "bytes": 8450,
+      "sha256": "53371445e5c4bca5da6717b5053bb4b7aa2e6232dcea6e942e68edb7a6c86dac"
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-gnu-provenance.json": {
+      "bytes": 3053,
+      "sha256": "41bd562fe18abc71cb97df22bd21c390f743ea7a67597d8c9ede9cef4f013bfa"
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-msvc-provenance.json": {
+      "bytes": 2824,
+      "sha256": "4c121aa6fc0d66ee631a4e79b56d7dd7b990d5cd97beff5056ed6ae4da427af3"
+    },
+    "crates/quant/tests/fixtures/flash/gnu-reference.bin": {
+      "bytes": 10128525,
+      "sha256": "e017b789df86029148dc885e1dcde13f02eb30948b4eab9316ace2aa3fc4491f"
+    },
+    "crates/quant/tests/fixtures/flash/inputs.bin": {
+      "bytes": 36676256,
+      "sha256": "999ac0ed4283c7a656758f326c41b48eb2bd48c2806627568f556fe034e1d96e"
+    },
+    "crates/quant/tests/fixtures/flash/msvc-reference.bin": {
+      "bytes": 10128525,
+      "sha256": "ce9cff995b074e2155079f9f14ea3c86054fcb599af316d80e55313b0da27b5d"
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-gnu-provenance.json": {
+      "bytes": 3593,
+      "sha256": "a87a775c123e14d7787a8317e6f8c9e63bd605c2b05c4c63afdb26382093cce9"
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-msvc-provenance.json": {
+      "bytes": 3369,
+      "sha256": "5b5932b70c160abe4c0c2697c387a2d0b8f7a934aa9b9dbd26f3c490c76f015f"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/compaction-provenance.json": {
+      "bytes": 4035,
+      "sha256": "fc0c2f6b8491f002a52631917eb861fb837d38384447b57a3c181e0fa6dba49c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/gnu-reference.bin": {
+      "bytes": 205704,
+      "sha256": "42065bff89488f51de9e0882f7b930a0504088331914d8e8610dbc557eda977c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/inputs.bin": {
+      "bytes": 7050960,
+      "sha256": "144c16e10daf27b77111082c33b983daf9d1876735c98c6a10867880c518e3ae"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/msvc-reference.bin": {
+      "bytes": 205704,
+      "sha256": "c13639ea1a1fe3021bd9ea355b5fb6f4d349d0f2be2aac87888cdc643491afa7"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-gnu-provenance.json": {
+      "bytes": 2170,
+      "sha256": "5525077a0231455accacda43cc84d49f5205d14c9a8b89901976abf2c87b5a2e"
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-msvc-provenance.json": {
+      "bytes": 2220,
+      "sha256": "f1d49130354344b674b5d2569f226e8a6bd611e1cdcfe25e6e3a57c9fb32d23b"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/compaction-provenance.json": {
+      "bytes": 10845,
+      "sha256": "516b5fd22a7a889ff029fcdd00eecbdf621150619759221ac04bbce305e8817c"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/gnu-reference.bin": {
+      "bytes": 949686,
+      "sha256": "5deb3b6e9b7d9ed31e04b66a4fc025ff51dbf5d695045f14761f9362e6ce837e"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/inputs.bin": {
+      "bytes": 530768,
+      "sha256": "dbfeb9f9196ce75fb2792a51a5d23c316de77c92d149c193a9808e4e4b6a6ac3"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/msvc-reference.bin": {
+      "bytes": 949686,
+      "sha256": "72126a0f60b4e5b2d44735b85f8b8c80b59fa1cdcfeb055b2287d600e60f63af"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-gnu-provenance.json": {
+      "bytes": 1710,
+      "sha256": "2250454b037cd05cb20edbd4b93b80ce8441582720755cf572746d6aac1595af"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-msvc-provenance.json": {
+      "bytes": 1718,
+      "sha256": "8b82382e4a68089eb8945ad56dc5cdcb8608da6893a5162b15882194c1b7823b"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-gnu-provenance.json": {
+      "bytes": 1998,
+      "sha256": "24e035f6717c4bc02348c2cbf77bf1dd8c24fa989652398b578b72b7feade983"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-msvc-provenance.json": {
+      "bytes": 2028,
+      "sha256": "4c44e4360d233a5638e93b0b17c3f4907765123f0be65f288595552abc15f0fe"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-gnu-provenance.json": {
+      "bytes": 2108,
+      "sha256": "7862ff36c56a8ab2be68cdeb5b912f7d675754f1fb963aa98c87cc1e8b0df3a5"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-msvc-provenance.json": {
+      "bytes": 2153,
+      "sha256": "01b04aa29075b33a18fc844f7f12fb207e18c4761343f47826b69469f34ada83"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-gnu-provenance.json": {
+      "bytes": 1899,
+      "sha256": "0bf67957c747e67e4f11139fd7517ec8a0a96aa1e6a1b44e4ed5a9968153e8e1"
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-msvc-provenance.json": {
+      "bytes": 1921,
+      "sha256": "e3235f55ec2f447bcc6cb54c6fae40fb6c99ea50d8114da1b3c4a2dab231cb46"
+    },
+    "crates/quant/tests/fixtures/integer-conversion-reference.bin": {
+      "bytes": 78130,
+      "sha256": "9079cbef5b3667b76f56cbc82de21f1f3bdff9a861e0029dfb870e0cc834bab4"
+    },
+    "crates/quant/tests/fixtures/iq1-encoder-provenance.json": {
+      "bytes": 109131,
+      "sha256": "e40a26e8c1ee95545779c355c12596e9d5e4627f14a08a53dbf09c02b0ef958f"
+    },
+    "crates/quant/tests/fixtures/iq1-encoder-reference.bin": {
+      "bytes": 2129100,
+      "sha256": "55ee959664760322a97f568ff0d77479d5cf27253ef44ad8a2422ac697c020d5"
+    },
+    "crates/quant/tests/fixtures/iq1-sort-reference.bin": {
+      "bytes": 87052,
+      "sha256": "3eb8242f434d78e849a03dbdc3c6df1bac98b88d78e263b41537a4710b0ee2d0"
+    },
+    "crates/quant/tests/fixtures/iq2-encoder-provenance.json": {
+      "bytes": 78812,
+      "sha256": "08f24f8cd24a515dd9624f1a7e0991c19299c337353c1391c120fee138d8f83a"
+    },
+    "crates/quant/tests/fixtures/iq2-encoder-reference.bin": {
+      "bytes": 2579004,
+      "sha256": "7496832ebf269151edc6b4d4e483fdbe90b3d746741b80b636f98886c6b757f7"
+    },
+    "crates/quant/tests/fixtures/iq3-encoder-provenance.json": {
+      "bytes": 49976,
+      "sha256": "983a6b6d4e2f91630a3ff14c2ec2f35b4462d0d037a5b924f5eb899920b64f0e"
+    },
+    "crates/quant/tests/fixtures/iq3-encoder-reference.bin": {
+      "bytes": 1525068,
+      "sha256": "c40bcc341d7a23733159d4c1f63d9895f49677fbe26e9c7c0014937766cd6753"
+    },
+    "crates/quant/tests/fixtures/matvec-extended-provenance.json": {
+      "bytes": 4323,
+      "sha256": "76a22574c269c360e0307427c8d3c297b1fb9c3b34efee9520a20ef7168c4fb5"
+    },
+    "crates/quant/tests/fixtures/matvec-extended-reference.bin": {
+      "bytes": 2224368,
+      "sha256": "d9e6a403a3bc967223c64067d8cc2c9c4792833e9b301dc63ab2566862565574"
+    },
+    "crates/quant/tests/fixtures/matvec-provenance.json": {
+      "bytes": 2566,
+      "sha256": "746ca6b78d97cea9d4c57aa1939e69414640568bf3d61d8cfe789b227774a5a2"
+    },
+    "crates/quant/tests/fixtures/matvec-reference.bin": {
+      "bytes": 561072,
+      "sha256": "a556025bdb90641c354e0fd0d2a0f7934e48cfec097eddd4f3ed5fcfca2cdc53"
+    },
+    "crates/quant/tests/fixtures/provenance.json": {
+      "bytes": 2143,
+      "sha256": "73e3cd1d143f4b2ad193cd9521fd4ecc05013d2ddd16738daec711f8fab5e1a1"
+    },
+    "crates/quant/tests/fixtures/q8k-reference.bin": {
+      "bytes": 79212,
+      "sha256": "1dcd361cb3ff919e7626b12f8c98ea5fb733ac21edbbdf944d28cf03ec7ce99b"
+    },
+    "crates/quant/tests/fixtures/quant-reference.bin": {
+      "bytes": 437608,
+      "sha256": "b18c46217e4cb7b10833b3d8f6b44d12cc448c187de4a7e50bdab62ad224f8fd"
+    },
+    "crates/quant/tests/fixtures/quick-scalar-gnu-provenance.json": {
+      "bytes": 1831,
+      "sha256": "36ccc514b598a1187e326712653704221b08480cb7260a73f9dcca2873f4c49b"
+    },
+    "crates/quant/tests/fixtures/quick-scalar-gnu-reference.bin": {
+      "bytes": 4016480,
+      "sha256": "10a5d0048c12a96dc45c544f99ada4fb65a51163f4019e79614b7f1e3c957d34"
+    },
+    "crates/quant/tests/fixtures/quick-scalar-msvc-provenance.json": {
+      "bytes": 1865,
+      "sha256": "fd7db652f259179063b2aaf7857db8164317c765da6f26da12e2063d8172c46d"
+    },
+    "crates/quant/tests/fixtures/quick-scalar-msvc-reference.bin": {
+      "bytes": 4016480,
+      "sha256": "bcc671eb9e0a3be80c068fc8de7ce6597c0b9aa9b783041d8da06c4d2ce06ce0"
+    },
+    "crates/quant/tests/fixtures/weighted-encoder-provenance.json": {
+      "bytes": 221719,
+      "sha256": "021e5124031a41a199f559ed83ec78b03996ef05338f7ff78d6abbc7df3800a4"
+    },
+    "crates/quant/tests/fixtures/weighted-encoder-reference.bin": {
+      "bytes": 7718658,
+      "sha256": "bdb2140276bf2e029fb911357bfdcd2f778d85c31a3e412c8253f5cc7b5a4fc9"
+    },
+    "crates/quant/tests/flash_attention.rs": {
+      "bytes": 7200,
+      "sha256": "055b405118a5a02a282943c54877fc799d21eb8c6bbb39d28e9142cb89ec635f"
+    },
+    "crates/quant/tests/iq1_encoders.rs": {
+      "bytes": 3180,
+      "sha256": "bad13d839d40b780f2543e5fb2d7c326415b70a0bfad4342d092963279fa21f8"
+    },
+    "crates/quant/tests/iq2_encoders.rs": {
+      "bytes": 3180,
+      "sha256": "5d18fd5c66045dc942565c0945b06c7857bea37aa102716896d1c1f246f598b4"
+    },
+    "crates/quant/tests/iq3_encoders.rs": {
+      "bytes": 3190,
+      "sha256": "885fea2ae0b109f868ac431a4b6218f96ee9bba6623269d793e0f231fe8725c0"
+    },
+    "crates/quant/tests/matvec.rs": {
+      "bytes": 3767,
+      "sha256": "5f9cc9deb822fe93bd11b9a08f89a24067531f90e619fc686e5ba8dccc75c5a4"
+    },
+    "crates/quant/tests/matvec_extended.rs": {
+      "bytes": 7666,
+      "sha256": "54f312a1335c958e3d199f648f1b428f4c5122fb30045d749993ada3b2e7a4f8"
+    },
+    "crates/quant/tests/reference.rs": {
+      "bytes": 6645,
+      "sha256": "1a17cd5ddf9531c98f5670b81c94935ef01b5f2672bb93fad13e103b50709814"
+    },
+    "crates/quant/tests/weighted_encoders.rs": {
+      "bytes": 8005,
+      "sha256": "adb7a70b3d9e3bdcbc016e22017b1d20c0a5610d24efd78f72a20588bd5fa0ee"
+    },
+    "Cargo.toml": {
+      "bytes": 270,
+      "sha256": "dd52b7f348a4a5ba50e421991dba8b8250ed4a90193a3006fb8395f0f0f90fe4"
+    },
+    "Cargo.lock": {
+      "bytes": 155,
+      "sha256": "034e251991c84eb3658d300f7c870a859e91dd5e935df157668f7e586a595456"
+    },
+    "rust-toolchain.toml": {
+      "bytes": 90,
+      "sha256": "d8c420f9c9a2fc00c09cf07b7bb570c92a09137ef1559cb9ef5b12c76f7557cc"
+    }
+  },
+  "unchanged": true,
+  "runner_sha256": "b464bea7780fed3d93de0e330a4e45531ddad086f90941ddb95dfca20d9719dd",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n"
+}

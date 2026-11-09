@@ -1,0 +1,151 @@
+#![cfg(all(
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+#[path = "common/flash_rows_fixture.rs"]
+mod fixture;
+use llama_quant::flash_attention::{Branch, ExecutionMode, KvRows, Limits, Plan, Selection};
+
+fn different(actual: &[f32], expected: &[u8]) -> (usize, usize, Option<(usize, u32, u32)>) {
+    assert_eq!(actual.len() * 4, expected.len());
+    let mut changed = 0;
+    let mut finite = 0;
+    let mut first = None;
+    for (index, (value, bytes)) in actual.iter().zip(expected.as_chunks::<4>().0).enumerate() {
+        let native = u32::from_le_bytes(*bytes);
+        if value.to_bits() != native {
+            changed += 1;
+            finite += usize::from(value.is_finite() && f32::from_bits(native).is_finite());
+            first.get_or_insert((index, value.to_bits(), native));
+        }
+    }
+    (changed, finite, first)
+}
+#[test]
+fn original_row_map_graphs_match_default_and_reference_with_real_workers() {
+    let cases = fixture::load();
+    let mut total = 0;
+    let mut failing = 0;
+    let mut changed = 0;
+    let mut finite_changed = 0;
+    let mut details = Vec::new();
+    for case in &cases {
+        for force in [false, true] {
+            let mut params = case.params;
+            params.force_reference = force;
+            let plan = Plan::new_with_rows(case.inputs, case.rows, params).unwrap();
+            assert_ne!(plan.branch(), Branch::SplitKv);
+            let result = plan.execute(Selection::All, Limits::default()).unwrap();
+            assert_eq!(result.shape, case.shape, "{}", case.name);
+            assert_eq!(result.stats.configured_workers, params.workers);
+            assert_eq!(result.stats.completed_partitions, params.workers);
+            assert_eq!(result.stats.worker_threads, params.workers);
+            assert_eq!(result.stats.mode, ExecutionMode::ScopedWorkers);
+            let expected = if force { case.forced } else { case.expected };
+            let (count, finite, first) = different(&result.values, expected);
+            total += result.values.len();
+            if count != 0 {
+                failing += 1;
+                changed += count;
+                finite_changed += finite;
+                if details.len() < 80 {
+                    details.push(format!("{} {} force={force}: {count} differing ({finite} finite), first {first:08x?}", case.cohort, case.name));
+                }
+            }
+        }
+    }
+    println!(
+        "{} original row-map graphs, default and forced-reference: {total} F32 words, {failing} failing cases, {changed} changed words, {finite_changed} finite changes",
+        cases.len()
+    );
+    assert_eq!(total, 2_119_032);
+    assert_eq!(failing, 0, "{}", details.join("\n"));
+}
+#[test]
+fn selected_rows_keep_full_row_map_batch_and_mask_geometry() {
+    let cases = fixture::load();
+    let mut checked = 0;
+    let mut details = Vec::new();
+    for case in &cases {
+        let [_, queries, heads, batches] = case.inputs.q.shape();
+        let coordinates = [
+            (0, 0, 0),
+            (queries - 1, heads - 1, batches - 1),
+            (queries / 2, heads / 2, 0),
+        ];
+        let plan = Plan::new_with_rows(case.inputs, case.rows, case.params).unwrap();
+        for (query, head, batch) in coordinates {
+            let output = plan
+                .execute_serial_partitions(Selection::Row { query, head, batch }, Limits::default())
+                .unwrap();
+            assert_eq!(output.stats.worker_threads, 1);
+            let width = case.shape[0];
+            let offset = ((batch * queries + query) * heads + head) * width * 4;
+            let (count, _, first) =
+                different(&output.values, &case.expected[offset..offset + width * 4]);
+            checked += width;
+            if count > 0 && details.len() < 80 {
+                details.push(format!(
+                    "{} ({query},{head},{batch}): {count} changed, {first:08x?}",
+                    case.name
+                ));
+            }
+        }
+    }
+    println!("Original row-map selected-row comparisons: {checked}");
+    assert!(checked > 10_000);
+    assert!(details.is_empty(), "{}", details.join("\n"));
+}
+#[test]
+fn typed_and_offset_row_map_storage_preserve_original_words() {
+    let cases = fixture::load();
+    let mut checked = 0;
+    for case in cases.iter().step_by(11) {
+        let raw = case.raw_inputs.last().unwrap();
+        let mut words = vec![77_i32, -99, 55];
+        words.extend(
+            raw.raw
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|&bytes| i32::from_le_bytes(bytes)),
+        );
+        let rows = KvRows::from_i32(&words, case.rows.shape(), 12).unwrap();
+        let result = Plan::new_with_rows(case.inputs, rows, case.params)
+            .unwrap()
+            .execute(Selection::All, Limits::default())
+            .unwrap();
+        assert_eq!(
+            different(&result.values, case.expected).0,
+            0,
+            "{}",
+            case.name
+        );
+        let mut bytes = vec![0xa5_u8; 12];
+        bytes.extend_from_slice(raw.raw);
+        let rows = KvRows::from_bytes(&bytes, case.rows.shape(), 12).unwrap();
+        let selected = Plan::new_with_rows(case.inputs, rows, case.params)
+            .unwrap()
+            .execute_serial_partitions(
+                Selection::Row {
+                    query: 0,
+                    head: 0,
+                    batch: 0,
+                },
+                Limits::default(),
+            )
+            .unwrap();
+        assert_eq!(
+            different(&selected.values, &case.expected[..case.shape[0] * 4]).0,
+            0,
+            "{}",
+            case.name
+        );
+        checked += result.values.len() + selected.values.len();
+    }
+    println!("Original typed/offset row-map comparisons: {checked}");
+    assert!(checked > 10_000);
+}

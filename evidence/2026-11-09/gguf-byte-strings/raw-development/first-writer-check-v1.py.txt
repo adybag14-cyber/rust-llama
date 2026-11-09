@@ -1,0 +1,21 @@
+from pathlib import Path
+import os,subprocess,hashlib,json,datetime,time
+root=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=root/'rust-draft-v1'
+out=root/'first-writer-check-v1';out.mkdir(exist_ok=False)
+assert json.loads((root/'prepare-writer-v1/status.json').read_text(encoding='utf-8'))['status']=='succeeded'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+source={str(p.relative_to(repo)).replace('\\','/'):sha(p.read_bytes()) for p in (repo/'crates/gguf/src').glob('*.rs')}
+report={'status':'running','started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source':source,'steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save();env=os.environ.copy();env['CARGO_TARGET_DIR']=str(root/'target-windows');env['CARGO_BUILD_JOBS']='2'
+try:
+ for name,args in [('check',['check','--workspace','--all-targets','--offline','--locked']),('gguf-tests',['test','--offline','--locked','-p','llama-gguf','--all-targets','--','--nocapture'])]:
+  assert all(sha((repo/n).read_bytes())==v for n,v in source.items())
+  start=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:p=subprocess.run(['cargo','+1.99.1',*args],cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1200)
+  data=(out/(name+'.log')).read_bytes();report['steps'].append({'name':name,'exit_code':p.returncode,'seconds':time.monotonic()-start,'log_sha256':sha(data)});save()
+  assert p.returncode==0,(name,data.decode('utf-8','replace')[-12000:])
+ report['status']='succeeded'
+except BaseException as e:report['status']='failed';report['error']=repr(e);raise
+finally:report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2))

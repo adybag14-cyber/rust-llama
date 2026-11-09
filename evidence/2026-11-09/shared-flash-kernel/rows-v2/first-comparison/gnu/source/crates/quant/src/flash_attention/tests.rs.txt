@@ -1,0 +1,328 @@
+use super::*;
+
+fn view(values: &[f32], shape: [usize; 4]) -> View4<'_> {
+    let strides = [
+        4,
+        shape[0] * 4,
+        shape[0] * shape[1] * 4,
+        shape[0] * shape[1] * shape[2] * 4,
+    ];
+    View4::from_f32(values, shape, strides, 0).unwrap()
+}
+fn small_inputs<'a>(query: &'a [f32], keys: &'a [f32], values: &'a [f32]) -> Inputs<'a> {
+    Inputs {
+        q: view(query, [1, 2, 1, 1]),
+        k: view(keys, [1, 2, 1, 1]),
+        v: view(values, [1, 2, 1, 1]),
+        mask: None,
+        sinks: None,
+    }
+}
+#[test]
+fn checked_views_preserve_offsets_and_raw_bits_and_reject_invalid_extents() {
+    let bits = [0xdead_beef_u32, 0x3f80_0000, 0x7fa1_2345, 0xffc5_4321];
+    let typed = bits.map(f32::from_bits);
+    let raw = bits
+        .into_iter()
+        .flat_map(u32::to_le_bytes)
+        .collect::<Vec<_>>();
+    let shape = [1, 2, 1, 1];
+    let strides = [4, 8, 16, 16];
+    let a = View4::from_f32(&typed, shape, strides, 4).unwrap();
+    let b = View4::from_bytes(DType::F32, &raw, shape, strides, 4).unwrap();
+    for row in 0..2 {
+        assert_eq!(
+            a.value([0, row, 0, 0]).to_bits(),
+            b.value([0, row, 0, 0]).to_bits()
+        );
+    }
+    assert_eq!(a.value([0, 1, 0, 0]).to_bits(), 0xffc5_4321);
+    assert!(matches!(
+        View4::from_bytes(DType::Q4_0, &raw, shape, strides, 0),
+        Err(Error::UnsupportedDType(DType::Q4_0))
+    ));
+    assert!(View4::from_f32(&typed, [0, 1, 1, 1], strides, 0).is_err());
+    assert!(View4::from_f32(&typed, shape, strides, 1).is_err());
+    assert!(View4::from_f32(&typed, shape, [4, 3, 16, 16], 0).is_err());
+    assert!(View4::from_f32(&typed, shape, strides, 8).is_err());
+    assert!(matches!(
+        View4::from_f32(&typed, [usize::MAX, 1, 1, 1], [4, 0, 0, 0], 0),
+        Err(Error::Overflow)
+    ));
+    let halves = [0x0000, 0x8000, 0x3c00, 0x7d55];
+    let half_view = View4::from_f16(&halves, [1, 2, 1, 1], [2, 4, 8, 8], 2).unwrap();
+    assert_eq!(
+        half_view.value([0, 0, 0, 0]).to_bits(),
+        (-0.0_f32).to_bits()
+    );
+    assert_eq!(
+        half_view.value([0, 1, 0, 0]).to_bits(),
+        f16_to_f32(0x7d55).to_bits()
+    );
+}
+#[test]
+fn plan_rejects_unsupported_geometry_and_parameters_before_execution() {
+    let q = [0.0, 0.0];
+    let k = [0.0, 0.0];
+    let v = [1.0, 3.0];
+    let inputs = small_inputs(&q, &k, &v);
+    for workers in [0, MAX_WORKERS + 1] {
+        assert!(
+            Plan::new(
+                inputs,
+                Params {
+                    workers,
+                    ..Params::default()
+                }
+            )
+            .is_err()
+        );
+    }
+    for params in [
+        Params {
+            scale: f32::NAN,
+            ..Params::default()
+        },
+        Params {
+            max_bias: f32::INFINITY,
+            ..Params::default()
+        },
+        Params {
+            logit_softcap: f32::NEG_INFINITY,
+            ..Params::default()
+        },
+        Params {
+            scale: f32::MAX,
+            logit_softcap: f32::MIN_POSITIVE,
+            ..Params::default()
+        },
+        Params {
+            max_bias: 1.0,
+            ..Params::default()
+        },
+    ] {
+        assert!(Plan::new(inputs, params).is_err());
+    }
+    let mut wrong = inputs;
+    wrong.q = View4::from_f16(&[0, 0], [1, 2, 1, 1], [2, 2, 4, 4], 0).unwrap();
+    assert!(Plan::new(wrong, Params::default()).is_err());
+    wrong = inputs;
+    wrong.v = view(&v[..1], [1, 1, 1, 1]);
+    assert!(Plan::new(wrong, Params::default()).is_err());
+    wrong = inputs;
+    wrong.k = view(&k, [2, 1, 1, 1]);
+    assert!(Plan::new(wrong, Params::default()).is_err());
+    wrong = inputs;
+    wrong.mask = Some(view(&q, [2, 1, 1, 1]));
+    assert!(Plan::new(wrong, Params::default()).is_err());
+    wrong = inputs;
+    wrong.sinks = Some(view(&v, [2, 1, 1, 1]));
+    assert!(Plan::new(wrong, Params::default()).is_err());
+    wrong = inputs;
+    wrong.k = View4::from_f32(&k, [1, 2, 2, 1], [4, 4, 0, 8], 0).unwrap();
+    assert!(Plan::new(wrong, Params::default()).is_err());
+}
+#[test]
+fn allocation_and_work_preflights_are_atomic_and_categories_do_not_overlap() {
+    let q = [0.0, 0.0];
+    let k = [0.0, 0.0];
+    let v = [1.0, 3.0];
+    let plan = Plan::new(small_inputs(&q, &k, &v), Params::default()).unwrap();
+    let needs = plan.requirements(Selection::All).unwrap();
+    assert_eq!(
+        needs.peak_bytes,
+        needs.output_bytes
+            + needs.staged_result_bytes
+            + needs.worker_scratch_bytes
+            + needs.descriptor_bytes
+            + needs.requested_thread_stack_bytes
+            + needs.thread_metadata_allowance_bytes
+    );
+    assert_eq!(needs.output_bytes, 8);
+    assert_eq!(needs.staged_result_bytes, 8);
+    assert_eq!(needs.requested_thread_stack_bytes, 0);
+    assert!(matches!(
+        plan.execute(
+            Selection::All,
+            Limits {
+                max_bytes: needs.peak_bytes - 1,
+                max_scalar_work: u64::MAX,
+            }
+        ),
+        Err(Error::ResourceLimit { .. })
+    ));
+    assert!(matches!(
+        plan.execute(
+            Selection::All,
+            Limits {
+                max_bytes: needs.peak_bytes,
+                max_scalar_work: needs.scalar_work_items - 1,
+            }
+        ),
+        Err(Error::WorkLimit { .. })
+    ));
+    let output = plan
+        .execute(
+            Selection::All,
+            Limits {
+                max_bytes: needs.peak_bytes,
+                max_scalar_work: needs.scalar_work_items,
+            },
+        )
+        .unwrap();
+    assert_eq!(output.values, [2.0, 2.0]);
+    assert_eq!(q, [0.0, 0.0]);
+    assert_eq!(k, [0.0, 0.0]);
+    assert_eq!(v, [1.0, 3.0]);
+    assert!(
+        plan.requirements(Selection::Row {
+            query: 2,
+            head: 0,
+            batch: 0
+        })
+        .is_err()
+    );
+}
+#[test]
+fn huge_borrowed_broadcast_geometry_cannot_bypass_work_or_overflow_checks() {
+    let data = [1.0];
+    let q = View4::from_f32(&data, [1, 1_000_000_000, 1, 1], [4, 0, 0, 0], 0).unwrap();
+    let k = View4::from_f32(&data, [1, 1_000_000_000, 1, 1], [4, 0, 0, 0], 0).unwrap();
+    let plan = Plan::new(
+        Inputs {
+            q,
+            k,
+            v: k,
+            mask: None,
+            sinks: None,
+        },
+        Params::default(),
+    )
+    .unwrap();
+    assert!(matches!(
+        plan.requirements(Selection::All),
+        Err(Error::Overflow)
+    ));
+    let too_many =
+        View4::from_f32(&data, [1, i32::MAX as usize + 1, 1, 1], [4, 0, 0, 0], 0).unwrap();
+    assert!(
+        Plan::new(
+            Inputs {
+                q: too_many,
+                k,
+                v: k,
+                mask: None,
+                sinks: None
+            },
+            Params::default()
+        )
+        .is_err()
+    );
+}
+#[test]
+fn actual_workers_and_serial_partitions_are_distinguished_and_failures_join() {
+    let q = [0.0, 0.0];
+    let k = [0.0, 0.0];
+    let v = [1.0, 3.0];
+    let plan = Plan::new(
+        small_inputs(&q, &k, &v),
+        Params {
+            workers: 3,
+            ..Params::default()
+        },
+    )
+    .unwrap();
+    let threaded = plan.execute(Selection::All, Limits::default()).unwrap();
+    let serial = plan
+        .execute_serial_partitions(Selection::All, Limits::default())
+        .unwrap();
+    assert_eq!(threaded.values, serial.values);
+    assert_eq!(threaded.stats.worker_threads, 3);
+    assert_eq!(serial.stats.worker_threads, 1);
+    assert_eq!(threaded.stats.completed_partitions, 3);
+    assert_eq!(
+        threaded.requirements.requested_thread_stack_bytes,
+        3 * WORKER_STACK_BYTES
+    );
+    assert_eq!(serial.requirements.requested_thread_stack_bytes, 0);
+    for failed_worker in [0, 1, 2] {
+        assert!(matches!(
+            plan.execute_impl(
+                Selection::All,
+                Limits::default(),
+                ExecutionMode::ScopedWorkers,
+                Faults {
+                    fail_spawn_at: Some(failed_worker),
+                    panic_at: None
+                }
+            ),
+            Err(Error::ThreadSpawn(_))
+        ));
+    }
+    assert!(matches!(
+        plan.execute_impl(
+            Selection::All,
+            Limits::default(),
+            ExecutionMode::ScopedWorkers,
+            Faults {
+                fail_spawn_at: None,
+                panic_at: Some(1)
+            }
+        ),
+        Err(Error::WorkerPanic)
+    ));
+    assert_eq!(
+        plan.execute(Selection::All, Limits::default())
+            .unwrap()
+            .values,
+        [2.0, 2.0]
+    );
+}
+
+#[test]
+fn selected_tiled_row_charges_packed_scratch_for_every_idle_worker() {
+    let queries = [0.0_f32; QUERY_TILE];
+    let keys = [0.0_f32];
+    let width = 4096;
+    let values = vec![1.0_f32; width];
+    let inputs = Inputs {
+        q: view(&queries, [1, QUERY_TILE, 1, 1]),
+        k: view(&keys, [1, 1, 1, 1]),
+        v: view(&values, [width, 1, 1, 1]),
+        mask: None,
+        sinks: None,
+    };
+    let plan = Plan::new(
+        inputs,
+        Params {
+            workers: MAX_WORKERS,
+            ..Params::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(plan.branch(), Branch::Tiled);
+    let selection = Selection::Row {
+        query: 0,
+        head: 0,
+        batch: 0,
+    };
+    let required = plan.requirements(selection).unwrap();
+    // These zero stores happen before any worker is started, including the
+    // 255 workers that will not own this selected row. This lower bound alone
+    // exposed the former selected-row initialization undercount.
+    let minimum_packed_stores = (MAX_WORKERS * KV_TILE * width) as u64;
+    assert!(
+        required.scalar_work_items >= minimum_packed_stores,
+        "idle-worker packed scratch initialization was not fully charged"
+    );
+    assert!(matches!(
+        plan.execute(
+            selection,
+            Limits {
+                max_bytes: usize::MAX,
+                max_scalar_work: minimum_packed_stores - 1,
+            }
+        ),
+        Err(Error::WorkLimit { .. })
+    ));
+}

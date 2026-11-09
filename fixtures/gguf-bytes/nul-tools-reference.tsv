@@ -1,0 +1,116 @@
+# Original reserved-key aliases, metadata overwrite order and native tensor prefix collisions; C/I/A/E as tools-reference.tsv
+C	key-nul-single	1	split	input.gguf	result	128
+I	input.gguf	0	160
+A	input.gguf	0	160
+A	result-00001-of-00001.gguf	160	224
+E
+C	key-nul-collision	1	split	input.gguf	result	128
+I	input.gguf	384	192
+A	input.gguf	384	192
+A	result-00001-of-00001.gguf	576	224
+E
+C	key-nul-exact-collision	1	split	input.gguf	result	128
+I	input.gguf	800	160
+A	input.gguf	800	160
+A	result-00001-of-00001.gguf	576	224
+E
+C	key-nul-leading	0	split	input.gguf	result	128
+I	input.gguf	960	160
+A	input.gguf	960	160
+E
+C	key-empty	0	split	input.gguf	result	128
+I	input.gguf	1120	128
+A	input.gguf	1120	128
+E
+C	key-nul-split-count	1	split	input.gguf	result	128
+I	input.gguf	1248	160
+A	input.gguf	1248	160
+A	result-00001-of-00001.gguf	1408	224
+E
+C	key-nul-alignment	1	split	input.gguf	result	128
+I	input.gguf	1632	192
+A	input.gguf	1632	192
+A	result-00001-of-00001.gguf	1824	256
+E
+C	key-nul-alignment-collision	1	split	input.gguf	result	128
+I	input.gguf	2080	256
+A	input.gguf	2080	256
+A	result-00001-of-00001.gguf	2336	256
+E
+C	key-nul-alignment-type-collision	0	split	input.gguf	result	128
+I	input.gguf	2592	256
+A	input.gguf	2592	256
+E
+C	name-nul-single	1	split	input.gguf	result	128
+I	input.gguf	2848	128
+A	input.gguf	2848	128
+A	result-00001-of-00001.gguf	2976	224
+E
+C	name-nul-leading	1	split	input.gguf	result	128
+I	input.gguf	3200	128
+A	input.gguf	3200	128
+A	result-00001-of-00001.gguf	3328	192
+E
+C	name-nul-collision	0	split	input.gguf	result	128
+I	input.gguf	3520	192
+A	input.gguf	3520	192
+E
+C	name-nul-collision-split-one	1	split	input.gguf	result	1
+I	input.gguf	3520	192
+A	input.gguf	3520	192
+A	result-00001-of-00002.gguf	3712	224
+A	result-00002-of-00002.gguf	3936	192
+E
+C	name-nul-exact-collision	0	split	input.gguf	result	128
+I	input.gguf	4128	192
+A	input.gguf	4128	192
+E
+C	name-nul-exact-collision-split-one	1	split	input.gguf	result	1
+I	input.gguf	4128	192
+A	input.gguf	4128	192
+A	result-00001-of-00002.gguf	3712	224
+A	result-00002-of-00002.gguf	3936	192
+E
+C	key-non-utf8	1	split	input.gguf	result	128
+I	input.gguf	4320	128
+A	input.gguf	4320	128
+A	result-00001-of-00001.gguf	4448	224
+E
+C	value-non-utf8	1	split	input.gguf	result	128
+I	input.gguf	4672	128
+A	input.gguf	4672	128
+A	result-00001-of-00001.gguf	4800	224
+E
+C	name-non-utf8	1	split	input.gguf	result	128
+I	input.gguf	5024	128
+A	input.gguf	5024	128
+A	result-00001-of-00001.gguf	5152	224
+E
+C	merge-key-nul-primary-count	1	merge	in-00001-of-00002.gguf	merged.gguf	0
+I	in-00001-of-00002.gguf	5376	224
+I	in-00002-of-00002.gguf	5600	192
+A	in-00001-of-00002.gguf	5376	224
+A	in-00002-of-00002.gguf	5600	192
+A	merged.gguf	5792	288
+E
+C	merge-key-nul-primary-total	1	merge	in-00001-of-00002.gguf	merged.gguf	0
+I	in-00001-of-00002.gguf	6080	224
+I	in-00002-of-00002.gguf	5600	192
+A	in-00001-of-00002.gguf	6080	224
+A	in-00002-of-00002.gguf	5600	192
+A	merged.gguf	5792	288
+E
+C	merge-key-nul-secondary-no	1	merge	in-00001-of-00002.gguf	merged.gguf	0
+I	in-00001-of-00002.gguf	6304	224
+I	in-00002-of-00002.gguf	6528	192
+A	in-00001-of-00002.gguf	6304	224
+A	in-00002-of-00002.gguf	6528	192
+A	merged.gguf	5792	288
+E
+C	merge-key-nul-secondary-count	1	merge	in-00001-of-00002.gguf	merged.gguf	0
+I	in-00001-of-00002.gguf	6304	224
+I	in-00002-of-00002.gguf	6720	192
+A	in-00001-of-00002.gguf	6304	224
+A	in-00002-of-00002.gguf	6720	192
+A	merged.gguf	5792	288
+E

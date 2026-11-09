@@ -137,6 +137,15 @@ pub(crate) struct KvLayer {
     pub values: Vec<f32>,
 }
 
+/// Per-token projection before cache storage conversion. Keeping this boundary
+/// separate lets native microbatches publish every current-layer K/V row before
+/// any query attends, while the strict sequential path retains its order.
+pub(crate) struct LayerProjection {
+    pub query: Vec<f32>,
+    pub key: Vec<f32>,
+    pub value: Vec<f32>,
+}
+
 impl LlamaModel {
     pub fn new(config: LlamaConfig, weights: LlamaWeights) -> Result<Self> {
         config.validate()?;
@@ -265,22 +274,15 @@ impl LlamaModel {
         let scale = c
             .attention_scale
             .unwrap_or_else(|| (head_dim as f32).sqrt().recip());
-        for (index, (layer, kv)) in self.weights.layers.iter().zip(cache).enumerate() {
+        for (index, kv) in cache.iter_mut().enumerate() {
             if cancel() {
                 return Err(Error::Cancelled);
             }
-            let norm = math::rms_norm(&hidden, &layer.attention_norm, c.rms_epsilon)?;
-            let mut q =
-                adapters.multiply(&format!("blk.{index}.attn_q.weight"), &layer.query, &norm)?;
-            let mut k =
-                adapters.multiply(&format!("blk.{index}.attn_k.weight"), &layer.key, &norm)?;
-            let mut v =
-                adapters.multiply(&format!("blk.{index}.attn_v.weight"), &layer.value, &norm)?;
-            math::bias(&mut q, &layer.query_bias);
-            math::bias(&mut k, &layer.key_bias);
-            math::bias(&mut v, &layer.value_bias);
-            math::rope(&mut q, c.head_dim()?, position, c.rope_base);
-            math::rope(&mut k, c.head_dim()?, position, c.rope_base);
+            let LayerProjection {
+                query: q,
+                key: mut k,
+                value: mut v,
+            } = self.project_layer(index, &hidden, position, adapters)?;
             // Native cache storage rounds at the original graph's copy into
             // K/V tensors. Nonflash Q and probability operands stay F32.
             k.iter_mut()
@@ -299,32 +301,84 @@ impl LlamaModel {
                 scale,
                 layout,
             )?;
-            let mut projected = adapters.multiply(
-                &format!("blk.{index}.attn_output.weight"),
-                &layer.attention_output,
-                &attention,
-            )?;
-            math::bias(&mut projected, &layer.attention_output_bias);
-            math::add(&mut hidden, &projected);
-            let norm = math::rms_norm(&hidden, &layer.feed_forward_norm, c.rms_epsilon)?;
-            let mut gate =
-                adapters.multiply(&format!("blk.{index}.ffn_gate.weight"), &layer.gate, &norm)?;
-            let mut up =
-                adapters.multiply(&format!("blk.{index}.ffn_up.weight"), &layer.up, &norm)?;
-            math::bias(&mut gate, &layer.gate_bias);
-            math::bias(&mut up, &layer.up_bias);
-            math::native_rows::silu_f32_in_place(&mut gate);
-            for (gate, up) in gate.iter_mut().zip(up) {
-                *gate *= up;
-            }
-            let mut ffn =
-                adapters.multiply(&format!("blk.{index}.ffn_down.weight"), &layer.down, &gate)?;
-            math::bias(&mut ffn, &layer.down_bias);
-            math::add(&mut hidden, &ffn);
-            adapters.control(index, &mut hidden);
-            math::finite(&hidden, "Llama layer output")?;
+            hidden = self.finish_layer(index, hidden, &attention, adapters)?;
         }
-        let embedding = math::rms_norm(&hidden, &self.weights.output_norm, c.rms_epsilon)?;
+        self.finish_hidden(&hidden, adapters)
+    }
+
+    pub(crate) fn project_layer(
+        &self,
+        index: usize,
+        hidden: &[f32],
+        position: usize,
+        adapters: &AdapterSet,
+    ) -> Result<LayerProjection> {
+        let c = &self.config;
+        let layer = self.weights.layers.get(index).ok_or_else(|| {
+            Error::InvalidState("Llama layer projection index is outside the model".into())
+        })?;
+        let norm = math::rms_norm(hidden, &layer.attention_norm, c.rms_epsilon)?;
+        let mut q =
+            adapters.multiply(&format!("blk.{index}.attn_q.weight"), &layer.query, &norm)?;
+        let mut k = adapters.multiply(&format!("blk.{index}.attn_k.weight"), &layer.key, &norm)?;
+        let mut v =
+            adapters.multiply(&format!("blk.{index}.attn_v.weight"), &layer.value, &norm)?;
+        math::bias(&mut q, &layer.query_bias);
+        math::bias(&mut k, &layer.key_bias);
+        math::bias(&mut v, &layer.value_bias);
+        math::rope(&mut q, c.head_dim()?, position, c.rope_base);
+        math::rope(&mut k, c.head_dim()?, position, c.rope_base);
+        Ok(LayerProjection {
+            query: q,
+            key: k,
+            value: v,
+        })
+    }
+
+    pub(crate) fn finish_layer(
+        &self,
+        index: usize,
+        mut hidden: Vec<f32>,
+        attention: &[f32],
+        adapters: &AdapterSet,
+    ) -> Result<Vec<f32>> {
+        let c = &self.config;
+        let layer = self.weights.layers.get(index).ok_or_else(|| {
+            Error::InvalidState("Llama layer finish index is outside the model".into())
+        })?;
+        let mut projected = adapters.multiply(
+            &format!("blk.{index}.attn_output.weight"),
+            &layer.attention_output,
+            attention,
+        )?;
+        math::bias(&mut projected, &layer.attention_output_bias);
+        math::add(&mut hidden, &projected);
+        let norm = math::rms_norm(&hidden, &layer.feed_forward_norm, c.rms_epsilon)?;
+        let mut gate =
+            adapters.multiply(&format!("blk.{index}.ffn_gate.weight"), &layer.gate, &norm)?;
+        let mut up = adapters.multiply(&format!("blk.{index}.ffn_up.weight"), &layer.up, &norm)?;
+        math::bias(&mut gate, &layer.gate_bias);
+        math::bias(&mut up, &layer.up_bias);
+        math::native_rows::silu_f32_in_place(&mut gate);
+        for (gate, up) in gate.iter_mut().zip(up) {
+            *gate *= up;
+        }
+        let mut ffn =
+            adapters.multiply(&format!("blk.{index}.ffn_down.weight"), &layer.down, &gate)?;
+        math::bias(&mut ffn, &layer.down_bias);
+        math::add(&mut hidden, &ffn);
+        adapters.control(index, &mut hidden);
+        math::finite(&hidden, "Llama layer output")?;
+        Ok(hidden)
+    }
+
+    pub(crate) fn finish_hidden(
+        &self,
+        hidden: &[f32],
+        adapters: &AdapterSet,
+    ) -> Result<(Vec<f32>, Vec<f32>)> {
+        let c = &self.config;
+        let embedding = math::rms_norm(hidden, &self.weights.output_norm, c.rms_epsilon)?;
         let output = self
             .weights
             .output

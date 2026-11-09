@@ -1,0 +1,154 @@
+//! Reuse sealed original kernel input/output bytes through the tensor DAG.
+//! These are adapter regressions, not additional independent source captures.
+#![cfg(all(
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+
+// These shared readers expose other cohorts exercised in the quant crate.
+#[allow(dead_code)]
+#[path = "../../quant/tests/common/flash_fixture.rs"]
+mod dense;
+#[allow(dead_code)]
+#[path = "../../quant/tests/common/flash_rows_fixture.rs"]
+mod mapped;
+use llama_quant::flash_attention::Params;
+use llama_tensor::{DType, FlashAttentionOptions, Graph, Op, Tensor, TensorDesc};
+
+struct GraphCase<'a> {
+    label: &'a str,
+    values: Vec<Tensor>,
+    params: Params,
+    with_mask: bool,
+    with_sinks: bool,
+    with_rows: bool,
+    shape: [usize; 4],
+}
+fn compare(
+    case: GraphCase<'_>,
+    expected: &[u8],
+    forced: &[u8],
+    failures: &mut Vec<String>,
+) -> usize {
+    for (force_reference, expected) in [(false, expected), (true, forced)] {
+        let mut graph = Graph::new();
+        let nodes = case
+            .values
+            .iter()
+            .map(|value| graph.input(value.clone()))
+            .collect::<Vec<_>>();
+        let options = FlashAttentionOptions {
+            params: Params {
+                force_reference,
+                ..case.params
+            },
+            ..FlashAttentionOptions::default()
+        };
+        let node = graph
+            .op(
+                Op::FlashAttnExt {
+                    options,
+                    with_mask: case.with_mask,
+                    with_sinks: case.with_sinks,
+                    with_rows: case.with_rows,
+                },
+                &nodes,
+            )
+            .unwrap();
+        let actual = graph
+            .evaluate(node)
+            .unwrap_or_else(|error| panic!("{}: {error}", case.label));
+        assert_eq!(actual.shape(), case.shape);
+        assert_eq!(actual.dtype(), DType::F32);
+        let actual = actual.to_bytes().unwrap();
+        assert_eq!(actual.len(), expected.len());
+        let changed = actual
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .zip(expected.as_chunks::<4>().0.iter())
+            .filter(|(a, b)| a != b)
+            .count();
+        if changed != 0 {
+            failures.push(format!(
+                "{} forced={force_reference}: {changed} changed words",
+                case.label
+            ));
+        }
+    }
+    (expected.len() + forced.len()) / 4
+}
+#[test]
+fn sealed_dense_and_mapped_nan_payloads_survive_the_dag_boundary() {
+    let mut graphs = 0;
+    let mut words = 0;
+    let mut failures = Vec::new();
+    for case in dense::load_nan_operands() {
+        let values = case
+            .raw_inputs
+            .iter()
+            .map(|input| {
+                Tensor::from_bytes(
+                    TensorDesc::with_strides(input.dtype, input.shape, input.strides).unwrap(),
+                    input.raw.to_vec(),
+                )
+                .unwrap()
+            })
+            .collect();
+        let label = format!("{}:{}", case.cohort, case.name);
+        words += compare(
+            GraphCase {
+                label: &label,
+                values,
+                params: case.params,
+                with_mask: case.inputs.mask.is_some(),
+                with_sinks: case.inputs.sinks.is_some(),
+                with_rows: false,
+                shape: case.shape,
+            },
+            case.expected,
+            case.forced,
+            &mut failures,
+        );
+        graphs += 1;
+    }
+    for case in mapped::load() {
+        assert_eq!(case.rows.shape()[1], case.inputs.q.shape()[3]);
+        let values = case
+            .raw_inputs
+            .iter()
+            .map(|input| {
+                Tensor::from_bytes(
+                    TensorDesc::with_strides(input.dtype, input.shape, input.strides).unwrap(),
+                    input.raw.to_vec(),
+                )
+                .unwrap()
+            })
+            .collect();
+        let label = format!("{}:{}", case.cohort, case.name);
+        words += compare(
+            GraphCase {
+                label: &label,
+                values,
+                params: case.params,
+                with_mask: case.inputs.mask.is_some(),
+                with_sinks: case.inputs.sinks.is_some(),
+                with_rows: true,
+                shape: case.shape,
+            },
+            case.expected,
+            case.forced,
+            &mut failures,
+        );
+        graphs += 1;
+    }
+    eprintln!(
+        "{graphs} sealed original graphs replayed through the tensor DAG: {words} exact default/forced words, {} failures",
+        failures.len()
+    );
+    assert_eq!((graphs, words), (896, 2343160));
+    assert!(failures.is_empty(), "{failures:#?}");
+}

@@ -1,7 +1,7 @@
 use crate::*;
 use llama_model_runtime::{
-    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType,
-    OutputSelection,
+    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, NativeExecutionOptions,
+    NativeKvType, OutputSelection,
 };
 use std::collections::BTreeMap;
 use std::ffi::c_void;
@@ -51,9 +51,9 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         || ![-1, 0].contains(&p.rope_scaling_type)
         || ![-1, 0].contains(&p.pooling_type)
         || ![-1, 0].contains(&p.attention_type)
-        || p.flash_attn_type != 0
+        || ![-1, 0, 1].contains(&p.flash_attn_type)
     {
-        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and explicitly disabled flash attention are supported; native AUTO/flash arithmetic is not yet available".into());
+        return Err("only default decoder, unscaled RoPE, no pooling, causal attention and defined AUTO/DISABLED/ENABLED flash modes are supported".into());
     }
     if !(p.rope_freq_base == 0.0 || p.rope_freq_base == data.rope_base)
         || !(p.rope_freq_scale == 0.0 || p.rope_freq_scale == 1.0)
@@ -85,9 +85,9 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     if p.no_perf == 0 {
         return Err("performance counters are not implemented".into());
     }
-    if p.n_threads != 1 || p.n_threads_batch != 1 {
-        return Err("the current scalar executor requires exactly one worker thread".into());
-    }
+    let threads = usize::try_from(p.n_threads).map_err(|_| "negative generation worker count")?;
+    let threads_batch =
+        usize::try_from(p.n_threads_batch).map_err(|_| "negative batch worker count")?;
     if p.n_seq_max == 0 || p.n_seq_max > 256 || p.n_batch == 0 || p.n_batch > 65536 {
         return Err("invalid context sequence/batch limits".into());
     }
@@ -97,13 +97,23 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         p.n_ctx
     };
     let n_batch = p.n_batch.min(n_ctx);
+    // The frozen output reserve asserts if n_seq_max exceeds its default
+    // n_batch output-row ceiling. Reject that source-invalid configuration
+    // before construction instead of exposing a process abort through C.
+    if p.n_seq_max > n_batch {
+        return Err("configured sequence count exceeds the default output-row ceiling".into());
+    }
     let n_ubatch = (if p.n_ubatch == 0 {
         p.n_batch
     } else {
         p.n_ubatch
     })
     .min(n_batch);
-    let runtime = NativeContext::new_with_cache_types(
+    // Frozen ordinary CPU support accepts FLASH_ATTN_EXT and assigns the probe
+    // to the same CPU as the model layer. Within this admitted Llama/F32-or-F16
+    // domain AUTO therefore resolves to enabled; other architectures/devices
+    // remain outside this constructor's compatibility scope.
+    let runtime = NativeContext::new_with_execution(
         loaded.runtime_model().map_err(|e| e.to_string())?,
         NativeContextOptions {
             context_tokens: n_ctx as usize,
@@ -114,6 +124,12 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         },
         key_type,
         value_type,
+        NativeExecutionOptions {
+            flash_attention: p.flash_attn_type != 0,
+            threads,
+            threads_batch,
+            embeddings: p.embeddings != 0,
+        },
     )
     .map_err(|e| e.to_string())?;
     let n_ctx = runtime.context_tokens() as u32;
@@ -195,39 +211,42 @@ ffi!(
     }
 );
 ffi!(llama_n_threads(context: *mut ContextHandle) -> i32, 0, {
-    unsafe {
-        reference(context)?;
-    }
-    Ok(1)
+    Ok(unsafe { reference(context)? }
+        .runtime
+        .execution_options()
+        .threads as i32)
 });
 ffi!(
     llama_n_threads_batch(context: *mut ContextHandle) -> i32,
     0,
     {
-        unsafe {
-            reference(context)?;
-        }
-        Ok(1)
+        Ok(unsafe { reference(context)? }
+            .runtime
+            .execution_options()
+            .threads_batch as i32)
     }
 );
 ffi!(
     llama_set_n_threads(context: *mut ContextHandle, generation: i32, batch: i32) -> (),
     (),
     {
-        unsafe {
-            reference_mut(context)?;
-        }
-        if generation != 1 || batch != 1 {
-            return Err("the current scalar executor supports exactly one worker thread".into());
-        }
-        Ok(())
+        let generation =
+            usize::try_from(generation).map_err(|_| "negative generation worker count")?;
+        let batch = usize::try_from(batch).map_err(|_| "negative batch worker count")?;
+        unsafe { reference_mut(context)? }
+            .runtime
+            .set_threads(generation, batch)
+            .map_err(|error| error.to_string())
     }
 );
 ffi!(
     llama_set_embeddings(context: *mut ContextHandle, enabled: u8) -> (),
     (),
     {
-        unsafe { reference_mut(context)? }.embeddings_enabled = boolean(enabled)?;
+        let enabled = boolean(enabled)?;
+        let context = unsafe { reference_mut(context)? };
+        context.runtime.set_embeddings(enabled);
+        context.embeddings_enabled = enabled;
         Ok(())
     }
 );
@@ -361,7 +380,7 @@ unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> 
         } else {
             Input::Embedding(embeddings.unwrap()[i * width..(i + 1) * width].to_vec())
         };
-        let requested = flags.map_or(c.embeddings_enabled || i == n - 1, |f| f[i] != 0);
+        let requested = c.embeddings_enabled || flags.map_or(i == n - 1, |f| f[i] != 0);
         let output = if !requested {
             OutputSelection::None
         } else if c.embeddings_enabled {

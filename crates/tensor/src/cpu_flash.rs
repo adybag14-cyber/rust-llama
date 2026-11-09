@@ -1,0 +1,637 @@
+//! Tensor/graph boundary for the single maintained quant-crate flash kernel.
+//! Source constructor validation is distinct from nonempty CPU execution.
+//! No dot, softmax, tile, row-map or worker arithmetic is duplicated here.
+
+use crate::graph::check_cancel;
+use crate::{DType, Op, Result, Tensor, TensorDesc, TensorError};
+use llama_quant::flash_attention::{
+    self as flash, ExecutionStats, Inputs, KvRows, Limits, MemoryRequirements, Params, Plan,
+    Selection, View4,
+};
+use std::sync::atomic::AtomicBool;
+
+/// Original op fields and explicit execution policy for FLASH_ATTN_EXT.
+///
+/// Inputs to Op::FlashAttnExt are Q, K, V, followed by each enabled mask,
+/// sinks and row-map tensor in that order. The complete original query/mask
+/// geometry is retained. Output order is [DV, heads, queries, batches].
+#[derive(Clone, Copy, Debug, Default)]
+pub struct FlashAttentionOptions {
+    /// Scale, ALiBi, softcap, worker count, captured arithmetic profiles and
+    /// the original graph plan's force-reference diagnostic policy.
+    pub params: Params,
+    /// Exact signed source op slot. Nonempty CPU nodes accept 0 (default),
+    /// 10 (F32) and 15 (BF16), with the same F32 accumulator implementation.
+    /// Other values are retained by graph construction and rejected on execution.
+    pub precision: i32,
+    /// Source hint slot, required to be nonnegative. The frozen CPU ignores it.
+    pub n_kv_max: i32,
+    /// Operator-local logical allocation/work envelope. Includes shared-kernel
+    /// transients and conversion into immutable tensor storage. Borrowed inputs,
+    /// other retained DAG nodes and allocator/OS overhead are outside this bound.
+    pub limits: Limits,
+}
+
+/// Cloneable diagnostics retain checked kernel failures without flattening them
+/// into fabricated results or discarding worker-creation error categories.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum FlashAttentionError {
+    Invalid(&'static str),
+    UnsupportedDType(DType),
+    UnsupportedPrecision(i32),
+    ResourceLimit {
+        required: usize,
+        limit: usize,
+    },
+    WorkLimit {
+        required: u64,
+        limit: u64,
+    },
+    ThreadSpawn {
+        kind: std::io::ErrorKind,
+        raw_os_error: Option<i32>,
+    },
+    WorkerPanic,
+}
+impl std::fmt::Display for FlashAttentionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Invalid(message) => write!(f, "invalid flash attention input: {message}"),
+            Self::UnsupportedDType(dtype) => {
+                write!(f, "unsupported flash attention dtype: {dtype:?}")
+            }
+            Self::UnsupportedPrecision(value) => {
+                write!(
+                    f,
+                    "source CPU flash attention does not execute precision {value}"
+                )
+            }
+            Self::ResourceLimit { required, limit } => {
+                write!(
+                    f,
+                    "flash attention operator requires {required} budget bytes; limit is {limit}"
+                )
+            }
+            Self::WorkLimit { required, limit } => {
+                write!(
+                    f,
+                    "flash attention operator requires {required} work items; limit is {limit}"
+                )
+            }
+            Self::ThreadSpawn { kind, raw_os_error } => {
+                write!(
+                    f,
+                    "flash attention worker creation failed: {kind:?}, OS error {raw_os_error:?}"
+                )
+            }
+            Self::WorkerPanic => f.write_str("flash attention worker panicked"),
+        }
+    }
+}
+impl std::error::Error for FlashAttentionError {}
+impl From<FlashAttentionError> for TensorError {
+    fn from(error: FlashAttentionError) -> Self {
+        Self::FlashAttention(error)
+    }
+}
+fn kernel_error(error: flash::Error) -> TensorError {
+    match error {
+        flash::Error::Overflow => TensorError::Overflow,
+        flash::Error::Allocation => TensorError::AllocationFailed,
+        flash::Error::Invalid(message) => FlashAttentionError::Invalid(message).into(),
+        flash::Error::UnsupportedDType(dtype) => {
+            FlashAttentionError::UnsupportedDType(dtype).into()
+        }
+        flash::Error::ResourceLimit { required, limit } => {
+            FlashAttentionError::ResourceLimit { required, limit }.into()
+        }
+        flash::Error::WorkLimit { required, limit } => {
+            FlashAttentionError::WorkLimit { required, limit }.into()
+        }
+        flash::Error::ThreadSpawn(error) => FlashAttentionError::ThreadSpawn {
+            kind: error.kind(),
+            raw_os_error: error.raw_os_error(),
+        }
+        .into(),
+        flash::Error::WorkerPanic => FlashAttentionError::WorkerPanic.into(),
+    }
+}
+fn mul(left: usize, right: usize) -> Result<usize> {
+    left.checked_mul(right).ok_or(TensorError::Overflow)
+}
+fn add(left: usize, right: usize) -> Result<usize> {
+    left.checked_add(right).ok_or(TensorError::Overflow)
+}
+
+#[derive(Clone, Copy)]
+struct OptionalInputs {
+    mask: bool,
+    sinks: bool,
+    rows: bool,
+}
+struct Sources<'a> {
+    q: &'a Tensor,
+    k: &'a Tensor,
+    v: &'a Tensor,
+    mask: Option<&'a Tensor>,
+    sinks: Option<&'a Tensor>,
+    rows: Option<&'a Tensor>,
+}
+impl<'a> Sources<'a> {
+    fn new(src: &[&'a Tensor], optional: OptionalInputs) -> Result<Self> {
+        let expected = 3
+            + usize::from(optional.mask)
+            + usize::from(optional.sinks)
+            + usize::from(optional.rows);
+        if src.len() != expected {
+            return Err(TensorError::InvalidArity {
+                expected,
+                actual: src.len(),
+            });
+        }
+        let mut next = 3;
+        let mask = optional.mask.then(|| {
+            let value = src[next];
+            next += 1;
+            value
+        });
+        let sinks = optional.sinks.then(|| {
+            let value = src[next];
+            next += 1;
+            value
+        });
+        let rows = optional.rows.then(|| src[next]);
+        Ok(Self {
+            q: src[0],
+            k: src[1],
+            v: src[2],
+            mask,
+            sinks,
+            rows,
+        })
+    }
+
+    /// Source graph-constructor checks also apply to empty-output nodes.
+    /// A zero divisor would be undefined in ggml_can_mul_mat, so it is rejected.
+    fn constructor(&self, options: FlashAttentionOptions) -> Result<[usize; 4]> {
+        for tensor in [
+            Some(self.q),
+            Some(self.k),
+            Some(self.v),
+            self.mask,
+            self.sinks,
+            self.rows,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if tensor
+                .desc
+                .ne
+                .iter()
+                .any(|&dimension| i64::try_from(dimension).is_err())
+            {
+                return Err(TensorError::Shape(
+                    "FLASH_ATTN_EXT dimensions exceed the signed-I64 source tensor domain",
+                ));
+            }
+        }
+        let q = self.q.desc.ne;
+        let k = self.k.desc.ne;
+        let v = self.v.desc.ne;
+        if k[2] == 0
+            || k[3] == 0
+            || q[0] != k[0]
+            || !q[2].is_multiple_of(k[2])
+            || !q[3].is_multiple_of(k[3])
+        {
+            return Err(TensorError::Shape(
+                "FLASH_ATTN_EXT Q/K matrix dimensions do not match",
+            ));
+        }
+        if let Some(rows) = self.rows {
+            let mask = self
+                .mask
+                .ok_or(TensorError::Shape("FLASH_ATTN_EXT row maps require a mask"))?;
+            if rows.desc.dtype != DType::I32 {
+                return Err(TensorError::Type {
+                    expected: DType::I32,
+                    actual: rows.desc.dtype,
+                });
+            }
+            if !rows.desc.is_contiguous()
+                || rows.desc.ne != [mask.desc.ne[0], q[3], 1, 1]
+                || k[3] != 1
+                || v[3] != 1
+            {
+                return Err(TensorError::Shape(
+                    "FLASH_ATTN_EXT requires contiguous I32 row maps and shared K/V batches",
+                ));
+            }
+        } else if q[3] != k[3] || q[3] != v[3] {
+            return Err(TensorError::Shape(
+                "FLASH_ATTN_EXT dense Q/K/V batches must match",
+            ));
+        }
+        if let Some(mask) = self.mask {
+            if mask.desc.dtype != DType::F16 {
+                return Err(TensorError::Type {
+                    expected: DType::F16,
+                    actual: mask.desc.dtype,
+                });
+            }
+            if !mask.desc.is_contiguous()
+                || mask.desc.ne[2] == 0
+                || mask.desc.ne[3] == 0
+                || !q[2].is_multiple_of(mask.desc.ne[2])
+                || !q[3].is_multiple_of(mask.desc.ne[3])
+            {
+                return Err(TensorError::Shape(
+                    "FLASH_ATTN_EXT mask must be contiguous with source head/batch broadcasting",
+                ));
+            }
+        } else if options.params.max_bias > 0.0 {
+            return Err(TensorError::Parameters(
+                "positive FLASH_ATTN_EXT max_bias requires a mask",
+            ));
+        }
+        if let Some(sinks) = self.sinks {
+            if sinks.desc.dtype != DType::F32 {
+                return Err(TensorError::Type {
+                    expected: DType::F32,
+                    actual: sinks.desc.dtype,
+                });
+            }
+            if sinks.desc.ne[0] != q[2] {
+                return Err(TensorError::Shape(
+                    "FLASH_ATTN_EXT sinks must have one first-axis entry per Q head",
+                ));
+            }
+        }
+        if options.n_kv_max < 0 {
+            return Err(TensorError::Parameters(
+                "FLASH_ATTN_EXT n_kv_max must be nonnegative",
+            ));
+        }
+        if options.params.workers == 0 || options.params.workers > flash::MAX_WORKERS {
+            return Err(FlashAttentionError::Invalid("worker count must be in 1..=256").into());
+        }
+        Ok([v[0], q[2], q[1], q[3]])
+    }
+
+    fn plan(&self, options: FlashAttentionOptions) -> Result<Plan<'a>> {
+        if ![0, 10, 15].contains(&options.precision) {
+            return Err(FlashAttentionError::UnsupportedPrecision(options.precision).into());
+        }
+        if [self.q, self.k, self.v]
+            .iter()
+            .any(|tensor| tensor.desc.ne.contains(&0))
+            || self.rows.is_some_and(|rows| rows.desc.ne.contains(&0))
+        {
+            return Err(TensorError::Unsupported(
+                "nonempty FLASH_ATTN_EXT with empty Q/K/V or row-map extents is not implemented",
+            ));
+        }
+        let view = |tensor: &'a Tensor| {
+            View4::from_bytes(
+                tensor.desc.dtype,
+                &tensor.data,
+                tensor.desc.ne,
+                tensor.desc.nb,
+                tensor.offset,
+            )
+            .map_err(kernel_error)
+        };
+        let sinks = self
+            .sinks
+            .map(|tensor| {
+                let heads = self.q.desc.ne[2];
+                let row = mul(heads, 4)?;
+                // Frozen CPU dereferences ((float *) sinks->data)[head]. It ignores
+                // logical sink strides/trailing dimensions, including zero extents.
+                // The retained Arc must still contain the entire physical prefix.
+                let end = add(tensor.offset, row)?;
+                if end > tensor.data.len() {
+                    return Err(TensorError::Bounds);
+                }
+                View4::from_bytes(
+                    DType::F32,
+                    &tensor.data,
+                    [heads, 1, 1, 1],
+                    [4, row, row, row],
+                    tensor.offset,
+                )
+                .map_err(kernel_error)
+            })
+            .transpose()?;
+        let inputs = Inputs {
+            q: view(self.q)?,
+            k: view(self.k)?,
+            v: view(self.v)?,
+            mask: self.mask.map(view).transpose()?,
+            sinks,
+        };
+        let plan = if let Some(rows) = self.rows {
+            let rows =
+                KvRows::from_bytes(&rows.data, [rows.desc.ne[0], rows.desc.ne[1]], rows.offset)
+                    .map_err(kernel_error)?;
+            Plan::new_with_rows(inputs, rows, options.params)
+        } else {
+            Plan::new(inputs, options.params)
+        };
+        plan.map_err(kernel_error)
+    }
+}
+
+/// Logical allowance for immutable Arc header/alignment. Like the shared kernel's
+/// thread metadata allowance, this is not an allocator/OS resident-byte promise.
+const ARC_METADATA_ALLOWANCE: usize = 64;
+#[derive(Clone, Copy, Debug)]
+struct OperatorRequirements {
+    peak_bytes: usize,
+    copy_work: u64,
+    total_work: u64,
+}
+fn requirements(
+    kernel: Option<MemoryRequirements>,
+    output_bytes: usize,
+) -> Result<OperatorRequirements> {
+    // Conversion has two phases: F32 Vec + byte Vec, then byte Vec + Arc.
+    // The F32 Vec is explicitly dropped before the Arc allocation below.
+    let conversion_peak = add(mul(output_bytes, 2)?, ARC_METADATA_ALLOWANCE)?;
+    // Conservative visits for reading/serializing F32 and copying bytes to Arc.
+    let copy_work = u64::try_from(output_bytes)
+        .map_err(|_| TensorError::Overflow)?
+        .checked_mul(3)
+        .and_then(|n| n.checked_add(ARC_METADATA_ALLOWANCE as u64))
+        .ok_or(TensorError::Overflow)?;
+    Ok(OperatorRequirements {
+        peak_bytes: conversion_peak.max(kernel.map_or(0, |value| value.peak_bytes)),
+        copy_work,
+        total_work: kernel
+            .map_or(0, |value| value.scalar_work_items)
+            .checked_add(copy_work)
+            .ok_or(TensorError::Overflow)?,
+    })
+}
+fn preflight(required: OperatorRequirements, limits: Limits) -> Result<()> {
+    if required.peak_bytes > limits.max_bytes {
+        return Err(FlashAttentionError::ResourceLimit {
+            required: required.peak_bytes,
+            limit: limits.max_bytes,
+        }
+        .into());
+    }
+    if required.total_work > limits.max_scalar_work {
+        return Err(FlashAttentionError::WorkLimit {
+            required: required.total_work,
+            limit: limits.max_scalar_work,
+        }
+        .into());
+    }
+    Ok(())
+}
+
+/// Cancellation is observed around kernel execution and during output copying.
+/// There is no in-kernel cancellation or graph-wide retained-buffer budget.
+fn run(
+    src: Sources<'_>,
+    options: FlashAttentionOptions,
+    cancel: &AtomicBool,
+) -> Result<(Tensor, Option<ExecutionStats>)> {
+    check_cancel(cancel)?;
+    let shape = src.constructor(options)?;
+    let desc = TensorDesc::contiguous(DType::F32, shape)?;
+    if shape.contains(&0) {
+        // The original CPU graph dispatcher skips empty output nodes, even
+        // when their precision would be unsupported for a nonempty output.
+        preflight(requirements(None, 0)?, options.limits)?;
+        check_cancel(cancel)?;
+        return Ok((Tensor::from_bytes(desc, Vec::new())?, None));
+    }
+    let plan = src.plan(options)?;
+    let kernel = plan.requirements(Selection::All).map_err(kernel_error)?;
+    let required = requirements(Some(kernel), kernel.output_bytes)?;
+    preflight(required, options.limits)?;
+    check_cancel(cancel)?;
+    let output = plan
+        .execute(
+            Selection::All,
+            Limits {
+                max_bytes: options.limits.max_bytes,
+                max_scalar_work: options.limits.max_scalar_work - required.copy_work,
+            },
+        )
+        .map_err(kernel_error)?;
+    check_cancel(cancel)?;
+    let stats = output.stats;
+    let values = output.values;
+    let mut bytes = Vec::new();
+    bytes
+        .try_reserve_exact(kernel.output_bytes)
+        .map_err(|_| TensorError::AllocationFailed)?;
+    for chunk in values.chunks(4096) {
+        check_cancel(cancel)?;
+        for value in chunk {
+            bytes.extend_from_slice(&value.to_bits().to_le_bytes());
+        }
+    }
+    drop(values);
+    check_cancel(cancel)?;
+    let result = Tensor::from_bytes(desc, bytes)?;
+    check_cancel(cancel)?;
+    Ok((result, Some(stats)))
+}
+
+pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Option<Result<Tensor>> {
+    let Op::FlashAttnExt {
+        options,
+        with_mask,
+        with_sinks,
+        with_rows,
+    } = op
+    else {
+        return None;
+    };
+    Some(
+        Sources::new(
+            src,
+            OptionalInputs {
+                mask: *with_mask,
+                sinks: *with_sinks,
+                rows: *with_rows,
+            },
+        )
+        .and_then(|src| run(src, *options, cancel))
+        .map(|(tensor, _)| tensor),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Graph;
+    use std::sync::atomic::Ordering;
+
+    fn qkv() -> [Tensor; 3] {
+        [
+            Tensor::from_f32([2, 1, 1, 1], &[0.5, -0.25]).unwrap(),
+            Tensor::from_f32([2, 1, 1, 1], &[0.75, 0.125]).unwrap(),
+            Tensor::from_f32([3, 1, 1, 1], &[1.0, -2.0, 3.0]).unwrap(),
+        ]
+    }
+    #[test]
+    fn actual_workers_and_atomic_local_budget_errors() {
+        let inputs = qkv();
+        let refs: Vec<_> = inputs.iter().collect();
+        let before: Vec<_> = inputs
+            .iter()
+            .map(|tensor| tensor.to_bytes().unwrap())
+            .collect();
+        let mut options = FlashAttentionOptions::default();
+        options.params.workers = 3;
+        let source = || {
+            Sources::new(
+                &refs,
+                OptionalInputs {
+                    mask: false,
+                    sinks: false,
+                    rows: false,
+                },
+            )
+            .unwrap()
+        };
+        let cancelled = AtomicBool::new(false);
+        let (output, stats) = run(source(), options, &cancelled).unwrap();
+        assert_eq!(output.to_f32().unwrap(), [1.0, -2.0, 3.0]);
+        let stats = stats.unwrap();
+        assert_eq!(stats.worker_threads, 3);
+        assert_eq!(stats.completed_partitions, 3);
+        assert_eq!(stats.mode, flash::ExecutionMode::ScopedWorkers);
+        // Independent lower bound: three additional worker stacks alone exceed
+        // this one-MiB ceiling, before any payload/descriptors are counted.
+        options.limits.max_bytes = 1024 * 1024;
+        assert!(matches!(
+            run(source(), options, &cancelled),
+            Err(TensorError::FlashAttention(
+                FlashAttentionError::ResourceLimit { .. }
+            ))
+        ));
+        options.limits = Limits {
+            max_scalar_work: 0,
+            ..Limits::default()
+        };
+        assert!(matches!(
+            run(source(), options, &cancelled),
+            Err(TensorError::FlashAttention(
+                FlashAttentionError::WorkLimit { .. }
+            ))
+        ));
+        options.limits = Limits::default();
+        cancelled.store(true, Ordering::Relaxed);
+        assert!(matches!(
+            run(source(), options, &cancelled),
+            Err(TensorError::Cancelled)
+        ));
+        for (tensor, original) in inputs.iter().zip(before) {
+            assert_eq!(tensor.to_bytes().unwrap(), original);
+        }
+    }
+    #[test]
+    fn short_flat_sink_backing_is_rejected_without_reading() {
+        let inputs = qkv();
+        let sink = Tensor::from_bytes(
+            TensorDesc::contiguous(DType::F32, [1, 0, 1, 1]).unwrap(),
+            Vec::new(),
+        )
+        .unwrap();
+        let mut graph = Graph::new();
+        let nodes =
+            [&inputs[0], &inputs[1], &inputs[2], &sink].map(|value| graph.input(value.clone()));
+        let out = graph
+            .op(
+                Op::FlashAttnExt {
+                    options: FlashAttentionOptions::default(),
+                    with_mask: false,
+                    with_sinks: true,
+                    with_rows: false,
+                },
+                &nodes,
+            )
+            .unwrap();
+        assert!(matches!(graph.evaluate(out), Err(TensorError::Bounds)));
+    }
+    #[cfg(target_pointer_width = "64")]
+    #[test]
+    fn empty_output_cannot_bypass_source_signed_dimension_bounds() {
+        let q = Tensor::from_bytes(
+            TensorDesc::contiguous(DType::F32, [1, 0, i64::MAX as usize + 1, 1]).unwrap(),
+            Vec::new(),
+        )
+        .unwrap();
+        let k = Tensor::from_f32([1, 1, 1, 1], &[0.0]).unwrap();
+        let v = Tensor::from_bytes(
+            TensorDesc::contiguous(DType::F32, [0, 1, 1, 1]).unwrap(),
+            Vec::new(),
+        )
+        .unwrap();
+        let mut graph = Graph::new();
+        let inputs = [q, k, v].map(|value| graph.input(value));
+        let output = graph
+            .op(
+                Op::FlashAttnExt {
+                    options: FlashAttentionOptions::default(),
+                    with_mask: false,
+                    with_sinks: false,
+                    with_rows: false,
+                },
+                &inputs,
+            )
+            .unwrap();
+        assert!(matches!(graph.evaluate(output), Err(TensorError::Shape(_))));
+    }
+    #[test]
+    fn graph_arity_and_row_map_failures_are_checked() {
+        let inputs = qkv();
+        let mut graph = Graph::new();
+        let nodes = inputs.map(|value| graph.input(value));
+        let op = Op::FlashAttnExt {
+            options: FlashAttentionOptions::default(),
+            with_mask: true,
+            with_sinks: false,
+            with_rows: true,
+        };
+        assert_eq!(op.code(), crate::OpCode::FLASH_ATTN_EXT);
+        assert!(matches!(
+            graph.op(op, &nodes),
+            Err(TensorError::InvalidArity {
+                expected: 5,
+                actual: 3
+            })
+        ));
+        let mask = Tensor::from_bytes(
+            TensorDesc::contiguous(DType::F16, [1, 1, 1, 1]).unwrap(),
+            vec![0x00, 0xfc],
+        )
+        .unwrap();
+        let rows = Tensor::from_i32([1, 1, 1, 1], &[1]).unwrap();
+        let mask = graph.input(mask);
+        let rows = graph.input(rows);
+        let out = graph
+            .op(
+                Op::FlashAttnExt {
+                    options: FlashAttentionOptions::default(),
+                    with_mask: true,
+                    with_sinks: false,
+                    with_rows: true,
+                },
+                &[nodes[0], nodes[1], nodes[2], mask, rows],
+            )
+            .unwrap();
+        // The physical index is invalid even though its logical mask is -Inf.
+        assert!(matches!(
+            graph.evaluate(out),
+            Err(TensorError::FlashAttention(FlashAttentionError::Invalid(_)))
+        ));
+    }
+}

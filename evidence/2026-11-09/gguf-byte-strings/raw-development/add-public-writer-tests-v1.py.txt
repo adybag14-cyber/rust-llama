@@ -1,0 +1,41 @@
+from pathlib import Path
+import hashlib,json,subprocess
+b=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=b/'rust-draft-v1';out=b/'raw-public-writer-tests-v1';out.mkdir(exist_ok=False)
+sha=lambda data:hashlib.sha256(data).hexdigest()
+p=repo/'crates/gguf/tests/raw_native.rs';before=p.read_bytes();assert sha(before)=='a1f6a4a75870fcd2da305f520df84db9bf6cf91a1de40209f69edee276270510'
+(out/'preimage.rs.txt').write_bytes(before);s=before.decode('utf-8')
+s=s.replace('use llama_gguf::{Limits, RawGguf, RawValue};','use llama_gguf::{Limits, RawGguf, RawValue, RawTensorDescriptor, write_raw_header};')
+assert 'RawTensorDescriptor' in s
+marker='fn number(text: &str) -> usize {'
+assert s.count(marker)==1
+s=s.replace(marker,'fn has_bool(value: &RawValue) -> bool {\n    match value {\n        RawValue::Bool(_) => true,\n        RawValue::Array {values,..} => values.iter().any(has_bool),\n        _ => false,\n    }\n}\n'+marker)
+s=s.replace('    let mut serialized_bytes = 0;','    let mut serialized_bytes = 0;\n    let mut raw_wire_headers = 0;\n    let mut raw_wire_bytes = 0;')
+marker='                    current = Some(raw);'
+assert s.count(marker)==1
+s=s.replace(marker,'''                    // The original input is the independent expected byte image
+                    // for the public lossless v3 writer. Boolean source inputs can
+                    // be noncanonical; their normalized bytes are already checked
+                    // against original native serialization above.
+                    if raw.version == 3 && !raw.metadata.values().any(has_bool) {
+                        let metadata: Vec<_> = raw.metadata_order()
+                            .map(|key| (key, &raw.metadata[key])).collect();
+                        let tensors: Vec<_> = raw.tensors.iter().map(|tensor| RawTensorDescriptor {
+                            name: tensor.name.as_slice(), dimensions: &tensor.dimensions,
+                            dtype: tensor.dtype,
+                        }).collect();
+                        let mut wire = Vec::new();
+                        let layout = write_raw_header(&mut wire, &metadata, &tensors, &Limits::default()).unwrap();
+                        let original_start = number(columns[3]);
+                        let original_bytes = number(columns[4]);
+                        assert_eq!(wire, data[original_start..original_start + wire.len()],
+                                   "{name}: raw writer preserves complete wire names/strings and original dimensions");
+                        assert_eq!(layout.file_bytes as usize, original_bytes, "{name}: public writer complete payload layout");
+                        raw_wire_headers += 1;
+                        raw_wire_bytes += wire.len();
+                    }
+'''+marker)
+s=s.replace('    assert_eq!(accepted, expected_success);','    assert_eq!(accepted, expected_success);\n    if expected_cases == 1093 { assert_eq!(raw_wire_headers, 1073); }\n    else { assert_eq!(raw_wire_headers, 0); }')
+s=s.replace('    println!(\n        "Independent original GGUF reader:', '    println!("Original input raw writer: {raw_wire_headers} headers; {raw_wire_bytes} exact header bytes");\n    println!(\n        "Independent original GGUF reader:')
+p.write_bytes(s.encode('utf-8'))
+r=subprocess.run(['cargo','+1.99.1','fmt','--all'],cwd=repo,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(out/'fmt.log').write_bytes(r.stdout);assert r.returncode==0
+print(json.dumps({'status':'succeeded','before_sha256':sha(before),'after_sha256':sha(p.read_bytes()),'after_bytes':p.stat().st_size},indent=2))

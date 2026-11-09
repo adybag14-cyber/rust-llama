@@ -1,0 +1,187 @@
+#![cfg(all(
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+
+#[path = "common/flash_adapter_fixture.rs"]
+mod fixture;
+use fixture::Case;
+use llama_tensor::{DType, FlashAttentionOptions, Graph, Op, OpCode, TensorError};
+
+fn execute(case: &Case, force_reference: bool) -> llama_tensor::Result<llama_tensor::Tensor> {
+    let mut graph = Graph::new();
+    let inputs = case
+        .inputs
+        .iter()
+        .map(|value| graph.input(value.clone()))
+        .collect::<Vec<_>>();
+    let mut options = case.options;
+    options.params.force_reference = force_reference;
+    let op = Op::FlashAttnExt {
+        options,
+        with_mask: case.flags & 1 != 0,
+        with_sinks: case.flags & 2 != 0,
+        with_rows: case.flags & 4 != 0,
+    };
+    assert_eq!(op.code(), OpCode::FLASH_ATTN_EXT);
+    let result = graph.op(op, &inputs).unwrap();
+    graph.evaluate(result)
+}
+fn platform_files() -> [&'static [u8]; 2] {
+    #[cfg(target_os = "windows")]
+    {
+        [
+            include_bytes!("fixtures/flash-attention/base-msvc-reference.bin"),
+            include_bytes!("fixtures/flash-attention/sinks-empty-msvc-reference.bin"),
+        ]
+    }
+    #[cfg(target_os = "linux")]
+    {
+        [
+            include_bytes!("fixtures/flash-attention/base-gnu-reference.bin"),
+            include_bytes!("fixtures/flash-attention/sinks-empty-gnu-reference.bin"),
+        ]
+    }
+}
+#[test]
+fn original_graph_contracts_and_exact_raw_outputs() {
+    let mut graphs = 0;
+    let mut empty = 0;
+    let mut unsupported = 0;
+    let mut words = 0;
+    let mut failures = Vec::new();
+    let mut branches = [0usize; 3];
+    for bytes in platform_files() {
+        for case in fixture::load(bytes, false) {
+            let expected = case.expected.unwrap();
+            let admitted = case.domain == 0
+                || expected.is_empty()
+                || (case.domain == 3 && case.options.params.scale.is_finite());
+            if !admitted {
+                for force in [false, true] {
+                    assert!(
+                        execute(&case, force).is_err(),
+                        "unimplemented source domain {}",
+                        case.name
+                    );
+                }
+                unsupported += 1;
+                continue;
+            }
+            graphs += 1;
+            empty += usize::from(expected.is_empty());
+            branches[case.branch as usize] += 1;
+            for (force, expected) in [(false, expected), (true, case.forced.unwrap())] {
+                let actual = execute(&case, force)
+                    .unwrap_or_else(|error| panic!("{} forced={force}: {error}", case.name));
+                assert_eq!(actual.shape(), case.shape, "{}", case.name);
+                assert_eq!(actual.dtype(), DType::F32);
+                assert!(actual.desc().is_contiguous());
+                assert!(
+                    case.inputs
+                        .iter()
+                        .all(|input| !actual.shares_storage(input))
+                );
+                let actual = actual.to_bytes().unwrap();
+                assert_eq!(actual.len(), expected.len(), "{}", case.name);
+                words += expected.len() / 4;
+                let differences = actual
+                    .chunks_exact(4)
+                    .zip(expected.chunks_exact(4))
+                    .enumerate()
+                    .filter(|(_, (a, b))| a != b)
+                    .collect::<Vec<_>>();
+                if !differences.is_empty() {
+                    let (index, (a, b)) = differences[0];
+                    failures.push(format!("{} forced={force}: {} changed words; first[{index}] {:08x} expected {:08x}",
+                        case.name, differences.len(), u32::from_le_bytes(a.try_into().unwrap()), u32::from_le_bytes(b.try_into().unwrap())));
+                }
+            }
+        }
+    }
+    eprintln!(
+        "{graphs} original tensor flash graphs ({empty} empty); {words} default/forced F32 words; {unsupported} explicitly unsupported native domains; branches {branches:?}; {} failing comparisons",
+        failures.len()
+    );
+    assert_eq!((graphs, empty, unsupported, words), (114, 5, 9, 689820));
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+#[test]
+fn captured_original_constructor_and_cpu_rejections() {
+    #[cfg(target_os = "windows")]
+    let bytes = include_bytes!("fixtures/flash-attention/rejected-msvc-rejected-inputs.bin");
+    #[cfg(target_os = "linux")]
+    let bytes = include_bytes!("fixtures/flash-attention/rejected-gnu-rejected-inputs.bin");
+    let cases = fixture::load(bytes, true);
+    assert_eq!(cases.len(), 27);
+    for case in cases {
+        assert_eq!(case.domain, 4);
+        let before = case
+            .inputs
+            .iter()
+            .map(|input| input.to_bytes().unwrap())
+            .collect::<Vec<_>>();
+        for force in [false, true] {
+            assert!(
+                execute(&case, force).is_err(),
+                "original rejected {}",
+                case.name
+            );
+        }
+        for (input, original) in case.inputs.iter().zip(before) {
+            assert_eq!(input.to_bytes().unwrap(), original, "{}", case.name);
+        }
+    }
+}
+#[test]
+fn empty_nodes_still_validate_source_constructor_fields() {
+    use llama_tensor::{Tensor, TensorDesc};
+    let q = Tensor::from_f32([2, 0, 1, 1], &[]).unwrap();
+    let k = Tensor::from_f32([2, 1, 1, 1], &[0.0, 0.0]).unwrap();
+    let v = Tensor::from_f32([1, 1, 1, 1], &[1.0]).unwrap();
+    for invalid in 0..3 {
+        let mut graph = Graph::new();
+        let mut inputs = [q.clone(), k.clone(), v.clone()]
+            .map(|input| graph.input(input))
+            .to_vec();
+        let mut options = FlashAttentionOptions::default();
+        let (with_mask, with_sinks) = match invalid {
+            0 => {
+                let bad_mask = Tensor::from_f32([1, 0, 1, 1], &[]).unwrap();
+                inputs.push(graph.input(bad_mask));
+                (true, false)
+            }
+            1 => {
+                let bad_sink = Tensor::from_bytes(
+                    TensorDesc::contiguous(DType::F16, [1, 1, 1, 1]).unwrap(),
+                    vec![0; 2],
+                )
+                .unwrap();
+                inputs.push(graph.input(bad_sink));
+                (false, true)
+            }
+            _ => {
+                options.n_kv_max = -1;
+                (false, false)
+            }
+        };
+        let output = graph
+            .op(
+                Op::FlashAttnExt {
+                    options,
+                    with_mask,
+                    with_sinks,
+                    with_rows: false,
+                },
+                &inputs,
+            )
+            .unwrap();
+        assert!(matches!(
+            graph.evaluate(output),
+            Err(TensorError::Type { .. } | TensorError::Parameters(_))
+        ));
+    }
+}

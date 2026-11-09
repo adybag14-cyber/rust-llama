@@ -1,6 +1,7 @@
 //! Exact typed-cache replay of independently captured original native C outputs.
 //! Four K/V dtype pairs, unified/separate physical buffers, state/session bytes,
-//! continuations and failure side effects; see f16-context-provenance.json.
+//! continuations and failure side effects in both nonflash and enabled-flash
+//! modes. See f16-context-provenance.json and flash-context-provenance.json.
 #![cfg(all(
     target_arch = "x86_64",
     any(
@@ -19,7 +20,8 @@ use std::sync::{
 };
 
 const PROMPT: [i32; 5] = [1, 403, 407, 261, 378];
-const PACKED_DATA: &[u8] = include_bytes!("../../../fixtures/ffi/f16-context-data.bin");
+const NONFLASH_DATA: &[u8] = include_bytes!("../../../fixtures/ffi/f16-context-data.bin");
+const FLASH_DATA: &[u8] = include_bytes!("../../../fixtures/ffi/flash-context-data.bin");
 #[cfg(target_env = "msvc")]
 const PROFILE: &str = "msvc";
 #[cfg(not(target_env = "msvc"))]
@@ -29,46 +31,62 @@ static CHECKED_STATE_BYTES: AtomicUsize = AtomicUsize::new(0);
 static CHECKED_STATE_BLOCKS: AtomicUsize = AtomicUsize::new(0);
 
 struct Fixture {
+    flash: i32,
+    data: &'static [u8],
     types: (i32, i32),
     report: Value,
     files: BTreeMap<String, Vec<u8>>,
 }
-fn packed_bytes(value: &Value) -> &'static [u8] {
+fn packed_bytes<'a>(data: &'a [u8], value: &Value) -> &'a [u8] {
     let start = usize::try_from(number(value, "offset")).unwrap();
     let bytes = usize::try_from(number(value, "bytes")).unwrap();
-    &PACKED_DATA[start..start.checked_add(bytes).unwrap()]
+    &data[start..start.checked_add(bytes).unwrap()]
 }
 fn fixtures() -> &'static [Fixture] {
     static FIXTURE: OnceLock<Vec<Fixture>> = OnceLock::new();
     FIXTURE.get_or_init(|| {
-        let document = json::parse(include_str!(
-            "../../../fixtures/ffi/f16-context-reference.json"
-        ))
-        .unwrap();
-        let entries = array(field(field(&document, "profiles"), PROFILE));
-        assert_eq!(entries.len(), 4);
-        entries
-            .iter()
-            .map(|entry| {
+        let mut fixtures = Vec::new();
+        for (flash, source, data) in [
+            (
+                0,
+                include_str!("../../../fixtures/ffi/f16-context-reference.json"),
+                NONFLASH_DATA,
+            ),
+            (
+                1,
+                include_str!("../../../fixtures/ffi/flash-context-reference.json"),
+                FLASH_DATA,
+            ),
+        ] {
+            let document = json::parse(source).unwrap();
+            let entries = array(field(field(&document, "profiles"), PROFILE));
+            assert_eq!(entries.len(), 4);
+            for entry in entries {
                 let mut files = BTreeMap::new();
                 for file in array(field(entry, "files")) {
                     assert!(
                         files
-                            .insert(text(file, "name").to_owned(), packed_bytes(file).to_vec())
+                            .insert(
+                                text(file, "name").to_owned(),
+                                packed_bytes(data, file).to_vec()
+                            )
                             .is_none()
                     );
                 }
                 assert_eq!(files.len(), 130);
-                Fixture {
+                fixtures.push(Fixture {
+                    flash,
+                    data,
                     types: (
                         number(entry, "type_k") as i32,
                         number(entry, "type_v") as i32,
                     ),
                     report: field(entry, "report").clone(),
                     files,
-                }
-            })
-            .collect()
+                });
+            }
+        }
+        fixtures
     })
 }
 fn field<'a>(value: &'a Value, name: &str) -> &'a Value {
@@ -136,7 +154,7 @@ impl Drop for ModelOwner {
 }
 struct ContextOwner(*mut ContextHandle);
 impl ContextOwner {
-    fn new(model: &ModelOwner, unified: bool, types: (i32, i32)) -> Self {
+    fn new(model: &ModelOwner, unified: bool, types: (i32, i32), flash: i32) -> Self {
         let n_ctx = 512;
         let p = LlamaContextParams {
             n_ctx,
@@ -148,7 +166,7 @@ impl ContextOwner {
             n_threads_batch: 1,
             type_k: types.0,
             type_v: types.1,
-            flash_attn_type: 0,
+            flash_attn_type: flash,
             offload_kqv: 0,
             op_offload: 0,
             no_perf: 1,
@@ -231,9 +249,9 @@ impl Drop for ContextOwner {
         }
     }
 }
-fn check_logits(actual: &[u32], expected: &Value) {
+fn check_logits(fixture: &Fixture, actual: &[u32], expected: &Value) {
     assert_eq!(text(expected, "kind"), "u32");
-    let bytes = packed_bytes(expected);
+    let bytes = packed_bytes(fixture.data, expected);
     assert_eq!(actual.len() * 4, bytes.len());
     for (index, (&actual, expected)) in actual.iter().zip(bytes.as_chunks::<4>().0).enumerate() {
         assert_eq!(
@@ -341,7 +359,7 @@ fn replay_memory_and_sequence_state(expected: &Fixture) {
     for case in cases {
         let name = text(case, "name");
         let unified = flag(case, "kv_unified");
-        let context = ContextOwner::new(&model, unified, expected.types);
+        let context = ContextOwner::new(&model, unified, expected.types, expected.flash);
         context.seed();
         context.assert_positions(field(case, "before"));
         assert_eq!(
@@ -353,7 +371,7 @@ fn replay_memory_and_sequence_state(expected: &Fixture) {
         let bytes = context.state();
         let native = &expected.files[&format!("{name}.state.bin")];
         check_state(&bytes, native, 0);
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         assert_eq!(
             unsafe { llama_state_set_data(restored.0, native.as_ptr(), native.len()) },
             bytes.len()
@@ -365,10 +383,12 @@ fn replay_memory_and_sequence_state(expected: &Fixture) {
         let seq = number(case, "follow_sequence") as i32;
         let pos = number(case, "follow_position") as i32;
         check_logits(
+            expected,
             &context.decode(&[token], seq, pos),
             field(case, "continuation_logit_bits"),
         );
         check_logits(
+            expected,
             &restored.decode(&[token], seq, pos),
             field(case, "restored_continuation_logit_bits"),
         );
@@ -378,7 +398,12 @@ fn replay_memory_and_sequence_state(expected: &Fixture) {
     assert_eq!(cases.len(), 40);
     for case in cases {
         let name = text(case, "name");
-        let context = ContextOwner::new(&model, flag(case, "kv_unified"), expected.types);
+        let context = ContextOwner::new(
+            &model,
+            flag(case, "kv_unified"),
+            expected.types,
+            expected.flash,
+        );
         context.seed();
         context.decode(&PROMPT[..2], 3, 0);
         let source = number(case, "source") as i32;
@@ -414,6 +439,7 @@ fn replay_memory_and_sequence_state(expected: &Fixture) {
             0,
         );
         check_logits(
+            expected,
             &context.decode(
                 &[number(case, "follow_token") as i32],
                 number(case, "follow_sequence") as i32,
@@ -458,7 +484,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
     for case in cases {
         let unified = flag(case, "kv_unified");
         let label = text(case, "name");
-        let context = ContextOwner::new(&model, unified, expected.types);
+        let context = ContextOwner::new(&model, unified, expected.types, expected.flash);
         context.seed();
         assert_eq!(
             unsafe { llama_n_ctx(context.0) },
@@ -504,7 +530,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
             state.len()
         );
         assert_eq!(copied, state);
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         assert_eq!(
             unsafe { llama_set_state_data(restored.0, copied.as_ptr()) },
             state.len()
@@ -513,7 +539,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
         assert_eq!(restored.positions(), context.positions());
         let mut tokens = [-77; 9];
         let mut count = 999;
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         assert!(unsafe {
             llama_state_load_file(
                 restored.0,
@@ -529,10 +555,11 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
         assert_eq!(tokens[5..], [-77; 4]);
         restored.assert_positions(field(case, "loaded_positions"));
         check_logits(
+            expected,
             &restored.decode(&[PROMPT[2]], 0, 5),
             field(case, "session_continuation"),
         );
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         assert!(unsafe {
             llama_load_session_file(
                 restored.0,
@@ -557,7 +584,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
             &expected.files[&format!("{label}.sequence.bin")],
             0,
         );
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         restored.decode(&PROMPT.iter().rev().copied().collect::<Vec<_>>(), 1, 0);
         let prior = restored.positions();
         count = 999;
@@ -593,10 +620,11 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
         okay();
         restored.assert_positions(field(case, "sequence_loaded_positions"));
         check_logits(
+            expected,
             &restored.decode(&[PROMPT[2]], 3, 5),
             field(case, "sequence_continuation"),
         );
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         restored.decode(&PROMPT[..1], 2, 0);
         count = 999;
         clean();
@@ -615,7 +643,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
         failed();
         assert_eq!(count, number(case, "small_prompt_count") as usize);
         restored.assert_positions(field(case, "small_prompt_positions"));
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         restored.decode(&PROMPT[..1], 2, 0);
         tokens.fill(-77);
         count = 999;
@@ -644,10 +672,11 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
         );
         restored.assert_positions(field(case, "trailing_full_positions"));
         check_logits(
+            expected,
             &restored.decode(&[PROMPT[2]], 0, 5),
             field(case, "trailing_full_continuation"),
         );
-        let restored = ContextOwner::new(&model, unified, expected.types);
+        let restored = ContextOwner::new(&model, unified, expected.types, expected.flash);
         let trailing = directory.cpath(&format!("{label}.sequence.bin.trailing"));
         clean();
         assert_eq!(
@@ -688,7 +717,7 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
                 }
             };
             assert_eq!(result, number(row, "result") as usize);
-            let golden = packed_bytes(field(row, "hex"));
+            let golden = packed_bytes(expected.data, field(row, "hex"));
             if let Some((_, parts)) = text(row, "name").split_once("_seq_") {
                 let parts: Vec<_> = parts.split('_').collect();
                 let mode = if unified { "unified" } else { "separate" };
@@ -707,36 +736,38 @@ fn replay_session_files_and_short_buffers(expected: &Fixture) {
 }
 
 #[test]
-fn original_four_dtype_pairs_memory_sessions_and_exact_continuations() {
-    CHECKED_LOGIT_WORDS.store(0, Ordering::Relaxed);
-    CHECKED_STATE_BYTES.store(0, Ordering::Relaxed);
-    CHECKED_STATE_BLOCKS.store(0, Ordering::Relaxed);
+fn original_four_dtype_pairs_nonflash_and_flash_state_and_continuations() {
     let fixtures = fixtures();
-    assert_eq!(
-        fixtures.iter().map(|f| f.types).collect::<Vec<_>>(),
-        [(0, 0), (1, 1), (1, 0), (0, 1)]
-    );
-    for expected in fixtures {
-        replay_memory_and_sequence_state(expected);
-        replay_session_files_and_short_buffers(expected);
+    assert_eq!(fixtures.len(), 8);
+    for flash in [0, 1] {
+        CHECKED_LOGIT_WORDS.store(0, Ordering::Relaxed);
+        CHECKED_STATE_BYTES.store(0, Ordering::Relaxed);
+        CHECKED_STATE_BLOCKS.store(0, Ordering::Relaxed);
+        let selected = fixtures.iter().filter(|fixture| fixture.flash == flash);
+        assert_eq!(
+            selected.clone().map(|f| f.types).collect::<Vec<_>>(),
+            [(0, 0), (1, 1), (1, 0), (0, 1)]
+        );
+        for expected in selected {
+            replay_memory_and_sequence_state(expected);
+            replay_session_files_and_short_buffers(expected);
+        }
+        // Counts are derived from the immutable original native reports and
+        // payload lengths independently for each attention mode and profile.
+        assert_eq!(CHECKED_LOGIT_WORDS.load(Ordering::Relaxed), 258_048);
+        assert_eq!(CHECKED_STATE_BLOCKS.load(Ordering::Relaxed), 1_048);
+        assert_eq!(CHECKED_STATE_BYTES.load(Ordering::Relaxed), 290_328);
     }
-    assert_eq!(CHECKED_LOGIT_WORDS.load(Ordering::Relaxed), 258_048);
-    assert_eq!(CHECKED_STATE_BLOCKS.load(Ordering::Relaxed), 1_048);
-    assert_eq!(CHECKED_STATE_BYTES.load(Ordering::Relaxed), 290_328);
 }
 
 #[test]
-fn original_defaults_remain_explicitly_outside_nonflash_single_worker_support() {
+fn original_default_layout_and_remaining_explicit_rejections() {
     let model = ModelOwner::load();
     let defaults = unsafe { llama_context_default_params() };
     assert_eq!((defaults.type_k, defaults.type_v), (1, 1));
     assert_eq!((defaults.n_threads, defaults.n_threads_batch), (4, 4));
     assert_eq!(defaults.flash_attn_type, -1);
     for (flash, workers, batch_workers, key, value) in [
-        (-1, 4, 4, 1, 1),
-        (-1, 1, 1, 1, 1),
-        (1, 1, 1, 1, 1),
-        (-1, 1, 1, 0, 0),
         (0, 2, 1, 1, 1),
         (0, 1, 2, 1, 1),
         (0, 4, 4, 1, 1),

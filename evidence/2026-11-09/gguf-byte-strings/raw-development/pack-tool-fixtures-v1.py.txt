@@ -1,0 +1,50 @@
+from pathlib import Path
+import json,hashlib,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=base/'rust-draft-v1';out=base/'tool-adapter-v1';out.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+seal_path=base/'original-tools-v1/sealed-review.json';seal=json.loads(seal_path.read_text(encoding='utf-8'));assert seal['status']=='succeeded'
+for row in seal['files']:
+ p=base/row['path'];assert p.stat().st_size==row['bytes'] and sha(p.read_bytes())==row['sha256']
+candidate=out/'candidate/fixtures/gguf-bytes';candidate.mkdir(parents=True)
+reports={}
+for platform in ['windows','linux']:
+ folder=base/'original-tools-v1'/platform
+ for source_name,target_name in [('report.json','tools-original-'+platform+'-report.json'),('data.bin','tools-original-'+platform+'-data.bin')]:
+  (candidate/target_name).write_bytes((folder/source_name).read_bytes())
+ reports[platform]=json.loads((folder/'report.json').read_text(encoding='utf-8'))
+pool=bytearray();blobs={}
+native_data=(base/'original-tools-v1/windows/data.bin').read_bytes()
+def blob(item):
+ data=native_data[item['offset']:item['offset']+item['bytes']]
+ assert len(data)==item['bytes'] and sha(data)==item['sha256']
+ h=sha(data)
+ if h not in blobs:blobs[h]=(len(pool),len(data));pool.extend(data)
+ return blobs[h]
+lines=['# Frozen original CLI decisions and exact before/after GGUF bytes; C=name/success/operation/input/output/limit; I=input; A=after; E=execute']
+for c in reports['windows']['cases']:
+ args=c['args'];operation='merge' if args[0]=='--merge' else 'split';limit=0 if operation=='merge' else int(args[1])
+ lines.append('\t'.join(map(str,['C',c['name'],int(c['exit_code']==0),operation,args[-2],args[-1],limit])))
+ for kind,key in [('I','input_files'),('A','after_files')]:
+  for item in c[key]:
+   offset,size=blob(item);lines.append('\t'.join(map(str,[kind,item['name'],offset,size])))
+ lines.append('E')
+(candidate/'tools-data.bin').write_bytes(pool)
+(candidate/'tools-reference.tsv').write_bytes(('\n'.join(lines)+'\n').encode('utf-8'))
+provenance={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_archive_sha256':reports['windows']['source_archive_sha256'],
+ 'independence':reports['windows']['independence'],'seal_sha256':sha(seal_path.read_bytes()),'seal':seal,'adapter_sha256':sha(Path(__file__).read_bytes()),
+ 'projection':'TSV and canonical deduplicated pool mechanically select unchanged original input/after file bytes and success decisions; each source pool slice was SHA-256 checked. Both original profiles retain full raw stdout/stderr, exit codes, partial files and binaries/source identities in their original JSON and byte pools.',
+ 'cases':3196,'successes':3176,'checked_errors':20,'successful_after_bytes':1438016,
+ 'scope':'All 1605 original reader/boolean inputs passed to split, with max_tensors 1; multi-tensor alias inputs also max_tensors 128. Every successful split with output files is independently merged by the original tool. Admission and successful GGUF bytes agree on Windows/GNU. Source native aborts become checked Rust errors, not reproduced undefined process behavior.',
+ 'not_claimed':'This corpus does not replace the separate 103-case general CLI corpus or the separate source getters/header corpus, and does not close full GGUF/conversion track gates.'}
+(candidate/'tools-provenance.json').write_bytes((json.dumps(provenance,indent=2)+'\n').encode('utf-8'))
+(candidate/'tools-README.md').write_bytes(b'# Original split and merge with arbitrary byte strings\n\nThe unchanged original CLI ran 3,196 cases on each native profile before the\nRust split/merge byte-string migration: 3,176 successes and 20 failures. Inputs\nreuse the independently sealed 1,605-case reader/boolean corpus, including all\nbyte values and first-prefix tensor aliases with distinct shapes/payloads.\nSuccessful post-operation files agree byte-for-byte across both profiles and\ncover 1,438,016 file bytes per profile. Each input is split one tensor per file;\nmulti-tensor aliases are also grouped; successful split products are merged.\n\nThe full original JSON reports and byte pools preserve all raw transcripts,\ninput/output files, nonzero process codes and failed partial files. The TSV/pool\nadapter selects observations without running Rust or deriving expectations from\nits output. Ordinary Rust tests run library file operations and compare every\nsuccessful file plus checked errors. The existing general CLI corpus separately\nchecks argument parsing, successful transcripts, dry runs and cleanup behavior.\n')
+rows=[]
+for p in sorted(candidate.iterdir()):
+ rows.append({'path':'fixtures/gguf-bytes/'+p.name,'bytes':p.stat().st_size,'sha256':sha(p.read_bytes()),'purpose':'Frozen original byte-string split/merge input, output and decisions; see fixtures/gguf-bytes/tools-provenance.json'})
+(out/'fixture-records.json').write_bytes((json.dumps(rows,indent=2)+'\n').encode('utf-8'))
+manifest=repo/'docs/fixture-manifest.tsv';before=manifest.read_bytes();(out/'fixture-manifest.preimage.tsv.txt').write_bytes(before)
+assert before.startswith(b'path\tbytes\tsha256\tpurpose\n')
+for row in rows:
+ target=repo/row['path'];assert not target.exists();target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((candidate/Path(row['path']).name).read_bytes())
+manifest.write_bytes(before+''.join(f"{r['path']}\t{r['bytes']}\t{r['sha256']}\t{r['purpose']}\n" for r in rows).encode('utf-8'))
+print(json.dumps({'status':'succeeded','fixtures':len(rows),'fixture_bytes':sum(r['bytes'] for r in rows),'canonical_bytes':len(pool),'manifest_before_sha256':sha(before),'manifest_after_sha256':sha(manifest.read_bytes())},indent=2))

@@ -1,0 +1,192 @@
+#![cfg(all(
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+#[path = "common/flash_fixture.rs"]
+mod fixture;
+
+use llama_quant::flash_attention::{ExecutionMode, Limits, Plan, Selection};
+
+fn different(actual: &[f32], expected: &[u8]) -> (usize, usize, Option<(usize, u32, u32)>) {
+    assert_eq!(actual.len() * 4, expected.len());
+    let mut changed = 0;
+    let mut finite = 0;
+    let mut first = None;
+    for (index, (value, bytes)) in actual.iter().zip(expected.as_chunks::<4>().0).enumerate() {
+        let native = u32::from_le_bytes(*bytes);
+        if value.to_bits() != native {
+            changed += 1;
+            finite += usize::from(value.is_finite() && f32::from_bits(native).is_finite());
+            first.get_or_insert((index, value.to_bits(), native));
+        }
+    }
+    (changed, finite, first)
+}
+#[test]
+fn original_default_and_reference_flash_graphs_match_with_real_workers() {
+    compare_cases(fixture::load(), Some(2_510_640));
+}
+#[test]
+fn original_nan_lane_boundaries_match_exactly() {
+    compare_cases(fixture::load_nan_lanes(), Some(36_384));
+}
+#[test]
+fn original_nan_operand_and_tile_stages_match_exactly() {
+    compare_cases(fixture::load_nan_operands(), Some(224_128));
+}
+fn compare_cases(cases: Vec<fixture::Case>, expected_total: Option<usize>) {
+    let mut total = 0;
+    let mut failing = 0;
+    let mut changed = 0;
+    let mut finite_changed = 0;
+    let mut details = Vec::new();
+    for case in &cases {
+        for force in [false, true] {
+            let mut params = case.params;
+            params.force_reference = force;
+            let plan = Plan::new(case.inputs, params).unwrap();
+            let result = plan.execute(Selection::All, Limits::default()).unwrap();
+            assert_eq!(result.shape, case.shape, "{}", case.name);
+            assert_eq!(result.stats.configured_workers, params.workers);
+            assert_eq!(result.stats.completed_partitions, params.workers);
+            assert_eq!(
+                result.stats.worker_threads, params.workers,
+                "actual thread count"
+            );
+            assert_eq!(result.stats.mode, ExecutionMode::ScopedWorkers);
+            let expected = if force { case.forced } else { case.expected };
+            let (count, finite, first) = different(&result.values, expected);
+            total += result.values.len();
+            if count != 0 {
+                failing += 1;
+                changed += count;
+                finite_changed += finite;
+                if details.len() < 100 {
+                    details.push(format!("{} {} force={force}: {count} differing ({finite} finite), first {first:08x?}", case.cohort, case.name));
+                }
+            }
+        }
+    }
+    println!(
+        "{} original flash graphs, default and forced-reference: {total} F32 words, {failing} failing cases, {changed} changed words, {finite_changed} finite changes",
+        cases.len()
+    );
+    if let Some(expected_total) = expected_total {
+        assert_eq!(total, expected_total);
+    }
+    assert_eq!(failing, 0, "{}", details.join("\n"));
+}
+#[test]
+fn selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions() {
+    let cases = fixture::load();
+    let mut checked = 0;
+    let mut failures = Vec::new();
+    for case in &cases {
+        let [_, queries, heads, batches] = case.inputs.q.shape();
+        let coordinates = [
+            (0, 0, 0),
+            (queries.saturating_sub(1), heads - 1, batches - 1),
+            ((queries / 2).min(64), (heads / 2).min(heads - 1), 0),
+        ];
+        let plan = Plan::new(case.inputs, case.params).unwrap();
+        for (query, head, batch) in coordinates {
+            let selection = Selection::Row { query, head, batch };
+            let result = plan
+                .execute_serial_partitions(selection, Limits::default())
+                .unwrap();
+            assert_eq!(result.stats.worker_threads, 1);
+            assert_eq!(result.stats.mode, ExecutionMode::SerialPartitions);
+            let width = case.shape[0];
+            let offset = ((batch * queries + query) * heads + head) * width * 4;
+            let expected = &case.expected[offset..offset + width * 4];
+            let (count, _, first) = different(&result.values, expected);
+            checked += result.values.len();
+            if count > 0 && failures.len() < 60 {
+                failures.push(format!(
+                    "{} ({query},{head},{batch}): {count} changed; {first:08x?}",
+                    case.name
+                ));
+            }
+        }
+    }
+    println!("Selected-row native output comparisons: {checked}");
+    assert!(checked > 10_000);
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn typed_f32_and_raw_half_views_match_original_graph_words() {
+    use llama_quant::DType;
+    use llama_quant::flash_attention::{Inputs, View4};
+    enum Storage {
+        F32(Vec<f32>),
+        F16(Vec<u16>),
+    }
+    let all = fixture::load();
+    let mut checked = 0;
+    for case in all.iter().step_by(17) {
+        let storage = case
+            .raw_inputs
+            .iter()
+            .map(|input| match input.dtype {
+                DType::F32 => Storage::F32(
+                    input
+                        .raw
+                        .as_chunks::<4>()
+                        .0
+                        .iter()
+                        .map(|&bytes| f32::from_le_bytes(bytes))
+                        .collect(),
+                ),
+                DType::F16 => Storage::F16(
+                    input
+                        .raw
+                        .as_chunks::<2>()
+                        .0
+                        .iter()
+                        .map(|&bytes| u16::from_le_bytes(bytes))
+                        .collect(),
+                ),
+                _ => unreachable!(),
+            })
+            .collect::<Vec<_>>();
+        let views = storage
+            .iter()
+            .zip(&case.raw_inputs)
+            .map(|(storage, input)| match storage {
+                Storage::F32(values) => {
+                    View4::from_f32(values, input.shape, input.strides, 0).unwrap()
+                }
+                Storage::F16(values) => {
+                    View4::from_f16(values, input.shape, input.strides, 0).unwrap()
+                }
+            })
+            .collect::<Vec<_>>();
+        let inputs = Inputs {
+            q: views[0],
+            k: views[1],
+            v: views[2],
+            mask: case.inputs.mask.map(|_| views[3]),
+            sinks: case
+                .inputs
+                .sinks
+                .map(|_| views[3 + usize::from(case.inputs.mask.is_some())]),
+        };
+        let result = Plan::new(inputs, case.params)
+            .unwrap()
+            .execute(Selection::All, Limits::default())
+            .unwrap();
+        assert_eq!(
+            different(&result.values, case.expected).0,
+            0,
+            "{}",
+            case.name
+        );
+        checked += result.values.len();
+    }
+    println!("Typed-view native output comparisons: {checked}");
+    assert!(checked > 10_000);
+}

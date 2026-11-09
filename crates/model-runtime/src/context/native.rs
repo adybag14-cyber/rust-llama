@@ -4,7 +4,7 @@
 //! native state bytes describe stored data and position metadata, and do not
 //! serialize pending updates. This module does not claim recurrent cache support.
 use super::{BatchToken, Input, OutputSelection, TokenOutput};
-use crate::{AdapterSet, Error, Model, Result, llama::KvLayer, math};
+use crate::{AdapterSet, Error, Model, Result, math};
 use std::sync::Arc;
 
 #[path = "native_state.rs"]
@@ -14,6 +14,12 @@ pub use native_state::NativeState;
 mod native_kv;
 pub use native_kv::NativeKvType;
 use native_kv::{KvBuffer, StoredKvLayer};
+#[path = "native_batch.rs"]
+mod native_batch;
+#[path = "native_decode.rs"]
+mod native_decode;
+#[path = "native_row_map.rs"]
+mod native_row_map;
 
 /// Dense F32/F16 compatibility cache configuration.
 #[derive(Debug, Clone)]
@@ -23,6 +29,36 @@ pub struct NativeContextOptions {
     pub microbatch_tokens: usize,
     pub maximum_batch_tokens: usize,
     pub unified: bool,
+}
+
+/// Explicit CPU execution configuration, independent of cache storage types.
+/// The old constructors retain one-worker nonflash behavior.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct NativeExecutionOptions {
+    /// Resolved native CPU flash decision; the C facade resolves AUTO by the
+    /// frozen CPU device-support rule before constructing this safe executor.
+    pub flash_attention: bool,
+    pub threads: usize,
+    pub threads_batch: usize,
+    /// Source embeddings mode changes separate-stream microbatch splitting.
+    pub embeddings: bool,
+}
+impl Default for NativeExecutionOptions {
+    fn default() -> Self {
+        Self {
+            flash_attention: false,
+            threads: 1,
+            threads_batch: 1,
+            embeddings: false,
+        }
+    }
+}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct NativeExecutionStats {
+    pub microbatches: usize,
+    pub flash_graphs: usize,
+    pub configured_worker_partitions: usize,
+    pub threads_executing_partitions: usize,
 }
 
 /// A native batch item can share one physical cache cell between sequences.
@@ -175,7 +211,7 @@ struct Stream {
     head: usize,
 }
 
-/// Scalar implementation of the frozen Llama F32/F16 memory contract.
+/// CPU implementation of the frozen Llama F32/F16 memory contract.
 ///
 /// The strict Context type remains the safe sequential API. This compatibility
 /// executor owns physical cells, can retain holes and duplicate positions after
@@ -191,6 +227,8 @@ pub struct NativeContext {
     width: usize,
     key_type: NativeKvType,
     value_type: NativeKvType,
+    execution: NativeExecutionOptions,
+    last_execution: NativeExecutionStats,
 }
 
 fn invalid(message: impl Into<String>) -> Error {
@@ -212,6 +250,24 @@ impl NativeContext {
         key_type: NativeKvType,
         value_type: NativeKvType,
     ) -> Result<Self> {
+        Self::new_with_execution(
+            model,
+            options,
+            key_type,
+            value_type,
+            NativeExecutionOptions::default(),
+        )
+    }
+    /// Select explicit measured CPU execution while preserving independently
+    /// typed resident K/V storage and the strict Context API.
+    pub fn new_with_execution(
+        model: Arc<Model>,
+        options: NativeContextOptions,
+        key_type: NativeKvType,
+        value_type: NativeKvType,
+        execution: NativeExecutionOptions,
+    ) -> Result<Self> {
+        Self::validate_execution(execution)?;
         if options.maximum_sequences == 0
             || options.maximum_sequences > 256
             || options.context_tokens == 0
@@ -225,7 +281,7 @@ impl NativeContext {
         }
         let Model::Llama(llama) = model.as_ref() else {
             return Err(Error::Unsupported(
-                "native recurrent memory and state layout".into(),
+                "native compatibility memory currently supports dense Llama models only".into(),
             ));
         };
         let rounded = options
@@ -325,6 +381,8 @@ impl NativeContext {
             width,
             key_type,
             value_type,
+            execution,
+            last_execution: NativeExecutionStats::default(),
         })
     }
     fn storage_bytes(&self) -> Result<usize> {
@@ -394,13 +452,71 @@ impl NativeContext {
             width: self.width,
             key_type: self.key_type,
             value_type: self.value_type,
+            execution: self.execution,
+            last_execution: self.last_execution,
         })
     }
     pub fn cache_types(&self) -> (NativeKvType, NativeKvType) {
         (self.key_type, self.value_type)
     }
     pub fn values_are_transposed(&self) -> bool {
-        true
+        !self.execution.flash_attention
+    }
+    fn validate_execution(execution: NativeExecutionOptions) -> Result<()> {
+        if execution.threads == 0
+            || execution.threads > 256
+            || execution.threads_batch == 0
+            || execution.threads_batch > 256
+        {
+            return Err(Error::InvalidConfig(
+                "native worker counts must be in 1..=256".into(),
+            ));
+        }
+        if !execution.flash_attention && (execution.threads != 1 || execution.threads_batch != 1) {
+            return Err(Error::Unsupported(
+                "nonflash multiple-worker execution is not implemented".into(),
+            ));
+        }
+        if execution.flash_attention
+            && !cfg!(any(
+                all(
+                    target_arch = "x86_64",
+                    target_os = "windows",
+                    target_env = "msvc"
+                ),
+                all(
+                    target_arch = "x86_64",
+                    target_os = "linux",
+                    target_env = "gnu"
+                ),
+            ))
+        {
+            return Err(Error::Unsupported(
+                "native flash context requires a measured x64 MSVC or GNU CPU profile".into(),
+            ));
+        }
+        Ok(())
+    }
+    pub fn execution_options(&self) -> NativeExecutionOptions {
+        self.execution
+    }
+    /// Counts returned by actual shared-kernel worker executions in the last
+    /// successful decode. Failed/cancelled transactions retain prior statistics.
+    pub fn execution_stats(&self) -> NativeExecutionStats {
+        self.last_execution
+    }
+    pub fn set_threads(&mut self, generation: usize, batch: usize) -> Result<()> {
+        let execution = NativeExecutionOptions {
+            threads: generation,
+            threads_batch: batch,
+            ..self.execution
+        };
+        Self::validate_execution(execution)?;
+        self.execution = execution;
+        Ok(())
+    }
+    pub fn set_embeddings(&mut self, enabled: bool) {
+        self.execution.embeddings = enabled;
     }
     pub fn model(&self) -> &Arc<Model> {
         &self.model
@@ -709,7 +825,7 @@ impl NativeContext {
     pub fn decode_batch(&mut self, batch: &[NativeBatchToken]) -> Result<Vec<TokenOutput>> {
         self.decode_batch_with_cancel(batch, || false)
     }
-    /// Validates and stages the batch before committing it. This scalar
+    /// Validates and stages the batch before committing it. This
     /// compatibility executor retains atomic cancellation while native graph
     /// cancellation can preserve completed microbatches.
     pub fn decode_batch_with_cancel(
@@ -749,6 +865,11 @@ impl NativeContext {
             }
             let mut seen = SequenceSet::new();
             for &sequence in &item.sequences {
+                // Batch allocation uses the configured ID range even when the
+                // unified memory API can address all 256 native sequence IDs.
+                if sequence < 0 || sequence as usize >= self.options.maximum_sequences {
+                    return Err(Error::InvalidSequence(sequence));
+                }
                 self.stream_id(sequence)?;
                 if !seen.insert(sequence) {
                     return Err(invalid("duplicate sequence ID in token"));
@@ -761,10 +882,7 @@ impl NativeContext {
                     ));
                 }
                 if let Some(old) = last[sequence as usize].replace(item.position) {
-                    if old == item.position {
-                        return Err(Error::Unsupported("duplicate positions in one native microbatch require batched layer execution".into()));
-                    }
-                    if old.checked_add(1) != Some(item.position) {
+                    if old != item.position && old.checked_add(1) != Some(item.position) {
                         return Err(invalid(
                             "native batch sequence positions must be consecutive and nondecreasing",
                         ));
@@ -794,250 +912,7 @@ impl NativeContext {
         if cancelled() {
             return Err(Error::Cancelled);
         }
-        let output_floats = batch.iter().try_fold(0usize, |sum, item| {
-            let count = match item.output {
-                OutputSelection::None => 0,
-                OutputSelection::Logits => self.model.vocabulary(),
-                OutputSelection::Embedding => self.model.width(),
-                OutputSelection::Both => self
-                    .model
-                    .vocabulary()
-                    .checked_add(self.model.width())
-                    .ok_or_else(|| invalid("native output shape overflow"))?,
-            };
-            sum.checked_add(count)
-                .ok_or_else(|| invalid("native output count overflow"))
-        })?;
-        let Model::Llama(model) = self.model.as_ref() else {
-            return Err(invalid("native model mismatch"));
-        };
-        let active = self
-            .streams
-            .iter()
-            .map(|stream| stream.cells.iter().filter(|cell| cell.occupied()).count())
-            .max()
-            .unwrap_or(0)
-            // Earlier chunks remain in the staged cache while later chunks
-            // gather their visible rows and retained outputs stay alive.
-            .checked_add(batch.len())
-            .ok_or_else(|| invalid("native active cache bound overflow"))?
-            .min(self.capacity);
-        // These heap buffers coexist with the gathered KV and physical row:
-        // two usize fields per slot, one stream index per token, and a
-        // temporary find_slots result. The stream and layer Vec descriptors
-        // are separate from their elements. Charge the whole microbatch even
-        // though allocation and evaluation phases do not retain every buffer.
-        let chunk_tokens = batch.len().min(self.options.microbatch_tokens);
-        let chunk_metadata = chunk_tokens
-            .checked_mul(4 * std::mem::size_of::<usize>())
-            .and_then(|n| {
-                n.checked_add(
-                    self.streams
-                        .len()
-                        .checked_mul(std::mem::size_of::<Vec<usize>>())?,
-                )
-            })
-            .and_then(|n| {
-                n.checked_add(
-                    model
-                        .layer_count()
-                        .checked_mul(std::mem::size_of::<KvLayer>())?,
-                )
-            })
-            .ok_or_else(|| invalid("native microbatch metadata overflow"))?;
-        let transient = active
-            .checked_mul(self.width)
-            .and_then(|n| n.checked_mul(model.layer_count()))
-            .and_then(|n| n.checked_mul(8))
-            // One visible usize index and one reused F32 score per physical
-            // column need at most 12 bytes on the supported x64 targets.
-            // Capacity, not visible count, bounds holes and common stream rows.
-            .and_then(|n| n.checked_add(self.capacity.checked_mul(16)?))
-            .and_then(|n| n.checked_add(chunk_metadata))
-            .and_then(|n| n.checked_add(output_floats.checked_mul(4)?))
-            .and_then(|n| n.checked_add(batch.len() * std::mem::size_of::<TokenOutput>()))
-            .and_then(|n| n.checked_add(model.config().width.checked_mul(128)?))
-            .and_then(|n| n.checked_add(model.config().feed_forward.checked_mul(32)?))
-            .and_then(|n| n.checked_add(model.config().vocabulary.checked_mul(16)?))
-            .ok_or_else(|| invalid("native decode working-set overflow"))?;
-        self.check_work_limit(
-            self.storage_bytes()?
-                .checked_add(transient)
-                .ok_or_else(|| invalid("native decode budget overflow"))?,
-            work_limit,
-        )?;
-        let mut staged = self.try_clone()?;
-        staged.apply_pending()?;
-        let mut outputs = Vec::new();
-        outputs
-            .try_reserve_exact(batch.len())
-            .map_err(|_| invalid("native output allocation failed"))?;
-        for (chunk_index, chunk) in batch.chunks(self.options.microbatch_tokens).enumerate() {
-            if cancelled() {
-                return Err(Error::Cancelled);
-            }
-            let mut by_stream = Vec::new();
-            by_stream
-                .try_reserve_exact(staged.streams.len())
-                .map_err(|_| invalid("native stream descriptor allocation failed"))?;
-            by_stream.resize_with(staged.streams.len(), Vec::<usize>::new);
-            for (index, item) in chunk.iter().enumerate() {
-                let indices = &mut by_stream[staged.stream_id(item.sequences[0])?];
-                indices
-                    .try_reserve_exact(1)
-                    .map_err(|_| invalid("native stream index allocation failed"))?;
-                indices.push(index);
-            }
-            let mut slots = Vec::new();
-            slots
-                .try_reserve_exact(chunk.len())
-                .map_err(|_| invalid("native batch slot allocation failed"))?;
-            slots.resize(chunk.len(), (0, 0));
-            for (stream, items) in by_stream.iter().enumerate() {
-                if items.is_empty() {
-                    continue;
-                }
-                let allocated = staged.find_slots(stream, items.len())?;
-                for (&item, &slot) in items.iter().zip(&allocated) {
-                    slots[item] = (stream, slot);
-                    staged.streams[stream].cells[slot] = Cell {
-                        position: chunk[item].position,
-                        shift: 0,
-                        sequences: chunk[item].sequences.iter().copied().collect(),
-                    };
-                }
-                staged.streams[stream].head = allocated.last().copied().unwrap_or(0) + 1;
-            }
-            // Source get_n_kv chooses one common width across the selected
-            // streams after allocating the complete microbatch. Physical holes
-            // and cells belonging to other sequences still occupy columns.
-            let row_len = by_stream
-                .iter()
-                .enumerate()
-                .filter(|(_, items)| !items.is_empty())
-                .try_fold(0usize, |maximum, (stream, _)| {
-                    let used = staged.streams[stream]
-                        .cells
-                        .iter()
-                        .rposition(Cell::occupied)
-                        .map_or(0, |index| index + 1);
-                    let padded = used
-                        .checked_add(255)
-                        .map(|count| count / 256 * 256)
-                        .ok_or_else(|| invalid("native attention padding overflow"))?
-                        .max(256)
-                        .min(staged.capacity);
-                    Ok::<_, Error>(maximum.max(padded))
-                })?;
-            let Model::Llama(model) = staged.model.as_ref() else {
-                return Err(invalid("native cache model mismatch"));
-            };
-            for (within, item) in chunk.iter().enumerate() {
-                if cancelled() {
-                    return Err(Error::Cancelled);
-                }
-                let (stream, slot) = slots[within];
-                let mut visible = Vec::new();
-                visible
-                    .try_reserve_exact(
-                        staged.streams[stream]
-                            .cells
-                            .iter()
-                            .filter(|cell| cell.occupied())
-                            .count(),
-                    )
-                    .map_err(|_| invalid("native visible cell allocation failed"))?;
-                visible.extend(
-                    staged.streams[stream]
-                        .cells
-                        .iter()
-                        .enumerate()
-                        .filter(|(index, cell)| {
-                            *index != slot
-                                && cell.position >= 0
-                                && cell.position <= item.position
-                                && cell.sequences.contains(&item.sequences[0])
-                        })
-                        .map(|(index, _)| index),
-                );
-                let insert = visible.partition_point(|index| *index < slot);
-                let mut cache = Vec::new();
-                cache
-                    .try_reserve_exact(staged.streams[stream].layers.len())
-                    .map_err(|_| invalid("native visible layer allocation failed"))?;
-                for layer in &staged.streams[stream].layers {
-                    let mut keys = Vec::new();
-                    let mut values = Vec::new();
-                    let count = (visible.len() + 1)
-                        .checked_mul(staged.width)
-                        .ok_or_else(|| invalid("native visible cache size overflow"))?;
-                    keys.try_reserve_exact(count)
-                        .map_err(|_| invalid("native visible key allocation failed"))?;
-                    values
-                        .try_reserve_exact(count)
-                        .map_err(|_| invalid("native visible value allocation failed"))?;
-                    for &index in &visible {
-                        let range = index * staged.width..(index + 1) * staged.width;
-                        layer.keys.extend_f32(range.clone(), &mut keys);
-                        layer.values.extend_f32(range, &mut values);
-                    }
-                    cache.push(KvLayer { keys, values });
-                }
-                let input = match &item.input {
-                    Input::Token(token) => staged.model.embedding(*token)?,
-                    Input::Embedding(values) => copy_values(values)?,
-                };
-                // The reserved visible list includes the new occupied slot,
-                // so insertion cannot require a further allocation.
-                visible.insert(insert, slot);
-                let layout = math::AttentionLayout {
-                    row_len,
-                    columns: Some(&visible),
-                };
-                let (embedding, logits) = model.step_inserting(
-                    input,
-                    item.position as usize,
-                    &mut cache,
-                    insert,
-                    layout,
-                    (staged.key_type, staged.value_type),
-                    &staged.adapters,
-                    &mut cancelled,
-                )?;
-                for (source, destination) in cache.iter().zip(&mut staged.streams[stream].layers) {
-                    destination.keys.write_f32(
-                        slot * staged.width,
-                        &source.keys[insert * staged.width..(insert + 1) * staged.width],
-                    );
-                    destination.values.write_f32(
-                        slot * staged.width,
-                        &source.values[insert * staged.width..(insert + 1) * staged.width],
-                    );
-                }
-                if item.output != OutputSelection::None {
-                    outputs.push(TokenOutput {
-                        batch_index: chunk_index * self.options.microbatch_tokens + within,
-                        sequence: item.sequences[0],
-                        position: item.position as usize,
-                        logits: matches!(
-                            item.output,
-                            OutputSelection::Logits | OutputSelection::Both
-                        )
-                        .then_some(logits),
-                        embedding: matches!(
-                            item.output,
-                            OutputSelection::Embedding | OutputSelection::Both
-                        )
-                        .then_some(embedding),
-                    });
-                }
-            }
-        }
-        if cancelled() {
-            return Err(Error::Cancelled);
-        }
-        *self = staged;
-        Ok(outputs)
+        native_decode::execute(self, batch, cancelled, work_limit)
     }
     pub fn native_state_size(&self, sequence: Option<i32>, flags: u32) -> Result<usize> {
         native_state::encoded_size(self, sequence, flags)
@@ -1162,12 +1037,16 @@ mod tests {
             })
             .collect::<Vec<_>>();
         let before = context.save_native_state(None, 0).unwrap();
-        // Allow both persistent copies, the reserved result descriptors and
-        // 12 KiB of remaining work. The first four-row gather fits, but the
-        // last of 128 microbatches needs all 512 rows and must be rejected.
+        // The complete physical score row is retained even in the earliest
+        // small microbatch. A ceiling below that independently known payload
+        // must reject before any of the 128 microbatches can commit.
         let retained =
             2 * context.storage_bytes().unwrap() + batch.len() * std::mem::size_of::<TokenOutput>();
-        let outcome = context.decode_batch_with_work_limit(&batch, || false, retained + 12 * 1024);
+        let outcome = context.decode_batch_with_work_limit(
+            &batch,
+            || false,
+            retained + context.capacity * std::mem::size_of::<f32>() - 1,
+        );
         assert!(matches!(outcome, Err(Error::Unsupported(_))));
         assert_eq!(context.save_native_state(None, 0).unwrap(), before);
         // A sufficient ceiling executes the identical valid batch fully.
@@ -1195,8 +1074,8 @@ mod tests {
         let before = context.save_native_state(None, 0).unwrap();
         let retained =
             2 * context.storage_bytes().unwrap() + batch.len() * std::mem::size_of::<TokenOutput>();
-        // The prior bound allowed 32 KiB here. Its gathered KV plus physical
-        // row fit, but the additional full-chunk descriptors exceed the limit.
+        // Whole-microbatch hidden/query matrices, physical scores and slot
+        // bookkeeping coexist; they cannot share a single row's allowance.
         assert!(matches!(
             context.decode_batch_with_work_limit(&batch, || false, retained + 32 * 1024),
             Err(Error::Unsupported(_))
@@ -1319,5 +1198,31 @@ mod tests {
             );
             assert_eq!(restored.save_native_state(None, 0).unwrap(), bytes);
         }
+    }
+    #[test]
+    fn decode_ids_use_configured_limit_while_memory_keeps_256_ids() {
+        let mut context = context(true);
+        context
+            .decode_batch(&[NativeBatchToken {
+                sequences: vec![0],
+                position: 0,
+                input: Input::Token(1),
+                output: OutputSelection::Logits,
+            }])
+            .unwrap();
+        context.copy_range(0, 255, -1, -1).unwrap();
+        assert_eq!(context.position_max(255).unwrap(), 0);
+        let before = context.save_native_state(None, 0).unwrap();
+        assert!(matches!(
+            context.decode_batch(&[NativeBatchToken {
+                sequences: vec![255],
+                position: 1,
+                input: Input::Token(1),
+                output: OutputSelection::Logits,
+            }]),
+            Err(Error::InvalidSequence(255))
+        ));
+        assert_eq!(context.save_native_state(None, 0).unwrap(), before);
+        assert_eq!(context.position_max(255).unwrap(), 0);
     }
 }

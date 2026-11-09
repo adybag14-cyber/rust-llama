@@ -1,0 +1,57 @@
+{
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "reference": "Original-only independent tiled FLASH_ATTN_EXT_ROWS and dense FLASH_ATTN_EXT operand-position sweep, captured before correcting Rust arithmetic. Distinct NaNs at channels0/j of one physical K row expose variable-width score GEMM operand preference; other key rows remain finite. No Rust outputs used.",
+  "cases": 224,
+  "default_output_words": 100352,
+  "forced_output_words": 100352,
+  "dense_graphs": 224,
+  "dense_default_words": 100352,
+  "dense_forced_words": 100352,
+  "dense_differences": [],
+  "sources": {
+    "f16-context-oracle\\flash-rows-graphs\\qk-nan-order-addon\\capture.py": {
+      "bytes": 10344,
+      "sha256": "35c2b9e41abd47d9bb8b1632567ec6b051e756e226cd654ef1f6a1628b745915"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\simd-gemm.h": {
+      "bytes": 8796,
+      "sha256": "03648e89ad588e6329bf72c6bfafff394d1030bbe04622d27260bb03b2658604"
+    }
+  },
+  "files": {
+    "flash-rows-reference.bin": {
+      "bytes": 7639702,
+      "sha256": "b8833b73be3c8b0bdce8fa303b29d45f879faf65e829ff325c2a3033c4abdfd3"
+    },
+    "forced-use-ref-diagnostic.bin": {
+      "bytes": 417270,
+      "sha256": "809ee782779b551e710550a242222caf3319b88343dc8f99008e3eb303950eee"
+    },
+    "dense-default-control.bin": {
+      "bytes": 417270,
+      "sha256": "a571eb4eee1b2c56b68d95bd41a7731bc0098cfab1850074046596e6d408b0bb"
+    },
+    "dense-forced-control.bin": {
+      "bytes": 417270,
+      "sha256": "809ee782779b551e710550a242222caf3319b88343dc8f99008e3eb303950eee"
+    },
+    "cases.jsonl": {
+      "bytes": 99572,
+      "sha256": "a7da36ca0f5bd8c4e3af8e384baccd64a7d850a77cd66139b1afda933ded4c6c"
+    }
+  }
+}

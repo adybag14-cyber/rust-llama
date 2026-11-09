@@ -1,0 +1,516 @@
+{
+  "schema": 1,
+  "purpose": "Exact source-produced fused KV row-map and Q/mask geometry; final microbatch, both model layers and both native platforms agree.",
+  "cases": [
+    {
+      "case": 0,
+      "cohort": "microbatch-kvrows-v1",
+      "name": "row-map-physical768-logical512",
+      "request": {
+        "bytes": 74804,
+        "sha256": "ecaa699eceb01936c5c9f6c568c894a691097bffead0402302a2925f27fa34ed"
+      },
+      "profiles": {
+        "windows": {
+          "status": {
+            "bytes": 360042,
+            "sha256": "1fff49f8315a18695c328e1f7cc374eb659ea69fc4c9e4d576bb6d427e418052"
+          },
+          "trace": {
+            "bytes": 136630,
+            "sha256": "56d6e93f18025d94048f2236c1eb12d8ec6cb6fda621035fb6f4c380b21ac84d"
+          },
+          "row_file": "node-104-src5.i32le",
+          "row_identity": {
+            "bytes": 2048,
+            "sha256": "3229e8cd37b24db84b7e5cd0787d7aa994c3f818ad8d0bb95940b1bb5d0bc63c"
+          },
+          "q_shape": [
+            2,
+            1,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            768,
+            1,
+            1
+          ],
+          "mask_shape": [
+            512,
+            1,
+            1,
+            1
+          ],
+          "row_shape": [
+            512,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 3211264,
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          }
+        },
+        "linux": {
+          "status": {
+            "bytes": 359441,
+            "sha256": "0621d06c93a639bcd3d273803c5182f29f5ac50c3a6f04ba1a08fe6dd1151e50"
+          },
+          "trace": {
+            "bytes": 129323,
+            "sha256": "0daca8e61fd334b5e570f5df59b731067b4af71b1f731539eb5475eb5293ab06"
+          },
+          "row_file": "node-104-src5.i32le",
+          "row_identity": {
+            "bytes": 2048,
+            "sha256": "3229e8cd37b24db84b7e5cd0787d7aa994c3f818ad8d0bb95940b1bb5d0bc63c"
+          },
+          "q_shape": [
+            2,
+            1,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            768,
+            1,
+            1
+          ],
+          "mask_shape": [
+            512,
+            1,
+            1,
+            1
+          ],
+          "row_shape": [
+            512,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 5499792,
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          }
+        }
+      },
+      "columns": 512,
+      "queries": 1,
+      "batches": 1,
+      "words": 512
+    },
+    {
+      "case": 1,
+      "cohort": "microbatch-rowmap-addon-v1",
+      "name": "shared-membership-width-k1-v1",
+      "request": {
+        "bytes": 80259,
+        "sha256": "44be370c2166630e86f9e83645798fa664323b2e98e6b7b71b7a38559175b2f6"
+      },
+      "profiles": {
+        "windows": {
+          "status": {
+            "bytes": 252878,
+            "sha256": "44cef5983daf840540b9bcb5045c0ffc348e9032bcbde3b44b1b51592d915c2d"
+          },
+          "trace": {
+            "bytes": 129955,
+            "sha256": "805bfe2d866bc9cff5d109a60682f89a408e7eaf23be149d192773a569b3d415"
+          },
+          "row_file": "node-104-src5.i32le",
+          "row_identity": {
+            "bytes": 3072,
+            "sha256": "bf264de84a2a9336e97ac0665d81a31eb3f7ca3dd25a8eb51eb7661d5e83ba88"
+          },
+          "q_shape": [
+            2,
+            1,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            768,
+            1,
+            1
+          ],
+          "mask_shape": [
+            768,
+            1,
+            1,
+            1
+          ],
+          "row_shape": [
+            768,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 3211264,
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          }
+        },
+        "linux": {
+          "status": {
+            "bytes": 252557,
+            "sha256": "72ff61f6cbdf85899f3b141455e0643dd0282cd8ce0e369fb053ec0b95f2fcca"
+          },
+          "trace": {
+            "bytes": 123142,
+            "sha256": "717d2e6cc1111358d6381026ded997ec9431a2b5703ce46afb425dd866d8b852"
+          },
+          "row_file": "node-104-src5.i32le",
+          "row_identity": {
+            "bytes": 3072,
+            "sha256": "bf264de84a2a9336e97ac0665d81a31eb3f7ca3dd25a8eb51eb7661d5e83ba88"
+          },
+          "q_shape": [
+            2,
+            1,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            768,
+            1,
+            1
+          ],
+          "mask_shape": [
+            768,
+            1,
+            1,
+            1
+          ],
+          "row_shape": [
+            768,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 5499792,
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          }
+        }
+      },
+      "columns": 768,
+      "queries": 1,
+      "batches": 1,
+      "words": 768
+    },
+    {
+      "case": 2,
+      "cohort": "microbatch-rowmap-addon-v3",
+      "name": "valid-batch512-declared256-high-sequence-words-workers3",
+      "request": {
+        "bytes": 2435,
+        "sha256": "6899472c92bcf98b73ddae2042de7f84f72cab2dea06d708349bd08c8f6a4eab"
+      },
+      "profiles": {
+        "windows": {
+          "status": {
+            "bytes": 41948,
+            "sha256": "c84a3f6a94357cdeb30ac21153eed146ea0521375ac451f57a7629ff1fd1986b"
+          },
+          "trace": {
+            "bytes": 64445,
+            "sha256": "3d460925bce34b6ccce0752b862697c965ee9a7ea79d7e5d9c2a3a368c7afece"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 5120,
+            "sha256": "042661d0bef90286d6df9d04ee6a7edbc3409ff3b23abf8e9c66c4f1441795da"
+          },
+          "q_shape": [
+            2,
+            2,
+            2,
+            5
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            2,
+            1,
+            5
+          ],
+          "row_shape": [
+            256,
+            5,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 3211264,
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          }
+        },
+        "linux": {
+          "status": {
+            "bytes": 41827,
+            "sha256": "ef0cbe5bb0d4d488ff22ce31dcf6ede3ee0f4e36e9bad10e1062bde33d2f2bab"
+          },
+          "trace": {
+            "bytes": 60402,
+            "sha256": "072f7a31c64a5efbdf1ecf0cf41190abe1db589af0f225232ba200842d974532"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 5120,
+            "sha256": "042661d0bef90286d6df9d04ee6a7edbc3409ff3b23abf8e9c66c4f1441795da"
+          },
+          "q_shape": [
+            2,
+            2,
+            2,
+            5
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            2,
+            1,
+            5
+          ],
+          "row_shape": [
+            256,
+            5,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 5499792,
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          }
+        }
+      },
+      "columns": 256,
+      "queries": 2,
+      "batches": 5,
+      "words": 1280
+    },
+    {
+      "case": 3,
+      "cohort": "microbatch-rowmap-addon-v2",
+      "name": "declared256-mixed-shared-sequence-slice",
+      "request": {
+        "bytes": 15328,
+        "sha256": "dc38be1a1d06e39fd24e4e0f355c3a23db86c225e8e22d83ed45192ea48ef73e"
+      },
+      "profiles": {
+        "windows": {
+          "status": {
+            "bytes": 48480,
+            "sha256": "8413861a92e84c11ed7aa5c395ebb6b6562099a73208ba5ce40104b9dc1adf41"
+          },
+          "trace": {
+            "bytes": 64426,
+            "sha256": "a862df0e7c3b9811f84207bca76a63dba65b45e9e590d44b32c08ed83a306fff"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 1024,
+            "sha256": "fcb53ea2f31d61b4ec347289126d1c155b51d8fe617217c10957ff68a6b0f649"
+          },
+          "q_shape": [
+            2,
+            3,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            3,
+            1,
+            1
+          ],
+          "row_shape": [
+            256,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 3211264,
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          }
+        },
+        "linux": {
+          "status": {
+            "bytes": 48247,
+            "sha256": "a305bef70f983c266f1dd34789ed569e930cd79397f8ed8cab1e7b2a2796d92f"
+          },
+          "trace": {
+            "bytes": 60394,
+            "sha256": "31278624ae567df85f77774a8b28f9137abbbeb5bc2e1450598a6d0b283be90f"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 1024,
+            "sha256": "fcb53ea2f31d61b4ec347289126d1c155b51d8fe617217c10957ff68a6b0f649"
+          },
+          "q_shape": [
+            2,
+            3,
+            2,
+            1
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            3,
+            1,
+            1
+          ],
+          "row_shape": [
+            256,
+            1,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 5499792,
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          }
+        }
+      },
+      "columns": 256,
+      "queries": 3,
+      "batches": 1,
+      "words": 256
+    },
+    {
+      "case": 4,
+      "cohort": "microbatch-kvrows-v1",
+      "name": "shared-prefix-two-divergent-queries",
+      "request": {
+        "bytes": 17968,
+        "sha256": "9b7b90081b04a85620b286a7730a7ec20b7ff364f14a3670ea3bee5e99da6881"
+      },
+      "profiles": {
+        "windows": {
+          "status": {
+            "bytes": 360042,
+            "sha256": "1fff49f8315a18695c328e1f7cc374eb659ea69fc4c9e4d576bb6d427e418052"
+          },
+          "trace": {
+            "bytes": 39939,
+            "sha256": "1586cdd7b996366c5070ed6b73b25d9c39e5ce3b93e2f82483598f03344bf5fc"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 2048,
+            "sha256": "c47c17cc0cebadd3c1248b9b2a2b66a788cfc870bb26a34bc26bf79003ba78c8"
+          },
+          "q_shape": [
+            2,
+            64,
+            2,
+            2
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            64,
+            1,
+            2
+          ],
+          "row_shape": [
+            256,
+            2,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 3211264,
+            "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+          }
+        },
+        "linux": {
+          "status": {
+            "bytes": 359441,
+            "sha256": "0621d06c93a639bcd3d273803c5182f29f5ac50c3a6f04ba1a08fe6dd1151e50"
+          },
+          "trace": {
+            "bytes": 37796,
+            "sha256": "f2a2c7cf505d519927a4536c8b1bf4b0a23b9d23c440c713ae7d5612f5fb418e"
+          },
+          "row_file": "node-29-src5.i32le",
+          "row_identity": {
+            "bytes": 2048,
+            "sha256": "c47c17cc0cebadd3c1248b9b2a2b66a788cfc870bb26a34bc26bf79003ba78c8"
+          },
+          "q_shape": [
+            2,
+            64,
+            2,
+            2
+          ],
+          "physical_k_shape": [
+            2,
+            256,
+            1,
+            1
+          ],
+          "mask_shape": [
+            256,
+            64,
+            1,
+            2
+          ],
+          "row_shape": [
+            256,
+            2,
+            1,
+            1
+          ],
+          "library": {
+            "bytes": 5499792,
+            "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+          }
+        }
+      },
+      "columns": 256,
+      "queries": 64,
+      "batches": 2,
+      "words": 512
+    }
+  ],
+  "binary": {
+    "bytes": 13424,
+    "sha256": "5b2078cf774363e0ee3e48fb778bb902d89849b275863c4d20886c429b06ded4"
+  },
+  "format": "LLKVR001, u32 cases; each u32 case_id/columns/queries/batches/word_count then word_count little-endian I32 source entries. Input cell/sequence recipes are reconstructed only from these original requests in the Rust test; expected map bytes come only from original GGML source-5 buffers."
+}

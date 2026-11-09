@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json,subprocess,os,datetime
+root=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=root/'rust-draft-v1'
+out=root/'clippy-test-cleanup-v2';out.mkdir(exist_ok=False)
+p=repo/'crates/gguf/tests/raw_native.rs';b=p.read_bytes()
+assert hashlib.sha256(b).hexdigest()=='5d10857cc234f34e21aa2568f7ebfef20c3f90a68b1bfbbc5afa21385d8cb124'
+(out/'raw_native.preimage.rs.txt').write_bytes(b)
+text=b.decode('utf-8');assert text.count('.chunks_exact(2)')==1
+p.write_bytes(text.replace('.chunks_exact(2)','.as_chunks::<2>()\n        .0\n        .iter()').encode('utf-8'))
+env=os.environ.copy();env['CARGO_TARGET_DIR']=str(root/'target-windows')
+with (out/'fmt.log').open('wb') as log:r=subprocess.run(['cargo','+1.99.1','fmt','--all'],cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT)
+assert r.returncode==0
+frozen=json.loads((root/'validation/focused-v1/windows/execution-inputs.json').read_text())
+changed=[]
+for row in frozen:
+ f=repo/row['path'];actual=hashlib.sha256(f.read_bytes()).hexdigest()
+ if actual!=row['sha256']:changed.append({'path':row['path'],'before':row['sha256'],'after':actual})
+assert len(changed)==1 and changed[0]['path']=='crates/gguf/tests/raw_native.rs',changed
+report={'status':'succeeded','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'changed':changed,'reason':'Strict Rust1.99 Clippy test hex helper uses array chunks, retaining the unchanged even-length assertion, output and frozen expected bytes. Production source and fixtures are byte-identical to the successful v1 Windows debug/release runs.'}
+(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+print(json.dumps(report,indent=2))

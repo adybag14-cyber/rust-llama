@@ -1,0 +1,170 @@
+{
+  "status": "failed",
+  "platform": "windows",
+  "base_commit": "40a4ee7deb59e5823dd6d242231592d0c9923168",
+  "execution_inputs_before": {
+    "files": 744,
+    "sha256": "bbd8f97b374823271bee100cfb400ef502ffd8b51aa4648c609917abdfecc31d"
+  },
+  "driver": {
+    "bytes": 5068,
+    "sha256": "b6ccc03a9c221767cb14fcb6917d5275e9bf79b79379c99f011394e0650db1a0"
+  },
+  "started_utc": "2026-11-09T20:41:23.648755+00:00",
+  "scope": "Raw GGUF reader/getters/native serialization, lossless raw v3 writer, native split/merge byte and NUL semantics; 1605 original reader cases, 3196 original tool cases, 22 original NUL tool cases, plus existing 103 CLI cases. All source/fixture inputs including both declarations are frozen. Not full T04 or full-port completion.",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0041191999989678,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "workspace-check",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "check",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "seconds": 2.764095800004725,
+      "log": {
+        "bytes": 781,
+        "sha256": "a7d99d5babbb337215d7b5121f2d26b2ce5f06f9fd4a8b3502c6102e8a90af46"
+      },
+      "native_metrics": []
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 64.47403280000435,
+      "log": {
+        "bytes": 21603,
+        "sha256": "5187c3a9967c950b5d23145bddfd5e7486beb3cf98118f8b0625a57a37d92785"
+      },
+      "tests": {
+        "passed": 73,
+        "failed": 0,
+        "ignored": 11,
+        "suites": 19
+      },
+      "native_metrics": [
+        "Original input raw writer: 0 headers; 0 exact header bytes",
+        "Independent original GGUF reader: 512 cases; 512 accepted; 57344 exact serialized header bytes; all observed C getter values agree",
+        "Original input raw writer: 1073 headers; 211424 exact header bytes",
+        "Independent original GGUF reader: 1093 cases; 1080 accepted; 211840 exact serialized header bytes; all observed C getter values agree",
+        "gguf-split-native: cases=103 success=63 checked_errors=40 exact_after_file_bytes=12179168"
+      ]
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 141.25230949999968,
+      "log": {
+        "bytes": 22136,
+        "sha256": "5d7226396dba0ac1db910759c5b87e9e343da6b3681d934fabd04eae27c78df6"
+      },
+      "tests": {
+        "passed": 73,
+        "failed": 0,
+        "ignored": 11,
+        "suites": 19
+      },
+      "native_metrics": [
+        "Original input raw writer: 0 headers; 0 exact header bytes",
+        "Independent original GGUF reader: 512 cases; 512 accepted; 57344 exact serialized header bytes; all observed C getter values agree",
+        "Original input raw writer: 1073 headers; 211424 exact header bytes",
+        "Independent original GGUF reader: 1093 cases; 1080 accepted; 211840 exact serialized header bytes; all observed C getter values agree",
+        "gguf-split-native: cases=103 success=63 checked_errors=40 exact_after_file_bytes=12179168"
+      ]
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 0.8378408999997191,
+      "log": {
+        "bytes": 1033,
+        "sha256": "12676bb4aa4f17c65813191f1ac86872305d3c3fd40b2664856e4069242d1a38"
+      },
+      "native_metrics": []
+    }
+  ],
+  "error": "RuntimeError('clippy failed')",
+  "execution_inputs_at_failure": {
+    "files": 744,
+    "sha256": "bbd8f97b374823271bee100cfb400ef502ffd8b51aa4648c609917abdfecc31d"
+  },
+  "finished_utc": "2026-11-09T20:44:59.776230+00:00"
+}

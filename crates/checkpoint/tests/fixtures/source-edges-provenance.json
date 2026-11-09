@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "original_v1_provenance_sha256": "9bbe91f02f3c610980ba05b4910884c2e05873eec248be59521669f870a5a24f",
+  "independence": "Ten file and five index cases per profile captured exclusively from unchanged original Python source before Rust comparisons for these cases; all original-v1 fixtures remain unchanged.",
+  "profiles": {
+    "windows": {
+      "python": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+      "dependencies": {
+        "numpy": "2.4.6",
+        "safetensors": "0.8.0"
+      },
+      "sources": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\gguf-py\\gguf\\utility.py",
+          "bytes": 13534,
+          "sha256": "da920e2c62166ec9f30e407e9fb35ec29fda671310ffbf0f8ce856b62f1c70d7"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\safetensors-port\\capture-reference-v1.py",
+          "bytes": 21160,
+          "sha256": "d494b252c575d51652e01f044f2e8951c1263bac9f422204fae3ac6139c99d3d"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\safetensors-port\\capture-edges-v1.py",
+          "bytes": 8394,
+          "sha256": "fa5afbb9f203be3d20173c402e3d669c616d8db52f2eb4c634fdfec4742a2705"
+        }
+      ],
+      "created_utc": "2026-11-09T19:58:06.493942+00:00",
+      "finished_utc": "2026-11-09T19:58:06.544452+00:00",
+      "bytecode_writes_disabled": true,
+      "file_cases": 10,
+      "index_cases": 5,
+      "source_file_accepts": 9,
+      "source_index_accepts": 5
+    },
+    "linux": {
+      "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+      "dependencies": {
+        "numpy": "2.2.6",
+        "safetensors": "0.8.0"
+      },
+      "sources": [
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/gguf-py/gguf/utility.py",
+          "bytes": 13534,
+          "sha256": "da920e2c62166ec9f30e407e9fb35ec29fda671310ffbf0f8ce856b62f1c70d7"
+        },
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/conversion/base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/safetensors-port/capture-reference-v1.py",
+          "bytes": 21160,
+          "sha256": "d494b252c575d51652e01f044f2e8951c1263bac9f422204fae3ac6139c99d3d"
+        },
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/safetensors-port/capture-edges-v1.py",
+          "bytes": 8394,
+          "sha256": "fa5afbb9f203be3d20173c402e3d669c616d8db52f2eb4c634fdfec4742a2705"
+        }
+      ],
+      "created_utc": "2026-11-09T19:58:07.815307+00:00",
+      "finished_utc": "2026-11-09T19:58:08.410255+00:00",
+      "bytecode_writes_disabled": true,
+      "file_cases": 10,
+      "index_cases": 5,
+      "source_file_accepts": 9,
+      "source_index_accepts": 5
+    }
+  },
+  "format": "STF2 extends STF1 with a metadata-present byte and serialized Python json.loads metadata value after each admitted file. STI2 extends STI1 with a directory-name list after initial files. Other fields/number/text rules are unchanged.",
+  "cases": "Threefold key replacement, mixed huge integer/float arithmetic failure, header-prefix raw access, codepoint name ordering, surrogate iteration, arbitrary metadata including 4300 digits and nonfinite/negative-zero numbers; index directories ignored, unselected malformed files ignored, five-shard overwrite ordering and two labels for the same file.",
+  "metadata_view": "Python json.loads is the exact header decoder used by SafetensorsLocal. Its __metadata__ value is separately retained as a caller-facing raw view; source loading itself ignores that value.",
+  "generated_bytecode_side_effect": {
+    "original_v1": "Initial imports emitted utility.cpython-310.pyc and utility.cpython-314.pyc under the source __pycache__. Parent archived and relocated only these generated files after its verify-source check detected them; utility.py was byte-compared to the original ZIP and unchanged.",
+    "cleanup_report": "gguf-streaming-integration-v1/validation/source-cleanup-v1/status.json",
+    "cleanup_report_sha256": "b4f8fadd49d59cf0374f3a1d1092602b905bc29626b4412b4edfdb2a499e2e45",
+    "prevention": "This additive harness sets sys.dont_write_bytecode before importing original source and is launched with Python -B / PYTHONDONTWRITEBYTECODE=1. Both generated cache paths are asserted absent after capture."
+  },
+  "packager": {
+    "bytes": 6408,
+    "sha256": "1e4b80cf06f1d86b15a7bb25cfa1bd9993bf88b90d67d65ccd71554d45669c28"
+  },
+  "reports": [
+    {
+      "profile": "windows",
+      "bytes": 42364,
+      "sha256": "41599b23ff1d3f58a5ad6cca45de105c1e9d63ab341cc6fe7547ebb5c415ba97"
+    },
+    {
+      "profile": "linux",
+      "bytes": 42325,
+      "sha256": "ad1202d2115468f3775985a604759f55af4a2e51a1441f79bdea202375f52c9e"
+    }
+  ],
+  "files": [
+    {
+      "name": "original-edges-linux-report.json.zlib",
+      "bytes": 4751,
+      "sha256": "474557dbca8759106725860912bd559f100b3cb9532988481b652cd4059c9832"
+    },
+    {
+      "name": "original-edges-windows-report.json.zlib",
+      "bytes": 4779,
+      "sha256": "6d01add22308cb84accfb468b3d878472bc2cd255d3ff49c0318bcd2d797d722"
+    },
+    {
+      "name": "source-files-edges-reference.bin",
+      "bytes": 12574,
+      "sha256": "da7ede18f485ec6b552d3097e7544e76cfe8b66b08214a3fa724a75bf18b034a"
+    },
+    {
+      "name": "source-index-edges-reference.bin",
+      "bytes": 2607,
+      "sha256": "95898454eb3b669caf9af642dab0300740a93298bb8476586fb1c170b35082f0"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+use llama_quant::DType;
+use llama_quant::flash_attention::{Inputs, Params, View4};
+
+struct Reader {
+    bytes: &'static [u8],
+    at: usize,
+}
+impl Reader {
+    fn take(&mut self, count: usize) -> &'static [u8] {
+        let bytes = &self.bytes[self.at..self.at + count];
+        self.at += count;
+        bytes
+    }
+    fn u32(&mut self) -> u32 {
+        u32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+    fn usize(&mut self) -> usize {
+        usize::try_from(u64::from_le_bytes(self.take(8).try_into().unwrap())).unwrap()
+    }
+    fn f32(&mut self) -> f32 {
+        f32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+    fn string(&mut self) -> &'static str {
+        let n = self.u32() as usize;
+        std::str::from_utf8(self.take(n)).unwrap()
+    }
+    fn view(&mut self) -> View4<'static> {
+        let dtype = DType::from_id(self.u32()).unwrap();
+        let shape = std::array::from_fn(|_| self.usize());
+        let strides = std::array::from_fn(|_| self.usize());
+        let size = self.usize();
+        View4::from_bytes(dtype, self.take(size), shape, strides, 0).unwrap()
+    }
+}
+pub struct Case {
+    pub cohort: &'static str,
+    pub name: &'static str,
+    pub inputs: Inputs<'static>,
+    pub params: Params,
+    pub shape: [usize; 4],
+    pub expected: &'static [u8],
+    pub forced: &'static [u8],
+}
+pub fn load() -> Vec<Case> {
+    let pool_bytes = include_bytes!("../fixtures/flash/inputs.bin").as_slice();
+    let mut pool = Reader {
+        bytes: pool_bytes,
+        at: 0,
+    };
+    assert_eq!(pool.take(8), b"FAIN0001");
+    let count = pool.u32();
+    assert_eq!(count, 568);
+    let tensors = (0..count).map(|_| pool.view()).collect::<Vec<_>>();
+    assert_eq!(pool.at, pool_bytes.len());
+    #[cfg(target_os = "windows")]
+    let bytes = include_bytes!("../fixtures/flash/msvc-reference.bin").as_slice();
+    #[cfg(target_os = "linux")]
+    let bytes = include_bytes!("../fixtures/flash/gnu-reference.bin").as_slice();
+    let mut reader = Reader { bytes, at: 0 };
+    assert_eq!(reader.take(8), b"FACA0001");
+    let count = reader.u32();
+    assert_eq!(count, 552);
+    let mut cases = Vec::new();
+    for _ in 0..count {
+        let cohort = reader.string();
+        let name = reader.string();
+        let workers = reader.u32() as usize;
+        let mask = reader.u32() != 0;
+        let sinks = reader.u32() != 0;
+        let scale = reader.f32();
+        let max_bias = reader.f32();
+        let logit_softcap = reader.f32();
+        let ni = reader.u32();
+        assert_eq!(ni, 3 + u32::from(mask) + u32::from(sinks));
+        let inputs = (0..ni)
+            .map(|_| tensors[reader.u32() as usize])
+            .collect::<Vec<_>>();
+        let shape = std::array::from_fn(|_| reader.usize());
+        let size = reader.usize();
+        let expected = reader.take(size);
+        let size = reader.usize();
+        let forced = reader.take(size);
+        assert_eq!(expected.len(), forced.len());
+        cases.push(Case {
+            cohort,
+            name,
+            shape,
+            expected,
+            forced,
+            inputs: Inputs {
+                q: inputs[0],
+                k: inputs[1],
+                v: inputs[2],
+                mask: mask.then(|| inputs[3]),
+                sinks: sinks.then(|| inputs[3 + usize::from(mask)]),
+            },
+            params: Params {
+                workers,
+                scale,
+                max_bias,
+                logit_softcap,
+                ..Params::default()
+            },
+        });
+    }
+    assert_eq!(reader.at, bytes.len());
+    cases
+}

@@ -103,12 +103,6 @@ impl KvBuffer {
             Self::F16(v) => v[index] = llama_quant::f32_to_f16(value),
         }
     }
-    pub(super) fn extend_f32(&self, range: Range<usize>, target: &mut Vec<f32>) {
-        match self {
-            Self::F32(v) => target.extend_from_slice(&v[range]),
-            Self::F16(v) => target.extend(v[range].iter().copied().map(llama_quant::f16_to_f32)),
-        }
-    }
     pub(super) fn write_f32(&mut self, start: usize, source: &[f32]) {
         match self {
             Self::F32(v) => v[start..start + source.len()].copy_from_slice(source),

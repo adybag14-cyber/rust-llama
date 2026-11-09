@@ -1,0 +1,58 @@
+from pathlib import Path
+import os,sys,json,hashlib,subprocess,time,datetime,shutil
+sys.dont_write_bytecode=True
+windows=os.name=='nt';platform='windows' if windows else 'linux'
+root=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings') if windows else Path('/mnt/c/Users/adyba/rust-llama-reference/gguf-byte-strings')
+source=root/'rust-draft-v1';frozen=json.loads((root/'validation/focused-v2'/platform/'execution-inputs.json').read_text(encoding='utf-8'))
+out=root/'validation/negative-controls-v1'/platform;out.mkdir(parents=True,exist_ok=False)
+draft=root/('negative-control-draft-'+platform)
+assert not draft.exists();draft.mkdir()
+def identity(path):
+ b=path.read_bytes();return {'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest()}
+def guard():
+ for row in frozen:assert identity(source/row['path'])=={k:row[k] for k in ('bytes','sha256')},row['path']
+guard()
+for row in frozen:
+ p=draft/row['path'];p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source/row['path'],p)
+env=os.environ.copy();env['CARGO_BUILD_JOBS']='2';env['PYTHONDONTWRITEBYTECODE']='1'
+if windows:env['CARGO_TARGET_DIR']=str(root/'target-negative-windows')
+else:
+ rustbin=Path('/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin')
+ env['PATH']=str(rustbin)+':/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+ env['RUSTC']=str(rustbin/'rustc');env['RUSTDOC']=str(rustbin/'rustdoc')
+ env['CARGO_TARGET_DIR']='/home/tdamre/.cache/rust-llama-gguf-raw-negative-v1'
+cargo=['cargo']+(['+1.99.1'] if windows else [])
+cases=[
+ ('boolean-only-one-is-true','crates/gguf/src/lib.rs','RawValue::Bool(self.u8()? != 0)','RawValue::Bool(self.u8()? == 1)','raw_native','original_all_boolean_encodings_scalar_and_array'),
+ ('last-tensor-prefix-lookup','crates/gguf/src/raw.rs','.position(|tensor| tensor.native_name() == wanted)','.rposition(|tensor| tensor.native_name() == wanted)','raw_native','original_all_byte_values_keys_names_strings_and_aliases'),
+ ('tool-later-alias-payload','crates/gguf/src/split.rs','*first.entry(tensor.native_name()).or_insert(index)','*first.entry(tensor.native_name()).and_modify(|old| *old = index).or_insert(index)','raw_tools','original_raw_tool_bytes_and_native_failures'),
+]
+# Resolve the observed existing raw-tool test name rather than assuming it.
+tooltext=(source/'crates/gguf/tests/raw_tools.rs').read_text(encoding='utf-8')
+import re
+names=re.findall(r'#\[test\]\s*fn (\w+)\(',tooltext)
+assert len(names)==2,names
+cases[-1]=(*cases[-1][:-1],names[0])
+report={'status':'running','platform':platform,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'driver':identity(Path(__file__)),'source_inputs':{'files':len(frozen),'sha256':hashlib.sha256('\n'.join(r['path']+'\0'+r['sha256'] for r in frozen).encode()).hexdigest()},'cases':[],'scope':'One semantic mutation at a time in an isolated copy; unchanged native fixture bytes and test code. A compiler failure does not count as a detected mutation.'}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save()
+try:
+ for name,path,old,new,test,target in cases:
+  guard();p=draft/path;pre=p.read_bytes();s=pre.decode('utf-8');assert s.count(old)==1,(name,s.count(old));post=s.replace(old,new).encode('utf-8')
+  (out/(name+'.preimage.rs.txt')).write_bytes(pre);(out/(name+'.mutation.rs.txt')).write_bytes(post);p.write_bytes(post)
+  argv=cargo+['test','--offline','--locked','-p','llama-gguf','--test',test,target,'--','--exact','--nocapture']
+  try:
+   start=time.monotonic()
+   with (out/(name+'.log')).open('wb') as f:r=subprocess.run(argv,cwd=draft,env=env,stdout=f,stderr=subprocess.STDOUT,timeout=1800)
+   log=(out/(name+'.log')).read_text(encoding='utf-8',errors='replace')
+   row={'name':name,'path':path,'before':{'bytes':len(pre),'sha256':hashlib.sha256(pre).hexdigest()},'mutation':identity(p),'argv':argv,'exit_code':r.returncode,'seconds':time.monotonic()-start,'log':identity(out/(name+'.log')),'detected_by_assertion':r.returncode!=0 and 'test result: FAILED.' in log and '1 failed;' in log and 'panicked at' in log}
+   report['cases'].append(row);save();print(platform,name,json.dumps(row),flush=True)
+   assert row['detected_by_assertion'],name
+  finally:p.write_bytes(pre)
+ guard()
+ for row in frozen:assert identity(draft/row['path'])=={k:row[k] for k in ('bytes','sha256')},row['path']
+ report['status']='succeeded';report['baseline_unchanged']=True
+except BaseException as error:
+ report['status']='failed';report['error']=repr(error);save();raise
+report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2),flush=True)

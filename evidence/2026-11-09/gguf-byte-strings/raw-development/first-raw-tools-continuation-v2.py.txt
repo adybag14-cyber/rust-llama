@@ -1,0 +1,21 @@
+from pathlib import Path
+import os,subprocess,hashlib,json,datetime,time
+root=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=root/'rust-draft-v1';out=root/'first-raw-tools-continuation-v2';out.mkdir(exist_ok=False)
+prior_path=root/'first-raw-tools-check-v1/status.json';prior=json.loads(prior_path.read_text(encoding='utf-8'))
+assert prior['status']=='failed' and prior['steps'][-1]['name']=='cli-tests' and 'did not match any packages' in prior['error']
+sha=lambda b:hashlib.sha256(b).hexdigest()
+source=prior['source'];assert all(sha((repo/n).read_bytes())==h for n,h in source.items())
+report={'status':'running','prior_status_sha256':sha(prior_path.read_bytes()),'source':source,'qualification':'Previous workspace check and all GGUF tests succeeded unchanged; rerun only corrected package selector and new strict Clippy gate.','steps':[]}
+def save():(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+save();env=os.environ.copy();env['CARGO_TARGET_DIR']=str(root/'target-windows');env['CARGO_BUILD_JOBS']='2'
+try:
+ for name,args in [('cli-tests',['test','--offline','--locked','-p','rust-llama-cli','--all-targets','--','--nocapture']),('clippy',['clippy','--offline','--locked','-p','llama-gguf','-p','rust-llama-cli','--all-targets','--','-D','warnings'])]:
+  assert all(sha((repo/n).read_bytes())==h for n,h in source.items())
+  start=time.monotonic()
+  with (out/(name+'.log')).open('wb') as log:p=subprocess.run(['cargo','+1.99.1',*args],cwd=repo,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=1200)
+  data=(out/(name+'.log')).read_bytes();report['steps'].append({'name':name,'exit_code':p.returncode,'seconds':time.monotonic()-start,'log_sha256':sha(data)});save()
+  assert p.returncode==0,(name,data.decode('utf-8','replace')[-14000:])
+ report['status']='succeeded'
+except BaseException as e:report['status']='failed';report['error']=repr(e);raise
+finally:report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();save()
+print(json.dumps(report,indent=2))

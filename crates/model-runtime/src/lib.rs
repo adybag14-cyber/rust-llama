@@ -24,7 +24,8 @@ pub use adapters::{AdapterSet, Lora};
 pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
 pub use context::{
     BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
-    NativeContextOptions, NativeKvType, NativeState, OutputSelection, TokenOutput,
+    NativeContextOptions, NativeExecutionOptions, NativeExecutionStats, NativeKvType, NativeState,
+    OutputSelection, TokenOutput,
 };
 pub use fixtures::{SmokeReport, smoke_demo};
 pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};

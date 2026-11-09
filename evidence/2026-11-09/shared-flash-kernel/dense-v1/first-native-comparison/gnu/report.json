@@ -1,0 +1,26 @@
+{
+  "platform": "gnu",
+  "command": [
+    "cargo",
+    "+1.99.1",
+    "test",
+    "--release",
+    "-p",
+    "llama-quant",
+    "--test",
+    "flash_attention",
+    "--target-dir",
+    "/tmp/rust-llama-flash-kernel",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "source_sha256": {
+    "crates/quant/src/flash_attention.rs": "ea55725aa2530a2efe67a5370d4d06a6eb995e3d9ef3e819c2c1face2278bc0b",
+    "crates/quant/src/cpu_math.rs": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5",
+    "crates/quant/src/lib.rs": "1b4dbe4bff8a9827f25a9835e85774753ac80bec41885371801ef527c6d80868",
+    "crates/quant/tests/flash_attention.rs": "f7b0950930e6b743a847d89e948a42de682f6df7d2fcd424d95c2985771fba00",
+    "crates/quant/tests/common/flash_fixture.rs": "357b85e263f0c630834e82973e44b43227543b2efc483459b3795919774fff03"
+  }
+}

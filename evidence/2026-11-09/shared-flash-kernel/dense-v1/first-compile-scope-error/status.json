@@ -1,0 +1,47 @@
+{
+  "id": "job-1794246712335-238c7872-768",
+  "status": "failed",
+  "mode": "shell",
+  "createdAtUtc": "2026-11-09T17:51:52.335Z",
+  "startedAtUtc": "2026-11-09T17:51:52.416Z",
+  "completedAtUtc": "2026-11-09T17:51:53.476Z",
+  "runnerPid": 44836,
+  "exitCode": 1,
+  "readOnly": false,
+  "resourceClass": "light",
+  "runtimeMode": "host",
+  "queuedAtUtc": "2026-11-09T17:51:52.398Z",
+  "runnerProcessInstance": "134387203123763761",
+  "queueWaitMs": 5,
+  "executionSlot": 18,
+  "executionSlots": [
+    18
+  ],
+  "executionPool": "execution",
+  "executionWeight": 1,
+  "childPid": 49224,
+  "error": "Compiling llama-quant v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-kernel\\rust-draft\\crates\\quant)\nerror[E0521]: borrowed data escapes outside of closure\n   --> crates\\quant\\src\\flash_attention.rs:675:39\n    |\n654 |             let mut handles = reserved(self.params.workers)?;\n    |                 ----------- `handles` declared here, outside of the closure body\n655 |             thread::scope(|scope| -> Result<()> {\n    |                            ----- `scope` is a reference that is only valid in the closure body\n...\n675 |                         Ok(handle) => handles.push(handle),\n    |                                       ^^^^^^^^^^^^^^^^^^^^ `scope` escapes the closure body here\n    |\n    = note: requirement occurs because of a mutable reference to `Vec<ScopedJoinHandle<'_, WorkerResult>>`\n    = note: mutable references are invariant over their type parameter\n    = help: see <https://doc.rust-lang.org/nomicon/subtyping.html> for more information about variance\n\nFor more information about this error, try `rustc --explain E0521`.\nerror: could not compile `llama-quant` (lib) due to 1 previous error",
+  "logs": {
+    "stdout": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 0,
+      "currentBytes": 0,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "stderr": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 1147,
+      "currentBytes": 1147,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "truncated": false
+  }
+}

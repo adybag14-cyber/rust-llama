@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "purpose": "Exact original native build qualification for the measured MSVC/GNU scalar-GEMM NaN operand rules; no source-language guarantee of payload choice is inferred.",
+  "source_calls": {
+    "scalar_fallback": {
+      "path": "llama.cpp-master/ggml/src/ggml-cpu/simd-gemm.h",
+      "line": 247,
+      "sha256": "03648e89ad588e6329bf72c6bfafff394d1030bbe04622d27260bb03b2658604"
+    },
+    "qk": {
+      "path": "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp",
+      "line": 9254,
+      "arguments": "C=KQ,A=Q,B=packed K,M=64,K=DK,N=64"
+    },
+    "pv": {
+      "path": "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp",
+      "line": 9317,
+      "arguments": "C=VKQ32,A=probabilities,B=packed V,M=64,K=64,N=DV"
+    }
+  },
+  "msvc": {
+    "compiler": "MSVC 19.51.36260.0",
+    "compiler_path": "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe",
+    "generator": "Visual Studio 18 2026",
+    "toolset": "v145",
+    "windows_sdk": "10.0.26100.0",
+    "host": "Windows-11-10.0.26300-SP0",
+    "release_settings": [
+      "/O2",
+      "/Ob2",
+      "/DNDEBUG",
+      "/MD",
+      "/EHsc",
+      "/arch:SSE4.2",
+      "/utf-8",
+      "/bigobj",
+      "C++17",
+      "OpenMP"
+    ],
+    "floating_point_model": "Unset in generated vcxproj; no explicit /fp:fast flag recorded.",
+    "source_macro_branch": {
+      "GGML_SIMD": false,
+      "__SSE2__": false
+    },
+    "cpu_library": {
+      "path": "build/bin/Release/ggml-cpu.dll",
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "base_library": {
+      "path": "build/bin/Release/ggml-base.dll",
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "pv_nan_operand_rule": "Product first at each fixed64 inner-loop index divisible by16; accumulator first at all other indices.",
+    "qk_nan_operand_rule": "Product first at channel indices divisible by4 strictly below floor(DK/4)*4; accumulator first in other prefix positions and all scalar tails."
+  },
+  "gnu": {
+    "compiler": "GNU GCC/G++ 11.4.0",
+    "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "cmake": "3.22.1",
+    "release_settings": [
+      "-O3",
+      "-DNDEBUG",
+      "-fPIC",
+      "-std=gnu++17"
+    ],
+    "fast_math": "No explicit fast-math flag in generated flags.make.",
+    "disabled_options": [
+      "GGML_NATIVE",
+      "GGML_SSE42",
+      "GGML_AVX",
+      "GGML_AVX2",
+      "GGML_AVX512",
+      "GGML_F16C",
+      "GGML_FMA",
+      "GGML_OPENMP",
+      "GGML_LTO"
+    ],
+    "source_macro_branch": {
+      "GGML_SIMD": false,
+      "__SSE2__": true
+    },
+    "cpu_library": {
+      "path": "build-ggml-linux-llama/bin/libggml-cpu.so",
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "base_library": {
+      "path": "build-ggml-linux-llama/bin/libggml-base.so",
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "nan_operand_rule": "Accumulator first for both score and value scalar-GEMM accumulations."
+  },
+  "raw_build_metadata": [
+    {
+      "path": "build/CMakeCache.txt",
+      "bytes": 32344,
+      "sha256": "75edc357561eb1b91512d5c4794eebd8137a6cd7aec7a11a586a54ea2a520f90"
+    },
+    {
+      "path": "build/ggml/src/ggml-cpu.vcxproj",
+      "bytes": 39054,
+      "sha256": "ab9740b26deeae35428c21ee9c1387fc34daf07a9d4ccedfd750c6324183686a"
+    },
+    {
+      "path": "build/CMakeFiles/4.2.1/CMakeCXXCompiler.cmake",
+      "sha256": "5cf2c34862e9c3aa87b781dbaf4c467e0d6c662712c8d914565f1d00b99d771b"
+    },
+    {
+      "path": "build-ggml-linux-llama/CMakeCache.txt",
+      "bytes": 29300,
+      "sha256": "49c84502c0aa6acab6c75c01c89e19a71b03a55beec08d537fdf9bbba1bb86b0"
+    },
+    {
+      "path": "build-ggml-linux-llama/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make",
+      "bytes": 1548,
+      "sha256": "bc31f62e7eff3a86848bf383cc2f1d6500283fcc09ebf36f5a5e59686c1b1f4f"
+    },
+    {
+      "path": "build-ggml-linux-llama/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake",
+      "sha256": "2b45b213952e8ff33366da3750a3a8ccdc914d32dde4b4cbb2051e959ab192ee"
+    }
+  ],
+  "scope": "Matching original DLL/SO profiles and fixed exact corpus only. Round-to-nearest ties-to-even and gradual underflow assumed. No altered FTZ/DAZ, floating traps, exception flags, unverified compiler/ISA/OS behavior or all-target bit-parity claim."
+}

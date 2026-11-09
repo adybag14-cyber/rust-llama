@@ -1,0 +1,120 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T20:48:11.002380+00:00",
+  "driver": {
+    "bytes": 4666,
+    "sha256": "fc62689770e5ce3a1a1b66cd7683b6e7590523706be491d397a1e1ff45cf5500"
+  },
+  "source_inputs": {
+    "files": 744,
+    "sha256": "d5b0b9ed78260a8a2dc91b79b0a2d5f7277ffbf6fdbd942a1299cb6135a9401e"
+  },
+  "cases": [
+    {
+      "name": "boolean-only-one-is-true",
+      "path": "crates/gguf/src/lib.rs",
+      "before": {
+        "bytes": 29504,
+        "sha256": "c98d56a231d3465411ee0846bb4af6480550a89daaad475dc61838c2927836f0"
+      },
+      "mutation": {
+        "bytes": 29504,
+        "sha256": "17ffe2ca37cecb3a4dcc96458072f3921a8d57a5806863ca95ff49288a5304e3"
+      },
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "--test",
+        "raw_native",
+        "original_all_boolean_encodings_scalar_and_array",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 1.6296483999976772,
+      "log": {
+        "bytes": 1948,
+        "sha256": "a9179b32a6999dca6daaabaabc94045d893097dedc87e8caef65138874297143"
+      },
+      "detected_by_assertion": true
+    },
+    {
+      "name": "last-tensor-prefix-lookup",
+      "path": "crates/gguf/src/raw.rs",
+      "before": {
+        "bytes": 18819,
+        "sha256": "a8a8d510f1a8d2e8cf284eb9e26e693e6afad6a8f81e26a0e8f957e86cdf8b38"
+      },
+      "mutation": {
+        "bytes": 18820,
+        "sha256": "6c722cdac184b7bdf5ab9046bfdf66af9f51d127bc749f3f61e636dc5ac5cfb3"
+      },
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "--test",
+        "raw_native",
+        "original_all_byte_values_keys_names_strings_and_aliases",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 1.1081279999998515,
+      "log": {
+        "bytes": 1019,
+        "sha256": "a438860b1cb3c0b597ed2e3bf085ca82ade4978cbcde0f4adc211523c966b19d"
+      },
+      "detected_by_assertion": true
+    },
+    {
+      "name": "tool-later-alias-payload",
+      "path": "crates/gguf/src/split.rs",
+      "before": {
+        "bytes": 26336,
+        "sha256": "34f5450eb6749057f89f7ec9c4c7453ec8c48c255ddade66e81fa0fd1f4b2d07"
+      },
+      "mutation": {
+        "bytes": 26367,
+        "sha256": "d62850fa66675e579979a3c2fa4b87fb8451d2230928b1bf51c089a34fdb6817"
+      },
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-gguf",
+        "--test",
+        "raw_tools",
+        "original_raw_strings_and_booleans_split_and_merge",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 5.167791899999429,
+      "log": {
+        "bytes": 2457,
+        "sha256": "12aab90841c4a7aef100cc266217a61e7090b420730803a0b10767e49230c22b"
+      },
+      "detected_by_assertion": true
+    }
+  ],
+  "scope": "One semantic mutation at a time in an isolated copy; unchanged native fixture bytes and test code. A compiler failure does not count as a detected mutation.",
+  "baseline_unchanged": true,
+  "finished_utc": "2026-11-09T20:48:20.324468+00:00"
+}

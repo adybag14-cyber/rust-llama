@@ -1,0 +1,70 @@
+
+running 27 tests
+test abi::tests::frozen_x64_layout ... ok
+test batch::tests::unsafe_allocation_sizes_fail_without_allocating ... ok
+test batch::tests::allocated_token_and_embedding_batches_have_native_shape_and_safe_free ... ok
+test sampler::tests::malformed_candidates_do_not_advance_builtin_rng ... ok
+test sampler::tests::chain_owns_children_rejects_cycles_and_remove_transfers_ownership ... ok
+test sampler::tests::penalty_accept_rejects_out_of_vocabulary_before_history_mutation ... ok
+test sampler::tests::sampler_layout_matches_frozen_x64_contract ... ok
+test sampler::tests::native_filter_retains_selection_and_xtc_advances_pointer ... ok
+test sampler::tests::cloned_distribution_and_copy_preserve_rng_and_reset ... ok
+test state::tests::actual_read_limit_does_not_depend_on_reported_file_length ... ok
+test tests::count_only_and_truncated_buffers_follow_c_conventions ... ok
+test sampler_grammar::tests::source_word_escaping_and_capture_start ... ok
+test sampler_reference_tests::pending_adaptive_clone_and_copy_fail_atomically ... ok
+test sampler::tests::frozen_windows_tied_sort_regressions ... ok
+test state::tests::legacy_reader_arithmetic_rejects_oversized_offsets_before_access ... ok
+test tests::panic_is_contained_and_diagnostic_is_thread_local ... ok
+test f16_context_reference_tests::original_default_layout_and_remaining_explicit_rejections ... ok
+test sampler_reference_tests::empty_grammar_ignores_unused_pointers_and_owned_vocabulary_survives_model_free ... ok
+test context_reference_tests::malformed_state_is_atomic_and_device_state_requires_its_owner ... ok
+test context_reference_tests::native_memory_and_sequence_state_match_original_bytes_and_continuations ... ok
+test context_reference_tests::original_physical_attention_rows_match_boundary_holes_and_shared_masks_bitwise ... ok
+test sampler_reference_tests::frozen_dll_grammar_lazy_and_dry_corpus ... ok
+test context_reference_tests::native_session_files_aliases_short_buffers_and_failure_side_effects ... ok
+test sampler_reference_tests::frozen_dll_adaptive_rng_and_infill_candidate_corpus ... ok
+test model_shard_tests::original_auto_shard_loading_getters_and_inference ... ok
+test f16_context_reference_tests::original_four_dtype_pairs_nonflash_and_flash_state_and_continuations ... ok
+test native_microbatch_reference_tests::original_native_microbatches_defaults_workers_masks_and_exact_state ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+
+
+running 33 tests
+test context::allocation_tests::explicit_default_and_zero_state_budget ... ok
+test context::allocation_tests::reset_removal_and_truncation_preserve_truthful_capacity_accounting ... ok
+test context::native::native_batch::tests::both_original_compilers_select_the_same_native_input_order ... ok
+test context::allocation_tests::initial_state_capacity_has_an_exact_checked_threshold ... ok
+test context::allocation_tests::fork_checkpoint_restore_and_serialized_restore_fail_atomically ... ok
+test context::native::native_decode::tests::worker_stack_budget_and_cancelled_decode_do_not_commit ... ok
+test context::native::native_batch::tests::unified_order_is_contiguous_and_empty_invalid_domains_are_checked ... ok
+test context::allocation_tests::live_checkpoints_and_fallible_copies_share_the_originating_budget ... ok
+test context::native::tests::native_resource_limits_fail_before_allocating_or_mutating ... ok
+test context::native::native_kv::tests::typed_copy_rejects_mismatch_without_writes ... ok
+test math::packed_matrix_tests::every_source_cpu_weight_type_loads_and_executes_through_matrix ... ok
+test context::native::native_row_map::tests::source_slice_conditions_and_full_batch_bound ... ok
+test context::allocation_tests::serialized_output_reserve_is_checked_and_then_returns_caller_owned_bytes ... ok
+test context::native::tests::metadata_membership_is_fixed_and_queued_copies_reuse_buffers_in_order ... ok
+test context::native::tests::decode_ids_use_configured_limit_while_memory_keeps_256_ids ... ok
+test math::packed_matrix_tests::packed_matrix_preserves_storage_and_native_activation_quantization ... ok
+test math::packed_matrix_tests::unsupported_dot_types_are_rejected_at_load ... ok
+test math::tests::attention_masks_and_physical_layout_bounds_fail_safely ... ok
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test context::allocation_tests::every_fallible_state_reservation_rolls_back_when_allocation_fails ... ok
+test context::native::native_decode::tests::flash_state_uses_untransposed_raw_half_bytes_and_rejects_cross_layout ... ok
+test state::tests::known_crc32_vector ... ok
+test context::allocation_tests::pending_kv_growth_and_sequence_multiplicity_cannot_bypass_budget ... ok
+test context::native::native_kv::tests::half_storage_preserves_every_payload_without_conversion ... ok
+test context::allocation_tests::checked_overflow_and_concurrent_reservations_never_exceed_the_ledger ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+test context::native::native_row_map::tests::original_row_map_bytes_and_logical_query_geometry ... ok
+test math::native_attention_tests::twelve_bert_layers_match_original_scalar_attention ... ok
+test context::native::native_decode::tests::configured_workers_execute_each_actual_microbatch ... ok
+test context::native::native_decode::tests::complete_logical_row_maps_are_charged_before_state_clone ... ok
+test context::native::tests::later_microbatches_are_counted_before_any_state_is_committed ... ok
+test context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows ... ok
+test context::native::tests::native_half_state_preserves_raw_payloads_and_rejects_wrong_storage_type_atomically ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

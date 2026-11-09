@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib,shutil,datetime
+ref=Path(r'C:\Users\adyba\rust-llama-reference');root=ref/'gguf-byte-strings'
+source=ref/'gguf-streaming-integration-v1/rust-draft';dest=root/'rust-draft-v1'
+sha=lambda b:hashlib.sha256(b).hexdigest()
+for directory in ['original-reader-v1','original-booleans-v1']:
+ review=json.loads((root/directory/'sealed-review.json').read_text(encoding='utf-8'));assert review['status']=='succeeded'
+ for row in review['files']:
+  p=root/row['path'];assert p.stat().st_size==row['bytes'] and sha(p.read_bytes())==row['sha256']
+rows=[]
+for p in source.rglob('*'):
+ rel=p.relative_to(source)
+ if p.is_file() and 'evidence' not in rel.parts and (p.suffix in ('.rs','.json','.bin','.gguf') or p.name in ('Cargo.toml','Cargo.lock','rust-toolchain.toml') or rel.as_posix() in ('.cargo/config.toml','.github/workflows/ci.yml')):
+  rows.append({'path':rel.as_posix(),'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())})
+rows.sort(key=lambda r:r['path'])
+fingerprint={'files':len(rows),'sha256':sha('\n'.join(r['path']+'\0'+r['sha256'] for r in rows).encode('utf-8'))}
+assert fingerprint=={'files':648,'sha256':'abd901487f73b01db4682a159c75b5a20c7e93b9e2c51cd81f2431923ca44a7c'}
+assert not dest.exists();shutil.copytree(source,dest)
+for row in rows:
+ p=dest/row['path'];assert p.stat().st_size==row['bytes'] and sha(p.read_bytes())==row['sha256']
+report={'seeded_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source':str(source),'destination':str(dest),'published_base':'1890f03291299ca3dca591f90d8b88ba6d29f1d5','unpublished_layer':'gguf-split-port/handoff-v1; guarded merge-v1 + prepare-v2 in gguf-streaming-integration-v1','execution_inputs':fingerprint,'source_preimages':{n:{'bytes':(dest/n).stat().st_size,'sha256':sha((dest/n).read_bytes())} for n in ['crates/gguf/src/lib.rs','crates/gguf/src/writer.rs','crates/gguf/src/split.rs']}}
+(root/'seed-v1.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'))
+print(json.dumps(report,indent=2))

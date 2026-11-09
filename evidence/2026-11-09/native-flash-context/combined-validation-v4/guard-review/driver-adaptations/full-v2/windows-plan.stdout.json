@@ -1,0 +1,337 @@
+{
+  "platform": "windows",
+  "fingerprint": {
+    "files": 952,
+    "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+  },
+  "drivers": {
+    "integration_common.py": {
+      "bytes": 2605,
+      "sha256": "9fcff8b698f6c5d69c792bdc1314975f91b324636136517cc6ffd87e667227b2"
+    },
+    "validate_full_v2.py": {
+      "bytes": 7408,
+      "sha256": "39962e80a85f5e3ea522195710e2b9a2ad6da1aa89ff52b738464f9a6680e6d9"
+    },
+    "verify-embedding-cli.py": {
+      "bytes": 5511,
+      "sha256": "50f3b38ac9e3cf772429c3f314e532ab3d6329aea86db70e06c138454e96d390"
+    },
+    "verify-decoder-cli.py": {
+      "bytes": 2625,
+      "sha256": "703c5095e08f1abae545cb1573c847d83942bf2d1ba8009033145c127bf6cbf5"
+    },
+    "verify-qwen2-http.py": {
+      "bytes": 6434,
+      "sha256": "fc708a80a1f108b56fa27af11e65feb1b032ef7e7542ff16a535f80d3abaf0af"
+    },
+    "verify-qwen3-http.py": {
+      "bytes": 6423,
+      "sha256": "dba9587a8494b6a65da248ae888b9774721be6467bcf4f4ac7beebe92ecb6cee"
+    },
+    "verify-sharded-apps-v2.py": {
+      "bytes": 8116,
+      "sha256": "8eb8c87658a5c8f241d6aedd5ed1301a805242eea80e8b8cdb45aa0c1df4b094"
+    },
+    "verify_rows_microbatch.py": {
+      "bytes": 8029,
+      "sha256": "6ae1d4ef317d65d70a9a61feacafc77b0f06bc3f559fa1b3466fa56bd4ce8f1f"
+    },
+    "verify_state_profiles.py": {
+      "bytes": 4652,
+      "sha256": "5e366ba3c389bfe6425081cd032cfdb4852e0b67075bb467d217b5046361aa44"
+    },
+    "verify_exports_v1.py": {
+      "bytes": 2917,
+      "sha256": "b49b1e33e8f16fb23487d728ce6d249b89ff66fe02de4b4e8861f354ca6689da"
+    },
+    "release_contract.py": {
+      "bytes": 1120,
+      "sha256": "5a151c2ada7e5e153a62c569a902145df76fa360215aba7e409cb1136ec68043"
+    },
+    "release-expected.json": {
+      "bytes": 5091,
+      "sha256": "460fe4ded9a6c035c4f37b1feba377839d0a861b5ceb2abe91f0c0fccafd05f6"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "math-provider",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "hash",
+        "C:\\Windows\\System32\\ucrtbase.dll"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "build-debug-ffi",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "native-context-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_rows_microbatch.py",
+        "debug",
+        "full-v2",
+        "native"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "native-state-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_state_profiles.py",
+        "debug",
+        "full-v2"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "native-context-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_rows_microbatch.py",
+        "release",
+        "full-v2",
+        "native"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "native-state-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify_state_profiles.py",
+        "release",
+        "full-v2"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "embedding-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-embedding-cli.py"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "decoder-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-decoder-cli.py"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "qwen2-http",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen2-http.py"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "qwen3-http",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-qwen3-http.py"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "sharded-applications",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\native-flash-integration-v1\\drivers\\full-v2\\verify-sharded-apps-v2.py"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "generation-http",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-server",
+        "--example",
+        "verify_model_server",
+        "--",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "expected_exit": 0
+    },
+    {
+      "name": "release-gate",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "expected_exit": 1
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T20:31:05.188813+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "independence": "All inputs reuse the already sealed original-only reader/boolean corpus. Only the frozen native tool supplies outputs, admissions, transcripts and failed partial files. Capture precedes the Rust byte-string tool migration and all Rust comparisons for this tool corpus; the separate Rust raw reader has already been compared.",
+  "seal_sha256": "00e11576e526740ac3a7b035dda49c92af32d41b41709e792f0dfd697e769198",
+  "seal": {
+    "schema": 1,
+    "status": "succeeded",
+    "sealed_utc": "2026-11-09T20:29:43.644220+00:00",
+    "files": [
+      {
+        "path": "original-tools-v1/windows/report.json",
+        "bytes": 4186054,
+        "sha256": "106cbb2b123d2c00c872768246cf6d9b04bf1b0d934932b1f427ca5696ded86a"
+      },
+      {
+        "path": "original-tools-v1/windows/data.bin",
+        "bytes": 842193,
+        "sha256": "1ed5be84eca1aa5aca5360037f3fac14b7f96f26f0eaf7a3dfca2991aa197746"
+      },
+      {
+        "path": "original-tools-v1/windows/status.json",
+        "bytes": 126,
+        "sha256": "230ce486f55d915ab8ec0b6af59011c455c1ef3aab8ae1a2aca986c994085cb7"
+      },
+      {
+        "path": "original-tools-v1/linux/report.json",
+        "bytes": 4182984,
+        "sha256": "db4067f942abcf6f811ebcb430235e841c8bdf846161995f389720610e420e59"
+      },
+      {
+        "path": "original-tools-v1/linux/data.bin",
+        "bytes": 850233,
+        "sha256": "b77948a2fc193d61446dd3943fa10b9b7f48617f421f274b05e3d20a1d6b7636"
+      },
+      {
+        "path": "original-tools-v1/linux/status.json",
+        "bytes": 126,
+        "sha256": "5498612c8279c7deb7a47e35c93889b33b2083d7f8a712fe7ba807a84685d600"
+      }
+    ],
+    "case_count_per_profile": 3196,
+    "successful_per_profile": 3176,
+    "checked_error_per_profile": 20,
+    "source_tool_preimage_sha256": "424a658a13fe1fdc2463defeec3be66ea3f45fb5bfdc675754d178481649524d",
+    "cross_profile": "Every input and every successful post-operation file agrees byte-for-byte across unchanged Windows and GNU native tools. Platform error codes/stderr and failed partial files are retained independently.",
+    "successful_post_operation_bytes_per_profile": 1438016,
+    "independence": "This seal precedes migration of the Rust split/merge implementation to RawGguf. All expected data are native observations; the Rust product and current raw reader supply no expected outputs."
+  },
+  "adapter_sha256": "a6eea4afeb679f0bed466351aca0ec04366068e7f9582b5719b4f848169fd482",
+  "projection": "TSV and canonical deduplicated pool mechanically select unchanged original input/after file bytes and success decisions; each source pool slice was SHA-256 checked. Both original profiles retain full raw stdout/stderr, exit codes, partial files and binaries/source identities in their original JSON and byte pools.",
+  "cases": 3196,
+  "successes": 3176,
+  "checked_errors": 20,
+  "successful_after_bytes": 1438016,
+  "scope": "All 1605 original reader/boolean inputs passed to split, with max_tensors 1; multi-tensor alias inputs also max_tensors 128. Every successful split with output files is independently merged by the original tool. Admission and successful GGUF bytes agree on Windows/GNU. Source native aborts become checked Rust errors, not reproduced undefined process behavior.",
+  "not_claimed": "This corpus does not replace the separate 103-case general CLI corpus or the separate source getters/header corpus, and does not close full GGUF/conversion track gates."
+}

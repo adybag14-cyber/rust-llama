@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-09T20:20:35.188705+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "independence": "All 1093 raw-byte and 512 boolean cases per host were captured from unchanged original gguf.cpp APIs before the byte-string Rust implementation. Pools and all case records agree byte-for-byte across Windows and GNU. TSV adapters only project existing observations; no Rust output supplies expected data.",
+  "source_reports": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\original-reader-v1\\windows\\report.json",
+      "copied_name": "reader-original-windows.json",
+      "bytes": 1122931,
+      "sha256": "ee90c00393896ead74778bfb03a35c69fe779afe99f23bc9e223dc468ef3408e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\original-reader-v1\\linux\\report.json",
+      "copied_name": "reader-original-linux.json",
+      "bytes": 1122931,
+      "sha256": "f6adbd6c08880e35f84d829b134a9e67a145dd9c14d88756aa17dc973053f151"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\original-booleans-v1\\windows\\report.json",
+      "copied_name": "booleans-original-windows.json",
+      "bytes": 501960,
+      "sha256": "6ef8195f755a0258b4168c82f615a8dbaf7c8758c4089e44e3a73bfcc957a63e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\gguf-byte-strings\\original-booleans-v1\\linux\\report.json",
+      "copied_name": "booleans-original-linux.json",
+      "bytes": 501960,
+      "sha256": "1b5d82ada1945a325a17573a2b7abcad312b074126d5559479a2f7ee03f36d9d"
+    }
+  ],
+  "adapter_sha256": "4a49efdb31496c5c5613a13c44ae9c32aee5e07c5bb04a549e49a3aabc55615c",
+  "comparison": "Parser admissions, metadata ordering/native C-string getters and first-prefix lookups, numerical raw bits including NaNs and noncanonical bool normalization, all tensor getters, and full original gguf_get_meta_data header bytes.",
+  "boundaries": [
+    "Header-only mode is explicit; full public file loading separately validates payload length.",
+    "Frozen raw parser accepts byte strings and full-name aliases; checked UTF-8 facade remains available.",
+    "The reader corpus does not claim setter/copy/split/merge compatibility; those require separate original tool observations.",
+    "Default resource limits remain explicit and may reject source-admitted oversized headers."
+  ]
+}

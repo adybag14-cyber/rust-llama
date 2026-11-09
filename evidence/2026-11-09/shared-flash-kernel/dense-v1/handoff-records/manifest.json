@@ -1,0 +1,835 @@
+{
+  "schema": 1,
+  "module": "llama_quant::flash_attention",
+  "archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "baseline": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\row-policy\\rust-draft",
+  "changed_files": {
+    "crates/quant/FLASH_ATTENTION.md": {
+      "before": null,
+      "after": {
+        "bytes": 9814,
+        "sha256": "4df40b8093261c60655c420804f10d17ef156093926e9f27f7966736615c5a22"
+      }
+    },
+    "crates/quant/src/flash_attention/tests.rs": {
+      "before": null,
+      "after": {
+        "bytes": 10038,
+        "sha256": "ca072c12a70bede1bf5258967bc2270c587ed8e227d8338204db8fb77090d642"
+      }
+    },
+    "crates/quant/src/flash_attention.rs": {
+      "before": null,
+      "after": {
+        "bytes": 47035,
+        "sha256": "796620f9d39d3f5ed81b0064a7ee0b0ded69ab5dfee9afe3ee1a4f2def6930ed"
+      }
+    },
+    "crates/quant/src/lib.rs": {
+      "before": {
+        "bytes": 14135,
+        "sha256": "703e9bca582aa7d80a75caebd7586b56dd27252510dd9c0d14905689d2d8b444"
+      },
+      "after": {
+        "bytes": 14608,
+        "sha256": "1b4dbe4bff8a9827f25a9835e85774753ac80bec41885371801ef527c6d80868"
+      }
+    },
+    "crates/quant/tests/common/flash_fixture.rs": {
+      "before": null,
+      "after": {
+        "bytes": 5295,
+        "sha256": "65cbff31c2bab0686dd28b5bae4cf7cfbe85ab6c6feba721932b4865558e9ffb"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/base-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 3520,
+        "sha256": "f6ca849cf044003dce859813b570d79e0783dba4b149d0c782690c95b14a2fe6"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/base-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 3295,
+        "sha256": "b15a7f1c9e867499cf4b5d3b2f5087bc531413efb7579b96e4b50afca1e85335"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/compaction-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 8450,
+        "sha256": "53371445e5c4bca5da6717b5053bb4b7aa2e6232dcea6e942e68edb7a6c86dac"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 3053,
+        "sha256": "41bd562fe18abc71cb97df22bd21c390f743ea7a67597d8c9ede9cef4f013bfa"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/exceptional-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2824,
+        "sha256": "4c121aa6fc0d66ee631a4e79b56d7dd7b990d5cd97beff5056ed6ae4da427af3"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/gnu-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 10128525,
+        "sha256": "e017b789df86029148dc885e1dcde13f02eb30948b4eab9316ace2aa3fc4491f"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/inputs.bin": {
+      "before": null,
+      "after": {
+        "bytes": 36676256,
+        "sha256": "999ac0ed4283c7a656758f326c41b48eb2bd48c2806627568f556fe034e1d96e"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/msvc-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 10128525,
+        "sha256": "ce9cff995b074e2155079f9f14ea3c86054fcb599af316d80e55313b0da27b5d"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 3593,
+        "sha256": "a87a775c123e14d7787a8317e6f8c9e63bd605c2b05c4c63afdb26382093cce9"
+      }
+    },
+    "crates/quant/tests/fixtures/flash/split-boundary-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 3369,
+        "sha256": "5b5932b70c160abe4c0c2697c387a2d0b8f7a934aa9b9dbd26f3c490c76f015f"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/compaction-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 4035,
+        "sha256": "fc0c2f6b8491f002a52631917eb861fb837d38384447b57a3c181e0fa6dba49c"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/gnu-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 205704,
+        "sha256": "42065bff89488f51de9e0882f7b930a0504088331914d8e8610dbc557eda977c"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/inputs.bin": {
+      "before": null,
+      "after": {
+        "bytes": 7050960,
+        "sha256": "144c16e10daf27b77111082c33b983daf9d1876735c98c6a10867880c518e3ae"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/msvc-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 205704,
+        "sha256": "c13639ea1a1fe3021bd9ea355b5fb6f4d349d0f2be2aac87888cdc643491afa7"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2170,
+        "sha256": "5525077a0231455accacda43cc84d49f5205d14c9a8b89901976abf2c87b5a2e"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-lanes/nan-lanes-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2220,
+        "sha256": "f1d49130354344b674b5d2569f226e8a6bd611e1cdcfe25e6e3a57c9fb32d23b"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/compaction-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 10845,
+        "sha256": "516b5fd22a7a889ff029fcdd00eecbdf621150619759221ac04bbce305e8817c"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/gnu-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 949686,
+        "sha256": "5deb3b6e9b7d9ed31e04b66a4fc025ff51dbf5d695045f14761f9362e6ce837e"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/inputs.bin": {
+      "before": null,
+      "after": {
+        "bytes": 530768,
+        "sha256": "dbfeb9f9196ce75fb2792a51a5d23c316de77c92d149c193a9808e4e4b6a6ac3"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/msvc-reference.bin": {
+      "before": null,
+      "after": {
+        "bytes": 949686,
+        "sha256": "72126a0f60b4e5b2d44735b85f8b8c80b59fa1cdcfeb055b2287d600e60f63af"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 1710,
+        "sha256": "2250454b037cd05cb20edbd4b93b80ce8441582720755cf572746d6aac1595af"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-cross-tile-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 1718,
+        "sha256": "8b82382e4a68089eb8945ad56dc5cdcb8608da6893a5162b15882194c1b7823b"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 1998,
+        "sha256": "24e035f6717c4bc02348c2cbf77bf1dd8c24fa989652398b578b72b7feade983"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-full-tile-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2028,
+        "sha256": "4c44e4360d233a5638e93b0b17c3f4907765123f0be65f288595552abc15f0fe"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2108,
+        "sha256": "7862ff36c56a8ab2be68cdeb5b912f7d675754f1fb963aa98c87cc1e8b0df3a5"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-operands-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 2153,
+        "sha256": "01b04aa29075b33a18fc844f7f12fb207e18c4761343f47826b69469f34ada83"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-gnu-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 1899,
+        "sha256": "0bf67957c747e67e4f11139fd7517ec8a0a96aa1e6a1b44e4ed5a9968153e8e1"
+      }
+    },
+    "crates/quant/tests/fixtures/flash-nan-operands/nan-stage-msvc-provenance.json": {
+      "before": null,
+      "after": {
+        "bytes": 1921,
+        "sha256": "e3235f55ec2f447bcc6cb54c6fae40fb6c99ea50d8114da1b3c4a2dab231cb46"
+      }
+    },
+    "crates/quant/tests/flash_attention.rs": {
+      "before": null,
+      "after": {
+        "bytes": 7217,
+        "sha256": "228a7c405c594bfec02f76a3e8bc537ddc23708a1aaf5dda6779598b1fda1093"
+      }
+    }
+  },
+  "fixtures": 28,
+  "native_graphs_per_host": 1262,
+  "default_plus_forced_words_per_host": 2771152,
+  "selected_row_words_per_host": 24066,
+  "typed_view_words_per_host": 75567,
+  "validated_profiles": {
+    "msvc": {
+      "commands": [
+        {
+          "name": "clippy",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "clippy",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "seconds": 1.0558835999981966
+        },
+        {
+          "name": "fmt",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "seconds": 0.2498256000035326
+        },
+        {
+          "name": "debug",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "seconds": 162.74242269999377
+        },
+        {
+          "name": "release",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "--release",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "seconds": 22.240529299997434
+        }
+      ],
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "test_counts": {
+        "debug": {
+          "test_binaries": 12,
+          "total_tests": 45,
+          "per_binary": [
+            7,
+            1,
+            4,
+            1,
+            5,
+            2,
+            2,
+            2,
+            3,
+            5,
+            8,
+            5
+          ]
+        },
+        "release": {
+          "test_binaries": 12,
+          "total_tests": 45,
+          "per_binary": [
+            7,
+            1,
+            4,
+            1,
+            5,
+            2,
+            2,
+            2,
+            3,
+            5,
+            8,
+            5
+          ]
+        }
+      }
+    },
+    "gnu": {
+      "commands": [
+        {
+          "name": "clippy",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "clippy",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--target-dir",
+            "/tmp/rust-llama-flash-kernel",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "seconds": 1.5728649890006636
+        },
+        {
+          "name": "fmt",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7720988090004539
+        },
+        {
+          "name": "debug",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--target-dir",
+            "/tmp/rust-llama-flash-kernel",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "seconds": 148.3164617199982
+        },
+        {
+          "name": "release",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "--release",
+            "-p",
+            "llama-quant",
+            "--all-targets",
+            "--target-dir",
+            "/tmp/rust-llama-flash-kernel",
+            "--",
+            "--nocapture",
+            "--test-threads=1"
+          ],
+          "exit_code": 0,
+          "seconds": 21.441913917999045
+        }
+      ],
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "test_counts": {
+        "debug": {
+          "test_binaries": 12,
+          "total_tests": 45,
+          "per_binary": [
+            7,
+            1,
+            4,
+            1,
+            5,
+            2,
+            2,
+            2,
+            3,
+            5,
+            8,
+            5
+          ]
+        },
+        "release": {
+          "test_binaries": 12,
+          "total_tests": 45,
+          "per_binary": [
+            7,
+            1,
+            4,
+            1,
+            5,
+            2,
+            2,
+            2,
+            3,
+            5,
+            8,
+            5
+          ]
+        }
+      }
+    }
+  },
+  "work_bound_negative_control": "both hosts fail the old formula at the lower-bound assertion before execute",
+  "standalone_only_excluded_files": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "rust-toolchain.toml"
+  ],
+  "dependency_changes": false,
+  "cpu_math_unchanged": {
+    "bytes": 7901,
+    "sha256": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5"
+  },
+  "existing_lib_change": "Add only pub mod flash_attention after pub mod cpu_math. The exact validated standalone lib copy uses CRLF; source.patch normalizes line endings and contains only this one-line semantic change.",
+  "product_mutation": false,
+  "consumer_integration": "NativeContext and tensor dispatch remain separate; core owns full physical K/V casts, mask/query geometry and per-layer microbatch staging.",
+  "finite_parameter_domain": "scale, max_bias, logit_softcap and scale/logit_softcap when applicable must be finite; nonfinite tensor payloads are supported on the captured profiles.",
+  "evidence_files": [
+    "first-compile-scope-error/flash_attention.rs",
+    "first-compile-scope-error/request.json",
+    "first-compile-scope-error/status.json",
+    "first-compile-scope-error/stderr.log",
+    "first-compile-scope-error/stdout.log",
+    "first-native-comparison/gnu/report.json",
+    "first-native-comparison/gnu/stderr.log",
+    "first-native-comparison/gnu/stdout.log",
+    "first-native-comparison/msvc/report.json",
+    "first-native-comparison/msvc/stderr.log",
+    "first-native-comparison/msvc/stdout.log",
+    "first-native-comparison/msvc/source/crates/quant/src/cpu_math.rs",
+    "first-native-comparison/msvc/source/crates/quant/src/flash_attention.rs",
+    "first-native-comparison/msvc/source/crates/quant/src/lib.rs",
+    "first-native-comparison/msvc/source/crates/quant/tests/flash_attention.rs",
+    "first-native-comparison/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "first-native-comparison/gnu/source/crates/quant/src/cpu_math.rs",
+    "first-native-comparison/gnu/source/crates/quant/src/flash_attention.rs",
+    "first-native-comparison/gnu/source/crates/quant/src/lib.rs",
+    "first-native-comparison/gnu/source/crates/quant/tests/flash_attention.rs",
+    "first-native-comparison/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "second-native-comparison/gnu/report.json",
+    "second-native-comparison/gnu/stderr.log",
+    "second-native-comparison/gnu/stdout.log",
+    "second-native-comparison/msvc/report.json",
+    "second-native-comparison/msvc/stderr.log",
+    "second-native-comparison/msvc/stdout.log",
+    "second-native-comparison/msvc/source/crates/quant/src/cpu_math.rs",
+    "second-native-comparison/msvc/source/crates/quant/src/flash_attention.rs",
+    "second-native-comparison/msvc/source/crates/quant/src/lib.rs",
+    "second-native-comparison/msvc/source/crates/quant/tests/flash_attention.rs",
+    "second-native-comparison/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "second-native-comparison/msvc/source/crates/quant/src/flash_attention/tests.rs",
+    "second-native-comparison/gnu/source/crates/quant/src/cpu_math.rs",
+    "second-native-comparison/gnu/source/crates/quant/src/flash_attention.rs",
+    "second-native-comparison/gnu/source/crates/quant/src/lib.rs",
+    "second-native-comparison/gnu/source/crates/quant/tests/flash_attention.rs",
+    "second-native-comparison/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "second-native-comparison/gnu/source/crates/quant/src/flash_attention/tests.rs",
+    "third-native-comparison/gnu/report.json",
+    "third-native-comparison/gnu/stderr.log",
+    "third-native-comparison/gnu/stdout.log",
+    "third-native-comparison/msvc/report.json",
+    "third-native-comparison/msvc/stderr.log",
+    "third-native-comparison/msvc/stdout.log",
+    "third-native-comparison/msvc/source/crates/quant/src/cpu_math.rs",
+    "third-native-comparison/msvc/source/crates/quant/src/flash_attention.rs",
+    "third-native-comparison/msvc/source/crates/quant/src/lib.rs",
+    "third-native-comparison/msvc/source/crates/quant/tests/flash_attention.rs",
+    "third-native-comparison/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "third-native-comparison/msvc/source/crates/quant/src/flash_attention/tests.rs",
+    "third-native-comparison/gnu/source/crates/quant/src/cpu_math.rs",
+    "third-native-comparison/gnu/source/crates/quant/src/flash_attention.rs",
+    "third-native-comparison/gnu/source/crates/quant/src/lib.rs",
+    "third-native-comparison/gnu/source/crates/quant/tests/flash_attention.rs",
+    "third-native-comparison/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "third-native-comparison/gnu/source/crates/quant/src/flash_attention/tests.rs",
+    "full-validation-v1/gnu/debug.stderr.log",
+    "full-validation-v1/gnu/debug.stdout.log",
+    "full-validation-v1/gnu/report.json",
+    "full-validation-v1/msvc/debug.stderr.log",
+    "full-validation-v1/msvc/debug.stdout.log",
+    "full-validation-v1/msvc/report.json",
+    "full-validation-v1/msvc/source/Cargo.lock",
+    "full-validation-v1/msvc/source/Cargo.toml",
+    "full-validation-v1/msvc/source/rust-toolchain.toml",
+    "full-validation-v1/msvc/source/crates/quant/Cargo.toml",
+    "full-validation-v1/msvc/source/crates/quant/src/activation.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/conversion.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/cpu_math.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/decode.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_iq1.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_iq2.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_iq3.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_iq4.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_k.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/encode_simple.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/flash_attention.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/iq_lattice.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/iq_sort.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/lib.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/matvec.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/matvec_extra.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/tables.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/weighted.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/cpu_math_scalar.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/encoders_extended.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/f16_matmul.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/flash_attention.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/iq1_encoders.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/iq2_encoders.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/iq3_encoders.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/matvec.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/matvec_extended.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/reference.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/weighted_encoders.rs",
+    "full-validation-v1/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "full-validation-v1/msvc/source/crates/quant/src/flash_attention/tests.rs",
+    "full-validation-v1/gnu/source/Cargo.lock",
+    "full-validation-v1/gnu/source/Cargo.toml",
+    "full-validation-v1/gnu/source/rust-toolchain.toml",
+    "full-validation-v1/gnu/source/crates/quant/Cargo.toml",
+    "full-validation-v1/gnu/source/crates/quant/src/activation.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/conversion.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/cpu_math.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/decode.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_iq1.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_iq2.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_iq3.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_iq4.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_k.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/encode_simple.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/flash_attention.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/iq_lattice.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/iq_sort.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/lib.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/matvec.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/matvec_extra.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/tables.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/weighted.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/cpu_math_scalar.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/encoders_extended.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/f16_matmul.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/flash_attention.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/iq1_encoders.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/iq2_encoders.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/iq3_encoders.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/matvec.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/matvec_extended.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/reference.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/weighted_encoders.rs",
+    "full-validation-v1/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "full-validation-v1/gnu/source/crates/quant/src/flash_attention/tests.rs",
+    "explicit-nan-v2/gnu/clippy.stderr.log",
+    "explicit-nan-v2/gnu/clippy.stdout.log",
+    "explicit-nan-v2/gnu/debug-nan.stderr.log",
+    "explicit-nan-v2/gnu/debug-nan.stdout.log",
+    "explicit-nan-v2/gnu/release-native.stderr.log",
+    "explicit-nan-v2/gnu/release-native.stdout.log",
+    "explicit-nan-v2/gnu/report.json",
+    "explicit-nan-v2/gnu/resource-unit.stderr.log",
+    "explicit-nan-v2/gnu/resource-unit.stdout.log",
+    "explicit-nan-v2/msvc/clippy.stderr.log",
+    "explicit-nan-v2/msvc/clippy.stdout.log",
+    "explicit-nan-v2/msvc/debug-nan.stderr.log",
+    "explicit-nan-v2/msvc/debug-nan.stdout.log",
+    "explicit-nan-v2/msvc/release-native.stderr.log",
+    "explicit-nan-v2/msvc/release-native.stdout.log",
+    "explicit-nan-v2/msvc/report.json",
+    "explicit-nan-v2/msvc/resource-unit.stderr.log",
+    "explicit-nan-v2/msvc/resource-unit.stdout.log",
+    "explicit-nan-v2/msvc/source/Cargo.lock",
+    "explicit-nan-v2/msvc/source/Cargo.toml",
+    "explicit-nan-v2/msvc/source/rust-toolchain.toml",
+    "explicit-nan-v2/msvc/source/crates/quant/Cargo.toml",
+    "explicit-nan-v2/msvc/source/crates/quant/src/activation.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/conversion.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/cpu_math.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/decode.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_iq1.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_iq2.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_iq3.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_iq4.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_k.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/encode_simple.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/flash_attention.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/iq_lattice.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/iq_sort.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/lib.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/matvec.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/matvec_extra.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/tables.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/weighted.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/cpu_math_scalar.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/encoders_extended.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/f16_matmul.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/flash_attention.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/iq1_encoders.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/iq2_encoders.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/iq3_encoders.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/matvec.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/matvec_extended.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/reference.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/weighted_encoders.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "explicit-nan-v2/msvc/source/crates/quant/src/flash_attention/tests.rs",
+    "explicit-nan-v2/gnu/source/Cargo.lock",
+    "explicit-nan-v2/gnu/source/Cargo.toml",
+    "explicit-nan-v2/gnu/source/rust-toolchain.toml",
+    "explicit-nan-v2/gnu/source/crates/quant/Cargo.toml",
+    "explicit-nan-v2/gnu/source/crates/quant/src/activation.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/conversion.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/cpu_math.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/decode.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_iq1.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_iq2.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_iq3.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_iq4.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_k.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/encode_simple.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/flash_attention.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/iq_lattice.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/iq_sort.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/lib.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/matvec.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/matvec_extra.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/tables.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/weighted.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/cpu_math_scalar.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/encoders_extended.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/f16_matmul.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/flash_attention.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/iq1_encoders.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/iq2_encoders.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/iq3_encoders.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/matvec.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/matvec_extended.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/reference.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/weighted_encoders.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "explicit-nan-v2/gnu/source/crates/quant/src/flash_attention/tests.rs",
+    "full-validation-v2/gnu/clippy.stderr.log",
+    "full-validation-v2/gnu/clippy.stdout.log",
+    "full-validation-v2/gnu/debug.stderr.log",
+    "full-validation-v2/gnu/debug.stdout.log",
+    "full-validation-v2/gnu/fmt.stderr.log",
+    "full-validation-v2/gnu/fmt.stdout.log",
+    "full-validation-v2/gnu/release.stderr.log",
+    "full-validation-v2/gnu/release.stdout.log",
+    "full-validation-v2/gnu/report.json",
+    "full-validation-v2/msvc/clippy.stderr.log",
+    "full-validation-v2/msvc/clippy.stdout.log",
+    "full-validation-v2/msvc/debug.stderr.log",
+    "full-validation-v2/msvc/debug.stdout.log",
+    "full-validation-v2/msvc/fmt.stderr.log",
+    "full-validation-v2/msvc/fmt.stdout.log",
+    "full-validation-v2/msvc/release.stderr.log",
+    "full-validation-v2/msvc/release.stdout.log",
+    "full-validation-v2/msvc/report.json",
+    "full-validation-v2/msvc/source/Cargo.lock",
+    "full-validation-v2/msvc/source/Cargo.toml",
+    "full-validation-v2/msvc/source/rust-toolchain.toml",
+    "full-validation-v2/msvc/source/crates/quant/Cargo.toml",
+    "full-validation-v2/msvc/source/crates/quant/FLASH_ATTENTION.md",
+    "full-validation-v2/msvc/source/crates/quant/README.md",
+    "full-validation-v2/msvc/source/crates/quant/src/activation.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/conversion.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/cpu_math.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/decode.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_iq1.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_iq2.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_iq3.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_iq4.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_k.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/encode_simple.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/flash_attention.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/iq_lattice.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/iq_sort.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/lib.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/matvec.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/matvec_extra.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/tables.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/weighted.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/cpu_math_scalar.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/encoders_extended.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/f16_matmul.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/flash_attention.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/iq1_encoders.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/iq2_encoders.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/iq3_encoders.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/matvec.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/matvec_extended.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/reference.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/weighted_encoders.rs",
+    "full-validation-v2/msvc/source/crates/quant/tests/common/flash_fixture.rs",
+    "full-validation-v2/msvc/source/crates/quant/src/flash_attention/tests.rs",
+    "full-validation-v2/gnu/source/Cargo.lock",
+    "full-validation-v2/gnu/source/Cargo.toml",
+    "full-validation-v2/gnu/source/rust-toolchain.toml",
+    "full-validation-v2/gnu/source/crates/quant/Cargo.toml",
+    "full-validation-v2/gnu/source/crates/quant/FLASH_ATTENTION.md",
+    "full-validation-v2/gnu/source/crates/quant/README.md",
+    "full-validation-v2/gnu/source/crates/quant/src/activation.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/conversion.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/cpu_math.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/decode.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_iq1.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_iq2.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_iq3.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_iq4.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_k.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/encode_simple.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/flash_attention.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/iq_lattice.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/iq_sort.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/lib.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/matvec.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/matvec_extra.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/tables.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/weighted.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/cpu_math_scalar.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/encoders_extended.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/f16_matmul.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/flash_attention.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/iq1_encoders.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/iq2_encoders.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/iq3_encoders.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/matvec.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/matvec_extended.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/reference.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/weighted_encoders.rs",
+    "full-validation-v2/gnu/source/crates/quant/tests/common/flash_fixture.rs",
+    "full-validation-v2/gnu/source/crates/quant/src/flash_attention/tests.rs",
+    "review-work-bound/finding-and-fix.json",
+    "work-negative-control/mutation.json",
+    "work-negative-control-v2/mutation.json",
+    "work-negative-control-v2/msvc/report.json",
+    "work-negative-control-v2/msvc/stdout.log",
+    "work-negative-control-v2/msvc/stderr.log",
+    "work-negative-control-v2/gnu/report.json",
+    "work-negative-control-v2/gnu/stdout.log",
+    "work-negative-control-v2/gnu/stderr.log",
+    "work-negative-control/msvc/report.json",
+    "work-negative-control/msvc/stdout.log",
+    "work-negative-control/msvc/stderr.log",
+    "work-negative-control/gnu/report.json",
+    "work-negative-control/gnu/stdout.log",
+    "work-negative-control/gnu/stderr.log",
+    "baseline-manifest.json",
+    "DESIGN.md",
+    "run_native.py",
+    "validate.py",
+    "validate_both.py",
+    "focus_v2.py",
+    "validate_v2.py",
+    "prepare_final.py",
+    "negative_control.py",
+    "negative_control_v2.py",
+    "compact_nan_operands.py",
+    "package_handoff.py"
+  ]
+}

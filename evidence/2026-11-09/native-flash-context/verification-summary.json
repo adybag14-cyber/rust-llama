@@ -1,0 +1,598 @@
+{
+  "schema": 1,
+  "passed": true,
+  "scope": "Native dense Llama CPU microbatch and flash consumer; qualified MSVC/GNU x86_64 profiles",
+  "profiles": [
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu"
+  ],
+  "validation": [
+    {
+      "name": "microbatch-final-v1-windows-debug-build",
+      "status": {
+        "bytes": 22642,
+        "sha256": "582ca2b2b8947f9ad22cee534d08dfdade0b1e276598668555663a8a06caeb4e"
+      },
+      "platform": "windows",
+      "profile": "debug",
+      "library": {
+        "bytes": 4509696,
+        "sha256": "2682d4927b595e743a40573f4b5ba12e8a02f83fd139c4bdca5dc5264babe6c2"
+      },
+      "cases": 0,
+      "binary_files": 0,
+      "binary_bytes": 0,
+      "logit_words": 0,
+      "input_differences_from_final": [],
+      "steps": [
+        {
+          "name": "fmt",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "fmt",
+            "-p",
+            "llama-ffi",
+            "-p",
+            "llama-model-runtime",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "unit",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--lib",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "build",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "build",
+            "-p",
+            "llama-ffi"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "clippy",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "clippy",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "native_assertion_controls": 0
+    },
+    {
+      "name": "microbatch-final-v1-windows-debug-native",
+      "status": {
+        "bytes": 395700,
+        "sha256": "7b377743a692868ad50d7af1635ae0537d56fac0262f2ed307b13e97e244e642"
+      },
+      "platform": "windows",
+      "profile": "debug",
+      "library": {
+        "bytes": 4509696,
+        "sha256": "2682d4927b595e743a40573f4b5ba12e8a02f83fd139c4bdca5dc5264babe6c2"
+      },
+      "cases": 228,
+      "binary_files": 710,
+      "binary_bytes": 14171045,
+      "logit_words": 2917888,
+      "input_differences_from_final": [],
+      "steps": [],
+      "native_assertion_controls": 2
+    },
+    {
+      "name": "microbatch-final-v1-windows-release-both",
+      "status": {
+        "bytes": 397264,
+        "sha256": "b4ce37a8cb0afaa1aaec641c46ee905d659ff1e2eb4832fb950d682f7c08f1fc"
+      },
+      "platform": "windows",
+      "profile": "release",
+      "library": {
+        "bytes": 1952256,
+        "sha256": "40a30f65f98daee500ea7512bf09daf9d7533f15f83aef3cdf7c3a40e7fbb15d"
+      },
+      "cases": 228,
+      "binary_files": 710,
+      "binary_bytes": 14171045,
+      "logit_words": 2917888,
+      "input_differences_from_final": [],
+      "steps": [
+        {
+          "name": "fmt",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "fmt",
+            "-p",
+            "llama-ffi",
+            "-p",
+            "llama-model-runtime",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "unit",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--lib",
+            "--release",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "build",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "build",
+            "-p",
+            "llama-ffi",
+            "--release"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "clippy",
+          "command": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "clippy",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--all-targets",
+            "--release",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "native_assertion_controls": 2
+    },
+    {
+      "name": "state-final-v1-windows-debug",
+      "status": {
+        "bytes": 36366,
+        "sha256": "53c342b9390ec1ad1974843e4bc0d8b446e31dab435f649acebaf7757bed401f"
+      },
+      "platform": "windows",
+      "profile": "debug",
+      "library": {
+        "bytes": 4509696,
+        "sha256": "2682d4927b595e743a40573f4b5ba12e8a02f83fd139c4bdca5dc5264babe6c2"
+      },
+      "cases": 16,
+      "binary_files": 2080,
+      "binary_bytes": 8459616,
+      "logit_words": 0,
+      "input_differences_from_final": [],
+      "steps": [],
+      "counts": {
+        "cases": 640,
+        "sequence_cases": 640,
+        "file_cases": 32,
+        "buffer_cases": 1536
+      }
+    },
+    {
+      "name": "state-final-v1-windows-release",
+      "status": {
+        "bytes": 36432,
+        "sha256": "04a8eba92bbf7f3b8dacf60cce001dcd31f359877ec0ad37c2e891a460b4d25b"
+      },
+      "platform": "windows",
+      "profile": "release",
+      "library": {
+        "bytes": 1952256,
+        "sha256": "40a30f65f98daee500ea7512bf09daf9d7533f15f83aef3cdf7c3a40e7fbb15d"
+      },
+      "cases": 16,
+      "binary_files": 2080,
+      "binary_bytes": 8459616,
+      "logit_words": 0,
+      "input_differences_from_final": [],
+      "steps": [],
+      "counts": {
+        "cases": 640,
+        "sequence_cases": 640,
+        "file_cases": 32,
+        "buffer_cases": 1536
+      }
+    },
+    {
+      "name": "microbatch-final-v1-linux-debug-build",
+      "status": {
+        "bytes": 22597,
+        "sha256": "0c88ec269bc19cbefa89b6770e2521a93103c589a84ad2ad6134e2dce93ec524"
+      },
+      "platform": "linux",
+      "profile": "debug",
+      "library": {
+        "bytes": 33438952,
+        "sha256": "e9e1380c4b8ad4dc20ba80cc384f8be7ae6884635f9539794b40ee3d61df5ea8"
+      },
+      "cases": 0,
+      "binary_files": 0,
+      "binary_bytes": 0,
+      "logit_words": 0,
+      "input_differences_from_final": [],
+      "steps": [
+        {
+          "name": "fmt",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "fmt",
+            "-p",
+            "llama-ffi",
+            "-p",
+            "llama-model-runtime",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "unit",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "test",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--lib",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "build",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "build",
+            "-p",
+            "llama-ffi"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "clippy",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "clippy",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "native_assertion_controls": 0
+    },
+    {
+      "name": "microbatch-rows-v2-linux-debug-both",
+      "status": {
+        "bytes": 388281,
+        "sha256": "e0297fa9764be7f305d0d7b22a6f922713e18361459af63587d8c2fd6156d315"
+      },
+      "platform": "linux",
+      "profile": "debug",
+      "library": {
+        "bytes": 33438952,
+        "sha256": "e9e1380c4b8ad4dc20ba80cc384f8be7ae6884635f9539794b40ee3d61df5ea8"
+      },
+      "cases": 228,
+      "binary_files": 710,
+      "binary_bytes": 14171045,
+      "logit_words": 2917888,
+      "input_differences_from_final": [
+        {
+          "path": "crates/model-runtime/src/context/native_decode.rs",
+          "prior": {
+            "bytes": 29682,
+            "sha256": "c7debc063de439d063f3272925e5ca3fb1d088aa2243845a0115dcf37f962495"
+          },
+          "current": {
+            "bytes": 30213,
+            "sha256": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835"
+          },
+          "reason": "Independent fixed-budget regression only; production prefix is unchanged. Final GNU debug shared-library hash is byte-identical to the earlier native and state proof."
+        }
+      ],
+      "steps": [
+        {
+          "name": "fmt",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "fmt",
+            "-p",
+            "llama-ffi",
+            "-p",
+            "llama-model-runtime",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "unit",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "test",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--lib",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "build",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "build",
+            "-p",
+            "llama-ffi"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "clippy",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "clippy",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "native_assertion_controls": 2
+    },
+    {
+      "name": "microbatch-final-v1-linux-release-both",
+      "status": {
+        "bytes": 389486,
+        "sha256": "e20c1a340c5643894da73e0436643debe68fe7a1a37ab87cd2adb02f8d9740ee"
+      },
+      "platform": "linux",
+      "profile": "release",
+      "library": {
+        "bytes": 2296912,
+        "sha256": "7101cefdbd7639f791f1f53a8a325fe0006d9dd060e71742abf43da990bc25e2"
+      },
+      "cases": 228,
+      "binary_files": 710,
+      "binary_bytes": 14171045,
+      "logit_words": 2917888,
+      "input_differences_from_final": [],
+      "steps": [
+        {
+          "name": "fmt",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "fmt",
+            "-p",
+            "llama-ffi",
+            "-p",
+            "llama-model-runtime",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "unit",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "test",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--lib",
+            "--release",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "build",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "build",
+            "-p",
+            "llama-ffi",
+            "--release"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "clippy",
+          "command": [
+            "/home/tdamre/.cargo/bin/cargo",
+            "clippy",
+            "-p",
+            "llama-model-runtime",
+            "-p",
+            "llama-ffi",
+            "--all-targets",
+            "--release",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "native_assertion_controls": 2
+    },
+    {
+      "name": "state-coherent-v1-linux-debug",
+      "status": {
+        "bytes": 35925,
+        "sha256": "401994b8647c37765569795bbb70c9d23326631f48de169a0da9e475a2e53d87"
+      },
+      "platform": "linux",
+      "profile": "debug",
+      "library": {
+        "bytes": 33438952,
+        "sha256": "e9e1380c4b8ad4dc20ba80cc384f8be7ae6884635f9539794b40ee3d61df5ea8"
+      },
+      "cases": 16,
+      "binary_files": 2080,
+      "binary_bytes": 8459616,
+      "logit_words": 0,
+      "input_differences_from_final": [
+        {
+          "path": "crates/model-runtime/src/context/native_decode.rs",
+          "prior": {
+            "bytes": 29682,
+            "sha256": "c7debc063de439d063f3272925e5ca3fb1d088aa2243845a0115dcf37f962495"
+          },
+          "current": {
+            "bytes": 30213,
+            "sha256": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835"
+          },
+          "reason": "Independent fixed-budget regression only; production prefix is unchanged. Final GNU debug shared-library hash is byte-identical to the earlier native and state proof."
+        }
+      ],
+      "steps": [],
+      "counts": {
+        "cases": 640,
+        "sequence_cases": 640,
+        "file_cases": 32,
+        "buffer_cases": 1536
+      }
+    },
+    {
+      "name": "state-final-v1-linux-release",
+      "status": {
+        "bytes": 35942,
+        "sha256": "59c7bd4575cf06946d1cef5b005e95dada05e98097d762c270fa2e919ff9e377"
+      },
+      "platform": "linux",
+      "profile": "release",
+      "library": {
+        "bytes": 2296912,
+        "sha256": "7101cefdbd7639f791f1f53a8a325fe0006d9dd060e71742abf43da990bc25e2"
+      },
+      "cases": 16,
+      "binary_files": 2080,
+      "binary_bytes": 8459616,
+      "logit_words": 0,
+      "input_differences_from_final": [],
+      "steps": [],
+      "counts": {
+        "cases": 640,
+        "sequence_cases": 640,
+        "file_cases": 32,
+        "buffer_cases": 1536
+      }
+    }
+  ],
+  "native_microbatch_per_platform_profile": {
+    "requested_cases": 228,
+    "exact_native_return_cases": 226,
+    "source_assertions_checked_errors": 2,
+    "logit_words": 2917888,
+    "binary_files": 710,
+    "binary_bytes": 14171045
+  },
+  "state_per_platform_profile": {
+    "cohorts": 16,
+    "memory_scenarios": 640,
+    "sequence_state_scenarios": 640,
+    "file_suites": 32,
+    "short_buffer_cases": 1536,
+    "binary_files": 2080,
+    "binary_bytes": 8459616
+  },
+  "ordinary_fixture_replay": {
+    "microbatch_cases": 205,
+    "checked_original_assertions": 2,
+    "deduplicated_identical_case_pairs": 13,
+    "microbatch_logit_words_per_platform": 2398720,
+    "embedding_words_per_platform": 588,
+    "flash_plus_nonflash_state_logit_words_per_platform": 516096,
+    "flash_plus_nonflash_state_buffer_checks_per_platform": 2096,
+    "state_buffer_bytes_per_platform": 580656,
+    "independent_order_cases": 12,
+    "independent_row_map_geometries": 5
+  },
+  "exports": {
+    "frozen_C": 184,
+    "frozen_total_C": 255,
+    "pending_C": 71,
+    "diagnostic_extensions": 4,
+    "original_mangled_CPP_exports_excluded": 39
+  },
+  "resource_negative_controls": {
+    "baseline_passed": true,
+    "omitted_map_charge_fails": true,
+    "omitted_decode_ID_bound_fails": true,
+    "unique_cell_padding_fails": true
+  },
+  "preserved_failures": [
+    "First direct row-map unit test used incorrect independently captured input recipe; exact expected row bytes never changed.",
+    "Earlier queued native capture expired before execution; recorded as infrastructure, not a numerical failure.",
+    "Two independently captured original context-initialization assertions return checked Rust errors.",
+    "Initial export-audit assertion counted 39 mangled C++ exports as C symbols; corrected classification before recording exact 255-header comparison."
+  ],
+  "default_qualification": "Untouched frozen default parameters are admitted for supported dense Llama CPU models on the two measured profiles; AUTO is source-probed, flash workers execute real partitions. Native C execution of Qwen2/Qwen3/Mamba/BERT remains outside this consumer slice.",
+  "limitations": [
+    "Nonflash worker counts above one reject.",
+    "Finite supported model arithmetic is exact; computed nonfinite model results reject instead of claiming NaN-logit equivalence.",
+    "Unsupported architectures, quantized KV, sliding-window attention, advanced RoPE and other explicit C context boundaries remain checked errors.",
+    "Whole-batch transactional cancellation preserves prior Rust guarantees and differs from source partial-microbatch mutation."
+  ]
+}

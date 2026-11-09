@@ -1,0 +1,55 @@
+from pathlib import Path
+import json,hashlib,datetime,shutil
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=base/'rust-draft-v1';out=base/'reader-adapter-v1';out.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+candidate=out/'candidate/fixtures/gguf-bytes';candidate.mkdir(parents=True)
+files=[];source_reports=[]
+for short,directory,count in [('reader','original-reader-v1',1093),('booleans','original-booleans-v1',512)]:
+ seal=json.loads((base/directory/'sealed-review.json').read_text(encoding='utf-8'));assert seal['status']=='succeeded'
+ reports=[]
+ for platform in ['windows','linux']:
+  p=base/directory/platform/'report.json';r=json.loads(p.read_text(encoding='utf-8'));assert r['status']=='succeeded' and len(r['cases'])==count
+  pool=(base/directory/platform/'data.bin').read_bytes()
+  assert len(pool)==r['pool']['bytes'] and sha(pool)==r['pool']['sha256']
+  for c in r['cases']:
+   for key in ['input','native_serialized_header']:
+    if key not in c:continue
+    b=c[key];data=pool[b['offset']:b['offset']+b['bytes']];assert len(data)==b['bytes'] and sha(data)==b['sha256'],(platform,c['name'],key)
+  reports.append((r,pool));name=short+'-original-'+platform+'.json';(candidate/name).write_bytes(p.read_bytes())
+  source_reports.append({'path':str(p),'copied_name':name,'bytes':p.stat().st_size,'sha256':sha(p.read_bytes())})
+ assert reports[0][0]['cases']==reports[1][0]['cases'] and reports[0][1]==reports[1][1]
+ r,pool=reports[0];(candidate/(short+'-data.bin')).write_bytes(pool)
+ lines=['# GGUF C reader getters and exact header serialization; mechanically projected from unchanged original reports.','# C=name/admitted/input_offset/input_bytes/header_offset/header_bytes/version/alignment/data_offset; M=key/getter; T=tensor/getter; E=end']
+ def line(values):lines.append('\t'.join(str(v) for v in values))
+ for c in r['cases']:
+  h=c.get('native_serialized_header',{});i=c['input']
+  line(['C',c['name'],int(c['accepted']),i['offset'],i['bytes'],h.get('offset',0),h.get('bytes',0),c.get('version',0),c.get('alignment',0),c.get('data_offset',0)])
+  for index,m in enumerate(c.get('metadata',[])):
+   common=['M',index,m['key_prefix_hex'],m['type'],m['find_key_index']]
+   if m['type']==8:line(common+['s',m['string_prefix_hex']])
+   elif m['type']==9:
+    value=','.join(m['string_prefixes_hex']) if m['element_type']==8 else m['native_data_hex']
+    line(common+['a',m['element_type'],m['count'],value])
+   else:line(common+['n',m['native_data_hex']])
+  for index,t in enumerate(c.get('tensors',[])):
+   line(['T',index,t['name_prefix_hex'],t['find_tensor_index'],','.join(map(str,t['dimensions'])),t['dtype'],t['offset'],t['bytes']])
+  line(['E'])
+ (candidate/(short+'-reference.tsv')).write_bytes(('\n'.join(lines)+'\n').encode('utf-8'))
+provenance={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_archive_sha256':'2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122',
+'independence':'All 1093 raw-byte and 512 boolean cases per host were captured from unchanged original gguf.cpp APIs before the byte-string Rust implementation. Pools and all case records agree byte-for-byte across Windows and GNU. TSV adapters only project existing observations; no Rust output supplies expected data.',
+'source_reports':source_reports,'adapter_sha256':sha(Path(__file__).read_bytes()),'comparison':'Parser admissions, metadata ordering/native C-string getters and first-prefix lookups, numerical raw bits including NaNs and noncanonical bool normalization, all tensor getters, and full original gguf_get_meta_data header bytes.',
+'boundaries':['Header-only mode is explicit; full public file loading separately validates payload length.','Frozen raw parser accepts byte strings and full-name aliases; checked UTF-8 facade remains available.','The reader corpus does not claim setter/copy/split/merge compatibility; those require separate original tool observations.','Default resource limits remain explicit and may reject source-admitted oversized headers.']}
+(candidate/'provenance.json').write_bytes((json.dumps(provenance,indent=2)+'\n').encode('utf-8'))
+(candidate/'README.md').write_bytes(b'# Frozen original GGUF byte-string and boolean observations\n\nThe two data pools and four complete source reports are captured from the original\nC implementation on Windows and GNU before the corresponding Rust implementation.\nThe 1,605 cases include all byte values separately in strings, arrays, keys and\ntensor names, invalid UTF-8, C-string prefix aliases, length limits, typed raw\nmetadata including NaNs, and every scalar/array boolean byte encoding. Both native\nprofiles have identical case records and pools; their identities remain separate.\n\nThe TSV files are a lossless selection of observations for dependency-free Rust\ntests. Original reports and each pool slice retain complete SHA-256 provenance.\nNo expected value is derived from Rust. Tests compare header-only admission,\nevery captured getter and 269,184 exact serialized header bytes. Full-file payload\nvalidation and the text facade have explicit separate contracts.\n')
+rows=[]
+for p in sorted(candidate.iterdir()):
+ rows.append({'path':'fixtures/gguf-bytes/'+p.name,'bytes':p.stat().st_size,'sha256':sha(p.read_bytes()),'purpose':'Frozen original GGUF byte-string/boolean independent getter and serialized-header observations; see fixtures/gguf-bytes/provenance.json'})
+(out/'fixture-records.json').write_bytes((json.dumps(rows,indent=2)+'\n').encode('utf-8'))
+manifest=repo/'docs/fixture-manifest.tsv';before=manifest.read_bytes();(out/'fixture-manifest.preimage.tsv.txt').write_bytes(before)
+assert before.startswith(b'path\tbytes\tsha256\tpurpose\n')
+for r in rows:
+ dst=repo/r['path'];assert not dst.exists();dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes((candidate/Path(r['path']).name).read_bytes())
+manifest.write_bytes(before+''.join(f"{r['path']}\t{r['bytes']}\t{r['sha256']}\t{r['purpose']}\n" for r in rows).encode('utf-8'))
+test_path=repo/'crates/gguf/tests/raw_native.rs';assert not test_path.exists()
+test_path.write_bytes((base/'raw-native-test-v1.rs.txt').read_bytes())
+print(json.dumps({'status':'succeeded','fixtures':len(rows),'fixture_bytes':sum(r['bytes'] for r in rows),'test_sha256':sha(test_path.read_bytes()),'manifest_before_sha256':sha(before),'manifest_after_sha256':sha(manifest.read_bytes())},indent=2))

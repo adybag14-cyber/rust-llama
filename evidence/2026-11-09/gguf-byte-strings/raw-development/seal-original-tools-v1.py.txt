@@ -1,0 +1,34 @@
+from pathlib import Path
+import json,hashlib,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings')
+sha=lambda b:hashlib.sha256(b).hexdigest()
+records=[];reports=[]
+for platform in ['windows','linux']:
+ directory=base/'original-tools-v1'/platform
+ p=directory/'report.json';report=json.loads(p.read_text(encoding='utf-8'))
+ assert report['status']=='succeeded' and report['summary']['timeouts']==0
+ data=(directory/'data.bin').read_bytes();assert len(data)==report['pool']['bytes'] and sha(data)==report['pool']['sha256']
+ for case in report['cases']:
+  assert not case['timed_out']
+  for item in case['input_files']+case['after_files']+[case['stdout'],case['stderr']]:
+   raw=data[item['offset']:item['offset']+item['bytes']]
+   assert len(raw)==item['bytes'] and sha(raw)==item['sha256'],(platform,case['name'])
+ for path in [p,directory/'data.bin',directory/'status.json']:
+  records.append({'path':path.relative_to(base).as_posix(),'bytes':path.stat().st_size,'sha256':sha(path.read_bytes())})
+ reports.append(report)
+assert len(reports[0]['cases'])==len(reports[1]['cases'])==3196
+signature=lambda files:[(r['name'],r['bytes'],r['sha256']) for r in files]
+for windows,linux in zip(reports[0]['cases'],reports[1]['cases']):
+ assert windows['name']==linux['name'] and windows['args']==linux['args']
+ assert (windows['exit_code']==0)==(linux['exit_code']==0),windows['name']
+ assert signature(windows['input_files'])==signature(linux['input_files']),windows['name']
+ if windows['exit_code']==0:assert signature(windows['after_files'])==signature(linux['after_files']),windows['name']
+preimage=base/'rust-draft-v1/crates/gguf/src/split.rs'
+assert sha(preimage.read_bytes())=='424a658a13fe1fdc2463defeec3be66ea3f45fb5bfdc675754d178481649524d','Tool source changed before independent capture was sealed'
+review={'schema':1,'status':'succeeded','sealed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'files':records,'case_count_per_profile':3196,
+'successful_per_profile':3176,'checked_error_per_profile':20,'source_tool_preimage_sha256':sha(preimage.read_bytes()),
+'cross_profile':'Every input and every successful post-operation file agrees byte-for-byte across unchanged Windows and GNU native tools. Platform error codes/stderr and failed partial files are retained independently.',
+'successful_post_operation_bytes_per_profile':reports[0]['summary']['successful_after_bytes'],
+'independence':'This seal precedes migration of the Rust split/merge implementation to RawGguf. All expected data are native observations; the Rust product and current raw reader supply no expected outputs.'}
+out=base/'original-tools-v1/sealed-review.json';assert not out.exists();out.write_bytes((json.dumps(review,indent=2)+'\n').encode('utf-8'))
+print(json.dumps(review,indent=2));print('sealed_review_sha256',sha(out.read_bytes()))

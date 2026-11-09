@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "passed": true,
+  "base_sources": {
+    "decode": "c7debc063de439d063f3272925e5ca3fb1d088aa2243845a0115dcf37f962495",
+    "context": "b2bccf202d9bc165a776035e3a1095684a2334c5dc4c684c73398630d5a33daa",
+    "map": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+  },
+  "independent_test_candidate_sha256": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835",
+  "steps": [
+    {
+      "label": "baseline-independent-tests",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--lib",
+        "context::native::",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "negative_control": false,
+      "detected": false,
+      "passed": true,
+      "source_hashes": {
+        "decode": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835",
+        "context": "b2bccf202d9bc165a776035e3a1095684a2334c5dc4c684c73398630d5a33daa",
+        "map": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+      }
+    },
+    {
+      "label": "map-charge-omitted",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--lib",
+        "complete_logical_row_maps_are_charged_before_state_clone",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "negative_control": true,
+      "detected": true,
+      "passed": true,
+      "source_hashes": {
+        "decode": "293120335b3f1df9388d309a8fa36e38762ba880e99a744f9804cb5666f0e8b8",
+        "context": "b2bccf202d9bc165a776035e3a1095684a2334c5dc4c684c73398630d5a33daa",
+        "map": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+      }
+    },
+    {
+      "label": "decode-limit-omitted",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--lib",
+        "decode_ids_use_configured_limit_while_memory_keeps_256_ids",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "negative_control": true,
+      "detected": true,
+      "passed": true,
+      "source_hashes": {
+        "decode": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835",
+        "context": "c9654b75f7d6384dc1e6d4b6e096df75e168611974efba8f99eeacbcb9b7084c",
+        "map": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+      }
+    },
+    {
+      "label": "unique-cell-padding",
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--lib",
+        "original_row_map_bytes_and_logical_query_geometry",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "negative_control": true,
+      "detected": true,
+      "passed": true,
+      "source_hashes": {
+        "decode": "38734c59c865820abd4df189b47c741ab226f43d07f45f87256181b01a322835",
+        "context": "b2bccf202d9bc165a776035e3a1095684a2334c5dc4c684c73398630d5a33daa",
+        "map": "94cd87650ffeb8088425dced4d3343ab87acd525dfe3555ec5543c59da1d6102"
+      }
+    }
+  ],
+  "base_unchanged": true
+}

@@ -1,7 +1,8 @@
 # Frozen C ABI export coverage
 
-The frozen header declares 255 llama functions and the original DLL exports the
-same 255 symbols. The Rust DLL implements **184**, leaves **71 unexported**, and
+The frozen header declares 255 llama C functions and the original DLL contains
+those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
+this public C-header inventory. The Rust DLL implements **184**, leaves **71 unexported**, and
 adds **4 diagnostic/layout extensions**. This is symbol coverage; accepted
 configurations and behavioral limits are in README.md, SAMPLERS.md and STATE.md.
 
@@ -12,6 +13,13 @@ source hashes are under evidence/2026-11-09/native-context. Previous 155- and
 Fresh integrated-product C results and DLL hashes are in the integrated-windows
 subdirectory. Whole-workspace validation is recorded separately by root release
 gates; no unimplemented function is represented by a placeholder export.
+
+The native microbatch/flash extension retains exactly the same 184 C exports
+and four extensions on Windows and GNU in debug and release. It expands the
+verified behavior of existing context, worker, decode and state functions.
+The exact PE/ELF symbol comparison and DLL/shared-object hashes are recorded in
+evidence/2026-11-09/native-flash-context/export-verification.json. It does not
+claim to implement the separate native C++ symbols.
 
 ## Implemented frozen exports
 

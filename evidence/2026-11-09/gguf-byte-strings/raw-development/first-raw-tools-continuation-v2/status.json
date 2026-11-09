@@ -1,0 +1,31 @@
+{
+  "status": "failed",
+  "prior_status_sha256": "98980def55f3a1ad3a7c4816a6b7ebb23bfe540c9d39ef9516bfb85e7f53cdf8",
+  "source": {
+    "crates/gguf/src/lib.rs": "fb3de962c503e6109d2d7e83002cc4e893522792dc88d9b9648ae8074df5d63e",
+    "crates/gguf/src/raw.rs": "a8a8d510f1a8d2e8cf284eb9e26e693e6afad6a8f81e26a0e8f957e86cdf8b38",
+    "crates/gguf/src/shards.rs": "3720132fbc542b3aefe7fc9f4c499d3217b55a33ffe88df715e0893902a416a8",
+    "crates/gguf/src/split.rs": "34f5450eb6749057f89f7ec9c4c7453ec8c48c255ddade66e81fa0fd1f4b2d07",
+    "crates/gguf/src/writer.rs": "ee71be04bb179334f5d4ed7f90ae53320d82c3503e4d937d980eaca7e4d783a2",
+    "crates/gguf/tests/raw_native.rs": "a1f6a4a75870fcd2da305f520df84db9bf6cf91a1de40209f69edee276270510",
+    "crates/gguf/tests/raw_tools.rs": "d343a883bcee6390e783a8763b67147fdab04bc2fb15f2db2c6f597ffb35660b",
+    "crates/gguf/tests/split_limits.rs": "ef6031f15e5bea48a9fce9bb7e3cd4db30dd35c74abb6c27dd771c2d759d95e5"
+  },
+  "qualification": "Previous workspace check and all GGUF tests succeeded unchanged; rerun only corrected package selector and new strict Clippy gate.",
+  "steps": [
+    {
+      "name": "cli-tests",
+      "exit_code": 0,
+      "seconds": 8.022586300001421,
+      "log_sha256": "a007849c01dfce4f64c3a48ccc15e72be980d220ec8749fd9b350c1db6747003"
+    },
+    {
+      "name": "clippy",
+      "exit_code": 101,
+      "seconds": 1.197664100000111,
+      "log_sha256": "94f844f5dfe21c845fd49e5d42c58630895543e1057c3527f0f1f31367e8c51c"
+    }
+  ],
+  "error": "AssertionError(('clippy', '    Checking llama-quant v0.1.0 (C:\\\\Users\\\\adyba\\\\rust-llama-reference\\\\gguf-byte-strings\\\\rust-draft-v1\\\\crates\\\\quant)\\n    Checking llama-behavior v0.1.0 (C:\\\\Users\\\\adyba\\\\rust-llama-reference\\\\gguf-byte-strings\\\\rust-draft-v1\\\\crates\\\\llama-behavior)\\n    Checking llama-gguf v0.1.0 (C:\\\\Users\\\\adyba\\\\rust-llama-reference\\\\gguf-byte-strings\\\\rust-draft-v1\\\\crates\\\\gguf)\\n    Checking llama-model-runtime v0.1.0 (C:\\\\Users\\\\adyba\\\\rust-llama-reference\\\\gguf-byte-strings\\\\rust-draft-v1\\\\crates\\\\model-runtime)\\nerror: associated function `read_header` is never used\\n   --> crates\\\\gguf\\\\src\\\\lib.rs:234:19\\n    |\\n230 | impl<R: Read + Seek> Gguf<R> {\\n    | ---------------------------- associated function in this implementation\\n...\\n234 |     pub(crate) fn read_header(reader: R, limits: Limits) -> Result<Self> {\\n    |                   ^^^^^^^^^^^\\n    |\\n    = note: `-D dead-code` implied by `-D warnings`\\n    = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`\\n\\nerror: could not compile `llama-gguf` (lib) due to 1 previous error\\nwarning: build failed, waiting for other jobs to finish...\\n'))",
+  "finished_utc": "2026-11-09T20:33:05.257174+00:00"
+}

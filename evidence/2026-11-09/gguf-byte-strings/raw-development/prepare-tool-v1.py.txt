@@ -1,0 +1,12 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=base/'rust-draft-v1';out=base/'prepare-tool-v1';out.mkdir(exist_ok=False)
+sha=lambda data:hashlib.sha256(data).hexdigest()
+seal=base/'original-tools-v1/sealed-review.json';assert sha(seal.read_bytes())=='00e11576e526740ac3a7b035dda49c92af32d41b41709e792f0dfd697e769198'
+assert json.loads(seal.read_text(encoding='utf-8'))['status']=='succeeded'
+path=repo/'crates/gguf/src/split.rs';before=path.read_bytes();assert sha(before)=='424a658a13fe1fdc2463defeec3be66ea3f45fb5bfdc675754d178481649524d'
+(out/'split.preimage.rs.txt').write_bytes(before)
+path.write_bytes((base/'raw-tool-source-v1.rs.txt').read_bytes())
+p=subprocess.run(['cargo','+1.99.1','fmt','--all'],cwd=repo,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(out/'fmt.log').write_bytes(p.stdout);assert p.returncode==0
+report={'status':'succeeded','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sealed_original_tools_sha256':sha(seal.read_bytes()),'before_sha256':sha(before),'after_sha256':sha(path.read_bytes()),'after_bytes':path.stat().st_size}
+(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'));print(json.dumps(report,indent=2))

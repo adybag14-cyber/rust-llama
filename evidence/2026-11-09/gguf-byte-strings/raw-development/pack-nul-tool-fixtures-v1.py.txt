@@ -1,0 +1,76 @@
+from pathlib import Path
+import json,hashlib,datetime,subprocess
+ref=Path(r'C:\Users\adyba\rust-llama-reference');base=ref/'gguf-byte-strings';repo=base/'rust-draft-v1';origin=ref/'gguf-split-port/nul-edges-v2';out=base/'nul-tool-adapter-v1';out.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+review=origin/'review-v3.json';assert sha(review.read_bytes())=='889996f1463fde9e124329d2c62c0708fc591f0327ef106fe3d8b58c8cefc03c'
+reports={};records=[]
+for platform,expected in [('windows','08db532e37a69e62dc2a58617970b2385853a0bcbd8edcd66ee5b63e5d91da24'),('linux','90bd8d451e597fc3c95d45dcedb048f2b3fe43803c3dc288518244da83d09c15')]:
+ p=origin/platform/'report.json';data=p.read_bytes();assert sha(data)==expected
+ r=json.loads(data);assert r['status']=='succeeded' and len(r['cases'])==22
+ for c in r['cases']:
+  for file in c['input_files']+c['after_files']:
+   actual=(origin/platform/'cases'/c['name']/file['name']).read_bytes()
+   assert len(actual)==file['bytes'] and sha(actual)==file['sha256']
+   if 'hex' in file:assert actual==bytes.fromhex(file['hex'])
+ reports[platform]=r
+ records.append({'source':str(p),'bytes':len(data),'sha256':sha(data)})
+signature=lambda files:[(r['name'],r['bytes'],r['sha256']) for r in files]
+for w,g in zip(reports['windows']['cases'],reports['linux']['cases']):
+ assert w['name']==g['name'] and w['args']==g['args'] and (w['exit_code']==0)==(g['exit_code']==0)
+ assert signature(w['input_files'])==signature(g['input_files']) and signature(w['after_files'])==signature(g['after_files'])
+candidate=out/'candidate/fixtures/gguf-bytes';candidate.mkdir(parents=True)
+for platform in ['windows','linux']:(candidate/('nul-original-'+platform+'-report.json')).write_bytes((origin/platform/'report.json').read_bytes())
+pool=bytearray();blobs={}
+def blob(data):
+ h=sha(data)
+ if h not in blobs:blobs[h]=(len(pool),len(data));pool.extend(data)
+ return blobs[h]
+lines=['# Original reserved-key aliases, metadata overwrite order and native tensor prefix collisions; C/I/A/E as tools-reference.tsv']
+count=0;success=0;exact=0
+for c in reports['windows']['cases']:
+ args=c['args'];op='merge' if '--merge' in args else 'split'
+ limit=0 if op=='merge' else int(args[args.index('--split-max-tensors')+1]) if '--split-max-tensors' in args else 128
+ lines.append('\t'.join(map(str,['C',c['name'],int(c['exit_code']==0),op,args[-2],args[-1],limit])))
+ for kind,key in [('I','input_files'),('A','after_files')]:
+  for file in c[key]:
+   data=(origin/'windows/cases'/c['name']/file['name']).read_bytes();offset,length=blob(data)
+   lines.append('\t'.join(map(str,[kind,file['name'],offset,length])))
+   if kind=='A' and c['exit_code']==0:exact+=length
+ lines.append('E');count+=1;success+=int(c['exit_code']==0)
+(candidate/'nul-tools-data.bin').write_bytes(pool);(candidate/'nul-tools-reference.tsv').write_bytes(('\n'.join(lines)+'\n').encode('utf-8'))
+p={'schema':1,'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'original_review_sha256':sha(review.read_bytes()),'source_reports':records,
+'independence':'Unchanged original-only addon captured before RawGguf implementation. The adapter checks every input and after-file SHA-256 against both native reports and preserves the complete original JSON reports.',
+'purpose':'Supplement the exhaustive byte/boolean tool corpus with reserved split-key C-string aliases, last-key ordering, intermediate alignment setter errors and native-prefix tensor collisions.',
+'cases':count,'successes':success,'checked_errors':count-success,'successful_post_operation_bytes':exact,'adapter_sha256':sha(Path(__file__).read_bytes())}
+(candidate/'nul-tools-provenance.json').write_bytes((json.dumps(p,indent=2)+'\n').encode('utf-8'))
+rows=[{'path':'fixtures/gguf-bytes/'+f.name,'bytes':f.stat().st_size,'sha256':sha(f.read_bytes()),'purpose':'Independent original GGUF reserved-key and name-prefix tool addon; see fixtures/gguf-bytes/nul-tools-provenance.json'} for f in sorted(candidate.iterdir())]
+manifest=repo/'docs/fixture-manifest.tsv';before=manifest.read_bytes();(out/'fixture-manifest.preimage.tsv.txt').write_bytes(before)
+for row in rows:
+ f=repo/row['path'];assert not f.exists();f.write_bytes((candidate/Path(row['path']).name).read_bytes())
+manifest.write_bytes(before+''.join(f"{r['path']}\t{r['bytes']}\t{r['sha256']}\t{r['purpose']}\n" for r in rows).encode('utf-8'))
+(out/'fixture-records.json').write_bytes((json.dumps(rows,indent=2)+'\n').encode('utf-8'))
+test=repo/'crates/gguf/tests/raw_tools.rs';before=test.read_bytes();assert sha(before)=='d343a883bcee6390e783a8763b67147fdab04bc2fb15f2db2c6f597ffb35660b'
+(out/'raw-tools.preimage.rs.txt').write_bytes(before);s=before.decode('utf-8')
+start=s.index('#[test]\nfn original_raw_strings_and_booleans_split_and_merge() {')
+end=s.index('    let root = Directory::new();',start)
+s=s[:start]+'fn corpus(rows: &str, data: &[u8], expected: (usize, usize, usize)) {\n'+s[end:]
+s=s.replace('assert_eq!((count, successful, exact_bytes), (3196, 3176, 1_438_016));','assert_eq!((count, successful, exact_bytes), expected);')
+assert '(3196, 3176, 1_438_016)' not in s
+s=s.replace('    println!(\n        "Independent original raw GGUF tools: {count} cases; {successful} successes; 20 checked errors;', '    let errors = count - successful;\n    println!(\n        "Independent original raw GGUF tools: {count} cases; {successful} successes; {errors} checked errors;')
+s+='''
+#[test]
+fn original_raw_strings_and_booleans_split_and_merge() {
+    corpus(include_str!("../../../fixtures/gguf-bytes/tools-reference.tsv"),
+           include_bytes!("../../../fixtures/gguf-bytes/tools-data.bin"),
+           (3196, 3176, 1_438_016));
+}
+#[test]
+fn original_reserved_key_aliases_and_tensor_prefix_collisions() {
+    corpus(include_str!("../../../fixtures/gguf-bytes/nul-tools-reference.tsv"),
+           include_bytes!("../../../fixtures/gguf-bytes/nul-tools-data.bin"),
+           (22, 17, NUL_EXPECTED_BYTES));
+}
+'''.replace('NUL_EXPECTED_BYTES',str(exact))
+test.write_bytes(s.encode('utf-8'))
+p=subprocess.run(['cargo','+1.99.1','fmt','--all'],cwd=repo,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(out/'fmt.log').write_bytes(p.stdout);assert p.returncode==0
+print(json.dumps({'status':'succeeded','cases':count,'successes':success,'exact_bytes':exact,'fixtures':len(rows),'fixture_bytes':sum(r['bytes'] for r in rows),'test_sha256':sha(test.read_bytes()),'manifest_sha256':sha(manifest.read_bytes())},indent=2))

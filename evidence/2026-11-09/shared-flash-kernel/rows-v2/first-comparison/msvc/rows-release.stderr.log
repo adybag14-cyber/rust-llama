@@ -1,0 +1,40 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\f16-context-oracle\flash-kernel-rows\rust-draft\crates\quant)
+    Finished `release` profile [optimized] target(s) in 6.81s
+     Running tests\flash_rows.rs (target\release\deps\flash_rows-da9881176dd51f95.exe)
+
+thread 'original_row_map_graphs_match_default_and_reference_with_real_workers' (24052) panicked at crates\quant\tests\flash_rows.rs:65:5:
+assertion `left == right` failed: kv-rows flash_rows_444_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers1 force=false: 2688 differing (0 finite), first Some((00000000, 7fc12345, ffc54321))
+kv-rows flash_rows_445_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers3 force=false: 2688 differing (0 finite), first Some((00000000, 7fc12345, ffc54321))
+kv-rows flash_rows_446_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers7 force=false: 2688 differing (0 finite), first Some((00000000, 7fc12345, ffc54321))
+kv-rows flash_rows_462_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers1 force=false: 2688 differing (0 finite), first Some((00000000, 7fc2a000, ffc4e000))
+kv-rows flash_rows_463_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers3 force=false: 2688 differing (0 finite), first Some((00000000, 7fc2a000, ffc4e000))
+kv-rows flash_rows_464_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers7 force=false: 2688 differing (0 finite), first Some((00000000, 7fc2a000, ffc4e000))
+  left: 6
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'selected_rows_keep_full_row_map_batch_and_mask_geometry' (5020) panicked at crates\quant\tests\flash_rows.rs:100:5:
+flash_rows_444_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers1 (0,0,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_444_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers1 (63,2,1): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_444_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers1 (32,1,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_445_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers3 (0,0,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_445_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers3 (63,2,1): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_445_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers3 (32,1,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_446_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers7 (0,0,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_446_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers7 (63,2,1): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_446_duplicates_nan_k0_v0_q64_cols65_physical19_b2_workers7 (32,1,0): 7 changed, Some((00000000, 7fc12345, ffc54321))
+flash_rows_462_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers1 (0,0,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_462_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers1 (63,2,1): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_462_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers1 (32,1,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_463_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers3 (0,0,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_463_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers3 (63,2,1): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_463_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers3 (32,1,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_464_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers7 (0,0,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_464_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers7 (63,2,1): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+flash_rows_464_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers7 (32,1,0): 7 changed, Some((00000000, 7fc2a000, ffc4e000))
+
+thread 'typed_and_offset_row_map_storage_preserve_original_words' (45716) panicked at crates\quant\tests\flash_rows.rs:121:9:
+assertion `left == right` failed: flash_rows_462_duplicates_nan_k1_v1_q64_cols65_physical19_b2_workers1
+  left: 2688
+ right: 0
+error: test failed, to rerun pass `-p llama-quant --test flash_rows`

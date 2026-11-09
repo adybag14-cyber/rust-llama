@@ -1,0 +1,130 @@
+
+running 11 tests
+test flash_attention::rows_tests::logical_row_columns_disable_split_and_are_distinct_from_physical_cache_rows ... ok
+test flash_attention::rows_tests::row_map_shapes_and_positive_indices_are_checked_atomically ... ok
+test flash_attention::rows_tests::row_map_storage_preserves_signed_values_and_checks_full_spans ... ok
+test flash_attention::rows_tests::selected_row_work_budget_charges_the_complete_map_validation ... ok
+test flash_attention::tests::actual_workers_and_serial_partitions_are_distinguished_and_failures_join ... ok
+test flash_attention::tests::allocation_and_work_preflights_are_atomic_and_categories_do_not_overlap ... ok
+test flash_attention::tests::checked_views_preserve_offsets_and_raw_bits_and_reject_invalid_extents ... ok
+test flash_attention::tests::huge_borrowed_broadcast_geometry_cannot_bypass_work_or_overflow_checks ... ok
+test flash_attention::tests::plan_rejects_unsupported_geometry_and_parameters_before_execution ... ok
+test flash_attention::tests::selected_tiled_row_charges_packed_scratch_for_every_idle_worker ... ok
+test iq_sort::tests::equal_value_order_matches_original_iq1_native_sort ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test scalar_quick_gelu_matches_original_inline_function_on_this_host ... Original scalar quick GELU: 502058 raw float output words exact
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 4 tests
+test extended_packed_validation_is_atomic ... ok
+test extended_reference_encoders_match_original_c_bytes ... ok
+test integer_assignment_matches_original_c_in_its_defined_domain ... ok
+test integer_conversion_rejects_undefined_source_assignments_atomically ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test f16_reduction_matches_original_batched_graphs_bit_for_bit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 5 tests
+test original_default_and_reference_flash_graphs_match_with_real_workers ... 552 original flash graphs, default and forced-reference: 2510640 F32 words, 0 failing cases, 0 changed words, 0 finite changes
+ok
+test original_nan_lane_boundaries_match_exactly ... 390 original flash graphs, default and forced-reference: 36384 F32 words, 0 failing cases, 0 changed words, 0 finite changes
+ok
+test original_nan_operand_and_tile_stages_match_exactly ... 320 original flash graphs, default and forced-reference: 224128 F32 words, 0 failing cases, 0 changed words, 0 finite changes
+ok
+test selected_rows_preserve_original_query_geometry_and_full_mask_tile_decisions ... Selected-row native output comparisons: 24066
+ok
+test typed_f32_and_raw_half_views_match_original_graph_words ... Typed-view native output comparisons: 75567
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.02s
+
+
+running 5 tests
+test original_row_map_graphs_match_default_and_reference_with_real_workers ... 576 original row-map graphs, default and forced-reference: 2119032 F32 words, 0 failing cases, 0 changed words, 0 finite changes
+ok
+test original_tiled_gemm_nan_position_controls_match_dense_and_mapped_paths ... 552 original tiled GEMM position controls and independent dense controls, default and forced: 1449432 F32 words, 0 failing comparisons, 0 changed words
+ok
+test original_tiled_qk_nan_channel_controls_match_dense_and_mapped_paths ... 402 original tiled QK channel controls and independent dense controls, default and forced: 720384 F32 words, 0 failing comparisons, 0 changed words
+ok
+test selected_rows_keep_full_row_map_batch_and_mask_geometry ... Original row-map selected-row comparisons: 13392
+ok
+test typed_and_offset_row_map_storage_preserve_original_words ... Original typed/offset row-map comparisons: 98093
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.02s
+
+
+running 2 tests
+test iq1_encoders_match_original_lattice_search_and_packing ... ok
+test iq1_invalid_later_blocks_cannot_change_destination ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+
+running 2 tests
+test iq2_encoders_match_original_lattice_search_and_packing ... ok
+test iq2_invalid_later_blocks_cannot_change_destination ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+
+running 2 tests
+test iq3_encoders_match_original_lattice_search_and_packing ... ok
+test iq3_invalid_later_blocks_cannot_change_destination ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+
+running 3 tests
+test activation_quantization_is_not_replaced_with_a_dense_dot ... ok
+test matvec_rejects_non_weight_types_and_malformed_rows ... ok
+test native_matvec_matches_generic_c_and_real_ggml_graphs ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test all_twenty_remaining_dots_match_both_independent_c_oracles_bitwise ... ok
+test every_extended_matvec_path_rejects_malformed_dimensions_and_packing ... ok
+test native_weight_dot_capabilities_distinguish_all_twenty_nine_supported_types ... ok
+test q8k_activation_encoder_matches_original_c_including_extreme_finite_values ... ok
+test q8k_preflight_is_atomic_and_zero_blocks_are_canonical ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 8 tests
+test all_active_decoders_match_independent_frozen_c_reference ... ok
+test bf16_and_fp8_edge_cases_are_ieee_correct ... ok
+test half_ieee_boundaries_and_ties_are_explicit ... ok
+test malformed_rows_are_rejected_before_output_is_changed ... ok
+test multiblock_decode_does_not_interleave_or_bleed_rows ... ok
+test numeric_ids_preserve_every_reserved_hole ... ok
+test quantizer_fails_clearly_without_mutating_the_destination ... ok
+test reference_encoders_match_frozen_c_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test codec_and_source_model_quantizer_capabilities_are_distinct ... ok
+test iq_numeric_failures_and_malformed_buffers_are_atomic ... ok
+test required_importance_is_explicit_and_validation_is_atomic ... ok
+test uninitialized_source_iq4_nl_zero_payload_is_canonicalized ... ok
+test weighted_and_iq4_encoders_match_unmodified_c_bytes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+

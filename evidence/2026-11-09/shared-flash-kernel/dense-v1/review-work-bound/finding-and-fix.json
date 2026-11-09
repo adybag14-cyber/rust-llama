@@ -1,0 +1,23 @@
+{
+  "finding": "Independent core review found tiled packed_v initialization undercount for idle workers in selected-row work budget.",
+  "previous_source": {
+    "sha256": "2ab4896760b7bd6d1ab7d1028f1781a49d83a2b1443c7767bb7d1b8438edd0ca",
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-kernel\\rust-draft\\crates\\quant\\src\\flash_attention.rs"
+  },
+  "previous_tests": {
+    "sha256": "5e858d8af46fbf800e33d0fad4eb1030e4211da0f50a5ab210d0b497e0128553",
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\f16-context-oracle\\flash-kernel\\rust-draft\\crates\\quant\\src\\flash_attention\\tests.rs"
+  },
+  "old_initialization": "        let initialization = mul(mul(self.params.workers, add(self.dv, KV_TILE)?)?, 32)?;",
+  "new_initialization": "        // execute preallocates every worker's complete buffers, even when a\n        // selected row leaves that worker idle. In particular packed_v contains\n        // KV_TILE * DV F32 elements for each tiled worker.\n        let scratch_elements_per_worker = add(self.dv, add(half / 2, packed_v / 4)?)?;\n        let initialized_elements = add(\n            mul(self.params.workers, scratch_elements_per_worker)?,\n            add(output_bytes, staged_result_bytes)? / 4,\n        )?;\n        let initialization = mul(initialized_elements, 2)?;",
+  "regression": {
+    "workers": 256,
+    "queries": 64,
+    "kv_columns": 1,
+    "dk": 1,
+    "dv": 4096,
+    "minimum_packed_zero_stores": 67108864,
+    "execution": "Must reject before allocation when max_scalar_work is one below the independently known packed-buffer store count."
+  },
+  "status": "Candidate prepared outside running hash-guarded source; not applied."
+}

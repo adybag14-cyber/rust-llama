@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,hashlib,subprocess,datetime
+base=Path(r'C:\Users\adyba\rust-llama-reference\gguf-byte-strings');repo=base/'rust-draft-v1';out=base/'text-facade-cleanup-v1';out.mkdir(exist_ok=False)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+p=repo/'crates/gguf/src/lib.rs';data=p.read_bytes();assert sha(data)=='fb3de962c503e6109d2d7e83002cc4e893522792dc88d9b9648ae8074df5d63e'
+(out/'lib.preimage.rs.txt').write_bytes(data);source=data.decode('utf-8')
+old="""    pub fn read(reader: R, limits: Limits) -> Result<Self> {
+        Self::read_with_payload_validation(reader, limits, true)
+    }
+    pub(crate) fn read_header(reader: R, limits: Limits) -> Result<Self> {
+        Self::read_with_payload_validation(reader, limits, false)
+    }
+    fn read_with_payload_validation(
+        reader: R,
+        limits: Limits,
+        validate_payload: bool,
+    ) -> Result<Self> {
+        RawGguf::read_with_payload_validation(reader, limits, validate_payload)?.into_text()
+    }
+"""
+new="""    pub fn read(reader: R, limits: Limits) -> Result<Self> {
+        RawGguf::read(reader, limits)?.into_text()
+    }
+"""
+assert source.count(old)==1;source=source.replace(old,new);p.write_bytes(source.encode('utf-8'))
+report={'status':'succeeded','created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'before_sha256':sha(data),'after_sha256':sha(p.read_bytes()),
+'reason':'The split tool now uses the public RawGguf header-only mode. Remove the unused internal text header-only adapter rather than suppress dead-code diagnostics; the public text read still validates payloads via the same parser.'}
+(out/'status.json').write_bytes((json.dumps(report,indent=2)+'\n').encode('utf-8'));print(json.dumps(report,indent=2))

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "reviewer": "/root/audit_core_progress",
+  "reviewed": {
+    "platform": "8d9dd4fa041a550609cda48251876f23416d8eedb044736f0bf9555adc0c6e0f",
+    "index": "c7b1a3f555f88a84dfd645753e40ce944eacfc8845f0f7f2bf25151f9ae2767e",
+    "lib": "56c6d979a31a26c97e97008f014a20c6715ae116a1c761b9883e7d9e8269b03f"
+  },
+  "finding": {
+    "severity": "safety",
+    "description": "Linux O_DIRECTORY/O_NOFOLLOW numeric constants were enabled for every Linux architecture even though the ARM64 UAPI uses different values. A non-x86 flag mismatch could omit no-follow and permit outside-root symbolic-link traversal.",
+    "resolution": "The measured Linux opener and constants are now gated to target_arch=x86_64, with an explicit unsupported directory fallback elsewhere. Caller-owned File parsing and std positioned reads remain separate."
+  },
+  "refinement": "UTF-16 code-unit length and the 65534-byte native ceiling are preflighted before wide-path allocation; Linux native path encoding is also charged before allocation.",
+  "scope": "Reviewer found no additional measured-x64 ownership/ABI/native enumeration/index allocation defect under the documented cumulative input/descriptor bounds. This is not a total-process allocation guarantee.",
+  "validated_platform_source_sha256": "6d8610a3b6a622f1a1bdd24c0292e476697dc6bc0c15469a6bfb74e30d06e085",
+  "validation": "Both hosts debug/release, strict Clippy, deterministic root/component/file swaps, native-stage unwind cleanup, and deliberate follow-symlinks mutation control."
+}

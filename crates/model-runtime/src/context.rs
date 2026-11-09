@@ -477,5 +477,6 @@ mod allocation_tests;
 
 mod native;
 pub use native::{
-    NativeBatchToken, NativeContext, NativeContextOptions, NativeKvType, NativeState,
+    NativeBatchToken, NativeContext, NativeContextOptions, NativeExecutionOptions,
+    NativeExecutionStats, NativeKvType, NativeState,
 };

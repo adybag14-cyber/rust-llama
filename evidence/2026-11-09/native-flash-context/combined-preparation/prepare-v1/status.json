@@ -1,0 +1,95 @@
+{
+  "status": "succeeded",
+  "started_utc": "2026-11-09T20:26:26.453106+00:00",
+  "before": {
+    "Cargo.lock": "c549e25bc77f3c8184d1fd0684dd6a8762143ac90a7197811392273852e02d02",
+    "Cargo.toml": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c",
+    "package.rs": "98ba8515c158791ff5930e6152150ed0a80fe75b2434f8d4eb972a18223e73de"
+  },
+  "steps": [
+    {
+      "name": "lock",
+      "args": [
+        "generate-lockfile",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06617980000009993,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "format-role",
+      "args": [
+        "fmt",
+        "-p",
+        "llama-conformance"
+      ],
+      "exit_code": 0,
+      "seconds": 0.16364299999986542,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fmt",
+      "args": [
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.114957300000242,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "role-test",
+      "args": [
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-conformance",
+        "--lib",
+        "special_data_roles_do_not_allow_arbitrary_foreign_implementations"
+      ],
+      "exit_code": 0,
+      "seconds": 2.4468927000052645,
+      "log_sha256": "ee4cf69a3449d61f10483a547aae44043a33f5a2b0b3a4e2d9f83b8363271f0a"
+    },
+    {
+      "name": "audit",
+      "args": [
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 34.007608699997945,
+      "log_sha256": "d46e4a85eaf6b85b912ae89aef76f9cb8eb10a530a3d758379e3ec7e441a8215"
+    },
+    {
+      "name": "fixtures",
+      "args": [
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 32.127484199998435,
+      "log_sha256": "951508e1abfe4b77256adc505bb9356fe09db78d6deb3f09c0dc237fb3b4ee77"
+    }
+  ],
+  "after": {
+    "Cargo.lock": "410ce2f915b7712a05a598843e396936d02e003c4b5f6292746d4231e542349e",
+    "Cargo.toml": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c",
+    "package.rs": "98ba8515c158791ff5930e6152150ed0a80fe75b2434f8d4eb972a18223e73de"
+  },
+  "finished_utc": "2026-11-09T20:27:36.383931+00:00"
+}
