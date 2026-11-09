@@ -18,6 +18,7 @@
 pub mod abi;
 mod batch;
 mod context;
+mod enum_names;
 mod memory;
 mod model;
 mod sampler;

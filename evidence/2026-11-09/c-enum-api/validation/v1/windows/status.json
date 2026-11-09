@@ -1,0 +1,314 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T22:22:25.647122+00:00",
+  "execution_inputs": {
+    "files": 980,
+    "sha256": "1f425268ed3fe9c3e4623221519bd2f535070b8c95952510478f88d62927539b"
+  },
+  "driver": {
+    "bytes": 14397,
+    "sha256": "7288d0c13c31981f65bda4bd7ee1de8396d52f56972df0de45430aafa283bb0a"
+  },
+  "oracle_projection_before": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "guarded_external_inputs": {
+    "validate-v1.py": {
+      "bytes": 14397,
+      "sha256": "7288d0c13c31981f65bda4bd7ee1de8396d52f56972df0de45430aafa283bb0a"
+    },
+    "freeze-v1\\status.json": {
+      "bytes": 885,
+      "sha256": "cf0be6812e721fe641db1edbcb09886c2d2e890e9a32e65bae4570ed327dd387"
+    },
+    "freeze-v1\\execution-inputs.json": {
+      "bytes": 167396,
+      "sha256": "02d87055fa05108a1214a84d5e6e811fab5fcdc19aec5663957c9b0eea70ec71"
+    },
+    "original-seal-v1.json": {
+      "bytes": 22551,
+      "sha256": "159c8c8b7dcd00648be55625d0ef1faa376cfe71aea42ba66f950f9211910b33"
+    },
+    "fixture-pack-v1.json": {
+      "bytes": 1855,
+      "sha256": "452aa83e079692dc342e99c2abc0510081ddf63c1ebfaab67debad42e5133050"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0627687999949558,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "check",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.9173978000035277,
+      "log": {
+        "bytes": 901,
+        "sha256": "fbb9347ca832b6cf37f8c3fbdf8b45fc248efd388c016f0f6c471b30abd7e39b"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 16.76816770000005,
+      "log": {
+        "bytes": 21957,
+        "sha256": "3455fa511eb4e48c84cfcf52a70d75ce5fb6c04b58a0580ea9a2be7410c94b99"
+      },
+      "tests": {
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 30.248068499997316,
+      "log": {
+        "bytes": 21948,
+        "sha256": "f2f4797e9c31997a1e540f35aa36b35d06ea9e4b33628c765292aeec4e1c6f20"
+      },
+      "tests": {
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 2.2959149000016623,
+      "log": {
+        "bytes": 901,
+        "sha256": "9b67afe0ee439c593fda78447a9bc43684c8d1a8939b66f47f323577789766b7"
+      }
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.7251421000037226,
+      "log": {
+        "bytes": 181,
+        "sha256": "807634fddfa277f8b6c52fadbbf6caf56c6b0d537402f0105ce8b11123bb2914"
+      }
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 16.518552600005933,
+      "log": {
+        "bytes": 892,
+        "sha256": "ea8a09b74d47396a0d2a05df82801e713f3ecd5fe80d0bddf808d3888bd0d2d5"
+      }
+    },
+    {
+      "name": "audit",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 32.743304499999795,
+      "log": {
+        "bytes": 43235,
+        "sha256": "ebe09271ed25184e6388e022cc4f22e57905e6a4ed099d96e53c2fb87fa2126a"
+      }
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 36.0302606999976,
+      "log": {
+        "bytes": 378,
+        "sha256": "1156fd91bc202d305e960fc9b17785bbccf9cbd96d98982f6d564a276916fb5d"
+      }
+    },
+    {
+      "name": "release-check",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\c-enum-api-port\\target-windows-v1\\debug\\xtask.exe",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.006477000002632849,
+      "log": {
+        "bytes": 3323,
+        "sha256": "a26a3a14ece6df8a92f91d90fdcba1f0764e7e9d9fe8ee3e55871ae0278e11e7"
+      }
+    }
+  ],
+  "profiles": {
+    "debug": {
+      "ftype_cases": 73057,
+      "enum_name_cases": 9,
+      "parser_cases": 1542,
+      "pointer_suffix_cases": 43,
+      "source_assertions_checked": 30,
+      "additional_null_check": 1,
+      "original_exact_result": {
+        "bytes": 4320451,
+        "sha256": "ed78959b3c70c70016791fa16320e1f70bbec6c61c1240716d47ada8ab2b968c"
+      },
+      "source_exports": 191,
+      "extensions": 4,
+      "unexported": 64,
+      "library": {
+        "bytes": 4648960,
+        "sha256": "66704b2be622dd95ab391632307dd876e844f3dc4229d88aec373c6c972b2289"
+      }
+    },
+    "release": {
+      "ftype_cases": 73057,
+      "enum_name_cases": 9,
+      "parser_cases": 1542,
+      "pointer_suffix_cases": 43,
+      "source_assertions_checked": 30,
+      "additional_null_check": 1,
+      "original_exact_result": {
+        "bytes": 4320451,
+        "sha256": "ed78959b3c70c70016791fa16320e1f70bbec6c61c1240716d47ada8ab2b968c"
+      },
+      "source_exports": 191,
+      "extensions": 4,
+      "unexported": 64,
+      "library": {
+        "bytes": 2040832,
+        "sha256": "2940916042ddcca163ef58d3e5b268dd0da82fb1e155b22252b8b3203de76634"
+      }
+    }
+  },
+  "open_gate_rows": 20,
+  "oracle_projection_after": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "execution_inputs_after": {
+    "files": 980,
+    "sha256": "1f425268ed3fe9c3e4623221519bd2f535070b8c95952510478f88d62927539b"
+  },
+  "finished_utc": "2026-11-09T22:24:47.149527+00:00"
+}

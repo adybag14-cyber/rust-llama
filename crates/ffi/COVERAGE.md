@@ -2,18 +2,24 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **187**, leaves
-**68 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **191**, leaves
+**64 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md and SPLITS.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md and ENUMS.md.
 
 Current debug/release PE and ELF export tables are checked against the original
-255-symbol inventory. The explicit-split checkpoint adds only
-`llama_model_load_from_splits`, `llama_split_path` and `llama_split_prefix`.
-Its exact library identities, C caller results and complete symbol sets are
-recorded in `evidence/2026-11-09/c-split-api`. No absent function is represented
-by a placeholder export. Symbol presence does not close all behavioral or
-platform requirements.
+255-symbol inventory. The static enum-helper checkpoint adds only
+`llama_ftype_name`, `llama_flash_attn_type_name`, `llama_load_mode_name` and
+`llama_load_mode_from_str`. Its independent native results and complete symbol
+sets are recorded in `evidence/2026-11-09/c-enum-api`. Descriptive helper
+availability does not enable an execution, quantizer or loading mode.
+
+The explicit-split checkpoint added `llama_model_load_from_splits`,
+`llama_split_path` and `llama_split_prefix`, reaching 187 source exports and
+four extensions. Its retained C caller evidence is in
+`evidence/2026-11-09/c-split-api`. No absent function is represented by a
+placeholder export. Symbol presence does not close all behavioral or platform
+requirements.
 
 The earlier native microbatch/flash checkpoint retained 184 source C exports
 and the same four extensions. It expanded existing context, worker, decode
@@ -37,8 +43,10 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_copy_state_data` |
 | `llama_decode` |
 | `llama_detokenize` |
+| `llama_flash_attn_type_name` |
 | `llama_free` |
 | `llama_free_model` |
+| `llama_ftype_name` |
 | `llama_get_causal_attn` |
 | `llama_get_embeddings` |
 | `llama_get_embeddings_ith` |
@@ -48,6 +56,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_model` |
 | `llama_get_state_size` |
 | `llama_init_from_model` |
+| `llama_load_mode_from_str` |
+| `llama_load_mode_name` |
 | `llama_load_model_from_file` |
 | `llama_load_session_file` |
 | `llama_max_devices` |
@@ -253,8 +263,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_chat_builtin_templates` |
 | `llama_detach_threadpool` |
 | `llama_encode` |
-| `llama_flash_attn_type_name` |
-| `llama_ftype_name` |
 | `llama_get_embeddings_seq` |
 | `llama_get_sampled_candidates_count_ith` |
 | `llama_get_sampled_candidates_ith` |
@@ -263,8 +271,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_sampled_probs_count_ith` |
 | `llama_get_sampled_probs_ith` |
 | `llama_get_sampled_token_ith` |
-| `llama_load_mode_from_str` |
-| `llama_load_mode_name` |
 | `llama_log_get` |
 | `llama_log_set` |
 | `llama_model_cls_label` |
@@ -295,4 +301,3 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_set_adapters_lora` |
 | `llama_set_sampler` |
 | `llama_set_warmup` |
-

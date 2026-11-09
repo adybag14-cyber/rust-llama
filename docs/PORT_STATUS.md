@@ -14,7 +14,7 @@ The merged workspace has local path dependencies. Optional OS/driver/vendor inte
 
 | Track | Current implementation and evidence | Requirements still open |
 | --- | --- | --- |
-| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 187/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 68 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
+| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 191/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 64 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
 | T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 76 executable operation IDs plus NONE leaves, including the checked shared CPU FLASH_ATTN_EXT adapter; the earlier 3,240-graph corpus remains preserved. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
 | T04: formats/conversion/tokenizers | Bounded shared raw/text GGUF v2/v3 reader, native byte/NUL alias and nonzero-boolean semantics, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, byte-preserving ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, raw/indexed Safetensors reading with retained capabilities, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Architecture checkpoint conversion; arbitrary-byte metadata across every high-level model/vocabulary consumer; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
@@ -301,8 +301,8 @@ The source audit checks implementation roles and dependency metadata; it reports
 
 ## Explicit C split lists and byte-oriented filename helpers
 
-The public C surface now contains 187 of the 255 frozen exports, plus the same
-four diagnostic/layout extensions; 68 source exports remain unavailable.
+At the explicit-split checkpoint the public C surface contained 187 of the
+255 frozen exports, plus four diagnostic/layout extensions, with 68 absent.
 `llama_model_load_from_splits` uses the existing owned GGUF file-set loader and
 the current C model execution/vocabulary contracts. It retains every supplied
 path before foreign progress callbacks, accepts raw Unix path bytes, and uses
@@ -333,3 +333,25 @@ Twenty mandatory full-port release gates remain open across twelve ownership
 tracks. Complete C ABI semantics, architectures, backends, platform coverage
 and performance remain open. Earlier evidence and release-gate reason records
 are retained with their original checkpoint counts.
+
+## Static C enum names and load-mode parsing
+
+The public C surface contains 191 of 255 frozen functions and four diagnostic
+extensions; 64 functions remain unavailable. This checkpoint adds
+`llama_ftype_name`, `llama_flash_attn_type_name`, `llama_load_mode_name` and
+`llama_load_mode_from_str` as native Rust static helpers. Returning a mode name
+does not enable that model-loading strategy or backend.
+
+Original MSVC/GNU captures agree on all 73,057 file-type inputs, nine valid
+enum-name inputs, 1,542 byte-string parser inputs and 43 guessed-prefix pointer
+relationships. The file-type corpus contains 76 distinct result strings and
+covers all unsigned 16-bit inputs, signed boundaries and additional 32-bit
+flags and samples. Inputs stop at their first NUL without requiring UTF-8.
+The source's 30 separately captured abort cases return checked Rust errors;
+a null parser input is an additional checked foreign-pointer boundary.
+
+`crates/ffi/ENUMS.md` documents ownership, diagnostic sentinels and the exact
+scope. `fixtures/ffi/enums` contains independently captured expected values;
+`evidence/2026-11-09/c-enum-api` records the validation provenance. Earlier
+checkpoint counts and evidence remain historical. All twenty complete-port
+release gates remain open.

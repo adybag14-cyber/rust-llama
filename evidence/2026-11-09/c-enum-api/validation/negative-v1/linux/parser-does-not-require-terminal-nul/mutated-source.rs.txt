@@ -1,0 +1,276 @@
+//! Static descriptive helpers from the frozen public C ABI.
+//! Names are borrowed process-lifetime C strings, independent of model loading.
+use crate::*;
+
+const GUESSED: i32 = 1024;
+const GUESSED_PREFIX_BYTES: usize = 10;
+
+ffi!(
+    llama_ftype_name(ftype: i32) -> *const c_char,
+    ptr::null(),
+    {
+        let name = match ftype & !GUESSED {
+            0 => c"(guessed) all F32",
+            1 => c"(guessed) F16",
+            2 => c"(guessed) Q4_0",
+            3 => c"(guessed) Q4_1",
+            7 => c"(guessed) Q8_0",
+            8 => c"(guessed) Q5_0",
+            9 => c"(guessed) Q5_1",
+            10 => c"(guessed) Q2_K - Medium",
+            11 => c"(guessed) Q3_K - Small",
+            12 => c"(guessed) Q3_K - Medium",
+            13 => c"(guessed) Q3_K - Large",
+            14 => c"(guessed) Q4_K - Small",
+            15 => c"(guessed) Q4_K - Medium",
+            16 => c"(guessed) Q5_K - Small",
+            17 => c"(guessed) Q5_K - Medium",
+            18 => c"(guessed) Q6_K",
+            19 => c"(guessed) IQ2_XXS - 2.0625 bpw",
+            20 => c"(guessed) IQ2_XS - 2.3125 bpw",
+            21 => c"(guessed) Q2_K - Small",
+            22 => c"(guessed) IQ3_XS - 3.3 bpw",
+            23 => c"(guessed) IQ3_XXS - 3.0625 bpw",
+            24 => c"(guessed) IQ1_S - 1.5625 bpw",
+            25 => c"(guessed) IQ4_NL - 4.5 bpw",
+            26 => c"(guessed) IQ3_S - 3.4375 bpw",
+            27 => c"(guessed) IQ3_S mix - 3.66 bpw",
+            28 => c"(guessed) IQ2_S - 2.5 bpw",
+            29 => c"(guessed) IQ2_M - 2.7 bpw",
+            30 => c"(guessed) IQ4_XS - 4.25 bpw",
+            31 => c"(guessed) IQ1_M - 1.75 bpw",
+            32 => c"(guessed) BF16",
+            36 => c"(guessed) TQ1_0 - 1.69 bpw ternary",
+            37 => c"(guessed) TQ2_0 - 2.06 bpw ternary",
+            38 => c"(guessed) MXFP4 MoE",
+            39 => c"(guessed) NVFP4",
+            40 => c"(guessed) Q1_0",
+            41 => c"(guessed) Q2_0",
+            42 => c"(guessed) F8_E4M3",
+            _ => c"(guessed) unknown, may not work",
+        };
+        Ok(if ftype & GUESSED != 0 {
+            name.as_ptr()
+        } else {
+            name.to_bytes_with_nul()[GUESSED_PREFIX_BYTES..]
+                .as_ptr()
+                .cast()
+        })
+    }
+);
+
+ffi!(
+    llama_flash_attn_type_name(flash_attn_type: i32) -> *const c_char,
+    ptr::null(),
+    {
+        Ok(match flash_attn_type {
+            -1 => c"auto",
+            0 => c"disabled",
+            1 => c"enabled",
+            _ => return Err("unknown flash attention type".into()),
+        }
+        .as_ptr())
+    }
+);
+
+ffi!(
+    llama_load_mode_name(load_mode: i32) -> *const c_char,
+    ptr::null(),
+    {
+        Ok(match load_mode {
+            -1 => c"auto",
+            0 => c"none",
+            1 => c"mmap",
+            2 => c"mlock",
+            3 => c"mmap+mlock",
+            4 => c"dio",
+            _ => return Err("unknown model load mode".into()),
+        }
+        .as_ptr())
+    }
+);
+
+ffi!(
+    llama_load_mode_from_str(input: *const c_char) -> i32,
+    i32::MIN,
+    {
+        if input.is_null() {
+            return Err("null model load mode string".into());
+        }
+        for (name, value) in [
+            (c"auto", -1),
+            (c"none", 0),
+            (c"mmap", 1),
+            (c"mlock", 2),
+            (c"mmap+mlock", 3),
+            (c"dio", 4),
+        ] {
+            // Match the source's strcmp order without allocating or scanning an
+            // arbitrarily long unknown string. Each comparison includes the NUL.
+            // A short input ends at its first mismatch, so no byte past its NUL
+            // is read. At most eleven bytes are read from a longer input.
+            let matches = name
+                .to_bytes()
+                .iter()
+                .enumerate()
+                .all(|(index, &expected)| {
+                    // SAFETY: the caller provides a live NUL-terminated string.
+                    // Earlier comparisons in this iterator matched non-NUL bytes.
+                    unsafe { input.cast::<u8>().add(index).read() == expected }
+                });
+            if matches {
+                return Ok(value);
+            }
+        }
+        Err("unknown model load mode string".into())
+    }
+);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn bytes(hex: &str) -> Vec<u8> {
+        assert!(hex.len().is_multiple_of(2));
+        hex.as_bytes()
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect()
+    }
+    unsafe fn returned(pointer: *const c_char) -> &'static [u8] {
+        assert!(!pointer.is_null());
+        // SAFETY: these helpers return immutable process-lifetime C strings.
+        unsafe { CStr::from_ptr(pointer) }.to_bytes()
+    }
+    fn clear() {
+        unsafe { llama_rust_clear_error() };
+    }
+    fn has_error() -> bool {
+        !unsafe { CStr::from_ptr(llama_rust_last_error()) }
+            .to_bytes()
+            .is_empty()
+    }
+
+    #[test]
+    fn original_file_type_names_include_guessed_bits_and_unknown_values() {
+        let mut count = 0;
+        let mut distinct = std::collections::BTreeSet::new();
+        for row in include_str!("../../../fixtures/ffi/enums/ftype.tsv")
+            .lines()
+            .skip(1)
+        {
+            let (input, expected) = row.split_once('\t').unwrap();
+            let input: i32 = input.parse().unwrap();
+            let expected = bytes(expected);
+            clear();
+            let actual = unsafe { llama_ftype_name(input) };
+            assert_eq!(unsafe { returned(actual) }, expected, "ftype {input}");
+            assert_eq!(unsafe { llama_ftype_name(input) }, actual);
+            assert!(!has_error());
+            distinct.insert(expected);
+            count += 1;
+        }
+        assert_eq!((count, distinct.len()), (73_057, 76));
+    }
+
+    #[test]
+    fn original_enum_names_and_byte_load_modes() {
+        let mut names = 0;
+        for row in include_str!("../../../fixtures/ffi/enums/names.tsv")
+            .lines()
+            .skip(1)
+        {
+            let columns: Vec<_> = row.split('\t').collect();
+            assert_eq!(columns.len(), 3);
+            let input: i32 = columns[1].parse().unwrap();
+            let function = match columns[0] {
+                "flash_attn_type" => llama_flash_attn_type_name,
+                "load_mode" => llama_load_mode_name,
+                _ => panic!("unknown original name function"),
+            };
+            clear();
+            let actual = unsafe { function(input) };
+            assert_eq!(unsafe { returned(actual) }, bytes(columns[2]));
+            assert_eq!(unsafe { function(input) }, actual);
+            assert!(!has_error());
+            names += 1;
+        }
+        let mut strings = 0;
+        for row in include_str!("../../../fixtures/ffi/enums/load-mode-strings.tsv")
+            .lines()
+            .skip(1)
+        {
+            let (input, expected) = row.split_once('\t').unwrap();
+            let mut input = bytes(input);
+            input.push(0);
+            clear();
+            assert_eq!(
+                unsafe { llama_load_mode_from_str(input.as_ptr().cast()) },
+                expected.parse::<i32>().unwrap()
+            );
+            assert!(!has_error());
+            strings += 1;
+        }
+        assert_eq!((names, strings), (9, 1542));
+    }
+
+    #[test]
+    fn original_guessed_names_share_the_static_suffix_pointer() {
+        let mut count = 0;
+        for row in include_str!("../../../fixtures/ffi/enums/suffix-pointers.tsv")
+            .lines()
+            .skip(1)
+        {
+            let columns: Vec<_> = row.split('\t').collect();
+            assert_eq!(columns.len(), 4);
+            let input: i32 = columns[0].parse().unwrap();
+            let plain = unsafe { llama_ftype_name(input) };
+            let guessed = unsafe { llama_ftype_name(input | GUESSED) };
+            assert_eq!(
+                plain as usize - guessed as usize,
+                columns[1].parse::<usize>().unwrap()
+            );
+            assert_eq!(unsafe { returned(plain) }, bytes(columns[2]));
+            assert_eq!(unsafe { returned(guessed) }, bytes(columns[3]));
+            count += 1;
+        }
+        assert_eq!(count, 43);
+    }
+
+    #[test]
+    fn original_abort_cases_and_null_string_are_checked() {
+        let mut count = 0;
+        for row in include_str!("../../../fixtures/ffi/enums/assertions.tsv")
+            .lines()
+            .skip(1)
+        {
+            let (operation, input) = row.split_once('\t').unwrap();
+            clear();
+            match operation {
+                "flash_attn_type" => {
+                    assert!(unsafe { llama_flash_attn_type_name(input.parse().unwrap()) }.is_null())
+                }
+                "load_mode" => {
+                    assert!(unsafe { llama_load_mode_name(input.parse().unwrap()) }.is_null())
+                }
+                "from_str" => {
+                    let mut input = bytes(input);
+                    input.push(0);
+                    assert_eq!(
+                        unsafe { llama_load_mode_from_str(input.as_ptr().cast()) },
+                        i32::MIN
+                    );
+                }
+                _ => panic!("unknown original abort function"),
+            }
+            assert!(has_error(), "{operation} {input}");
+            count += 1;
+        }
+        clear();
+        assert_eq!(unsafe { llama_load_mode_from_str(ptr::null()) }, i32::MIN);
+        assert!(has_error());
+        assert_eq!(count, 30);
+    }
+}

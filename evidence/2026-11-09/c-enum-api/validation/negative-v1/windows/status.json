@@ -1,0 +1,137 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T22:32:00.520463+00:00",
+  "execution_inputs": {
+    "files": 980,
+    "sha256": "1f425268ed3fe9c3e4623221519bd2f535070b8c95952510478f88d62927539b"
+  },
+  "protected_files": {
+    "validate-negative-v1.py": {
+      "bytes": 5766,
+      "sha256": "4ef6f81853e1b0a37e81412b52516fcc7fbcf053190aa0f7955ddfebf85a2476"
+    },
+    "validate-v1.py": {
+      "bytes": 14397,
+      "sha256": "7288d0c13c31981f65bda4bd7ee1de8396d52f56972df0de45430aafa283bb0a"
+    },
+    "validation\\v1\\windows\\status.json": {
+      "bytes": 7724,
+      "sha256": "c1ca686a5d66dbd5537966a5292e9f8d3ab6b768c3ff6a2fbd183ef8bf237a7c"
+    },
+    "freeze-v1\\status.json": {
+      "bytes": 885,
+      "sha256": "cf0be6812e721fe641db1edbcb09886c2d2e890e9a32e65bae4570ed327dd387"
+    },
+    "freeze-v1\\execution-inputs.json": {
+      "bytes": 167396,
+      "sha256": "02d87055fa05108a1214a84d5e6e811fab5fcdc19aec5663957c9b0eea70ec71"
+    }
+  },
+  "positive_libraries": {
+    "C:\\Users\\adyba\\rust-llama-reference\\c-enum-api-port\\target-windows-v1\\debug\\llama_ffi.dll": {
+      "bytes": 4648960,
+      "sha256": "66704b2be622dd95ab391632307dd876e844f3dc4229d88aec373c6c972b2289"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\c-enum-api-port\\target-windows-v1\\release\\llama_ffi.dll": {
+      "bytes": 2040832,
+      "sha256": "2940916042ddcca163ef58d3e5b268dd0da82fb1e155b22252b8b3203de76634"
+    }
+  },
+  "oracle_projection_before": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "mutations": [
+    {
+      "name": "guessed-bit-is-not-masked",
+      "test": "enum_names::tests::original_file_type_names_include_guessed_bits_and_unknown_values",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "enum_names::tests::original_file_type_names_include_guessed_bits_and_unknown_values",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit_code": 101,
+      "exit_code": 101,
+      "passed": true,
+      "one_selected_test_failed_after_successful_compilation": true,
+      "seconds": 8.36114649999945,
+      "before": {
+        "bytes": 9625,
+        "sha256": "befa6dc208f2572d57ec09edd63998f8797a5f0cf35595b7009e8551acb727d7"
+      },
+      "mutated": {
+        "bytes": 9614,
+        "sha256": "b65d9ddc9fbcea97c43967b46146242994ee21f24334668784123e62e9f147fe"
+      },
+      "log": {
+        "bytes": 2048,
+        "sha256": "b82e01fe9cf4aa687a09f71d2fc46f3910b6a4c31185fa1502d68856a358bdd7"
+      },
+      "clone_restored": true
+    },
+    {
+      "name": "parser-does-not-require-terminal-nul",
+      "test": "enum_names::tests::original_abort_cases_and_null_string_are_checked",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "enum_names::tests::original_abort_cases_and_null_string_are_checked",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit_code": 101,
+      "exit_code": 101,
+      "passed": true,
+      "one_selected_test_failed_after_successful_compilation": true,
+      "seconds": 3.940927499999816,
+      "before": {
+        "bytes": 9625,
+        "sha256": "befa6dc208f2572d57ec09edd63998f8797a5f0cf35595b7009e8551acb727d7"
+      },
+      "mutated": {
+        "bytes": 9616,
+        "sha256": "c230ca707ed86ec8b16f3a3d84b96460aa965fc84ef0ace1af5373caef3c2cf3"
+      },
+      "log": {
+        "bytes": 979,
+        "sha256": "8edb9b5321442d5e35aa7a392dc8effc78e5085524687aab95dfa50273ab30ac"
+      },
+      "clone_restored": true
+    }
+  ],
+  "oracle_projection_after": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "finished_utc": "2026-11-09T22:32:17.974323+00:00",
+  "original_source_fixtures_and_libraries_unchanged": true
+}

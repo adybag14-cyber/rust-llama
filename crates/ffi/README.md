@@ -10,6 +10,14 @@ workspace. No original llama/ggml library is linked or loaded by the product.
 Unavailable functions have no placeholder exports. The native reference DLL is
 used only by an external test process.
 
+## Static enum names and mode parsing
+
+`ENUMS.md` covers the four model-file-type, flash-attention and load-mode
+descriptive helpers. Returned names are immutable process-lifetime C strings.
+Load-mode parsing compares bytes exactly through the first NUL. Invalid names
+and null parser inputs produce checked diagnostics. Describing a load mode
+does not claim that the execution loader implements it.
+
 ## Frozen interface and compatibility checks
 
 The interface comes from `include/llama.h` in the original archive with SHA-256

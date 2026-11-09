@@ -1,0 +1,305 @@
+{
+  "status": "succeeded",
+  "platform": "linux",
+  "started_utc": "2026-11-09T22:25:01.989632+00:00",
+  "execution_inputs": {
+    "files": 980,
+    "sha256": "1f425268ed3fe9c3e4623221519bd2f535070b8c95952510478f88d62927539b"
+  },
+  "driver": {
+    "bytes": 14397,
+    "sha256": "7288d0c13c31981f65bda4bd7ee1de8396d52f56972df0de45430aafa283bb0a"
+  },
+  "oracle_projection_before": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "guarded_external_inputs": {
+    "validate-v1.py": {
+      "bytes": 14397,
+      "sha256": "7288d0c13c31981f65bda4bd7ee1de8396d52f56972df0de45430aafa283bb0a"
+    },
+    "freeze-v1/status.json": {
+      "bytes": 885,
+      "sha256": "cf0be6812e721fe641db1edbcb09886c2d2e890e9a32e65bae4570ed327dd387"
+    },
+    "freeze-v1/execution-inputs.json": {
+      "bytes": 167396,
+      "sha256": "02d87055fa05108a1214a84d5e6e811fab5fcdc19aec5663957c9b0eea70ec71"
+    },
+    "original-seal-v1.json": {
+      "bytes": 22551,
+      "sha256": "159c8c8b7dcd00648be55625d0ef1faa376cfe71aea42ba66f950f9211910b33"
+    },
+    "fixture-pack-v1.json": {
+      "bytes": 1855,
+      "sha256": "452aa83e079692dc342e99c2abc0510081ddf63c1ebfaab67debad42e5133050"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 4.7796938350002165,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "check",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 2.925448777998099,
+      "log": {
+        "bytes": 929,
+        "sha256": "9d320218036933284f77e560ff84e5793ddfdf22b90f8df42a05a8e2d273a6bf"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 14.986753394005063,
+      "log": {
+        "bytes": 21596,
+        "sha256": "da26b0da3e37603bc4fd70c5166d4fa08ff3b371840d789258a47a45ad9b6763"
+      },
+      "tests": {
+        "passed": 35,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 20.930704060003336,
+      "log": {
+        "bytes": 21588,
+        "sha256": "8666e99ed251bc81b0b9cc5f22c315397eb7f19c2b919eb8c38874b5c354c4a1"
+      },
+      "tests": {
+        "passed": 35,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 3.7289030679967254,
+      "log": {
+        "bytes": 929,
+        "sha256": "1c5e5ad0358955e036f5c5e71519ce42b80460d42cda2fc10dfdf56e1a9014f0"
+      }
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.9441924119964824,
+      "log": {
+        "bytes": 185,
+        "sha256": "773ac897efaecd11c28b2a4a920a50a4e98a6032f05a7b050f2a7fc30a10ab58"
+      }
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 12.361316686001373,
+      "log": {
+        "bytes": 920,
+        "sha256": "a9ad031a43b045ed26845d58b7bb9cd2d86f09e3b5391e09d4f21ecccd6c5441"
+      }
+    },
+    {
+      "name": "audit",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 24.509889054999803,
+      "log": {
+        "bytes": 43214,
+        "sha256": "0d6dd34738a98b2279cd5e71a3d76e7afda19dfe286bef11b17b93b5cc493ff3"
+      }
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 23.137895465995825,
+      "log": {
+        "bytes": 349,
+        "sha256": "fbee8c3f0a28c59e140004f3f63f6001f6072998d906ef4b934c96ef635d9e9e"
+      }
+    },
+    {
+      "name": "release-check",
+      "command": [
+        "/home/tdamre/.cache/rust-llama-c-enum-api-v1/debug/xtask",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.0132428209981299,
+      "log": {
+        "bytes": 3323,
+        "sha256": "a26a3a14ece6df8a92f91d90fdcba1f0764e7e9d9fe8ee3e55871ae0278e11e7"
+      }
+    }
+  ],
+  "profiles": {
+    "debug": {
+      "ftype_cases": 73057,
+      "enum_name_cases": 9,
+      "parser_cases": 1542,
+      "pointer_suffix_cases": 43,
+      "source_assertions_checked": 30,
+      "additional_null_check": 1,
+      "original_exact_result": {
+        "bytes": 4320451,
+        "sha256": "ed78959b3c70c70016791fa16320e1f70bbec6c61c1240716d47ada8ab2b968c"
+      },
+      "source_exports": 191,
+      "extensions": 4,
+      "unexported": 64,
+      "library": {
+        "bytes": 34441360,
+        "sha256": "d2573bf1b44c8260b634e3671f6690e360b7ad0c8a84b597731849898657e4de"
+      }
+    },
+    "release": {
+      "ftype_cases": 73057,
+      "enum_name_cases": 9,
+      "parser_cases": 1542,
+      "pointer_suffix_cases": 43,
+      "source_assertions_checked": 30,
+      "additional_null_check": 1,
+      "original_exact_result": {
+        "bytes": 4320451,
+        "sha256": "ed78959b3c70c70016791fa16320e1f70bbec6c61c1240716d47ada8ab2b968c"
+      },
+      "source_exports": 191,
+      "extensions": 4,
+      "unexported": 64,
+      "library": {
+        "bytes": 2376824,
+        "sha256": "f51dc8f9a2c4dde854eaf41c990503e935f3b962f8649f76ccd362e10351730a"
+      }
+    }
+  },
+  "open_gate_rows": 20,
+  "oracle_projection_after": {
+    "original_files": 132,
+    "original_inventory": {
+      "files": 132,
+      "sha256": "10baa0aadebd7337ea44c988f254688610d2a1f6c170332029f037da4fc2cf00"
+    },
+    "fixtures": 9,
+    "fixture_bytes": 4388505,
+    "all_outputs_reconstructed_from_original": true
+  },
+  "execution_inputs_after": {
+    "files": 980,
+    "sha256": "1f425268ed3fe9c3e4623221519bd2f535070b8c95952510478f88d62927539b"
+  },
+  "finished_utc": "2026-11-09T22:27:21.046220+00:00"
+}
