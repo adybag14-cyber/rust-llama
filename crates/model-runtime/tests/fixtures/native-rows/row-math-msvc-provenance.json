@@ -1,0 +1,45 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Actual original GGML F32 SiLU and scaled softmax graphs; one CPU thread, original padded-row views. No Rust result used.",
+  "platform": "msvc",
+  "cases": 198,
+  "float_outputs": 144666,
+  "file": {
+    "name": "row-math-msvc-reference.bin",
+    "bytes": 1203786,
+    "sha256": "eac3f988a994abc6d2a5fbc13ec52c6128a7fd88a47ff8f449f327f62ec0b0c5"
+  },
+  "sources": {
+    "tensor-oracle\\sse2-math\\generate_graphs.py": {
+      "bytes": 5006,
+      "sha256": "0eb46b007ac245e9cb7ea295e906667d22c802e533e7d5e7f9d4cdc4c7ef1483"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    }
+  },
+  "notes": [
+    "MSVC uses scalar expf; GNU's default SSE2 macro selects four-lane prefixes with scalar tails.",
+    "Widths straddle four-lane boundaries, with row padding, two batch axes, scaled softmax and masked/underflow ranges.",
+    "Softmax uses an explicit original GGML CONT node after its padded input view, because the source constructor requires contiguous input. The initial noncontiguous-construction assertion is preserved externally.",
+    "Softmax uses the source F64 reciprocal converted to F32 once, then F32 scaling.",
+    "No expected-value tolerance or Rust substitution is applied."
+  ]
+}

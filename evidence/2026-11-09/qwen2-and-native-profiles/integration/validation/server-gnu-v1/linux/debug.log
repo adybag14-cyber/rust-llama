@@ -1,0 +1,106 @@
+   Compiling llama-model-runtime v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/qwen2-integration-v1/rust-draft/crates/model-runtime)
+   Compiling llama-inference v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/qwen2-integration-v1/rust-draft/crates/inference)
+   Compiling llama-server v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/qwen2-integration-v1/rust-draft/crates/llama-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.89s
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/deps/llama_server-39a5ca7fed9590e4)
+
+running 19 tests
+test client::tests::html_text_is_escaped ... ok
+test http::tests::arbitrary_public_limits_cannot_overflow_and_bad_headers_write_nothing ... ok
+test http::tests::duplicate_query_and_bad_percent_are_errors ... ok
+test http::tests::enforces_limits_before_body_allocation ... ok
+test http::tests::rejects_smuggling_and_malformed_headers ... ok
+test runtime::tests::aliases_seed_and_temperature_never_silently_truncate ... ok
+test runtime::tests::invalid_stop_and_token_budgets_are_errors ... ok
+test runtime::tests::options_preserve_limits_stops_and_deterministic_seed ... ok
+test runtime::tests::unimplemented_sampling_and_message_options_are_rejected ... ok
+test http::tests::request_at_every_split_boundary ... ok
+test stream::tests::completed_replay_expires_but_active_does_not ... ok
+test stream::tests::queue_timeout_and_oversize_are_explicit ... ok
+test stream::tests::blocked_sender_observes_cancel_and_disconnect ... ok
+test stream::tests::replay_overflow_preserves_raw_suffix_and_absolute_offsets ... ok
+test stream::tests::replay_replacement_lookup_cancel_and_future_offset ... ok
+test stream::tests::sse_multiline_framing ... ok
+test stream::tests::utf8_decoder_handles_every_byte_boundary ... ok
+test stream::tests::concurrent_queue_never_exceeds_byte_budget ... ok
+test embedding::tests::normalization_matches_original_server_from_identical_native_raw_inputs ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/deps/llama_server-4d16c891adcf8067)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/embedding_http.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/deps/embedding_http-8dde79cdc189ea44)
+
+running 3 tests
+test pretrained_bert_matches_original_embedding_http_transcripts ... ignored, requires the hash-pinned BGE model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture
+Original embedding numeric conversions: 30 requests, 168 numeric comparisons, maximum absolute error 0
+test json_numeric_conversions_match_original_embedding_server ... ok
+Original embedding HTTP: 226 requests, 1498 numeric comparisons, 4 base64 vectors, maximum absolute error 0
+test tiny_bert_matches_original_embedding_http_transcripts ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.56s
+
+     Running tests/embedding_lifecycle.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/deps/embedding_lifecycle-504ca94ab9ebbc50)
+
+running 7 tests
+
+thread 'llama-inference-provider' (253485) panicked at crates/llama-server/tests/embedding_lifecycle.rs:72:28:
+test embedding provider panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test embedding_response_limits_are_transactional_and_release_admission ... ok
+thread 'llama-inference-provider' (253488) panicked at crates/llama-server/tests/embedding_lifecycle.rs:72:28:
+test embedding provider panic
+
+test embedding_disconnect_and_shutdown_cancel_held_requests ... ok
+test embedding_preflight_limits_do_not_admit_model_work ... ok
+test embedding_provider_failures_never_send_partial_success_json ... ok
+test disabled_embeddings_and_unavailable_models_fail_before_decoding ... ok
+test embedding_deadline_cancels_work_and_releases_capacity ... ok
+test explicit_model_load_bounds_reach_embedding_execution ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/tcp.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/deps/tcp-5bb7d130665f1f95)
+
+running 21 tests
+test malformed_framing_is_rejected_on_the_wire ... ok
+test disconnect_cancels_ordinary_stream_and_releases_admission ... ok
+test runtime_preflight_rejects_before_stream_or_replay_creation ... ok
+test simultaneous_generation_admission_is_bounded ... ok
+test streaming_chat_emits_role_deltas_finish_and_done ... ok
+
+thread 'llama-inference-provider' (253624) panicked at crates/llama-server/tests/tcp.rs:66:13:
+test-only provider panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_and_openai_completion_shapes_and_usage ... ok
+
+thread 'llama-inference-provider' (253635) panicked at crates/llama-server/tests/tcp.rs:66:13:
+test-only provider panic
+test completed_replay_returns_exact_byte_suffix_and_lookup_metadata ... ok
+test replay_survives_disconnect_then_resumes_and_explicit_delete_cancels ... ok
+test auth_cors_preflight_and_typed_failures ... ok
+test replay_overflow_is_explicit_and_delete_is_idempotent ... ok
+test provider_error_and_panic_are_typed_without_a_second_status_line ... ok
+test tokenizer_never_ignores_unimplemented_modes ... ok
+test connection_admission_limit_rejects_excess_socket ... ok
+test unavailable_binary_contract_over_tcp ... ok
+test invalid_json_unsupported_features_and_tokens_are_explicit ... ok
+test shutdown_interrupts_incomplete_request_without_waiting_full_timeout ... ok
+test template_endpoint_matches_independent_chatml_transcripts ... ok
+test disconnected_replay_generation_still_has_an_absolute_deadline ... ok
+test nonstream_deadline_always_returns_a_complete_gateway_timeout ... ok
+test slow_drip_cannot_extend_absolute_request_deadline ... ok
+test slow_network_reader_applies_backpressure_with_a_bounded_wait ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running unittests examples/verify_model_server.rs (/home/tdamre/.cache/rust-llama-qwen2-integration-v1/debug/examples/verify_model_server-07608375b4386903)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

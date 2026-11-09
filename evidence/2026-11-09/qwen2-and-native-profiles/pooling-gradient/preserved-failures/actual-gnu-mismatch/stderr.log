@@ -1,0 +1,26 @@
+   Compiling llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-oracle\row-policy\rust-draft\crates\tensor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests\backward_nan.rs (target\debug\deps\backward_nan-0f092b4624320f4e.exe)
+     Running tests\row_policy.rs (target\debug\deps\row_policy-b643df2c0ec9e058.exe)
+   Compiling llama-tensor v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/tensor-oracle/row-policy/rust-draft/crates/tensor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.79s
+     Running tests/backward_nan.rs (/tmp/rust-llama-tensor-row-policy/debug/deps/backward_nan-bfa74d9bba4dce6f)
+
+thread 'native_overlapping_pool_gradients_preserve_nan_payload_order' (267138) panicked at crates/tensor/tests/backward_nan.rs:150:5:
+assertion `left == right` failed: pool_back_distinct_nan_1_0: 11 differing values (0 finite); index 1: Rust [45, 23, c1, ff] (NaN), native [01, 00, c0, 7f] (NaN)
+pool_back_distinct_nan_1_1: 9 differing values (0 finite); index 1: Rust [34, 12, e0, 7f] (NaN), native [45, 23, c1, ff] (NaN)
+pool_back_distinct_nan_1_2: 7 differing values (0 finite); index 1: Rust [78, 56, e0, ff] (NaN), native [34, 12, e0, 7f] (NaN)
+pool_back_distinct_nan_1_3: 6 differing values (0 finite); index 1: Rust [67, 45, c3, 7f] (NaN), native [78, 56, e0, ff] (NaN)
+pool_back_distinct_nan_1_4: 4 differing values (0 finite); index 1: Rust [89, 67, c5, ff] (NaN), native [67, 45, c3, 7f] (NaN)
+pool_back_distinct_nan_1_5: 2 differing values (0 finite); index 7: Rust [01, 00, c0, 7f] (NaN), native [89, 67, c5, ff] (NaN)
+pool_back_distinct_nan_1_6: 5 differing values (0 finite); index 6: Rust [01, 00, c0, 7f] (NaN), native [00, 00, c0, ff] (NaN)
+pool_back_distinct_nan_1_7: 6 differing values (0 finite); index 6: Rust [45, 23, c1, ff] (NaN), native [01, 00, c0, 7f] (NaN)
+pool_back_distinct_nan_1_8: 7 differing values (0 finite); index 6: Rust [34, 12, e0, 7f] (NaN), native [45, 23, c1, ff] (NaN)
+pool_back_distinct_nan_1_9: 9 differing values (0 finite); index 2: Rust [45, 23, c1, ff] (NaN), native [01, 00, c0, 7f] (NaN)
+  left: 10
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p llama-tensor --test backward_nan`
+     Running tests/row_policy.rs (/tmp/rust-llama-tensor-row-policy/debug/deps/row_policy-c318e1a03b96a37e)
+error: 1 target failed:
+    `-p llama-tensor --test backward_nan`

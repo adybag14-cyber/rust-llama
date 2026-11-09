@@ -369,7 +369,7 @@ fn kv_suffix_truncation_matches_recomputed_prefix() {
 fn recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse() {
     let mut c = context(mamba());
     c.decode_batch(&batch(0, &[1, 2])).unwrap();
-    let checkpoint = c.checkpoint();
+    let checkpoint = c.checkpoint().unwrap();
     let state = c.save_state().unwrap();
     c.decode_batch(&[BatchToken::token(0, 2, 3)]).unwrap();
     assert!(matches!(
@@ -466,7 +466,7 @@ fn state_rejects_different_model_weights_or_adapters() {
     let mut c = context(llama());
     c.decode_batch(&batch(0, &[1])).unwrap();
     let bytes = c.save_state().unwrap();
-    let checkpoint = c.checkpoint();
+    let checkpoint = c.checkpoint().unwrap();
     let original = fixtures::tiny_llama().unwrap();
     let mut w = original.weights().clone();
     w.output_norm[0] += 0.25;
@@ -669,5 +669,5 @@ fn smoke_demo_is_real_execution_with_reproducible_state() {
     assert_eq!(report.llama_logits.len(), 7);
     assert_eq!(report.mamba_logits.len(), 7);
     assert_eq!(report.bert_mean_embedding.len(), 4);
-    assert_eq!(report.executable_f32_slices, 3);
+    assert_eq!(report.executable_f32_slices, 4);
 }

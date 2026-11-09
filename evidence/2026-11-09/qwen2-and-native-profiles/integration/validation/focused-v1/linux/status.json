@@ -1,0 +1,89 @@
+{
+  "status": "succeeded",
+  "platform": "linux",
+  "started_utc": "2026-11-09T16:20:52.721458+00:00",
+  "qualification": "Coherent Qwen/strict Context/source row arithmetic integration; NativeContext descriptor follow-up and original GNU HTTP captures are still pending, not a final checkpoint proof",
+  "inputs_before": {
+    "files": 549,
+    "sha256": "c580a3b1438898214880881cd330f71549f966aa3777ddeeae535758fea78b13"
+  },
+  "steps": [
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 18.171381103002204,
+      "tests": {
+        "passed": 96,
+        "failed": 0,
+        "ignored": 7
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 80.11874943599832,
+      "tests": {
+        "passed": 96,
+        "failed": 0,
+        "ignored": 7
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 5.033687818999169
+    }
+  ],
+  "inputs_after": {
+    "files": 549,
+    "sha256": "c580a3b1438898214880881cd330f71549f966aa3777ddeeae535758fea78b13"
+  },
+  "finished_utc": "2026-11-09T16:22:50.393476+00:00"
+}

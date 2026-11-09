@@ -1,3 +1,4 @@
+use llama_inference::LoadOptions;
 use llama_server::{
     EmbeddingOptions, InferenceProvider, Pooling, ProviderStatus, RuntimeProvider, Server,
     ServerConfig, UnavailableProvider,
@@ -36,6 +37,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut model_path: Option<PathBuf> = None;
     let mut embeddings = false;
     let mut embedding_options = EmbeddingOptions::default();
+    let mut load_options = LoadOptions::default();
     let mut args = std::env::args_os().skip(1);
     while let Some(arg) = args.next() {
         let arg = arg
@@ -44,7 +46,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         match arg {
             "--help" | "-h" => {
                 println!(
-                    "Rust llama-server\n\nUsage: llama-server [--model PATH.gguf] [--bind 127.0.0.1:8080]\n                    [--api-key KEY] [--allow-origin ORIGIN]\n                    [--max-connections N] [--max-generations N]\n                    [--embeddings] [--pooling model|none|mean|cls|last]\n                    [--embd-normalize N] [--max-embedding-inputs N]\n\n--model / -m loads an explicitly supported GGUF with the Rust CPU runtime.\nLoad failures stop startup; unsupported model features are reported explicitly.\nWithout --model, health and generation report HTTP 503.\nGeneration supports temperature, explicit u32 seed, token limit and stop strings.\nAn omitted seed is 0; the ambient-random seed sentinel is not implemented.\n--embeddings enables embedding routes on supported models.\nPooled embeddings use normalization 2 (Euclidean) by default; unpooled vectors remain raw.\nNative routes preserve token-level vectors; /v1/embeddings requires pooling.\nThe server stays running until stdin receives 'quit' or the process exits.\nTLS and the full original protocol/CLI surface are not yet implemented."
+                    "Rust llama-server\n\nUsage: llama-server [--model PATH.gguf] [--bind 127.0.0.1:8080]\n                    [--api-key KEY] [--allow-origin ORIGIN]\n                    [--max-connections N] [--max-generations N]\n                    [--ctx-size N] [--max-weight-mib N]\n                    [--embeddings] [--pooling model|none|mean|cls|last]\n                    [--embd-normalize N] [--max-embedding-inputs N]\n\n--model / -m loads an explicitly supported GGUF with the Rust CPU runtime.\nLoad failures stop startup; unsupported model features are reported explicitly.\n--ctx-size / -c bounds the context (default 1024, capped at the training context).\n--max-weight-mib bounds the decoded F32 weight cache (default 2048 MiB).\nPacked weights and runtime state are additional allocations, outside that weight budget.\nWithout --model, health and generation report HTTP 503.\nGeneration supports temperature, explicit u32 seed, token limit and stop strings.\nAn omitted seed is 0; the ambient-random seed sentinel is not implemented.\n--embeddings enables embedding routes on supported models.\nPooled embeddings use normalization 2 (Euclidean) by default; unpooled vectors remain raw.\nNative routes preserve token-level vectors; /v1/embeddings requires pooling.\nThe server stays running until stdin receives 'quit' or the process exits.\nTLS and the full original protocol/CLI surface are not yet implemented."
                 );
                 return Ok(());
             }
@@ -53,6 +55,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                     return Err("--model may be supplied only once".into());
                 }
                 model_path = Some(PathBuf::from(next_value(&mut args, arg)?));
+            }
+            "--ctx-size" | "-c" => {
+                load_options.context_length = text_value(&mut args, arg)?.parse()?;
+            }
+            "--max-weight-mib" => {
+                let mib: usize = text_value(&mut args, arg)?.parse()?;
+                load_options.max_decoded_weight_bytes = mib
+                    .checked_mul(1024 * 1024)
+                    .ok_or("--max-weight-mib exceeds the addressable byte range")?;
             }
             "--embeddings" | "--embedding" => embeddings = true,
             "--pooling" => {
@@ -90,7 +101,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
     let provider: Arc<dyn InferenceProvider> = match model_path {
         Some(path) => {
-            let mut provider = RuntimeProvider::load(&path)?;
+            let mut provider = RuntimeProvider::load_with_options(&path, &load_options)?;
             if embeddings {
                 provider = provider.with_embeddings(embedding_options)?;
             }

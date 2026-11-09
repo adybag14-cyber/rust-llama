@@ -1,0 +1,135 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T17:29:10.905285+00:00",
+  "base_commit": "6ddeb75eb3b708ace4cb48a365030f94a30192f3",
+  "qualification": "Focused combined tensor verification after the six-file overlapping backward-pool correction; full-v1 remains the separate complete-workspace/pretrained base run. The native comparison module is now gated to measured x86_64 MSVC/GNU targets.",
+  "execution_inputs_before": {
+    "files": 572,
+    "sha256": "faf38b62cab6b455fe1267501d3b8a41ed3a944a619af58d1dc40112fa97d083"
+  },
+  "driver_sha256": "6312665aeda0389b6391516d10f8dc9435ad71ed141717fccb2b662e6c50f0dd",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.360898899998574,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 4.388568500002293,
+      "log_sha256": "80a9192718181f304146d9fe1c8a4e4b0fbe50158d2b49257ef3d29dc61bf2ce",
+      "tests": {
+        "passed": 26,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 7
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "-p",
+        "llama-tensor",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 41.209792599998764,
+      "log_sha256": "93a22772d7fa6ec86b243f1d353ba0187cdf72335e9706f01da6badaf784f80a",
+      "tests": {
+        "passed": 26,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 7
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-tensor",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3001852999987022,
+      "log_sha256": "2fcfe6659fab8b27e549f575f07586cc6b4253cdcbb56570a731c973405af8ee"
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 12.841033100001368,
+      "log_sha256": "1b19c172194dcf8fef071d21d16ff6b29270c796e683e97a9e36c25df4199551"
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 12.805150300002424,
+      "log_sha256": "9527b236958c34874993abf3e438c5cb7b844597241daaf0bc8c090d658f6e36"
+    }
+  ],
+  "execution_inputs_after": {
+    "files": 572,
+    "sha256": "faf38b62cab6b455fe1267501d3b8a41ed3a944a619af58d1dc40112fa97d083"
+  },
+  "finished_utc": "2026-11-09T17:30:30.967264+00:00"
+}

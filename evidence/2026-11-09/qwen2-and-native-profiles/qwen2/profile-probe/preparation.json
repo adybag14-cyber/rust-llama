@@ -1,0 +1,67 @@
+{
+  "created_utc": "2026-11-09T15:56:24.826243+00:00",
+  "base_reviewed_qwen_fingerprint": "ebbf6560550a32c6545a99796a4e6216b0c0173b0d9c5a2d2d763b9fc2dd2ab3",
+  "changes": [
+    "snapshot stable shared padded-attention and whole-row math",
+    "preserve reviewed Qwen NeoX RoPE",
+    "run whole Qwen FFN SiLU row"
+  ],
+  "expected_data": "Unmodified independent native captures per compiler profile",
+  "preparation_retry": {
+    "first_failure": "AssertionError: old Multi-head attention documentation marker absent in new shared math; copy had completed, no source edits or evaluation yet",
+    "correction": "Insert preserved rope function after verified native_rows module declaration",
+    "expected_data_changes": false
+  },
+  "inputs": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\model-runtime\\src\\math.rs",
+      "bytes": 21871,
+      "sha256": "2cb8b2b291d15a3dc76c2a6062733fe9df50c21aff3fc78bc9db7eadff9fb3f1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\model-runtime\\src\\math\\native_rows.rs",
+      "bytes": 5241,
+      "sha256": "d23cff15f3583ec1dcbf2cda3c2140fddcb7e079f3f7cb73146f4026079ca81b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-draft\\crates\\model-runtime\\src\\math.rs",
+      "bytes": 22452,
+      "sha256": "8498c29ad10b8688479ee94a0376c6862b649824d15c76161f4f842695d5ba5e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-draft\\crates\\model-runtime\\src\\math\\native_rows.rs",
+      "bytes": 5241,
+      "sha256": "d23cff15f3583ec1dcbf2cda3c2140fddcb7e079f3f7cb73146f4026079ca81b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-draft\\crates\\model-runtime\\src\\qwen2.rs",
+      "bytes": 15274,
+      "sha256": "d87be80dc22d048ca2af9386580dffd6674eb8b44eed380f4ffe21fc141708c2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-probe\\Cargo.toml",
+      "bytes": 299,
+      "sha256": "dedb6cad0369dce8a34a7575a6f9505f35f3d7f31c4b1b23fa2c83abc80c98b8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-probe\\Cargo.lock",
+      "bytes": 832,
+      "sha256": "6a951124f7c3a19c5b96197f2e8169cd55359dfb0918d887b43033bd09145a5c"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\profile-probe\\src\\main.rs",
+      "bytes": 4081,
+      "sha256": "b0c81adfa31d6e55246fd709b668a8003ad35b86879b2f27c1c5e80cc28fe0d6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\qwen-gnu-v1\\qwen2.native.json",
+      "bytes": 108626907,
+      "sha256": "3b4e45fb7a677c7e91bf1debe9a3be820e2b7398ad72f7b6b3cf0cdd9db233d3"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\qwen2-inference-oracle\\native.json",
+      "bytes": 108652054,
+      "sha256": "1ccf73c61c165861c2d619fd602c3ffd1cd66f5ebd24080305fce7243da481a1"
+    }
+  ]
+}

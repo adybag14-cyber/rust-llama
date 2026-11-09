@@ -1,4 +1,4 @@
-//! Owned Llama, Mamba-1 and BERT execution in native Rust.
+//! Owned Llama, Qwen2, Mamba-1 and BERT execution in native Rust.
 //!
 //! Dense and packed quantized matrix paths execute source-derived equations.
 //! The strict sequential Context API and the separately bounded NativeContext
@@ -15,6 +15,7 @@ pub mod fixtures;
 pub mod llama;
 pub mod mamba;
 pub mod math;
+pub mod qwen2;
 pub mod registry;
 mod state;
 
@@ -28,6 +29,7 @@ pub use fixtures::{SmokeReport, smoke_demo};
 pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
 pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
 pub use math::Matrix;
+pub use qwen2::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
 
 use std::fmt;
 
@@ -86,54 +88,63 @@ impl std::error::Error for Error {}
 pub enum Model {
     Llama(LlamaModel),
     Mamba(MambaModel),
+    Qwen2(Qwen2Model),
 }
 impl Model {
     pub fn architecture(&self) -> &'static registry::Architecture {
         match self {
             Self::Llama(_) => &registry::ARCHITECTURES[1],
             Self::Mamba(_) => &registry::ARCHITECTURES[60],
+            Self::Qwen2(_) => &registry::ARCHITECTURES[24],
         }
     }
     pub fn width(&self) -> usize {
         match self {
             Self::Llama(m) => m.config().width,
             Self::Mamba(m) => m.config().width,
+            Self::Qwen2(m) => m.config().width,
         }
     }
     pub fn vocabulary(&self) -> usize {
         match self {
             Self::Llama(m) => m.config().vocabulary,
             Self::Mamba(m) => m.config().vocabulary,
+            Self::Qwen2(m) => m.config().vocabulary,
         }
     }
     pub fn max_context(&self) -> usize {
         match self {
             Self::Llama(m) => m.config().max_context,
             Self::Mamba(m) => m.config().max_context,
+            Self::Qwen2(m) => m.config().max_context,
         }
     }
     pub fn layer_count(&self) -> usize {
         match self {
             Self::Llama(m) => m.layer_count(),
             Self::Mamba(m) => m.layer_count(),
+            Self::Qwen2(m) => m.layer_count(),
         }
     }
     pub fn fingerprint(&self) -> u64 {
         match self {
             Self::Llama(m) => m.fingerprint(),
             Self::Mamba(m) => m.fingerprint(),
+            Self::Qwen2(m) => m.fingerprint(),
         }
     }
     pub fn weight(&self, name: &str) -> Option<&Matrix> {
         match self {
             Self::Llama(m) => m.weight(name),
             Self::Mamba(m) => m.weight(name),
+            Self::Qwen2(m) => m.weight(name),
         }
     }
     pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
         match self {
             Self::Llama(m) => m.embedding(token),
             Self::Mamba(m) => m.embedding(token),
+            Self::Qwen2(m) => m.embedding(token),
         }
     }
 }

@@ -1,7 +1,7 @@
 //! Transport failure and lifecycle tests for embedding work. The controlled
 //! provider is test code; model/numeric parity is covered in embedding_http.rs.
 use llama_behavior::json::{self, Value};
-use llama_inference::Model;
+use llama_inference::{LoadOptions, Model};
 use llama_server::*;
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream};
@@ -370,4 +370,49 @@ fn embedding_disconnect_and_shutdown_cancel_held_requests() {
         assert!(json::parse(body).unwrap().get("error").is_some());
     }
     assert_eq!(provider.cancelled.load(Ordering::SeqCst), 2);
+}
+
+#[test]
+fn explicit_model_load_bounds_reach_embedding_execution() {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../fixtures/inference/tiny-bert-missing-pooling.gguf");
+    let decoded = Model::load(&path).unwrap().decoded_weight_bytes();
+    let mut options = LoadOptions {
+        max_decoded_weight_bytes: decoded - 1,
+        context_length: 2,
+    };
+    let error = match RuntimeProvider::load_with_options(&path, &options) {
+        Ok(_) => panic!("a model larger than the configured weight budget became ready"),
+        Err(error) => error,
+    };
+    assert!(error.to_string().contains("budget"), "{error}");
+    options.max_decoded_weight_bytes = decoded;
+    let provider = RuntimeProvider::load_with_options(&path, &options)
+        .unwrap()
+        .with_embeddings(EmbeddingOptions {
+            pooling: Some(Pooling::Mean),
+            ..EmbeddingOptions::default()
+        })
+        .unwrap();
+    assert_eq!(provider.embedding_info().unwrap().context_length, 2);
+    let server = Server::new(config(), Arc::new(provider))
+        .unwrap()
+        .spawn()
+        .unwrap();
+    assert_eq!(
+        post(server.local_addr(), "/v1/embeddings", r#"{"input":[1,2]}"#).0,
+        200
+    );
+    assert_eq!(
+        post(
+            server.local_addr(),
+            "/v1/embeddings",
+            r#"{"input":[1,2,3]}"#
+        )
+        .0,
+        400
+    );
+    server.shutdown().unwrap();
+    options.context_length = 0;
+    assert!(RuntimeProvider::load_with_options(&path, &options).is_err());
 }

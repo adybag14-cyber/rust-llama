@@ -15,10 +15,10 @@ The merged workspace has local path dependencies. Optional OS/driver/vendor inte
 | Track | Current implementation and evidence | Requirements still open |
 | --- | --- | --- |
 | T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 184/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 71 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
-| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 62 executable operation IDs plus NONE leaves and 1,252 distinct native graph cases. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
+| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 75 executable operation IDs plus NONE leaves and 2,233 distinct native graph cases. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
 | T04: formats/conversion/tokenizers | Bounded GGUF v2/v3 reader, tensor validation, little-endian writer, scalar endian conversion, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Checkpoint/Safetensors and sharded loading; all converters, metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
-| T05: models/runtime | Typed Llama/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
+| T05: models/runtime | Typed Llama/Qwen2/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Qwen2 GGUF executes pretrained Q4_K_M generation; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
 | T06: CUDA/HIP/MUSA | Rust driver interfaces and typed PTX generation; actual CUDA kernels including matvec, stride/broadcast/tail coverage; 138 recorded dispatches on RTX 4090. | Full tensor/backend scheduler integration, upstream operation and dtype coverage, memory/collective modes, optimized kernels; HIP and MUSA hardware execution/parity. |
 | T07: portable GPU | Typed kernel IR; generated OpenCL kernels executed on NVIDIA and AMD; Vulkan/other host foundations. | Complete Metal, Vulkan, OpenCL and WebGPU implementation; full compiler/device/OS matrix, scheduler integration and numerical/performance parity. |
 | T08: specialty/remote | Checked RPC 8.0.1 subset with transactional scalar graph execution; CBLAS interfaces, DSP ELF/SWIV and virtual-device utilities with explicit capability handling. | Complete BLAS, CANN, ET, SYCL, zDNN, Hexagon, ZenDNN, OpenVINO, RPC and VirtGPU backend semantics and actual required device/vendor testing. |
@@ -31,15 +31,15 @@ The tables and registries in the original plan retain the full scope. A missing 
 
 ## Pretrained inference findings
 
-The first end-to-end model is `stories260K.gguf`, SHA-256 `270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d`. The independent frozen llama API oracle uses one CPU thread, F32 KV and disabled flash attention. Six prompts produced 96 matching greedy tokens. The initial 62,976-logit comparison had maximum absolute error `1.764297485e-5`. Matching the source's F32 products with F64 accumulation now gives exact equality on Windows and maximum absolute error `5.722045898e-6` on Linux, within the unchanged predefined bound `2e-4 + 2e-5 * abs(reference)`.
+The first end-to-end model is `stories260K.gguf`, SHA-256 `270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d`. The independent frozen llama API oracle uses one CPU thread, F32 KV and disabled flash attention. Six prompts produced 96 matching greedy tokens. The initial 62,976-logit comparison had maximum absolute error `1.764297485e-5`. Matching the source's F32 products with F64 accumulation gave exact Windows equality and left a historical GNU difference of `5.722045898e-6`. The new matching-profile captures and physical attention-row correction now give exact equality on both verified targets. The predefined portable bound `2e-4 + 2e-5 * abs(reference)` is unchanged.
 
 The larger `stories15M-q4_0.gguf`, SHA-256 `66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739`, initially exposed a real bug: expanding all packed matrices to F32 preserved sixteen greedy tokens but changed logits by as much as `0.4481242895126343`. The corrected runtime retains packed weights, converts activations according to the source CPU trait, and evaluates integer block dots with the original scaling order. All 640,000 compared logits then matched the frozen Windows reference exactly. The report before the fix is retained beside the report after the fix.
 
-The F16 BGE-small BERT model, SHA-256 `f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999`, exposed a second real rounding issue. Input embeddings, normalization and Q/K/V projections were exact, but F32 attention accumulation differed from the scalar source's F64 sum. Those small differences crossed GELU table bins in later layers. Correcting attention and mean-pooling order yields exact Windows equality for all 13,056 compared values and all 122 captured diagnostic stages. Linux maximum error is `1.348853111e-4`, within the original fixed tolerance. A 12-layer independent attention fixture exercises 46,080 output values in ordinary tests. The before/after diagnosis remains recorded.
+The F16 BGE-small BERT model, SHA-256 `f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999`, exposed a second real rounding issue. Input embeddings, normalization and Q/K/V projections were exact, but F32 attention accumulation differed from the scalar source's F64 sum. Those small differences crossed GELU table bins in later layers. Correcting attention and mean-pooling order yields exact Windows equality for all 13,056 compared values and all 122 captured diagnostic stages. The earlier GNU comparison had maximum error `1.348853111e-4`, within the original fixed tolerance. Preserving the GNU source's four-lane variance order and comparing its separate native capture now gives exact equality. A 12-layer independent attention fixture exercises 46,080 output values in ordinary tests. The before/after diagnosis remains recorded.
 
 The equivalent big-endian BERT download is separately hash-pinned and produces the same expected results through the Rust reader. The frozen C reader rejects that opposite-endian file; this is reader validation against the equivalent little-endian native corpus, not a claim of original-reader support.
 
-Exact equality is recorded evidence for that exercised build and prompt. Portable tests retain the previously declared numerical tolerance because platform math libraries and ISA reduction orders can differ. These tests do not establish arbitrary quantized-format support or all-model quality parity.
+Exact equality is recorded evidence for the exercised build and prompt, against the corresponding original profile. Portable tests retain the previously declared numerical tolerance because platform math libraries and ISA reduction orders can differ. These tests do not establish arbitrary quantized-format support or all-model quality parity.
 
 The SPM corpus uses the original vocabulary-only fixture and verifies 68 cases, 312 pieces, parsing/insertion flags, byte fallback, whitespace and detokenization. WordPiece adds 1,728 native cases across nine metadata variants, all 30,522 original vocabulary entries and 72 special-token fallback cases. Unicode checks cover all 1,114,112 codepoints, 15,957 normalization sequences and 65,809 UTF-8 inputs. The BPE extension now covers every reachable metadata profile: 64 pretokenizer types and 99 aliases. Three other enum names have no metadata dispatch in the frozen source; they are not invented as extra supported profiles. Independent Windows/Linux comparisons cover all 14 original BPE vocabularies, complete property/piece/EOG records, 22,518 raw-byte cases and 126,896 regex splits. Ambiguous inferred EOT/FIM IDs preserve the measured MSVC/libstdc++ container ordering. Full-vector/input tests require explicit original-vocabulary prerequisites; compact synthetic native corpora run ordinarily. The remaining frozen tokenizer families are now implemented: Unigram, RWKV and PLaMo2/PLaMo3, with an explicit no-vocabulary metadata mode. Their independent corpus covers 91,476 synthetic cases, 346,112 original vocabulary records, 10,412 real-vocabulary tokenization cases and 4,067,668 normalizer outputs. This does not close conversion, sharding or every native C override configuration.
 
@@ -63,13 +63,15 @@ detokenization checks add 1,505,576 vocabulary records and 7,598 tokenization ca
 The context/memory extension raises the implemented inventory to 184 exported source symbols; 71 remain absent. Its independent 80-case cohort covers 400 checks, 61,440 continuation logits and 1,223,532 state bytes. Restoring and reserializing original state payloads is byte-exact on both platforms. Windows generated floats are exact; Linux retains the original fixed tolerance. Native sessions, per-sequence state, memory operations, bounded copies and file edge cases have separate frozen-header checks. An additional family C getter cohort covers 347,066 vocabulary records and 27,508 tokenization cases, with 176 physical-metadata cases covering 23,903 records and 480 outputs. Nonnull metadata override lists and native recurrent C memory remain explicitly unsupported.
 
 The server embedding corpora exercise 256 ordinary tiny-model requests and
-27 explicit pretrained BGE requests. Windows output bits and seven base64
-payloads match the native HTTP reference. Linux retains the existing raw
-encoder budget. Normalization 0 deliberately scales into +/-32760, so its
-portable bound is derived from the unchanged raw-vector bound before testing;
-the measured largest absolute scaled difference is 0.75439453125. This is
-separate from direct normalization of identical native raw inputs, checked
-over 4,608 outputs with exact Windows bits and at most two portable ULPs.
+27 explicit pretrained BGE requests per original build. Both verified profiles
+now require exact corresponding F32 bits and all seven base64 vectors. GNU
+expectations come from a separately built, unmodified original server. The
+original profiles themselves differ in 23,786 of 24,704 embedding values; mode
+0 amplifies their maximum absolute difference to 1.4208984375. That source-to-
+source difference is not a Rust error. The matching-profile Rust comparisons
+record zero error. Earlier cross-profile failures and the unchanged portable
+normalization envelope remain recorded. Direct normalization of identical raw
+inputs is separately checked over 4,608 outputs.
 
 Transport failure tests exposed a deadline race: the listener's monitor could
 cancel the worker before the handler checked its timer, turning a timeout into
@@ -78,21 +80,90 @@ deadline before forwarding a generic cancellation result. The regression
 requires a complete HTTP 504 response and verifies that capacity is released.
 Disconnect and server-shutdown cancellation remain separate cases.
 
+## Qwen2, source row math and tensor coverage
+
+Dense Qwen2 execution supports half-pair NeoX RoPE without scaling, separate or
+fused Q/K/V projections, source bias selection, tied or separate output and
+output bias. The pinned Qwen2.5-0.5B Q4_K_M input contributes 5,165,824 unique
+logits and 24 greedy predictions per original profile. Both profiles match
+their own native output exactly. Its decoded F32 cache requires a 3 GiB weight
+budget; the default 2 GiB limit deliberately rejects the load.
+
+Twenty-one synthetic Qwen2 variants cover separate/fused projection and bias
+combinations, packed Q4 and output variants. Thirteen physical metadata inputs
+check source typing and RoPE resolution. Review caught partial fused-bias
+selection and nonfinite output-bias transaction failures; permanent regressions
+and the failed baselines are retained.
+
+The verified original GNU build enables SSE2 row exponentiation, four-lane
+sum and variance; verified MSVC uses scalar row branches. Rust preserves those
+policies, whole-row SiLU, attention padding to 256 columns, masked cache holes
+and shared attention widths across active streams. Expected profile selection
+is independent of runtime dispatch. Native physical-layout probes include
+31,744 continuation logits and 193,868 state bytes, exact on both hosts.
+Unverified ISA and platform configurations remain open.
+
+The convolution/pooling/resize extension adds thirteen operation IDs and
+981 distinct original graphs, including 530,246 exact output bytes per host.
+Twenty overlapping backward-gradient cases preserve native MSVC/GNU NaN
+operand selection; the earlier GNU mismatch in ten cases and 66 F32 words is
+retained in the evidence.
+Shape, stride and parameter/error behavior are tested separately. Tensor
+coverage is now 75 executable IDs plus NONE, with 26 operation IDs still
+pending. Across the tensor corpus there are 2,233 distinct graph inputs and
+4,104 native captures; repeated platform executions are not counted as new
+graph cases. General tensor row/ISA policies and exact platform erff remain
+open work, separate from the model runtime correction.
+
 ## Memory and execution qualifications
 
-The high-level model facade loads a single dense Llama, Mamba-1 or BERT GGUF into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
+The high-level model facade loads a single dense Llama, Qwen2, Mamba-1 or BERT GGUF into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
 
-Llama decoder context state uses F32 KV. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
+Llama and Qwen2 decoder context state uses F32 KV. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
 
+The strict Rust Context defaults to a 1 GiB max_state_bytes budget. It reserves
+owned sequence/layer records, KV and recurrent capacities, planning records,
+transactional state and retained checkpoints before mutation. checkpoint() and
+ContextCheckpoint::try_clone() return errors on allocation/budget failures.
+Reservations survive a dropped context; cross-context restore charges the
+destination. The contract excludes model weights, execution scratch, returned
+logits/embeddings, caller buffers and allocator overhead. Serialization charges
+the output while constructing it, then transfers ownership to the caller.
+
+NativeContext uses a separate budget. Its earlier full-batch KV correction is
+retained; review additionally accounted for temporary stream/chunk descriptors
+and resident outer-vector storage. A regression rejects the old underestimated
+budget atomically and succeeds at the sufficient budget; removing only that
+descriptor charge makes the regression fail. Neither state budget is an RSS
+limit. Default F16 C-API cache modes and the complete original worker/flash
+configuration remain unimplemented.
+
+The CLI and server accept --ctx-size and --max-weight-mib, and the server
+exposes RuntimeProvider::load_with_options for the same checked limits.
 Generation currently supports greedy or temperature/distribution sampling with an explicit u32 seed. The presence of other sampler implementations in the behavior crate does not mean every upstream generation option is wired into the CLI/server.
 
 ## Validation and honest failure reporting
 
 Current validation logs are under `evidence/2026-11-09/`; historical archive logs remain under `docs/imports/`. Test outputs are associated with their command, platform and inputs. A test marked ignored requires an explicit external model, native reference library, installed compiler or vendor service. Ordinary workspace tests do not substitute for those explicit runs.
 
-The expanded checkpoint passes 384 ordinary tests on Windows and 385 on Linux in both debug and release, with 17 explicitly gated tests left out of ordinary execution. Seven pretrained tests run separately and pass on both platforms. The 195 fixture declarations, source tree, strict Clippy, offline release builds, 37 generation HTTP checks, embedding CLI lifecycle and SmolLM2/Mamba generation CLI checks also pass. The same 396 execution inputs have SHA-256 050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9. The preserved audit/driver failures and same-fingerprint continuation are explained in evidence/2026-11-09/expanded-runtime/README.md.
+The earlier expanded checkpoint passed 384 ordinary tests on Windows and 385 on Linux in both debug and release, with 17 explicitly gated tests left out of ordinary execution. Seven pretrained tests run separately and pass on both platforms. The 195 fixture declarations, source tree, strict Clippy, offline release builds, 37 generation HTTP checks, embedding CLI lifecycle and SmolLM2/Mamba generation CLI checks also pass. The same 396 execution inputs have SHA-256 050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9. The preserved audit/driver failures and same-fingerprint continuation are explained in evidence/2026-11-09/expanded-runtime/README.md.
 
 After that complete run, independent review found and fixed an undercount of transient KV rows across later native microbatches. Only the NativeContext implementation changed. The incremental correction passes both profiles and strict Clippy on both platforms, with 64/62 focused Windows/Linux tests and 489,158 independent native float comparisons per profile plus state/metadata checks. The prior full-run fingerprint is retained; the corrected 396-input fingerprint is 26399fc8edf90a9c3871cea43e9212757d08094875bb046efe11898504ce2afa. See evidence/2026-11-09/expanded-runtime/final-checkpoint.json for the precise delta and the negative-control regression.
+
+The exact published 6ddeb75eb3b708ace4cb48a365030f94a30192f3 checkpoint then
+passed GitHub Actions run 42648885432: Windows 385 and Ubuntu 386 ordinary
+tests in each profile, plus seven explicit pretrained tests on each host.
+That CI result includes the final native-cache correction and is distinct
+from the earlier complete-run/incremental local evidence above.
+
+Current Qwen2/native-profile integration evidence is recorded separately under
+evidence/2026-11-09/qwen2-and-native-profiles. Focused server verification passes
+49 ordinary tests in each profile on each host, plus the explicit pretrained
+BGE HTTP test (27 requests, 23,479 numeric comparisons, zero error). Its
+567 execution inputs have the same normalized SHA-256
+01acfdcf20cb878a2ab54444f8194fe782c7720e2b99a00da1a1d187937afd89
+on Windows and GNU. The full integrated run and application results are recorded
+in that evidence directory before checkpoint promotion.
 
 The source audit checks implementation roles and dependency metadata; it reports unsafe review candidates instead of claiming every unsafe block is proven sound. Fixture integrity checks hashes, declared lengths, provenance fields and complete fixture inventory. Numerical tests check semantics separately.
 

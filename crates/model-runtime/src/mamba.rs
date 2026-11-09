@@ -184,16 +184,6 @@ impl MambaModel {
         }
         Ok(self.weights.token_embedding.row(token as usize)?.to_vec())
     }
-    pub(crate) fn empty_state(&self) -> Vec<RecurrentLayer> {
-        self.weights
-            .layers
-            .iter()
-            .map(|_| RecurrentLayer {
-                convolution: vec![0.0; self.config.inner * (self.config.convolution_width - 1)],
-                ssm: vec![0.0; self.config.inner * self.config.state_size],
-            })
-            .collect()
-    }
     pub(crate) fn step(
         &self,
         mut hidden: Vec<f32>,
@@ -213,6 +203,12 @@ impl MambaModel {
                 &normalized,
             )?;
             let (x, z) = xz.split_at(c.inner);
+            let mut activated_z = Vec::new();
+            activated_z
+                .try_reserve_exact(z.len())
+                .map_err(|_| Error::InvalidState("Mamba gate allocation failed".into()))?;
+            activated_z.extend_from_slice(z);
+            math::native_rows::silu_f32_in_place(&mut activated_z);
             let mut convolved = vec![0.0; c.inner];
             let prior = c.convolution_width - 1;
             for channel in 0..c.inner {
@@ -224,12 +220,13 @@ impl MambaModel {
                 }
                 value += x[channel] * kernel[prior];
                 value += layer.convolution_bias[channel];
-                convolved[channel] = math::silu(value);
+                convolved[channel] = value;
                 if prior != 0 {
                     old.rotate_left(1);
                     old[prior - 1] = x[channel];
                 }
             }
+            math::native_rows::silu_f32_in_place(&mut convolved);
             let projected = adapters.multiply(
                 &format!("blk.{index}.ssm_x.weight"),
                 &layer.x_projection,
@@ -275,7 +272,7 @@ impl MambaModel {
                         memory.ssm[at] * (delta * layer.a.values()[at]).exp() + b[i] * input_delta;
                     sum += memory.ssm[at] * cc[i];
                 }
-                y[channel] = (sum + convolved[channel] * layer.d[channel]) * math::silu(z[channel]);
+                y[channel] = (sum + convolved[channel] * layer.d[channel]) * activated_z[channel];
             }
             let output =
                 adapters.multiply(&format!("blk.{index}.ssm_out.weight"), &layer.output, &y)?;

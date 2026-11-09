@@ -1,0 +1,53 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\quant)
+   Compiling llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\platform-loader)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\llama-behavior)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\model-runtime)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\gguf)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\tokenizer)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\inference)
+   Compiling llama-ffi v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\ffi)
+    Finished `release` profile [optimized] target(s) in 21.14s
+     Running unittests src\lib.rs (target\release\deps\llama_ffi-6f85dc07f7a2c2c0.exe)
+     Running unittests src\lib.rs (target\release\deps\llama_model_runtime-b95e6ace3583628a.exe)
+     Running tests\native_rows_graphs.rs (target\release\deps\native_rows_graphs-35fb98eca0d7c5d6.exe)
+     Running tests\native_rows_native.rs (target\release\deps\native_rows_native-bd712d095c6efa8b.exe)
+     Running tests\numerical_reference.rs (target\release\deps\numerical_reference-d733737ea1781cbc.exe)
+     Running tests\runtime.rs (target\release\deps\runtime-fe65d25ac020226b.exe)
+   Doc-tests llama_ffi
+   Doc-tests llama_model_runtime
+    Finished `release` profile [optimized] target(s) in 0.04s
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\quant)
+    Checking llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\platform-loader)
+    Checking llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\llama-behavior)
+    Checking llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\model-runtime)
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\gguf)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\tokenizer)
+error: this `if` statement can be collapsed
+   --> crates\model-runtime\src\math.rs:330:9
+    |
+330 | /         if let Some(columns) = self.columns {
+331 | |             if columns.len() != count
+332 | |                 || columns.last().is_some_and(|&column| column >= self.row_len)
+333 | |                 || columns.windows(2).any(|pair| pair[0] >= pair[1])
+...   |
+337 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+330 ~         if let Some(columns) = self.columns
+331 ~             && (columns.len() != count
+332 |                 || columns.last().is_some_and(|&column| column >= self.row_len)
+333 ~                 || columns.windows(2).any(|pair| pair[0] >= pair[1]))
+334 |             {
+335 |                 return Err(Error::Shape("invalid attention physical columns".into()));
+336 ~             }
+    |
+
+error: could not compile `llama-model-runtime` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-model-runtime` (lib test) due to 1 previous error

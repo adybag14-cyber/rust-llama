@@ -1,0 +1,344 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "status": "external frozen candidate ready for authorized integration",
+  "base_commit": "6ddeb75",
+  "source_manifest": {
+    "bytes": 4348,
+    "sha256": "5aed31dd0f4d5af10fccd1268306ccf02c9ba4e74f2214a6fdb9e68ccf6a75c6"
+  },
+  "candidate_files": 17,
+  "product_preimages_verified": 27,
+  "new_operation_ids": [
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63
+  ],
+  "executable_ids": 75,
+  "input_leaf_ids": 1,
+  "pending_ids": 26,
+  "reference": {
+    "new_distinct_graph_cases": 961,
+    "new_platform_graph_captures": 1922,
+    "exact_output_bytes_per_platform": 529046,
+    "total_distinct_tensor_graph_cases": 2213,
+    "total_tensor_graph_captures": 4064,
+    "cohorts": [
+      {
+        "cohort": "main",
+        "cases": 446,
+        "output_bytes": 524520,
+        "msvc": {
+          "bytes": 1210334,
+          "sha256": "1a0c8be3021f3b1ed3b2082c13f9d04229a149083f83fc07f8c9d4dc773fe53d"
+        },
+        "gnu": {
+          "bytes": 1210334,
+          "sha256": "1a0c8be3021f3b1ed3b2082c13f9d04229a149083f83fc07f8c9d4dc773fe53d"
+        },
+        "fixture": "cpu-convolution-reference.bin"
+      },
+      {
+        "cohort": "edgecases",
+        "cases": 490,
+        "output_bytes": 4104,
+        "msvc": {
+          "bytes": 134407,
+          "sha256": "0fa7306c77a190e96b4280dd7bb81d181b24f5f9d0d1a57fb5cf53a4977d1960"
+        },
+        "gnu": {
+          "bytes": 134407,
+          "sha256": "0fa7306c77a190e96b4280dd7bb81d181b24f5f9d0d1a57fb5cf53a4977d1960"
+        },
+        "fixture": "cpu-convolution-edges-reference.bin"
+      },
+      {
+        "cohort": "construction-corners",
+        "cases": 25,
+        "output_bytes": 422,
+        "msvc": {
+          "bytes": 10177,
+          "sha256": "6eee2b48b2069538accf8c8419bc5159e69eb3b7123260ab09d3c31239f560ea"
+        },
+        "gnu": {
+          "bytes": 10177,
+          "sha256": "6eee2b48b2069538accf8c8419bc5159e69eb3b7123260ab09d3c31239f560ea"
+        },
+        "fixture": "cpu-convolution-corners-reference.bin"
+      }
+    ]
+  },
+  "validation": {
+    "final_job": "job-1794240844742-ad349b26-458",
+    "platforms": [
+      "Windows MSVC",
+      "GNU/Linux x86_64"
+    ],
+    "rust": "1.99.1",
+    "profiles": [
+      "debug",
+      "release"
+    ],
+    "tests_per_platform_profile": 25,
+    "strict_clippy": "passed both",
+    "formatting": "passed",
+    "new_numeric_tolerance": "none; all output bytes and strides exact"
+  },
+  "source_paths": [
+    "crates/tensor/src/cpu_conv.rs",
+    "crates/tensor/src/cpu.rs",
+    "crates/tensor/src/graph.rs",
+    "crates/tensor/src/lib.rs"
+  ],
+  "fixture_files": {
+    "cpu-convolution-corners-gnu-provenance.json": {
+      "bytes": 15626,
+      "sha256": "bd819a8f60e2a757f28d34619b238320e5bfef59f92198f933824ed60240a294"
+    },
+    "cpu-convolution-corners-msvc-provenance.json": {
+      "bytes": 16132,
+      "sha256": "a8ea373c5abd870b79b9d5ef2eec89810484cc6892bef4cb3aa78bd190668c77"
+    },
+    "cpu-convolution-corners-reference.bin": {
+      "bytes": 10177,
+      "sha256": "6eee2b48b2069538accf8c8419bc5159e69eb3b7123260ab09d3c31239f560ea"
+    },
+    "cpu-convolution-edges-gnu-provenance.json": {
+      "bytes": 228621,
+      "sha256": "0871841c52a9eb6394691e5ce7815c091897d68da507c912f19191277b1e84d7"
+    },
+    "cpu-convolution-edges-msvc-provenance.json": {
+      "bytes": 242105,
+      "sha256": "066fed011bf2d731aa6b06fe2349b9cc717a51be7d1babc0f7900e349283a5f1"
+    },
+    "cpu-convolution-edges-reference.bin": {
+      "bytes": 134407,
+      "sha256": "0fa7306c77a190e96b4280dd7bb81d181b24f5f9d0d1a57fb5cf53a4977d1960"
+    },
+    "cpu-convolution-gnu-provenance.json": {
+      "bytes": 210569,
+      "sha256": "9daebef5fa2a75ad4aafbbe9a8a69d7efa73f115c08d46c8a2b9948e2c0ca8ee"
+    },
+    "cpu-convolution-msvc-provenance.json": {
+      "bytes": 222748,
+      "sha256": "83b68a4ec9383886c1e7fb3b09c715a114a52404e9fad70059c5efae9ab70589"
+    },
+    "cpu-convolution-reference.bin": {
+      "bytes": 1210334,
+      "sha256": "1a0c8be3021f3b1ed3b2082c13f9d04229a149083f83fc07f8c9d4dc773fe53d"
+    }
+  },
+  "job_logs": {
+    "job-1794238424181-a3d43f99-5c7": {
+      "request.json": {
+        "bytes": 581,
+        "sha256": "2492ce6bec43304b20ec1cda7a0c7d23ec06827c217e710e4b7043b860f25892"
+      },
+      "status.json": {
+        "bytes": 1078,
+        "sha256": "458c76943689ea67b525074758317e6ed074018208602418d95d8d953ad22d8a"
+      },
+      "stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout.log": {
+        "bytes": 17890,
+        "sha256": "61798e99af5671c9e28354c72c242dc7b0e97968636dcd6c80943f1b090ff45a"
+      }
+    },
+    "job-1794239507648-2d1a754f-5e4": {
+      "request.json": {
+        "bytes": 426,
+        "sha256": "f7b0741db5fed2f29cfdf12ecfb78ed07cac36543e6e3f8937236eda8f5dd5d7"
+      },
+      "status.json": {
+        "bytes": 2009,
+        "sha256": "c6e81fda020d616fd94ea885d6c3af1172cb7113ff044dfb9c2ed51db29b1c2d"
+      },
+      "stderr.log": {
+        "bytes": 896,
+        "sha256": "de0b256fdbcaea1ebeee515af7c0b6d2509d3fa23a6ad1d4a0fbe43a965e7279"
+      },
+      "stdout.log": {
+        "bytes": 374,
+        "sha256": "02088ef52141b551252020d5f3d13d0c53c03f1a68fdea86959eba84a496724f"
+      }
+    },
+    "job-1794240107851-6164d782-aff": {
+      "request.json": {
+        "bytes": 551,
+        "sha256": "e0a608bc6ff13a3941904c9d080279a333e9538329f9ff02d958874361134b78"
+      },
+      "status.json": {
+        "bytes": 1079,
+        "sha256": "f0a684a8a9192e1c04b4c9ec49481f6e04534119e5eed0c4bb2c37004f444690"
+      },
+      "stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout.log": {
+        "bytes": 23816,
+        "sha256": "a16e8e00198a5171d5249c12c917ca6e08e019bfbb0b210d771fe2280594c977"
+      }
+    },
+    "job-1794240304094-123e8f1b-9dc": {
+      "request.json": {
+        "bytes": 426,
+        "sha256": "9180bda0ece9e5ba9d310cf4fff355ba2f343f3998a3787f543ff118da88bbd9"
+      },
+      "status.json": {
+        "bytes": 5254,
+        "sha256": "57ef44b9e80deda10627577102db7eb7d0865a0f65495482749164df7164c2c1"
+      },
+      "stderr.log": {
+        "bytes": 15854,
+        "sha256": "17e4ae8edaa261d16598f803c940dbfe11943441e53aafff3df00a9cdaecb408"
+      },
+      "stdout.log": {
+        "bytes": 597,
+        "sha256": "fe0028751da6e1f8a3409e14a2310fbb9b501036ee11a41c315a1f2a172443d5"
+      }
+    },
+    "job-1794240433104-370fe075-9a5": {
+      "request.json": {
+        "bytes": 554,
+        "sha256": "413edc05d04b5c5f89031487152c5d9f35f513e3bd4fc91016166a61f96cd31b"
+      },
+      "status.json": {
+        "bytes": 1078,
+        "sha256": "e36b5a2912d60911c56cb19818bbabbbbc4d3cc6e723d69025827aa3879f4c49"
+      },
+      "stderr.log": {
+        "bytes": 521,
+        "sha256": "373449d964c92cde488282bf8726bb7a0312990f2f47a3352e8a5574b3b639f0"
+      },
+      "stdout.log": {
+        "bytes": 406,
+        "sha256": "2ea3a60669f2a39a73a76bc6e09fe8b58993bbf82485f708426a3010ed92f1b0"
+      }
+    },
+    "job-1794240548322-355582b2-8da": {
+      "request.json": {
+        "bytes": 609,
+        "sha256": "d1428c61030109ce6325b28b6f2d0181122d904644578e79a89b60dbf38e7477"
+      },
+      "status.json": {
+        "bytes": 1637,
+        "sha256": "080df2f2dd30ea15f549b81c68f376045097d8ca8e0a10c66dd8ea74f97cd15b"
+      },
+      "stderr.log": {
+        "bytes": 532,
+        "sha256": "cebf30e683d214a171009021d161ed9c3850da30840b98a405155ee3cb2460a9"
+      },
+      "stdout.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "job-1794240632897-39ec2e99-992": {
+      "request.json": {
+        "bytes": 609,
+        "sha256": "5dd93bcce522d9b38c2d13ab7f182feefc4d65ce8ce102a9589efc7d2dcd47b9"
+      },
+      "status.json": {
+        "bytes": 1083,
+        "sha256": "51b8f5da151cbafefe619db8ad951bc8025397b7377d8f8c6a200e2242ab2109"
+      },
+      "stderr.log": {
+        "bytes": 1710,
+        "sha256": "d3e10884b0ab62c9436ef113001d5784daec5db9631e28124fee56a649a0725a"
+      },
+      "stdout.log": {
+        "bytes": 6320,
+        "sha256": "bdb8529285fccb1e7d0dd4bc779685495a0cc46dacd87b1f4d34f3430b1aff02"
+      }
+    },
+    "job-1794240633808-20008e54-b16": {
+      "request.json": {
+        "bytes": 573,
+        "sha256": "407d7d966755f619626c7eadb6c0aabb32991a2391a13001fe9d24eefaa4cbd6"
+      },
+      "status.json": {
+        "bytes": 1077,
+        "sha256": "b1de967435c45863242232e21c029cee1c4cc65983ca8504c5af1289ad70816d"
+      },
+      "stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout.log": {
+        "bytes": 2317,
+        "sha256": "c43439549937786c05666989e49361235735fa5160ced62fa1a942451e30aaa2"
+      }
+    },
+    "job-1794240797423-d305f4d8-84e": {
+      "request.json": {
+        "bytes": 706,
+        "sha256": "c0f20a350411d1f560cffbc001247108cf3eac212b85fd0c515897f73249812f"
+      },
+      "status.json": {
+        "bytes": 1082,
+        "sha256": "d016aee3c9024914c88d369d925c40aeb6c821b86fa9ad5de7a058e71b0e26ad"
+      },
+      "stderr.log": {
+        "bytes": 435,
+        "sha256": "e81d0dd833fdee0a56cf8bc48942b0435e276a1b4f9231acbcd67a513cb426e3"
+      },
+      "stdout.log": {
+        "bytes": 812,
+        "sha256": "42db5c41352ae7e3c0ca89f9e7afc6be1eb0c234d24d548e34f06d60e0eb632a"
+      }
+    },
+    "job-1794240844742-ad349b26-458": {
+      "request.json": {
+        "bytes": 1147,
+        "sha256": "6b0a846471b659f2f6d3009f1684932e079c8320954ec02947d5dde012ed91db"
+      },
+      "status.json": {
+        "bytes": 1085,
+        "sha256": "4a25ecb5f575b8cd5ab1c4c6e15013f6a1f9a62a125bf083dcc17e6705e29fdf"
+      },
+      "stderr.log": {
+        "bytes": 3805,
+        "sha256": "5c6f3bd2c27fa16cbaaa5f53bf348a6a4f80fa2595d0ac77c57595cbac9b2271"
+      },
+      "stdout.log": {
+        "bytes": 13313,
+        "sha256": "253eec514d79105167577e9aca04f2429def4b0e806b1272813b0fa67688c8c9"
+      }
+    }
+  },
+  "initial_failures": [
+    {
+      "path": "first-pool-nan-failure",
+      "main_mismatches": 2,
+      "expanded_mismatches": 188,
+      "cause": "Rust/LLVM addition selected a later NaN payload in pooling; native loops preserve the first.",
+      "resolution": "Explicit source operand selection; raw expected bytes unchanged."
+    },
+    {
+      "path": "test-authoring-literal-error",
+      "cause": "Rust test float literal lacked initial zero; fixed before tests ran."
+    }
+  ],
+  "qualifications": [
+    "Frozen native compiler/ISA profiles, one original CPU thread; this does not assert arbitrary optimized SIMD scheduling.",
+    "Main 446 cases captured before implementation. Later 490 and25 source edge/geometry cases captured before their Rust comparisons; original prior captures untouched.",
+    "All maintained implementation is safe Rust. Original C/C++ is only in external independent oracles.",
+    "Nonempty image dimensions and checked signed parameter domains; unsupported dtypes/layouts and source-undefined addresses return errors.",
+    "Existing GNU SiLU/softmax/NORM row-policy integration remains separate/open in this tensor slice, as does exact UCRT ERF equivalence.",
+    "Standalone draft Cargo.toml and Cargo.lock are intentionally excluded from candidate; no new product dependency required."
+  ],
+  "unchanged_product": true
+}

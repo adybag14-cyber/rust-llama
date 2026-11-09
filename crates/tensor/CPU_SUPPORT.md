@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **62 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **39 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **75 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **26 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -57,19 +57,19 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 48 | `ROPE` | Implemented slice | F32 | Basic normal and NeoX modes, positions/base/scale; extended/multimodal/YaRN modes remain pending. |
 | 49 | `ROPE_BACK` | Pending | — | No executable Op constructor; no fallback result. |
 | 50 | `CLAMP` | Implemented slice | F32 | Finite ordered limits. |
-| 51 | `CONV_TRANSPOSE_1D` | Pending | — | No executable Op constructor; no fallback result. |
-| 52 | `IM2COL` | Pending | — | No executable Op constructor; no fallback result. |
-| 53 | `IM2COL_BACK` | Pending | — | No executable Op constructor; no fallback result. |
-| 54 | `IM2COL_3D` | Pending | — | No executable Op constructor; no fallback result. |
-| 55 | `COL2IM_1D` | Pending | — | No executable Op constructor; no fallback result. |
-| 56 | `CONV_2D` | Pending | — | No executable Op constructor; no fallback result. |
-| 57 | `CONV_3D` | Pending | — | No executable Op constructor; no fallback result. |
-| 58 | `CONV_2D_DW` | Pending | — | No executable Op constructor; no fallback result. |
-| 59 | `CONV_TRANSPOSE_2D` | Pending | — | No executable Op constructor; no fallback result. |
-| 60 | `POOL_1D` | Pending | — | No executable Op constructor; no fallback result. |
-| 61 | `POOL_2D` | Pending | — | No executable Op constructor; no fallback result. |
-| 62 | `POOL_2D_BACK` | Pending | — | No executable Op constructor; no fallback result. |
-| 63 | `UPSCALE` | Pending | — | No executable Op constructor; no fallback result. |
+| 51 | `CONV_TRANSPOSE_1D` | Implemented slice | F32/F16 kernel × F32 → F32 | Matrix input, no padding, unit dilation, positive stride; F32 products/F64 channel dots then F32 scatter-add. |
+| 52 | `IM2COL` | Implemented slice | F32 → F32/F16; F16 → F16 | 1D/2D extraction, contiguous first axis; source flat addresses inside channels, checked declared spans, raw half payload copies. |
+| 53 | `IM2COL_BACK` | Implemented slice | F32 gradient + F32/F16 kernel metadata → F32 | Actual CPU input order is gradient then kernel; explicit output shape; source flat gradient addressing and gather order. |
+| 54 | `IM2COL_3D` | Implemented slice | F32 → F32/F16 | 3D extraction with all input byte strides; explicit positive input channels and checked packed channel/batch dimensions. |
+| 55 | `COL2IM_1D` | Implemented slice | F32 / F16 / BF16 | Contiguous matrix to channel rows; explicit stride/channels/nonnegative padding; F32 accumulation and final dtype rounding. |
+| 56 | `CONV_2D` | Implemented slice | F32/F16 kernel × F32 → F32 | Direct CPU operator; contiguous weights, strided input, signed padding/positive stride/dilation; F32 products/F64 dot. |
+| 57 | `CONV_3D` | Implemented slice | F32/F16 kernel × F32 → F32 | Direct 3D operator, checked packed channel/batch axes; contiguous weights and input strides preserved. |
+| 58 | `CONV_2D_DW` | Implemented slice | F32/F16 kernel × F32 → F32 | Native WHCN/CWHN layout predicates, F32 accumulation and source output byte strides; undefined reads rejected. |
+| 59 | `CONV_TRANSPOSE_2D` | Implemented slice | F32/F16 kernel × F32 → F32 | No-padding transpose, positive common spatial stride; source flattened kernel planes and F64 channel dots. |
+| 60 | `POOL_1D` | Implemented slice | F32/F16 → F32 | Max/average, source flattened outer-row addressing; average excludes padding, max preserves comparison/NaN order. |
+| 61 | `POOL_2D` | Implemented slice | F32/F16 → F32 | Max/average, checked native plane stepping; fractional size padding then I32 kernel padding, full-area average divisor. |
+| 62 | `POOL_2D_BACK` | Implemented slice | F32 gradient + F32 forward → F32 | Explicit backward geometry; source flat addresses, first-max tie/NaN order and measured overlapping-gradient operand selection; unsafe half-forward reinterpretation rejected. |
+| 63 | `UPSCALE` | Implemented slice | F32 → F32 | Nearest, bilinear, bicubic; align-corners and bilinear antialias; all four output extents and source byte strides. |
 | 64 | `PAD` | Implemented slice | F32 | Signed crop/pad and circular forms; checked source-defined address domain. |
 | 65 | `PAD_REFLECT_1D` | Implemented slice | F32 | Reflection pads strictly smaller than the input row. |
 | 66 | `ROLL` | Implemented slice | F32 | Four axes; absolute shift must be smaller than its axis. |
@@ -136,3 +136,41 @@ The README lists every native CPU conversion destination and CPY pair. Missing C
 ## Still open
 
 Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The portable ERF implementation's exact equivalence to Windows UCRT `erff` also remains open; a numerical-comparison pass does not close that requirement.
+
+## Convolution, extraction, pooling and resize bounds
+
+The 13 operators in IDs 51–63 are implemented in `cpu_conv.rs` with immutable
+outputs and fallible allocations. They require nonempty positive dimensions that
+fit the original CPU's signed I32 parameter domain, positive active strides and
+dilations, checked output geometry, scalar alignment, and every addressed byte
+inside the declared view span. Source flat-address formulas are retained even
+when they differ from logical stride traversal. Descriptors that would escape
+their view, overrun a native output, or reinterpret half storage as F32 return a
+checked error. Empty image execution remains unsupported.
+
+The source integer convolution formula truncates signed division toward zero.
+Pool geometry uses F32 arithmetic when padding is a float, then truncates padding
+to I32 for the CPU window. Neither is replaced with a mathematically different
+floor/round convention. The 961 original native graph cases for this slice
+preserve raw outputs and output byte strides; both measured platform captures
+are identical, and no numerical tolerance is used for this cohort.
+
+Twenty additional overlapping backward-gradient graphs retain distinct native
+MSVC/GNU NaN operand selection. These add 1,200 exact output bytes per host;
+the pre-fix GNU average-backward mismatch covered ten cases and 66 F32 words.
+The source policy is explicit for the two measured x86_64 targets; exceptional
+value parity on other toolchains is unverified.
+
+This slice does not supply transposed-convolution padding/dilation modes absent
+from these original CPU constructors, non-F32 resize, arbitrary depthwise storage
+layouts, or antialiased nearest/bicubic modes. General graph autodiff remains
+open; the two new backward operators require their gradients explicitly.
+
+## Separate GNU vector-row policy work
+
+The previously captured scalar NORM, SiLU and softmax references are the frozen
+MSVC profile. GNU selects additional SSE2 vector-prefix policies in these
+operators. The independently verified row helpers developed for model-runtime
+have not yet been wired into this tensor crate. GNU exact row-policy completion
+for those existing operators remains a separate integration item; passing the
+convolution or indexing cohort does not close it.

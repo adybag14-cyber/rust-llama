@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "numeric_profile": "frozen x86_64 Linux GNU SSE2",
+  "native_build": {
+    "path": "fixtures/inference/gnu-native-build-provenance.json",
+    "sha256": "ade2dbaf943ddba82c0d844aed2856e6dd5d3a2b98311b476cf1e75bfc2f6510"
+  },
+  "input_model_and_request_provenance": {
+    "path": "fixtures/inference/stories15m-q4-provenance.json",
+    "sha256": "155d10afad4f535f47467d03b343c25fa2d4d54582b11f842442fd8500885dfe"
+  },
+  "raw_original_json_sha256": "af9f8dc24edf7b30289a61c4a69f01f72d61ea293e886917f36e8287fb77e6de",
+  "capture_report_sha256": "4c1aef3ba092a4fc14598b68bce3b1c445a39bcae2b29f4abbec1c4945741926",
+  "capture_report": {
+    "passed": true,
+    "captures": [
+      {
+        "name": "smollm2",
+        "command": [
+          "wsl.exe",
+          "-d",
+          "Ubuntu",
+          "-u",
+          "tdamre",
+          "--",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/models/SmolLM2-135M-Q4_K_M.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/bpe-inference-oracle/request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/quantized-gnu-v1/smollm2.native.json"
+        ],
+        "exit_code": 0,
+        "model_sha256": "e3131339bf4e8065265593d4fd8f7bb7ff2d3abff1edb5618aa1197b89cad9f5",
+        "request_sha256": "c27c7fe39ddd049d5548a82d53230f29eb10f4da7445ea23bac610bf4b154c7f",
+        "adapter_sha256": "e18dc4ad07d994263d049fddfe7ed10ea5f5f63676bb92830a0eb8be71486407",
+        "capture_sha256": "f3d8f4aefb4f74bb4ee49b005ebdf890b18a4b31ada931e8677d6256061dc695"
+      },
+      {
+        "name": "stories15m-q4",
+        "command": [
+          "wsl.exe",
+          "-d",
+          "Ubuntu",
+          "-u",
+          "tdamre",
+          "--",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/models/stories15M-q4_0.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/inference-oracle/stories15m-q4-request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/quantized-gnu-v1/stories15m-q4.native.json"
+        ],
+        "exit_code": 0,
+        "model_sha256": "66967fbece6dbe97886593fdbb73589584927e29119ec31f08090732d1861739",
+        "request_sha256": "083ecf8029d09bb06ddaff41f50ffbdb895ee5c205af68e4c4b5c4ece4582a0e",
+        "adapter_sha256": "e18dc4ad07d994263d049fddfe7ed10ea5f5f63676bb92830a0eb8be71486407",
+        "capture_sha256": "af9f8dc24edf7b30289a61c4a69f01f72d61ea293e886917f36e8287fb77e6de"
+      }
+    ]
+  },
+  "transformation": "Lossless JSON-to-little-endian-F32 conversion. Shared last-prompt/first-greedy rows removed only after bit equality; every remaining F32 round-tripped; token IDs and byte strings retained from this independent GNU capture.",
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05,
+    "rule": "abs(actual-reference) <= absolute + relative * abs(reference)",
+    "token_ids_and_generated_bytes": "exact",
+    "bitwise_equality": "reported only; not a portable gate"
+  },
+  "tolerance_qualification": "Unchanged from the original MSVC corpus before profile evaluation; expected values are independent GNU outputs, never adjusted from Rust results.",
+  "logits": {
+    "rows": 20,
+    "columns": 32000,
+    "values": 640000,
+    "bytes": 2560000,
+    "sha256": "579a521b36d682c9b26cac4d533b00beb4803e3bf5bfe2f86a29a07a4959fd21"
+  },
+  "metadata_sha256": "a29492c445f68c953fe85d8cb89b9bd61b3f6799cbcd9d4e143ba1a9fb812205",
+  "recorded_utc": "2026-11-09T16:04:38.258179+00:00"
+}

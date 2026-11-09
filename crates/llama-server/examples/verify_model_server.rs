@@ -162,9 +162,16 @@ fn main() -> Result<()> {
         .ok_or("supply the external stories260K.gguf path")?;
     let provider = Arc::new(RuntimeProvider::load(&model_path)?);
     assert_eq!(provider.status(), ProviderStatus::Ready);
-    let fixture = json::parse(include_str!(
-        "../../../fixtures/inference/stories260k-reference.json"
-    ))?;
+    let original = if cfg!(all(
+        target_arch = "x86_64",
+        target_os = "linux",
+        target_env = "gnu"
+    )) {
+        include_str!("../../../fixtures/inference/stories260k-gnu-reference.json")
+    } else {
+        include_str!("../../../fixtures/inference/stories260k-reference.json")
+    };
+    let fixture = json::parse(original)?;
     let cases = fixture.get("cases").unwrap().as_array().unwrap();
     let server = Server::new(
         ServerConfig {

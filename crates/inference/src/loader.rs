@@ -226,12 +226,15 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
     if architecture == "bert" {
         return crate::bert_loader::load(g, path, options);
     }
+    if architecture == "qwen2" {
+        return crate::qwen2_loader::load(g, path, options);
+    }
     if architecture == "mamba" {
         return crate::mamba_loader::load(g, path, options);
     }
     if architecture != "llama" {
         return Err(unsupported(format!(
-            "model architecture {architecture}; this loader currently executes dense llama, bert and mamba"
+            "model architecture {architecture}; this loader currently executes dense llama, qwen2, bert and mamba"
         )));
     }
     if let Some(t) = m.get("general.type").and_then(Value::as_str)

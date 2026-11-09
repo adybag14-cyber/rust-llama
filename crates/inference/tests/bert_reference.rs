@@ -1,10 +1,18 @@
 //! Pretrained BERT comparison against the external frozen C API oracle.
+#[path = "support/native_profile.rs"]
+mod native_profile;
 use llama_behavior::json::{self, Value};
 use llama_conformance::digest::hash_reader;
 use llama_inference::{Error, LoadOptions, Model, Pooling};
+use native_profile::source_profile;
 use std::{cell::Cell, fs::File, path::PathBuf};
 
-const REFERENCE: &str = include_str!("../../../fixtures/inference/bert-bge-reference.json");
+fn native_reference() -> &'static str {
+    source_profile(
+        include_str!("../../../fixtures/inference/bert-bge-reference.json"),
+        include_str!("../../../fixtures/inference/bert-bge-gnu-reference.json"),
+    )
+}
 const MODEL_SHA256: &str = "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999";
 
 fn field<'a>(value: &'a Value, key: &str) -> &'a Value {
@@ -57,7 +65,7 @@ fn verify_model(variable: &str, model_sha256: &str) {
         hash_reader(File::open(&path).expect("open pretrained BERT model")).unwrap();
     assert_eq!(bytes, 67_308_128);
     assert_eq!(hash, model_sha256, "wrong pretrained model");
-    let reference = json::parse(REFERENCE).unwrap();
+    let reference = json::parse(native_reference()).unwrap();
     assert_eq!(
         field(&reference, "model_sha256").as_str().unwrap(),
         MODEL_SHA256

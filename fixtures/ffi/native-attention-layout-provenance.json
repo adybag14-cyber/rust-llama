@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "header_sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a",
+  "adapter_sha256": "1cc76ff07d4748a25aec54b0f26846626dea81723547247f6dea6ee21422877f",
+  "model": "native-context-model.gguf",
+  "model_sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18",
+  "parameters": {
+    "n_ctx_unified": 512,
+    "n_ctx_separate": 2048,
+    "n_seq_max": 4,
+    "n_batch": 128,
+    "n_ubatch": 32,
+    "threads": 1,
+    "flash_attention": false,
+    "kv_type": "F32"
+  },
+  "cases": [
+    "dense_boundary",
+    "physical_holes",
+    "high_used_prefix_removed",
+    "shared_cells",
+    "common_stream_width",
+    "shared_membership_mask"
+  ],
+  "format": "ATTNROW1,u32json-length,UTF8JSON,payload; descriptors point into payload bytes",
+  "platforms": {
+    "msvc": {
+      "source_capture_sha256": "1d08d437e0f7803e50be7bdfecc64b4b0491cad577dae3934e4d7111ac6b938d",
+      "native_library_sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3",
+      "fixture": "native-attention-layout-msvc.bin",
+      "fixture_bytes": 325478,
+      "fixture_sha256": "b13d8acb1688a9f42d2c24748a17cef5174eb3e4edba6062e765c39fd4adf5be",
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868
+    },
+    "gnu": {
+      "source_capture_sha256": "cb64f1074b970a844b1214a33031eb92742141c6011efecf20addd0337b5b235",
+      "native_library_sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9",
+      "fixture": "native-attention-layout-gnu.bin",
+      "fixture_bytes": 325478,
+      "fixture_sha256": "531f080d8ee53878c5c96e1b49ecf737f157212180f86aa6b052797acc9d717a",
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868
+    }
+  }
+}

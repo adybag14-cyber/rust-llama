@@ -1,0 +1,11 @@
+error: float literals must have an integer part
+ --> \\?\C:\Users\adyba\rust-llama-reference\tensor-oracle\convolution\rust-draft\tests\convolution_checks.rs:8:56
+  |
+8 |     Tensor::from_f32(shape,&(0..count).map(|i|i as f32*.125-1.0).collect::<Vec<_>>()).unwrap()
+  |                                                        ^^^^
+  |
+help: must have an integer part
+  |
+8 |     Tensor::from_f32(shape,&(0..count).map(|i|i as f32*0.125-1.0).collect::<Vec<_>>()).unwrap()
+  |                                                        +
+

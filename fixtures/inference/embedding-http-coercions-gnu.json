@@ -1,0 +1,935 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "model": {
+    "bytes": 6832,
+    "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+  },
+  "qualification": "Native JSON arithmetic conversions: booleans, finite truncation, lexical integer/float distinction and measured integer narrowing.",
+  "absolute_tolerance": 2e-06,
+  "relative_tolerance": 2e-06,
+  "cases_by_pooling": [
+    {
+      "pooling": "cls",
+      "argv": [
+        "/mnt/c/Users/adyba/rust-llama-reference/build-server-gnu-profile-v1/bin/llama-server",
+        "-m",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/inference/tiny-bert-missing-pooling.gguf",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "34861",
+        "--embeddings",
+        "--parallel",
+        "1",
+        "--ctx-size",
+        "8",
+        "--batch-size",
+        "32",
+        "--ubatch-size",
+        "32",
+        "--threads",
+        "1",
+        "--threads-batch",
+        "1",
+        "--flash-attn",
+        "off",
+        "--no-warmup",
+        "--alias",
+        "fixture-model",
+        "--pooling",
+        "cls"
+      ],
+      "cases": [
+        {
+          "name": "norm_u32_minus1",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 4294967295
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "c851e214efde71a1e8fa4d486a943d4ef0895bf2f0305680388730f5cf8e503a"
+          }
+        },
+        {
+          "name": "norm_u32_minus1",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 4294967295
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "0b19470e4b6dcdb5fe159d20ca5e9d7ab3e76c2c572ea8db0066e948e1b93005"
+          }
+        },
+        {
+          "name": "norm_u32_plus2",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 4294967298
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.026502935215830803,
+                    0.7107841968536377,
+                    -0.7027791738510132,
+                    0.013592099770903587
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "5c5a0b4b7b9aaab83fd3e45a9bd5a461a9464a69c5fcfcb1df967969fb60e1a9"
+          }
+        },
+        {
+          "name": "norm_u32_plus2",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 4294967298
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.026502935215830803,
+                    0.7107841968536377,
+                    -0.7027791738510132,
+                    0.013592099770903587
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "22d0543fe3c929cbce75eecc5c83eebbec1f1573fe65eebce91a68b7609ae134"
+          }
+        },
+        {
+          "name": "norm_u64_max",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 18446744073709551615
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "c851e214efde71a1e8fa4d486a943d4ef0895bf2f0305680388730f5cf8e503a"
+          }
+        },
+        {
+          "name": "norm_u64_max",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 18446744073709551615
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "0b19470e4b6dcdb5fe159d20ca5e9d7ab3e76c2c572ea8db0066e948e1b93005"
+          }
+        },
+        {
+          "name": "norm_i64_min",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": -9223372036854775808
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -1221.5185546875,
+                    32760.0,
+                    -32391.048828125,
+                    626.4590454101562
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "cba094167535962956ea9bfddbd01c8938e98494702af6737d4530e7d594a576"
+          }
+        },
+        {
+          "name": "norm_i64_min",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": -9223372036854775808
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -1221.5185546875,
+                    32760.0,
+                    -32391.048828125,
+                    626.4590454101562
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "ee8b4464d99c73e58432f189dcaf73fc5868a25660b0dc147f594437f57caf56"
+          }
+        },
+        {
+          "name": "norm_false",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": false
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -1221.5185546875,
+                    32760.0,
+                    -32391.048828125,
+                    626.4590454101562
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "cba094167535962956ea9bfddbd01c8938e98494702af6737d4530e7d594a576"
+          }
+        },
+        {
+          "name": "norm_false",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": false
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -1221.5185546875,
+                    32760.0,
+                    -32391.048828125,
+                    626.4590454101562
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "ee8b4464d99c73e58432f189dcaf73fc5868a25660b0dc147f594437f57caf56"
+          }
+        },
+        {
+          "name": "norm_true",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": true
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.018231887370347977,
+                    0.4889623522758484,
+                    -0.48345550894737244,
+                    0.009350270964205265
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "2217ba55c90019a547889beab04a7d2271130fad76af7f0810ea6529592adef8"
+          }
+        },
+        {
+          "name": "norm_true",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": true
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.018231887370347977,
+                    0.4889623522758484,
+                    -0.48345550894737244,
+                    0.009350270964205265
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "c7badc5a8f5a5f0610a6de8960f5beae63f4f5eecb8968d03243b54e00c35c3b"
+          }
+        },
+        {
+          "name": "norm_fraction",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 1.75
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.018231887370347977,
+                    0.4889623522758484,
+                    -0.48345550894737244,
+                    0.009350270964205265
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "2217ba55c90019a547889beab04a7d2271130fad76af7f0810ea6529592adef8"
+          }
+        },
+        {
+          "name": "norm_fraction",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": 1.75
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.018231887370347977,
+                    0.4889623522758484,
+                    -0.48345550894737244,
+                    0.009350270964205265
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "c7badc5a8f5a5f0610a6de8960f5beae63f4f5eecb8968d03243b54e00c35c3b"
+          }
+        },
+        {
+          "name": "norm_negative_fraction",
+          "path": "/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": -1.75
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "c851e214efde71a1e8fa4d486a943d4ef0895bf2f0305680388730f5cf8e503a"
+          }
+        },
+        {
+          "name": "norm_negative_fraction",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": "hello world",
+            "embd_normalize": -1.75
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.05274593085050583,
+                    1.4145971536636353,
+                    -1.3986655473709106,
+                    0.027050890028476715
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "0b19470e4b6dcdb5fe159d20ca5e9d7ab3e76c2c572ea8db0066e948e1b93005"
+          }
+        },
+        {
+          "name": "tokens_wrap_u32",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              4294967397,
+              4294967400,
+              4294967398
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "18460ff736b71a81a3afb16e0e4f519e259198f3f6ca86da3cc9b41789a8ab71"
+          }
+        },
+        {
+          "name": "tokens_wrap_u32",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              4294967397,
+              4294967400,
+              4294967398
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 3,
+                "total_tokens": 3
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "a1fa1cb5fb551df43e112e71fb7420c51b0763282b9b6559d24e6e76ad14ac5f"
+          }
+        },
+        {
+          "name": "tokens_wrap_negative",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              -4294967195,
+              -4294967192,
+              -4294967194
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "18460ff736b71a81a3afb16e0e4f519e259198f3f6ca86da3cc9b41789a8ab71"
+          }
+        },
+        {
+          "name": "tokens_wrap_negative",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              -4294967195,
+              -4294967192,
+              -4294967194
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 3,
+                "total_tokens": 3
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "a1fa1cb5fb551df43e112e71fb7420c51b0763282b9b6559d24e6e76ad14ac5f"
+          }
+        },
+        {
+          "name": "tokens_wrap_u64",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              18446744069414584421,
+              18446744069414584424,
+              18446744069414584422
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "18460ff736b71a81a3afb16e0e4f519e259198f3f6ca86da3cc9b41789a8ab71"
+          }
+        },
+        {
+          "name": "tokens_wrap_u64",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              18446744069414584421,
+              18446744069414584424,
+              18446744069414584422
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 3,
+                "total_tokens": 3
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.02981100045144558,
+                    0.704314112663269,
+                    -0.7086216807365417,
+                    0.03013766184449196
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "a1fa1cb5fb551df43e112e71fb7420c51b0763282b9b6559d24e6e76ad14ac5f"
+          }
+        },
+        {
+          "name": "mixed_boolean",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              101,
+              "hello",
+              true,
+              false,
+              102
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.02376282587647438,
+                    0.7155027389526367,
+                    -0.6982052326202393,
+                    0.0008425798732787371
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "89ac9cc8bc665daedb6c1e6f07a703ecae2b146cff8b3734375dc9a94f412bbc"
+          }
+        },
+        {
+          "name": "mixed_boolean",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              101,
+              "hello",
+              true,
+              false,
+              102
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 5,
+                "total_tokens": 5
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.02376282587647438,
+                    0.7155027389526367,
+                    -0.6982052326202393,
+                    0.0008425798732787371
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "7d9a50941c5f5791280fecf6dc2f9e919a0b0017fbe28ebb9a091134e8317202"
+          }
+        },
+        {
+          "name": "object_boolean",
+          "path": "/embeddings",
+          "request": {
+            "input": {
+              "prompt_string": [
+                true,
+                "hello",
+                false
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.4532994031906128,
+                    0.16467583179473877,
+                    0.7570018172264099,
+                    -0.44085100293159485
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "f00b838aba876f2a3af1ae05887f28c0dd9733e1b3e45e2a17d6358fa4531baa"
+          }
+        },
+        {
+          "name": "object_boolean",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": {
+              "prompt_string": [
+                true,
+                "hello",
+                false
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 3,
+                "total_tokens": 3
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.4532994031906128,
+                    0.16467583179473877,
+                    0.7570018172264099,
+                    -0.44085100293159485
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "5fabbcfb4cbd1f42a3e9019d783eedceed9e25fba300dd36957f1109bbcc0a04"
+          }
+        },
+        {
+          "name": "mixed_fraction",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              101,
+              "hello",
+              1.75,
+              102
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": [
+              {
+                "index": 0,
+                "embedding": [
+                  [
+                    -0.0253438763320446,
+                    0.7120482921600342,
+                    -0.7016050815582275,
+                    0.009761881083250046
+                  ]
+                ]
+              }
+            ],
+            "raw_sha256": "e61b4e6f989d14f2084000b048deeb6fd19d1fa6459c112b64adb243368ec1af"
+          }
+        },
+        {
+          "name": "mixed_fraction",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              101,
+              "hello",
+              1.75,
+              102
+            ]
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "model": "fixture-model",
+              "object": "list",
+              "usage": {
+                "prompt_tokens": 4,
+                "total_tokens": 4
+              },
+              "data": [
+                {
+                  "embedding": [
+                    -0.0253438763320446,
+                    0.7120482921600342,
+                    -0.7016050815582275,
+                    0.009761881083250046
+                  ],
+                  "index": 0,
+                  "object": "embedding"
+                }
+              ]
+            },
+            "raw_sha256": "a725ca02eeabbabfd8dc5f7ac7c3d88f4812d431e252ec2cb26f81ef267c16f4"
+          }
+        },
+        {
+          "name": "float_lexical_ids",
+          "path": "/embeddings",
+          "request": {
+            "input": [
+              101.0,
+              104.0,
+              102.0
+            ]
+          },
+          "response": {
+            "status": 400,
+            "body": {
+              "error": {
+                "code": 400,
+                "message": "\"prompt\" elements must be a string, a list of tokens, a JSON object containing a prompt string, or a list of mixed strings & tokens.",
+                "type": "invalid_request_error"
+              }
+            },
+            "raw_sha256": "0c47e832faed0a6ab7b38f4f777ad85434b0486358977f37853bae6a40f827ff"
+          }
+        },
+        {
+          "name": "float_lexical_ids",
+          "path": "/v1/embeddings",
+          "request": {
+            "input": [
+              101.0,
+              104.0,
+              102.0
+            ]
+          },
+          "response": {
+            "status": 400,
+            "body": {
+              "error": {
+                "code": 400,
+                "message": "\"prompt\" elements must be a string, a list of tokens, a JSON object containing a prompt string, or a list of mixed strings & tokens.",
+                "type": "invalid_request_error"
+              }
+            },
+            "raw_sha256": "0c47e832faed0a6ab7b38f4f777ad85434b0486358977f37853bae6a40f827ff"
+          }
+        }
+      ]
+    }
+  ]
+}

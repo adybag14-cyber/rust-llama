@@ -1,0 +1,71 @@
+     Locking 7 packages to highest Rust 1.99.1 compatible versions
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\quant)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\llama-behavior)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\gguf)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\tokenizer)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\model-runtime)
+   Compiling llama-inference v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\inference)
+   Compiling llama-conformance v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\llama-conformance)
+   Compiling qwen2-tiny-probe v0.0.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\tiny-probe)
+error[E0277]: the trait bound `Value: From<f64>` is not satisfied
+  --> src\main.rs:74:78
+   |
+74 | ...   ("failed_generations",Value::from(failed_generation)),("max_abs",Value::from(maximum)),("max_fraction",Value::from(fraction)),
+   |                                                                        ^^^^^ the trait `From<f64>` is not implemented for `Value`
+   |
+   = help: `Value` implements trait `From<T>`:
+             From<&str>
+             From<bool>
+             From<i32>
+             From<i64>
+             From<std::string::String>
+             From<u32>
+             From<u64>
+
+error[E0277]: the trait bound `Value: From<f64>` is not satisfied
+  --> src\main.rs:74:116
+   |
+74 | ...ue::from(maximum)),("max_fraction",Value::from(fraction)),
+   |                                       ^^^^^ the trait `From<f64>` is not implemented for `Value`
+   |
+   = help: `Value` implements trait `From<T>`:
+             From<&str>
+             From<bool>
+             From<i32>
+             From<i64>
+             From<std::string::String>
+             From<u32>
+             From<u64>
+
+error[E0277]: the trait bound `Value: From<{float}>` is not satisfied
+  --> src\main.rs:84:77
+   |
+84 | ...otals[4])),("absolute_tolerance",Value::from(2e-6)),("relative_tolerance",Value::from(2e-6)),
+   |                                     ^^^^^ the trait `From<{float}>` is not implemented for `Value`
+   |
+   = help: `Value` implements trait `From<T>`:
+             From<&str>
+             From<bool>
+             From<i32>
+             From<i64>
+             From<std::string::String>
+             From<u32>
+             From<u64>
+
+error[E0277]: the trait bound `Value: From<{float}>` is not satisfied
+  --> src\main.rs:84:118
+   |
+84 | ...rom(2e-6)),("relative_tolerance",Value::from(2e-6)),
+   |                                     ^^^^^ the trait `From<{float}>` is not implemented for `Value`
+   |
+   = help: `Value` implements trait `From<T>`:
+             From<&str>
+             From<bool>
+             From<i32>
+             From<i64>
+             From<std::string::String>
+             From<u32>
+             From<u64>
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `qwen2-tiny-probe` (bin "qwen2-tiny-probe") due to 4 previous errors

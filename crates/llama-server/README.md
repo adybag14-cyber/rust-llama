@@ -106,6 +106,8 @@ separate open requirements.
 
 ## Resource and lifecycle behavior
 
+The --ctx-size / -c option sets the requested model context (default 1024, capped at the trained limit). The --max-weight-mib option sets the decoded F32 weight-cache budget (default 2048 MiB). Packed tensors, context state and other allocations are additional; this is not an RSS limit. Arithmetic overflow and invalid/zero model bounds fail before the listener starts. RuntimeProvider::load_with_options exposes the same LoadOptions contract to Rust callers. The pinned Qwen2.5-0.5B Q4_K_M input needs --max-weight-mib 3072.
+
 Generation and embedding work share --max-generations admission capacity.
 The --max-embedding-inputs limit defaults to 64 per request. Each input must fit
 the loaded model context. The server bounds request bytes, response bytes,
@@ -136,13 +138,18 @@ from this Rust implementation. Coverage includes input shapes, ordering,
 special-token insertion, all pooling modes, normalization, base64, model labels,
 token usage, numeric conversions and typed errors.
 
-Windows matches every compared output F32 bit, including seven base64 vectors.
-Linux passes the fixed raw BERT error budget. Normalization 0 scales values into
+The independently built MSVC and GNU originals have separate captures. Both
+verified targets require exact corresponding output F32 bits, including all
+seven base64 vectors. Expected profiles are selected from target configuration
+independently of runtime dispatch. Normalization 0 scales values into
 an int16-sized range, so its portable end-to-end bound is derived from that
 unchanged raw budget before comparison. Direct normalization of identical native
 raw inputs is checked separately over 4,608 values, requiring exact Windows
-bits and at most two F32 ULPs on portable targets. The formulas and observed
-results are recorded in evidence/2026-11-09/server-embeddings.
+bits and at most two F32 ULPs on portable targets. The original formulas and historical drift are recorded in
+evidence/2026-11-09/server-embeddings. The new corresponding-profile comparison
+records zero error for all 283 HTTP transcripts on both verified targets,
+including 23,479 numeric comparisons in the pretrained subset; see
+evidence/2026-11-09/qwen2-and-native-profiles.
 
 Run the pretrained HTTP test explicitly after obtaining the hash-pinned model
 listed in fixtures/inference/README.md:

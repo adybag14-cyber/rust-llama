@@ -47,8 +47,9 @@ The numerical gate was fixed before comparing Rust results:
 This gate applies to this model and CPU path. Tokens and text use exact equality.
 The initial 9 November 2026 Windows execution compared 62,976 logits with
 maximum absolute error `1.764297485e-5`. Matching the source's F32-product/F64-sum
-reduction now makes all those Windows logits exact; Linux records maximum error
-`5.722045898e-6`. All 96 greedy IDs and six complete outputs remain exact. The compared-row count includes the final prompt row
+reduction now makes all those Windows logits exact; the separate GNU capture now also matches exactly after preserving native
+SSE2 row arithmetic and padded attention layout. The earlier GNU comparison
+recorded maximum error `5.722045898e-6` and remains historical evidence. All 96 greedy IDs and six complete outputs remain exact. The compared-row count includes the final prompt row
 again as the initial greedy prediction row.
 
 The real-model server check executes HTTP requests, SSE, replay, tokenizer
@@ -120,8 +121,10 @@ therefore checks the Rust reader against the independently captured outputs of
 the equivalent little-endian model; it does not imply native big-endian support.
 
 After matching source attention and pooling reduction, Windows compares every
-value exactly. Linux maximum absolute error is `1.348853111e-4`, within the
-same predeclared `2e-4 + 2e-5 * abs(reference)` limit. The initial numerical
+value exactly. The corresponding GNU capture now matches exactly after preserving its
+four-lane variance reduction. The earlier cross-profile comparison recorded
+`1.348853111e-4`, within the same predeclared
+`2e-4 + 2e-5 * abs(reference)` limit; its evidence is retained. The initial numerical
 failure, per-stage diagnosis and permanent 12-layer attention fixture are
 documented under `evidence/2026-11-09/bert`.
 
@@ -141,7 +144,7 @@ no external model download:
 cargo test --locked --offline -p llama-inference --test bert_defaults
 ```
 
-CI additionally supplies all six pretrained model environment variables and
+CI additionally supplies all seven pretrained model environment variables and
 runs the complete set of explicit ignored model comparisons in release mode.
 Other ignored vendor/hardware tests have separate prerequisites.
 
@@ -171,7 +174,9 @@ configured alias fixture-model is mapped to the Rust provider's identifier
 only when the request does not supply a string model label. Explicit labels,
 indices, field structure and token counts remain exact.
 
-Windows MSVC x64 requires exact F32 bits and base64 payloads. Portable raw BERT
+Both verified x86_64 MSVC and GNU targets require exact F32 bits and base64
+payloads against their separate original-server captures. The -gnu file suffix
+selects the GNU corpus independently of the runtime math policy. Portable raw BERT
 comparisons keep the predeclared bound 2e-4 + 2e-5 * abs(reference). Mode 0
 normalization magnifies values into the range +/-32760; its bound is propagated
 from the same raw-vector bound using the formula recorded in
@@ -204,8 +209,9 @@ nor portable tolerances are generated from the Rust implementation.
 
 Each model contributes three prompts, 34 unique full-vocabulary rows and 24
 greedy predictions. SmolLM2 contributes 1,671,168 logits; Mamba contributes
-1,709,520. Windows records exact F32 equality for both. Linux SmolLM2 is also
-exact; Linux Mamba maximum absolute difference is 0.00008940696716308594.
+1,709,520. Windows records exact F32 equality for both. The corresponding GNU profiles are also exact after preserving source row
+arithmetic. The prior GNU Mamba difference of 0.00008940696716308594 remains
+recorded in historical evidence.
 The portable gate remains `2e-4 + 2e-5 * abs(reference)`.
 
 ~~~sh
@@ -238,3 +244,51 @@ modified inputs; they never alter the pinned native fixtures.
 cargo test --offline --locked -p llama-inference --test native_reference tiny_mamba -- --nocapture
 cargo test --offline --locked -p llama-inference --test mamba_loader
 ~~~
+
+
+## Qwen2 decoder corpus
+
+The external Qwen2.5-0.5B-Instruct Q4_K_M model has 491,400,032 bytes and SHA-256
+74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db.
+The pinned source revision is 9217f5db79a29953eb74d5343926648285ec7e67;
+its declared license is Apache-2.0. Weights remain outside this repository.
+Set LLAMA_TEST_QWEN2_MODEL to this file. Tests use a 3 GiB decoded-weight
+budget, context 128, one original CPU worker, F32 KV and disabled flash attention.
+
+The qwen2-05b-q4-k-m metadata/binary/provenance triples contain three prompts,
+34 unique full-vocabulary rows (5,165,824 F32 values) and 24 greedy predictions.
+Final-prompt and first-greedy rows are stored once only after bitwise equality
+checks. Both verified original profiles have independent expected data.
+
+Twenty-one tiny-qwen2 model variants exercise separate/fused Q/K/V, no/all/
+partial biases, tied/untied output, output bias and fused packed Q4 weights.
+Their independent corpora contain 165,888 unique logits and 198 generated IDs;
+early end tokens are retained. Thirteen physical GGUF metadata variants check
+source types, causal settings and RoPE factor precedence against the original.
+The partial fused-bias and nonfinite output-bias failures found during review
+are preserved outside the expected data, with permanent atomicity regressions.
+
+~~~sh
+cargo test --release --offline --locked -p llama-inference --test native_reference trained_qwen2 -- --ignored --nocapture
+cargo test --offline --locked -p llama-inference --test native_reference tiny_qwen2 -- --nocapture
+~~~
+
+## Separate native arithmetic profiles
+
+The verified Windows original uses scalar row math. The GNU build activates
+the source SSE2 exponentiation, summation and variance branches. Compiler
+macros and full build settings are recorded in gnu-native-build-provenance.json
+and the per-corpus provenance. The builds must not be described as numerically
+identical. The GNU Qwen story emits a different later greedy sequence from the
+Windows original; each Rust target must follow its corresponding original.
+
+GNU metadata/binary/provenance triples retain all request and output semantics.
+Complete GNU F32 Llama and BERT JSON references are also retained. Expected F32
+bytes were converted losslessly from original captures and round-tripped; no
+expected value was regenerated from Rust. Existing MSVC expectations and the
+predeclared numerical budgets remain unchanged. Ordinary profile selectors use
+target cfg independently of runtime arithmetic dispatch.
+
+The model runtime preserves source attention padding to 256 columns, masked
+physical slots, whole-row SiLU and the appropriate variance order. These
+verified profiles do not establish every CPU ISA, OS math library or compiler.

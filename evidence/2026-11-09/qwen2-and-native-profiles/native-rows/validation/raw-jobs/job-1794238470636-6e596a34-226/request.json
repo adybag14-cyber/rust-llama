@@ -1,0 +1,13 @@
+{
+  "id": "job-1794238470636-6e596a34-226",
+  "mode": "shell",
+  "command": "cargo build -p llama-ffi\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\npython '..\\check_context.py' debug 1\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo test -p llama-model-runtime -p llama-ffi --release --no-fail-fast\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo build -p llama-ffi --release\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\npython '..\\check_context.py' release 1\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo clippy -p llama-model-runtime -p llama-ffi --all-targets -- -D warnings\nexit $LASTEXITCODE",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft",
+  "timeoutMs": 3600000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T15:34:30.636Z"
+}

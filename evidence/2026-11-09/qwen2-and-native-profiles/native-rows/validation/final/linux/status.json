@@ -1,0 +1,155 @@
+{
+  "platform": "linux",
+  "passed": true,
+  "source_snapshot_sha256": "3b1cd9e8055211ba7e637ee74a2231a1443c7e74e2e3af91c83b8a207e74c494",
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.423
+    },
+    {
+      "name": "debug-tests",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--no-fail-fast",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.646
+    },
+    {
+      "name": "debug-build",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "build",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.674
+    },
+    {
+      "name": "debug-context",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+        "debug",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 14.608
+    },
+    {
+      "name": "debug-layout",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+        "debug",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.878
+    },
+    {
+      "name": "release-tests",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--no-fail-fast",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 13.428
+    },
+    {
+      "name": "release-build",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.627
+    },
+    {
+      "name": "release-context",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+        "release",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.082
+    },
+    {
+      "name": "release-layout",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+        "release",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.67
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "/home/tdamre/.cargo/bin/cargo",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.675
+    },
+    {
+      "name": "gnu-models",
+      "command": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_all_models.py",
+        "release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 122.221
+    }
+  ]
+}

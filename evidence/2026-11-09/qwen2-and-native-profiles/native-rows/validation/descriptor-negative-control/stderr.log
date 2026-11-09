@@ -1,0 +1,21 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\descriptor-negative-control\crates\quant)
+   Compiling llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\descriptor-negative-control\crates\platform-loader)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\row-math-integration\descriptor-negative-control\crates\model-runtime)
+warning: unused variable: `chunk_metadata`
+   --> crates\model-runtime\src\context\native.rs:816:13
+    |
+816 |         let chunk_metadata = chunk_tokens
+    |             ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_chunk_metadata`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `llama-model-runtime` (lib) generated 1 warning (run `cargo fix --lib -p llama-model-runtime` to apply 1 suggestion)
+warning: `llama-model-runtime` (lib test) generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.89s
+     Running unittests src\lib.rs (C:\Users\adyba\rust-llama-reference\row-math-integration\descriptor-negative-target\debug\deps\llama_model_runtime-81aaf186b3020add.exe)
+
+thread 'context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows' (47796) panicked at crates\model-runtime\src\context\native.rs:1178:9:
+assertion failed: matches!(context.decode_batch_with_work_limit(&batch, || false, retained + 32
+    * 1024), Err(Error::Unsupported(_)))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p llama-model-runtime --lib`

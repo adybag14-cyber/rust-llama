@@ -2,12 +2,16 @@
 //! Maintained implementation is Rust. The full operation registry is not a support claim.
 #![forbid(unsafe_code)]
 mod cpu;
+mod cpu_conv;
 mod cpu_extra;
 mod cpu_index;
 mod graph;
 mod native_sort;
 mod registry;
-pub use graph::{Graph, NodeId, Op, RopeMode, SortOrder, Triangle};
+pub use graph::{
+    Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode, SortOrder,
+    Triangle,
+};
 pub use llama_quant::DType;
 pub use registry::{GluOp, OpCode, UnaryOp};
 use std::sync::Arc;

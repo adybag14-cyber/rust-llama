@@ -1,0 +1,92 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T16:20:44.078882+00:00",
+  "qualification": "Coherent Qwen/strict Context/source row arithmetic integration; NativeContext descriptor follow-up and original GNU HTTP captures are still pending, not a final checkpoint proof",
+  "inputs_before": {
+    "files": 549,
+    "sha256": "875c2f4047346e98211f1be043be1c5326689bf04c8b0f49e15c1a072da97fa6"
+  },
+  "steps": [
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 12.345586900002672,
+      "tests": {
+        "passed": 97,
+        "failed": 0,
+        "ignored": 7
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 112.9040623999972,
+      "tests": {
+        "passed": 97,
+        "failed": 0,
+        "ignored": 7
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.9966712999994343
+    }
+  ],
+  "inputs_after": {
+    "files": 549,
+    "sha256": "875c2f4047346e98211f1be043be1c5326689bf04c8b0f49e15c1a072da97fa6"
+  },
+  "finished_utc": "2026-11-09T16:22:53.201908+00:00"
+}

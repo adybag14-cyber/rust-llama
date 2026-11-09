@@ -206,16 +206,6 @@ impl LlamaModel {
         }
         Ok(self.weights.token_embedding.row(token as usize)?.to_vec())
     }
-    pub(crate) fn empty_cache(&self) -> Vec<KvLayer> {
-        self.weights
-            .layers
-            .iter()
-            .map(|_| KvLayer {
-                keys: Vec::new(),
-                values: Vec::new(),
-            })
-            .collect()
-    }
     pub(crate) fn step(
         &self,
         hidden: Vec<f32>,
@@ -226,16 +216,23 @@ impl LlamaModel {
     ) -> Result<(Vec<f32>, Vec<f32>)> {
         let width = self.config.kv_width()?;
         let insertion = cache.first().map_or(0, |layer| layer.keys.len() / width);
-        self.step_inserting(hidden, position, cache, insertion, adapters, cancel)
+        let layout = math::AttentionLayout::contiguous_padded(
+            insertion
+                .checked_add(1)
+                .ok_or_else(|| Error::InvalidState("KV row count overflow".into()))?,
+        )?;
+        self.step_inserting(hidden, position, cache, insertion, layout, adapters, cancel)
     }
     // A physical native KV hole can precede already populated cells. Preserve
     // source accumulation order by inserting the new row at that exact index.
+    #[allow(clippy::too_many_arguments)] // Carries explicit physical softmax columns with the insertion.
     pub(crate) fn step_inserting(
         &self,
         mut hidden: Vec<f32>,
         position: usize,
         cache: &mut [KvLayer],
         insertion: usize,
+        layout: math::AttentionLayout<'_>,
         adapters: &AdapterSet,
         cancel: &mut impl FnMut() -> bool,
     ) -> Result<(Vec<f32>, Vec<f32>)> {
@@ -275,7 +272,7 @@ impl LlamaModel {
             math::rope(&mut k, c.head_dim()?, position, c.rope_base);
             kv.keys.splice(offset..offset, k);
             kv.values.splice(offset..offset, v);
-            let attention = math::attention(
+            let attention = math::attention_with_layout(
                 &q,
                 &kv.keys,
                 &kv.values,
@@ -283,6 +280,7 @@ impl LlamaModel {
                 c.kv_heads,
                 c.head_dim()?,
                 scale,
+                layout,
             )?;
             let mut projected = adapters.multiply(
                 &format!("blk.{index}.attn_output.weight"),
@@ -298,8 +296,9 @@ impl LlamaModel {
                 adapters.multiply(&format!("blk.{index}.ffn_up.weight"), &layer.up, &norm)?;
             math::bias(&mut gate, &layer.gate_bias);
             math::bias(&mut up, &layer.up_bias);
+            math::native_rows::silu_f32_in_place(&mut gate);
             for (gate, up) in gate.iter_mut().zip(up) {
-                *gate = math::silu(*gate) * up;
+                *gate *= up;
             }
             let mut ffn =
                 adapters.multiply(&format!("blk.{index}.ffn_down.weight"), &layer.down, &gate)?;

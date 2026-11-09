@@ -1,4 +1,7 @@
-//! Scalar runtime math and checked native quantized matrix-vector execution.
+//! Source-profile row math and checked native quantized matrix-vector execution.
+
+pub mod native_rows;
+
 use crate::{Error, Result};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -198,25 +201,27 @@ pub(crate) fn layer_norm(
     bias: &[f32],
     epsilon: f32,
 ) -> Result<Vec<f32>> {
+    if input.is_empty() || input.len() != weight.len() || input.len() != bias.len() {
+        return Err(Error::Shape("invalid layer normalization row".into()));
+    }
     let mean = input.iter().map(|x| *x as f64).sum::<f64>() as f32 / input.len() as f32;
-    let centered: Vec<f32> = input.iter().map(|x| x - mean).collect();
-    let variance =
-        (centered.iter().map(|x| (*x * *x) as f64).sum::<f64>() / input.len() as f64) as f32;
+    let mut centered = Vec::new();
+    centered
+        .try_reserve_exact(input.len())
+        .map_err(|_| Error::InvalidState("layer normalization allocation failed".into()))?;
+    centered.extend_from_slice(input);
+    // Source cvar selects its own SSE2 grouped F32 square sum on GNU x64.
+    // Return is F64; the NORM graph casts variance once before adding epsilon.
+    let variance = native_rows::center_f32_and_variance(&mut centered, mean) as f32;
     let scale = (variance + epsilon).sqrt().recip();
     if !scale.is_finite() || scale <= 0.0 {
         return Err(Error::NonFinite("layer normalization scale".into()));
     }
-    let output: Vec<f32> = centered
-        .iter()
-        .zip(weight)
-        .zip(bias)
-        .map(|((x, w), b)| x * scale * w + b)
-        .collect();
-    finite(&output, "layer normalization output")?;
-    Ok(output)
-}
-pub(crate) fn silu(x: f32) -> f32 {
-    x / (1.0 + (-x).exp())
+    for ((value, weight), bias) in centered.iter_mut().zip(weight).zip(bias) {
+        *value = *value * scale * weight + bias;
+    }
+    finite(&centered, "layer normalization output")?;
+    Ok(centered)
 }
 pub(crate) fn gelu(x: f32) -> f32 {
     // The frozen CPU vec.h unconditionally enables GGML_GELU_FP16. Its F32
@@ -257,12 +262,21 @@ pub(crate) fn softmax(values: &mut [f32]) -> Result<()> {
     if values.is_empty() {
         return Err(Error::Shape("empty attention row".into()));
     }
-    finite(values, "attention scores")?;
+    if values
+        .iter()
+        .any(|value| value.is_nan() || *value == f32::INFINITY)
+    {
+        return Err(Error::NonFinite("attention scores".into()));
+    }
     let max = values.iter().copied().fold(f32::NEG_INFINITY, f32::max);
-    let mut sum = 0.0f64;
-    for x in values.iter_mut() {
-        *x = (*x - max).exp();
-        sum += *x as f64;
+    if !max.is_finite() {
+        return Err(Error::NonFinite(
+            "attention row has no unmasked values".into(),
+        ));
+    }
+    let sum = native_rows::softmax_exp_sum_f32_in_place(values, max);
+    if !sum.is_finite() || sum <= 0.0 {
+        return Err(Error::NonFinite("attention normalization sum".into()));
     }
     let inverse = (1.0 / sum) as f32;
     for x in values {
@@ -287,7 +301,69 @@ pub(crate) fn rope(values: &mut [f32], head_dim: usize, position: usize, base: f
     }
 }
 
-/// Multi-head attention over dense flattened K/V rows, including GQA.
+pub(crate) fn rope_neox(values: &mut [f32], head_dim: usize, position: usize, base: f32) {
+    let theta_scale = base.powf(-2.0 / head_dim as f32);
+    for head in values.chunks_exact_mut(head_dim) {
+        let (left, right) = head.split_at_mut(head_dim / 2);
+        let mut theta = position as f32;
+        for (left, right) in left.iter_mut().zip(right) {
+            let (sin, cos) = theta.sin_cos();
+            let (x, y) = (*left, *right);
+            *left = x * cos - y * sin;
+            *right = x * sin + y * cos;
+            theta *= theta_scale;
+        }
+    }
+}
+
+/// Columns occupied by gathered K/V rows inside the original softmax row.
+///
+/// GGML keeps empty, unrelated-sequence, future and padded columns in place.
+/// Removing them changes SSE2 four-lane grouping and the normalization sum.
+/// An absent index map denotes contiguous columns starting at zero. The caller
+/// supplies the original row width; it is never inferred from visible rows.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct AttentionLayout<'a> {
+    pub row_len: usize,
+    pub columns: Option<&'a [usize]>,
+}
+impl AttentionLayout<'_> {
+    /// Dense non-flash graph rows use a multiple of 256 columns, including
+    /// BERT/no-cache attention. Zero and overflowing lengths are rejected.
+    pub fn contiguous_padded(count: usize) -> Result<Self> {
+        if count == 0 {
+            return Err(Error::Shape("empty attention row".into()));
+        }
+        let row_len = count
+            .checked_add(255)
+            .map(|n| n / 256 * 256)
+            .ok_or_else(|| Error::Shape("attention padding overflow".into()))?;
+        Ok(Self {
+            row_len,
+            columns: None,
+        })
+    }
+    fn validate(self, count: usize) -> Result<()> {
+        if self.row_len == 0 || count == 0 || count > self.row_len {
+            return Err(Error::Shape("invalid attention row width".into()));
+        }
+        if let Some(columns) = self.columns
+            && (columns.len() != count
+                || columns.last().is_some_and(|&column| column >= self.row_len)
+                || columns.windows(2).any(|pair| pair[0] >= pair[1]))
+        {
+            return Err(Error::Shape("invalid attention physical columns".into()));
+        }
+        Ok(())
+    }
+    fn column(self, row: usize) -> usize {
+        self.columns.map_or(row, |columns| columns[row])
+    }
+}
+
+/// Attention with dense contiguous source columns, including GQA. Strict
+/// sequential contexts and no-cache encoders use this path. NativeContext
+/// supplies its physical hole/stream layout through attention_with_layout.
 pub(crate) fn attention(
     query: &[f32],
     keys: &[f32],
@@ -297,18 +373,66 @@ pub(crate) fn attention(
     head_dim: usize,
     scale: f32,
 ) -> Result<Vec<f32>> {
-    let kv_width = kv_heads * head_dim;
+    let width = kv_heads
+        .checked_mul(head_dim)
+        .filter(|&width| width != 0)
+        .ok_or_else(|| Error::Shape("invalid attention KV width".into()))?;
+    attention_with_layout(
+        query,
+        keys,
+        values,
+        heads,
+        kv_heads,
+        head_dim,
+        scale,
+        AttentionLayout::contiguous_padded(keys.len() / width)?,
+    )
+}
+
+/// Execute the original full softmax row while storing only visible K/V rows.
+/// The grouped shape arguments retain the source head/GQA mapping explicitly.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn attention_with_layout(
+    query: &[f32],
+    keys: &[f32],
+    values: &[f32],
+    heads: usize,
+    kv_heads: usize,
+    head_dim: usize,
+    scale: f32,
+    layout: AttentionLayout<'_>,
+) -> Result<Vec<f32>> {
+    let kv_width = kv_heads
+        .checked_mul(head_dim)
+        .filter(|&width| width != 0)
+        .ok_or_else(|| Error::Shape("invalid attention KV width".into()))?;
+    if heads == 0
+        || !heads.is_multiple_of(kv_heads)
+        || heads.checked_mul(head_dim) != Some(query.len())
+        || keys.len() != values.len()
+        || !keys.len().is_multiple_of(kv_width)
+        || !scale.is_finite()
+    {
+        return Err(Error::Shape("invalid attention tensor shape".into()));
+    }
     let count = keys.len() / kv_width;
-    debug_assert_eq!(keys.len(), values.len());
-    debug_assert_eq!(query.len(), heads * head_dim);
+    layout.validate(count)?;
     // Frozen scalar ggml_vec_dot_f32 rounds each product to F32, then sums
-    // in ggml_float (F64). Attention uses that dot operation for both QK
-    // and probability-times-V; F32 accumulation can cross GELU table bins.
-    let mut output = vec![0.0f64; query.len()];
+    // in ggml_float (F64). This applies to QK and probability-times-V.
+    let mut output = Vec::new();
+    output
+        .try_reserve_exact(query.len())
+        .map_err(|_| Error::InvalidState("attention output allocation failed".into()))?;
+    output.resize(query.len(), 0.0f64);
+    let mut scores = Vec::new();
+    scores
+        .try_reserve_exact(layout.row_len)
+        .map_err(|_| Error::InvalidState("attention row allocation failed".into()))?;
+    scores.resize(layout.row_len, f32::NEG_INFINITY);
     for head in 0..heads {
+        scores.fill(f32::NEG_INFINITY);
         let kv_head = head / (heads / kv_heads);
         let q = &query[head * head_dim..(head + 1) * head_dim];
-        let mut scores = Vec::with_capacity(count);
         for token in 0..count {
             let offset = token * kv_width + kv_head * head_dim;
             let dot = q
@@ -316,24 +440,90 @@ pub(crate) fn attention(
                 .zip(&keys[offset..offset + head_dim])
                 .map(|(a, b)| f64::from(a * b))
                 .sum::<f64>() as f32;
-            scores.push(dot * scale);
+            let score = dot * scale;
+            if !score.is_finite() {
+                return Err(Error::NonFinite("attention score".into()));
+            }
+            scores[layout.column(token)] = score;
         }
         softmax(&mut scores)?;
-        for (token, probability) in scores.iter().enumerate() {
+        for token in 0..count {
+            let probability = scores[layout.column(token)];
             let offset = token * kv_width + kv_head * head_dim;
             for d in 0..head_dim {
                 output[head * head_dim + d] += f64::from(probability * values[offset + d]);
             }
         }
     }
-    let output: Vec<f32> = output.into_iter().map(|x| x as f32).collect();
-    finite(&output, "attention output")?;
-    Ok(output)
+    let mut result = Vec::new();
+    result
+        .try_reserve_exact(output.len())
+        .map_err(|_| Error::InvalidState("attention result allocation failed".into()))?;
+    result.extend(output.into_iter().map(|x| x as f32));
+    finite(&result, "attention output")?;
+    Ok(result)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn attention_masks_and_physical_layout_bounds_fail_safely() {
+        let mut row = [0.0, f32::NEG_INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY];
+        softmax(&mut row).unwrap();
+        assert_eq!(row, [1.0, 0.0, 0.0, 0.0]);
+        for mut invalid in [
+            [f32::NEG_INFINITY; 4],
+            [0.0, f32::INFINITY, 0.0, 0.0],
+            [0.0, f32::NAN, 0.0, 0.0],
+        ] {
+            let before = invalid.map(f32::to_bits);
+            assert!(softmax(&mut invalid).is_err());
+            assert_eq!(before, invalid.map(f32::to_bits));
+        }
+        let query = [0.5, 1.0];
+        let keys = [1.0, 2.0, 3.0, 4.0];
+        for columns in [&[0, 0][..], &[1, 0], &[0, 4], &[0]] {
+            assert!(
+                attention_with_layout(
+                    &query,
+                    &keys,
+                    &keys,
+                    1,
+                    1,
+                    2,
+                    1.0,
+                    AttentionLayout {
+                        row_len: 4,
+                        columns: Some(columns)
+                    },
+                )
+                .is_err()
+            );
+        }
+        for row_len in [0, 1, usize::MAX] {
+            assert!(
+                attention_with_layout(
+                    &query,
+                    &keys,
+                    &keys,
+                    1,
+                    1,
+                    2,
+                    1.0,
+                    AttentionLayout {
+                        row_len,
+                        columns: None
+                    },
+                )
+                .is_err()
+            );
+        }
+        assert!(AttentionLayout::contiguous_padded(0).is_err());
+        assert!(AttentionLayout::contiguous_padded(usize::MAX).is_err());
+        assert!(layer_norm(&[], &[], &[], 1e-5).is_err());
+        assert!(layer_norm(&[1.0], &[], &[0.0], 1e-5).is_err());
+    }
     #[test]
     fn half_rounding_handles_normal_and_subnormal_ties_even() {
         assert_eq!(round_f16(1.0 + 1.0 / 2048.0), 1.0);

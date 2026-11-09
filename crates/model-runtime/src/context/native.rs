@@ -261,8 +261,19 @@ impl NativeContext {
             .checked_mul(streams)
             .and_then(|n| n.checked_mul(std::mem::size_of::<Cell>()))
             .ok_or_else(|| invalid("native cell accounting overflow"))?;
+        let descriptor_bytes = streams
+            .checked_mul(std::mem::size_of::<Stream>())
+            .and_then(|n| {
+                n.checked_add(
+                    streams
+                        .checked_mul(llama.layer_count())?
+                        .checked_mul(std::mem::size_of::<KvLayer>())?,
+                )
+            })
+            .ok_or_else(|| invalid("native descriptor accounting overflow"))?;
         if bytes
             .checked_add(metadata_bytes)
+            .and_then(|n| n.checked_add(descriptor_bytes))
             .and_then(|n| n.checked_mul(2))
             .is_none_or(|n| n > MAX_NATIVE_WORK_BYTES)
         {
@@ -310,6 +321,13 @@ impl NativeContext {
             .pending_copies
             .capacity()
             .checked_mul(std::mem::size_of::<(usize, usize)>())
+            .and_then(|n| {
+                n.checked_add(
+                    self.streams
+                        .capacity()
+                        .checked_mul(std::mem::size_of::<Stream>())?,
+                )
+            })
             .ok_or_else(|| invalid("native memory accounting overflow"))?;
         for stream in &self.streams {
             bytes = bytes
@@ -699,7 +717,9 @@ impl NativeContext {
                 "empty or oversized native batch".into(),
             ));
         }
-        let mut last = std::collections::BTreeMap::new();
+        // Sequence IDs are already bounded to 0..256; avoid an unaccounted
+        // heap-backed tree for this validation-only lookup.
+        let mut last = [None; 256];
         for item in batch {
             if item.position < 0
                 || item.sequences.is_empty()
@@ -725,7 +745,7 @@ impl NativeContext {
                         "coupled native sequences have diverged position ranges",
                     ));
                 }
-                if let Some(old) = last.insert(sequence, item.position) {
+                if let Some(old) = last[sequence as usize].replace(item.position) {
                     if old == item.position {
                         return Err(Error::Unsupported("duplicate positions in one native microbatch require batched layer execution".into()));
                     }
@@ -787,11 +807,38 @@ impl NativeContext {
             .checked_add(batch.len())
             .ok_or_else(|| invalid("native active cache bound overflow"))?
             .min(self.capacity);
+        // These heap buffers coexist with the gathered KV and physical row:
+        // two usize fields per slot, one stream index per token, and a
+        // temporary find_slots result. The stream and layer Vec descriptors
+        // are separate from their elements. Charge the whole microbatch even
+        // though allocation and evaluation phases do not retain every buffer.
+        let chunk_tokens = batch.len().min(self.options.microbatch_tokens);
+        let chunk_metadata = chunk_tokens
+            .checked_mul(4 * std::mem::size_of::<usize>())
+            .and_then(|n| {
+                n.checked_add(
+                    self.streams
+                        .len()
+                        .checked_mul(std::mem::size_of::<Vec<usize>>())?,
+                )
+            })
+            .and_then(|n| {
+                n.checked_add(
+                    model
+                        .layer_count()
+                        .checked_mul(std::mem::size_of::<KvLayer>())?,
+                )
+            })
+            .ok_or_else(|| invalid("native microbatch metadata overflow"))?;
         let transient = active
             .checked_mul(self.width)
             .and_then(|n| n.checked_mul(model.layer_count()))
             .and_then(|n| n.checked_mul(8))
-            .and_then(|n| n.checked_add(self.capacity * 16))
+            // One visible usize index and one reused F32 score per physical
+            // column need at most 12 bytes on the supported x64 targets.
+            // Capacity, not visible count, bounds holes and common stream rows.
+            .and_then(|n| n.checked_add(self.capacity.checked_mul(16)?))
+            .and_then(|n| n.checked_add(chunk_metadata))
             .and_then(|n| n.checked_add(output_floats.checked_mul(4)?))
             .and_then(|n| n.checked_add(batch.len() * std::mem::size_of::<TokenOutput>()))
             .and_then(|n| n.checked_add(model.config().width.checked_mul(128)?))
@@ -814,11 +861,13 @@ impl NativeContext {
             if cancelled() {
                 return Err(Error::Cancelled);
             }
-            let mut by_stream = std::collections::BTreeMap::<usize, Vec<usize>>::new();
+            let mut by_stream = Vec::new();
+            by_stream
+                .try_reserve_exact(staged.streams.len())
+                .map_err(|_| invalid("native stream descriptor allocation failed"))?;
+            by_stream.resize_with(staged.streams.len(), Vec::<usize>::new);
             for (index, item) in chunk.iter().enumerate() {
-                let indices = by_stream
-                    .entry(staged.stream_id(item.sequences[0])?)
-                    .or_default();
+                let indices = &mut by_stream[staged.stream_id(item.sequences[0])?];
                 indices
                     .try_reserve_exact(1)
                     .map_err(|_| invalid("native stream index allocation failed"))?;
@@ -829,7 +878,10 @@ impl NativeContext {
                 .try_reserve_exact(chunk.len())
                 .map_err(|_| invalid("native batch slot allocation failed"))?;
             slots.resize(chunk.len(), (0, 0));
-            for (&stream, items) in &by_stream {
+            for (stream, items) in by_stream.iter().enumerate() {
+                if items.is_empty() {
+                    continue;
+                }
                 let allocated = staged.find_slots(stream, items.len())?;
                 for (&item, &slot) in items.iter().zip(&allocated) {
                     slots[item] = (stream, slot);
@@ -841,6 +893,27 @@ impl NativeContext {
                 }
                 staged.streams[stream].head = allocated.last().copied().unwrap_or(0) + 1;
             }
+            // Source get_n_kv chooses one common width across the selected
+            // streams after allocating the complete microbatch. Physical holes
+            // and cells belonging to other sequences still occupy columns.
+            let row_len = by_stream
+                .iter()
+                .enumerate()
+                .filter(|(_, items)| !items.is_empty())
+                .try_fold(0usize, |maximum, (stream, _)| {
+                    let used = staged.streams[stream]
+                        .cells
+                        .iter()
+                        .rposition(Cell::occupied)
+                        .map_or(0, |index| index + 1);
+                    let padded = used
+                        .checked_add(255)
+                        .map(|count| count / 256 * 256)
+                        .ok_or_else(|| invalid("native attention padding overflow"))?
+                        .max(256)
+                        .min(staged.capacity);
+                    Ok::<_, Error>(maximum.max(padded))
+                })?;
             let Model::Llama(model) = staged.model.as_ref() else {
                 return Err(invalid("native cache model mismatch"));
             };
@@ -902,11 +975,19 @@ impl NativeContext {
                     Input::Token(token) => staged.model.embedding(*token)?,
                     Input::Embedding(values) => copy_values(values)?,
                 };
+                // The reserved visible list includes the new occupied slot,
+                // so insertion cannot require a further allocation.
+                visible.insert(insert, slot);
+                let layout = math::AttentionLayout {
+                    row_len,
+                    columns: Some(&visible),
+                };
                 let (embedding, logits) = model.step_inserting(
                     input,
                     item.position as usize,
                     &mut cache,
                     insert,
+                    layout,
                     &staged.adapters,
                     &mut cancelled,
                 )?;
@@ -1072,6 +1153,37 @@ mod tests {
         assert!(
             context
                 .decode_batch_with_work_limit(&batch, || false, retained + 32 * 1024,)
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(context.position_max(0).unwrap(), 511);
+    }
+    #[test]
+    fn full_microbatch_metadata_is_counted_separately_from_attention_rows() {
+        let mut context = context(true);
+        context.options.microbatch_tokens = 512;
+        context.options.maximum_batch_tokens = 512;
+        let batch = (0..512)
+            .map(|position| NativeBatchToken {
+                sequences: vec![0],
+                position,
+                input: Input::Token(1),
+                output: OutputSelection::None,
+            })
+            .collect::<Vec<_>>();
+        let before = context.save_native_state(None, 0).unwrap();
+        let retained =
+            2 * context.storage_bytes().unwrap() + batch.len() * std::mem::size_of::<TokenOutput>();
+        // The prior bound allowed 32 KiB here. Its gathered KV plus physical
+        // row fit, but the additional full-chunk descriptors exceed the limit.
+        assert!(matches!(
+            context.decode_batch_with_work_limit(&batch, || false, retained + 32 * 1024),
+            Err(Error::Unsupported(_))
+        ));
+        assert_eq!(context.save_native_state(None, 0).unwrap(), before);
+        assert!(
+            context
+                .decode_batch_with_work_limit(&batch, || false, retained + 64 * 1024)
                 .unwrap()
                 .is_empty()
         );

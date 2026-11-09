@@ -1,0 +1,150 @@
+{
+  "native_cases": 20,
+  "output_words_per_host": 300,
+  "prior_original_convolution_cases": 961,
+  "prefixed_gnu_differing_values": 66,
+  "prefixed_gnu_differing_cases": 10,
+  "reports": {
+    "msvc": {
+      "platform": "msvc",
+      "steps": [
+        {
+          "step": "fmt",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "fmt",
+            "--all",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "debug",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "release",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "--release",
+            "-p",
+            "llama-tensor",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "clippy",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "clippy",
+            "-p",
+            "llama-tensor",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "source_sha256": "3db7ab2d1f00d4d4e4c85ce2a0241a6443fe3460c59958a5018d88c833b7328b",
+      "qualification": "Focused complete tensor suite, including unchanged original961 convolution/extraction/pooling/resize cases and new20 overlapping backward-gradient native controls; no row-policy/OS-math revisions in this snapshot.",
+      "tests_per_profile": {
+        "debug": 26,
+        "release": 26
+      }
+    },
+    "gnu": {
+      "platform": "gnu",
+      "steps": [
+        {
+          "step": "fmt",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "fmt",
+            "--all",
+            "--check"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "debug",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--target-dir",
+            "/tmp/rust-llama-pool-backward-nan",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "release",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "test",
+            "--release",
+            "-p",
+            "llama-tensor",
+            "--target-dir",
+            "/tmp/rust-llama-pool-backward-nan",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0
+        },
+        {
+          "step": "clippy",
+          "command": [
+            "cargo",
+            "+1.99.1",
+            "clippy",
+            "-p",
+            "llama-tensor",
+            "--all-targets",
+            "--target-dir",
+            "/tmp/rust-llama-pool-backward-nan",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "source_sha256": "3db7ab2d1f00d4d4e4c85ce2a0241a6443fe3460c59958a5018d88c833b7328b",
+      "qualification": "Focused complete tensor suite, including unchanged original961 convolution/extraction/pooling/resize cases and new20 overlapping backward-gradient native controls; no row-policy/OS-math revisions in this snapshot.",
+      "tests_per_profile": {
+        "debug": 26,
+        "release": 26
+      }
+    }
+  },
+  "native_capture_job": "job-1794243905443-f084d42d-b48",
+  "validation_job": "job-1794244257505-776a3cc1-58f",
+  "preserved_failures": {
+    "adapter_enum_error": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\convolution\\backward-nan-control\\pre-fix\\adapter-source",
+    "actual_gnu_66_word_mismatch": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\convolution\\backward-nan-control\\pre-fix\\actual-gnu-mismatch"
+  },
+  "original_handoff": "The previous convolution handoff is unchanged."
+}

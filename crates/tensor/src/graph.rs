@@ -37,10 +37,106 @@ pub enum SortOrder {
     Descending = 1,
 }
 
+/// Signed frozen convolution parameters, in width/height order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Conv2dParams {
+    pub stride: [i32; 2],
+    pub padding: [i32; 2],
+    pub dilation: [i32; 2],
+}
+/// Signed frozen convolution parameters, in width/height/depth order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Conv3dParams {
+    pub stride: [i32; 3],
+    pub padding: [i32; 3],
+    pub dilation: [i32; 3],
+}
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PoolMode {
+    Max = 0,
+    Average = 1,
+}
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ResizeMode {
+    Nearest = 0,
+    Bilinear = 1,
+    Bicubic = 2,
+}
+
 /// Only these explicitly modeled operations can be submitted to this executor.
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Inputs: kernel metadata, image. Preserves the frozen CPU address policy.
+    Im2col {
+        params: Conv2dParams,
+        is_2d: bool,
+        dtype: DType,
+    },
+    /// Inputs: gradient, kernel metadata, matching the actual frozen CPU kernel.
+    Im2colBack {
+        params: Conv2dParams,
+        is_2d: bool,
+        shape: [usize; 4],
+    },
+    Im2col3d {
+        params: Conv3dParams,
+        input_channels: usize,
+        dtype: DType,
+    },
+    Col2im1d {
+        stride: usize,
+        output_channels: usize,
+        padding: usize,
+    },
+    /// Source supports zero padding and unit dilation only.
+    ConvTranspose1d {
+        stride: usize,
+    },
+    /// Direct CONV_2D operation, distinct from the im2col/matmul graph helper.
+    Conv2d {
+        params: Conv2dParams,
+    },
+    /// Batch and output-channel counts are derived from the packed axis 3.
+    Conv3d {
+        params: Conv3dParams,
+        input_channels: usize,
+    },
+    Conv2dDepthwise {
+        params: Conv2dParams,
+    },
+    /// Source transpose-2D constructor supports zero padding only.
+    ConvTranspose2d {
+        stride: usize,
+    },
+    Pool1d {
+        mode: PoolMode,
+        kernel: usize,
+        stride: usize,
+        padding: i32,
+    },
+    /// Fractional pads affect constructor geometry, then truncate for addressing.
+    Pool2d {
+        mode: PoolMode,
+        kernel: [usize; 2],
+        stride: [usize; 2],
+        padding: [f32; 2],
+    },
+    /// Inputs: output gradient, original forward input. F32 result.
+    Pool2dBack {
+        mode: PoolMode,
+        kernel: [usize; 2],
+        stride: [usize; 2],
+        padding: [f32; 2],
+    },
+    Resize {
+        shape: [usize; 4],
+        mode: ResizeMode,
+        align_corners: bool,
+        antialias: bool,
+    },
     Dup,
     /// Inputs: values, expert bias rows, I32 expert indices. -1 copies a row.
     AddId,
@@ -239,6 +335,20 @@ impl Op {
         use Op::*;
         match self {
             Dup => OpCode::DUP,
+
+            Im2col { .. } => OpCode::IM2COL,
+            Im2colBack { .. } => OpCode::IM2COL_BACK,
+            Im2col3d { .. } => OpCode::IM2COL_3D,
+            Col2im1d { .. } => OpCode::COL2IM_1D,
+            ConvTranspose1d { .. } => OpCode::CONV_TRANSPOSE_1D,
+            Conv2d { .. } => OpCode::CONV_2D,
+            Conv3d { .. } => OpCode::CONV_3D,
+            Conv2dDepthwise { .. } => OpCode::CONV_2D_DW,
+            ConvTranspose2d { .. } => OpCode::CONV_TRANSPOSE_2D,
+            Pool1d { .. } => OpCode::POOL_1D,
+            Pool2d { .. } => OpCode::POOL_2D,
+            Pool2dBack { .. } => OpCode::POOL_2D_BACK,
+            Resize { .. } => OpCode::UPSCALE,
             AddId => OpCode::ADD_ID,
             MatMulId => OpCode::MUL_MAT_ID,
             SetRows => OpCode::SET_ROWS,
@@ -319,7 +429,17 @@ impl Op {
             } => {
                 2 + usize::from(*with_scores) + usize::from(*with_blocks) + usize::from(*with_extra)
             }
-            Self::Acc { .. } | Self::Set { .. } => 2,
+            Self::Acc { .. }
+            | Self::Set { .. }
+            | Self::Im2col { .. }
+            | Self::Im2colBack { .. }
+            | Self::Im2col3d { .. }
+            | Self::ConvTranspose1d { .. }
+            | Self::Conv2d { .. }
+            | Self::Conv3d { .. }
+            | Self::Conv2dDepthwise { .. }
+            | Self::ConvTranspose2d { .. }
+            | Self::Pool2dBack { .. } => 2,
             Self::CountEqual
             | Self::OutProd
             | Self::SiluBack

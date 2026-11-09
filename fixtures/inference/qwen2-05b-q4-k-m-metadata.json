@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "reference": "frozen-llama.cpp-master-c-api",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "vocab_only": false,
+  "n_vocab": 151936,
+  "n_ctx": 128,
+  "max_tokens": 8,
+  "threads": 1,
+  "kv_type": "F32",
+  "flash_attention": false,
+  "mmap": false,
+  "logits_layout": "one unique full vocabulary row per consumed prompt/greedy input token",
+  "detokenize_remove_special": true,
+  "detokenize_unparse_special": false,
+  "comparison_tolerance": {
+    "absolute": 0.0002,
+    "relative": 2e-05
+  },
+  "cases": [
+    {
+      "name": "story",
+      "prompt": "Once upon a time",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "pieces_hex": [
+        "4f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "pieces_special_hex": [
+        "4f6e6365",
+        "2075706f6e",
+        "2061",
+        "2074696d65"
+      ],
+      "detokenized_hex": "4f6e63652075706f6e20612074696d65",
+      "greedy_tokens": [
+        11,
+        1052,
+        572,
+        264,
+        883,
+        6941,
+        3757,
+        13
+      ],
+      "greedy_pieces_hex": [
+        "2c",
+        "207468657265",
+        "20776173",
+        "2061",
+        "206d616e",
+        "206e616d6564",
+        "204a6f686e",
+        "2e"
+      ],
+      "finished_eog": false,
+      "generated_hex": "2c207468657265207761732061206d616e206e616d6564204a6f686e2e",
+      "first_row": 0,
+      "row_count": 11
+    },
+    {
+      "name": "geography",
+      "prompt": "The capital of France is",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        785,
+        6722,
+        315,
+        9625,
+        374
+      ],
+      "pieces_hex": [
+        "546865",
+        "206361706974616c",
+        "206f66",
+        "204672616e6365",
+        "206973"
+      ],
+      "pieces_special_hex": [
+        "546865",
+        "206361706974616c",
+        "206f66",
+        "204672616e6365",
+        "206973"
+      ],
+      "detokenized_hex": "546865206361706974616c206f66204672616e6365206973",
+      "greedy_tokens": [
+        12095,
+        13,
+        1084,
+        374,
+        279,
+        7772,
+        3283,
+        304
+      ],
+      "greedy_pieces_hex": [
+        "205061726973",
+        "2e",
+        "204974",
+        "206973",
+        "20746865",
+        "206c617267657374",
+        "2063697479",
+        "20696e"
+      ],
+      "finished_eog": false,
+      "generated_hex": "2050617269732e20497420697320746865206c617267657374206369747920696e",
+      "first_row": 11,
+      "row_count": 12
+    },
+    {
+      "name": "code",
+      "prompt": "fn main() {",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        8822,
+        1887,
+        368,
+        314
+      ],
+      "pieces_hex": [
+        "666e",
+        "206d61696e",
+        "2829",
+        "207b"
+      ],
+      "pieces_special_hex": [
+        "666e",
+        "206d61696e",
+        "2829",
+        "207b"
+      ],
+      "detokenized_hex": "666e206d61696e2829207b",
+      "greedy_tokens": [
+        715,
+        262,
+        1077,
+        5206,
+        856,
+        284,
+        220,
+        16
+      ],
+      "greedy_pieces_hex": [
+        "200a",
+        "202020",
+        "206c6574",
+        "206d7574",
+        "2078",
+        "203d",
+        "20",
+        "31"
+      ],
+      "finished_eog": false,
+      "generated_hex": "200a202020206c6574206d75742078203d2031",
+      "first_row": 23,
+      "row_count": 11
+    }
+  ],
+  "row_count": 34
+}

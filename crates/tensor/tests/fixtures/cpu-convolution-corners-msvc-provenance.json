@@ -1,0 +1,807 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "reference": "Original GGML constructors, actual original one-thread CPU graphs, unchanged native outputs captured before Rust implementation/comparison.",
+  "cases": 25,
+  "output_bytes": 422,
+  "by_operation": {
+    "conv_2d_direct": 6,
+    "conv_2d_dw_direct": 6,
+    "conv_3d_direct": 2,
+    "im2col": 4,
+    "im2col_3d": 2,
+    "im2col_back": 1,
+    "pool_2d": 4
+  },
+  "file": {
+    "name": "cpu-convolution-reference.bin",
+    "bytes": 10177,
+    "sha256": "6eee2b48b2069538accf8c8419bc5159e69eb3b7123260ab09d3c31239f560ea"
+  },
+  "sources": {
+    "tensor-oracle\\convolution\\construction-corners\\generate.py": {
+      "bytes": 10316,
+      "sha256": "dc10de15519a29f74ec9e2dfb10f40a9459204625d3d14c8e83681e399bceda0"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml.c": {
+      "bytes": 267312,
+      "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    }
+  },
+  "notes": [
+    "IM2COL_BACK CPU input order is gradient then kernel metadata; header comments reverse these names.",
+    "IM2COL 1D/2D uses flattened IH*IW addresses within each channel, including original padded-row behavior; 3D uses source strides.",
+    "Pool1D excludes padding from average divisor; Pool2D includes padding in the full kernel-area divisor.",
+    "Pool2D fractional padding affects constructor output dimensions, then is truncated into I32 operator parameters for kernel addressing.",
+    "Pool max initializes -FLT_MAX and uses source comparator argument order. Backward uses source first-tie and NaN comparison order.",
+    "Native output byte strides before CONT are retained as the last four case integers, including CWHN depthwise outputs.",
+    "Raw payload and exceptional cases preserve original output bytes; no normalization or numerical tolerance is applied.",
+    "Compiler/macro provenance matches the prior indexing and row-math references. Both frozen builds omit GGML_SIMD/SSE3 and use F64 scalar F32/F16 channel dots."
+  ],
+  "case_inventory": [
+    {
+      "name": "conv2d_truncated_negative_0_3",
+      "tag": "conv_2d_direct",
+      "ints": [
+        3,
+        3,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "a3bcfa60e32be6805b03943996e441e2271f5bcec351eccbe41a634c8e042b46"
+    },
+    {
+      "name": "depthwise_truncated_negative_0_3",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        3,
+        3,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "f9135ef41a430b07f15297f8b049152b0ddc210218a60e24c71da84627c79f66"
+    },
+    {
+      "name": "conv2d_truncated_negative_0_4",
+      "tag": "conv_2d_direct",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "5958207d48d0ce78f19291f01b3b2c391e0a100f70f7367848c7a6c8ecbef36e"
+    },
+    {
+      "name": "depthwise_truncated_negative_0_4",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "a3ffd235b052e9642de342e302c464dc13ca08d8399d4d97b26fb62e94819c70"
+    },
+    {
+      "name": "conv2d_truncated_negative_0_7",
+      "tag": "conv_2d_direct",
+      "ints": [
+        7,
+        7,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "87720a64ae222481c7af05bcbc807aa40327093fa383d2996e13225fb33a39dc"
+    },
+    {
+      "name": "depthwise_truncated_negative_0_7",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        7,
+        7,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "075911ebab166fbf9d4f795ee425eccbd6112f2d37cef1593c5b12bc4e30187c"
+    },
+    {
+      "name": "conv2d_truncated_negative_1_3",
+      "tag": "conv_2d_direct",
+      "ints": [
+        3,
+        3,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "87c242f7a161e04030080326ca788d004ed9178dba295f5137e37303275aa115"
+    },
+    {
+      "name": "depthwise_truncated_negative_1_3",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        3,
+        3,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "82fe91b53205fbd5937c79dee7cd16ee09e95f51ddf60cf50cd830c0fb143e11"
+    },
+    {
+      "name": "conv2d_truncated_negative_1_4",
+      "tag": "conv_2d_direct",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "fa05b7531f4e8c570db48af275231a23efef3a2c546d56e0ea5287ef98484ec4"
+    },
+    {
+      "name": "depthwise_truncated_negative_1_4",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "16cd0efa9bf1a0494979a8bdab6f49027bfd870e01d2a6c61dcce566e1247222"
+    },
+    {
+      "name": "conv2d_truncated_negative_1_7",
+      "tag": "conv_2d_direct",
+      "ints": [
+        7,
+        7,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "d4c72e72ec17166d99ba2d919dc95a4f184380d6b62cd394c80ab5c59d1f8c7e"
+    },
+    {
+      "name": "depthwise_truncated_negative_1_7",
+      "tag": "conv_2d_dw_direct",
+      "ints": [
+        7,
+        7,
+        0,
+        0,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "fcc37506382cdb03f88ad7cdfb2222d01c900dfb1e4266ed428bb6ed0e73bdd8"
+    },
+    {
+      "name": "im2col1d_truncated_negative_0",
+      "tag": "im2col",
+      "ints": [
+        4,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        3,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        12,
+        12,
+        12
+      ],
+      "output_bytes": 12,
+      "sha256": "4971fa49f8f9c0ee37afafe0545c56c202b53ac5650db441c8ab5e1fc5165ac3"
+    },
+    {
+      "name": "im2col2d_truncated_negative_0",
+      "tag": "im2col",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        36,
+        36,
+        36
+      ],
+      "output_bytes": 36,
+      "sha256": "31224ab83433324eaa8f7cc117a2746f55032950c63eb109920ebe731240966d"
+    },
+    {
+      "name": "im2col3d_truncated_negative_0",
+      "tag": "im2col_3d",
+      "ints": [
+        1,
+        4,
+        4,
+        4,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        27,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        108,
+        108,
+        108
+      ],
+      "output_bytes": 108,
+      "sha256": "735613767aa9d5fb8db88d4db626c3a65eccda0e0d362e88a68ed96c60913611"
+    },
+    {
+      "name": "im2col1d_truncated_negative_1",
+      "tag": "im2col",
+      "ints": [
+        4,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "floats": [],
+      "dtype": 1,
+      "shape": [
+        3,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        2,
+        6,
+        6,
+        6
+      ],
+      "output_bytes": 6,
+      "sha256": "e808dec276cfac7e815a2bbf71960d07bfcef115bd75d526c0590cb1d925172c"
+    },
+    {
+      "name": "im2col2d_truncated_negative_1",
+      "tag": "im2col",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 1,
+      "shape": [
+        9,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        2,
+        18,
+        18,
+        18
+      ],
+      "output_bytes": 18,
+      "sha256": "8b72193fe8e76e8c45ced4f5ca04b3df9049c85b81650e18b72b87b207258ad9"
+    },
+    {
+      "name": "im2col3d_truncated_negative_1",
+      "tag": "im2col_3d",
+      "ints": [
+        1,
+        4,
+        4,
+        4,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 1,
+      "shape": [
+        27,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        2,
+        54,
+        54,
+        54
+      ],
+      "output_bytes": 54,
+      "sha256": "1a7bdba05340ffbc8c399a45559deb1c8b8b127dfd093ecc5859854421e717f3"
+    },
+    {
+      "name": "im2col_back_truncated_negative",
+      "tag": "im2col_back",
+      "ints": [
+        4,
+        4,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "97efe0a44a6c404c2c5a5bbaa8301cbe547971d0eef22e0346c7424e0d3e892c"
+    },
+    {
+      "name": "conv3d_truncated_negative_0",
+      "tag": "conv_3d_direct",
+      "ints": [
+        4,
+        4,
+        4,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "4c6b2333dc341a9eb42814d34f70bda0ae2a3dddb63696a5b46cbf30e6eca331"
+    },
+    {
+      "name": "conv3d_truncated_negative_1",
+      "tag": "conv_3d_direct",
+      "ints": [
+        4,
+        4,
+        4,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "floats": [],
+      "dtype": 0,
+      "shape": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "output_bytes": 4,
+      "sha256": "e35c769db165ef5c9ec9471b7be4e8f481afe35b597b0492e4cf7958de274e81"
+    },
+    {
+      "name": "pool2d_negative_fractional_padding_0_0",
+      "tag": "pool_2d",
+      "ints": [
+        0,
+        3,
+        2,
+        2,
+        1
+      ],
+      "floats": [
+        -0.75,
+        0.25
+      ],
+      "dtype": 0,
+      "shape": [
+        2,
+        4,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        8,
+        32,
+        32
+      ],
+      "output_bytes": 32,
+      "sha256": "b85ae61195d7eb03f468c41651530dec7503046b3ccca9dd3dbf51deebc4c072"
+    },
+    {
+      "name": "pool2d_negative_fractional_padding_0_1",
+      "tag": "pool_2d",
+      "ints": [
+        1,
+        3,
+        2,
+        2,
+        1
+      ],
+      "floats": [
+        -0.75,
+        0.25
+      ],
+      "dtype": 0,
+      "shape": [
+        2,
+        4,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        8,
+        32,
+        32
+      ],
+      "output_bytes": 32,
+      "sha256": "e87e1955b956773f6ee659da7d7af971bbfc24ed525feadebe8d4f6f1fdb2c2c"
+    },
+    {
+      "name": "pool2d_negative_fractional_padding_1_0",
+      "tag": "pool_2d",
+      "ints": [
+        0,
+        3,
+        2,
+        2,
+        1
+      ],
+      "floats": [
+        -0.75,
+        0.25
+      ],
+      "dtype": 0,
+      "shape": [
+        2,
+        4,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        8,
+        32,
+        32
+      ],
+      "output_bytes": 32,
+      "sha256": "68b28a3fe4ce98d8defccf96af79f82b105250acd870f71323e01ef6387eb2ac"
+    },
+    {
+      "name": "pool2d_negative_fractional_padding_1_1",
+      "tag": "pool_2d",
+      "ints": [
+        1,
+        3,
+        2,
+        2,
+        1
+      ],
+      "floats": [
+        -0.75,
+        0.25
+      ],
+      "dtype": 0,
+      "shape": [
+        2,
+        4,
+        1,
+        1
+      ],
+      "native_strides": [
+        4,
+        8,
+        32,
+        32
+      ],
+      "output_bytes": 32,
+      "sha256": "3016bceaa17d5caca56cb176efb4c2c59a2fa923eb5d03cfd023cc0016c0ae92"
+    }
+  ]
+}

@@ -10,8 +10,33 @@ use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
+// Expected profiles are chosen from target cfg independently of the runtime
+// dispatch, so a wrong runtime policy cannot also switch its expected output.
+#[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+const TINY: &str = include_str!("../../../fixtures/inference/embedding-http-tiny-gnu.json");
+#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
 const TINY: &str = include_str!("../../../fixtures/inference/embedding-http-tiny.json");
+#[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+const BGE: &str = include_str!("../../../fixtures/inference/embedding-http-bge-gnu.json");
+#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
 const BGE: &str = include_str!("../../../fixtures/inference/embedding-http-bge.json");
+#[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+const COERCIONS: &str =
+    include_str!("../../../fixtures/inference/embedding-http-coercions-gnu.json");
+#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
+const COERCIONS: &str = include_str!("../../../fixtures/inference/embedding-http-coercions.json");
+const EXACT_NATIVE_PROFILE: bool = cfg!(any(
+    all(
+        target_os = "windows",
+        target_arch = "x86_64",
+        target_env = "msvc"
+    ),
+    all(
+        target_os = "linux",
+        target_arch = "x86_64",
+        target_env = "gnu"
+    ),
+));
 
 struct Reply {
     status: u16,
@@ -111,15 +136,11 @@ fn compare_number(
         difference <= absolute + relative * expected.abs(),
         "{location}: {actual} != {expected}; absolute error {difference}"
     );
-    if cfg!(all(
-        target_os = "windows",
-        target_arch = "x86_64",
-        target_env = "msvc"
-    )) {
+    if EXACT_NATIVE_PROFILE {
         assert_eq!(
             (actual as f32).to_bits(),
             (expected as f32).to_bits(),
-            "{location}: Windows native f32 bits differ"
+            "{location}: matching-profile native f32 bits differ"
         );
     }
     metrics.numbers += 1;
@@ -182,11 +203,7 @@ fn compare(
             let expected_bytes = base64_bytes(expected);
             assert_eq!(actual_bytes.len(), expected_bytes.len());
             assert_eq!(actual_bytes.len() % 4, 0);
-            if cfg!(all(
-                target_os = "windows",
-                target_arch = "x86_64",
-                target_env = "msvc"
-            )) {
+            if EXACT_NATIVE_PROFILE {
                 assert_eq!(actual, expected, "{location}: native base64 bytes differ");
             }
             for (actual, expected) in actual_bytes
@@ -378,10 +395,7 @@ fn pretrained_bert_matches_original_embedding_http_transcripts() {
 fn json_numeric_conversions_match_original_embedding_server() {
     let path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../fixtures/inference/tiny-bert-missing-pooling.gguf");
-    let reference = json::parse(include_str!(
-        "../../../fixtures/inference/embedding-http-coercions.json"
-    ))
-    .unwrap();
+    let reference = json::parse(COERCIONS).unwrap();
     let metrics = verify(&path, &reference);
     assert_eq!(metrics.requests, 30);
     eprintln!(

@@ -1,0 +1,26 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\quant)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\llama-behavior)
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\gguf)
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\tokenizer)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\model-runtime)
+error[E0425]: cannot find function `silu` in module `math`
+   --> C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\model-runtime\src\llama.rs:264:31
+    |
+264 |                 *gate = math::silu(*gate) * up;
+    |                               ^^^^ not found in `math`
+
+error[E0425]: cannot find function `silu` in module `math`
+   --> C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\model-runtime\src\mamba.rs:217:44
+    |
+217 |                 convolved[channel] = math::silu(value);
+    |                                            ^^^^ not found in `math`
+
+error[E0425]: cannot find function `silu` in module `math`
+   --> C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\profile-draft\crates\model-runtime\src\mamba.rs:268:84
+    |
+268 |                 y[channel] = (sum + convolved[channel] * layer.d[channel]) * math::silu(z[channel]);
+    |                                                                                    ^^^^ not found in `math`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `llama-model-runtime` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

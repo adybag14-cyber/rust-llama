@@ -1,0 +1,276 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T16:49:18.912144+00:00",
+  "base_commit": "6ddeb75eb3b708ace4cb48a365030f94a30192f3",
+  "qualification": "Full combined Qwen2, strict Context state budget, native scalar/SSE2 math/physical layout, NativeContext descriptor accounting, convolution and server resource/profile verification. Sharded GGUF and F16 native KV are separate unmerged work.",
+  "fingerprint_scope": "All Rust, Cargo/compiler/CI inputs and JSON/bin/GGUF data outside historical evidence; canonical POSIX relative paths, same ordering on both hosts.",
+  "execution_inputs_before": {
+    "files": 567,
+    "sha256": "b526251fe952ed9d59957918b9d24cdb21adb9f498c51cdf43d995fc3e673031"
+  },
+  "external_driver_sha256": {
+    "verify-embedding-cli.py": "a929e8e220507535f51e4d1cb8189b4b003855d15f9fb319ce29ddf4d1e84803",
+    "verify-decoder-cli.py": "449a7366775a9b89da2f3a4a583014ad650a4bf81067f45f4af145a27c98a3a9",
+    "verify-qwen2-http.py": "32e104965913c10e2be7b58c4d7c456030b11a8d7ce2b9d9164950d79576e2ce",
+    "validate-full-v1.py": "c626ef8cb15808f6c4534ceb2710406b17ad77abed78c5169c08c955ebf5307a"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.8903432000006433,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 77.30755609999687,
+      "log_sha256": "1c9642f362d822caf4eb7e0adbd0d08e01bf5c346480f5507a653e76b18ef74a",
+      "tests": {
+        "passed": 416,
+        "failed": 0,
+        "ignored": 18,
+        "suites": 77
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 404.1431599999996,
+      "log_sha256": "5e0234f6672acb3ee7e768fd596a354a69584ec1c93d901ea8b7289838383932",
+      "tests": {
+        "passed": 416,
+        "failed": 0,
+        "ignored": 18,
+        "suites": 77
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 8.570059199999378,
+      "log_sha256": "cc97e11dcb6fe1a7466f252c5cd523d8925f02e040d13bab8fe166adabbde55e"
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 11.089038300000539,
+      "log_sha256": "0b5660f6af93fcc917b4212aa1bdd4d27748107d6b5a154f4672e544ed18976e"
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 10.70554329999868,
+      "log_sha256": "f79242b423e1909e6d72c033804bcd028087241436805ad65b8fd0c479822de5"
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 41.44676040000195,
+      "log_sha256": "51ac9676a8debca79d350c27a39399bffb1c159fd4bd73734cd1ed065416aee1"
+    },
+    {
+      "name": "embedding-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\qwen2-integration-v1\\verify-embedding-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.45703380000122706,
+      "log_sha256": "a55b819ce2ceb36ba0b3b09e23b76714d605678905e167b8eda0f8768783a93d"
+    },
+    {
+      "name": "decoder-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\qwen2-integration-v1\\verify-decoder-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 39.04816480000227,
+      "log_sha256": "b900f1a46c4d56ab82cd0ce47465fe9827dd555d236434e67011f462f4883343"
+    },
+    {
+      "name": "qwen2-http",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\qwen2-integration-v1\\verify-qwen2-http.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 30.31729550000091,
+      "log_sha256": "9d632d2e6897348840426f30955bb89543565ed24bd8456a5e61149ce037cef6"
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 129.6523441999998,
+      "log_sha256": "06ef761d22c5f36054cb662945c322fb6a8db57f710cfa058ff430ce0ca66d85",
+      "tests": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 11
+      }
+    },
+    {
+      "name": "generation-http",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-server",
+        "--example",
+        "verify_model_server",
+        "--",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 9.779418299996905,
+      "log_sha256": "ec1f0312315e9e71fffad8d400f43d083100d076c3c3d2d615e93a60d7df5511"
+    },
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 12.600165300002118,
+      "log_sha256": "46d8e859080d03935f4ca70b9abb16d39e20b53f395352701839c2222e783f0f"
+    },
+    {
+      "name": "release-gate",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.07390220000161207,
+      "log_sha256": "5edf1de4e01d1880647fc5e000d9df606d63bf104dedde30233e8b24608a66ca"
+    }
+  ],
+  "execution_inputs_after": {
+    "files": 567,
+    "sha256": "b526251fe952ed9d59957918b9d24cdb21adb9f498c51cdf43d995fc3e673031"
+  },
+  "finished_utc": "2026-11-09T17:02:20.903876+00:00"
+}

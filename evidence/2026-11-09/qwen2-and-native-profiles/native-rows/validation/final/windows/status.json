@@ -1,0 +1,160 @@
+{
+  "platform": "windows",
+  "passed": true,
+  "source_snapshot_sha256": "3b1cd9e8055211ba7e637ee74a2231a1443c7e74e2e3af91c83b8a207e74c494",
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.943
+    },
+    {
+      "name": "debug-tests",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--no-fail-fast",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.28
+    },
+    {
+      "name": "debug-build",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.085
+    },
+    {
+      "name": "debug-context",
+      "command": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+        "debug",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.582
+    },
+    {
+      "name": "debug-layout",
+      "command": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+        "debug",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.638
+    },
+    {
+      "name": "release-tests",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--no-fail-fast",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 18.876
+    },
+    {
+      "name": "release-build",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.659
+    },
+    {
+      "name": "release-context",
+      "command": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+        "release",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.247
+    },
+    {
+      "name": "release-layout",
+      "command": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+        "release",
+        "final"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.117
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "row-math-probe",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.311
+    },
+    {
+      "name": "msvc-pretrained",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "--release",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 86.682
+    }
+  ]
+}

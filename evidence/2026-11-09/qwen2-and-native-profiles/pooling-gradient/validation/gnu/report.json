@@ -1,0 +1,66 @@
+{
+  "platform": "gnu",
+  "steps": [
+    {
+      "step": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--target-dir",
+        "/tmp/rust-llama-pool-backward-nan",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "-p",
+        "llama-tensor",
+        "--target-dir",
+        "/tmp/rust-llama-pool-backward-nan",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "step": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-tensor",
+        "--all-targets",
+        "--target-dir",
+        "/tmp/rust-llama-pool-backward-nan",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": "3db7ab2d1f00d4d4e4c85ce2a0241a6443fe3460c59958a5018d88c833b7328b",
+  "qualification": "Focused complete tensor suite, including unchanged original961 convolution/extraction/pooling/resize cases and new20 overlapping backward-gradient native controls; no row-policy/OS-math revisions in this snapshot."
+}

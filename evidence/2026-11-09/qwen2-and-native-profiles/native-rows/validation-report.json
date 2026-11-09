@@ -1,0 +1,1657 @@
+{
+  "schema": 1,
+  "passed": true,
+  "completed_at_utc": "2026-11-09T16:25:17.704180+00:00",
+  "baseline_commit": "6ddeb75",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_files": [
+    {
+      "path": "crates/model-runtime/src/math.rs",
+      "bytes": 24210,
+      "sha256": "edf0181c6db5b703d5106aac6ba4b5c8bf95863358cecd5dbc442fdf1023b8fe",
+      "baseline_sha256": "43a6acee59b57047032f7fe779d305096b66b8ee681abb8597a5368215f02d04",
+      "baseline_bytes": 17774
+    },
+    {
+      "path": "crates/model-runtime/src/math/native_rows.rs",
+      "bytes": 7029,
+      "sha256": "11952fcd2a620c2dd6402c7493a3d591395fd4977f4b6e58ee38df5c4d3133cc",
+      "baseline_sha256": null,
+      "baseline_bytes": 0
+    },
+    {
+      "path": "crates/model-runtime/src/llama.rs",
+      "bytes": 14058,
+      "sha256": "74b9dea1c2b7110936ec34f06c38fd6c8fe4bf01dfb1b0621801091cd3756242",
+      "baseline_sha256": "9f4928dc2d40c237baa53e3d13fadc1582c6571337c33ef3dca2a12d0d6604a6",
+      "baseline_bytes": 13608
+    },
+    {
+      "path": "crates/model-runtime/src/mamba.rs",
+      "bytes": 13203,
+      "sha256": "2702b7483719a2fb1dda605e1d8c3eafee4f84c4b8ac9aece8387d9215fedb4b",
+      "baseline_sha256": "237a7febae187c31a5c205ce4a747a226daec1dff60b35802a7cd9566ccf02b8",
+      "baseline_bytes": 12832
+    },
+    {
+      "path": "crates/model-runtime/src/context/native.rs",
+      "bytes": 48535,
+      "sha256": "6cf3e06725b79479e769cf698ba64f7b00ad5abee7d90a149c1cc9ed0a5e4da0",
+      "baseline_sha256": "63ef50acc37d8173df4ab3dfbc86dafbd9cc4fdcbde2fe54fc2085f86c2ea681",
+      "baseline_bytes": 43304,
+      "first_stage_sha256": "b66589e8c596ff9866ecfd0c7b324ba52012a15f47c6883b5dfaed6a4d8cfeea"
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_native.rs",
+      "bytes": 4603,
+      "sha256": "22468ee5029f43816e9c9c9f266d4d9f71f855340ddd7c8197736858330092b9",
+      "baseline_sha256": null,
+      "baseline_bytes": 0
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_graphs.rs",
+      "bytes": 4413,
+      "sha256": "9b147da9d7b039125923c8b26be5e130b8465d04974257ee37e52a36f1722433",
+      "baseline_sha256": null,
+      "baseline_bytes": 0
+    },
+    {
+      "path": "crates/model-runtime/tests/native_rows_variance.rs",
+      "bytes": 6523,
+      "sha256": "e2da0dec649cd72a11e68d342dff0315213b1681ca96f7622ce0273da405c195",
+      "baseline_sha256": null,
+      "baseline_bytes": 0
+    },
+    {
+      "path": "crates/ffi/src/context_reference_tests.rs",
+      "bytes": 36378,
+      "sha256": "d113732919d01a37321723de02a48681d34773f080e79e605eb0b9a44a1b5f54",
+      "baseline_sha256": "bd59281397c0bc55ab641039b0cb144d5027be2f2c8bb28dbfde2530e45e0d41",
+      "baseline_bytes": 30059
+    },
+    {
+      "path": "crates/model-runtime/src/bert.rs",
+      "bytes": 11368,
+      "sha256": "fdf7faeadb86e40e779ae1cad3f4f9f034f96d533fbc7fec85e6ced941482c3a",
+      "unchanged": true
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/gnu-sse2-math-provenance.json",
+      "bytes": 54374,
+      "sha256": "feed1072ac3137afb36ca0ca17cf4976aa41d721d434ccd2648150e7e1cef8c9"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/gnu-sse2-math-reference.bin",
+      "bytes": 4852609,
+      "sha256": "1150ad8351d57bec48431d9ed60c4a5bda41a3d14e936c7739aef529b8edc4c2"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/norm-gnu-reference.bin",
+      "bytes": 3018304,
+      "sha256": "a22fac40ce6ea8b75ab27007155fd5612c93b3e12a9885a62c5b3628b3ec6c18"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/norm-msvc-reference.bin",
+      "bytes": 3018304,
+      "sha256": "2aa14cfedd8a4627e94b33c0ba67b731022418dfdac77a3456dfd1144e81028a"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/row-math-gnu-provenance.json",
+      "bytes": 2076,
+      "sha256": "e153f2b9bd78d54facfd06162cef8883ee474d7cb4ae5e51f282af66a95bac9d"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/row-math-gnu-reference.bin",
+      "bytes": 1203786,
+      "sha256": "3dd09c675c3d9b1e0aa4d043a482f8701c0ceefd661c3de541003fea98eb72ad"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/row-math-msvc-provenance.json",
+      "bytes": 2121,
+      "sha256": "ba37ce33f907c88f40c0d7dccedb2a6cb8538247288d5579faf599e22d0df338"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/row-math-msvc-reference.bin",
+      "bytes": 1203786,
+      "sha256": "eac3f988a994abc6d2a5fbc13ec52c6128a7fd88a47ff8f449f327f62ec0b0c5"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/variance-gnu-provenance.json",
+      "bytes": 145576,
+      "sha256": "5531e42ef3e1e386d42ea32453663e95a74925206ac4e449883c08cc0d1dd375"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/variance-gnu-reference.bin",
+      "bytes": 885811,
+      "sha256": "ce096315064cec8bee4d15410e2af9f4efbeff68c2f57e2842c35452a9831ccc"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/variance-msvc-provenance.json",
+      "bytes": 152607,
+      "sha256": "44ba615ca75faefd1fe50e261539fd249f7346945080f5610da7759b9156127c"
+    },
+    {
+      "path": "crates/model-runtime/tests/fixtures/native-rows/variance-msvc-reference.bin",
+      "bytes": 885811,
+      "sha256": "9eecbb1e1876b21a13d42868d50f993101bd99abce7ccc8384481303f87107ca"
+    },
+    {
+      "path": "fixtures/ffi/native-attention-layout-gnu.bin",
+      "bytes": 325478,
+      "sha256": "531f080d8ee53878c5c96e1b49ecf737f157212180f86aa6b052797acc9d717a"
+    },
+    {
+      "path": "fixtures/ffi/native-attention-layout-msvc.bin",
+      "bytes": 325478,
+      "sha256": "b13d8acb1688a9f42d2c24748a17cef5174eb3e4edba6062e765c39fd4adf5be"
+    },
+    {
+      "path": "fixtures/ffi/native-attention-layout-provenance.json",
+      "bytes": 1845,
+      "sha256": "48b2043f0d17bd007a76b51e2cd41092f30e587ffb0e2c2dc025aa63d754ef98"
+    }
+  ],
+  "job_ids": {
+    "final_windows": "job-1794240635228-c35182d0-f3c",
+    "final_linux": "job-1794240634756-2fc6c07a-918",
+    "descriptor_windows": "job-1794241290385-e7827916-56f",
+    "descriptor_linux": "job-1794241290084-ef7904a2-f07",
+    "descriptor_negative_control": "job-1794241290807-53f81f19-bb0",
+    "descriptor_initial": "job-1794241191620-424c8403-a9c"
+  },
+  "focused_profiles": {
+    "final-windows": {
+      "status": {
+        "platform": "windows",
+        "passed": true,
+        "source_snapshot_sha256": "3b1cd9e8055211ba7e637ee74a2231a1443c7e74e2e3af91c83b8a207e74c494",
+        "steps": [
+          {
+            "name": "fmt",
+            "command": [
+              "cargo",
+              "fmt",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.943
+          },
+          {
+            "name": "debug-tests",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 7.28
+          },
+          {
+            "name": "debug-build",
+            "command": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.085
+          },
+          {
+            "name": "debug-context",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+              "debug",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 4.582
+          },
+          {
+            "name": "debug-layout",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+              "debug",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.638
+          },
+          {
+            "name": "release-tests",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--release",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 18.876
+          },
+          {
+            "name": "release-build",
+            "command": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--release"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 4.659
+          },
+          {
+            "name": "release-context",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+              "release",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.247
+          },
+          {
+            "name": "release-layout",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+              "release",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.117
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "cargo",
+              "clippy",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.311
+          },
+          {
+            "name": "msvc-pretrained",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-inference",
+              "--release",
+              "--",
+              "--ignored",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 86.682
+          }
+        ]
+      },
+      "tests": {
+        "debug": {
+          "passed": 70,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 70,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "logs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\clippy.stderr.log",
+          "bytes": 548,
+          "sha256": "92976b3b501ea77e9d2313aa5adc6e50ed61cf1a3e46d93876c693d6429bc1a1"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\clippy.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-build.stderr.log",
+          "bytes": 72,
+          "sha256": "02db5a66fa0c60ca8618bd08aac556eac4f3ec863e8630a0d353dba6a0f6e126"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-context.stdout.log",
+          "bytes": 428,
+          "sha256": "59ea48738ee0a5b7e1dc85eff7995ff4ae3132db02e90e868a8a4c270458a1f2"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-layout.stdout.log",
+          "bytes": 653,
+          "sha256": "f5934d045281a88caeed1c064370a848502b343fc68e1853a570ea9ca35ea67d"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-tests.stderr.log",
+          "bytes": 1484,
+          "sha256": "8816d9c549c742950a4cfedcb40c459bffab2b73ac686a97ec8bd97415969f76"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\debug-tests.stdout.log",
+          "bytes": 6711,
+          "sha256": "bb302c444298f36e2593bf9e820fc109cba34cde9e080229af89c9b36f501716"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\fmt.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\fmt.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\msvc-pretrained.stderr.log",
+          "bytes": 2364,
+          "sha256": "75ca60c0f3defc218558718b9240100bdc236a8566efd6c0ac60343602695832"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\msvc-pretrained.stdout.log",
+          "bytes": 1070,
+          "sha256": "8d77f0cbd5e1b8547229d0546903e2ccada1dbda1144b13ece4569fc3bc853c6"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-build.stderr.log",
+          "bytes": 306,
+          "sha256": "eb0adf01c98129f30656dff8bf0d3ca73a0a5a0efd6fa1f2ad9ee942c58a0d50"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-context.stdout.log",
+          "bytes": 430,
+          "sha256": "57dbaa71129beac6632545180370a7296c0bd8668814a27cbe12d7aa1eca9a54"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-layout.stdout.log",
+          "bytes": 657,
+          "sha256": "8c6d3ca169ce878e0a883d947b96ba9e1bdaf1bd29382d2c9e444e8f4f0b44c4"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-tests.stderr.log",
+          "bytes": 1377,
+          "sha256": "a8085800a5006d248fa1507b1fb155a3ffb6315e5add9eb6ca607b198f849f2c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\windows\\release-tests.stdout.log",
+          "bytes": 6711,
+          "sha256": "ec76d08c4da5ef3bdb9e0333778df8bfbd80a85254fa1dfb38fb507ba0ec84b8"
+        }
+      ]
+    },
+    "final-linux": {
+      "status": {
+        "platform": "linux",
+        "passed": true,
+        "source_snapshot_sha256": "3b1cd9e8055211ba7e637ee74a2231a1443c7e74e2e3af91c83b8a207e74c494",
+        "steps": [
+          {
+            "name": "fmt",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "fmt",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.423
+          },
+          {
+            "name": "debug-tests",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 6.646
+          },
+          {
+            "name": "debug-build",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "build",
+              "-p",
+              "llama-ffi"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.674
+          },
+          {
+            "name": "debug-context",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+              "debug",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 14.608
+          },
+          {
+            "name": "debug-layout",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+              "debug",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.878
+          },
+          {
+            "name": "release-tests",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--release",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 13.428
+          },
+          {
+            "name": "release-build",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--release"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 2.627
+          },
+          {
+            "name": "release-context",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+              "release",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 6.082
+          },
+          {
+            "name": "release-layout",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+              "release",
+              "final"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.67
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "clippy",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 2.675
+          },
+          {
+            "name": "gnu-models",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_all_models.py",
+              "release"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 122.221
+          }
+        ]
+      },
+      "tests": {
+        "debug": {
+          "passed": 69,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 69,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "logs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\clippy.stderr.log",
+          "bytes": 1334,
+          "sha256": "ea2fa88e1b5422d3b6ab5087f8b99d2317f39db75ead517c841ba87c67e352a8"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\clippy.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-build.stderr.log",
+          "bytes": 72,
+          "sha256": "73596b79c23573c30ea3176cec2df235cf5a72cea804331b01f4aa027afa4a13"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-context.stdout.log",
+          "bytes": 427,
+          "sha256": "f2ff5d33f2025330d5fc1c7f1bb20f24d8cac6b42f3d6fccd6644caa89ea4728"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-layout.stdout.log",
+          "bytes": 588,
+          "sha256": "84810fbcd3b0d4223ea29976069ff3017206e26de13a57f57375acc78d836e00"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-tests.stderr.log",
+          "bytes": 1589,
+          "sha256": "5e047c991ea186bde5c649b6ef4abfc4df27bd5bc6eb754e4ba6fd4cc38f2fbd"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\debug-tests.stdout.log",
+          "bytes": 6723,
+          "sha256": "4e0d98d11683d494459ffc6f406278983467412ca8afa82e4d767c209187a04b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\fmt.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\fmt.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\gnu-models.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\gnu-models.stdout.log",
+          "bytes": 3098,
+          "sha256": "e27054fc6600a94116b4fec489322093afeb1da9553f2021f3e83f8c1be2fd33"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-build.stderr.log",
+          "bytes": 177,
+          "sha256": "35d8e3dc0cb732154259a4dab9e61caa5b49d16c808e79c155324de0b3c6e053"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-context.stdout.log",
+          "bytes": 429,
+          "sha256": "d0f90de5f8d49e1599c9ade188fe23c39c1344f34f67c25f7e25a264b63f15bf"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-layout.stdout.log",
+          "bytes": 592,
+          "sha256": "0882e8e562122227fa6be535815536018c24c5dcccab8342c5efe9e37ce1ae8b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-tests.stderr.log",
+          "bytes": 1593,
+          "sha256": "aa15da120e5fc121dcfa3ae1b4ba19ea213de3d28a2c748b7a54a09a3193b1dc"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final\\linux\\release-tests.stdout.log",
+          "bytes": 6723,
+          "sha256": "44f53e5879e7e5214e332cedc30a3385e9da64b73633862b71d136009a095b2f"
+        }
+      ]
+    },
+    "final2-windows": {
+      "status": {
+        "platform": "windows",
+        "passed": true,
+        "source_snapshot_sha256": "357331ae7aeb5ffdf1fb8a53cd5b73695d0982a1be04f5bee2072ce3358c69b3",
+        "steps": [
+          {
+            "name": "fmt",
+            "command": [
+              "cargo",
+              "fmt",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.271
+          },
+          {
+            "name": "debug-tests",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 5.191
+          },
+          {
+            "name": "debug-build",
+            "command": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.088
+          },
+          {
+            "name": "debug-context",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+              "debug",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 4.421
+          },
+          {
+            "name": "debug-layout",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+              "debug",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.638
+          },
+          {
+            "name": "release-tests",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--release",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 19.183
+          },
+          {
+            "name": "release-build",
+            "command": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--release"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 2.678
+          },
+          {
+            "name": "release-context",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_context.py",
+              "release",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.683
+          },
+          {
+            "name": "release-layout",
+            "command": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\check_layout.py",
+              "release",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.117
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "cargo",
+              "clippy",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.942
+          }
+        ]
+      },
+      "tests": {
+        "debug": {
+          "passed": 71,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 71,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "logs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\clippy.stderr.log",
+          "bytes": 548,
+          "sha256": "961f5350438d290918e775852904712a9dfa9c36663c3e3f76c24778221a407c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\clippy.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-build.stderr.log",
+          "bytes": 72,
+          "sha256": "02db5a66fa0c60ca8618bd08aac556eac4f3ec863e8630a0d353dba6a0f6e126"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-context.stdout.log",
+          "bytes": 429,
+          "sha256": "c77dfefbe0392bb4fcf316e1c4a4e2eb5552b1eac05e2a8ec7785bda0ea46dfe"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-layout.stdout.log",
+          "bytes": 654,
+          "sha256": "c434b358abf6b473e894fe397133b3cfa4d30eb52083549f9664ddd140bfa99b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-tests.stderr.log",
+          "bytes": 1373,
+          "sha256": "e867d6583aa2d26ce05b846150cc7d33c535cc56725b29f51ae2ecf151163012"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\debug-tests.stdout.log",
+          "bytes": 6814,
+          "sha256": "95e22b525277fb9efc1ea67b687ba3ccd8d2233fb9eb265677fd75029753d71b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\fmt.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\fmt.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-build.stderr.log",
+          "bytes": 173,
+          "sha256": "2061b54e2028e7ddfd1ba8fc54c764dce5e67d03659c320383b59a924b56311c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-context.stdout.log",
+          "bytes": 431,
+          "sha256": "55954adebc61bf134a35064888b94822a94276f111a2ffc3bf51f346464a29bf"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-layout.stdout.log",
+          "bytes": 658,
+          "sha256": "a9c18745875aeb3f049ac82c0d54c89070903be5a70ae8954c5055ffb6769991"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-tests.stderr.log",
+          "bytes": 1377,
+          "sha256": "4fd16624e2e224919372c22d7fd4f2a76f8387bca75c0b9174b7acc2b54642c2"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\windows\\release-tests.stdout.log",
+          "bytes": 6814,
+          "sha256": "079b2fd73f8e281e544c4dcb9d34ce4a9c7f8cf76f3606855c707ef5978e8353"
+        }
+      ]
+    },
+    "final2-linux": {
+      "status": {
+        "platform": "linux",
+        "passed": true,
+        "source_snapshot_sha256": "357331ae7aeb5ffdf1fb8a53cd5b73695d0982a1be04f5bee2072ce3358c69b3",
+        "steps": [
+          {
+            "name": "fmt",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "fmt",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.921
+          },
+          {
+            "name": "debug-tests",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 5.182
+          },
+          {
+            "name": "debug-build",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "build",
+              "-p",
+              "llama-ffi"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.419
+          },
+          {
+            "name": "debug-context",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+              "debug",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 11.393
+          },
+          {
+            "name": "debug-layout",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+              "debug",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.522
+          },
+          {
+            "name": "release-tests",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "test",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "--release",
+              "--no-fail-fast",
+              "--",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 12.511
+          },
+          {
+            "name": "release-build",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--release"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 2.726
+          },
+          {
+            "name": "release-context",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_context.py",
+              "release",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 6.233
+          },
+          {
+            "name": "release-layout",
+            "command": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/check_layout.py",
+              "release",
+              "final2"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 0.67
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "/home/tdamre/.cargo/bin/cargo",
+              "clippy",
+              "-p",
+              "llama-model-runtime",
+              "-p",
+              "llama-ffi",
+              "-p",
+              "row-math-probe",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "elapsed_seconds": 1.522
+          }
+        ]
+      },
+      "tests": {
+        "debug": {
+          "passed": 70,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 70,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "logs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\clippy.stderr.log",
+          "bytes": 564,
+          "sha256": "cf2bec164630582e63944a4e7890756b9b752ae334710216806aa45a0d66dce8"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\clippy.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-build.stderr.log",
+          "bytes": 72,
+          "sha256": "a178c7902ac24dda0e2c0cd4cf0e47a2a6976ef30481cb4015f2f71620380d8b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-context.stdout.log",
+          "bytes": 428,
+          "sha256": "f9ad7f3b413ced16b27d10dc7e95be9f82c08fca59cd58c815f2ae1134f34aa6"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-layout.stdout.log",
+          "bytes": 589,
+          "sha256": "4d03b6a99f02c7e46cbc52adb5b298c1e2394219a01fd57fef131dc2010d1d2b"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-tests.stderr.log",
+          "bytes": 1589,
+          "sha256": "be39e8216564d8e86dce960a2d2017f9d29a502c017474235e8caa43c9e3ccf5"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\debug-tests.stdout.log",
+          "bytes": 6826,
+          "sha256": "9b365d948d3562b6087ccb628e1a35c2b05a9b4060387a710e89ac8dc8ddf1df"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\fmt.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\fmt.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-build.stderr.log",
+          "bytes": 177,
+          "sha256": "7e81bd03fc863a130fc92dc092997aecc53569b94e8b9f5fc34a2cf19d174538"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-build.stdout.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-context.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-context.stdout.log",
+          "bytes": 430,
+          "sha256": "82e5589281ab0475ad54ee3b9d324cb046d8211882d72225387858f45b1c3be4"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-layout.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-layout.stdout.log",
+          "bytes": 593,
+          "sha256": "ec951bfa0281edf207e86a833ac244f4c5c69507d6c9d1888b6bcafc9280ff77"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-tests.stderr.log",
+          "bytes": 1593,
+          "sha256": "132a26ab7cbb01eb9fb07c96a17484d1d034858fb06689574e9dbd7693309f8c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\validation\\final2\\linux\\release-tests.stdout.log",
+          "bytes": 6826,
+          "sha256": "db1d4f3a22bd513b8037f54916018a8cfd38d0cb51c4a64a16ff32de5e0ecd27"
+        }
+      ]
+    }
+  },
+  "native_context": {
+    "windows-debug": {
+      "platform": "windows",
+      "profile": "debug",
+      "library": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\target\\debug\\llama_ffi.dll",
+      "sha256": "6f322024b050fad867e4827b0451dbc064ed93dd1e120ff3e6f17223f9ba1e6d",
+      "passed": true,
+      "models": {
+        "trained": {
+          "reference": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-reference-final",
+          "actual": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\windows-debug-final2\\trained",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 415857,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 1329186,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        },
+        "tiny": {
+          "reference": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\tiny-reference-final",
+          "actual": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\windows-debug-final2\\tiny",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 73301,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 58890,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        }
+      }
+    },
+    "windows-release": {
+      "platform": "windows",
+      "profile": "release",
+      "library": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\target\\release\\llama_ffi.dll",
+      "sha256": "a0ae5a1c2ddd1b2e860c5ac9e801a79f240ebfcc0d8d2127e0fa7602a99b130e",
+      "passed": true,
+      "models": {
+        "trained": {
+          "reference": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-reference-final",
+          "actual": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\windows-release-final2\\trained",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 415857,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 1329186,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        },
+        "tiny": {
+          "reference": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\tiny-reference-final",
+          "actual": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\windows-release-final2\\tiny",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 73301,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 58890,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        }
+      }
+    },
+    "linux-debug": {
+      "platform": "linux",
+      "profile": "debug",
+      "library": "/home/tdamre/rust-llama-row-math-target/debug/libllama_ffi.so",
+      "sha256": "ce2e78f9f48baf79299a66eeffd3867599bf30edff91f027c751ddf354dd360f",
+      "passed": true,
+      "models": {
+        "trained": {
+          "reference": "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-reference",
+          "actual": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/linux-debug-final2/trained",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 415857,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 1329186,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        },
+        "tiny": {
+          "reference": "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-tiny-reference",
+          "actual": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/linux-debug-final2/tiny",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 73301,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 58890,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        }
+      }
+    },
+    "linux-release": {
+      "platform": "linux",
+      "profile": "release",
+      "library": "/home/tdamre/rust-llama-row-math-target/release/libllama_ffi.so",
+      "sha256": "0931ddc435bf892f1fb88a9a36f8a98248ef6e6e2f7f35af20109529c00fedda",
+      "passed": true,
+      "models": {
+        "trained": {
+          "reference": "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-reference",
+          "actual": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/linux-release-final2/trained",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 415857,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 1329186,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        },
+        "tiny": {
+          "reference": "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-tiny-reference",
+          "actual": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/linux-release-final2/tiny",
+          "strict_float_bits": true,
+          "absolute_bound": 0.0002,
+          "relative_bound": 2e-05,
+          "metadata_mismatches": [],
+          "float_failures": [],
+          "float_values": 73301,
+          "differing_float_bits": 0,
+          "max_abs_error": 0.0,
+          "binary_files": 130,
+          "binary_bytes": 58890,
+          "derived_roundtrip_flag_differences": [],
+          "passed": true
+        }
+      }
+    }
+  },
+  "physical_attention_layout": {
+    "windows-debug": {
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\build-windows\\Release\\attention-layout-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\target\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\layout\\windows-debug-final2.json"
+      ],
+      "library_sha256": "6f322024b050fad867e4827b0451dbc064ed93dd1e120ff3e6f17223f9ba1e6d",
+      "exit_code": 0,
+      "passed": true,
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868,
+      "exact": true,
+      "first_differences": []
+    },
+    "windows-release": {
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\build-windows\\Release\\attention-layout-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\target\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\layout\\windows-release-final2.json"
+      ],
+      "library_sha256": "a0ae5a1c2ddd1b2e860c5ac9e801a79f240ebfcc0d8d2127e0fa7602a99b130e",
+      "exit_code": 0,
+      "passed": true,
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868,
+      "exact": true,
+      "first_differences": []
+    },
+    "linux-debug": {
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/build-linux/attention-layout-oracle",
+        "/home/tdamre/rust-llama-row-math-target/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/layout/linux-debug-final2.json"
+      ],
+      "library_sha256": "ce2e78f9f48baf79299a66eeffd3867599bf30edff91f027c751ddf354dd360f",
+      "exit_code": 0,
+      "passed": true,
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868,
+      "exact": true,
+      "first_differences": []
+    },
+    "linux-release": {
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/build-linux/attention-layout-oracle",
+        "/home/tdamre/rust-llama-row-math-target/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/layout/linux-release-final2.json"
+      ],
+      "library_sha256": "0931ddc435bf892f1fb88a9a36f8a98248ef6e6e2f7f35af20109529c00fedda",
+      "exit_code": 0,
+      "passed": true,
+      "cases": 10,
+      "logit_values": 31744,
+      "state_bytes": 193868,
+      "exact": true,
+      "first_differences": []
+    }
+  },
+  "gnu_model_facade": {
+    "passed": true,
+    "profile": "release",
+    "executable_sha256": "c7ba9ab519a3874b53498ba5fa5659b8f0934bb4bd740f60b238cf2792790e59",
+    "models": [
+      {
+        "cases": 6,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/stories260k-gnu-v1/stories260k.compact.json",
+        "tokens": 96,
+        "values": 62976
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/mamba-130m-hf.f16.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/mamba130m.compact.json",
+        "tokens": 24,
+        "values": 1860360
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/bert-bge-small-f16.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/bert.compact.json",
+        "tokens": 25,
+        "values": 13056
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/SmolLM2-135M-Q4_K_M.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/quantized-gnu-v1/smollm2.compact.json",
+        "tokens": 24,
+        "values": 1818624
+      },
+      {
+        "cases": 1,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/stories15M-q4_0.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/quantized-gnu-v1/stories15m-q4.compact.json",
+        "tokens": 16,
+        "values": 672000
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-default.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-default.compact.json",
+        "tokens": 12,
+        "values": 10752
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-rms.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-rms.compact.json",
+        "tokens": 12,
+        "values": 10752
+      },
+      {
+        "cases": 3,
+        "comparison": "raw F32 bit equality",
+        "differing_values": 0,
+        "first_differences": [],
+        "max_abs_error": 0.0,
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-untied.gguf",
+        "passed": true,
+        "reference": "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-untied.compact.json",
+        "tokens": 12,
+        "values": 10752
+      }
+    ]
+  },
+  "msvc_pretrained_tests": 6,
+  "independent_math_primitives": {
+    "primitive_silu_softmax": {
+      "exact_f32": 603231,
+      "exact_f64_sums": 417,
+      "native_graph_cases_per_host": 198,
+      "native_graph_f32_per_host": 144666
+    },
+    "centered_variance": {
+      "exact_centered_f32_both_policies": 206952,
+      "exact_f64_both_policies": 2786,
+      "native_norm_graph_cases_per_host": 312,
+      "native_norm_f32_per_host": 368208
+    },
+    "reports": [
+      {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\sse2-math\\validation-report.json",
+        "bytes": 24733,
+        "sha256": "6c919146cd738540fd415c8b9d4ac345bac54df766f6dfc84711bfe0ea921fc8"
+      },
+      {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\sse2-math\\variance\\validation-report.json",
+        "bytes": 9340,
+        "sha256": "1074e2047bdb77a16a925f9c302fde3c7ad3bdbd0cefbad3c71ee0eb1eab28bb"
+      }
+    ]
+  },
+  "descriptor_negative_control": {
+    "passed": true,
+    "expected_behavior": "Removing only the new microbatch descriptor charge must allow the limited decode and fail the rejection assertion.",
+    "exit_code": 101,
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "llama-model-runtime",
+      "context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows",
+      "--",
+      "--nocapture"
+    ],
+    "correct_source_sha256": "6cf3e06725b79479e769cf698ba64f7b00ad5abee7d90a149c1cc9ed0a5e4da0",
+    "negative_control_sha256": "3b4a43e8bbea157f16d3dd2838704654a6c68dd586a86a7d5357904e3ef5e827"
+  },
+  "independent_review": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\handoff\\descriptor-review.md",
+    "bytes": 1203,
+    "sha256": "c54dc7d3343f6169ce7e634703a1358ec1aa910aa3bb5ed2f0a510d060e328fb"
+  },
+  "retained_failure_jobs": {
+    "initial_format_failure": "job-1794238275412-25cb3424-c30",
+    "initial_clippy_failure_after_native_pass": "job-1794238470636-6e596a34-226",
+    "initial_bert_variance_failure_after_context_pass": "job-1794239042764-74e1a027-809"
+  },
+  "retained_bert_failure": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\captures\\model-gnu-release-1\\bert.json",
+    "bytes": 3325,
+    "sha256": "745e4d76cf3d666fa371a26b20c04251e2431fa6c514025d002e6b831e8337cc"
+  },
+  "qualifications": [
+    "Sources in the external draft only; product/Git unchanged by this handoff.",
+    "Only NativeContext descriptor representation/accounting changed after the first successful full facade proof. Its follow-up reran runtime/FFI debug/release, strict Clippy and independent context/layout C captures on both hosts.",
+    "Model facade value counts retain duplicate last-prompt/first-greedy rows; root integration owns deduplicated fixtures and compiler-profile selection.",
+    "All Windows expected captures and predeclared portable tolerances are unchanged.",
+    "The physical attention row is reused across heads and bounded by capacity; sparse high slots do not reduce its budget charge.",
+    "NativeContext heap metadata is explicitly charged separately from row scratch; shared immutable model weights, allocator bookkeeping and thread stacks are outside the owned heap payload budget.",
+    "No new ABI exports or claim of full original hardware/ISA coverage."
+  ]
+}

@@ -1,0 +1,17 @@
+{"source_preimage": {"bytes": 51435, "sha256": "f1ded7432c41ebc22e11884a9f95c352c8d4ed7c0fe458bb74bcdac325111da0"}, "copied": 89}
+msvc fmt
+{"step": "fmt", "command": ["cargo", "+1.99.1", "fmt", "--all", "--check"], "exit_code": 0}
+msvc debug
+{"step": "debug", "command": ["cargo", "+1.99.1", "test", "-p", "llama-tensor", "--", "--nocapture"], "exit_code": 0}
+msvc release
+{"step": "release", "command": ["cargo", "+1.99.1", "test", "--release", "-p", "llama-tensor", "--", "--nocapture"], "exit_code": 0}
+msvc clippy
+{"step": "clippy", "command": ["cargo", "+1.99.1", "clippy", "-p", "llama-tensor", "--all-targets", "--", "-D", "warnings"], "exit_code": 0}
+gnu fmt
+{"step": "fmt", "command": ["cargo", "+1.99.1", "fmt", "--all", "--check"], "exit_code": 0}
+gnu debug
+{"step": "debug", "command": ["cargo", "+1.99.1", "test", "-p", "llama-tensor", "--target-dir", "/tmp/rust-llama-pool-backward-nan", "--", "--nocapture"], "exit_code": 0}
+gnu release
+{"step": "release", "command": ["cargo", "+1.99.1", "test", "--release", "-p", "llama-tensor", "--target-dir", "/tmp/rust-llama-pool-backward-nan", "--", "--nocapture"], "exit_code": 0}
+gnu clippy
+{"step": "clippy", "command": ["cargo", "+1.99.1", "clippy", "-p", "llama-tensor", "--all-targets", "--target-dir", "/tmp/rust-llama-pool-backward-nan", "--", "-D", "warnings"], "exit_code": 0}

@@ -117,8 +117,11 @@ impl Drop for ModelOwner {
 struct ContextOwner(*mut ContextHandle);
 impl ContextOwner {
     fn new(model: &ModelOwner, unified: bool) -> Self {
+        Self::with_context_tokens(model, unified, 512)
+    }
+    fn with_context_tokens(model: &ModelOwner, unified: bool, n_ctx: u32) -> Self {
         let p = LlamaContextParams {
-            n_ctx: 512,
+            n_ctx,
             n_seq_max: 4,
             n_batch: 128,
             n_ubatch: 32,
@@ -870,4 +873,147 @@ fn malformed_state_is_atomic_and_device_state_requires_its_owner() {
     unsafe { llama_memory_seq_cp(llama_get_memory(separate.0), 0, 2, 1, 3) };
     failed();
     assert_eq!(separate.state(), before);
+}
+
+#[test]
+#[cfg(any(
+    target_env = "msvc",
+    all(target_arch = "x86_64", target_os = "linux", target_env = "gnu")
+))]
+fn original_physical_attention_rows_match_boundary_holes_and_shared_masks_bitwise() {
+    #[cfg(target_env = "msvc")]
+    let data = include_bytes!("../../../fixtures/ffi/native-attention-layout-msvc.bin");
+    #[cfg(all(target_arch = "x86_64", target_os = "linux", target_env = "gnu"))]
+    let data = include_bytes!("../../../fixtures/ffi/native-attention-layout-gnu.bin");
+    assert_eq!(&data[..8], b"ATTNROW1");
+    let metadata_bytes = raw_u32(data, 8);
+    let metadata =
+        json::parse(std::str::from_utf8(&data[12..12 + metadata_bytes]).unwrap()).unwrap();
+    let payload = &data[12 + metadata_bytes..];
+    fn expected<'a>(descriptor: &Value, payload: &'a [u8]) -> &'a [u8] {
+        let offset = number(descriptor, "offset") as usize;
+        let length = number(descriptor, "length") as usize;
+        &payload[offset..offset + length]
+    }
+    fn bytes_equal(actual: &[u8], expected: &[u8], label: &str) {
+        assert_eq!(actual.len(), expected.len(), "{label} byte count");
+        let difference = actual.iter().zip(expected).position(|(a, b)| a != b);
+        assert!(
+            difference.is_none(),
+            "{label} first differing byte {difference:?}"
+        );
+    }
+    fn seed_long(context: &ContextOwner, sequence: i32, count: usize) {
+        for first in (0..count).step_by(32) {
+            let tokens = (first..(first + 32).min(count))
+                .map(|i| PROMPT[(i + sequence as usize) % PROMPT.len()])
+                .collect::<Vec<_>>();
+            context.decode(&tokens, sequence, first as i32);
+        }
+    }
+    let model = ModelOwner::load();
+    let cases = array(field(&metadata, "cases"));
+    assert_eq!(cases.len(), 10);
+    let mut checked_logits = 0;
+    let mut checked_state_bytes = 0;
+    for case in cases {
+        let name = text(case, "name");
+        let unified = flag(case, "unified");
+        let operation = name.split_once('_').unwrap().1;
+        let context =
+            ContextOwner::with_context_tokens(&model, unified, if unified { 512 } else { 2048 });
+        let count = if operation == "dense_boundary" {
+            257
+        } else {
+            260
+        };
+        seed_long(&context, 0, count);
+        if matches!(operation, "physical_holes" | "shared_membership_mask") {
+            seed_long(&context, 1, 17);
+        }
+        if operation == "common_stream_width" {
+            seed_long(&context, 1, 3);
+        }
+        clean();
+        let memory = unsafe { llama_get_memory(context.0) };
+        match operation {
+            "physical_holes" => {
+                for (start, end) in [(1, 2), (3, 4), (64, 66), (127, 130), (254, 257)] {
+                    assert!(unsafe { llama_memory_seq_rm(memory, 0, start, end) });
+                }
+            }
+            "high_used_prefix_removed" => {
+                assert!(unsafe { llama_memory_seq_rm(memory, 0, 0, 253) });
+            }
+            "shared_cells" => unsafe { llama_memory_seq_cp(memory, 0, 2, -1, -1) },
+            "shared_membership_mask" => unsafe {
+                llama_memory_seq_cp(memory, 0, 2, -1, -1);
+                assert!(llama_memory_seq_rm(memory, 0, 0, 253));
+            },
+            "dense_boundary" | "common_stream_width" => {}
+            _ => panic!("unknown frozen layout case {operation}"),
+        }
+        okay();
+        context.assert_positions(field(case, "positions_before"));
+        let reference = expected(field(case, "state_before"), payload);
+        bytes_equal(&context.state(), reference, name);
+        checked_state_bytes += reference.len();
+        let items: Vec<(i32, i32, Vec<i32>)> = match operation {
+            "common_stream_width" => vec![(403, count as i32, vec![0]), (407, 3, vec![1])],
+            "shared_membership_mask" => {
+                vec![(403, count as i32, vec![0]), (407, count as i32, vec![2])]
+            }
+            _ => (0..8)
+                .map(|i| {
+                    (
+                        PROMPT[i % PROMPT.len()],
+                        (count + i) as i32,
+                        if operation == "shared_cells" {
+                            vec![0, 2]
+                        } else {
+                            vec![0]
+                        },
+                    )
+                })
+                .collect(),
+        };
+        let rows = array(field(case, "logits"));
+        assert_eq!(rows.len(), items.len());
+        clean();
+        unsafe {
+            let mut batch = llama_batch_init(items.len() as i32, 0, 2);
+            okay();
+            batch.n_tokens = items.len() as i32;
+            for (index, (token, position, sequences)) in items.iter().enumerate() {
+                *batch.token.add(index) = *token;
+                *batch.pos.add(index) = *position;
+                *batch.n_seq_id.add(index) = sequences.len() as i32;
+                for (offset, sequence) in sequences.iter().enumerate() {
+                    *(*batch.seq_id.add(index)).add(offset) = *sequence;
+                }
+                *batch.logits.add(index) = 1;
+            }
+            let code = llama_decode(context.0, batch);
+            llama_batch_free(batch);
+            okay();
+            assert_eq!(code, 0, "{name}");
+            for (index, descriptor) in rows.iter().enumerate() {
+                let row = llama_get_logits_ith(context.0, index as i32);
+                okay();
+                assert!(!row.is_null());
+                let actual = slice::from_raw_parts(row, 512)
+                    .iter()
+                    .flat_map(|f| f.to_le_bytes())
+                    .collect::<Vec<_>>();
+                bytes_equal(&actual, expected(descriptor, payload), name);
+                checked_logits += 512;
+            }
+        }
+        context.assert_positions(field(case, "positions_after"));
+        let reference = expected(field(case, "state_after"), payload);
+        bytes_equal(&context.state(), reference, name);
+        checked_state_bytes += reference.len();
+    }
+    assert_eq!(checked_logits, 31_744);
+    assert_eq!(checked_state_bytes, 193_868);
 }

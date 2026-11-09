@@ -1,0 +1,2891 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Original inline ggml_v_expf SSE2 branch and original shared-library ggml_vec_silu_f32/ggml_vec_soft_max_f32; thin wrapper only, no Rust run.",
+  "compiler": "c++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "mxcsr_before": "0x1fa0",
+  "mxcsr_after": "0x1fbb",
+  "fegetround": 0,
+  "floating_environment": "round-to-nearest ties-to-even, gradual underflow, DAZ/FTZ disabled, default masked exceptions; floating status flags are not asserted equal.",
+  "cases": 564,
+  "float_outputs": 603231,
+  "softmax_f64_sums": 417,
+  "file": {
+    "name": "gnu-sse2-math-reference.bin",
+    "bytes": 4852609,
+    "sha256": "1150ad8351d57bec48431d9ed60c4a5bda41a3d14e936c7739aef529b8edc4c2"
+  },
+  "sources": {
+    "tensor-oracle/sse2-math/generate.py": {
+      "bytes": 6656,
+      "sha256": "293d37a1f6a236c5fdf256f0ec4ee1220b19eba7a7ac32f7dafd8c9d62530b77"
+    },
+    "tensor-oracle/sse2-math/oracle.cpp": {
+      "bytes": 640,
+      "sha256": "778375909de12b00b4847042c502e3526516077b0a6531c587469fa4b05a069f"
+    },
+    "tensor-oracle/sse2-math/liboracle.so": {
+      "bytes": 15576,
+      "sha256": "3d4e5d4fc094e17cbe2f3fb41c034d1388a3d30fb411791f9186beb2cb9e0e05"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ggml-cpu-impl.h": {
+      "bytes": 14311,
+      "sha256": "1dc9a672a756a1184c965d8b58679236292285ce5a2479317d51a7e1a0f7dc19"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/simd-mappings.h": {
+      "bytes": 57838,
+      "sha256": "5b1106263759a83e779185b72567d629cb690eb0ccdb0040d635b156a605d465"
+    },
+    "build-ggml-linux-llama/bin/libggml-cpu.so": {
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "build-ggml-linux-llama/bin/libggml-base.so": {
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "build-ggml-linux-llama/ggml/src/CMakeFiles/ggml-cpu.dir/flags.make": {
+      "bytes": 1548,
+      "sha256": "bc31f62e7eff3a86848bf383cc2f1d6500283fcc09ebf36f5a5e59686c1b1f4f"
+    },
+    "tensor-oracle/compiler-macro-probe-gnu.txt": {
+      "bytes": 160,
+      "sha256": "27bcc07426f37a7120d78f494befe399b5034e081b344102e114542b35510d90"
+    }
+  },
+  "cases_inventory": [
+    {
+      "name": "exp4_half_domain",
+      "kind": 0,
+      "values": 65536
+    },
+    {
+      "name": "silu_half_domain",
+      "kind": 1,
+      "values": 65536
+    },
+    {
+      "name": "exp4_bf16_domain",
+      "kind": 0,
+      "values": 65536
+    },
+    {
+      "name": "silu_bf16_domain",
+      "kind": 1,
+      "values": 65536
+    },
+    {
+      "name": "exp4_random_bits",
+      "kind": 0,
+      "values": 100000
+    },
+    {
+      "name": "silu_random_bits",
+      "kind": 1,
+      "values": 100000
+    },
+    {
+      "name": "exp4_dense_grid",
+      "kind": 0,
+      "values": 38404
+    },
+    {
+      "name": "silu_dense_grid",
+      "kind": 1,
+      "values": 38404
+    },
+    {
+      "name": "exp4_range_reduction_edges",
+      "kind": 0,
+      "values": 328
+    },
+    {
+      "name": "silu_range_reduction_edges",
+      "kind": 1,
+      "values": 328
+    },
+    {
+      "name": "exp4_mixed_special_lanes",
+      "kind": 0,
+      "values": 256
+    },
+    {
+      "name": "silu_mixed_special_lanes",
+      "kind": 1,
+      "values": 256
+    },
+    {
+      "name": "silu_0_random",
+      "kind": 1,
+      "values": 0
+    },
+    {
+      "name": "softmax_0_random",
+      "kind": 2,
+      "values": 0
+    },
+    {
+      "name": "silu_0_cancellation",
+      "kind": 1,
+      "values": 0
+    },
+    {
+      "name": "softmax_0_cancellation",
+      "kind": 2,
+      "values": 0
+    },
+    {
+      "name": "silu_0_small",
+      "kind": 1,
+      "values": 0
+    },
+    {
+      "name": "softmax_0_small",
+      "kind": 2,
+      "values": 0
+    },
+    {
+      "name": "silu_0_masked",
+      "kind": 1,
+      "values": 0
+    },
+    {
+      "name": "softmax_0_masked",
+      "kind": 2,
+      "values": 0
+    },
+    {
+      "name": "silu_1_random",
+      "kind": 1,
+      "values": 1
+    },
+    {
+      "name": "softmax_1_random",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "silu_1_cancellation",
+      "kind": 1,
+      "values": 1
+    },
+    {
+      "name": "softmax_1_cancellation",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "silu_1_small",
+      "kind": 1,
+      "values": 1
+    },
+    {
+      "name": "softmax_1_small",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "silu_1_masked",
+      "kind": 1,
+      "values": 1
+    },
+    {
+      "name": "softmax_1_masked",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "silu_2_random",
+      "kind": 1,
+      "values": 2
+    },
+    {
+      "name": "softmax_2_random",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "silu_2_cancellation",
+      "kind": 1,
+      "values": 2
+    },
+    {
+      "name": "softmax_2_cancellation",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "silu_2_small",
+      "kind": 1,
+      "values": 2
+    },
+    {
+      "name": "softmax_2_small",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "silu_2_masked",
+      "kind": 1,
+      "values": 2
+    },
+    {
+      "name": "softmax_2_masked",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "silu_3_random",
+      "kind": 1,
+      "values": 3
+    },
+    {
+      "name": "softmax_3_random",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "silu_3_cancellation",
+      "kind": 1,
+      "values": 3
+    },
+    {
+      "name": "softmax_3_cancellation",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "silu_3_small",
+      "kind": 1,
+      "values": 3
+    },
+    {
+      "name": "softmax_3_small",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "silu_3_masked",
+      "kind": 1,
+      "values": 3
+    },
+    {
+      "name": "softmax_3_masked",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "silu_4_random",
+      "kind": 1,
+      "values": 4
+    },
+    {
+      "name": "softmax_4_random",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "silu_4_cancellation",
+      "kind": 1,
+      "values": 4
+    },
+    {
+      "name": "softmax_4_cancellation",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "silu_4_small",
+      "kind": 1,
+      "values": 4
+    },
+    {
+      "name": "softmax_4_small",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "silu_4_masked",
+      "kind": 1,
+      "values": 4
+    },
+    {
+      "name": "softmax_4_masked",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "silu_5_random",
+      "kind": 1,
+      "values": 5
+    },
+    {
+      "name": "softmax_5_random",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "silu_5_cancellation",
+      "kind": 1,
+      "values": 5
+    },
+    {
+      "name": "softmax_5_cancellation",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "silu_5_small",
+      "kind": 1,
+      "values": 5
+    },
+    {
+      "name": "softmax_5_small",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "silu_5_masked",
+      "kind": 1,
+      "values": 5
+    },
+    {
+      "name": "softmax_5_masked",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "silu_6_random",
+      "kind": 1,
+      "values": 6
+    },
+    {
+      "name": "softmax_6_random",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "silu_6_cancellation",
+      "kind": 1,
+      "values": 6
+    },
+    {
+      "name": "softmax_6_cancellation",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "silu_6_small",
+      "kind": 1,
+      "values": 6
+    },
+    {
+      "name": "softmax_6_small",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "silu_6_masked",
+      "kind": 1,
+      "values": 6
+    },
+    {
+      "name": "softmax_6_masked",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "silu_7_random",
+      "kind": 1,
+      "values": 7
+    },
+    {
+      "name": "softmax_7_random",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "silu_7_cancellation",
+      "kind": 1,
+      "values": 7
+    },
+    {
+      "name": "softmax_7_cancellation",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "silu_7_small",
+      "kind": 1,
+      "values": 7
+    },
+    {
+      "name": "softmax_7_small",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "silu_7_masked",
+      "kind": 1,
+      "values": 7
+    },
+    {
+      "name": "softmax_7_masked",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "silu_8_random",
+      "kind": 1,
+      "values": 8
+    },
+    {
+      "name": "softmax_8_random",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "silu_8_cancellation",
+      "kind": 1,
+      "values": 8
+    },
+    {
+      "name": "softmax_8_cancellation",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "silu_8_small",
+      "kind": 1,
+      "values": 8
+    },
+    {
+      "name": "softmax_8_small",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "silu_8_masked",
+      "kind": 1,
+      "values": 8
+    },
+    {
+      "name": "softmax_8_masked",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "silu_9_random",
+      "kind": 1,
+      "values": 9
+    },
+    {
+      "name": "softmax_9_random",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "silu_9_cancellation",
+      "kind": 1,
+      "values": 9
+    },
+    {
+      "name": "softmax_9_cancellation",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "silu_9_small",
+      "kind": 1,
+      "values": 9
+    },
+    {
+      "name": "softmax_9_small",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "silu_9_masked",
+      "kind": 1,
+      "values": 9
+    },
+    {
+      "name": "softmax_9_masked",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "silu_15_random",
+      "kind": 1,
+      "values": 15
+    },
+    {
+      "name": "softmax_15_random",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "silu_15_cancellation",
+      "kind": 1,
+      "values": 15
+    },
+    {
+      "name": "softmax_15_cancellation",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "silu_15_small",
+      "kind": 1,
+      "values": 15
+    },
+    {
+      "name": "softmax_15_small",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "silu_15_masked",
+      "kind": 1,
+      "values": 15
+    },
+    {
+      "name": "softmax_15_masked",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "silu_16_random",
+      "kind": 1,
+      "values": 16
+    },
+    {
+      "name": "softmax_16_random",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "silu_16_cancellation",
+      "kind": 1,
+      "values": 16
+    },
+    {
+      "name": "softmax_16_cancellation",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "silu_16_small",
+      "kind": 1,
+      "values": 16
+    },
+    {
+      "name": "softmax_16_small",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "silu_16_masked",
+      "kind": 1,
+      "values": 16
+    },
+    {
+      "name": "softmax_16_masked",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "silu_17_random",
+      "kind": 1,
+      "values": 17
+    },
+    {
+      "name": "softmax_17_random",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "silu_17_cancellation",
+      "kind": 1,
+      "values": 17
+    },
+    {
+      "name": "softmax_17_cancellation",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "silu_17_small",
+      "kind": 1,
+      "values": 17
+    },
+    {
+      "name": "softmax_17_small",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "silu_17_masked",
+      "kind": 1,
+      "values": 17
+    },
+    {
+      "name": "softmax_17_masked",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "silu_31_random",
+      "kind": 1,
+      "values": 31
+    },
+    {
+      "name": "softmax_31_random",
+      "kind": 2,
+      "values": 31
+    },
+    {
+      "name": "silu_31_cancellation",
+      "kind": 1,
+      "values": 31
+    },
+    {
+      "name": "softmax_31_cancellation",
+      "kind": 2,
+      "values": 31
+    },
+    {
+      "name": "silu_31_small",
+      "kind": 1,
+      "values": 31
+    },
+    {
+      "name": "softmax_31_small",
+      "kind": 2,
+      "values": 31
+    },
+    {
+      "name": "silu_31_masked",
+      "kind": 1,
+      "values": 31
+    },
+    {
+      "name": "softmax_31_masked",
+      "kind": 2,
+      "values": 31
+    },
+    {
+      "name": "silu_32_random",
+      "kind": 1,
+      "values": 32
+    },
+    {
+      "name": "softmax_32_random",
+      "kind": 2,
+      "values": 32
+    },
+    {
+      "name": "silu_32_cancellation",
+      "kind": 1,
+      "values": 32
+    },
+    {
+      "name": "softmax_32_cancellation",
+      "kind": 2,
+      "values": 32
+    },
+    {
+      "name": "silu_32_small",
+      "kind": 1,
+      "values": 32
+    },
+    {
+      "name": "softmax_32_small",
+      "kind": 2,
+      "values": 32
+    },
+    {
+      "name": "silu_32_masked",
+      "kind": 1,
+      "values": 32
+    },
+    {
+      "name": "softmax_32_masked",
+      "kind": 2,
+      "values": 32
+    },
+    {
+      "name": "silu_33_random",
+      "kind": 1,
+      "values": 33
+    },
+    {
+      "name": "softmax_33_random",
+      "kind": 2,
+      "values": 33
+    },
+    {
+      "name": "silu_33_cancellation",
+      "kind": 1,
+      "values": 33
+    },
+    {
+      "name": "softmax_33_cancellation",
+      "kind": 2,
+      "values": 33
+    },
+    {
+      "name": "silu_33_small",
+      "kind": 1,
+      "values": 33
+    },
+    {
+      "name": "softmax_33_small",
+      "kind": 2,
+      "values": 33
+    },
+    {
+      "name": "silu_33_masked",
+      "kind": 1,
+      "values": 33
+    },
+    {
+      "name": "softmax_33_masked",
+      "kind": 2,
+      "values": 33
+    },
+    {
+      "name": "silu_63_random",
+      "kind": 1,
+      "values": 63
+    },
+    {
+      "name": "softmax_63_random",
+      "kind": 2,
+      "values": 63
+    },
+    {
+      "name": "silu_63_cancellation",
+      "kind": 1,
+      "values": 63
+    },
+    {
+      "name": "softmax_63_cancellation",
+      "kind": 2,
+      "values": 63
+    },
+    {
+      "name": "silu_63_small",
+      "kind": 1,
+      "values": 63
+    },
+    {
+      "name": "softmax_63_small",
+      "kind": 2,
+      "values": 63
+    },
+    {
+      "name": "silu_63_masked",
+      "kind": 1,
+      "values": 63
+    },
+    {
+      "name": "softmax_63_masked",
+      "kind": 2,
+      "values": 63
+    },
+    {
+      "name": "silu_64_random",
+      "kind": 1,
+      "values": 64
+    },
+    {
+      "name": "softmax_64_random",
+      "kind": 2,
+      "values": 64
+    },
+    {
+      "name": "silu_64_cancellation",
+      "kind": 1,
+      "values": 64
+    },
+    {
+      "name": "softmax_64_cancellation",
+      "kind": 2,
+      "values": 64
+    },
+    {
+      "name": "silu_64_small",
+      "kind": 1,
+      "values": 64
+    },
+    {
+      "name": "softmax_64_small",
+      "kind": 2,
+      "values": 64
+    },
+    {
+      "name": "silu_64_masked",
+      "kind": 1,
+      "values": 64
+    },
+    {
+      "name": "softmax_64_masked",
+      "kind": 2,
+      "values": 64
+    },
+    {
+      "name": "silu_65_random",
+      "kind": 1,
+      "values": 65
+    },
+    {
+      "name": "softmax_65_random",
+      "kind": 2,
+      "values": 65
+    },
+    {
+      "name": "silu_65_cancellation",
+      "kind": 1,
+      "values": 65
+    },
+    {
+      "name": "softmax_65_cancellation",
+      "kind": 2,
+      "values": 65
+    },
+    {
+      "name": "silu_65_small",
+      "kind": 1,
+      "values": 65
+    },
+    {
+      "name": "softmax_65_small",
+      "kind": 2,
+      "values": 65
+    },
+    {
+      "name": "silu_65_masked",
+      "kind": 1,
+      "values": 65
+    },
+    {
+      "name": "softmax_65_masked",
+      "kind": 2,
+      "values": 65
+    },
+    {
+      "name": "silu_127_random",
+      "kind": 1,
+      "values": 127
+    },
+    {
+      "name": "softmax_127_random",
+      "kind": 2,
+      "values": 127
+    },
+    {
+      "name": "silu_127_cancellation",
+      "kind": 1,
+      "values": 127
+    },
+    {
+      "name": "softmax_127_cancellation",
+      "kind": 2,
+      "values": 127
+    },
+    {
+      "name": "silu_127_small",
+      "kind": 1,
+      "values": 127
+    },
+    {
+      "name": "softmax_127_small",
+      "kind": 2,
+      "values": 127
+    },
+    {
+      "name": "silu_127_masked",
+      "kind": 1,
+      "values": 127
+    },
+    {
+      "name": "softmax_127_masked",
+      "kind": 2,
+      "values": 127
+    },
+    {
+      "name": "silu_128_random",
+      "kind": 1,
+      "values": 128
+    },
+    {
+      "name": "softmax_128_random",
+      "kind": 2,
+      "values": 128
+    },
+    {
+      "name": "silu_128_cancellation",
+      "kind": 1,
+      "values": 128
+    },
+    {
+      "name": "softmax_128_cancellation",
+      "kind": 2,
+      "values": 128
+    },
+    {
+      "name": "silu_128_small",
+      "kind": 1,
+      "values": 128
+    },
+    {
+      "name": "softmax_128_small",
+      "kind": 2,
+      "values": 128
+    },
+    {
+      "name": "silu_128_masked",
+      "kind": 1,
+      "values": 128
+    },
+    {
+      "name": "softmax_128_masked",
+      "kind": 2,
+      "values": 128
+    },
+    {
+      "name": "silu_129_random",
+      "kind": 1,
+      "values": 129
+    },
+    {
+      "name": "softmax_129_random",
+      "kind": 2,
+      "values": 129
+    },
+    {
+      "name": "silu_129_cancellation",
+      "kind": 1,
+      "values": 129
+    },
+    {
+      "name": "softmax_129_cancellation",
+      "kind": 2,
+      "values": 129
+    },
+    {
+      "name": "silu_129_small",
+      "kind": 1,
+      "values": 129
+    },
+    {
+      "name": "softmax_129_small",
+      "kind": 2,
+      "values": 129
+    },
+    {
+      "name": "silu_129_masked",
+      "kind": 1,
+      "values": 129
+    },
+    {
+      "name": "softmax_129_masked",
+      "kind": 2,
+      "values": 129
+    },
+    {
+      "name": "silu_255_random",
+      "kind": 1,
+      "values": 255
+    },
+    {
+      "name": "softmax_255_random",
+      "kind": 2,
+      "values": 255
+    },
+    {
+      "name": "silu_255_cancellation",
+      "kind": 1,
+      "values": 255
+    },
+    {
+      "name": "softmax_255_cancellation",
+      "kind": 2,
+      "values": 255
+    },
+    {
+      "name": "silu_255_small",
+      "kind": 1,
+      "values": 255
+    },
+    {
+      "name": "softmax_255_small",
+      "kind": 2,
+      "values": 255
+    },
+    {
+      "name": "silu_255_masked",
+      "kind": 1,
+      "values": 255
+    },
+    {
+      "name": "softmax_255_masked",
+      "kind": 2,
+      "values": 255
+    },
+    {
+      "name": "silu_256_random",
+      "kind": 1,
+      "values": 256
+    },
+    {
+      "name": "softmax_256_random",
+      "kind": 2,
+      "values": 256
+    },
+    {
+      "name": "silu_256_cancellation",
+      "kind": 1,
+      "values": 256
+    },
+    {
+      "name": "softmax_256_cancellation",
+      "kind": 2,
+      "values": 256
+    },
+    {
+      "name": "silu_256_small",
+      "kind": 1,
+      "values": 256
+    },
+    {
+      "name": "softmax_256_small",
+      "kind": 2,
+      "values": 256
+    },
+    {
+      "name": "silu_256_masked",
+      "kind": 1,
+      "values": 256
+    },
+    {
+      "name": "softmax_256_masked",
+      "kind": 2,
+      "values": 256
+    },
+    {
+      "name": "silu_257_random",
+      "kind": 1,
+      "values": 257
+    },
+    {
+      "name": "softmax_257_random",
+      "kind": 2,
+      "values": 257
+    },
+    {
+      "name": "silu_257_cancellation",
+      "kind": 1,
+      "values": 257
+    },
+    {
+      "name": "softmax_257_cancellation",
+      "kind": 2,
+      "values": 257
+    },
+    {
+      "name": "silu_257_small",
+      "kind": 1,
+      "values": 257
+    },
+    {
+      "name": "softmax_257_small",
+      "kind": 2,
+      "values": 257
+    },
+    {
+      "name": "silu_257_masked",
+      "kind": 1,
+      "values": 257
+    },
+    {
+      "name": "softmax_257_masked",
+      "kind": 2,
+      "values": 257
+    },
+    {
+      "name": "silu_383_random",
+      "kind": 1,
+      "values": 383
+    },
+    {
+      "name": "softmax_383_random",
+      "kind": 2,
+      "values": 383
+    },
+    {
+      "name": "silu_383_cancellation",
+      "kind": 1,
+      "values": 383
+    },
+    {
+      "name": "softmax_383_cancellation",
+      "kind": 2,
+      "values": 383
+    },
+    {
+      "name": "silu_383_small",
+      "kind": 1,
+      "values": 383
+    },
+    {
+      "name": "softmax_383_small",
+      "kind": 2,
+      "values": 383
+    },
+    {
+      "name": "silu_383_masked",
+      "kind": 1,
+      "values": 383
+    },
+    {
+      "name": "softmax_383_masked",
+      "kind": 2,
+      "values": 383
+    },
+    {
+      "name": "silu_384_random",
+      "kind": 1,
+      "values": 384
+    },
+    {
+      "name": "softmax_384_random",
+      "kind": 2,
+      "values": 384
+    },
+    {
+      "name": "silu_384_cancellation",
+      "kind": 1,
+      "values": 384
+    },
+    {
+      "name": "softmax_384_cancellation",
+      "kind": 2,
+      "values": 384
+    },
+    {
+      "name": "silu_384_small",
+      "kind": 1,
+      "values": 384
+    },
+    {
+      "name": "softmax_384_small",
+      "kind": 2,
+      "values": 384
+    },
+    {
+      "name": "silu_384_masked",
+      "kind": 1,
+      "values": 384
+    },
+    {
+      "name": "softmax_384_masked",
+      "kind": 2,
+      "values": 384
+    },
+    {
+      "name": "silu_385_random",
+      "kind": 1,
+      "values": 385
+    },
+    {
+      "name": "softmax_385_random",
+      "kind": 2,
+      "values": 385
+    },
+    {
+      "name": "silu_385_cancellation",
+      "kind": 1,
+      "values": 385
+    },
+    {
+      "name": "softmax_385_cancellation",
+      "kind": 2,
+      "values": 385
+    },
+    {
+      "name": "silu_385_small",
+      "kind": 1,
+      "values": 385
+    },
+    {
+      "name": "softmax_385_small",
+      "kind": 2,
+      "values": 385
+    },
+    {
+      "name": "silu_385_masked",
+      "kind": 1,
+      "values": 385
+    },
+    {
+      "name": "softmax_385_masked",
+      "kind": 2,
+      "values": 385
+    },
+    {
+      "name": "silu_1535_random",
+      "kind": 1,
+      "values": 1535
+    },
+    {
+      "name": "softmax_1535_random",
+      "kind": 2,
+      "values": 1535
+    },
+    {
+      "name": "silu_1535_cancellation",
+      "kind": 1,
+      "values": 1535
+    },
+    {
+      "name": "softmax_1535_cancellation",
+      "kind": 2,
+      "values": 1535
+    },
+    {
+      "name": "silu_1535_small",
+      "kind": 1,
+      "values": 1535
+    },
+    {
+      "name": "softmax_1535_small",
+      "kind": 2,
+      "values": 1535
+    },
+    {
+      "name": "silu_1535_masked",
+      "kind": 1,
+      "values": 1535
+    },
+    {
+      "name": "softmax_1535_masked",
+      "kind": 2,
+      "values": 1535
+    },
+    {
+      "name": "silu_1536_random",
+      "kind": 1,
+      "values": 1536
+    },
+    {
+      "name": "softmax_1536_random",
+      "kind": 2,
+      "values": 1536
+    },
+    {
+      "name": "silu_1536_cancellation",
+      "kind": 1,
+      "values": 1536
+    },
+    {
+      "name": "softmax_1536_cancellation",
+      "kind": 2,
+      "values": 1536
+    },
+    {
+      "name": "silu_1536_small",
+      "kind": 1,
+      "values": 1536
+    },
+    {
+      "name": "softmax_1536_small",
+      "kind": 2,
+      "values": 1536
+    },
+    {
+      "name": "silu_1536_masked",
+      "kind": 1,
+      "values": 1536
+    },
+    {
+      "name": "softmax_1536_masked",
+      "kind": 2,
+      "values": 1536
+    },
+    {
+      "name": "silu_1537_random",
+      "kind": 1,
+      "values": 1537
+    },
+    {
+      "name": "softmax_1537_random",
+      "kind": 2,
+      "values": 1537
+    },
+    {
+      "name": "silu_1537_cancellation",
+      "kind": 1,
+      "values": 1537
+    },
+    {
+      "name": "softmax_1537_cancellation",
+      "kind": 2,
+      "values": 1537
+    },
+    {
+      "name": "silu_1537_small",
+      "kind": 1,
+      "values": 1537
+    },
+    {
+      "name": "softmax_1537_small",
+      "kind": 2,
+      "values": 1537
+    },
+    {
+      "name": "silu_1537_masked",
+      "kind": 1,
+      "values": 1537
+    },
+    {
+      "name": "softmax_1537_masked",
+      "kind": 2,
+      "values": 1537
+    },
+    {
+      "name": "silu_special_tail_1",
+      "kind": 1,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_tail_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "silu_special_tail_2",
+      "kind": 1,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_tail_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "silu_special_tail_3",
+      "kind": 1,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_tail_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "silu_special_tail_4",
+      "kind": 1,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_tail_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "silu_special_tail_5",
+      "kind": 1,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_tail_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "silu_special_tail_7",
+      "kind": 1,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_tail_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "silu_special_tail_8",
+      "kind": 1,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_tail_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "silu_special_tail_9",
+      "kind": 1,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_tail_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "silu_special_tail_15",
+      "kind": 1,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_tail_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "silu_special_tail_16",
+      "kind": 1,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_tail_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "silu_special_tail_17",
+      "kind": 1,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_tail_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_grouped_sum_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_grouped_sum_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_grouped_sum_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_grouped_sum_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_grouped_sum_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_grouped_sum_63",
+      "kind": 2,
+      "values": 63
+    },
+    {
+      "name": "softmax_grouped_sum_64",
+      "kind": 2,
+      "values": 64
+    },
+    {
+      "name": "softmax_grouped_sum_65",
+      "kind": 2,
+      "values": 65
+    },
+    {
+      "name": "softmax_grouped_sum_384",
+      "kind": 2,
+      "values": 384
+    },
+    {
+      "name": "softmax_grouped_sum_1536",
+      "kind": 2,
+      "values": 1536
+    },
+    {
+      "name": "softmax_special_reduction_0_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_0_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_0_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_0_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_0_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_0_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_0_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_0_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_0_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_0_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_0_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_0_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_0_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_0_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_0_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_0_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_0_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_1_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_1_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_1_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_1_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_1_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_1_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_1_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_1_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_1_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_1_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_1_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_1_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_1_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_1_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_1_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_1_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_1_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_2_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_2_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_2_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_2_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_2_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_2_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_2_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_2_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_2_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_2_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_2_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_2_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_2_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_2_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_2_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_2_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_2_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_3_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_3_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_3_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_3_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_3_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_3_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_3_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_3_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_3_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_3_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_3_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_3_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_3_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_3_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_3_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_3_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_3_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_4_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_4_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_4_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_4_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_4_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_4_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_4_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_4_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_4_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_4_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_4_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_4_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_4_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_4_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_4_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_4_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_4_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_5_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_5_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_5_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_5_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_5_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_5_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_5_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_5_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_5_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_5_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_5_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_5_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_5_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_5_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_5_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_5_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_5_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_6_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_6_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_6_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_6_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_6_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_6_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_6_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_6_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_6_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_6_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_6_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_6_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_6_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_6_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_6_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_6_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_6_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_7_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_7_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_7_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_7_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_7_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_7_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_7_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_7_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_7_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_7_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_7_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_7_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_7_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_7_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_7_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_7_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_7_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_8_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_8_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_8_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_8_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_8_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_8_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_8_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_8_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_8_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_8_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_8_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_8_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_8_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_8_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_8_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_8_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_8_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_9_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_9_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_9_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_9_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_9_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_9_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_9_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_9_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_9_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_9_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_9_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_9_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_9_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_9_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_9_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_9_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_9_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_10_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_10_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_10_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_10_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_10_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_10_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_10_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_10_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_10_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_10_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_10_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_10_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_10_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_10_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_10_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_10_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_10_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_11_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_11_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_11_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_11_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_11_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_11_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_11_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_11_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_11_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_11_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_11_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_11_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_11_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_11_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_11_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_11_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_11_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_12_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_12_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_12_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_12_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_12_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_12_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_12_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_12_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_12_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_12_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_12_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_12_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_12_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_12_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_12_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_12_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_12_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_13_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_13_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_13_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_13_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_13_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_13_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_13_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_13_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_13_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_13_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_13_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_13_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_13_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_13_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_13_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_13_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_13_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_14_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_14_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_14_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_14_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_14_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_14_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_14_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_14_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_14_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_14_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_14_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_14_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_14_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_14_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_14_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_14_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_14_17",
+      "kind": 2,
+      "values": 17
+    },
+    {
+      "name": "softmax_special_reduction_15_1",
+      "kind": 2,
+      "values": 1
+    },
+    {
+      "name": "softmax_special_reduction_15_2",
+      "kind": 2,
+      "values": 2
+    },
+    {
+      "name": "softmax_special_reduction_15_3",
+      "kind": 2,
+      "values": 3
+    },
+    {
+      "name": "softmax_special_reduction_15_4",
+      "kind": 2,
+      "values": 4
+    },
+    {
+      "name": "softmax_special_reduction_15_5",
+      "kind": 2,
+      "values": 5
+    },
+    {
+      "name": "softmax_special_reduction_15_6",
+      "kind": 2,
+      "values": 6
+    },
+    {
+      "name": "softmax_special_reduction_15_7",
+      "kind": 2,
+      "values": 7
+    },
+    {
+      "name": "softmax_special_reduction_15_8",
+      "kind": 2,
+      "values": 8
+    },
+    {
+      "name": "softmax_special_reduction_15_9",
+      "kind": 2,
+      "values": 9
+    },
+    {
+      "name": "softmax_special_reduction_15_10",
+      "kind": 2,
+      "values": 10
+    },
+    {
+      "name": "softmax_special_reduction_15_11",
+      "kind": 2,
+      "values": 11
+    },
+    {
+      "name": "softmax_special_reduction_15_12",
+      "kind": 2,
+      "values": 12
+    },
+    {
+      "name": "softmax_special_reduction_15_13",
+      "kind": 2,
+      "values": 13
+    },
+    {
+      "name": "softmax_special_reduction_15_14",
+      "kind": 2,
+      "values": 14
+    },
+    {
+      "name": "softmax_special_reduction_15_15",
+      "kind": 2,
+      "values": 15
+    },
+    {
+      "name": "softmax_special_reduction_15_16",
+      "kind": 2,
+      "values": 16
+    },
+    {
+      "name": "softmax_special_reduction_15_17",
+      "kind": 2,
+      "values": 17
+    }
+  ],
+  "notes": [
+    "Every expected value is captured before Rust implementation; input words, output words and F64 sums are retained exactly.",
+    "Four-lane prefixes and scalar tails are independently exercised; SIMD exponentials use the frozen no-FMA SSE2 polynomial and integer exponent scaling.",
+    "Nonfinite primitive cases are retained separately from graph validation; NaN payload propagation and floating status flags are platform qualifications to be reported, not silently normalized in stored references."
+  ]
+}

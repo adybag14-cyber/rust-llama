@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "reference": "frozen-llama.cpp-master-c-api",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "vocab_only": false,
+  "n_vocab": 512,
+  "n_ctx": 32,
+  "max_tokens": 4,
+  "threads": 1,
+  "kv_type": "F32",
+  "flash_attention": false,
+  "mmap": false,
+  "logits_layout": "one unique full vocabulary row per consumed prompt/greedy input token",
+  "detokenize_remove_special": true,
+  "detokenize_unparse_special": false,
+  "comparison_tolerance": {
+    "absolute": 2e-06,
+    "relative": 2e-06
+  },
+  "numeric_profile": "frozen x86_64 Linux GNU SSE2",
+  "cases": [
+    {
+      "name": "empty",
+      "prompt": "",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        1
+      ],
+      "pieces_hex": [
+        ""
+      ],
+      "pieces_special_hex": [
+        "3c733e"
+      ],
+      "detokenized_hex": "",
+      "greedy_tokens": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "greedy_pieces_hex": [
+        "00",
+        "00",
+        "00",
+        "00"
+      ],
+      "finished_eog": false,
+      "generated_hex": "00000000",
+      "first_row": 0,
+      "row_count": 4
+    },
+    {
+      "name": "hello",
+      "prompt": "hello",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        1,
+        281,
+        306,
+        414
+      ],
+      "pieces_hex": [
+        "",
+        "206865",
+        "6c6c",
+        "6f"
+      ],
+      "pieces_special_hex": [
+        "3c733e",
+        "206865",
+        "6c6c",
+        "6f"
+      ],
+      "detokenized_hex": "2068656c6c6f",
+      "greedy_tokens": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "greedy_pieces_hex": [
+        "08",
+        "08",
+        "08",
+        "08"
+      ],
+      "finished_eog": false,
+      "generated_hex": "08080808",
+      "first_row": 4,
+      "row_count": 7
+    },
+    {
+      "name": "small",
+      "prompt": "a cat",
+      "add_special": true,
+      "parse_special": true,
+      "tokens": [
+        1,
+        261,
+        280,
+        294
+      ],
+      "pieces_hex": [
+        "",
+        "2061",
+        "2063",
+        "6174"
+      ],
+      "pieces_special_hex": [
+        "3c733e",
+        "2061",
+        "2063",
+        "6174"
+      ],
+      "detokenized_hex": "206120636174",
+      "greedy_tokens": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "greedy_pieces_hex": [
+        "01",
+        "01",
+        "01",
+        "01"
+      ],
+      "finished_eog": false,
+      "generated_hex": "01010101",
+      "first_row": 11,
+      "row_count": 7
+    }
+  ],
+  "row_count": 18,
+  "logits_sha256": "0f34c8bf70fa0bc8328a2364d8deb5067e8e0808c6bc438518e6539d26b588cb"
+}

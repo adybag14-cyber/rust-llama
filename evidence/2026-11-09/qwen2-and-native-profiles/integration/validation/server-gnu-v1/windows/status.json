@@ -1,0 +1,124 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T16:40:07.847194+00:00",
+  "qualification": "Combined draft server GNU HTTP and explicit load-resource options focused verification; sharded GGUF integration is still pending",
+  "inputs_before": {
+    "files": 567,
+    "sha256": "01acfdcf20cb878a2ab54444f8194fe782c7720e2b99a00da1a1d187937afd89"
+  },
+  "steps": [
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-server",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 6.261526400001458,
+      "tests": {
+        "passed": 49,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-server",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 53.2239135000018,
+      "tests": {
+        "passed": 49,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    {
+      "name": "pretrained-bert-http",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-server",
+        "--test",
+        "embedding_http",
+        "--release",
+        "--offline",
+        "--locked",
+        "pretrained_bert_matches_original_embedding_http_transcripts",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 43.190599100002146,
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-server",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4746023000006971
+    },
+    {
+      "name": "binaries",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "-p",
+        "rust-llama-cli",
+        "-p",
+        "llama-server",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 8.15654910000012
+    }
+  ],
+  "inputs_after": {
+    "files": 567,
+    "sha256": "01acfdcf20cb878a2ab54444f8194fe782c7720e2b99a00da1a1d187937afd89"
+  },
+  "finished_utc": "2026-11-09T16:42:01.382526+00:00"
+}

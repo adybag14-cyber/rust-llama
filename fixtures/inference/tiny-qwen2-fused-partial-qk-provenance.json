@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "model": {
+    "kind": "deterministic synthetic Qwen2 graph fixture",
+    "generator_sha256": "60209f52aa90786263e4522e01765f3e27eb819984783c709e50443fa4a738fb",
+    "configuration": "fused-partial-qk",
+    "bytes": 33088,
+    "sha256": "e4d194774cf86d15466dc6bb8f868cc0fdbcad06b9dd2a719ce84b51976b23a4"
+  },
+  "oracle_source_sha256": "bf6aa1da45e5b7d2d928d8595e4c5c92238ec3e77225906bcf2f54b5d7d808be",
+  "oracle_executable_sha256": "80f68315c21b4e85f1195537f1bcb75a08d72c00ad3a68045e97a7d47a800a0d",
+  "libraries": {
+    "ggml-base.dll": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756",
+    "ggml-cpu.dll": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f",
+    "ggml.dll": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7",
+    "llama.dll": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+  },
+  "raw_original_json_sha256": "62faec72a9153c431727c9ab79b51d464536336b23a863665532207b9c096b65",
+  "request": {
+    "n_ctx": 32,
+    "max_tokens": 4,
+    "cases": [
+      {
+        "name": "empty",
+        "prompt": ""
+      },
+      {
+        "name": "hello",
+        "prompt": "hello"
+      },
+      {
+        "name": "small",
+        "prompt": "a cat"
+      }
+    ]
+  },
+  "request_sha256": "58080c6eb3e27d99e7cf412786bf579895ff96c5e9c8c3dc48903ddcb45c1468",
+  "transformation": "Lossless conversion of original JSON F32 logits into little-endian F32; identical prompt/greedy overlap removed only after exact equality check; all token IDs and byte strings retained",
+  "logits": {
+    "rows": 15,
+    "columns": 512,
+    "values": 7680,
+    "bytes": 30720,
+    "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+  },
+  "metadata_sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a",
+  "comparison_tolerance": {
+    "absolute": 2e-06,
+    "relative": 2e-06
+  },
+  "tolerance_qualification": "Pretrained budget retained from earlier model gates; tiny-model budget fixed before any Rust evaluation of these fixtures",
+  "recorded_utc": "2026-11-09T15:22:00.545050+00:00"
+}

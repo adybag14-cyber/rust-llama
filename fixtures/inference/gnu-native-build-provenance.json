@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "x86_64 Linux GNU",
+  "row_arithmetic": "Original __SSE2__ vector-prefix exponential, padded softmax and centered-variance branches; no AVX/FMA",
+  "original_build_and_capture": {
+    "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+    "passed": true,
+    "jobs": [
+      {
+        "name": "build-inference",
+        "command": [
+          "g++",
+          "-std=c++17",
+          "-O2",
+          "/mnt/c/Users/adyba/rust-llama-reference/inference-oracle/oracle.cpp",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/include",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/include",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/vendor",
+          "-L/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin",
+          "-Wl,-rpath,/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin",
+          "-lllama",
+          "-lggml",
+          "-lggml-base",
+          "-o",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "build-embedding",
+        "command": [
+          "g++",
+          "-std=c++17",
+          "-O2",
+          "/mnt/c/Users/adyba/rust-llama-reference/embedding-oracle/oracle.cpp",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/include",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/ggml/include",
+          "-I/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/vendor",
+          "-L/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin",
+          "-Wl,-rpath,/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin",
+          "-lllama",
+          "-lggml",
+          "-lggml-base",
+          "-o",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/embedding-oracle"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "mamba130m",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/models/mamba-130m-hf.f16.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/mamba130m.native.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "bert",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/embedding-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/models/bert-bge-small-f16.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/embedding-oracle/request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/bert.native.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "tiny-mamba-default",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-default.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-default.native.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "tiny-mamba-rms",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-rms.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-rms.native.json"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "tiny-mamba-untied",
+        "command": [
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/inference-oracle",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-untied.gguf",
+          "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+          "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/native-gnu-v1/tiny-mamba-untied.native.json"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "models": [
+      {
+        "name": "mamba130m",
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/mamba-130m-hf.f16.gguf",
+        "model_sha256": "cde77cf92d0fbee2346f342faf7f4992622b28d163277a7e52eefa0331be7e32",
+        "request": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/request.json",
+        "request_sha256": "c27c7fe39ddd049d5548a82d53230f29eb10f4da7445ea23bac610bf4b154c7f",
+        "capture_sha256": "792cd5dfb6cdb2ad697eb536ac447ae62ca65b35f4f9f9523a440b571edccc8f",
+        "kind": "inference"
+      },
+      {
+        "name": "bert",
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/models/bert-bge-small-f16.gguf",
+        "model_sha256": "f0b2fef971e8366438bfd2d9aefea1b0115919389448806d290237f638bae999",
+        "request": "/mnt/c/Users/adyba/rust-llama-reference/embedding-oracle/request.json",
+        "request_sha256": "b1376bdfd79edad4b494df56ead4e72cc00269a6ba180271808af9bff97dab4c",
+        "capture_sha256": "6a8b5264ee12fa4a66c84cb93178c7dcaecb01a87ae9fdd2ed9846b573b6f310",
+        "kind": "embedding"
+      },
+      {
+        "name": "tiny-mamba-default",
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-default.gguf",
+        "model_sha256": "50ec6a3787b9311f9a25b801180003b122009d442e72921d86a78532666aa003",
+        "request": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+        "request_sha256": "58080c6eb3e27d99e7cf412786bf579895ff96c5e9c8c3dc48903ddcb45c1468",
+        "capture_sha256": "411d816f1a0f5591829f23f6710f508aacccaa4db841e4c79fb19de895b791c8",
+        "kind": "inference"
+      },
+      {
+        "name": "tiny-mamba-rms",
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-rms.gguf",
+        "model_sha256": "29bb3f8ed8e05c80676bb64a5d09d19a7ed8592240c494e3126cdaa3aacdfb85",
+        "request": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+        "request_sha256": "58080c6eb3e27d99e7cf412786bf579895ff96c5e9c8c3dc48903ddcb45c1468",
+        "capture_sha256": "e904efbb753409d16a0625d611562afbaf9e096031313af4cf08176a09deb885",
+        "kind": "inference"
+      },
+      {
+        "name": "tiny-mamba-untied",
+        "model": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-models/tiny-mamba-untied.gguf",
+        "model_sha256": "e0dabebc8a3e44e5bda8fcc4e204034a0d9c302f7fd02a95ecf4fab0dce5b24f",
+        "request": "/mnt/c/Users/adyba/rust-llama-reference/mamba-inference-oracle/tiny-request.json",
+        "request_sha256": "58080c6eb3e27d99e7cf412786bf579895ff96c5e9c8c3dc48903ddcb45c1468",
+        "capture_sha256": "44653b19904686c1b198adc4df4a3836a0c6ea8ce793df8bd80209577c12be4d",
+        "kind": "inference"
+      }
+    ],
+    "libraries": [
+      {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so",
+        "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+      },
+      {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-cpu.so",
+        "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+      },
+      {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml.so",
+        "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+      },
+      {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so",
+        "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+      }
+    ]
+  },
+  "original_build_and_capture_sha256": "95e71c2a0aa97411d6d97f227afa9a68bf5b3bdd7fb36cad62daff65421a1852",
+  "adapter_executable_sha256": "e18dc4ad07d994263d049fddfe7ed10ea5f5f63676bb92830a0eb8be71486407",
+  "adapter_source_sha256": "bf6aa1da45e5b7d2d928d8595e4c5c92238ec3e77225906bcf2f54b5d7d808be",
+  "qualification": "Native oracle remains outside the product; this file identifies independent source-library outputs, not a product dependency."
+}

@@ -9,7 +9,7 @@ use crate::provider::{
 };
 use crate::stream::CancellationToken;
 use llama_behavior::json::Value;
-use llama_inference::{Error, GenerationOptions, Model, Pooling};
+use llama_inference::{Error, GenerationOptions, LoadOptions, Model, Pooling};
 use std::path::Path;
 
 /// Omitted seeds are deterministic until an explicit platform entropy contract
@@ -43,7 +43,18 @@ impl Default for EmbeddingOptions {
 
 impl RuntimeProvider {
     pub fn load(path: impl AsRef<Path>) -> Result<Self, ProviderError> {
-        Model::load(path).map(Self::from_model).map_err(map_error)
+        Self::load_with_options(path, &LoadOptions::default())
+    }
+
+    /// Load a model with explicit decoded-weight and context bounds. The weight
+    /// budget excludes packed tensors and runtime state; it is not an RSS limit.
+    pub fn load_with_options(
+        path: impl AsRef<Path>,
+        options: &LoadOptions,
+    ) -> Result<Self, ProviderError> {
+        Model::load_with_options(path, options)
+            .map(Self::from_model)
+            .map_err(map_error)
     }
 
     pub fn from_model(model: Model) -> Self {
@@ -370,7 +381,7 @@ mod tests {
     #[test]
     fn options_preserve_limits_stops_and_deterministic_seed() {
         let mut request = request(r#"{"max_tokens":16,"n_predict":16,"stream":true}"#);
-        request.stop = vec!["END".into(), "界".into()];
+        request.stop = vec!["END".into(), "ç•Œ".into()];
         let options = generation_options(&request).unwrap();
         assert_eq!(options.max_tokens, 16);
         assert_eq!(options.temperature, 0.0);

@@ -1,0 +1,7037 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "platform": "msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "reference": "Original source centered-variance function independently compiled; GNU also compared bit-for-bit with the original shared-library function. Actual original GGML NORM graphs. No Rust output used.",
+  "macro_flags": 0,
+  "macro_flag_meaning": "bit0=SSE2,bit1=SSE3,bit2=AVX,bit3=FMA",
+  "mxcsr_before": "0x1fa0",
+  "mxcsr_after": "0x1fbb",
+  "fegetround": 0,
+  "floating_environment": "nearest-even, gradual underflow, FTZ/DAZ disabled; status flag parity is outside this API contract.",
+  "primitive_cases": 1393,
+  "primitive_outputs": 103476,
+  "graph_cases": 312,
+  "graph_outputs": 368208,
+  "files": {
+    "variance-msvc-reference.bin": {
+      "bytes": 885811,
+      "sha256": "9eecbb1e1876b21a13d42868d50f993101bd99abce7ccc8384481303f87107ca"
+    },
+    "norm-msvc-reference.bin": {
+      "bytes": 3018304,
+      "sha256": "2aa14cfedd8a4627e94b33c0ba67b731022418dfdac77a3456dfd1144e81028a"
+    }
+  },
+  "sources": {
+    "tensor-oracle\\sse2-math\\variance\\generate.py": {
+      "bytes": 7891,
+      "sha256": "1b19342657955736cf7190d52bba3598d30cb5e04ade629d6a9f260de51a0bfa"
+    },
+    "tensor-oracle\\sse2-math\\variance\\oracle.cpp": {
+      "bytes": 3986,
+      "sha256": "06d3b416133ee82f8064b5512293b019a6a4b7da5be628e8bbcf742fb39e3398"
+    },
+    "tensor-oracle\\sse2-math\\variance\\original-cvar.txt": {
+      "bytes": 3120,
+      "sha256": "1908bc11cba8b74c9f7f4e859d52ac2fd4e30e547df61b649e7045e63b3b6273"
+    },
+    "tensor-oracle\\sse2-math\\variance\\CMakeLists.txt": {
+      "bytes": 209,
+      "sha256": "b193b5c18189039d7ec8e99a81b7a51280ab0ed50d8a021b8a821d68fbc22da2"
+    },
+    "tensor-oracle\\sse2-math\\variance\\build-msvc\\Release\\cvar_oracle.dll": {
+      "bytes": 10240,
+      "sha256": "4794600ff097f372365ae4feb1c1dfada3551c7dc6a8f4b27e8c2c137ed5d28a"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    }
+  },
+  "notes": [
+    "F32 centering and square products; SSE2 adjacent-pair F32 square reduction before F64 accumulation; individual tail squares.",
+    "Return is F64(sum)/n, and the NORM caller then casts variance to F32 before epsilon/sqrt and scales centered F32 values.",
+    "Native NORM input has contiguous inner rows with padding in higher strides; this does not assert the separate noncontiguous-inner-axis scalar F32 loop.",
+    "Zero-length primitive and nonfinite words are retained as observed native behavior; graph corpus is finite with positive epsilon."
+  ],
+  "primitive_inventory": [
+    {
+      "name": "empty",
+      "values": 0,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_random_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_random_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_random_c0ec9e0e",
+      "values": 1,
+      "mean_bits": "c0ec9e0e"
+    },
+    {
+      "name": "cvar_1_offset_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_offset_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_offset_47c3502c",
+      "values": 1,
+      "mean_bits": "47c3502c"
+    },
+    {
+      "name": "cvar_1_large_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_large_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_large_5bd7b448",
+      "values": 1,
+      "mean_bits": "5bd7b448"
+    },
+    {
+      "name": "cvar_1_tiny_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_tiny_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_tiny_1ae7f50f",
+      "values": 1,
+      "mean_bits": "1ae7f50f"
+    },
+    {
+      "name": "cvar_1_alternating_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_alternating_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_alternating_501502f9",
+      "values": 1,
+      "mean_bits": "501502f9"
+    },
+    {
+      "name": "cvar_1_constant_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1_constant_3e99999a",
+      "values": 1,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1_constant_bec00000",
+      "values": 1,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_2_random_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_random_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_random_c0cf6e54",
+      "values": 2,
+      "mean_bits": "c0cf6e54"
+    },
+    {
+      "name": "cvar_2_offset_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_offset_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_offset_47c3506b",
+      "values": 2,
+      "mean_bits": "47c3506b"
+    },
+    {
+      "name": "cvar_2_large_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_large_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_large_5d325b4d",
+      "values": 2,
+      "mean_bits": "5d325b4d"
+    },
+    {
+      "name": "cvar_2_tiny_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_tiny_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_tiny_19ff1a9f",
+      "values": 2,
+      "mean_bits": "19ff1a9f"
+    },
+    {
+      "name": "cvar_2_alternating_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_alternating_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_alternating_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_constant_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_2_constant_3e99999a",
+      "values": 2,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_2_constant_bec00000",
+      "values": 2,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_3_random_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_random_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_random_3ffe71cb",
+      "values": 3,
+      "mean_bits": "3ffe71cb"
+    },
+    {
+      "name": "cvar_3_offset_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_offset_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_offset_47c34fd9",
+      "values": 3,
+      "mean_bits": "47c34fd9"
+    },
+    {
+      "name": "cvar_3_large_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_large_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_large_5cc85797",
+      "values": 3,
+      "mean_bits": "5cc85797"
+    },
+    {
+      "name": "cvar_3_tiny_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_tiny_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_tiny_1a36be58",
+      "values": 3,
+      "mean_bits": "1a36be58"
+    },
+    {
+      "name": "cvar_3_alternating_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_alternating_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_alternating_3eaaaaab",
+      "values": 3,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_3_constant_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_3_constant_3e99999a",
+      "values": 3,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_3_constant_bec00000",
+      "values": 3,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_4_random_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_random_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_random_c055eb54",
+      "values": 4,
+      "mean_bits": "c055eb54"
+    },
+    {
+      "name": "cvar_4_offset_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_offset_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_offset_47c34ff8",
+      "values": 4,
+      "mean_bits": "47c34ff8"
+    },
+    {
+      "name": "cvar_4_large_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_large_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_large_5c01cc2d",
+      "values": 4,
+      "mean_bits": "5c01cc2d"
+    },
+    {
+      "name": "cvar_4_tiny_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_tiny_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_tiny_1aaaa616",
+      "values": 4,
+      "mean_bits": "1aaaa616"
+    },
+    {
+      "name": "cvar_4_alternating_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_alternating_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_alternating_3e800000",
+      "values": 4,
+      "mean_bits": "3e800000"
+    },
+    {
+      "name": "cvar_4_constant_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_4_constant_3e99999a",
+      "values": 4,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_4_constant_bec00000",
+      "values": 4,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_5_random_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_random_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_random_3fac35ef",
+      "values": 5,
+      "mean_bits": "3fac35ef"
+    },
+    {
+      "name": "cvar_5_offset_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_offset_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_offset_47c35032",
+      "values": 5,
+      "mean_bits": "47c35032"
+    },
+    {
+      "name": "cvar_5_large_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_large_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_large_dc69d3f2",
+      "values": 5,
+      "mean_bits": "dc69d3f2"
+    },
+    {
+      "name": "cvar_5_tiny_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_tiny_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_tiny_9a390261",
+      "values": 5,
+      "mean_bits": "9a390261"
+    },
+    {
+      "name": "cvar_5_alternating_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_alternating_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_alternating_be4ccccd",
+      "values": 5,
+      "mean_bits": "be4ccccd"
+    },
+    {
+      "name": "cvar_5_constant_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_5_constant_3e99999a",
+      "values": 5,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_5_constant_bec00000",
+      "values": 5,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_7_random_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_random_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_random_bde1c459",
+      "values": 7,
+      "mean_bits": "bde1c459"
+    },
+    {
+      "name": "cvar_7_offset_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_offset_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_offset_47c34fb9",
+      "values": 7,
+      "mean_bits": "47c34fb9"
+    },
+    {
+      "name": "cvar_7_large_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_large_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_large_db013003",
+      "values": 7,
+      "mean_bits": "db013003"
+    },
+    {
+      "name": "cvar_7_tiny_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_tiny_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_tiny_9a2c86c2",
+      "values": 7,
+      "mean_bits": "9a2c86c2"
+    },
+    {
+      "name": "cvar_7_alternating_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_alternating_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_alternating_4eaa4c8a",
+      "values": 7,
+      "mean_bits": "4eaa4c8a"
+    },
+    {
+      "name": "cvar_7_constant_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_7_constant_3e99999a",
+      "values": 7,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_7_constant_bec00000",
+      "values": 7,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_8_random_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_random_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_random_bf83cfae",
+      "values": 8,
+      "mean_bits": "bf83cfae"
+    },
+    {
+      "name": "cvar_8_offset_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_offset_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_offset_47c35025",
+      "values": 8,
+      "mean_bits": "47c35025"
+    },
+    {
+      "name": "cvar_8_large_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_large_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_large_5c03f583",
+      "values": 8,
+      "mean_bits": "5c03f583"
+    },
+    {
+      "name": "cvar_8_tiny_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_tiny_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_tiny_189966cc",
+      "values": 8,
+      "mean_bits": "189966cc"
+    },
+    {
+      "name": "cvar_8_alternating_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_alternating_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_alternating_3e800000",
+      "values": 8,
+      "mean_bits": "3e800000"
+    },
+    {
+      "name": "cvar_8_constant_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_8_constant_3e99999a",
+      "values": 8,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_8_constant_bec00000",
+      "values": 8,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_9_random_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_random_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_random_c0060c5e",
+      "values": 9,
+      "mean_bits": "c0060c5e"
+    },
+    {
+      "name": "cvar_9_offset_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_offset_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_offset_47c34fc8",
+      "values": 9,
+      "mean_bits": "47c34fc8"
+    },
+    {
+      "name": "cvar_9_large_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_large_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_large_dc84a9e3",
+      "values": 9,
+      "mean_bits": "dc84a9e3"
+    },
+    {
+      "name": "cvar_9_tiny_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_tiny_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_tiny_9907c757",
+      "values": 9,
+      "mean_bits": "9907c757"
+    },
+    {
+      "name": "cvar_9_alternating_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_alternating_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_alternating_3eaaaaab",
+      "values": 9,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_9_constant_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_9_constant_3e99999a",
+      "values": 9,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_9_constant_bec00000",
+      "values": 9,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_15_random_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_random_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_random_3f7aa804",
+      "values": 15,
+      "mean_bits": "3f7aa804"
+    },
+    {
+      "name": "cvar_15_offset_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_offset_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_offset_47c34f9e",
+      "values": 15,
+      "mean_bits": "47c34f9e"
+    },
+    {
+      "name": "cvar_15_large_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_large_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_large_5bb2654c",
+      "values": 15,
+      "mean_bits": "5bb2654c"
+    },
+    {
+      "name": "cvar_15_tiny_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_tiny_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_tiny_995e7cd0",
+      "values": 15,
+      "mean_bits": "995e7cd0"
+    },
+    {
+      "name": "cvar_15_alternating_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_alternating_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_alternating_3eaaaaab",
+      "values": 15,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_15_constant_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_15_constant_3e99999a",
+      "values": 15,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_15_constant_bec00000",
+      "values": 15,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_16_random_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_random_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_random_bf87d5a5",
+      "values": 16,
+      "mean_bits": "bf87d5a5"
+    },
+    {
+      "name": "cvar_16_offset_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_offset_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_offset_47c34fe3",
+      "values": 16,
+      "mean_bits": "47c34fe3"
+    },
+    {
+      "name": "cvar_16_large_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_large_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_large_5b1b8115",
+      "values": 16,
+      "mean_bits": "5b1b8115"
+    },
+    {
+      "name": "cvar_16_tiny_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_tiny_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_tiny_18069340",
+      "values": 16,
+      "mean_bits": "18069340"
+    },
+    {
+      "name": "cvar_16_alternating_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_alternating_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_alternating_3ea00000",
+      "values": 16,
+      "mean_bits": "3ea00000"
+    },
+    {
+      "name": "cvar_16_constant_00000000",
+      "values": 16,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_16_constant_3e99999a",
+      "values": 16,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_16_constant_bec00000",
+      "values": 16,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_17_random_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_random_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_random_c00d0d38",
+      "values": 17,
+      "mean_bits": "c00d0d38"
+    },
+    {
+      "name": "cvar_17_offset_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_offset_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_offset_47c34fe7",
+      "values": 17,
+      "mean_bits": "47c34fe7"
+    },
+    {
+      "name": "cvar_17_large_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_large_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_large_dc9fe808",
+      "values": 17,
+      "mean_bits": "dc9fe808"
+    },
+    {
+      "name": "cvar_17_tiny_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_tiny_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_tiny_17c5fd67",
+      "values": 17,
+      "mean_bits": "17c5fd67"
+    },
+    {
+      "name": "cvar_17_alternating_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_alternating_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_alternating_3e34b4b5",
+      "values": 17,
+      "mean_bits": "3e34b4b5"
+    },
+    {
+      "name": "cvar_17_constant_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_17_constant_3e99999a",
+      "values": 17,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_17_constant_bec00000",
+      "values": 17,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_31_random_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_random_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_random_be596cf1",
+      "values": 31,
+      "mean_bits": "be596cf1"
+    },
+    {
+      "name": "cvar_31_offset_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_offset_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_offset_47c34fdc",
+      "values": 31,
+      "mean_bits": "47c34fdc"
+    },
+    {
+      "name": "cvar_31_large_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_large_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_large_db7b30dd",
+      "values": 31,
+      "mean_bits": "db7b30dd"
+    },
+    {
+      "name": "cvar_31_tiny_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_tiny_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_tiny_981735bc",
+      "values": 31,
+      "mean_bits": "981735bc"
+    },
+    {
+      "name": "cvar_31_alternating_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_alternating_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_alternating_4d99d185",
+      "values": 31,
+      "mean_bits": "4d99d185"
+    },
+    {
+      "name": "cvar_31_constant_00000000",
+      "values": 31,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_31_constant_3e99999a",
+      "values": 31,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_31_constant_bec00000",
+      "values": 31,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_32_random_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_random_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_random_bf94eec6",
+      "values": 32,
+      "mean_bits": "bf94eec6"
+    },
+    {
+      "name": "cvar_32_offset_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_offset_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_offset_47c34ffb",
+      "values": 32,
+      "mean_bits": "47c34ffb"
+    },
+    {
+      "name": "cvar_32_large_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_large_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_large_5bdcda70",
+      "values": 32,
+      "mean_bits": "5bdcda70"
+    },
+    {
+      "name": "cvar_32_tiny_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_tiny_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_tiny_180494ca",
+      "values": 32,
+      "mean_bits": "180494ca"
+    },
+    {
+      "name": "cvar_32_alternating_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_alternating_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_alternating_3ea00000",
+      "values": 32,
+      "mean_bits": "3ea00000"
+    },
+    {
+      "name": "cvar_32_constant_00000000",
+      "values": 32,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_32_constant_3e99999a",
+      "values": 32,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_32_constant_bec00000",
+      "values": 32,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_33_random_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_random_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_random_bd736bae",
+      "values": 33,
+      "mean_bits": "bd736bae"
+    },
+    {
+      "name": "cvar_33_offset_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_offset_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_offset_47c35007",
+      "values": 33,
+      "mean_bits": "47c35007"
+    },
+    {
+      "name": "cvar_33_large_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_large_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_large_5a672f0a",
+      "values": 33,
+      "mean_bits": "5a672f0a"
+    },
+    {
+      "name": "cvar_33_tiny_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_tiny_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_tiny_99de48a3",
+      "values": 33,
+      "mean_bits": "99de48a3"
+    },
+    {
+      "name": "cvar_33_alternating_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_alternating_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_alternating_3eaaaaab",
+      "values": 33,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_33_constant_00000000",
+      "values": 33,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_33_constant_3e99999a",
+      "values": 33,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_33_constant_bec00000",
+      "values": 33,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_63_random_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_random_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_random_3f294d74",
+      "values": 63,
+      "mean_bits": "3f294d74"
+    },
+    {
+      "name": "cvar_63_offset_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_offset_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_offset_47c35003",
+      "values": 63,
+      "mean_bits": "47c35003"
+    },
+    {
+      "name": "cvar_63_large_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_large_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_large_dbe9af66",
+      "values": 63,
+      "mean_bits": "dbe9af66"
+    },
+    {
+      "name": "cvar_63_tiny_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_tiny_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_tiny_192e015c",
+      "values": 63,
+      "mean_bits": "192e015c"
+    },
+    {
+      "name": "cvar_63_alternating_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_alternating_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_alternating_3eaaaaab",
+      "values": 63,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_63_constant_00000000",
+      "values": 63,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_63_constant_3e99999a",
+      "values": 63,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_63_constant_bec00000",
+      "values": 63,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_64_random_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_random_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_random_3f366482",
+      "values": 64,
+      "mean_bits": "3f366482"
+    },
+    {
+      "name": "cvar_64_offset_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_offset_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_offset_47c34ffe",
+      "values": 64,
+      "mean_bits": "47c34ffe"
+    },
+    {
+      "name": "cvar_64_large_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_large_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_large_5b4b8688",
+      "values": 64,
+      "mean_bits": "5b4b8688"
+    },
+    {
+      "name": "cvar_64_tiny_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_tiny_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_tiny_19286ecf",
+      "values": 64,
+      "mean_bits": "19286ecf"
+    },
+    {
+      "name": "cvar_64_alternating_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_alternating_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_alternating_3ea80000",
+      "values": 64,
+      "mean_bits": "3ea80000"
+    },
+    {
+      "name": "cvar_64_constant_00000000",
+      "values": 64,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_64_constant_3e99999a",
+      "values": 64,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_64_constant_bec00000",
+      "values": 64,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_65_random_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_random_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_random_bf31532e",
+      "values": 65,
+      "mean_bits": "bf31532e"
+    },
+    {
+      "name": "cvar_65_offset_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_offset_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_offset_47c35016",
+      "values": 65,
+      "mean_bits": "47c35016"
+    },
+    {
+      "name": "cvar_65_large_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_large_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_large_5ba73e60",
+      "values": 65,
+      "mean_bits": "5ba73e60"
+    },
+    {
+      "name": "cvar_65_tiny_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_tiny_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_tiny_183bfce0",
+      "values": 65,
+      "mean_bits": "183bfce0"
+    },
+    {
+      "name": "cvar_65_alternating_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_alternating_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_alternating_3e95a95b",
+      "values": 65,
+      "mean_bits": "3e95a95b"
+    },
+    {
+      "name": "cvar_65_constant_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_65_constant_3e99999a",
+      "values": 65,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_65_constant_bec00000",
+      "values": 65,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_127_random_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_random_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_random_3e095fc4",
+      "values": 127,
+      "mean_bits": "3e095fc4"
+    },
+    {
+      "name": "cvar_127_offset_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_offset_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_offset_47c34fec",
+      "values": 127,
+      "mean_bits": "47c34fec"
+    },
+    {
+      "name": "cvar_127_large_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_large_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_large_5b9d9d20",
+      "values": 127,
+      "mean_bits": "5b9d9d20"
+    },
+    {
+      "name": "cvar_127_tiny_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_tiny_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_tiny_9860b06a",
+      "values": 127,
+      "mean_bits": "9860b06a"
+    },
+    {
+      "name": "cvar_127_alternating_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_alternating_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_alternating_4c962f58",
+      "values": 127,
+      "mean_bits": "4c962f58"
+    },
+    {
+      "name": "cvar_127_constant_00000000",
+      "values": 127,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_127_constant_3e99999a",
+      "values": 127,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_127_constant_bec00000",
+      "values": 127,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_128_random_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_random_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_random_bedd83d1",
+      "values": 128,
+      "mean_bits": "bedd83d1"
+    },
+    {
+      "name": "cvar_128_offset_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_offset_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_offset_47c34ffd",
+      "values": 128,
+      "mean_bits": "47c34ffd"
+    },
+    {
+      "name": "cvar_128_large_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_large_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_large_dac6a1fb",
+      "values": 128,
+      "mean_bits": "dac6a1fb"
+    },
+    {
+      "name": "cvar_128_tiny_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_tiny_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_tiny_189e686f",
+      "values": 128,
+      "mean_bits": "189e686f"
+    },
+    {
+      "name": "cvar_128_alternating_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_alternating_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_alternating_3ea80000",
+      "values": 128,
+      "mean_bits": "3ea80000"
+    },
+    {
+      "name": "cvar_128_constant_00000000",
+      "values": 128,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_128_constant_3e99999a",
+      "values": 128,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_128_constant_bec00000",
+      "values": 128,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_129_random_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_random_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_random_3ee935a3",
+      "values": 129,
+      "mean_bits": "3ee935a3"
+    },
+    {
+      "name": "cvar_129_offset_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_offset_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_offset_47c3500d",
+      "values": 129,
+      "mean_bits": "47c3500d"
+    },
+    {
+      "name": "cvar_129_large_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_large_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_large_5abc9c48",
+      "values": 129,
+      "mean_bits": "5abc9c48"
+    },
+    {
+      "name": "cvar_129_tiny_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_tiny_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_tiny_1794a303",
+      "values": 129,
+      "mean_bits": "1794a303"
+    },
+    {
+      "name": "cvar_129_alternating_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_alternating_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_alternating_3eaaaaab",
+      "values": 129,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_129_constant_00000000",
+      "values": 129,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_129_constant_3e99999a",
+      "values": 129,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_129_constant_bec00000",
+      "values": 129,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_256_random_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_random_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_random_3d3b52a4",
+      "values": 256,
+      "mean_bits": "3d3b52a4"
+    },
+    {
+      "name": "cvar_256_offset_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_offset_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_offset_47c34ffa",
+      "values": 256,
+      "mean_bits": "47c34ffa"
+    },
+    {
+      "name": "cvar_256_large_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_large_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_large_599f25f8",
+      "values": 256,
+      "mean_bits": "599f25f8"
+    },
+    {
+      "name": "cvar_256_tiny_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_tiny_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_tiny_17e45702",
+      "values": 256,
+      "mean_bits": "17e45702"
+    },
+    {
+      "name": "cvar_256_alternating_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_alternating_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_alternating_3eaa0000",
+      "values": 256,
+      "mean_bits": "3eaa0000"
+    },
+    {
+      "name": "cvar_256_constant_00000000",
+      "values": 256,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_256_constant_3e99999a",
+      "values": 256,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_256_constant_bec00000",
+      "values": 256,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_257_random_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_random_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_random_bc24079a",
+      "values": 257,
+      "mean_bits": "bc24079a"
+    },
+    {
+      "name": "cvar_257_offset_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_offset_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_offset_47c35009",
+      "values": 257,
+      "mean_bits": "47c35009"
+    },
+    {
+      "name": "cvar_257_large_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_large_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_large_d908f61b",
+      "values": 257,
+      "mean_bits": "d908f61b"
+    },
+    {
+      "name": "cvar_257_tiny_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_tiny_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_tiny_95104849",
+      "values": 257,
+      "mean_bits": "95104849"
+    },
+    {
+      "name": "cvar_257_alternating_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_alternating_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_alternating_3ea55aa5",
+      "values": 257,
+      "mean_bits": "3ea55aa5"
+    },
+    {
+      "name": "cvar_257_constant_00000000",
+      "values": 257,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_257_constant_3e99999a",
+      "values": 257,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_257_constant_bec00000",
+      "values": 257,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_384_random_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_random_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_random_bd92cb53",
+      "values": 384,
+      "mean_bits": "bd92cb53"
+    },
+    {
+      "name": "cvar_384_offset_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_offset_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_offset_47c34ff5",
+      "values": 384,
+      "mean_bits": "47c34ff5"
+    },
+    {
+      "name": "cvar_384_large_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_large_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_large_5b080f3b",
+      "values": 384,
+      "mean_bits": "5b080f3b"
+    },
+    {
+      "name": "cvar_384_tiny_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_tiny_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_tiny_983b13d8",
+      "values": 384,
+      "mean_bits": "983b13d8"
+    },
+    {
+      "name": "cvar_384_alternating_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_alternating_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_alternating_3eaaaaab",
+      "values": 384,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_384_constant_00000000",
+      "values": 384,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_384_constant_3e99999a",
+      "values": 384,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_384_constant_bec00000",
+      "values": 384,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_385_random_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_random_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_random_be611a20",
+      "values": 385,
+      "mean_bits": "be611a20"
+    },
+    {
+      "name": "cvar_385_offset_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_offset_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_offset_47c35001",
+      "values": 385,
+      "mean_bits": "47c35001"
+    },
+    {
+      "name": "cvar_385_large_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_large_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_large_d8f51e49",
+      "values": 385,
+      "mean_bits": "d8f51e49"
+    },
+    {
+      "name": "cvar_385_tiny_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_tiny_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_tiny_988c84c3",
+      "values": 385,
+      "mean_bits": "988c84c3"
+    },
+    {
+      "name": "cvar_385_alternating_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_alternating_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_alternating_4bc62a85",
+      "values": 385,
+      "mean_bits": "4bc62a85"
+    },
+    {
+      "name": "cvar_385_constant_00000000",
+      "values": 385,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_385_constant_3e99999a",
+      "values": 385,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_385_constant_bec00000",
+      "values": 385,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_1536_random_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_random_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_random_bb0c3d83",
+      "values": 1536,
+      "mean_bits": "bb0c3d83"
+    },
+    {
+      "name": "cvar_1536_offset_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_offset_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_offset_47c35000",
+      "values": 1536,
+      "mean_bits": "47c35000"
+    },
+    {
+      "name": "cvar_1536_large_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_large_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_large_dab60967",
+      "values": 1536,
+      "mean_bits": "dab60967"
+    },
+    {
+      "name": "cvar_1536_tiny_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_tiny_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_tiny_97b97aa5",
+      "values": 1536,
+      "mean_bits": "97b97aa5"
+    },
+    {
+      "name": "cvar_1536_alternating_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_alternating_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_alternating_3eaaaaab",
+      "values": 1536,
+      "mean_bits": "3eaaaaab"
+    },
+    {
+      "name": "cvar_1536_constant_00000000",
+      "values": 1536,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1536_constant_3e99999a",
+      "values": 1536,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1536_constant_bec00000",
+      "values": 1536,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "cvar_1537_random_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_random_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_random_3bf6033d",
+      "values": 1537,
+      "mean_bits": "3bf6033d"
+    },
+    {
+      "name": "cvar_1537_offset_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_offset_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_offset_47c34ff7",
+      "values": 1537,
+      "mean_bits": "47c34ff7"
+    },
+    {
+      "name": "cvar_1537_large_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_large_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_large_5aa7efea",
+      "values": 1537,
+      "mean_bits": "5aa7efea"
+    },
+    {
+      "name": "cvar_1537_tiny_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_tiny_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_tiny_9802b700",
+      "values": 1537,
+      "mean_bits": "9802b700"
+    },
+    {
+      "name": "cvar_1537_alternating_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_alternating_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_alternating_4ac68d8b",
+      "values": 1537,
+      "mean_bits": "4ac68d8b"
+    },
+    {
+      "name": "cvar_1537_constant_00000000",
+      "values": 1537,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "cvar_1537_constant_3e99999a",
+      "values": 1537,
+      "mean_bits": "3e99999a"
+    },
+    {
+      "name": "cvar_1537_constant_bec00000",
+      "values": 1537,
+      "mean_bits": "bec00000"
+    },
+    {
+      "name": "special_1_0_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_0_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_0_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_0_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_0_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_0_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_1_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_1_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_1_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_1_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_1_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_1_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_2_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_2_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_2_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_2_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_2_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_2_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_3_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_3_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_3_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_3_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_3_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_3_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_4_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_4_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_4_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_4_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_4_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_4_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_5_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_5_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_5_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_5_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_5_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_5_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_6_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_6_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_6_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_6_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_6_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_6_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_7_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_7_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_7_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_7_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_7_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_7_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_8_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_8_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_8_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_8_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_8_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_8_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_9_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_9_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_9_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_9_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_9_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_9_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_10_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_10_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_10_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_10_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_10_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_10_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_11_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_11_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_11_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_11_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_11_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_11_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_12_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_12_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_12_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_12_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_12_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_12_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_1_13_00000000",
+      "values": 1,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_1_13_80000000",
+      "values": 1,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_1_13_7f800000",
+      "values": 1,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_1_13_ff800000",
+      "values": 1,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_1_13_7fc13579",
+      "values": 1,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_1_13_ffc24680",
+      "values": 1,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_0_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_0_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_0_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_0_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_0_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_0_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_1_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_1_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_1_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_1_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_1_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_1_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_2_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_2_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_2_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_2_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_2_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_2_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_3_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_3_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_3_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_3_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_3_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_3_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_4_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_4_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_4_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_4_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_4_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_4_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_5_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_5_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_5_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_5_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_5_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_5_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_6_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_6_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_6_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_6_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_6_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_6_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_7_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_7_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_7_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_7_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_7_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_7_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_8_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_8_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_8_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_8_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_8_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_8_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_9_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_9_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_9_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_9_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_9_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_9_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_10_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_10_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_10_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_10_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_10_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_10_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_11_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_11_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_11_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_11_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_11_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_11_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_12_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_12_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_12_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_12_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_12_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_12_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_2_13_00000000",
+      "values": 2,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_2_13_80000000",
+      "values": 2,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_2_13_7f800000",
+      "values": 2,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_2_13_ff800000",
+      "values": 2,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_2_13_7fc13579",
+      "values": 2,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_2_13_ffc24680",
+      "values": 2,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_0_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_0_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_0_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_0_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_0_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_0_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_1_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_1_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_1_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_1_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_1_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_1_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_2_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_2_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_2_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_2_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_2_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_2_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_3_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_3_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_3_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_3_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_3_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_3_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_4_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_4_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_4_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_4_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_4_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_4_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_5_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_5_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_5_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_5_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_5_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_5_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_6_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_6_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_6_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_6_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_6_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_6_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_7_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_7_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_7_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_7_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_7_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_7_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_8_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_8_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_8_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_8_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_8_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_8_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_9_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_9_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_9_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_9_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_9_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_9_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_10_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_10_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_10_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_10_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_10_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_10_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_11_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_11_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_11_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_11_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_11_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_11_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_12_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_12_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_12_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_12_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_12_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_12_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_3_13_00000000",
+      "values": 3,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_3_13_80000000",
+      "values": 3,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_3_13_7f800000",
+      "values": 3,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_3_13_ff800000",
+      "values": 3,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_3_13_7fc13579",
+      "values": 3,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_3_13_ffc24680",
+      "values": 3,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_0_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_0_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_0_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_0_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_0_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_0_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_1_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_1_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_1_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_1_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_1_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_1_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_2_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_2_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_2_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_2_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_2_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_2_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_3_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_3_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_3_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_3_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_3_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_3_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_4_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_4_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_4_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_4_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_4_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_4_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_5_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_5_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_5_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_5_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_5_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_5_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_6_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_6_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_6_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_6_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_6_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_6_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_7_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_7_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_7_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_7_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_7_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_7_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_8_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_8_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_8_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_8_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_8_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_8_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_9_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_9_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_9_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_9_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_9_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_9_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_10_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_10_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_10_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_10_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_10_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_10_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_11_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_11_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_11_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_11_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_11_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_11_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_12_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_12_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_12_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_12_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_12_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_12_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_4_13_00000000",
+      "values": 4,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_4_13_80000000",
+      "values": 4,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_4_13_7f800000",
+      "values": 4,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_4_13_ff800000",
+      "values": 4,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_4_13_7fc13579",
+      "values": 4,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_4_13_ffc24680",
+      "values": 4,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_0_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_0_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_0_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_0_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_0_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_0_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_1_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_1_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_1_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_1_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_1_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_1_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_2_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_2_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_2_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_2_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_2_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_2_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_3_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_3_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_3_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_3_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_3_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_3_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_4_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_4_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_4_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_4_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_4_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_4_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_5_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_5_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_5_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_5_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_5_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_5_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_6_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_6_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_6_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_6_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_6_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_6_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_7_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_7_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_7_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_7_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_7_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_7_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_8_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_8_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_8_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_8_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_8_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_8_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_9_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_9_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_9_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_9_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_9_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_9_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_10_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_10_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_10_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_10_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_10_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_10_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_11_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_11_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_11_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_11_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_11_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_11_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_12_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_12_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_12_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_12_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_12_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_12_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_5_13_00000000",
+      "values": 5,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_5_13_80000000",
+      "values": 5,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_5_13_7f800000",
+      "values": 5,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_5_13_ff800000",
+      "values": 5,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_5_13_7fc13579",
+      "values": 5,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_5_13_ffc24680",
+      "values": 5,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_0_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_0_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_0_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_0_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_0_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_0_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_1_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_1_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_1_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_1_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_1_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_1_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_2_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_2_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_2_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_2_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_2_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_2_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_3_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_3_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_3_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_3_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_3_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_3_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_4_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_4_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_4_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_4_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_4_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_4_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_5_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_5_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_5_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_5_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_5_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_5_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_6_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_6_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_6_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_6_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_6_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_6_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_7_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_7_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_7_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_7_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_7_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_7_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_8_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_8_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_8_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_8_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_8_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_8_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_9_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_9_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_9_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_9_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_9_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_9_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_10_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_10_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_10_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_10_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_10_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_10_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_11_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_11_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_11_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_11_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_11_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_11_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_12_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_12_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_12_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_12_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_12_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_12_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_7_13_00000000",
+      "values": 7,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_7_13_80000000",
+      "values": 7,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_7_13_7f800000",
+      "values": 7,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_7_13_ff800000",
+      "values": 7,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_7_13_7fc13579",
+      "values": 7,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_7_13_ffc24680",
+      "values": 7,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_0_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_0_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_0_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_0_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_0_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_0_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_1_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_1_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_1_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_1_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_1_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_1_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_2_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_2_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_2_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_2_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_2_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_2_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_3_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_3_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_3_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_3_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_3_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_3_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_4_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_4_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_4_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_4_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_4_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_4_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_5_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_5_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_5_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_5_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_5_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_5_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_6_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_6_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_6_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_6_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_6_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_6_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_7_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_7_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_7_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_7_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_7_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_7_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_8_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_8_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_8_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_8_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_8_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_8_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_9_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_9_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_9_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_9_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_9_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_9_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_10_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_10_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_10_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_10_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_10_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_10_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_11_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_11_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_11_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_11_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_11_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_11_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_12_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_12_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_12_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_12_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_12_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_12_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_8_13_00000000",
+      "values": 8,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_8_13_80000000",
+      "values": 8,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_8_13_7f800000",
+      "values": 8,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_8_13_ff800000",
+      "values": 8,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_8_13_7fc13579",
+      "values": 8,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_8_13_ffc24680",
+      "values": 8,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_0_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_0_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_0_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_0_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_0_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_0_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_1_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_1_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_1_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_1_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_1_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_1_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_2_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_2_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_2_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_2_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_2_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_2_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_3_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_3_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_3_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_3_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_3_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_3_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_4_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_4_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_4_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_4_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_4_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_4_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_5_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_5_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_5_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_5_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_5_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_5_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_6_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_6_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_6_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_6_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_6_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_6_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_7_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_7_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_7_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_7_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_7_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_7_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_8_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_8_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_8_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_8_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_8_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_8_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_9_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_9_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_9_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_9_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_9_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_9_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_10_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_10_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_10_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_10_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_10_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_10_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_11_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_11_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_11_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_11_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_11_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_11_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_12_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_12_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_12_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_12_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_12_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_12_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_9_13_00000000",
+      "values": 9,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_9_13_80000000",
+      "values": 9,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_9_13_7f800000",
+      "values": 9,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_9_13_ff800000",
+      "values": 9,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_9_13_7fc13579",
+      "values": 9,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_9_13_ffc24680",
+      "values": 9,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_0_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_0_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_0_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_0_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_0_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_0_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_1_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_1_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_1_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_1_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_1_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_1_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_2_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_2_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_2_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_2_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_2_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_2_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_3_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_3_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_3_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_3_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_3_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_3_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_4_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_4_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_4_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_4_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_4_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_4_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_5_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_5_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_5_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_5_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_5_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_5_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_6_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_6_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_6_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_6_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_6_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_6_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_7_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_7_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_7_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_7_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_7_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_7_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_8_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_8_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_8_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_8_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_8_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_8_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_9_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_9_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_9_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_9_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_9_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_9_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_10_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_10_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_10_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_10_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_10_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_10_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_11_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_11_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_11_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_11_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_11_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_11_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_12_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_12_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_12_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_12_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_12_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_12_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_15_13_00000000",
+      "values": 15,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_15_13_80000000",
+      "values": 15,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_15_13_7f800000",
+      "values": 15,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_15_13_ff800000",
+      "values": 15,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_15_13_7fc13579",
+      "values": 15,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_15_13_ffc24680",
+      "values": 15,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_0_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_0_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_0_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_0_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_0_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_0_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_1_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_1_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_1_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_1_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_1_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_1_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_2_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_2_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_2_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_2_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_2_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_2_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_3_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_3_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_3_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_3_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_3_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_3_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_4_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_4_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_4_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_4_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_4_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_4_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_5_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_5_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_5_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_5_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_5_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_5_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_6_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_6_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_6_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_6_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_6_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_6_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_7_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_7_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_7_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_7_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_7_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_7_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_8_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_8_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_8_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_8_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_8_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_8_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_9_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_9_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_9_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_9_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_9_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_9_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_10_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_10_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_10_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_10_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_10_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_10_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_11_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_11_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_11_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_11_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_11_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_11_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_12_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_12_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_12_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_12_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_12_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_12_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_17_13_00000000",
+      "values": 17,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_17_13_80000000",
+      "values": 17,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_17_13_7f800000",
+      "values": 17,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_17_13_ff800000",
+      "values": 17,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_17_13_7fc13579",
+      "values": 17,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_17_13_ffc24680",
+      "values": 17,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_0_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_0_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_0_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_0_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_0_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_0_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_1_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_1_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_1_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_1_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_1_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_1_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_2_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_2_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_2_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_2_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_2_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_2_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_3_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_3_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_3_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_3_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_3_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_3_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_4_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_4_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_4_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_4_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_4_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_4_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_5_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_5_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_5_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_5_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_5_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_5_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_6_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_6_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_6_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_6_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_6_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_6_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_7_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_7_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_7_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_7_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_7_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_7_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_8_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_8_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_8_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_8_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_8_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_8_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_9_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_9_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_9_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_9_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_9_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_9_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_10_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_10_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_10_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_10_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_10_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_10_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_11_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_11_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_11_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_11_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_11_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_11_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_12_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_12_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_12_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_12_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_12_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_12_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    },
+    {
+      "name": "special_65_13_00000000",
+      "values": 65,
+      "mean_bits": "00000000"
+    },
+    {
+      "name": "special_65_13_80000000",
+      "values": 65,
+      "mean_bits": "80000000"
+    },
+    {
+      "name": "special_65_13_7f800000",
+      "values": 65,
+      "mean_bits": "7f800000"
+    },
+    {
+      "name": "special_65_13_ff800000",
+      "values": 65,
+      "mean_bits": "ff800000"
+    },
+    {
+      "name": "special_65_13_7fc13579",
+      "values": 65,
+      "mean_bits": "7fc13579"
+    },
+    {
+      "name": "special_65_13_ffc24680",
+      "values": 65,
+      "mean_bits": "ffc24680"
+    }
+  ]
+}

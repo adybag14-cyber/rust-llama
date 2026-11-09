@@ -1,0 +1,42 @@
+{
+  "status": "succeeded",
+  "platform": "linux",
+  "started_utc": "2026-11-09T15:57:52.523133+00:00",
+  "inputs_before": {
+    "files": 474,
+    "sha256": "56a8f163280f31617a2d86c7c4e7b84bf842ea186156d606b14abb5147c8b962"
+  },
+  "expected_sha256": "3b4e45fb7a677c7e91bf1debe9a3be820e2b7398ad72f7b6b3cf0cdd9db233d3",
+  "absolute_tolerance": 0.0002,
+  "relative_tolerance": 2e-05,
+  "qualification": "Separate original compiler-profile capture, preserved reviewed draft and budgets; shared row math snapshot with full Qwen SiLU rows",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "/mnt/c/Users/adyba/rust-llama-reference/qwen2-inference-oracle/profile-probe/Cargo.toml",
+    "--",
+    "/mnt/c/Users/adyba/rust-llama-reference/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "/mnt/c/Users/adyba/rust-llama-reference/row-math-integration/captures/qwen-gnu-v1/qwen2.native.json"
+  ],
+  "exit_code": 0,
+  "seconds": 122.46439489200202,
+  "inputs_after": {
+    "files": 474,
+    "sha256": "56a8f163280f31617a2d86c7c4e7b84bf842ea186156d606b14abb5147c8b962"
+  },
+  "expected_after_sha256": "3b4e45fb7a677c7e91bf1debe9a3be820e2b7398ad72f7b6b3cf0cdd9db233d3",
+  "comparison": {
+    "passed": true,
+    "logits": 5165824,
+    "bitwise_equal": 5165824,
+    "greedy_ids": 24,
+    "max_abs": 0,
+    "max_fraction": 0,
+    "seconds": 117.701387746
+  },
+  "finished_utc": "2026-11-09T16:00:00.432307+00:00"
+}

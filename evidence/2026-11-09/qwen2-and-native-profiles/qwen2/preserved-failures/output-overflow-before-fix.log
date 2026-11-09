@@ -1,0 +1,26 @@
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\quant)
+   Compiling llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\platform-loader)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\rust-draft\crates\model-runtime)
+    Finished `release` profile [optimized] target(s) in 7.34s
+     Running tests\qwen2.rs (C:\Users\adyba\rust-llama-reference\qwen2-inference-oracle\overflow-probe-target\release\deps\qwen2-a8fb731d386f7e95.exe)
+
+running 2 tests
+
+thread 'finite_qwen2_projection_and_bias_overflow_cannot_commit_state' (46536) panicked at crates\model-runtime\tests\qwen2.rs:57:5:
+Ok([TokenOutput { batch_index: 0, sequence: 0, position: 1, logits: Some([inf, 0.0]), embedding: Some([0.999995, 0.999995]) }])
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'qwen2_late_output_overflow_rolls_back_other_sequences' (500) panicked at crates\model-runtime\tests\qwen2.rs:71:5:
+Ok([TokenOutput { batch_index: 0, sequence: 0, position: 0, logits: Some([1.7014204e38, 0.0]), embedding: Some([-0.999995, -0.999995]) }, TokenOutput { batch_index: 1, sequence: 1, position: 0, logits: Some([1.7014204e38, 0.0]), embedding: Some([-0.999995, -0.999995]) }, TokenOutput { batch_index: 2, sequence: 0, position: 1, logits: Some([inf, 0.0]), embedding: Some([0.999995, 0.999995]) }])
+test finite_qwen2_projection_and_bias_overflow_cannot_commit_state ... FAILED
+test qwen2_late_output_overflow_rolls_back_other_sequences ... FAILED
+
+failures:
+
+failures:
+    finite_qwen2_projection_and_bias_overflow_cannot_commit_state
+    qwen2_late_output_overflow_rolls_back_other_sequences
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p llama-model-runtime --test qwen2`

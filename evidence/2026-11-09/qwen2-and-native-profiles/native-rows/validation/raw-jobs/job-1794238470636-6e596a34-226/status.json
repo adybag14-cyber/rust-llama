@@ -1,0 +1,48 @@
+{
+  "id": "job-1794238470636-6e596a34-226",
+  "status": "failed",
+  "mode": "shell",
+  "createdAtUtc": "2026-11-09T15:34:30.636Z",
+  "startedAtUtc": "2026-11-09T15:34:50.838Z",
+  "completedAtUtc": "2026-11-09T15:35:21.183Z",
+  "runnerPid": 25556,
+  "exitCode": 101,
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "queuedAtUtc": "2026-11-09T15:34:30.702Z",
+  "runnerProcessInstance": "134387120706740045",
+  "queueWaitMs": 20121,
+  "executionSlot": 2,
+  "executionSlots": [
+    2,
+    1
+  ],
+  "executionPool": "execution",
+  "executionWeight": 2,
+  "childPid": 47488,
+  "error": "Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s\n   Compiling llama-quant v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\quant)\n   Compiling llama-platform-loader v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\platform-loader)\n   Compiling llama-behavior v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\llama-behavior)\n   Compiling llama-model-runtime v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\model-runtime)\n   Compiling llama-gguf v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\gguf)\n   Compiling llama-tokenizer v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\tokenizer)\n   Compiling llama-inference v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\inference)\n   Compiling llama-ffi v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\ffi)\n    Finished `release` profile [optimized] target(s) in 21.14s\n     Running unittests src\\lib.rs (target\\release\\deps\\llama_ffi-6f85dc07f7a2c2c0.exe)\n     Running unittests src\\lib.rs (target\\release\\deps\\llama_model_runtime-b95e6ace3583628a.exe)\n     Running tests\\native_rows_graphs.rs (target\\release\\deps\\native_rows_graphs-35fb98eca0d7c5d6.exe)\n     Running tests\\native_rows_native.rs (target\\release\\deps\\native_rows_native-bd712d095c6efa8b.exe)\n     Running tests\\numerical_reference.rs (target\\release\\deps\\numerical_reference-d733737ea1781cbc.exe)\n     Running tests\\runtime.rs (target\\release\\deps\\runtime-fe65d25ac020226b.exe)\n   Doc-tests llama_ffi\n   Doc-tests llama_model_runtime\n    Finished `release` profile [optimized] target(s) in 0.04s\n    Checking llama-quant v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\quant)\n    Checking llama-platform-loader v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\platform-loader)\n    Checking llama-behavior v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\llama-behavior)\n    Checking llama-model-runtime v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\model-runtime)\n    Checking llama-gguf v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\gguf)\n    Checking llama-tokenizer v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\row-math-integration\\rust-draft\\crates\\tokenizer)\nerror: this `if` statement can be collapsed\n   --> crates\\model-runtime\\src\\math.rs:330:9\n    |\n330 | /         if let Some(columns) = self.columns {\n331 | |             if columns.len() != count\n332 | |                 || columns.last().is_some_and(|&column| column >= self.row_len)\n333 | |                 || columns.windows(2).any(|pair| pair[0] >= pair[1])\n...   |\n337 | |         }\n    | |_________^\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if\n    = note: `-D clippy::collapsible-if` implied by `-D warnings`\n    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`\nhelp: collapse nested if block\n    |\n330 ~         if let Some(columns) = self.columns\n331 ~             && (columns.len() != count\n332 |                 || columns.last().is_some_and(|&column| column >= self.row_len)\n333 ~                 || columns.windows(2).any(|pair| pair[0] >= pair[1]))\n334 |             {\n335 |                 return Err(Error::Shape(\"invalid attention physical columns\".into()));\n336 ~             }\n    |\n\nerror: could not compile `llama-model-runtime` (lib) due to 1 previous error\nwarning: build failed, waiting for other jobs to finish...\nerror: could not compile `llama-model-runtime` (lib test) due to 1 previous error",
+  "logs": {
+    "stdout": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 6739,
+      "currentBytes": 6739,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "stderr": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 3876,
+      "currentBytes": 3876,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "truncated": false
+  }
+}

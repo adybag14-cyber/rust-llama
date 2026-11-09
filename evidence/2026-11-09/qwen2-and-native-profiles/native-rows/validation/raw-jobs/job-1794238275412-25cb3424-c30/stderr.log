@@ -1,0 +1,15 @@
+error[E0753]: expected outer doc comment
+ --> \\?\C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\model-runtime\src\math.rs:3:1
+  |
+3 | //! Scalar runtime math and checked native quantized matrix-vector execution.
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 | use crate::{Error, Result};
+  | --------------------------- the inner doc comment doesn't annotate this `use` import
+  |
+help: to annotate the `use` import, change the doc comment from inner to outer style
+  |
+3 - //! Scalar runtime math and checked native quantized matrix-vector execution.
+3 + /// Scalar runtime math and checked native quantized matrix-vector execution.
+  |
+
+Error writing files: failed to resolve mod `math`: cannot parse \\?\C:\Users\adyba\rust-llama-reference\row-math-integration\rust-draft\crates\model-runtime\src\math.rs
