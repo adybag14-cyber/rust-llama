@@ -1,4 +1,4 @@
-use crate::{GluOp, OpCode, Result, Tensor, TensorError, UnaryOp};
+use crate::{DType, GluOp, OpCode, Result, Tensor, TensorError, UnaryOp};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 static NEXT_GRAPH: AtomicU64 = AtomicU64::new(1);
 
@@ -19,11 +19,156 @@ pub enum RopeMode {
     NeoX,
 }
 
+/// Numeric values match the frozen ggml_tri_type enum.
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Triangle {
+    UpperDiagonal = 0,
+    Upper = 1,
+    LowerDiagonal = 2,
+    Lower = 3,
+}
+
+/// Numeric values match ggml_sort_order.
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SortOrder {
+    Ascending = 0,
+    Descending = 1,
+}
+
 /// Only these explicitly modeled operations can be submitted to this executor.
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
     Dup,
+    /// Inputs: values, expert bias rows, I32 expert indices. -1 copies a row.
+    AddId,
+    /// Inputs: expert matrices, activation rows, I32 expert indices.
+    MatMulId,
+    /// Inputs: destination, replacement rows, I32/I64 row indices.
+    /// Returns independent storage with the destination's byte layout.
+    SetRows,
+    Argsort {
+        order: SortOrder,
+    },
+    /// Native TOP_K intentionally swaps its first two selected indices.
+    TopK {
+        count: usize,
+    },
+    /// Inputs: mask, top-k indices, then enabled score/blocks/extra tensors.
+    TopKMask {
+        with_scores: bool,
+        with_blocks: bool,
+        with_extra: bool,
+    },
+    /// Byte-strided update into a contiguous base. Axis 0 has scalar stride 4.
+    /// Overlapping updates read the original base, matching out-of-place ACC.
+    Acc {
+        strides: [usize; 3],
+        offset: usize,
+    },
+    Set {
+        strides: [usize; 3],
+        offset: usize,
+    },
+    /// CPY with a new dtype and the same shape. Only source CPU conversions.
+    Cast {
+        dtype: DType,
+    },
+    /// Checked immutable view, with a byte offset relative to the input.
+    View {
+        shape: [usize; 4],
+        strides: [usize; 4],
+        offset: usize,
+    },
+    CumSum,
+    ArgMax,
+    CountEqual,
+    RepeatBack {
+        shape: [usize; 4],
+    },
+    GroupNorm {
+        groups: usize,
+        epsilon: f32,
+    },
+    L2Norm {
+        epsilon: f32,
+    },
+    OutProd,
+    Diag,
+    /// Signed padding permits cropping. Circular padding wraps every axis.
+    Pad {
+        left: [i32; 4],
+        right: [i32; 4],
+        circular: bool,
+    },
+    PadReflect1d {
+        left: usize,
+        right: usize,
+    },
+    Roll {
+        shifts: [i32; 4],
+    },
+    /// A zero-input graph operation; stop must exceed start and step be positive.
+    Arange {
+        start: f32,
+        stop: f32,
+        step: f32,
+    },
+    TimestepEmbedding {
+        dimensions: usize,
+        max_period: usize,
+    },
+    LeakyRelu {
+        negative_slope: f32,
+    },
+    Tri {
+        triangle: Triangle,
+    },
+    Fill {
+        value: f32,
+    },
+    /// Inputs are output gradient, then the original forward input.
+    SiluBack,
+    RmsNormBack {
+        epsilon: f32,
+    },
+    /// Inputs are output gradient, then the softmax output. ALiBi backward is
+    /// not defined by the frozen CPU and is not accepted here.
+    SoftmaxBack {
+        scale: f32,
+    },
+    GetRowsBack {
+        rows: usize,
+    },
+    /// Constructor parameters, before the source's softplus transform.
+    Xielu {
+        alpha_n: f32,
+        alpha_p: f32,
+        beta: f32,
+        epsilon: f32,
+    },
+    GluPacked {
+        kind: GluOp,
+        swap: bool,
+    },
+    SwiGluOai {
+        alpha: f32,
+        limit: f32,
+    },
+    SwiGluClamp {
+        limit: f32,
+    },
+    SwiGluOaiPacked {
+        alpha: f32,
+        limit: f32,
+        swap: bool,
+    },
+    SwiGluClampPacked {
+        limit: f32,
+        swap: bool,
+    },
     Add,
     Sub,
     Mul,
@@ -94,6 +239,42 @@ impl Op {
         use Op::*;
         match self {
             Dup => OpCode::DUP,
+            AddId => OpCode::ADD_ID,
+            MatMulId => OpCode::MUL_MAT_ID,
+            SetRows => OpCode::SET_ROWS,
+            Argsort { .. } => OpCode::ARGSORT,
+            TopK { .. } => OpCode::TOP_K,
+            TopKMask { .. } => OpCode::TOP_K_MASK,
+            Acc { .. } => OpCode::ACC,
+            Set { .. } => OpCode::SET,
+            Cast { .. } => OpCode::CPY,
+            View { .. } => OpCode::VIEW,
+            CumSum => OpCode::CUMSUM,
+            ArgMax => OpCode::ARGMAX,
+            CountEqual => OpCode::COUNT_EQUAL,
+            RepeatBack { .. } => OpCode::REPEAT_BACK,
+            GroupNorm { .. } => OpCode::GROUP_NORM,
+            L2Norm { .. } => OpCode::L2_NORM,
+            OutProd => OpCode::OUT_PROD,
+            Diag => OpCode::DIAG,
+            Pad { .. } => OpCode::PAD,
+            PadReflect1d { .. } => OpCode::PAD_REFLECT_1D,
+            Roll { .. } => OpCode::ROLL,
+            Arange { .. } => OpCode::ARANGE,
+            TimestepEmbedding { .. } => OpCode::TIMESTEP_EMBEDDING,
+            LeakyRelu { .. } => OpCode::LEAKY_RELU,
+            Tri { .. } => OpCode::TRI,
+            Fill { .. } => OpCode::FILL,
+            SiluBack => OpCode::SILU_BACK,
+            RmsNormBack { .. } => OpCode::RMS_NORM_BACK,
+            SoftmaxBack { .. } => OpCode::SOFT_MAX_BACK,
+            GetRowsBack { .. } => OpCode::GET_ROWS_BACK,
+            Xielu { .. } => OpCode::UNARY,
+            GluPacked { .. }
+            | SwiGluOai { .. }
+            | SwiGluClamp { .. }
+            | SwiGluOaiPacked { .. }
+            | SwiGluClampPacked { .. } => OpCode::GLU,
             Add => OpCode::ADD,
             Sub => OpCode::SUB,
             Mul => OpCode::MUL,
@@ -129,7 +310,25 @@ impl Op {
     }
     fn arity(&self) -> usize {
         match self {
-            Self::Add
+            Self::Arange { .. } => 0,
+            Self::AddId | Self::MatMulId | Self::SetRows => 3,
+            Self::TopKMask {
+                with_scores,
+                with_blocks,
+                with_extra,
+            } => {
+                2 + usize::from(*with_scores) + usize::from(*with_blocks) + usize::from(*with_extra)
+            }
+            Self::Acc { .. } | Self::Set { .. } => 2,
+            Self::CountEqual
+            | Self::OutProd
+            | Self::SiluBack
+            | Self::RmsNormBack { .. }
+            | Self::SoftmaxBack { .. }
+            | Self::GetRowsBack { .. }
+            | Self::SwiGluOai { .. }
+            | Self::SwiGluClamp { .. }
+            | Self::Add
             | Self::Sub
             | Self::Mul
             | Self::Div

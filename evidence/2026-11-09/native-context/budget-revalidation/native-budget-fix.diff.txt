@@ -1,0 +1,98 @@
+--- before/native.rs
++++ after/native.rs
+@@ -334,10 +334,13 @@
+         Ok(bytes)
+     }
+     fn check_work(&self, extra: usize) -> Result<()> {
++        self.check_work_limit(extra, MAX_NATIVE_WORK_BYTES)
++    }
++    fn check_work_limit(&self, extra: usize, limit: usize) -> Result<()> {
+         if self
+             .storage_bytes()?
+             .checked_add(extra)
+-            .is_none_or(|bytes| bytes > MAX_NATIVE_WORK_BYTES)
++            .is_none_or(|bytes| bytes > limit.min(MAX_NATIVE_WORK_BYTES))
+         {
+             return Err(Error::Unsupported(
+                 "native operation exceeds the two-GiB owned working-set budget".into(),
+@@ -679,7 +682,17 @@
+     pub fn decode_batch_with_cancel(
+         &mut self,
+         batch: &[NativeBatchToken],
++        cancelled: impl FnMut() -> bool,
++    ) -> Result<Vec<TokenOutput>> {
++        self.decode_batch_with_work_limit(batch, cancelled, MAX_NATIVE_WORK_BYTES)
++    }
++    // Keep one production preflight path; module tests lower its ceiling to
++    // exercise near-limit rejection without allocating multi-GiB fixtures.
++    fn decode_batch_with_work_limit(
++        &mut self,
++        batch: &[NativeBatchToken],
+         mut cancelled: impl FnMut() -> bool,
++        work_limit: usize,
+     ) -> Result<Vec<TokenOutput>> {
+         if batch.is_empty() || batch.len() > self.options.maximum_batch_tokens {
+             return Err(Error::InvalidConfig(
+@@ -769,7 +782,10 @@
+             .map(|stream| stream.cells.iter().filter(|cell| cell.occupied()).count())
+             .max()
+             .unwrap_or(0)
+-            .saturating_add(batch.len().min(self.options.microbatch_tokens))
++            // Earlier chunks remain in the staged cache while later chunks
++            // gather their visible rows and retained outputs stay alive.
++            .checked_add(batch.len())
++            .ok_or_else(|| invalid("native active cache bound overflow"))?
+             .min(self.capacity);
+         let transient = active
+             .checked_mul(self.width)
+@@ -782,10 +798,11 @@
+             .and_then(|n| n.checked_add(model.config().feed_forward.checked_mul(32)?))
+             .and_then(|n| n.checked_add(model.config().vocabulary.checked_mul(16)?))
+             .ok_or_else(|| invalid("native decode working-set overflow"))?;
+-        self.check_work(
++        self.check_work_limit(
+             self.storage_bytes()?
+                 .checked_add(transient)
+                 .ok_or_else(|| invalid("native decode budget overflow"))?,
++            work_limit,
+         )?;
+         let mut staged = self.try_clone()?;
+         staged.apply_pending()?;
+@@ -1030,6 +1047,37 @@
+         assert!(context.pending_copies.is_empty());
+     }
+     #[test]
++    fn later_microbatches_are_counted_before_any_state_is_committed() {
++        let mut context = context(true);
++        context.options.microbatch_tokens = 4;
++        context.options.maximum_batch_tokens = 512;
++        let batch = (0..512)
++            .map(|position| NativeBatchToken {
++                sequences: vec![0],
++                position,
++                input: Input::Token(1),
++                output: OutputSelection::None,
++            })
++            .collect::<Vec<_>>();
++        let before = context.save_native_state(None, 0).unwrap();
++        // Allow both persistent copies, the reserved result descriptors and
++        // 12 KiB of remaining work. The first four-row gather fits, but the
++        // last of 128 microbatches needs all 512 rows and must be rejected.
++        let retained =
++            2 * context.storage_bytes().unwrap() + batch.len() * std::mem::size_of::<TokenOutput>();
++        let outcome = context.decode_batch_with_work_limit(&batch, || false, retained + 12 * 1024);
++        assert!(matches!(outcome, Err(Error::Unsupported(_))));
++        assert_eq!(context.save_native_state(None, 0).unwrap(), before);
++        // A sufficient ceiling executes the identical valid batch fully.
++        assert!(
++            context
++                .decode_batch_with_work_limit(&batch, || false, retained + 32 * 1024,)
++                .unwrap()
++                .is_empty()
++        );
++        assert_eq!(context.position_max(0).unwrap(), 511);
++    }
++    #[test]
+     fn native_resource_limits_fail_before_allocating_or_mutating() {
+         let mut context = context(true);
+         assert!(context.check_work(MAX_NATIVE_WORK_BYTES).is_err());

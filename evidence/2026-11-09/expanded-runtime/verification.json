@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "status": "checkpoint_verified_full_port_incomplete",
+  "parent_commit": "abffdc84cb01bc69a02cc32599be0ba68221f2d0",
+  "recorded_utc": "2026-11-09T15:36:31.237609+00:00",
+  "execution_inputs": {
+    "files": 396,
+    "sha256": "050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "platforms": {
+    "windows": {
+      "status": "passed",
+      "debug": {
+        "passed": 384,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      },
+      "release": {
+        "passed": 384,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      },
+      "explicit_pretrained_tests": 7,
+      "source_verified_files": 4082,
+      "fixture_files": 195,
+      "fixture_declarations": 195,
+      "fixture_manifests": 4,
+      "generation_http_requests": 37,
+      "embedding_cli_scenarios": 11,
+      "embedding_cli_native_comparisons": 12,
+      "decoder_cli_native_comparisons": 2,
+      "release_gate_exit_code": 1,
+      "prior_report": "evidence/2026-11-09/expanded-runtime/revalidated/windows/status.json",
+      "continuation_report": "evidence/2026-11-09/expanded-runtime/revalidated/continued/windows/status.json"
+    },
+    "linux": {
+      "status": "passed",
+      "debug": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      },
+      "release": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      },
+      "explicit_pretrained_tests": 7,
+      "source_verified_files": 4082,
+      "fixture_files": 195,
+      "fixture_declarations": 195,
+      "fixture_manifests": 4,
+      "generation_http_requests": 37,
+      "embedding_cli_scenarios": 11,
+      "embedding_cli_native_comparisons": 12,
+      "decoder_cli_native_comparisons": 2,
+      "release_gate_exit_code": 1,
+      "prior_report": "evidence/2026-11-09/expanded-runtime/revalidated/linux/status.json",
+      "continuation_report": "evidence/2026-11-09/expanded-runtime/revalidated/continued/linux/status.json"
+    }
+  },
+  "retained_failures": [
+    "Initial source audit rejected three undeclared tensor license paths; specific license classifications and negative regression were added, then the whole workspace was rerun.",
+    "External decoder CLI driver used the Cargo package name instead of the declared rust-llama binary name. Same-fingerprint continuation preserves prior passing gates and reruns the corrected CLI and remaining gates.",
+    "Embedding CLI driver initially reused historical evidence paths. New output was preserved under this cohort, original tracked bytes were restored exactly from HEAD, and subsequent output uses fresh paths. See driver-corrections.json."
+  ],
+  "release_qualification": "This is a verified development checkpoint. Mandatory full-ABI/architecture/backend/tool/UI/performance gates remain open; release-check correctly returns 1."
+}

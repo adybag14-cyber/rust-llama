@@ -1,0 +1,13 @@
+{
+  "id": "job-1794238993222-442c5706-896",
+  "mode": "shell",
+  "command": "$env:CARGO_TARGET_DIR='C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\product-target'\ncargo fmt -p llama-model-runtime -- --check\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo test -p llama-model-runtime -p llama-ffi --no-fail-fast\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo build -p llama-ffi\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\npython 'C:\\Users\\adyba\\rust-llama-reference\\native-budget-fix\\check_context.py' debug\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo test -p llama-model-runtime -p llama-ffi --release --no-fail-fast\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo build -p llama-ffi --release\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\npython 'C:\\Users\\adyba\\rust-llama-reference\\native-budget-fix\\check_context.py' release\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\ncargo clippy -p llama-model-runtime -p llama-ffi --all-targets -- -D warnings\nexit $LASTEXITCODE",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama",
+  "timeoutMs": 3600000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T15:43:13.222Z"
+}

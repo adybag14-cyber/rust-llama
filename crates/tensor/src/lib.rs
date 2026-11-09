@@ -2,9 +2,12 @@
 //! Maintained implementation is Rust. The full operation registry is not a support claim.
 #![forbid(unsafe_code)]
 mod cpu;
+mod cpu_extra;
+mod cpu_index;
 mod graph;
+mod native_sort;
 mod registry;
-pub use graph::{Graph, NodeId, Op, RopeMode};
+pub use graph::{Graph, NodeId, Op, RopeMode, SortOrder, Triangle};
 pub use llama_quant::DType;
 pub use registry::{GluOp, OpCode, UnaryOp};
 use std::sync::Arc;
@@ -181,6 +184,17 @@ impl Tensor {
         }
         Self::from_bytes(desc, data)
     }
+    pub fn from_i64(ne: [usize; 4], values: &[i64]) -> Result<Self> {
+        let desc = TensorDesc::contiguous(DType::I64, ne)?;
+        if desc.elements()? != values.len() {
+            return Err(TensorError::Shape("I64 data length differs from shape"));
+        }
+        let mut data = reserved(desc.byte_span()?)?;
+        for v in values {
+            data.extend_from_slice(&v.to_le_bytes());
+        }
+        Self::from_bytes(desc, data)
+    }
     pub fn desc(&self) -> &TensorDesc {
         &self.desc
     }
@@ -256,6 +270,14 @@ impl Tensor {
         }
         self.view(desc, 0)
     }
+    /// Copy logical blocks in GGML element order, excluding view padding.
+    /// Unlike floating extraction, this preserves integer and NaN payload bits.
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+        let target = TensorDesc::contiguous(self.dtype(), self.shape())?;
+        let mut bytes = reserved(target.byte_span()?)?;
+        self.for_each_block(|range| bytes.extend_from_slice(&self.data[range]));
+        Ok(bytes)
+    }
     pub fn contiguous(&self) -> Result<Self> {
         let target = TensorDesc::contiguous(self.dtype(), self.shape())?;
         let mut bytes = reserved(target.byte_span()?)?;
@@ -297,7 +319,25 @@ impl Tensor {
         });
         Ok(values)
     }
+    pub fn to_i64(&self) -> Result<Vec<i64>> {
+        if self.dtype() != DType::I64 {
+            return Err(TensorError::Type {
+                expected: DType::I64,
+                actual: self.dtype(),
+            });
+        }
+        let mut values = reserved(self.desc.elements()?)?;
+        self.for_each_block(|range| {
+            values.push(i64::from_le_bytes(
+                self.data[range].try_into().expect("validated I64"),
+            ));
+        });
+        Ok(values)
+    }
     fn for_each_block(&self, mut visit: impl FnMut(std::ops::Range<usize>)) {
+        if self.shape().contains(&0) {
+            return;
+        }
         let [n0, n1, n2, n3] = self.shape();
         let [s0, s1, s2, s3] = self.desc.nb;
         for i3 in 0..n3 {

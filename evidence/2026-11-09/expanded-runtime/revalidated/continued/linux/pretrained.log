@@ -1,0 +1,96 @@
+    Finished `release` profile [optimized] target(s) in 0.60s
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/llama_inference-8e6ff779837bc5a1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/bert_defaults.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/bert_defaults-dd26563529ff80be)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/bert_reference.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/bert_reference-b848953fa2bcad4d)
+
+running 2 tests
+BERT conformance (LLAMA_TEST_BERT_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=1.348853111e-4
+test trained_bert_full_sequence_and_all_pooling_modes ... ok
+BERT conformance (LLAMA_TEST_BERT_BE_MODEL): cases=3 token_vectors=25 pooled_vectors=9 compared_values=13056 max_abs=1.348853111e-4
+test big_endian_bert_preserves_the_same_native_model_outputs ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 56.05s
+
+     Running tests/mamba_loader.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/mamba_loader-f242aa4e46aedb5e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/native_reference.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/native_reference-75f156d52f5bc351)
+
+running 4 tests
+native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=5.722045898e-6 max_fraction_of_tolerance=2.010456311e-2
+test trained_stories260k_full_logits_greedy_ids_and_text ... ok
+native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ok
+native SmolLM2-135M conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1671168 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=1671168 (informational; gate uses unchanged declared tolerance)
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ok
+test trained_mamba130m_full_logits_greedy_ids_and_text has been running for over 60 seconds
+native Mamba 130m Hf conformance: cases=3 rows=34 greedy_ids=24 compared_logits=1709520 max_abs=8.940696716e-5 max_fraction_of_tolerance=4.280459944e-1 bitwise_equal=191402 (informational; gate uses unchanged declared tolerance)
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 68.05s
+
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/llama_server-2da1152b61cbb7c8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/llama_server-3326e97d304b2c09)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/embedding_http.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/embedding_http-80e03a8dade08596)
+
+running 1 test
+model/raw_batch: maximum absolute error 0.00007212162017822266, absolute budget 0.0002, relative budget 0.00002
+model/oai_batch: maximum absolute error 0.000007778406143188477, absolute budget 0.0002, relative budget 0.00002
+model/base64: maximum absolute error 0.000007778406143188477, absolute budget 0.0002, relative budget 0.00002
+model/legacy_content: maximum absolute error 0.0000001862645149230957, absolute budget 0.0002, relative budget 0.00002
+model/text_parts: maximum absolute error 0.0000001862645149230957, absolute budget 0.0002, relative budget 0.00002
+model/norm_0: maximum absolute error 0.75439453125, absolute budget 2.0995302605172497, relative budget 0.000104568426045001
+model/norm_1: maximum absolute error 0.0000005913898348808289, absolute budget 0.0002, relative budget 0.00002
+model/norm_3: maximum absolute error 0.000014089047908782959, absolute budget 0.0002, relative budget 0.00002
+none/raw_batch: maximum absolute error 0.00013488531112670898, absolute budget 0.0002, relative budget 0.00002
+mean/raw_batch: maximum absolute error 0.00006324052810668945, absolute budget 0.0002, relative budget 0.00002
+mean/oai_batch: maximum absolute error 0.000007471069693565369, absolute budget 0.0002, relative budget 0.00002
+mean/base64: maximum absolute error 0.000007471069693565369, absolute budget 0.0002, relative budget 0.00002
+mean/legacy_content: maximum absolute error 0.00000010011717677116394, absolute budget 0.0002, relative budget 0.00002
+test pretrained_bert_matches_original_embedding_http_transcripts has been running for over 60 seconds
+mean/text_parts: maximum absolute error 0.00000010011717677116394, absolute budget 0.0002, relative budget 0.00002
+last/raw_batch: maximum absolute error 0.00007727742195129395, absolute budget 0.0002, relative budget 0.00002
+last/oai_batch: maximum absolute error 0.000008370727300643921, absolute budget 0.0002, relative budget 0.00002
+last/base64: maximum absolute error 0.000008370727300643921, absolute budget 0.0002, relative budget 0.00002
+last/legacy_content: maximum absolute error 0.0000000521540641784668, absolute budget 0.0002, relative budget 0.00002
+last/text_parts: maximum absolute error 0.0000000521540641784668, absolute budget 0.0002, relative budget 0.00002
+Original pretrained BGE embedding HTTP: 27 requests, 23479 numeric comparisons, 3 base64 vectors, maximum absolute error across output scales 0.75439453125
+test pretrained_bert_matches_original_embedding_http_transcripts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 80.46s
+
+     Running tests/embedding_lifecycle.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/embedding_lifecycle-3573b4e33e04856b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/tcp.rs (/home/tdamre/.cache/rust-llama-20261109-target/release/deps/tcp-e9cdc1bc2ee8e831)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+

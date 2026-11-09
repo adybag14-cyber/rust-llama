@@ -1,5 +1,15 @@
 # T12 — validation and release checkpoint
 
+> **Historical imported snapshot.** This report describes the standalone
+> T09–T12 archive, including its Linux-only 123-test and 44-input validation.
+> Those totals and missing-track statements do not describe the merged product.
+> Current commands are in [xtask/README.md](../xtask/README.md); current Windows
+> and Linux results are in
+> [expanded runtime verification](../evidence/2026-11-09/expanded-runtime/README.md)
+> and [PORT_STATUS.md](PORT_STATUS.md). The [import manifest](imports/manifest.json)
+> retains the archive identity. The full validation and release requirements
+> remain unchanged in the [active gates](../release/gates.tsv).
+
 ## Implemented
 
 The `llama-conformance` crate and `xtask` binary are authored entirely in Rust 2024 with no Cargo dependencies outside this workspace. They provide streaming SHA-256, ZIP CRC-32, exact and budgeted numeric comparisons, source ownership/disposition proposals, registry extraction, drift detection, bounded process capture, source audits, package integrity validation and reproducible uncompressed ZIP output.

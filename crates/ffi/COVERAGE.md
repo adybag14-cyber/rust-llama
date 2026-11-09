@@ -1,8 +1,17 @@
 # Frozen C ABI export coverage
 
-The frozen header declares 255 llama functions; the independently built reference DLL exports 255 llama symbols. Their union contains 255 symbols. The Rust DLL implements 155 of them, leaves 100 unexported, and adds 4 diagnostic/layout extensions. This is symbol coverage; accepted configurations and behavioral restrictions are documented in README.md and SAMPLERS.md.
+The frozen header declares 255 llama functions and the original DLL exports the
+same 255 symbols. The Rust DLL implements **184**, leaves **71 unexported**, and
+adds **4 diagnostic/layout extensions**. This is symbol coverage; accepted
+configurations and behavioral limits are in README.md, SAMPLERS.md and STATE.md.
 
-The inventory is generated from the actual PE export tables and frozen header. Machine-readable evidence is in evidence/2026-11-09/sampler-cpu/exports.json and exports.tsv. The previous 137-export checkpoint remains preserved under evidence/2026-11-09/sampler-ffi.
+This inventory comes from actual PE export tables. The independently validated
+candidate and the integrated product release DLL export the same surface. Machine-readable symbols, DLL/import hashes and
+source hashes are under evidence/2026-11-09/native-context. Previous 155- and
+137-export checkpoints remain preserved in sampler-cpu and sampler-ffi evidence.
+Fresh integrated-product C results and DLL hashes are in the integrated-windows
+subdirectory. Whole-workspace validation is recorded separately by root release
+gates; no unimplemented function is represented by a placeholder export.
 
 ## Implemented frozen exports
 
@@ -16,6 +25,7 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_batch_get_one` |
 | `llama_batch_init` |
 | `llama_context_default_params` |
+| `llama_copy_state_data` |
 | `llama_decode` |
 | `llama_detokenize` |
 | `llama_free` |
@@ -25,12 +35,24 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_get_embeddings_ith` |
 | `llama_get_logits` |
 | `llama_get_logits_ith` |
+| `llama_get_memory` |
 | `llama_get_model` |
+| `llama_get_state_size` |
 | `llama_init_from_model` |
 | `llama_load_model_from_file` |
+| `llama_load_session_file` |
 | `llama_max_devices` |
 | `llama_max_parallel_sequences` |
 | `llama_max_tensor_buft_overrides` |
+| `llama_memory_can_shift` |
+| `llama_memory_clear` |
+| `llama_memory_seq_add` |
+| `llama_memory_seq_cp` |
+| `llama_memory_seq_div` |
+| `llama_memory_seq_keep` |
+| `llama_memory_seq_pos_max` |
+| `llama_memory_seq_pos_min` |
+| `llama_memory_seq_rm` |
 | `llama_model_chat_template` |
 | `llama_model_decoder_start_token` |
 | `llama_model_default_params` |
@@ -108,10 +130,25 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_sampler_name` |
 | `llama_sampler_reset` |
 | `llama_sampler_sample` |
+| `llama_save_session_file` |
 | `llama_set_abort_callback` |
 | `llama_set_causal_attn` |
 | `llama_set_embeddings` |
 | `llama_set_n_threads` |
+| `llama_set_state_data` |
+| `llama_state_get_data` |
+| `llama_state_get_size` |
+| `llama_state_load_file` |
+| `llama_state_save_file` |
+| `llama_state_seq_get_data` |
+| `llama_state_seq_get_data_ext` |
+| `llama_state_seq_get_size` |
+| `llama_state_seq_get_size_ext` |
+| `llama_state_seq_load_file` |
+| `llama_state_seq_save_file` |
+| `llama_state_seq_set_data` |
+| `llama_state_seq_set_data_ext` |
+| `llama_state_set_data` |
 | `llama_supports_gpu_offload` |
 | `llama_supports_mlock` |
 | `llama_supports_mmap` |
@@ -154,6 +191,7 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_vocab_get_add_sep` |
 | `llama_vocab_get_attr` |
 | `llama_vocab_get_score` |
+| `llama_vocab_get_suppress_tokens` |
 | `llama_vocab_get_text` |
 | `llama_vocab_is_control` |
 | `llama_vocab_is_eog` |
@@ -201,13 +239,11 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_batch_ext_set_pos` |
 | `llama_chat_apply_template` |
 | `llama_chat_builtin_templates` |
-| `llama_copy_state_data` |
 | `llama_detach_threadpool` |
 | `llama_encode` |
 | `llama_flash_attn_type_name` |
 | `llama_ftype_name` |
 | `llama_get_embeddings_seq` |
-| `llama_get_memory` |
 | `llama_get_sampled_candidates_count_ith` |
 | `llama_get_sampled_candidates_ith` |
 | `llama_get_sampled_logits_count_ith` |
@@ -215,21 +251,10 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_get_sampled_probs_count_ith` |
 | `llama_get_sampled_probs_ith` |
 | `llama_get_sampled_token_ith` |
-| `llama_get_state_size` |
 | `llama_load_mode_from_str` |
 | `llama_load_mode_name` |
-| `llama_load_session_file` |
 | `llama_log_get` |
 | `llama_log_set` |
-| `llama_memory_can_shift` |
-| `llama_memory_clear` |
-| `llama_memory_seq_add` |
-| `llama_memory_seq_cp` |
-| `llama_memory_seq_div` |
-| `llama_memory_seq_keep` |
-| `llama_memory_seq_pos_max` |
-| `llama_memory_seq_pos_min` |
-| `llama_memory_seq_rm` |
 | `llama_model_cls_label` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
@@ -255,26 +280,10 @@ The inventory is generated from the actual PE export tables and frozen header. M
 | `llama_perf_sampler_reset` |
 | `llama_print_system_info` |
 | `llama_process` |
-| `llama_save_session_file` |
 | `llama_set_adapter_cvec` |
 | `llama_set_adapters_lora` |
 | `llama_set_sampler` |
-| `llama_set_state_data` |
 | `llama_set_warmup` |
 | `llama_split_path` |
 | `llama_split_prefix` |
-| `llama_state_get_data` |
-| `llama_state_get_size` |
-| `llama_state_load_file` |
-| `llama_state_save_file` |
-| `llama_state_seq_get_data` |
-| `llama_state_seq_get_data_ext` |
-| `llama_state_seq_get_size` |
-| `llama_state_seq_get_size_ext` |
-| `llama_state_seq_load_file` |
-| `llama_state_seq_save_file` |
-| `llama_state_seq_set_data` |
-| `llama_state_seq_set_data_ext` |
-| `llama_state_set_data` |
-| `llama_vocab_get_suppress_tokens` |
 

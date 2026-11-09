@@ -1,0 +1,13 @@
+{
+  "id": "job-1794236035113-0e7104ac-61c",
+  "mode": "shell",
+  "command": "cargo fmt -p llama-model-runtime -p llama-ffi; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo clippy -p llama-model-runtime -p llama-ffi --all-targets -- -D warnings; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo build -p llama-ffi; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo test -p llama-ffi --lib --release; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo test -p llama-model-runtime context::native --release; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo build -p llama-ffi --release; exit $LASTEXITCODE",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle\\rust-draft",
+  "timeoutMs": 2400000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T14:53:55.113Z"
+}

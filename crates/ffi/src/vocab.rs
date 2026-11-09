@@ -12,11 +12,11 @@ ffi!(llama_vocab_type(vocab: *const VocabHandle) -> i32, 0, {
     Ok(unsafe { reference(vocab)? }.tokenizer.vocab_type() as i32)
 });
 ffi!(llama_vocab_n_tokens(vocab: *const VocabHandle) -> i32, 0, {
-    i32::try_from(unsafe { reference(vocab)? }.texts.len())
+    i32::try_from(unsafe { reference(vocab)? }.tokenizer.vocabulary_size())
         .map_err(|_| "vocabulary too large".into())
 });
 ffi!(llama_n_vocab(vocab: *const VocabHandle) -> i32, 0, {
-    i32::try_from(unsafe { reference(vocab)? }.texts.len())
+    i32::try_from(unsafe { reference(vocab)? }.tokenizer.vocabulary_size())
         .map_err(|_| "vocabulary too large".into())
 });
 
@@ -261,6 +261,9 @@ unsafe fn detokenize_to_buffer(
     let final_bytes = tokenizer
         .detokenize_bytes(tokens, remove_special, unparse_special)
         .map_err(|e| e.to_string())?;
+    if tokenizer.vocab_type() as i32 == 0 {
+        return Ok(0);
+    }
     let mut tokens = tokens;
     let mut remove_space = tokenizer.add_space_prefix;
     if remove_special && tokenizer.add_bos && tokens.first() == Some(&tokenizer.bos_id) {
@@ -378,3 +381,25 @@ ffi!(llama_vocab_fim_sep(vocab: *const VocabHandle) -> i32, -1, {
 ffi!(llama_token_fim_sep(vocab: *const VocabHandle) -> i32, -1, {
     Ok(unsafe { reference(vocab)? }.special["fim_sep"])
 });
+
+// Borrowed token storage remains valid while the model/vocabulary owner lives.
+// The count pointer is optional in the frozen API.
+ffi!(
+    llama_vocab_get_suppress_tokens(vocab: *const VocabHandle, count_out: *mut i32) -> *const i32,
+    ptr::null(),
+    {
+        let tokens = unsafe { reference(vocab)? }.tokenizer.suppressed_tokens();
+        let count =
+            i32::try_from(tokens.len()).map_err(|_| "suppressed token count exceeds INT32_MAX")?;
+        if !count_out.is_null() {
+            unsafe {
+                *reference_mut(count_out)? = count;
+            }
+        }
+        Ok(if tokens.is_empty() {
+            ptr::null()
+        } else {
+            tokens.as_ptr()
+        })
+    }
+);

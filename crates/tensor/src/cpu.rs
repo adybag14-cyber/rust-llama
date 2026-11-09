@@ -1,5 +1,5 @@
 use crate::graph::check_cancel;
-use crate::{DType, GluOp, Op, Result, RopeMode, Tensor, TensorDesc, TensorError, UnaryOp, zeros};
+use crate::{DType, Op, Result, RopeMode, Tensor, TensorDesc, TensorError, UnaryOp, zeros};
 use std::sync::atomic::AtomicBool;
 
 fn f32_values(t: &Tensor) -> Result<Vec<f32>> {
@@ -43,6 +43,12 @@ fn eps(v: f32) -> Result<()> {
 
 pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<Tensor> {
     use Op::*;
+    if let Some(result) = crate::cpu_index::evaluate(op, src, cancel) {
+        return result;
+    }
+    if let Some(result) = crate::cpu_extra::evaluate(op, src, cancel) {
+        return result;
+    }
     let a = src[0];
     let n = a.shape();
     match op {
@@ -90,19 +96,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             }
             map(n, &x, cancel, |v| Ok(v * scale + bias))
         }
-        Square => map(n, &x, cancel, |v| Ok(v * v)),
-        Sqrt => map(n, &x, cancel, |v| Ok(v.sqrt())),
-        Log => map(n, &x, cancel, |v| Ok(v.ln())),
-        Sin => map(n, &x, cancel, |v| Ok(v.sin())),
-        Cos => map(n, &x, cancel, |v| Ok(v.cos())),
-        Unary(u) => {
-            if matches!(u, UnaryOp::GELU_ERF | UnaryOp::XIELU) {
-                return Err(TensorError::Unsupported(
-                    "this unary operation has not been ported",
-                ));
-            }
-            map(n, &x, cancel, |v| unary(*u, v))
-        }
+        Square | Sqrt | Log | Sin | Cos | Unary(_) => unreachable!("typed unary handled first"),
         Clamp { min, max } => {
             if !min.is_finite() || !max.is_finite() || min > max {
                 return Err(TensorError::Parameters(
@@ -111,10 +105,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             }
             map(n, &x, cancel, |v| Ok(v.max(*min).min(*max)))
         }
-        Sum => {
-            let sum = x.iter().map(|&v| v as f64).sum::<f64>() as f32;
-            Tensor::from_f32([1; 4], &[sum])
-        }
+        Sum => unreachable!("typed sum handled first"),
         SumRows | Mean => {
             if n[0] == 0 {
                 return Err(TensorError::Shape("row reduction requires a nonempty row"));
@@ -122,7 +113,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             let mut out = zeros(x.len() / n[0])?;
             for (row, chunk) in x.chunks_exact(n[0]).enumerate() {
                 check_cancel(cancel)?;
-                let sum = chunk.iter().map(|&v| v as f64).sum::<f64>() as f32;
+                let sum = chunk.iter().fold(0.0_f64, |sum, &v| sum + v as f64) as f32;
                 out[row] = if matches!(op, Mean) {
                     sum / n[0] as f32
                 } else {
@@ -178,7 +169,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             }
             Tensor::from_f32(shape, &out)
         }
-        MatMul => matmul(a, &x, src[1], cancel),
+        MatMul => unreachable!("mixed-precision matmul handled first"),
         Softmax { scale } => {
             if !scale.is_finite() {
                 return Err(TensorError::Parameters("softmax scale must be finite"));
@@ -220,17 +211,31 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             let mut out = zeros(x.len())?;
             for (input, output) in x.chunks_exact(n[0]).zip(out.chunks_exact_mut(n[0])) {
                 check_cancel(cancel)?;
-                let mean = if matches!(op, Norm { .. }) {
-                    (input.iter().map(|&v| v as f64).sum::<f64>() as f32) / n[0] as f32
+                // The native NORM kernel deliberately uses F32 sums on its
+                // strided first-axis path, and F64 on its contiguous-row path.
+                let strided_norm = matches!(op, Norm { .. }) && a.desc.nb[0] != 4;
+                let mean = if strided_norm {
+                    input.iter().fold(0.0_f32, |sum, &v| sum + v) / n[0] as f32
+                } else if matches!(op, Norm { .. }) {
+                    (input.iter().fold(0.0_f64, |sum, &v| sum + v as f64) as f32) / n[0] as f32
                 } else {
                     0.0
                 };
-                let mut squares = 0.0_f64;
-                for (o, &v) in output.iter_mut().zip(input) {
-                    *o = v - mean;
-                    squares += (*o * *o) as f64;
-                }
-                let variance = (squares / n[0] as f64) as f32;
+                let variance = if strided_norm {
+                    let mut squares = 0.0_f32;
+                    for (o, &v) in output.iter_mut().zip(input) {
+                        *o = v - mean;
+                        squares += *o * *o;
+                    }
+                    squares / n[0] as f32
+                } else {
+                    let mut squares = 0.0_f64;
+                    for (o, &v) in output.iter_mut().zip(input) {
+                        *o = v - mean;
+                        squares += (*o * *o) as f64;
+                    }
+                    (squares / n[0] as f64) as f32
+                };
                 let inv = 1.0 / (variance + epsilon).sqrt();
                 for o in output {
                     *o *= inv;
@@ -238,48 +243,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
             }
             Tensor::from_f32(n, &out)
         }
-        Glu { kind, swap } => {
-            if !matches!(
-                kind,
-                GluOp::REGLU | GluOp::GEGLU | GluOp::SWIGLU | GluOp::GEGLU_QUICK
-            ) {
-                return Err(TensorError::Unsupported(
-                    "this GLU variant has not been ported",
-                ));
-            }
-            let b = src[1];
-            if b.shape() != n {
-                return Err(TensorError::Shape(
-                    "binary GLU inputs must have identical shapes",
-                ));
-            }
-            let y = f32_values(b)?;
-            let mut out = zeros(x.len())?;
-            for i in 0..out.len() {
-                if i % 4096 == 0 {
-                    check_cancel(cancel)?;
-                }
-                let (gate, value) = if *swap { (y[i], x[i]) } else { (x[i], y[i]) };
-                out[i] = match kind {
-                    GluOp::REGLU => {
-                        if gate > 0.0 {
-                            gate * value
-                        } else {
-                            0.0
-                        }
-                    }
-                    GluOp::GEGLU => unary(UnaryOp::GELU, gate)? * value,
-                    GluOp::SWIGLU => unary(UnaryOp::SILU, gate)? * value,
-                    GluOp::GEGLU_QUICK => unary(UnaryOp::GELU_QUICK, gate)? * value,
-                    _ => {
-                        return Err(TensorError::Unsupported(
-                            "this GLU variant has not been ported",
-                        ));
-                    }
-                };
-            }
-            Tensor::from_f32(n, &out)
-        }
+        Glu { .. } => unreachable!("typed GLU handled first"),
         DiagMask { past, zero } => {
             let mut out = x;
             for (i, v) in out.iter_mut().enumerate() {
@@ -341,6 +305,7 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
         Dup | Contiguous | Reshape { .. } | Permute { .. } | Transpose | GetRows => {
             unreachable!("view and gather handled first")
         }
+        _ => unreachable!("extended operators handled first"),
     }
 }
 
@@ -360,7 +325,13 @@ fn map(
     Tensor::from_f32(n, &out)
 }
 
-fn unary(op: UnaryOp, x: f32) -> Result<f32> {
+fn hard_sigmoid(x: f32) -> f32 {
+    // C fmaxf returns its numeric argument when the other argument is NaN.
+    let v = (x + 3.0) / 6.0;
+    if v.is_nan() { 0.0 } else { v.clamp(0.0, 1.0) }
+}
+
+pub(crate) fn unary(op: UnaryOp, x: f32) -> Result<f32> {
     use UnaryOp::*;
     Ok(match op {
         ABS => x.abs(),
@@ -386,10 +357,16 @@ fn unary(op: UnaryOp, x: f32) -> Result<f32> {
             if x > 0.0 {
                 x
             } else {
-                x.exp() - 1.0
+                x.exp_m1()
             }
         }
-        RELU => x.max(0.0),
+        RELU => {
+            if x > 0.0 {
+                x
+            } else {
+                0.0
+            }
+        }
         SIGMOID => 1.0 / (1.0 + (-x).exp()),
         GELU => {
             // The frozen CPU enables GGML_GELU_FP16: round its lookup input/output.
@@ -405,69 +382,30 @@ fn unary(op: UnaryOp, x: f32) -> Result<f32> {
         }
         GELU_QUICK => x * (1.0 / (1.0 + (-1.702 * x).exp())),
         SILU => x / (1.0 + (-x).exp()),
-        HARDSWISH => x * ((x + 3.0) / 6.0).clamp(0.0, 1.0),
-        HARDSIGMOID => ((x + 3.0) / 6.0).clamp(0.0, 1.0),
+        HARDSWISH => x * hard_sigmoid(x),
+        HARDSIGMOID => hard_sigmoid(x),
         EXP => x.exp(),
-        EXPM1 => x.exp_m1(),
+        EXPM1 => x.exp() - 1.0,
         SOFTPLUS => {
             if x > 20.0 {
                 x
             } else {
-                (1.0 + x.exp()).ln()
+                x.exp().ln_1p()
             }
         }
         FLOOR => x.floor(),
         CEIL => x.ceil(),
         ROUND => x.round(),
         TRUNC => x.trunc(),
-        GELU_ERF | XIELU => {
+        GELU_ERF => {
+            0.5 * x * (1.0 + crate::cpu_extra::erf_f32(x * std::f32::consts::FRAC_1_SQRT_2))
+        }
+        XIELU => {
             return Err(TensorError::Unsupported(
                 "this unary operation has not been ported",
             ));
         }
     })
-}
-
-fn matmul(a: &Tensor, x: &[f32], b: &Tensor, cancel: &AtomicBool) -> Result<Tensor> {
-    let an = a.shape();
-    let bn = b.shape();
-    let y = f32_values(b)?;
-    if an[0] != bn[0]
-        || an[2] == 0
-        || an[3] == 0
-        || !bn[2].is_multiple_of(an[2])
-        || !bn[3].is_multiple_of(an[3])
-    {
-        return Err(TensorError::Shape(
-            "GGML matmul reduction or grouped batch dimensions are incompatible",
-        ));
-    }
-    if a.desc().nb[0] > a.desc().nb[1] {
-        return Err(TensorError::Layout(
-            "GGML matmul left operand cannot be transposed",
-        ));
-    }
-    let shape = [an[1], bn[1], bn[2], bn[3]];
-    let mut out = zeros(count(shape)?)?;
-    let r2 = bn[2] / an[2];
-    let r3 = bn[3] / an[3];
-    for i3 in 0..shape[3] {
-        for i2 in 0..shape[2] {
-            for row_b in 0..bn[1] {
-                check_cancel(cancel)?;
-                for row_a in 0..an[1] {
-                    let abase = flat([0, row_a, i2 / r2, i3 / r3], an);
-                    let bbase = flat([0, row_b, i2, i3], bn);
-                    let mut sum = 0.0_f64;
-                    for k in 0..an[0] {
-                        sum += (x[abase + k] * y[bbase + k]) as f64;
-                    }
-                    out[flat([row_a, row_b, i2, i3], shape)] = sum as f32;
-                }
-            }
-        }
-    }
-    Tensor::from_f32(shape, &out)
 }
 
 fn get_rows(a: &Tensor, b: &Tensor, cancel: &AtomicBool) -> Result<Tensor> {

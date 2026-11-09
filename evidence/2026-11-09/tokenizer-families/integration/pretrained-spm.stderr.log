@@ -1,0 +1,12 @@
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running tests\native_reference.rs (target-tokenizer\release\deps\native_reference-c228bd18d88b7912.exe)
+
+thread 'trained_mamba130m_full_logits_greedy_ids_and_text' (47092) panicked at crates\inference\tests\native_reference.rs:600:10:
+LLAMA_TEST_MAMBA_MODEL must point to the external mamba-130m-hf.f16.gguf
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text' (26408) panicked at crates\inference\tests\native_reference.rs:386:10:
+LLAMA_TEST_BPE_MODEL must point to the external SmolLM2-135M-Q4_K_M.gguf
+native trained-model conformance: cases=6 greedy_ids=96 compared_logits=62976 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0
+native trained Q4_0 conformance: cases=1 greedy_ids=16 compared_logits=640000 max_abs=0.000000000e0 max_fraction_of_tolerance=0.000000000e0 bitwise_equal=640000 (informational; portable gate uses declared tolerance)
+error: test failed, to rerun pass `-p llama-inference --test native_reference`

@@ -2,7 +2,7 @@
 
 This crate builds a cdylib, staticlib and rlib. The Windows DLL is
 `target/release/llama_ffi.dll`; the import library is `llama_ffi.dll.lib`.
-It executes the Rust GGUF loader, SPM/BPE/WordPiece tokenizers, CPU samplers and scalar decoder from this
+It executes the Rust GGUF loader, all nine frozen vocabulary family identifiers, CPU samplers and scalar decoder from this
 workspace. No original llama/ggml library is linked or loaded by the product.
 
 **This is an operational subset, not full llama.cpp ABI compatibility.**
@@ -27,9 +27,11 @@ workspace builds additionally check compilation on supported Rust targets.
 
 ## Operational configuration
 
-The currently accepted execution path is dense Llama with a llama/SPM tokenizer,
-as supported by `llama-inference`. Vocabulary-only SPM, BPE and WordPiece loading is supported for llama, bert,
-gpt2, gptneox, mpt, falcon, command-r, refact, starcoder2, qwen2 and gemma4 metadata.
+The accepted execution path is dense Llama, using the validated GGUF loader and
+tokenizer from `llama-inference`. Vocabulary-only loading covers the frozen
+NONE, SPM, BPE, WordPiece, UGM, RWKV, PLaMo-2, test and PLaMo-3 identifiers.
+Admitted architecture metadata is llama, bert, gpt2, gptneox, mpt, falcon,
+command-r, refact, starcoder2, qwen2, gemma4, nomic-bert-moe, baichuan and phi3.
 Execution of non-Llama architectures is explicitly rejected in this C layer.
 Vocabulary-only loading retains the source's unloaded model-info defaults:
 context/embedding/layer dimensions are zero, description is empty and file type
@@ -68,23 +70,27 @@ substitutes F32 silently. Model default `n_gpu_layers = -1` and automatic
 attention/offload preferences resolve to CPU because this C ABI registers no
 GPU backend. Positive GPU-layer requests and forced flash attention fail.
 
-The executor runs one worker. Context creation treats positive thread counts
-as budgets and the thread query functions report the actual value, 1.
+The executor runs one worker. Context creation requires thread counts 1/1,
+and the thread query functions report that actual value.
 `llama_set_n_threads` accepts 1/1; unsupported changes leave state unchanged
 and set the diagnostic.
 
-A context supports up to the frozen limit of 256 independent sequence IDs.
-Each token may belong to exactly one sequence; shared-token sequence lists
-are rejected. Batch limits are bounded to 65,536 tokens. Logical per-sequence
-context capacity is `n_ctx / n_seq_max`, rounded down; queries return the
-resulting actual capacities. A zero requested n_ctx resolves to the model
-training context. Extending a sequence beyond its configured capacity returns 1.
-Creating a context beyond its supported per-sequence training length fails.
+The compatibility executor supports separate and unified physical F32 KV
+buffers. Context padding, per-stream capacity, metadata holes, sequence sharing,
+queued cross-stream copies and signed position transforms follow the measured
+frozen cache behavior. Separate mode has the configured sequence streams;
+unified mode accepts the frozen 256-ID range, with per-token membership bounded
+by n_seq_max. Both modes pad cache capacity to the source's 256-cell boundary.
+Batch limits are bounded to 65,536 tokens. A zero n_ctx resolves to the model
+training context. STATE.md documents precise memory and serialization behavior.
 
-Positions must append to a sequence. Null positions compute the next position
-independently for each sequence, including interleaved batches. Null sequence
-arrays mean sequence 0. Both sequence arrays must otherwise be provided.
-Token and embedding inputs are mutually exclusive.
+A newly empty sequence may begin at any nonnegative position. Existing sequences
+resume after their stored maximum; positions within a batch must advance
+consecutively. Null positions compute the next position for each sequence.
+Null sequence arrays mean sequence 0. Both sequence arrays must otherwise be
+provided. Token and embedding inputs are mutually exclusive. Duplicate positions
+inside one batch and coupled multi-sequence token input in separate-buffer mode
+are explicitly unsupported; unified shared-token input is implemented.
 
 Logit and embedding rows follow the requested batch flags. Positive
 `llama_get_logits_ith` and `llama_get_embeddings_ith` indices refer to original
@@ -97,8 +103,7 @@ hidden output are implemented. Pooling and noncausal attention are not.
 Context creation rejects non-F32 KV caches, nondefault context types, custom
 RoPE/YaRN, pooling, noncausal attention, forced flash attention, evaluator
 callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
-slots, nondefault output capacity fields, performance counters and unified KV
-buffers. SWA preferences have no effect for the supported non-SWA model.
+slots, nondefault output capacity fields and performance counters. SWA preferences have no effect for the supported non-SWA model.
 All boolean and enum inputs are validated.
 
 Model loading rejects device lists, tensor buffer overrides, tensor splitting,
@@ -116,9 +121,15 @@ padding, masks, EOG attributes, newline IDs and insertion flags use the shared
 tokenizer's normalized loader results. Ambiguous inferred special spellings
 follow the independently measured MSVC/libstdc++ source map order.
 
-Broader tokenizer families, backend-attached sampling, state/session formats,
-memory manipulation, adapters, encoder entry points, model saving, split-file
-loading and performance APIs remain absent. Source custom chat-template lookup
+The suppression-token pointer/count getter preserves source order and duplicates,
+and its count pointer is optional. NONE retains its nominal vocabulary count
+and special IDs, returns empty detokenization, and rejects unavailable token
+data/pieces/tokenization with a checked diagnostic instead of the native abort.
+
+Dense F32 memory manipulation and frozen state/session formats are implemented
+as described in STATE.md. Backend-attached sampling, recurrent native caches,
+adapters, encoder entry points, model saving, split-file loading and performance
+APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
 
 ## CPU sampling
@@ -219,5 +230,15 @@ across all 14 frozen BPE vocabularies plus the synthetic raw-byte fixture,
 5,096 text cases and 2,502 raw-byte cases, including buffer sizes and partial
 detokenization writes. Prior sampler evidence remains preserved separately.
 
-These checks establish the stated subset on Windows x64. They do not close the
-full ABI, architecture, backend, platform or performance release gates.
+The additional native context corpus uses both MSVC and GNU builds of the original
+source. Ordinary tests replay all 40 memory cases, 40 sequence-state cases and 96
+short-buffer cases against committed synthetic-model fixtures. Session files,
+legacy aliases, trailing-file side effects and malformed-state atomicity are
+covered. Original raw buffers restore and reserialize bitwise exactly. Generated
+Windows state floats/logits are bitwise exact in the external cohort; Linux
+generated floats use the predeclared model conformance bound because the frozen
+GNU source selects a different vector exponential path. See STATE.md and
+evidence/2026-11-09/native-context for measured errors and actual build flags.
+
+These checks establish the stated subset on Windows x64 and Linux x64. They do
+not close the full ABI, architecture, backend, platform or performance gates.

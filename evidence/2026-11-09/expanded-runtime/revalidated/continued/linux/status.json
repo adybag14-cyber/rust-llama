@@ -1,0 +1,237 @@
+{
+  "status": "succeeded",
+  "platform": "linux",
+  "started_at_utc": "2026-11-09T15:27:57.772623+00:00",
+  "parent_commit": "abffdc84cb01bc69a02cc32599be0ba68221f2d0",
+  "execution_inputs_before": {
+    "files": 396,
+    "sha256": "050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "steps": [
+    {
+      "name": "embedding-cli",
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/verify-embedding-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.0203826350007148
+    },
+    {
+      "name": "decoder-cli",
+      "argv": [
+        "/usr/bin/python3",
+        "/mnt/c/Users/adyba/rust-llama-reference/verify-decoder-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 66.7324084810025
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 205.2267703260004
+    },
+    {
+      "name": "generation-http",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-server",
+        "--example",
+        "verify_model_server",
+        "--",
+        "/mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 6.183353848002298
+    },
+    {
+      "name": "source",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 20.91830706700057
+    },
+    {
+      "name": "release-gate",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 0.418878691001737
+    }
+  ],
+  "qualification": "Continues the same immutable execution-input checkpoint after correcting external CLI driver filenames/evidence paths; all prior failures are retained",
+  "predecessor_report": "evidence/2026-11-09/expanded-runtime/revalidated/linux/status.json",
+  "predecessor_passed_steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 3.575979744997312
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 52.499583565997455,
+      "tests": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 80.11363978300142,
+      "tests": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 3.475731858998188
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 9.539268321001146
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 8.887246834998223
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 20.917163523001364
+    }
+  ],
+  "external_driver_inputs": {
+    "verify-embedding-cli.py": "c891fe04d7a8f2d1c8f0b9aa886a7d74faa0b918984eb43d7d021ec2e8a8fde1",
+    "verify-decoder-cli.py": "73322d9216660fbf1dafbc9d9030f43a5cebd2ddc51c70277920b308a54749c3"
+  },
+  "execution_inputs_after": {
+    "files": 396,
+    "sha256": "050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "finished_at_utc": "2026-11-09T15:33:36.153402+00:00"
+}

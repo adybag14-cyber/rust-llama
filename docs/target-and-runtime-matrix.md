@@ -1,39 +1,59 @@
-# Target and runtime evidence
+# Current target and runtime evidence
 
-| Surface | Status in this checkpoint | Evidence boundary |
-|---|---|---|
-| Linux x86_64 GNU host Rust 1.99.1 | Compiled and executed | Pure Rust media, behavior, server transport and validation tools; final command logs in `evidence/`. |
-| Linux CPU model inference backend | Not supplied | Host scalar preprocessing/sampling is not a completed T03 tensor backend or T05 runtime. |
-| Other Linux architectures / musl | Untested | No corresponding Rust standard libraries or runner was installed. |
-| Windows | Untested | No Windows target build, OS integration or native client validation. |
-| Apple/macOS/iOS | Untested | No Apple SDK, native app or Metal execution. |
-| Android | Untested | No Android target/SDK or app lifecycle run. |
-| Browser/WASM | Untested | No WASM standard library/browser bindings/UI migration execution. The server can emit a Rust-authored diagnostics HTML page. |
-| Device backends | Not supplied | T06–T08 work belongs to separate track outputs, which were not attached. |
+Updated 9 November 2026. This matrix replaces the host-only matrix inherited
+from the standalone T09–T12 archive. The [import manifest](imports/manifest.json)
+retains that archive's identity. Current executable scope is recorded in
+[PORT_STATUS.md](PORT_STATUS.md); full requirements remain in the
+[original plan](plan.md) and [release gates](../release/gates.tsv).
+
+## Tested configurations
+
+| Surface | Verified scope | Evidence boundary |
+| --- | --- | --- |
+| Windows x86_64 MSVC, Rust 1.99.1 | Offline workspace debug/release builds and tests, strict Clippy, source/fixture audits, CLI and HTTP execution. | [Expanded runtime verification](../evidence/2026-11-09/expanded-runtime/README.md) records the exact input fingerprint and command results. This does not establish native GUI/client, other Windows architecture or every OS integration contract. |
+| Linux x86_64 GNU under Ubuntu/WSL, Rust 1.99.1 | The same workspace gates, explicit pretrained comparisons, CLI and HTTP execution. | The same [verification report](../evidence/2026-11-09/expanded-runtime/README.md) separates Linux results from Windows. Other distributions, libc versions and CPU ISAs require their own checks. |
+| CPU model inference on these hosts | Dense Llama generation with SPM/BPE and native packed dots; Mamba-1 recurrence; dense BERT embeddings and pooling. | [Inference contracts](../crates/inference/README.md) identify the exercised pretrained models, fixed error budgets and unsupported metadata. Model families and all graph variants remain separate requirements. |
+| Scalar tensor execution on these hosts | 62 operation IDs plus NONE input leaves; 1,252 distinct original-GGML graph cases. | [CPU operation inventory](../crates/tensor/CPU_SUPPORT.md) states dtype/shape restrictions. MSVC/GNU tied-sort differences have separate native references; exact UCRT ERF bit parity remains open. |
+| Native C ABI on these hosts | 184 frozen C exports plus four diagnostic extensions; dense Llama context/memory/session and all vocabulary-family identifiers within accepted parameters. | [Export coverage](../crates/ffi/COVERAGE.md), [ABI contract](../crates/ffi/README.md) and [state contract](../crates/ffi/STATE.md) retain all 71 missing exports and semantic limitations. Native recurrent memory and nonnull metadata overrides remain unsupported. |
+| CUDA device slice | Selected Rust-generated kernels executed on an RTX 4090. | [T06 evidence](T06-STATUS.md) records 138 dispatches. This is not complete backend scheduling, model offload, all operation/dtype or performance parity. |
+| OpenCL device slice | Selected Rust-generated kernels executed on NVIDIA and AMD devices. | [T07 evidence](T07-STATUS.md) records the exercised device/compiler configuration. Other GPU frontends remain partial foundations. |
+| Other Linux architectures / musl | Not validated by this checkpoint. | No successful target execution is inferred from the x64 GNU results. |
+| Apple/macOS/iOS | Not validated by this checkpoint. | Apple SDK, native client and Metal execution requirements remain open. |
+| Android | Not validated by this checkpoint. | Target/SDK, device and application lifecycle requirements remain open. |
+| Browser/WASM | Not validated by this checkpoint. | The server's diagnostic HTML page does not supply the browser application, WASM runtime, bindings or storage migrations. |
+
+The linked verification report associates its totals with a specific execution
+fingerprint. A later source revision or added regression needs its own recorded
+validation; this matrix does not transfer earlier results to changed inputs.
+Frozen C/C++ libraries are external comparison tools. They are not linked or
+loaded by the Rust product.
 
 ## Backend closure
 
-Every backend in the original plan remains in scope. This package does not claim any of these backends is complete.
+Every backend in the original plan remains in scope. Current device and scalar
+results establish bounded slices; no complete backend gate is closed here.
 
-| Backend | Owner | Current required next input |
-|---|---|---|
-| CPU | T03 | Rust tensor kernels plus T02/T05 end-to-end inference and ISA checks |
-| CUDA | T06 | Reviewed Rust host/device implementation, CUDA SDK/device evidence |
-| HIP | T06 | Reviewed Rust host/device implementation, HIP SDK/device evidence |
-| MUSA | T06 | Reviewed Rust host/device implementation, MUSA SDK/device evidence |
-| Metal | T07 | Rust host/device implementation and Apple target/device proof |
-| Vulkan | T07 | Rust host/IR lowering and Vulkan device evidence |
-| OpenCL | T07 | Rust host/IR lowering and supported OpenCL device evidence |
-| WebGPU | T07 | Rust host/IR lowering and actual browser/device evidence |
-| BLAS | T08 | Rust backend adapter and explicit external vendor-library boundary |
-| CANN | T08 | Rust backend and intended accelerator evidence |
-| ET | T08 | Rust backend/compiler/firmware contract and runner evidence |
-| SYCL | T08 | Rust backend/compiler strategy and target evidence |
-| zDNN | T08 | Rust backend and IBM target evidence |
-| Hexagon | T08 | Rust host/DSP implementation and FastRPC/HMX/QuRT evidence |
-| ZenDNN | T08 | Rust backend plus validated vendor ABI/behavior |
-| OpenVINO | T08 | Rust graph/state frontend and target evidence |
-| RPC | T08 | Rust wire/client/server implementation over real downstream backend |
-| VirtGPU | T08 | Rust guest/host implementation and real shared-buffer synchronization |
+| Backend | Owner | Remaining execution and integration requirements |
+| --- | --- | --- |
+| CPU | T03 | Complete tensor operators, ISA implementations/dispatch, scheduler and model integration, numerical and performance checks across supported hosts. |
+| CUDA | T06 | Full tensor/backend scheduler and model integration, remaining operation/dtype coverage, memory/collective modes and optimized-kernel/device parity. |
+| HIP | T06 | Complete host/device implementation, actual AMD execution and full integration/parity. |
+| MUSA | T06 | Complete host/device implementation, actual MUSA execution and full integration/parity. |
+| Metal | T07 | Complete Rust host/device implementation and Apple target/device evidence. |
+| Vulkan | T07 | Complete host/IR lowering, device execution, scheduler integration and parity. |
+| OpenCL | T07 | Complete operation/dtype coverage and scheduler/model integration beyond the measured kernels. |
+| WebGPU | T07 | Complete host/IR lowering and actual browser/device execution. |
+| BLAS | T08 | Complete adapter semantics, supported vendor ABI matrix and independently exercised end-to-end integration. |
+| CANN | T08 | Complete Rust backend and intended accelerator execution. |
+| ET | T08 | Complete backend/compiler/firmware contract and runner evidence. |
+| SYCL | T08 | Complete backend/compiler strategy and target execution. |
+| zDNN | T08 | Complete Rust backend and IBM target execution. |
+| Hexagon | T08 | Complete host/DSP implementation and FastRPC/HMX/QuRT execution; parser and rewrite fixtures do not establish DSP execution. |
+| ZenDNN | T08 | Complete Rust backend, validated vendor ABI/behavior and target execution. |
+| OpenVINO | T08 | Complete graph/state frontend and target execution. |
+| RPC | T08 | Complete wire/client/server semantics and integration beyond the checked RPC 8.0.1 scalar graph subset. |
+| VirtGPU | T08 | Complete guest/host implementation and real shared-buffer synchronization. |
 
-Model weights, GPU throughput, end-to-end generation quality, complete browser/client behavior and full media-codec coverage remain separate gates. No hardware or model result is inferred from successful compilation of these host crates.
+Model quality and performance across the full corpus, complete browser/native
+clients and all media/model paths remain explicit release requirements.
+Hardware discovery or successful compilation does not establish device execution.

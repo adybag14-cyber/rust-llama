@@ -249,7 +249,9 @@ fn round_f16(x: f32) -> f32 {
     }
 }
 pub(crate) fn softplus(x: f32) -> f32 {
-    if x > 20.0 { x } else { x.exp().ln_1p() }
+    // The frozen ggml_compute_softplus_f32 rounds 1 + exp(x) to F32 before log.
+    // log1p(exp(x)) changes small deltas and therefore persistent SSM state.
+    if x > 20.0 { x } else { (1.0 + x.exp()).ln() }
 }
 pub(crate) fn softmax(values: &mut [f32]) -> Result<()> {
     if values.is_empty() {

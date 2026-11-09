@@ -9,33 +9,95 @@ use std::{
     sync::Arc,
 };
 
+/// Frozen model hparams use exact GGUF UINT32 values, not arbitrary integers.
 pub(super) fn uint(
     m: &BTreeMap<String, Value>,
     key: &str,
     default: Option<usize>,
 ) -> Result<usize> {
     match m.get(key) {
-        Some(v) => v
-            .as_u64()
-            .and_then(|v| usize::try_from(v).ok())
-            .ok_or_else(|| Error::Invalid(format!("{key} must be an unsigned integer"))),
+        Some(Value::U32(value)) => Ok(*value as usize),
+        Some(_) => Err(Error::Invalid(format!("{key} must have GGUF UINT32 type"))),
         None => default.ok_or_else(|| Error::Invalid(format!("missing {key}"))),
+    }
+}
+/// The original split count is UINT16. Zero and an omitted field both denote
+/// an ordinary single-file load; counts above one need shard resolution.
+pub(super) fn split_count(m: &BTreeMap<String, Value>) -> Result<usize> {
+    match m.get("split.count") {
+        None => Ok(0),
+        Some(Value::U16(value)) => Ok(usize::from(*value)),
+        Some(_) => Err(Error::Invalid(
+            "split.count must have GGUF UINT16 type".into(),
+        )),
     }
 }
 pub(super) fn float(m: &BTreeMap<String, Value>, key: &str, default: f32) -> Result<f32> {
     match m.get(key) {
         None => Ok(default),
-        Some(v) => {
-            let v = v
-                .as_f64()
-                .ok_or_else(|| Error::Invalid(format!("{key} must be floating point")))?;
-            if !v.is_finite() || v.abs() > f32::MAX as f64 {
-                Err(Error::Invalid(format!("{key} is non-finite/out of range")))
-            } else {
-                Ok(v as f32)
-            }
-        }
+        Some(Value::F32(value)) if value.is_finite() => Ok(*value),
+        Some(Value::F32(_)) => Err(Error::Invalid(format!("{key} must be finite"))),
+        Some(_) => Err(Error::Invalid(format!("{key} must have GGUF FLOAT32 type"))),
     }
+}
+pub(super) fn require_causal(
+    m: &BTreeMap<String, Value>,
+    architecture: &str,
+    causal: bool,
+) -> Result<()> {
+    let key = format!("{architecture}.attention.causal");
+    match m.get(&key) {
+        None => Ok(()),
+        Some(Value::Bool(value)) if *value == causal => Ok(()),
+        Some(Value::Bool(_)) => Err(unsupported(format!("nondefault {key}"))),
+        Some(_) => Err(Error::Invalid(format!("{key} must be a boolean"))),
+    }
+}
+/// Resolve the source's new/legacy frequency-factor precedence, including its
+/// zero default and explicit NONE override. Gain and scaled modes stay explicit.
+pub(super) fn require_unscaled_rope(m: &BTreeMap<String, Value>, architecture: &str) -> Result<()> {
+    let key = format!("{architecture}.rope.scaling.type");
+    let kind = match m.get(&key) {
+        None => "linear",
+        Some(Value::String(value)) => value.as_str(),
+        Some(_) => return Err(Error::Invalid(format!("{key} must be a string"))),
+    };
+    if !matches!(kind, "none" | "linear") {
+        return Err(unsupported(format!(
+            "{architecture} RoPE scaling mode {kind}"
+        )));
+    }
+    let new_key = format!("{architecture}.rope.scaling.factor");
+    let old_key = format!("{architecture}.rope.scale_linear");
+    let factor = if m.contains_key(&new_key) {
+        float(m, &new_key, 0.0)?
+    } else {
+        float(m, &old_key, 0.0)?
+    };
+    if kind != "none" && factor != 0.0 && factor != 1.0 {
+        return Err(unsupported(format!(
+            "{architecture} scaled RoPE frequencies"
+        )));
+    }
+    if float(m, &format!("{architecture}.rope.scaling.attn_factor"), 1.0)? != 1.0 {
+        return Err(unsupported(format!("{architecture} RoPE attention gain")));
+    }
+    Ok(())
+}
+fn shared_metadata(m: &BTreeMap<String, Value>, architecture: &str) -> Result<()> {
+    match m.get("general.type") {
+        None => {}
+        Some(Value::String(kind)) if kind == "model" => {}
+        Some(Value::String(kind)) => return Err(unsupported(format!("GGUF general.type={kind}"))),
+        Some(_) => return Err(Error::Invalid("general.type must be a string".into())),
+    }
+    if uint(m, &format!("{architecture}.nextn_predict_layers"), Some(0))? != 0 {
+        return Err(unsupported(format!("{architecture} NextN/MTP layers")));
+    }
+    if m.contains_key("prism.hadamard.version") {
+        return Err(unsupported("PRISM Hadamard model transforms"));
+    }
+    Ok(())
 }
 pub(super) fn unsupported(s: impl Into<String>) -> Error {
     Error::Unsupported(s.into())
@@ -160,12 +222,16 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
         .get("general.architecture")
         .and_then(Value::as_str)
         .ok_or_else(|| Error::Invalid("missing general.architecture".into()))?;
+    shared_metadata(m, architecture)?;
     if architecture == "bert" {
         return crate::bert_loader::load(g, path, options);
     }
+    if architecture == "mamba" {
+        return crate::mamba_loader::load(g, path, options);
+    }
     if architecture != "llama" {
         return Err(unsupported(format!(
-            "model architecture {architecture}; this loader currently executes dense llama and bert"
+            "model architecture {architecture}; this loader currently executes dense llama, bert and mamba"
         )));
     }
     if let Some(t) = m.get("general.type").and_then(Value::as_str)
@@ -173,7 +239,7 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
     {
         return Err(unsupported(format!("GGUF general.type={t}")));
     }
-    if uint(m, "split.count", Some(1))? > 1 {
+    if split_count(m)? > 1 {
         return Err(unsupported("split GGUF model loading"));
     }
     let tokenizer = Tokenizer::from_metadata(m)?;
@@ -185,8 +251,8 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
     let head_dim = width / heads;
     let kv_heads = uint(m, "llama.attention.head_count_kv", Some(heads))?;
     let layers = uint(m, "llama.block_count", None)?;
-    if layers == 0 || layers > 4096 {
-        return Err(Error::Invalid("layer count must be 1..=4096".into()));
+    if layers == 0 || layers > 512 {
+        return Err(Error::Invalid("layer count must be 1..=512".into()));
     }
     let feed_forward = uint(m, "llama.feed_forward_length", None)?;
     let train_context = uint(m, "llama.context_length", None)?;
@@ -207,18 +273,8 @@ pub(crate) fn load(path: &Path, options: &LoadOptions) -> Result<Model> {
             return Err(unsupported(format!("nonzero {key}")));
         }
     }
-    if m.get("llama.rope.scaling.type")
-        .is_some_and(|v| v.as_str() != Some("none"))
-    {
-        return Err(unsupported(
-            "RoPE scaling; this runtime implements unscaled adjacent-pair RoPE",
-        ));
-    }
-    if float(m, "llama.rope.scaling.factor", 1.)? != 1.
-        || float(m, "llama.rope.scale_linear", 1.)? != 1.
-    {
-        return Err(unsupported("scaled RoPE frequencies"));
-    }
+    require_causal(m, "llama", true)?;
+    require_unscaled_rope(m, "llama")?;
     for key in ["llama.attention.qk_norm", "llama.attention.qk_norm_rms"] {
         if m.get(key).is_some_and(|v| v.as_bool() != Some(false)) {
             return Err(unsupported(key.to_string()));

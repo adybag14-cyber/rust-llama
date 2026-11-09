@@ -46,10 +46,16 @@ jobs:
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/bert-bge-small-f16.gguf" https://huggingface.co/ggml-org/models-moved/resolve/main/bert-bge-small/ggml-model-f16.gguf
       - name: Fetch equivalent big-endian BERT model data
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf" https://huggingface.co/ggml-org/models-moved/resolve/main/bert-bge-small/ggml-model-f16-big-endian.gguf
+      - name: Fetch pinned BPE Q4_K model data
+        run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/SmolLM2-135M-Q4_K_M.gguf" https://huggingface.co/ggml-org/SmolLM2-135M-GGUF/resolve/main/SmolLM2-135M-Q4_K_M.gguf
+      - name: Fetch pinned Mamba recurrent model data
+        run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/mamba-130m-hf.f16.gguf" https://huggingface.co/mradermacher/mamba-130m-hf-GGUF/resolve/ecd441bd76c60ebf9c3e71bfc3f83ba64fa1edd1/mamba-130m-hf.f16.gguf
       - name: Pretrained model comparisons with verified SHA-256 inputs
         env:
           LLAMA_TEST_MODEL: ${{ runner.temp }}/stories260K.gguf
           LLAMA_TEST_Q4_MODEL: ${{ runner.temp }}/stories15M-q4_0.gguf
+          LLAMA_TEST_BPE_MODEL: ${{ runner.temp }}/SmolLM2-135M-Q4_K_M.gguf
+          LLAMA_TEST_MAMBA_MODEL: ${{ runner.temp }}/mamba-130m-hf.f16.gguf
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
         run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture

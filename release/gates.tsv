@@ -1,9 +1,9 @@
 gate	owner	status	evidence_or_blocker
 baseline-ownership	T12	validated	ledger/baseline-files.tsv contains all 4082 frozen files with owner/hash/size; semantic completion remains separate
-baseline-source-identity	T12	validated	Complete 4082-file frozen source checked against ledger; evidence/2026-11-09/native-surface and prior integration evidence
-workspace-build-and-tests	T12	validated	evidence/2026-11-09/native-surface/{windows,linux}/revalidated: 360/361 ordinary tests per debug/release profile; strict Clippy and release builds passed; exact immutable execution-input fingerprint recorded
+baseline-source-identity	T12	validated	All 4082 frozen files checked against ledger on Windows and Linux; evidence/2026-11-09/expanded-runtime/verification.json
+workspace-build-and-tests	T12	validated	Full base: Windows384/Linux385 tests per profile plus7 pretrained tests; final one-file NativeContext budget fix separately passes64/62 focused tests per profile strict Clippy and independent C corpus. Exact base/final fingerprints in evidence/2026-11-09/expanded-runtime/final-checkpoint.json; final commit CI is checked after push
 language-and-dependency-audit	T12	validated	Rust audit passes on the integrated workspace; unsafe candidates are an inventory rather than blanket proof
-fixture-integrity	T12	validated	All declared original fixtures pass integrity verification; numerical and protocol checks remain separate; evidence/2026-11-09/native-surface
+fixture-integrity	T12	validated	195 fixtures with 195 declarations in 4 manifests verified on Windows/Linux; numerical/protocol parity is checked separately; evidence/2026-11-09/expanded-runtime
 pretrained-f32-reference	T04,T05	validated	62976 logits now exactly equal on Windows; Linux within original fixed tolerance; 96 greedy IDs equal; evidence/2026-11-09/bert and linux-extension
 pretrained-q4-reference	T03,T05	validated	640000 logits exactly equal in exercised Windows build; evidence/2026-11-09/inference/stories15m-q4-packed-validation.json
 pretrained-bert-reference	T04,T05	validated	13056 values exact on Windows; Linux within unchanged native bound; equivalent big-endian encoding checked; evidence/2026-11-09/bert and linux-extension
@@ -16,19 +16,24 @@ opencl-kernel-subset	T07	validated	Actual NVIDIA and AMD cases; evidence/2026-11
 real-model-server-subset	T11	validated	48 ordinary server tests plus 37 real generation HTTP requests; 226 tiny and 27 pretrained embedding HTTP cases plus 30 numeric coercions; evidence/2026-11-09/server-embeddings and native-surface
 native-cpu-sampler-grammar	T01,T10	validated	165 original CPU scenarios and 585 generated IDs exact; 383053 independent grammar masks; reconstructed grammar separately reviewed and revalidated; evidence/2026-11-09/sampler-cpu/revalidated
 bert-embedding-http	T05,T11	validated	Windows native response floats exact; Linux uses unchanged raw-encoder budget and predeclared propagation for max-abs scaling; independent normalization checks and bounded lifecycle tests; evidence/2026-11-09/server-embeddings
+remaining-tokenizer-families	T04	validated	Native Unigram RWKV PLaMo2 PLaMo3 and no-vocabulary mode; 91476 synthetic cases 346112 original records 10412 real-vocabulary cases 4067668 normalizer outputs; evidence/2026-11-09/tokenizer-families
+pretrained-bpe-reference	T04,T05	validated	1671168 SmolLM2 Q4_K_M logits and 24 greedy IDs exact on Windows/Linux; evidence/2026-11-09/smollm2
+pretrained-mamba-reference	T05	validated	1709520 logits and 24 IDs exact on Windows; Linux max absolute 0.00008940696716308594 within unchanged bound; evidence/2026-11-09/mamba
+native-context-memory-subset	T01,T05	validated	80 independent scenarios 400 checks 61440 continuation logits and 1223532 state bytes; native raw state roundtrip exact both platforms; restricted scope documented; evidence/2026-11-09/native-context
+tensor-scalar-indexing-subset	T02	validated	1252 distinct native graphs across scalar and indexing slices; 599152 new exact indexing output bytes per platform; exact platform erff and remaining operations stay open; evidence/2026-11-09/tensor-scalar and tensor-indexing
 file-disposition-closure	ALL	planned	Every baseline path requires reviewed capability-linked replacement and evidence
-complete-public-abi	T01	implementing	155 of 255 frozen exports implemented plus 4 diagnostic extensions; 100 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md
-complete-tensor-engine	T02	implementing	Full operators scheduler allocation events autograd and optimizers remain open
+complete-public-abi	T01	implementing	184 of 255 frozen exports implemented plus 4 diagnostic extensions; 71 frozen exports and remaining semantics stay open; crates/ffi/COVERAGE.md
+complete-tensor-engine	T02	implementing	62 executable operation IDs plus NONE checked against 1252 distinct original graphs; 39 operation IDs plus scheduler allocation events autograd optimizers and remaining modes stay open
 complete-cpu-and-quantization	T03	implementing	All 36 decoders 29 CPU weight dots and 29 defined scalar model quantizers including weighted paths implemented; general operators ISA optimization and full CPU/backend closure remain open
-formats-tokenizers-conversion-parity	T04	implementing	SPM WPM core Unicode and all 64 reachable BPE metadata profiles independently checked; remaining tokenizer families checkpoint/converter support sharding and metadata tools remain open
-all-model-architectures	T05	implementing	Selected typed graphs plus dense Llama and BERT GGUF execute; full 172 named-entry architecture scope remains
+formats-tokenizers-conversion-parity	T04	implementing	All frozen tokenizer families have native Rust implementations and independent corpora; checkpoint/converter support sharding metadata tools native override arrays and remaining platform contracts stay open
+all-model-architectures	T05	implementing	Selected typed graphs plus dense Llama Mamba-1 and BERT GGUF execute; full 172 named-entry architecture scope remains
 all-eighteen-backends	T03,T06-T08	implementing	Full operation memory scheduling compiler hardware and vendor parity remains open across 18 families
 multimodal-model-embeddings	T09	planned	All 58 modality graph builders require complete runtime/model execution and independent fixtures
 media-codec-completeness	T09	implementing	Selected formats only; full frozen codec/container and preprocessing scope remains open
 speech-generation	T09	planned	Acoustic model execution and waveform quality validation remain open
 sampler-grammar-chat-completeness	T10	implementing	Native CPU sampler constructors and token-aware grammar checked against original CPU behavior; full Jinja PEG backend sampling and remaining semantics stay open
 all-cli-tools-and-updater	T10	implementing	Core inference CLI exists; remaining tools examples unified app and installer contract remain open
-server-protocol-parity	T11	implementing	Dense Llama generation and dense BERT embedding HTTP integrated; complete protocols routing production scheduling tools reranking and decoder embeddings remain open
+server-protocol-parity	T11	implementing	Dense Llama and Mamba-1 generation plus dense BERT embedding HTTP integrated; complete protocols routing production scheduling tools reranking and decoder embeddings remain open
 browser-feature-and-migration-parity	T11	planned	Diagnostics renderer is not complete browser application parity
 native-clients-and-connect	T11	planned	Native platform applications target SDKs and pinned connect contract require implementation and validation
 independent-conformance-suite	T12	implementing	Selected original fixtures and pretrained/device/server cases pass; exhaustive scope remains open

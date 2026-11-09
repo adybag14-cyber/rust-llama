@@ -1,0 +1,47 @@
+{
+  "id": "job-1794235724837-ffa15c96-79d",
+  "status": "failed",
+  "mode": "shell",
+  "createdAtUtc": "2026-11-09T14:48:44.837Z",
+  "startedAtUtc": "2026-11-09T14:48:44.892Z",
+  "completedAtUtc": "2026-11-09T14:48:49.693Z",
+  "runnerPid": 33628,
+  "exitCode": 1,
+  "readOnly": false,
+  "resourceClass": "light",
+  "runtimeMode": "host",
+  "queuedAtUtc": "2026-11-09T14:48:44.873Z",
+  "runnerProcessInstance": "134387093248500161",
+  "queueWaitMs": 6,
+  "executionSlot": 18,
+  "executionSlots": [
+    18
+  ],
+  "executionPool": "execution",
+  "executionWeight": 1,
+  "childPid": 47932,
+  "error": "Compiling llama-tensor v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\indexing-draft)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.10s\n     Running unittests src\\lib.rs (target\\debug\\deps\\llama_tensor-0bcc00c96aee5660.exe)\n     Running tests\\extended.rs (target\\debug\\deps\\extended-d857fc6bb5bffe5b.exe)\n     Running tests\\indexing.rs (target\\debug\\deps\\indexing-5a6c7581e2bd2918.exe)\n     Running tests\\reference.rs (target\\debug\\deps\\reference-a89591463d478f9d.exe)\n   Doc-tests llama_tensor\n   Compiling llama-quant v0.1.0 (C:\\Users\\adyba\\rust-llama\\crates\\quant)\n   Compiling llama-tensor v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\indexing-draft)\n    Finished `release` profile [optimized] target(s) in 2.11s\n     Running unittests src\\lib.rs (target\\release\\deps\\llama_tensor-e07f2c8d3e7afcb0.exe)\n     Running tests\\extended.rs (target\\release\\deps\\extended-03687faf4546886e.exe)\n     Running tests\\indexing.rs (target\\release\\deps\\indexing-d09bb7e12c96d46e.exe)\n     Running tests\\reference.rs (target\\release\\deps\\reference-2588c2b8d1e2b499.exe)\n   Doc-tests llama_tensor\n    Checking llama-tensor v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\tensor-oracle\\indexing-draft)\nerror: using `chunks_exact` with a constant chunk size\n   --> src\\cpu_index.rs:240:34\n    |\n240 |                 .zip(values.data.chunks_exact(4))\n    |                                  ^^^^^^^^^^^^^^^\n    |\nhelp: consider using `as_chunks::<4>()` instead\n   --> src\\cpu_index.rs:240:34\n    |\n240 |                 .zip(values.data.chunks_exact(4))\n    |                                  ^^^^^^^^^^^^^^^\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks\n    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`\n    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`\n\nerror: using `chunks_exact` with a constant chunk size\n   --> src\\cpu_index.rs:469:55\n    |\n469 |         for bytes in a.data[start..start + row_bytes].chunks_exact(4) {\n    |                                                       ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0`\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks\n\nerror: could not compile `llama-tensor` (lib) due to 2 previous errors\nwarning: build failed, waiting for other jobs to finish...\nerror: could not compile `llama-tensor` (lib test) due to 2 previous errors",
+  "logs": {
+    "stdout": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 4614,
+      "currentBytes": 4614,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "stderr": {
+      "maxBytes": 33554432,
+      "rotations": 2,
+      "rotationsPerformed": 0,
+      "totalBytes": 2588,
+      "currentBytes": 2588,
+      "truncated": false,
+      "failed": false,
+      "error": null
+    },
+    "truncated": false
+  }
+}

@@ -1,0 +1,42 @@
+   Compiling llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-oracle\indexing-draft)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.10s
+     Running unittests src\lib.rs (target\debug\deps\llama_tensor-0bcc00c96aee5660.exe)
+     Running tests\extended.rs (target\debug\deps\extended-d857fc6bb5bffe5b.exe)
+     Running tests\indexing.rs (target\debug\deps\indexing-5a6c7581e2bd2918.exe)
+     Running tests\reference.rs (target\debug\deps\reference-a89591463d478f9d.exe)
+   Doc-tests llama_tensor
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\quant)
+   Compiling llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-oracle\indexing-draft)
+    Finished `release` profile [optimized] target(s) in 2.11s
+     Running unittests src\lib.rs (target\release\deps\llama_tensor-e07f2c8d3e7afcb0.exe)
+     Running tests\extended.rs (target\release\deps\extended-03687faf4546886e.exe)
+     Running tests\indexing.rs (target\release\deps\indexing-d09bb7e12c96d46e.exe)
+     Running tests\reference.rs (target\release\deps\reference-2588c2b8d1e2b499.exe)
+   Doc-tests llama_tensor
+    Checking llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\tensor-oracle\indexing-draft)
+error: using `chunks_exact` with a constant chunk size
+   --> src\cpu_index.rs:240:34
+    |
+240 |                 .zip(values.data.chunks_exact(4))
+    |                                  ^^^^^^^^^^^^^^^
+    |
+help: consider using `as_chunks::<4>()` instead
+   --> src\cpu_index.rs:240:34
+    |
+240 |                 .zip(values.data.chunks_exact(4))
+    |                                  ^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> src\cpu_index.rs:469:55
+    |
+469 |         for bytes in a.data[start..start + row_bytes].chunks_exact(4) {
+    |                                                       ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `llama-tensor` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-tensor` (lib test) due to 2 previous errors

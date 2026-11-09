@@ -14,7 +14,8 @@ pub struct MambaConfig {
     pub normalize_dt_b_c: bool,
 }
 impl MambaConfig {
-    fn validate(&self) -> Result<()> {
+    /// Check raw dimensions and normalization before deriving sizes or allocating weights.
+    pub fn validate(&self) -> Result<()> {
         check_positive(&[
             ("vocabulary", self.vocabulary),
             ("width", self.width),

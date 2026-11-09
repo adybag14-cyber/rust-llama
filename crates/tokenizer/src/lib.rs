@@ -1,9 +1,16 @@
-//! Frozen llama.cpp SPM, WordPiece and metadata-selected GPT-2/BPE tokenizers.
-//! Unicode properties, raw-byte decoding and pretokenizer profiles use the frozen
-//! source behavior; unimplemented families return explicit errors.
+//! Frozen llama.cpp tokenizers: SPM, BPE, WordPiece, Unigram, RWKV,
+//! PLaMo-2/3 and the source test family, plus no-vocabulary metadata.
+//! Algorithms, Unicode properties, byte decoding, pretokenizer selection and
+//! metadata normalization follow the frozen source under explicit resource bounds.
 #![forbid(unsafe_code)]
 
 mod bpe;
+mod byte_trie;
+mod plamo;
+mod rwkv;
+mod ugm;
+#[cfg(test)]
+mod ugm_reference;
 pub mod unicode;
 mod unicode_regex;
 mod vocab_order;
@@ -48,14 +55,25 @@ struct Token {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum VocabType {
+    None = 0,
     Spm = 1,
     Bpe = 2,
     Wpm = 3,
+    Ugm = 4,
+    Rwkv = 5,
+    Plamo2 = 6,
+    Test = 7,
+    Plamo3 = 8,
 }
 #[derive(Debug, Clone)]
 pub struct Tokenizer {
     family: VocabType,
+    token_type_count: u32,
+    suppressed_tokens: Vec<i32>,
     bpe: Option<bpe::Bpe>,
+    ugm: Option<ugm::Ugm>,
+    rwkv: Option<rwkv::Rwkv>,
+    plamo: Option<plamo::Plamo>,
     max_token_len: usize,
     lowercase: bool,
     strip_accents: bool,
@@ -86,18 +104,107 @@ pub struct Tokenizer {
     eog: BTreeSet<i32>,
 }
 impl Tokenizer {
+    fn without_vocabulary(metadata: &BTreeMap<String, Value>) -> Result<Self> {
+        let key = metadata
+            .get("general.architecture")
+            .and_then(Value::as_str)
+            .map(|architecture| format!("{architecture}.vocab_size"));
+        let count = key
+            .as_ref()
+            .and_then(|key| metadata.get(key))
+            .map(|value| match value {
+                Value::U32(n) => Ok(u64::from(*n)),
+                _ => Err(invalid("dummy vocabulary size is not UINT32")),
+            })
+            .transpose()?
+            .unwrap_or(0);
+        if count > 1_000_000 {
+            return Err(Error::Limit(
+                "dummy vocabulary exceeds 1000000 entries".into(),
+            ));
+        }
+        Ok(Self {
+            family: VocabType::None,
+            token_type_count: metadata
+                .get("tokenizer.ggml.token_type_count")
+                .and_then(Value::as_u64)
+                .unwrap_or(0) as u32,
+            suppressed_tokens: Vec::new(),
+            bpe: None,
+            ugm: None,
+            rwkv: None,
+            plamo: None,
+            max_token_len: 0,
+            lowercase: true,
+            strip_accents: true,
+            clean_spaces: false,
+            tokens: vec![
+                Token {
+                    text: String::new(),
+                    score: 0.0,
+                    kind: 0,
+                    attributes: 0
+                };
+                count as usize
+            ],
+            lookup: BTreeMap::new(),
+            byte_ids: [None; 256],
+            special: Vec::new(),
+            bos_id: -1,
+            eos_id: -1,
+            eot_id: -1,
+            eom_id: -1,
+            unk_id: -1,
+            sep_id: -1,
+            pad_id: -1,
+            mask_id: -1,
+            newline_id: -1,
+            fim_pre_id: -1,
+            fim_suf_id: -1,
+            fim_mid_id: -1,
+            fim_pad_id: -1,
+            fim_rep_id: -1,
+            fim_sep_id: -1,
+            add_sep: false,
+            add_bos: false,
+            add_eos: false,
+            add_space_prefix: false,
+            eog: BTreeSet::new(),
+        })
+    }
     pub fn from_metadata(m: &BTreeMap<String, Value>) -> Result<Self> {
         let model = m
             .get("tokenizer.ggml.model")
             .and_then(Value::as_str)
-            .ok_or_else(|| invalid("missing tokenizer.ggml.model"))?;
+            .ok_or_else(|| invalid("missing tokenizer.ggml.model"))?
+            .split('\0')
+            .next()
+            .unwrap();
+        if let Some(value) = m.get("tokenizer.ggml.pre")
+            && !matches!(value, Value::String(_))
+        {
+            return Err(invalid("tokenizer.ggml.pre is not STRING"));
+        }
+        if let Some(value) = m.get("tokenizer.ggml.token_type_count")
+            && !matches!(value, Value::U32(_))
+        {
+            return Err(invalid("tokenizer.ggml.token_type_count is not UINT32"));
+        }
+        if matches!(model, "none" | "no_vocab") {
+            return Self::without_vocabulary(m);
+        }
         let family = match model {
             "llama" => VocabType::Spm,
             "bert" => VocabType::Wpm,
+            "t5" => VocabType::Ugm,
+            "rwkv" => VocabType::Rwkv,
+            "plamo2" => VocabType::Plamo2,
+            "plamo3" => VocabType::Plamo3,
+            "test" => VocabType::Test,
             "gpt2" | "hybriddna" | "whitespace" | "gemma4" => VocabType::Bpe,
             other => {
                 return Err(Error::Unsupported(format!(
-                    "family {other}; implemented families are llama/SPM, bert/WordPiece, and GPT-2/BPE"
+                    "unknown tokenizer family {other}"
                 )));
             }
         };
@@ -106,27 +213,13 @@ impl Tokenizer {
         } else {
             None
         };
-        let words = m
-            .get("tokenizer.ggml.tokens")
-            .and_then(Value::as_array)
+        let words = typed_array(m, "tokenizer.ggml.tokens", &[8])?
             .ok_or_else(|| invalid("missing token array"))?;
         if words.is_empty() || words.len() > 1_000_000 {
             return Err(invalid("vocabulary size must be 1..=1000000"));
         }
-        let scores = match m.get("tokenizer.ggml.scores") {
-            Some(v) => Some(
-                v.as_array()
-                    .ok_or_else(|| invalid("scores is not an array"))?,
-            ),
-            None => None,
-        };
-        let kinds = match m.get("tokenizer.ggml.token_type") {
-            Some(v) => Some(
-                v.as_array()
-                    .ok_or_else(|| invalid("token_type is not an array"))?,
-            ),
-            None => None,
-        };
+        let scores = typed_array(m, "tokenizer.ggml.scores", &[5, 6])?;
+        let kinds = typed_array(m, "tokenizer.ggml.token_type", &[5])?;
         if scores.is_some_and(|v| v.len() < words.len())
             || kinds.is_some_and(|v| v.len() < words.len())
         {
@@ -139,6 +232,9 @@ impl Tokenizer {
             let mut text = w
                 .as_str()
                 .ok_or_else(|| invalid("non-string vocabulary entry"))?
+                .split('\0')
+                .next()
+                .unwrap()
                 .to_owned();
             if text.is_empty() {
                 text = format!("[EMPTY_{i}]")
@@ -151,8 +247,8 @@ impl Tokenizer {
                 }
                 None => 0.,
             };
-            if !score.is_finite() {
-                return Err(invalid("non-finite token score"));
+            if family == VocabType::Spm && !score.is_finite() {
+                return Err(invalid("non-finite SentencePiece merge score"));
             }
             let kind = match kinds {
                 Some(k) => {
@@ -161,13 +257,17 @@ impl Tokenizer {
                 }
                 None => 1,
             };
-            if !(0..=6).contains(&kind) {
-                return Err(invalid("token type outside 0..=6"));
-            }
+            // Unknown source token-type integers map to UNDEFINED attributes.
+            let kind = if (0..=6).contains(&kind) { kind } else { 0 };
             if kind == 6 {
-                let byte = parse_byte_token(&text)
-                    .ok_or_else(|| invalid(format!("invalid byte token {text}")))?;
-                byte_ids[byte as usize] = Some(i as i32);
+                match parse_byte_token(&text) {
+                    Some(byte) => byte_ids[byte as usize] = Some(i as i32),
+                    None if matches!(
+                        family,
+                        VocabType::Rwkv | VocabType::Test | VocabType::Plamo2 | VocabType::Plamo3
+                    ) => {}
+                    None => return Err(invalid(format!("invalid byte token {text}"))),
+                }
             }
             if lookup.insert(text.clone(), i as i32).is_some() {
                 return Err(invalid(format!("duplicate vocabulary token {text}")));
@@ -179,6 +279,21 @@ impl Tokenizer {
                 attributes: attributes_from_kind(kind),
             });
         }
+        let ugm = if family == VocabType::Ugm {
+            Some(ugm::Ugm::from_metadata(m, &tokens)?)
+        } else {
+            None
+        };
+        let rwkv = if family == VocabType::Rwkv {
+            Some(rwkv::Rwkv::new(&tokens)?)
+        } else {
+            None
+        };
+        let plamo = if matches!(family, VocabType::Plamo2 | VocabType::Plamo3) {
+            Some(plamo::Plamo::new(&tokens, family == VocabType::Plamo3)?)
+        } else {
+            None
+        };
         let bool_value = |key: &str, default: bool| -> Result<bool> {
             match m.get(key) {
                 None => Ok(default),
@@ -196,10 +311,11 @@ impl Tokenizer {
             let Some(value) = m.get(key) else {
                 return Ok(fallback);
             };
-            let value = value
-                .as_i64()
-                .ok_or_else(|| invalid(format!("{key} is not integer")))?;
-            if value < 0 || value as u64 >= tokens.len() as u64 {
+            let Value::U32(value) = value else {
+                return Err(invalid(format!("{key} is not UINT32")));
+            };
+            let value = *value;
+            if value as u64 >= tokens.len() as u64 {
                 // The frozen loader ignores out-of-range optional overrides
                 // for every family, including the UINT32_MAX sentinel in
                 // pretrained SPM metadata, and retains its source default.
@@ -212,6 +328,8 @@ impl Tokenizer {
             "tokenizer.ggml.bos_token_id",
             match family {
                 VocabType::Spm => 1,
+                VocabType::None | VocabType::Ugm | VocabType::Rwkv | VocabType::Test => -1,
+                VocabType::Plamo2 | VocabType::Plamo3 => 1,
                 VocabType::Wpm => 101,
                 VocabType::Bpe => {
                     if bpe.as_ref().unwrap().gemma_defaults || bpe.as_ref().unwrap().config.bos_null
@@ -227,6 +345,9 @@ impl Tokenizer {
             "tokenizer.ggml.eos_token_id",
             match family {
                 VocabType::Spm => 2,
+                VocabType::Ugm => 1,
+                VocabType::None | VocabType::Rwkv | VocabType::Test => -1,
+                VocabType::Plamo2 | VocabType::Plamo3 => 2,
                 VocabType::Wpm => -1,
                 VocabType::Bpe => {
                     if bpe.as_ref().unwrap().gemma_defaults {
@@ -241,6 +362,9 @@ impl Tokenizer {
             "tokenizer.ggml.unknown_token_id",
             match family {
                 VocabType::Spm => 0,
+                VocabType::Ugm => 2,
+                VocabType::None | VocabType::Rwkv | VocabType::Test => -1,
+                VocabType::Plamo2 | VocabType::Plamo3 => 0,
                 VocabType::Wpm => 100,
                 VocabType::Bpe => -1,
             },
@@ -251,7 +375,13 @@ impl Tokenizer {
         )?;
         let pad_id = optional_id(
             "tokenizer.ggml.padding_token_id",
-            if family == VocabType::Wpm { 0 } else { -1 },
+            if matches!(family, VocabType::Wpm | VocabType::Ugm) {
+                0
+            } else if matches!(family, VocabType::Plamo2 | VocabType::Plamo3) {
+                3
+            } else {
+                -1
+            },
         )?;
         let mask_id = optional_id(
             "tokenizer.ggml.mask_token_id",
@@ -259,7 +389,8 @@ impl Tokenizer {
         )?;
         let mut add_bos = bool_value(
             "tokenizer.ggml.add_bos_token",
-            bpe.as_ref().is_none_or(|b| b.config.add_bos),
+            matches!(family, VocabType::Spm | VocabType::Wpm)
+                || bpe.as_ref().is_some_and(|b| b.config.add_bos),
         )?;
         if bpe
             .as_ref()
@@ -267,7 +398,7 @@ impl Tokenizer {
         {
             add_bos = true;
         }
-        let add_eos = bool_value("tokenizer.ggml.add_eos_token", false)?;
+        let add_eos = bool_value("tokenizer.ggml.add_eos_token", family == VocabType::Ugm)?;
         let add_sep = bool_value(
             "tokenizer.ggml.add_sep_token",
             family == VocabType::Wpm || bpe.as_ref().is_some_and(|b| b.config.add_sep),
@@ -283,9 +414,33 @@ impl Tokenizer {
             bpe.as_ref().is_none_or(|b| b.config.lowercase),
         )?;
         let strip_accents = bool_value("tokenizer.ggml.normalizer.strip_accents", lowercase)?;
-        if family != VocabType::Bpe && m.contains_key("tokenizer.ggml.precompiled_charsmap") {
-            return Err(Error::Unsupported("precompiled normalization map".into()));
+        // These keys are typed and validated by the source for every family,
+        // including families whose tokenizer does not consume the setting.
+        bool_value("tokenizer.ggml.normalizer.nfc", false)?;
+        bool_value("tokenizer.ggml.remove_extra_whitespaces", false)?;
+        bool_value("tokenizer.ggml.dna_auto_tags", false)?;
+        if let Some(value) = m.get("tokenizer.ggml.metaspace.prepend_scheme") {
+            match value.as_str().map(|text| text.split('\0').next().unwrap()) {
+                Some("never" | "first" | "always") => {}
+                Some(other) => {
+                    return Err(invalid(format!("unknown metaspace prepend scheme {other}")));
+                }
+                None => return Err(invalid("metaspace prepend scheme is not STRING")),
+            }
         }
+
+        let token_type_count = m
+            .get("tokenizer.ggml.token_type_count")
+            .and_then(Value::as_u64)
+            .unwrap_or(0) as u32;
+        let suppressed_tokens = typed_array(m, "tokenizer.ggml.suppress_tokens", &[5])?
+            .unwrap_or(&[])
+            .iter()
+            .filter_map(|value| {
+                let id = value.as_i64().unwrap() as i32;
+                (id >= 0 && (id as usize) < tokens.len()).then_some(id)
+            })
+            .collect();
         let mut native_order = None;
         let mut inferred_control = Vec::new();
         let mut resolve =
@@ -554,7 +709,12 @@ impl Tokenizer {
         }
         let mut result = Self {
             family,
+            token_type_count,
+            suppressed_tokens,
             bpe,
+            ugm,
+            rwkv,
+            plamo,
             max_token_len,
             lowercase,
             strip_accents,
@@ -585,8 +745,13 @@ impl Tokenizer {
             eog,
         };
         result.newline_id = match family {
+            VocabType::None => -1,
             VocabType::Spm => result.byte_ids[10].unwrap_or(-1),
             VocabType::Wpm => 0,
+            VocabType::Ugm => result.ugm.as_ref().unwrap().newline(&result)?,
+            VocabType::Rwkv => result.rwkv.as_ref().unwrap().newline()?,
+            VocabType::Plamo2 | VocabType::Plamo3 => result.plamo.as_ref().unwrap().newline()?,
+            VocabType::Test => 10 % result.tokens.len() as i32,
             VocabType::Bpe => result.bpe.as_ref().unwrap().newline(&result),
         };
         Ok(result)
@@ -598,10 +763,20 @@ impl Tokenizer {
     pub fn metaspace_prepend_first(&self) -> bool {
         self.bpe.as_ref().is_some_and(|bpe| bpe.metaspace_first)
     }
+    /// Model-specific IDs in native order; invalid IDs were dropped on load.
+    pub fn suppressed_tokens(&self) -> &[i32] {
+        &self.suppressed_tokens
+    }
+    pub fn token_type_count(&self) -> u32 {
+        self.token_type_count
+    }
     pub fn vocab_type(&self) -> VocabType {
         self.family
     }
     pub fn token_attributes(&self, id: i32) -> Option<u32> {
+        if self.family == VocabType::None {
+            return None;
+        }
         usize::try_from(id)
             .ok()
             .and_then(|index| self.tokens.get(index))
@@ -612,6 +787,9 @@ impl Tokenizer {
     }
     /// Normalized vocabulary entry; kind uses frozen LLAMA_TOKEN_TYPE values.
     pub fn token_info(&self, id: i32) -> Option<(&str, f32, i32)> {
+        if self.family == VocabType::None {
+            return None;
+        }
         usize::try_from(id)
             .ok()
             .and_then(|i| self.tokens.get(i))
@@ -633,6 +811,9 @@ impl Tokenizer {
         add_special: bool,
         parse_special: bool,
     ) -> Result<Vec<i32>> {
+        if self.family == VocabType::None {
+            return Err(Error::Unsupported("model has no tokenizer".into()));
+        }
         if text.len() > MAX_INPUT_BYTES {
             return Err(Error::Limit("input exceeds 4 MiB".into()));
         }
@@ -688,7 +869,10 @@ impl Tokenizer {
             fragments = next;
         }
         let mut output = Vec::new();
-        if add_special && (self.family == VocabType::Wpm || self.add_bos) {
+        if add_special
+            && !matches!(self.family, VocabType::Rwkv | VocabType::Test)
+            && (self.family == VocabType::Wpm || self.add_bos)
+        {
             if self.bos_id < 0 {
                 return Err(invalid("add_special requires a valid BOS token"));
             }
@@ -702,6 +886,27 @@ impl Tokenizer {
                     previous_special = true;
                 }
                 Fragment::Text(text) => {
+                    if let Some(plamo) = &self.plamo {
+                        plamo.tokenize(text, &mut output)?;
+                        continue;
+                    }
+                    if self.family == VocabType::Test {
+                        for chunk in text.chunks(5) {
+                            let hash = chunk.iter().fold(0u64, |hash, &byte| {
+                                hash.wrapping_mul(31).wrapping_add(u64::from(byte))
+                            });
+                            output.push((hash % self.tokens.len() as u64) as i32);
+                        }
+                        continue;
+                    }
+                    if let Some(rwkv) = &self.rwkv {
+                        rwkv.tokenize(text, self.unk_id, &mut output)?;
+                        continue;
+                    }
+                    if let Some(ugm) = &self.ugm {
+                        ugm.tokenize(self, text, &mut output)?;
+                        continue;
+                    }
                     if let Some(bpe) = &self.bpe {
                         let mut prepared = if bpe.config.escape_whitespaces {
                             escape_spaces(text)
@@ -731,7 +936,7 @@ impl Tokenizer {
                 }
             }
         }
-        if add_special {
+        if add_special && !matches!(self.family, VocabType::Rwkv | VocabType::Test) {
             if self.family == VocabType::Wpm {
                 if self.sep_id < 0 {
                     return Err(invalid("add_special requires a valid SEP token"));
@@ -908,10 +1113,30 @@ impl Tokenizer {
         Ok(())
     }
     pub fn token_piece(&self, id: i32, special: bool) -> Result<Vec<u8>> {
+        if self.family == VocabType::None {
+            return Err(Error::Unsupported("model has no token pieces".into()));
+        }
         let token = usize::try_from(id)
             .ok()
             .and_then(|i| self.tokens.get(i))
             .ok_or_else(|| invalid(format!("token ID {id} is outside vocabulary")))?;
+        if !special && token.attributes & (1 | 8) != 0 {
+            return Ok(Vec::new());
+        }
+        if self.family == VocabType::Rwkv {
+            return Ok(rwkv::unescape(token.text.as_bytes()));
+        }
+        if matches!(self.family, VocabType::Plamo2 | VocabType::Plamo3) {
+            return Ok(if token.attributes & 32 != 0 {
+                parse_byte_token(&token.text)
+                    .map_or_else(|| token.text.as_bytes().to_vec(), |byte| vec![byte])
+            } else {
+                token.text.as_bytes().to_vec()
+            });
+        }
+        if self.family == VocabType::Test {
+            return Ok(format!("{id:x}").into_bytes());
+        }
         Ok(match token.kind {
             2 | 3 if !special => vec![],
             2..=4 => token.text.as_bytes().to_vec(),
@@ -935,6 +1160,9 @@ impl Tokenizer {
         remove_special: bool,
         unparse_special: bool,
     ) -> Result<Vec<u8>> {
+        if self.family == VocabType::None {
+            return Ok(Vec::new());
+        }
         if tokens.len() > MAX_INPUT_BYTES {
             return Err(Error::Limit("token sequence too long".into()));
         }
@@ -972,6 +1200,27 @@ impl Tokenizer {
         }
         Ok(result)
     }
+}
+
+fn typed_array<'a>(
+    metadata: &'a BTreeMap<String, Value>,
+    key: &str,
+    types: &[u32],
+) -> Result<Option<&'a [Value]>> {
+    let Some(value) = metadata.get(key) else {
+        return Ok(None);
+    };
+    let Value::Array {
+        element_type,
+        values,
+    } = value
+    else {
+        return Err(invalid(format!("{key} is not ARRAY")));
+    };
+    if !types.contains(element_type) || values.iter().any(|v| v.type_id() != *element_type) {
+        return Err(invalid(format!("{key} has invalid array element type")));
+    }
+    Ok(Some(values))
 }
 
 fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {

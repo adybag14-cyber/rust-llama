@@ -218,13 +218,41 @@ impl LlamaModel {
     }
     pub(crate) fn step(
         &self,
-        mut hidden: Vec<f32>,
+        hidden: Vec<f32>,
         position: usize,
         cache: &mut [KvLayer],
         adapters: &AdapterSet,
         cancel: &mut impl FnMut() -> bool,
     ) -> Result<(Vec<f32>, Vec<f32>)> {
+        let width = self.config.kv_width()?;
+        let insertion = cache.first().map_or(0, |layer| layer.keys.len() / width);
+        self.step_inserting(hidden, position, cache, insertion, adapters, cancel)
+    }
+    // A physical native KV hole can precede already populated cells. Preserve
+    // source accumulation order by inserting the new row at that exact index.
+    pub(crate) fn step_inserting(
+        &self,
+        mut hidden: Vec<f32>,
+        position: usize,
+        cache: &mut [KvLayer],
+        insertion: usize,
+        adapters: &AdapterSet,
+        cancel: &mut impl FnMut() -> bool,
+    ) -> Result<(Vec<f32>, Vec<f32>)> {
         let c = &self.config;
+        let width = c.kv_width()?;
+        let offset = insertion
+            .checked_mul(width)
+            .ok_or_else(|| Error::InvalidState("KV insertion offset overflow".into()))?;
+        if cache.len() != self.layer_count()
+            || cache.iter().any(|layer| {
+                layer.keys.len() != layer.values.len()
+                    || !layer.keys.len().is_multiple_of(width)
+                    || offset > layer.keys.len()
+            })
+        {
+            return Err(Error::InvalidState("invalid KV insertion shape".into()));
+        }
         let head_dim = c.head_dim()?;
         let scale = c
             .attention_scale
@@ -245,8 +273,8 @@ impl LlamaModel {
             math::bias(&mut v, &layer.value_bias);
             math::rope(&mut q, c.head_dim()?, position, c.rope_base);
             math::rope(&mut k, c.head_dim()?, position, c.rope_base);
-            kv.keys.extend(k);
-            kv.values.extend(v);
+            kv.keys.splice(offset..offset, k);
+            kv.values.splice(offset..offset, v);
             let attention = math::attention(
                 &q,
                 &kv.keys,

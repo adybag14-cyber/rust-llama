@@ -1,5 +1,5 @@
 //! Dense BERT GGUF loader, following the frozen src/models/bert.cpp names/shapes.
-use crate::loader::{bias, details, float, matrix, uint, unsupported, vector};
+use crate::loader::{bias, details, float, matrix, split_count, uint, unsupported, vector};
 use crate::{Error, Executor, LoadOptions, Model, Result};
 use llama_gguf::{Gguf, Value};
 use llama_model_runtime::{BertConfig, BertLayer, BertModel, BertWeights, Pooling};
@@ -13,7 +13,7 @@ pub(crate) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
     {
         return Err(unsupported(format!("GGUF general.type={t}")));
     }
-    if uint(m, "split.count", Some(1))? > 1 {
+    if split_count(m)? > 1 {
         return Err(unsupported("split GGUF model loading"));
     }
     if m.get("tokenizer.ggml.model").and_then(Value::as_str) != Some("bert") {
@@ -38,7 +38,7 @@ pub(crate) fn load(mut g: Gguf<File>, path: &Path, options: &LoadOptions) -> Res
             "invalid BERT embedding/head dimensions".into(),
         ));
     }
-    if layers == 0 || layers > 4096 || token_types == 0 || train_context == 0 {
+    if layers == 0 || layers > 512 || token_types == 0 || train_context == 0 {
         return Err(Error::Invalid(
             "invalid BERT layer, token-type or context count".into(),
         ));

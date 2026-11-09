@@ -1,0 +1,50 @@
+{
+  "status": "succeeded",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-inference"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "native_reference",
+        "trained_smollm2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

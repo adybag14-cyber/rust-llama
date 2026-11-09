@@ -1,12 +1,15 @@
 use crate::*;
-use llama_model_runtime::{BatchToken, Context, ContextOptions, Error, Input, OutputSelection};
+use llama_model_runtime::{
+    Error, Input, NativeBatchToken, NativeContext, NativeContextOptions, OutputSelection,
+};
 use std::collections::BTreeMap;
 use std::ffi::c_void;
 
 pub struct ContextHandle {
     // A distinct borrowed handle preserves model access after its original owner is freed.
     model_handle: Box<ModelHandle>,
-    runtime: Context,
+    pub(crate) runtime: NativeContext,
+    pub(crate) state_snapshots: BTreeMap<i32, Vec<u8>>,
     n_ctx: u32,
     n_ctx_seq: u32,
     n_batch: u32,
@@ -74,18 +77,13 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     {
         return Err("evaluation callbacks, backend samplers, shared/MTP contexts, MoE caches and nondefault output limits are not implemented".into());
     }
-    if p.no_perf == 0 || p.kv_unified != 0 {
-        return Err("performance counters and unified KV buffers are not implemented".into());
+    if p.no_perf == 0 {
+        return Err("performance counters are not implemented".into());
     }
-    if p.n_threads <= 0 || p.n_threads_batch <= 0 {
-        return Err("thread counts must be positive".into());
+    if p.n_threads != 1 || p.n_threads_batch != 1 {
+        return Err("the current scalar executor requires exactly one worker thread".into());
     }
-    if p.n_seq_max == 0
-        || p.n_seq_max > 256
-        || p.n_batch == 0
-        || p.n_batch > 65536
-        || p.n_ubatch == 0
-    {
+    if p.n_seq_max == 0 || p.n_seq_max > 256 || p.n_batch == 0 || p.n_batch > 65536 {
         return Err("invalid context sequence/batch limits".into());
     }
     let n_ctx = if p.n_ctx == 0 {
@@ -93,27 +91,30 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     } else {
         p.n_ctx
     };
-    let n_ctx_seq = n_ctx / p.n_seq_max;
-    if n_ctx_seq == 0 || n_ctx_seq > data.train_context as u32 {
-        return Err("per-sequence context must be between 1 and the model training context".into());
-    }
-    let n_ctx = n_ctx_seq
-        .checked_mul(p.n_seq_max)
-        .ok_or("context length overflow")?;
     let n_batch = p.n_batch.min(n_ctx);
-    let n_ubatch = p.n_ubatch.min(n_batch);
-    let runtime = Context::new(
+    let n_ubatch = (if p.n_ubatch == 0 {
+        p.n_batch
+    } else {
+        p.n_ubatch
+    })
+    .min(n_batch);
+    let runtime = NativeContext::new(
         loaded.runtime_model().map_err(|e| e.to_string())?,
-        ContextOptions {
+        NativeContextOptions {
+            context_tokens: n_ctx as usize,
             maximum_sequences: p.n_seq_max as usize,
             microbatch_tokens: n_ubatch as usize,
             maximum_batch_tokens: n_batch as usize,
+            unified: p.kv_unified != 0,
         },
     )
     .map_err(|e| e.to_string())?;
+    let n_ctx = runtime.context_tokens() as u32;
+    let n_ctx_seq = runtime.context_tokens_per_sequence() as u32;
     Ok(Box::into_raw(Box::new(ContextHandle {
         model_handle: Box::new(ModelHandle { data, owned: false }),
         runtime,
+        state_snapshots: BTreeMap::new(),
         n_ctx,
         n_ctx_seq,
         n_batch,
@@ -320,35 +321,34 @@ unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> 
     let mut next = BTreeMap::<i32, usize>::new();
     let mut runtime_batch = Vec::with_capacity(n);
     for i in 0..n {
-        let sequence = if let (Some(counts), Some(ids)) = (seq_counts, seq_ids) {
-            if counts[i] != 1 {
-                return Err("shared-token sequence lists are not yet supported; each token must have exactly one sequence".into());
+        let sequences = if let (Some(counts), Some(ids)) = (seq_counts, seq_ids) {
+            let number = count(counts[i])?;
+            if number == 0 || number > c.n_seq_max as usize {
+                return Err("invalid per-token sequence count".into());
             }
-            *unsafe { reference(ids[i])? }
+            unsafe { input_slice(ids[i], number)? }.to_vec()
         } else {
-            0
+            vec![0]
         };
-        if sequence < 0 || sequence >= c.n_seq_max as i32 {
-            return Err("batch sequence id exceeds configured n_seq_max".into());
+        let sequence = sequences[0];
+        for &id in &sequences {
+            if id < 0 || id as usize >= c.runtime.sequence_id_limit() {
+                return Err("batch sequence ID exceeds the configured native memory limit".into());
+            }
         }
-        let expected = *next
-            .entry(sequence)
-            .or_insert_with(|| c.runtime.next_position(sequence).unwrap_or(0));
+        let expected = *next.entry(sequence).or_insert(
+            c.runtime
+                .next_position(sequence)
+                .map_err(|e| e.to_string())? as usize,
+        );
         let position = if let Some(pos) = positions {
-            count(pos[i])?
+            usize::try_from(pos[i]).map_err(|_| "negative token position")?
         } else {
             expected
         };
-        if position != expected {
-            return Err(format!(
-                "sequence {sequence} expected position {expected}, got {position}"
-            ));
+        for &id in &sequences {
+            next.insert(id, position + 1);
         }
-        if position >= c.n_ctx_seq as usize {
-            set_error("sequence context is full");
-            return Ok(1);
-        }
-        next.insert(sequence, position + 1);
         let input = if let Some(tokens) = tokens {
             Input::Token(u32::try_from(tokens[i]).map_err(|_| "negative token id")?)
         } else {
@@ -362,9 +362,9 @@ unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> 
         } else {
             OutputSelection::Logits
         };
-        runtime_batch.push(BatchToken {
-            sequence,
-            position,
+        runtime_batch.push(NativeBatchToken {
+            sequences,
+            position: i32::try_from(position).map_err(|_| "position exceeds INT32_MAX")?,
             input,
             output,
         });

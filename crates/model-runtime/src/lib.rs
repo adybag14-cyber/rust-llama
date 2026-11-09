@@ -1,9 +1,11 @@
-//! T05 model/runtime progress: checked, owned F32 model slices in Rust.
+//! Owned Llama, Mamba-1 and BERT execution in native Rust.
 //!
-//! The Llama, Mamba-1 and BERT paths execute real source-derived equations, but
-//! do not claim full family coverage or a compatible llama public ABI. They use
-//! a scalar validation executor until T02/T03/T04 are integrated. No original
-//! llama/ggml object or external numerical library is linked into this crate.
+//! Dense and packed quantized matrix paths execute source-derived equations.
+//! The strict sequential Context API and the separately bounded NativeContext
+//! compatibility cache have distinct state contracts. The latter supports the
+//! measured partial C ABI in llama-ffi; neither API claims every architecture,
+//! cache type or backend from the frozen source. No original llama/ggml object
+//! or external numerical library is linked into this crate.
 #![forbid(unsafe_code)]
 
 pub mod adapters;
@@ -19,7 +21,8 @@ mod state;
 pub use adapters::{AdapterSet, Lora};
 pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
 pub use context::{
-    BatchToken, Context, ContextCheckpoint, ContextOptions, Input, OutputSelection, TokenOutput,
+    BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
+    NativeContextOptions, NativeState, OutputSelection, TokenOutput,
 };
 pub use fixtures::{SmokeReport, smoke_demo};
 pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};

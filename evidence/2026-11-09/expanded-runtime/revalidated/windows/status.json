@@ -1,0 +1,156 @@
+{
+  "status": "failed",
+  "platform": "windows",
+  "started_at_utc": "2026-11-09T15:22:58.363039+00:00",
+  "parent_commit": "abffdc84cb01bc69a02cc32599be0ba68221f2d0",
+  "execution_inputs_before": {
+    "files": 396,
+    "sha256": "050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.8475628000014694
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 57.784599999999045,
+      "tests": {
+        "passed": 384,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 68.5486383000025,
+      "tests": {
+        "passed": 384,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.2623611000017263
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 6.6474715000003926
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 5.712189300000318
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 19.66077740000037
+    },
+    {
+      "name": "embedding-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\verify-embedding-cli.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.4441058999982488
+    },
+    {
+      "name": "decoder-cli",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\verify-decoder-cli.py"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "seconds": 0.13504910000119708
+    }
+  ],
+  "qualification": "Fresh integrated tokenizer, scalar tensor, Mamba and native context checkpoint; no result reuse from focused drafts",
+  "execution_inputs_at_failure": {
+    "files": 396,
+    "sha256": "050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  }
+}

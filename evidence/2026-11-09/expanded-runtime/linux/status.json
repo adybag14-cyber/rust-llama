@@ -1,0 +1,106 @@
+{
+  "status": "failed",
+  "platform": "linux",
+  "started_at_utc": "2026-11-09T15:17:11.311969+00:00",
+  "parent_commit": "abffdc84cb01bc69a02cc32599be0ba68221f2d0",
+  "execution_inputs_before": {
+    "files": 396,
+    "sha256": "4748829b39a1b6131ed46d22f13416d6e99b04b0ca4f1b1b541473a7f6f7be86",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 4.127594573001261
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 57.66751906799982,
+      "tests": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 127.62792684799933,
+      "tests": {
+        "passed": 385,
+        "failed": 0,
+        "ignored": 17,
+        "suites": 70
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 5.881880250002723
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "seconds": 10.342217352001171
+    }
+  ],
+  "qualification": "Fresh integrated tokenizer, scalar tensor, Mamba and native context checkpoint; no result reuse from focused drafts",
+  "execution_inputs_at_failure": {
+    "files": 396,
+    "sha256": "4748829b39a1b6131ed46d22f13416d6e99b04b0ca4f1b1b541473a7f6f7be86",
+    "scope": "Rust sources, Cargo/compiler/configuration inputs, CI workflow, numerical/tokenizer fixture data and provenance; excludes mutable evidence and prose documents"
+  }
+}

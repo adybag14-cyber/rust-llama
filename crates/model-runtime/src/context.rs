@@ -333,3 +333,6 @@ impl Context {
         crate::state::decode(self, bytes)
     }
 }
+
+mod native;
+pub use native::{NativeBatchToken, NativeContext, NativeContextOptions, NativeState};

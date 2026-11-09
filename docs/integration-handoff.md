@@ -1,4 +1,16 @@
-# T09–T12 integration handoff
+# Historical T09–T12 integration handoff
+
+> **Historical imported snapshot.** The sections below describe the standalone
+> T09–T12 archive before integration. Statements about missing tracks, an
+> unavailable model runtime and future provider wiring apply to that archive,
+> not to the current repository. The current server loads supported GGUF models
+> and executes CPU generation and BERT embeddings. See [current port status](PORT_STATUS.md),
+> the [server contract](../crates/llama-server/README.md), the
+> [target matrix](target-and-runtime-matrix.md) and
+> [expanded runtime verification](../evidence/2026-11-09/expanded-runtime/README.md).
+> The [import manifest](imports/manifest.json) preserves the archive identities.
+> This historical handoff does not replace the complete port requirements or
+> the active [release gates](../release/gates.tsv).
 
 ## Scope and source identity
 

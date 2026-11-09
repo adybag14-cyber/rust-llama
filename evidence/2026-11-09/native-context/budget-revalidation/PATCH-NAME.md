@@ -1,0 +1,1 @@
+The unified Rust source review patch is preserved byte-for-byte as native-budget-fix.diff.txt. Its original external filename was native-budget-fix.diff; the text suffix classifies the non-executable review artifact under the existing evidence-document rule. SHA-256: 6450b55e689e4759ccbe1d90d1cbc1fa8466e03617dc1e04bcb6a5070ba61e5e

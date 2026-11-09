@@ -208,6 +208,9 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
         "starcoder2",
         "qwen2",
         "gemma4",
+        "nomic-bert-moe",
+        "baichuan",
+        "phi3",
     ]
     .contains(&architecture)
     {
@@ -222,10 +225,16 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
         );
     }
     let tokenizer = Tokenizer::from_metadata(m).map_err(|e| e.to_string())?;
-    let mut texts = Vec::with_capacity(tokenizer.vocabulary_size());
+    // NONE has a nominal vocabulary count but no token data in the frozen API.
+    let stored_tokens = if tokenizer.vocab_type() as i32 == 0 {
+        0
+    } else {
+        tokenizer.vocabulary_size()
+    };
+    let mut texts = Vec::with_capacity(stored_tokens);
     let mut scores = Vec::with_capacity(texts.capacity());
     let mut attrs = Vec::with_capacity(texts.capacity());
-    for id in 0..tokenizer.vocabulary_size() {
+    for id in 0..stored_tokens {
         let (text, score, _) = tokenizer
             .token_info(id as i32)
             .ok_or("missing vocabulary item")?;
@@ -473,8 +482,9 @@ ffi!(
         Ok(
             match unsafe { reference(model)? }.data.architecture.as_str() {
                 "gpt2" | "mpt" | "refact" => -1,
-                "llama" | "command-r" => 0,
-                "bert" | "gptneox" | "falcon" | "starcoder2" | "qwen2" | "gemma4" => 2,
+                "llama" | "command-r" | "baichuan" => 0,
+                "bert" | "gptneox" | "falcon" | "starcoder2" | "qwen2" | "gemma4"
+                | "nomic-bert-moe" | "phi3" => 2,
                 _ => return Err("unsupported model RoPE classification".into()),
             },
         )

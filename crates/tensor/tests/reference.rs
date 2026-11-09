@@ -227,7 +227,7 @@ fn cancellation_and_unrelated_branches_do_not_change_inputs() {
     let input = Tensor::from_f32([4, 1, 1, 1], &[1., 2., 3., 4.]).unwrap();
     let mut graph = Graph::new();
     let a = graph.input(input.clone());
-    let pending = graph.op(Op::Unary(UnaryOp::GELU_ERF), &[a]).unwrap();
+    let pending = graph.op(Op::Unary(UnaryOp::XIELU), &[a]).unwrap();
     let target = graph.op(Op::Square, &[a]).unwrap();
     assert!(matches!(
         graph.evaluate(pending),

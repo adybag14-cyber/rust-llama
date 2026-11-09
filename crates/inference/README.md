@@ -6,12 +6,13 @@ This crate connects checked GGUF loading, native tokenizers and the Rust model r
 
 | GGUF architecture | Tokenizer | Current high-level execution |
 | --- | --- | --- |
-| `llama` | Llama SentencePiece | Dense autoregressive generation and complete per-token logits, standard adjacent-pair RoPE without scaling, F32 KV state. |
+| `llama` | Llama SentencePiece or native BPE | Dense autoregressive generation and complete per-token logits, standard adjacent-pair RoPE without scaling, F32 KV state. |
 | `bert` | BERT WordPiece | Dense bidirectional encoding, complete token embeddings and none/mean/first/last pooling. |
+| `mamba` | Native tokenizer metadata; SPM and BPE independently exercised | Mamba-1 causal convolution and selective recurrence, tied or separate output weights, optional unweighted dt/B/C RMS normalization. |
 
-Typed Mamba execution exists in `llama-model-runtime`; this facade does not yet load Mamba GGUF. Other architectures, unsupported tensor arrangements and unimplemented options return explicit errors. The full upstream architecture and runtime contract remains open.
+Mamba-1 loading validates source tensor names and dimensions before constructing its owned recurrent state. Convolution and SSM A tensors require the source CPU kernel's F32 storage. The frozen loader does not load optional dt/B/C normalization weight tensors; its metadata flag selects unweighted normalization. Other architectures, unsupported tensor arrangements and unimplemented options return explicit errors. The full upstream architecture and runtime contract remains open.
 
-All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The current pretrained corpus exercises F32 and Q4_0 Llama and F16 BERT.
+All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The pretrained corpus exercises F32 and Q4_0 Llama, BPE/Q4_K_M SmolLM2, F16 Mamba-1 and F16 BERT.
 
 ## Loading and memory
 
@@ -62,6 +63,8 @@ The Windows scalar checks record:
 
 - Six F32 Llama prompts: 62,976 logits and 96 greedy token IDs, now bit-identical after matching the original F32-product/F64-sum reduction.
 - Q4_0 Llama: 640,000 logits and 16 greedy token IDs, bit-identical with the original packed activation arithmetic.
+- BPE/Q4_K_M SmolLM2-135M: three prompts, 1,671,168 logits and 24 greedy token IDs, bit-identical on Windows and Linux.
+- F16 Mamba-130M: three prompts, 1,709,520 logits and 24 greedy token IDs, bit-identical on Windows; Linux maximum absolute error is 0.00008940696716308594, within the same fixed budget.
 - F16 BERT: three prompts, 25 token vectors and nine pooled vectors, totaling 13,056 values, bit-identical after the attention and pooling corrections.
 - BERT diagnosis: all 122 captured stages of the first sequence match exactly; a committed independent attention fixture checks 46,080 output values across all 12 layers.
 
@@ -69,7 +72,7 @@ Portable model tests retain the declared tolerance `2e-4 + 2e-5 * abs(reference)
 
 The big-endian BERT regression compares an equivalent independently downloaded encoding with the same little-endian native outputs. The frozen C reader itself rejects that opposite-endian GGUF file, so this check is explicitly a Rust reader capability rather than a claim that the original reader loads it.
 
-Set `LLAMA_TEST_MODEL`, `LLAMA_TEST_Q4_MODEL`, `LLAMA_TEST_BERT_MODEL` and `LLAMA_TEST_BERT_BE_MODEL` to the pinned files, then run:
+Set `LLAMA_TEST_MODEL`, `LLAMA_TEST_Q4_MODEL`, `LLAMA_TEST_BPE_MODEL`, `LLAMA_TEST_MAMBA_MODEL`, `LLAMA_TEST_BERT_MODEL` and `LLAMA_TEST_BERT_BE_MODEL` to the pinned files, then run:
 
 ```sh
 cargo test --release --offline --locked -p llama-inference --tests -- --ignored --nocapture

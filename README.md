@@ -2,7 +2,7 @@
 
 A native Rust implementation of the functionality in the supplied `llama.cpp-master.zip`.
 
-**This is an active, incomplete port.** The repository builds and runs real pretrained Llama generation and BERT embedding models on its Rust CPU runtime, including packed Q4 inference. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
+**This is an active, incomplete port.** The repository builds and runs real pretrained Llama and Mamba-1 generation plus BERT embedding models on its Rust CPU runtime, including packed Q4 inference. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
 
 The authoritative source input is the 41,458,461-byte ZIP with SHA-256:
 
@@ -36,7 +36,7 @@ cargo run --release --offline --locked -p rust-llama-cli -- generate \
 
 On PowerShell, put the command on one line. Generated text is written to stdout; token counts and timing are written to stderr.
 
-The high-level generation loader supports dense `llama` models with the Llama SPM vocabulary, full adjacent-pair RoPE without scaling, and F32 KV storage. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
+The high-level generation loader supports dense `llama` models with native SPM or BPE tokenization, full adjacent-pair RoPE without scaling, and F32 KV storage. It also loads Mamba-1 GGUF models with causal convolution, selective recurrent state, optional dt/B/C RMS normalization and tied or separate output weights. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
 
 The runtime retains decoded F32 weights for row access and original packed bytes for native quantized matrix arithmetic. The default decoded-weight budget is 2 GiB; packed storage and runtime/cache allocations are additional. The default context bound is 1,024 tokens and is capped to the model's training limit. Generation is currently CPU-based; the separately verified CUDA and OpenCL kernel APIs are not yet a complete GPU model backend.
 
@@ -87,10 +87,10 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | Area | Executable implementation |
 | --- | --- |
 | Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
-| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, and independently compared scalar operators. |
-| Formats and vocabulary | Bounded GGUF v2/v3 reader, little-endian writer, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, and exhaustive frozen Unicode/UTF-8 behavior. |
-| Model runtime | Llama, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama and dense BERT. |
-| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 155 implemented frozen C API exports. |
+| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 62 executable operation IDs plus NONE input leaves, all scalar unary/GLU formulas for supported typed families, and 1,252 distinct native graph cases. |
+| Formats and vocabulary | Bounded GGUF v2/v3 reader, little-endian writer, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
+| Model runtime | Llama, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Mamba-1 and dense BERT. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 184 implemented frozen C API exports. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
 | Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
@@ -104,13 +104,16 @@ The recorded 9 November 2026 evidence includes:
 
 - **Pretrained F32 inference:** six prompts, 96 matching greedy token IDs and 62,976 logits, now bit-identical on the frozen Windows comparison after matching source scalar accumulation.
 - **Pretrained Q4_0 inference:** 640,000 logits across 20 rows matched the frozen Windows reference exactly after preserving the source's Q8 activation quantization. Sixteen greedy token IDs matched. The earlier failed all-F32 comparison remains recorded.
+- **Pretrained BPE/Q4_K_M inference:** 1,671,168 SmolLM2 logits and 24 generated IDs match exactly on Windows and Linux.
+- **Pretrained Mamba-1 inference:** 1,709,520 logits and 24 generated IDs match exactly on Windows. Linux preserves all generated IDs with maximum logit difference 0.00008940696716308594, inside the unchanged numerical budget. Three synthetic recurrent models provide ordinary independent loader and state regressions.
 - **BERT embeddings:** 13,056 token/pooled values exactly match the frozen Windows reference. All 122 captured stages of the diagnostic sequence match exactly; 46,080 independent attention outputs remain in the ordinary regression suite.
 - **Vocabulary behavior:** the preserved SPM/WordPiece corpora plus 1,499,449 complete BPE vocabulary records across all 14 original BPE models; 5,096 real-model token/piece/detokenization cases; 18,018 GPT-2 alias cases; 23,754 synthetic configuration cases; 22,518 raw-byte cases; 126,896 regex splits. All 64 reachable profiles and 99 aliases are covered on Windows and Linux. Source-inferred special IDs preserve the measured platform container ordering.
+- **Remaining tokenizer families:** Unigram, RWKV and PLaMo2/PLaMo3 have 91,476 synthetic family cases, 346,112 original vocabulary records, 10,412 real-vocabulary tokenization cases and 4,067,668 exact normalizer outputs. Invalid source assertion/nonprogress inputs return bounded errors. The no-vocabulary mode is explicit.
 - **Unicode behavior:** all 1,114,112 codepoints, 15,957 normalization sequences and 65,809 valid/malformed UTF-8 cases checked against the original source.
 - **Quant codecs and dots:** all 36 dtype layouts, exhaustive F16/BF16/F8 patterns, all 29 model quantizers, additional activation/conversion codecs, and complete scalar weight-dot inventory. The weighted/IQ extension adds 3,362 exact original-C encoder rows and 640 native tied-sort cases. Source-undefined payload/access cases have explicit safe behavior documented in the quant crate.
-- **Tensor graphs:** 65 independently executed frozen GGML graph cases.
+- **Tensor graphs:** 1,252 distinct independently executed frozen GGML graph cases, including 297 scalar extension cases and 890 indexing/casting/update cases. The indexing slice compares 599,152 output bytes exactly per platform and preserves 88 native MSVC/GNU sort-order differences. The scalar extension checks 256,233 exact outputs, 170,260 transcendental outputs and 96,910 independently rounded high-precision ERF values. Exact platform-specific erff parity remains open; the declared F16/BF16 conversion bounds and original failed comparisons are preserved.
 - **Actual devices:** 138 CUDA dispatches on RTX 4090 with zero recorded error; OpenCL kernel cases on RTX 4090 and AMD gfx1036 with recorded numerical bounds.
-- **C ABI:** 155 of 255 frozen exports, plus four diagnostic extensions, are exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. Prior core/sampler/WPM fixtures remain passing. The [coverage inventory](crates/ffi/COVERAGE.md) retains all 100 absent exports and the remaining semantic restrictions.
+- **C ABI:** 184 of 255 frozen exports, plus four diagnostic extensions, are exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Prior core/sampler/WPM fixtures remain passing. The [coverage inventory](crates/ffi/COVERAGE.md) retains all 71 absent exports and the remaining semantic restrictions.
 - **Server:** 37 real-model generation requests plus 283 independently captured embedding HTTP transcripts (256 tiny-model, 27 pretrained BGE). Windows output bits/base64 match exactly; Linux retains the fixed raw BERT bound with explicitly derived scaling bounds for normalization 0. Independent normalization checks cover 4,608 values. Real TCP lifecycle tests cover limits, provider failures, disconnects, shutdown and complete deadline errors.
 
 Evidence and qualifications are under [evidence/2026-11-09](evidence/2026-11-09). These results establish the exercised configurations, not all hardware, models or performance parity. Pretrained weights are not distributed in this repository; the tokenizer-only GGUF is test data with provenance.
@@ -126,7 +129,7 @@ cargo xtask audit
 cargo xtask fixtures
 ```
 
-Windows and Linux CI run these checks and separately download hash-pinned F32, Q4 and BERT model inputs for explicit numerical comparisons. Hardware/vendor tests retain their own explicit prerequisites. Windows records exact equality for the exercised model cases; Linux remains within the predefined portable limits, with Q4 also exact. See [fixtures/inference/README.md](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
+Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Mamba-1 and BERT model inputs for explicit numerical comparisons. Hardware/vendor tests retain their own explicit prerequisites. Windows records exact equality for the exercised model cases; Linux remains within the predefined portable limits, with Q4 also exact. See [fixtures/inference/README.md](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
 
 With the frozen source extracted separately:
 

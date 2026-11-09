@@ -1,5 +1,16 @@
 # T11: bounded Rust server transport checkpoint
 
+> **Historical imported snapshot.** This report describes the transport-only
+> T11 archive and its identified implementation checkpoint. Statements that the
+> executable has no model runtime, embeddings return 501 or template rendering
+> is disconnected apply to that earlier archive. The current implementation
+> performs supported GGUF generation and BERT embeddings; see the
+> [server contract](../crates/llama-server/README.md),
+> [current port status](PORT_STATUS.md) and
+> [expanded runtime verification](../evidence/2026-11-09/expanded-runtime/README.md).
+> Historical limitations and route tables are retained below as provenance;
+> the complete T11 requirements remain open under the [release gates](../release/gates.tsv).
+
 ## Status and scope
 
 This is a working transport checkpoint, not completion of Track T11. The crate

@@ -1,0 +1,13 @@
+{
+  "id": "job-1794235693713-55dfd9f3-32e",
+  "mode": "shell",
+  "command": "cmake --build build --config Release --parallel 2; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; New-Item -ItemType Directory -Force resource-debug,tiny-resource-debug,tiny-reference-final,native-reference-final | Out-Null; & .\\build\\Release\\context-next-oracle.exe '..\\build\\bin\\Release\\llama.dll' '..\\models\\stories260K.gguf' request.json native-reference-final; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; & .\\build\\Release\\context-next-oracle.exe '.\\rust-draft\\target\\debug\\llama_ffi.dll' '..\\models\\stories260K.gguf' request.json resource-debug; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; & .\\build\\Release\\context-next-oracle.exe '..\\build\\bin\\Release\\llama.dll' native-context-model.gguf request.json tiny-reference-final; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; & .\\build\\Release\\context-next-oracle.exe '.\\rust-draft\\target\\debug\\llama_ffi.dll' native-context-model.gguf request.json tiny-resource-debug; exit $LASTEXITCODE",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle",
+  "timeoutMs": 1800000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T14:48:13.713Z"
+}

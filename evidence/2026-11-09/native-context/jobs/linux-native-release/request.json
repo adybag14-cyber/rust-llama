@@ -1,0 +1,13 @@
+{
+  "id": "job-1794236994807-ab887558-10e",
+  "mode": "shell",
+  "command": "wsl -d Ubuntu -- /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/build-linux/context-next-oracle /home/tdamre/rust-llama-context-draft-target/release/libllama_ffi.so /mnt/c/Users/adyba/rust-llama-reference/models/stories260K.gguf /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-rust-release; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; wsl -d Ubuntu -- /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/build-linux/context-next-oracle /home/tdamre/rust-llama-context-draft-target/release/libllama_ffi.so /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/native-context-model.gguf /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/request.json /mnt/c/Users/adyba/rust-llama-reference/context-next-oracle/linux-tiny-rust-release; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; python compare_context.py linux-reference linux-rust-release linux-context-release-comparison.json; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; python compare_context.py linux-tiny-reference linux-tiny-rust-release linux-tiny-release-comparison.json; exit $LASTEXITCODE",
+  "args": [],
+  "workingDir": "C:\\Users\\adyba\\rust-llama-reference\\context-next-oracle",
+  "timeoutMs": 1800000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-09T15:09:54.807Z"
+}

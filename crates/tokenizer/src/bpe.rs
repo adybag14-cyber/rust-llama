@@ -61,7 +61,10 @@ impl Bpe {
                 None => "",
                 Some(value) => value
                     .as_str()
-                    .ok_or_else(|| invalid("tokenizer.ggml.pre is not a string"))?,
+                    .ok_or_else(|| invalid("tokenizer.ggml.pre is not a string"))?
+                    .split('\0')
+                    .next()
+                    .unwrap(),
             }
         };
         let config = Config::profile(pre)?;
@@ -109,7 +112,7 @@ impl Bpe {
         let metaspace_first =
             match metadata.get("tokenizer.ggml.metaspace.prepend_scheme") {
                 None => false,
-                Some(value) => match value.as_str() {
+                Some(value) => match value.as_str().map(|text| text.split('\0').next().unwrap()) {
                     Some("never") => false,
                     Some("first") => true,
                     Some("always") => return Err(Error::Unsupported(

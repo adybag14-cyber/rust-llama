@@ -1,0 +1,122 @@
+{
+  "started_utc": "2026-11-09T14:30:07.287264+00:00",
+  "source_before": {
+    "crates/inference/src/bert_loader.rs": "378bc5d123758bd26b4440a3a804233156a9313f946ae1d26e09fb71106a9030",
+    "crates/inference/src/lib.rs": "f5d246cf63bf963626ea384afa98372fb58016cd181cfa449ad3472ae44917c6",
+    "crates/inference/src/loader.rs": "f160aa94b1d2c21152f2a086734c35fb9e7b4095bfe6e5f60ba1f4dd1274b7d8",
+    "crates/inference/src/mamba_loader.rs": "0e04a074c07a83a29370fdc6407010c6c7accfec58d51a947c61c265fc1c31da",
+    "crates/inference/src/stream.rs": "4e81e9f4570e6d0d65a017e4c91a3ee596ae667719ee714bd33d86f795f1a6d3",
+    "crates/inference/tests/bert_defaults.rs": "ccdaf9fbe9ac93c500b78d2cc1f2878d225a68653319c7d1846f1a9e30df41dd",
+    "crates/inference/tests/bert_reference.rs": "386fac96244b3fc4dbc65853ec5d52d42ac19360e019a7df98960e28beb32d0b",
+    "crates/inference/tests/mamba_loader.rs": "0f609dd9103c2edf0d6ead3c8a19e93d452454f3f2359ee1ddd20d7bc8af1c3a",
+    "crates/inference/tests/native_reference.rs": "31601c2ad15396f349785af9a7b9d6d13c57f58b0ffaf3005c69a6e6e74c4038",
+    "crates/model-runtime/src/mamba.rs": "237a7febae187c31a5c205ce4a747a226daec1dff60b35802a7cd9566ccf02b8",
+    "crates/model-runtime/src/math.rs": "43a6acee59b57047032f7fe779d305096b66b8ee681abb8597a5368215f02d04"
+  },
+  "status": "succeeded",
+  "steps": [
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--locked",
+        "--offline",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--release",
+        "--locked",
+        "--offline",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "pretrained-mamba",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "--test",
+        "native_reference",
+        "trained_mamba130m",
+        "--release",
+        "--locked",
+        "--offline",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "pretrained-bpe",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "--test",
+        "native_reference",
+        "trained_smollm2",
+        "--release",
+        "--locked",
+        "--offline",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_after": {
+    "crates/inference/src/bert_loader.rs": "378bc5d123758bd26b4440a3a804233156a9313f946ae1d26e09fb71106a9030",
+    "crates/inference/src/lib.rs": "f5d246cf63bf963626ea384afa98372fb58016cd181cfa449ad3472ae44917c6",
+    "crates/inference/src/loader.rs": "f160aa94b1d2c21152f2a086734c35fb9e7b4095bfe6e5f60ba1f4dd1274b7d8",
+    "crates/inference/src/mamba_loader.rs": "0e04a074c07a83a29370fdc6407010c6c7accfec58d51a947c61c265fc1c31da",
+    "crates/inference/src/stream.rs": "4e81e9f4570e6d0d65a017e4c91a3ee596ae667719ee714bd33d86f795f1a6d3",
+    "crates/inference/tests/bert_defaults.rs": "ccdaf9fbe9ac93c500b78d2cc1f2878d225a68653319c7d1846f1a9e30df41dd",
+    "crates/inference/tests/bert_reference.rs": "386fac96244b3fc4dbc65853ec5d52d42ac19360e019a7df98960e28beb32d0b",
+    "crates/inference/tests/mamba_loader.rs": "0f609dd9103c2edf0d6ead3c8a19e93d452454f3f2359ee1ddd20d7bc8af1c3a",
+    "crates/inference/tests/native_reference.rs": "31601c2ad15396f349785af9a7b9d6d13c57f58b0ffaf3005c69a6e6e74c4038",
+    "crates/model-runtime/src/mamba.rs": "237a7febae187c31a5c205ce4a747a226daec1dff60b35802a7cd9566ccf02b8",
+    "crates/model-runtime/src/math.rs": "43a6acee59b57047032f7fe779d305096b66b8ee681abb8597a5368215f02d04"
+  },
+  "finished_utc": "2026-11-09T14:32:23.928589+00:00"
+}

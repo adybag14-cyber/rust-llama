@@ -1,0 +1,141 @@
+{
+  "date": "2026-11-09",
+  "result": "passed",
+  "source_frozen": true,
+  "jobs": {
+    "windows-product": {
+      "job_id": "job-1794236470693-3b69f06c-335",
+      "status": "succeeded",
+      "gates": [
+        "debug tests",
+        "release tests",
+        "strict all-target Clippy",
+        "rustfmt check"
+      ],
+      "tests_per_profile": 18,
+      "native_indexing_cases": 890,
+      "exact_output_bytes": 599152
+    },
+    "linux-product": {
+      "job_id": "job-1794236471100-ca4807f1-b36",
+      "status": "succeeded",
+      "gates": [
+        "debug tests",
+        "release tests",
+        "strict all-target Clippy",
+        "rustfmt check"
+      ],
+      "tests_per_profile": 18,
+      "native_indexing_cases": 890,
+      "exact_output_bytes": 599152
+    }
+  },
+  "files": [
+    {
+      "path": "crates/tensor/src/cpu_index.rs",
+      "bytes": 20619,
+      "sha256": "daadf1c68bdd97bafecbc9f79e501092cbe1c9a81b9117d8aca58070a4412e8a"
+    },
+    {
+      "path": "crates/tensor/src/native_sort.rs",
+      "bytes": 8817,
+      "sha256": "71a358a1db25b04fbc927eb67c11e01e4419603fb15e7395ab8dabc24e479e4f"
+    },
+    {
+      "path": "crates/tensor/src/cpu.rs",
+      "bytes": 16556,
+      "sha256": "2723cafba08a532d15e702f28fbf9379920347a6858de4f670407c6f0cdec90a"
+    },
+    {
+      "path": "crates/tensor/src/cpu_extra.rs",
+      "bytes": 41447,
+      "sha256": "52473a28d954501ba707e6278f54b836608cca43ade3302e8a1b8f2969f8ce24"
+    },
+    {
+      "path": "crates/tensor/src/graph.rs",
+      "bytes": 12796,
+      "sha256": "9ef542c1049390d98160615f083ce88933f980a556952f5448ee9458529fd112"
+    },
+    {
+      "path": "crates/tensor/src/lib.rs",
+      "bytes": 12930,
+      "sha256": "1186988afe95ecc4d18f39faab7a8143a8412b37f23d759f04ca369f48ca17a5"
+    },
+    {
+      "path": "crates/tensor/tests/indexing.rs",
+      "bytes": 9348,
+      "sha256": "33fd7007d3c7403c963c8903aa461c45becd4582ddb0b2428b37d80999171bd0"
+    },
+    {
+      "path": "crates/tensor/README.md",
+      "bytes": 16839,
+      "sha256": "265f3770cb0be0bc667af95248234e862edb1157af6d992a72cbcfa53cec0616"
+    },
+    {
+      "path": "crates/tensor/CPU_SUPPORT.md",
+      "bytes": 16132,
+      "sha256": "476807e804967a524897e39e91e926839140d356989ea4d1c6f3bd94bb18da90"
+    },
+    {
+      "path": "crates/tensor/Cargo.toml",
+      "bytes": 243,
+      "sha256": "aa44be6da8728d516327dfd616c8f26dfc30af6cbc70d207ca81b9083a0d3426"
+    },
+    {
+      "path": "crates/tensor/THIRD_PARTY_NOTICES.md",
+      "bytes": 1056,
+      "sha256": "9fb68b12cafff4776a16f504803d32ee8d41bdfa6c17e9d2e7de818d5c1ad6d9"
+    },
+    {
+      "path": "crates/tensor/LICENSE-MICROSOFT-STL.txt",
+      "bytes": 12550,
+      "sha256": "1fc6b6db121d4555d8f661937d7f6013693cd8fd67495d5e5d98c1d18fb83eda"
+    },
+    {
+      "path": "crates/tensor/LICENSE-MIT.txt",
+      "bytes": 1071,
+      "sha256": "86be3abfe4ca1f3a10498e185023d24da731ac6bb5c30fef95423f5cb30d2110"
+    },
+    {
+      "path": "crates/tensor/LICENSE-LLAMA-CPP.txt",
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/cpu-indexing-msvc-reference.bin",
+      "bytes": 2494819,
+      "sha256": "0a1877e33f7cb3e62dcfc4ddf331f6ec704f7c8921fc06db53fd63c5550dec1e"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/cpu-indexing-msvc-provenance.json",
+      "bytes": 294055,
+      "sha256": "dcda92e870472fb839fdd622d54f3c174927ae848dbd65328a48b8a1c9ebba3c"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/cpu-indexing-gnu-reference.bin",
+      "bytes": 2494819,
+      "sha256": "ab7985671bab1543933ea3a0e2293a3aceffd4192d41965905cad254462a4bd2"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/cpu-indexing-gnu-provenance.json",
+      "bytes": 280010,
+      "sha256": "1e79b220252217b0f761ada26bf07042499b1d7af0a54e0e0156815aec79e5c2"
+    }
+  ],
+  "actual_execution": {
+    "operation_ids": 62,
+    "input_leaf_id": "NONE",
+    "pending_operation_ids": 39,
+    "native_graph_cases_distinct": 1252,
+    "native_graph_captures": 2142,
+    "native_indexing_cases_per_platform": 890,
+    "windows_gnu_differing_native_arg_sort_cases": 88
+  },
+  "limitations": [
+    "Exact platform ERF remains open and prior failed thresholds/native bytes are preserved.",
+    "NaN sort keys and undefined float-to-integer casts are checked errors.",
+    "Only pinned MSVC/GNU sort ordering is supported; source C++ does not guarantee portable equal-key order.",
+    "Arbitrary CPY destination shapes/views and the other documented T02 modes remain open.",
+    "The Linux original SSE2 activation branch is a separate ongoing numerical compatibility investigation; new indexing cases do not execute it."
+  ]
+}
