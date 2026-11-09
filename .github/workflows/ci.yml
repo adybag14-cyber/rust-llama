@@ -20,10 +20,6 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       RUST_BACKTRACE: 1
-      LLAMA_TEST_MODEL: ${{ runner.temp }}/stories260K.gguf
-      LLAMA_TEST_Q4_MODEL: ${{ runner.temp }}/stories15M-q4_0.gguf
-      LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
-      LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned compiler and review tools
@@ -51,4 +47,9 @@ jobs:
       - name: Fetch equivalent big-endian BERT model data
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf" https://huggingface.co/ggml-org/models-moved/resolve/main/bert-bge-small/ggml-model-f16-big-endian.gguf
       - name: Pretrained model comparisons with verified SHA-256 inputs
+        env:
+          LLAMA_TEST_MODEL: ${{ runner.temp }}/stories260K.gguf
+          LLAMA_TEST_Q4_MODEL: ${{ runner.temp }}/stories15M-q4_0.gguf
+          LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
+          LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
         run: cargo test --release --offline --locked -p llama-inference --tests -- --ignored --nocapture

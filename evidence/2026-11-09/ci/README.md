@@ -7,3 +7,7 @@ The fix half-closes the write side after the error response, then drains at most
 The focused Windows run passed all 20 TCP tests and strict all-targets Clippy for server/inference/CLI (Hermes job job-1794225053649-3f493600-9e1). The original failed CI log is preserved here.
 
 The committed fix, fdfeda09bbc72fa61a25218cf93a9ca5807527c1, then passed every configured gate on Windows and Ubuntu in [workflow 42612502780](https://github.com/adybag14-cyber/rust-llama/actions/runs/42612502780). The observed job and step results are preserved in `socket-fix-jobs.json`. These results apply to that exact commit; later work requires its own validation.
+
+## Extension workflow validation
+
+Commit 57fb7e9c1415973bbad7b4b36510eac33b0681fa failed workflow validation before creating any jobs in [run 42620236813](https://github.com/adybag14-cyber/rust-llama/actions/runs/42620236813). GitHub rejected all four uses of runner.temp in the job-level env mapping. The exact annotation and before/after workflow hashes are recorded in extension-workflow-validation.json. The configuration fix moves these environment values to the pretrained-model comparison step, where the runner context exists. Model URLs, expected hashes, numerical tolerances, and test commands are unchanged. Local Windows/Linux evidence for 57fb7e9 remains separate from CI; this failed run did not execute any tests.
