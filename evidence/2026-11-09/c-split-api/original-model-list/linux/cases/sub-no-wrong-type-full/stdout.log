@@ -1,0 +1,13 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007ee4b0cea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x00007ee4b0cea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007ee4b0e5e6cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#2  0x00007ee4b0e5e862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#3  0x00007ee4b0ed9c27 in gguf_get_val_u16 () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#4  0x00007ee4b0aa8443 in llama_model_loader::llama_model_loader(gguf_context*, void (*)(ggml_tensor*, void*), void*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, _IO_FILE*, llama_load_mode, bool, bool, bool, llama_model_kv_override const*, llama_model_tensor_buft_override const*) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#5  0x00007ee4b09ad381 in llama_model_load(gguf_context*, void (*)(ggml_tensor*, void*), void*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, _IO_FILE*, llama_model_params&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#6  0x00007ee4b09aee65 in llama_model_load_from_file_impl(gguf_context*, void (*)(ggml_tensor*, void*), void*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, _IO_FILE*, llama_model_params) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#7  0x00007ee4b09af72d in llama_model_load_from_splits () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#8  0x0000569c6aa715b7 in main ()
+[Inferior 1 (process 463006) detached]

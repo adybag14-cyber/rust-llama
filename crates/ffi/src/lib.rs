@@ -23,6 +23,7 @@ mod model;
 mod sampler;
 mod sampler_grammar;
 mod sampler_vocab;
+mod split_path;
 mod state;
 mod vocab;
 pub use abi::*;

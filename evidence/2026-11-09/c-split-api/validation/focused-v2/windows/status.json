@@ -1,0 +1,277 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T21:31:42.853554+00:00",
+  "execution_inputs_before": {
+    "files": 968,
+    "sha256": "64916247c3be60e1b31151dc4eeaa26fa0bdbc3faa4146b7a923ae1b863557bd"
+  },
+  "driver": {
+    "bytes": 7132,
+    "sha256": "9ad6e817be895a598760c837ce63787b8a44abb6b266399ee19c5ff942134cf6"
+  },
+  "external_adapter": {
+    "bytes": 10073,
+    "sha256": "6b7d4f58e3b59f9c07222d4815ebb721d55232a3d02b3deb6dcc9d3d27ea8fe6"
+  },
+  "fixture_projection_before": {
+    "status": "succeeded",
+    "created_utc": "2026-11-09T21:31:42.849263+00:00",
+    "original_files_verified": 756,
+    "original_inventory_sha256": "1939c406723f105fe33d50100b54f6332414a6c7270507b0c2905656d772c091",
+    "helper_cases": 7807,
+    "helper_observed_bytes": 506563,
+    "profiles": {
+      "msvc": {
+        "cases": 104,
+        "accepted": 55,
+        "rejected": 49,
+        "logit_words": 172032,
+        "unique_numeric_bytes": 65536
+      },
+      "gnu": {
+        "cases": 106,
+        "accepted": 57,
+        "rejected": 49,
+        "logit_words": 180224,
+        "unique_numeric_bytes": 65536
+      }
+    },
+    "fixture_files": 14,
+    "expected_bytes_changed": false,
+    "qualification": "Independent seal-bound verification of existing v1 projections. The v1 packer lacked explicit rehash guards; its source and output remain preserved. No Rust output is read here."
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.2637083000008715,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "check",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "seconds": 1.9509281999999075,
+      "log": {
+        "bytes": 908,
+        "sha256": "594c8eb28dd92b3249fa71207392e38538ea8574cc82d793217594c564c10af6"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 16.35599010000442,
+      "log": {
+        "bytes": 21631,
+        "sha256": "5944f3e2edc53273582544e93bdeed940e7b3be3349bc64efa6dfc2841b97a08"
+      },
+      "tests": {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 29.328799800001434,
+      "log": {
+        "bytes": 21623,
+        "sha256": "1ba6e088d34d229f5aec54590c4cb952fb692ee219ee0b337c6631236b1c9f4a"
+      },
+      "tests": {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.248845499998424,
+      "log": {
+        "bytes": 908,
+        "sha256": "ab81d6f893021f373d643365e5b7e26a433a343e3d81e4782906d68f36be895b"
+      }
+    },
+    {
+      "name": "audit",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 29.140480699999898,
+      "log": {
+        "bytes": 42658,
+        "sha256": "6fbbd1ca5cb289fdf8d57d65387feb0b5f242dcb80dd5ec080854f0627e9a1ad"
+      }
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 28.046185899998818,
+      "log": {
+        "bytes": 379,
+        "sha256": "7e4832c23c9d296078ede48f2802c377c395e128899f1d29152fbd4b849a4efc"
+      }
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6322834999955376,
+      "log": {
+        "bytes": 182,
+        "sha256": "6afe171b167d77a5c615654d5e7f05c45bd4f375313d3ceca8f67ec903529a0a"
+      }
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "seconds": 16.845023899993976,
+      "log": {
+        "bytes": 899,
+        "sha256": "06e995fc3a6225f2453f3fb1fac78e98b11fca60fc9b20ae6de8a2f11b806b26"
+      }
+    }
+  ],
+  "scope": "Focused FFI crate regression and unchanged-source audit over the separate native flash integration candidate. No complete-port claim.",
+  "artifacts": {
+    "debug": {
+      "bytes": 4636160,
+      "sha256": "115fd9404fd96438bc080b1a96c330723c583fadd75a3335f3d792d45d88fda9"
+    },
+    "release": {
+      "bytes": 2035200,
+      "sha256": "cb76a43dc038bd36525e408809c9dce578f60099b10755eb9cda3a327a791356"
+    }
+  },
+  "fixture_projection_after": {
+    "status": "succeeded",
+    "created_utc": "2026-11-09T21:33:58.081146+00:00",
+    "original_files_verified": 756,
+    "original_inventory_sha256": "1939c406723f105fe33d50100b54f6332414a6c7270507b0c2905656d772c091",
+    "helper_cases": 7807,
+    "helper_observed_bytes": 506563,
+    "profiles": {
+      "msvc": {
+        "cases": 104,
+        "accepted": 55,
+        "rejected": 49,
+        "logit_words": 172032,
+        "unique_numeric_bytes": 65536
+      },
+      "gnu": {
+        "cases": 106,
+        "accepted": 57,
+        "rejected": 49,
+        "logit_words": 180224,
+        "unique_numeric_bytes": 65536
+      }
+    },
+    "fixture_files": 14,
+    "expected_bytes_changed": false,
+    "qualification": "Independent seal-bound verification of existing v1 projections. The v1 packer lacked explicit rehash guards; its source and output remain preserved. No Rust output is read here."
+  },
+  "execution_inputs_after": {
+    "files": 968,
+    "sha256": "64916247c3be60e1b31151dc4eeaa26fa0bdbc3faa4146b7a923ae1b863557bd"
+  },
+  "finished_utc": "2026-11-09T21:33:59.643460+00:00"
+}

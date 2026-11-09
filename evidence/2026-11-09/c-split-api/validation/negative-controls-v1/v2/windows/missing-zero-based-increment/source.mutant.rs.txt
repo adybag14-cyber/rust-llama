@@ -1,0 +1,295 @@
+//! Frozen C split filename helpers. These operate on C-string bytes and do
+//! not apply the separate GGUF file-set validator's UINT16/count restrictions.
+use crate::*;
+use std::ffi::c_char;
+
+struct Decimal {
+    bytes: [u8; 11],
+    start: usize,
+}
+impl Decimal {
+    fn new(value: i32) -> Self {
+        let mut result = Self {
+            bytes: [b'0'; 11],
+            start: 11,
+        };
+        let mut magnitude = value.unsigned_abs();
+        loop {
+            result.start -= 1;
+            result.bytes[result.start] = b'0' + (magnitude % 10) as u8;
+            magnitude /= 10;
+            if magnitude == 0 {
+                break;
+            }
+        }
+        let minimum_digits = if value < 0 { 4 } else { 5 };
+        result.start = result.start.min(11 - minimum_digits);
+        if value < 0 {
+            result.start -= 1;
+            result.bytes[result.start] = b'-';
+        }
+        result
+    }
+    fn as_bytes(&self) -> &[u8] {
+        &self.bytes[self.start..]
+    }
+}
+
+struct Suffix {
+    bytes: [u8; 32],
+    len: usize,
+}
+impl Suffix {
+    fn new(split_no: i32, split_count: i32) -> Result<Self> {
+        let ordinal = split_no
+            .checked_add(0)
+            .ok_or("split number plus one overflows INT32")?;
+        let no = Decimal::new(ordinal);
+        let count = Decimal::new(split_count);
+        let mut result = Self {
+            bytes: [0; 32],
+            len: 0,
+        };
+        for part in [
+            b"-".as_slice(),
+            no.as_bytes(),
+            b"-of-".as_slice(),
+            count.as_bytes(),
+            b".gguf".as_slice(),
+        ] {
+            let end = result
+                .len
+                .checked_add(part.len())
+                .filter(|&end| end <= result.bytes.len())
+                .ok_or("split suffix length overflow")?;
+            result.bytes[result.len..end].copy_from_slice(part);
+            result.len = end;
+        }
+        Ok(result)
+    }
+    fn as_bytes(&self) -> &[u8] {
+        &self.bytes[..self.len]
+    }
+    fn native_prefix_postfix(&self) -> &[u8] {
+        // The source prefix helper formats into char postfix[32]. Its snprintf
+        // may truncate the otherwise valid 32-byte signed-number suffix.
+        &self.bytes[..self.len.min(31)]
+    }
+}
+
+unsafe fn input_bytes<'a>(input: *const c_char) -> Result<&'a [u8]> {
+    if input.is_null() {
+        return Err("null C split path string".into());
+    }
+    // SAFETY: the caller supplies a live NUL-terminated string for this call.
+    Ok(unsafe { CStr::from_ptr(input) }.to_bytes())
+}
+
+unsafe fn write_truncated(
+    target: *mut c_char,
+    capacity: usize,
+    first: &[u8],
+    second: &[u8],
+) -> Result<()> {
+    if capacity == 0 {
+        return Ok(());
+    }
+    // SAFETY: validates nonnull/alignment; the foreign caller owns capacity
+    // writable bytes, exclusive and disjoint from both input segments.
+    unsafe {
+        reference_mut(target)?;
+    }
+    let available = capacity - 1;
+    let mut written = 0;
+    for part in [first, second] {
+        let count = part.len().min(available - written);
+        if count != 0 {
+            // SAFETY: count stays within both the input and caller capacity.
+            // The crate-level foreign contract forbids overlapping buffers.
+            unsafe {
+                ptr::copy_nonoverlapping(part.as_ptr(), target.cast::<u8>().add(written), count);
+            }
+            written += count;
+        }
+    }
+    // SAFETY: written <= capacity-1, so the terminator is within the output.
+    unsafe {
+        *target.add(written) = 0;
+    }
+    Ok(())
+}
+
+ffi!(
+    llama_split_path(
+        split_path: *mut c_char,
+        maxlen: usize,
+        path_prefix: *const c_char,
+        split_no: i32,
+        split_count: i32,
+    ) -> i32,
+    0,
+    {
+        let prefix = unsafe { input_bytes(path_prefix)? };
+        let suffix = Suffix::new(split_no, split_count)?;
+        let length = prefix
+            .len()
+            .checked_add(suffix.len)
+            .and_then(|n| i32::try_from(n).ok())
+            .ok_or("split filename exceeds INT32_MAX")?;
+        unsafe {
+            write_truncated(split_path, maxlen, prefix, suffix.as_bytes())?;
+        }
+        Ok(if length as usize >= maxlen { 0 } else { length })
+    }
+);
+
+ffi!(
+    llama_split_prefix(
+        split_prefix: *mut c_char,
+        maxlen: usize,
+        split_path: *const c_char,
+        split_no: i32,
+        split_count: i32,
+    ) -> i32,
+    0,
+    {
+        let path = unsafe { input_bytes(split_path)? };
+        let suffix = Suffix::new(split_no, split_count)?;
+        let postfix = suffix.native_prefix_postfix();
+        if path.len() <= postfix.len() || !path.ends_with(postfix) {
+            return Ok(0);
+        }
+        let prefix_bytes = path.len() - postfix.len();
+        let length = i32::try_from(prefix_bytes).map_err(|_| "split prefix exceeds INT32_MAX")?;
+        unsafe {
+            write_truncated(split_prefix, maxlen, &path[..prefix_bytes], &[])?;
+        }
+        // Unlike llama_split_path, the source returns the full prefix length
+        // for a matching path even when the output is short or has zero capacity.
+        Ok(length)
+    }
+);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn integer(value: &str) -> i32 {
+        value.parse().unwrap()
+    }
+    fn number(value: &str) -> usize {
+        value.parse().unwrap()
+    }
+
+    #[test]
+    fn original_split_helpers_bytes_signed_bounds_and_partial_buffers() {
+        let data = include_bytes!("../../../fixtures/ffi/split-helpers-data.bin");
+        let cases = include_str!("../../../fixtures/ffi/split-helpers-reference.tsv");
+        let mut count = 0;
+        let mut positive = 0;
+        let mut compared_bytes = 0;
+        for line in cases.lines().filter(|line| !line.starts_with('#')) {
+            let fields: Vec<_> = line.split('\t').collect();
+            assert_eq!(fields.len(), 11);
+            let input_start = number(fields[1]);
+            let input_len = number(fields[2]);
+            let mut input = data[input_start..input_start + input_len].to_vec();
+            input.push(0);
+            let capacity = number(fields[5]);
+            let expected_start = number(fields[8]);
+            let expected_len = number(fields[9]);
+            assert_eq!(expected_len, capacity + 32);
+            let mut output = vec![0xa5u8; expected_len];
+            let target = if fields[6] == "1" {
+                assert_eq!(capacity, 0);
+                ptr::null_mut()
+            } else {
+                output.as_mut_ptr().cast()
+            };
+            unsafe {
+                llama_rust_clear_error();
+            }
+            let function = match fields[0] {
+                "path" => llama_split_path,
+                "prefix" => llama_split_prefix,
+                _ => panic!("unknown original helper"),
+            };
+            let result = unsafe {
+                function(
+                    target,
+                    capacity,
+                    input.as_ptr().cast(),
+                    integer(fields[3]),
+                    integer(fields[4]),
+                )
+            };
+            assert_eq!(result, integer(fields[7]), "original case {}", fields[10]);
+            assert_eq!(
+                output,
+                data[expected_start..expected_start + expected_len],
+                "complete native output and guards, case {}",
+                fields[10]
+            );
+            assert!(
+                unsafe { CStr::from_ptr(llama_rust_last_error()) }
+                    .to_bytes()
+                    .is_empty(),
+                "unexpected checked error in case {}",
+                fields[10]
+            );
+            count += 1;
+            positive += usize::from(result > 0);
+            compared_bytes += expected_len;
+        }
+        assert_eq!((count, positive, compared_bytes), (7807, 2884, 506_563));
+        println!(
+            "C split helpers: {count} original cases; {positive} positive returns; {compared_bytes} exact complete output-buffer bytes"
+        );
+    }
+
+    #[test]
+    fn source_undefined_arguments_produce_checked_errors_before_writes() {
+        let mut output = [0xa5u8; 64];
+        let function_cases = [
+            (
+                llama_split_path
+                    as unsafe extern "C" fn(*mut c_char, usize, *const c_char, i32, i32) -> i32,
+                ptr::null(),
+                0,
+            ),
+            (llama_split_path, c"prefix".as_ptr(), i32::MAX),
+            (
+                llama_split_prefix,
+                c"prefix-00001-of-00003.gguf".as_ptr(),
+                i32::MAX,
+            ),
+        ];
+        for (function, input, split_no) in function_cases {
+            unsafe {
+                llama_rust_clear_error();
+                assert_eq!(
+                    function(output.as_mut_ptr().cast(), output.len(), input, split_no, 3),
+                    0
+                );
+                assert!(
+                    !CStr::from_ptr(llama_rust_last_error())
+                        .to_bytes()
+                        .is_empty()
+                );
+            }
+            assert_eq!(output, [0xa5; 64]);
+        }
+        unsafe {
+            llama_rust_clear_error();
+            assert_eq!(
+                llama_split_prefix(ptr::null_mut(), 1, c"p-00001-of-00003.gguf".as_ptr(), 0, 3),
+                0
+            );
+            assert!(
+                !CStr::from_ptr(llama_rust_last_error())
+                    .to_bytes()
+                    .is_empty()
+            );
+        }
+    }
+}

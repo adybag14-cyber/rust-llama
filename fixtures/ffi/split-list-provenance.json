@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_inputs": {
+    "path": "fixtures/gguf/shards-inputs.bin",
+    "sha256": "b444d977bd9326a352a9967efcdf3d2d44ea3397b608cf2562879ad6e1ed8086"
+  },
+  "independence": "Native original C entry point executed every fixed caller path list before Rust implementation. New files reuse unmodified original shard byte-pool ranges. Expected float blocks are lossless F32 encodings of original full-precision JSON captures; numeric pools only deduplicate byte-identical blocks within their own host profile. No Rust output generates expected values.",
+  "native_profiles": {
+    "windows": {
+      "source": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\model-list-oracle.cpp",
+        "bytes": 20539,
+        "sha256": "49e1b7c7c48fe2b0a1cf57bf3ed153fbcc1e8d1587f445d938dc6600b09ad253"
+      },
+      "header": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\include\\llama.h",
+        "bytes": 91177,
+        "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+      },
+      "library": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "bytes": 3211264,
+        "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+      },
+      "harness": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\build-model-list-windows\\Release\\explicit-splits-oracle.exe",
+        "bytes": 172544,
+        "sha256": "50433362ce518e9cd7d8b15c97398c126fdc970a5584878ef479f3ead2a6c6db"
+      },
+      "compiler_configuration": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\build-model-list-windows\\CMakeCache.txt",
+        "bytes": 13178,
+        "sha256": "eb739f0d786a55095a0dccbd7755eeb23994fa2eee6e13f3527c074925863d4f"
+      },
+      "matrix": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\model-list-matrix-v1.json",
+        "bytes": 229872,
+        "sha256": "7c1367ac820fe6909824f78565928bb593f03a25b74b98b33965e2f4e6ef1e93"
+      },
+      "driver": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\capture-original-model-list-v1.py",
+        "bytes": 5212,
+        "sha256": "1b9a0662d14caff2eca73a33cec89c67613ed76c941ff287b21e23803d600900"
+      }
+    },
+    "linux": {
+      "source": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/model-list-oracle.cpp",
+        "bytes": 20539,
+        "sha256": "49e1b7c7c48fe2b0a1cf57bf3ed153fbcc1e8d1587f445d938dc6600b09ad253"
+      },
+      "header": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master/include/llama.h",
+        "bytes": 91177,
+        "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+      },
+      "library": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0",
+        "bytes": 5499792,
+        "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+      },
+      "harness": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/build-model-list-linux/explicit-splits-oracle",
+        "bytes": 1080568,
+        "sha256": "a61346aca188285987eb348254de07a22962dab48ff38f366148096a135b67ab"
+      },
+      "compiler_configuration": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/build-model-list-linux/CMakeCache.txt",
+        "bytes": 12485,
+        "sha256": "4b9e00694fc6fbc5db02cb369fba898cdcf7d38dbe8ae8f7ec5bef03675bff6c"
+      },
+      "matrix": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/model-list-matrix-v1.json",
+        "bytes": 229872,
+        "sha256": "7c1367ac820fe6909824f78565928bb593f03a25b74b98b33965e2f4e6ef1e93"
+      },
+      "driver": {
+        "path": "/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/capture-original-model-list-v1.py",
+        "bytes": 5212,
+        "sha256": "1b9a0662d14caff2eca73a33cec89c67613ed76c941ff287b21e23803d600900"
+      }
+    }
+  },
+  "seal": {
+    "status": "sealed",
+    "sealed_utc": "2026-11-09T21:06:04.123517+00:00",
+    "before_first_rust_implementation": true,
+    "profiles": {
+      "windows": {
+        "cases": 104,
+        "accepted": 55,
+        "rejected": 49,
+        "logit_words": 172032,
+        "report": {
+          "bytes": 249535,
+          "sha256": "0e230227d0156b313bfc7fdc9b1cf992f2a20abecae86ba254604b58abe8714c"
+        },
+        "asserted_cases": [
+          "sub-no-wrong-type-vocab",
+          "sub-no-wrong-type-full"
+        ]
+      },
+      "linux": {
+        "cases": 106,
+        "accepted": 57,
+        "rejected": 49,
+        "logit_words": 180224,
+        "report": {
+          "bytes": 249773,
+          "sha256": "b3aa8237c0018ac4a238a6a6f269edacbdfdc0a173fd1a30385ad424f8a3f88f"
+        },
+        "asserted_cases": [
+          "sub-no-wrong-type-vocab",
+          "sub-no-wrong-type-full"
+        ]
+      }
+    },
+    "common_successful_structural_outputs": 55,
+    "common_logit_words": 172032,
+    "original_cross_profile_word_differences": 58590,
+    "original_cross_profile_maximum_absolute": 5.960464477539063e-08,
+    "inventory": {
+      "bytes": 193684,
+      "sha256": "2589b3d5fcbecec943d4048735ae296e05b0c6cb39a68f09e1e118b470131b23"
+    },
+    "interpretation": "Native host outputs remain separate and unchanged even when equal. Non-UTF8 Unix path cases are GNU-only; all shared input-list admission and successful nonnumeric outputs agree. Assertions become checked errors. Existing C ABI architecture/execution limitations are not closed by this new split-list entry point."
+  },
+  "projections": {
+    "split-list-reference.json": {
+      "bytes": 199519,
+      "sha256": "4e4100e8b1e9c25811e86e520b797296fdf8021242886677de04901b99c30a7e"
+    },
+    "split-list-msvc-values.f32le.bin": {
+      "bytes": 65536,
+      "sha256": "1d2b78e5e9be22a9e45475c8dbbf011826b9b1dec460cfd73cd43c6cd0b9244f"
+    },
+    "split-list-gnu-values.f32le.bin": {
+      "bytes": 65536,
+      "sha256": "040576f13cb8d69bfe95c11daeddac922e3e84757a03b9c0d31e12cb04a4b11f"
+    }
+  },
+  "license": "Original llama.cpp/ggml MIT; inherited tiny-model/tokenizer fixture origins remain in fixtures/gguf/shards-provenance.json."
+}

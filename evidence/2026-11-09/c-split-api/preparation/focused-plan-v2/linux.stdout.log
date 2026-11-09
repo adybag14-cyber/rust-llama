@@ -1,0 +1,142 @@
+{
+  "platform": "linux",
+  "frozen": {
+    "status": "frozen",
+    "created_utc": "2026-11-09T21:28:00.264487+00:00",
+    "execution_inputs": {
+      "files": 968,
+      "sha256": "64916247c3be60e1b31151dc4eeaa26fa0bdbc3faa4146b7a923ae1b863557bd"
+    },
+    "driver": {
+      "bytes": 7132,
+      "sha256": "9ad6e817be895a598760c837ce63787b8a44abb6b266399ee19c5ff942134cf6"
+    },
+    "external_adapter": {
+      "bytes": 10073,
+      "sha256": "6b7d4f58e3b59f9c07222d4815ebb721d55232a3d02b3deb6dcc9d3d27ea8fe6"
+    },
+    "files_bytes": 464226252,
+    "scope": "Every draft file, including all policies, licenses, prose and fixture extensions. This seed omits historical evidence by construction; no wildcard extension filter.",
+    "parent": {
+      "files": 952,
+      "sha256": "7506786aa5f5f400f745acbc94ac62fab754083fd5f5e3c656f0e5edd0a72402"
+    }
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    {
+      "name": "check",
+      "argv": [
+        "cargo",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ]
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "--",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ]
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ]
+    },
+    {
+      "name": "build-debug",
+      "argv": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ]
+    },
+    {
+      "name": "build-release",
+      "argv": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi"
+      ]
+    }
+  ]
+}

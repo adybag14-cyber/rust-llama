@@ -1,0 +1,27 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/quant)
+   Compiling llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/llama-behavior)
+   Compiling llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/gguf)
+   Compiling llama-tokenizer v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/tokenizer)
+   Compiling llama-model-runtime v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/model-runtime)
+   Compiling llama-inference v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/inference)
+   Compiling llama-ffi v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/c-split-api-port/negative-draft-v2-linux-v1/crates/ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.52s
+     Running unittests src/lib.rs (/home/tdamre/.cache/rust-llama-c-split-negative-v1/debug/deps/llama_ffi-f83fce02dbb15254)
+
+running 1 test
+
+thread 'split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers' (511173) panicked at crates/ffi/src/split_path.rs:227:13:
+assertion `left == right` failed: complete native output and guards, case 4
+  left: [45, 48, 48, 48, 48, 48, 45, 111, 102, 45, 48, 48, 48, 48, 49, 46, 103, 103, 0, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165]
+ right: [45, 48, 48, 48, 48, 49, 45, 111, 102, 45, 48, 48, 48, 48, 49, 46, 103, 103, 0, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165, 165]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers ... FAILED
+
+failures:
+
+failures:
+    split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p llama-ffi --lib`

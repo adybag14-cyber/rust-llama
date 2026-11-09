@@ -49,8 +49,12 @@ parameter totals, and guessed file type, cover the complete validated set.
 Full model loading consumes those same owned file handles. A primary split.count
 of zero, one or absent retains the original single-file interpretation.
 Missing siblings, malformed headers, duplicate tensor names, invalid indices or
-payload extents fail with a diagnostic. The explicit C split-list and filename
-buffer APIs remain unexported.
+payload extents fail with a diagnostic. The explicit `llama_model_load_from_splits`
+entry point uses the same owned loader with the caller-provided ordered path list.
+Both that entry and automatic loading retain paths before foreign progress
+callbacks. `llama_split_path` and `llama_split_prefix` preserve the original
+byte-string, signed-format and partial-buffer behavior. See SPLITS.md for path
+encoding, truncation, ownership and independent regression scope.
 
 Start with the frozen parameter functions and select CPU model loading. On the
 qualified Windows x64/MSVC and Linux x64/GNU CPU profiles, an admitted dense
@@ -149,8 +153,7 @@ data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32/F16 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
-adapters, encoder entry points, model saving, explicit split-list loading and
-performance APIs remain absent. Source custom chat-template lookup
+adapters, encoder entry points, model saving and performance APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
 
 ## Automatic shard regression
@@ -165,6 +168,16 @@ detokenization. Full Llama cases additionally compare 163,840 F32 logit words
 exactly, including greedy continuations. Expected values are deduplicated to
 16,384 stored words per profile, with the original captures retained separately.
 fixtures/ffi/shards-provenance.json records input and capture hashes.
+
+## Explicit split-list and filename regression
+
+SPLITS.md records 104 Windows / 106 GNU fixed caller-list cases, 7,807
+byte-oriented filename-helper calls per profile, and four isolated mutation
+controls. Expected outputs were captured from the original before Rust
+implementation. Ordinary tests and external frozen-header C callers compare
+the same independent model, token and raw F32 outputs. Every path is copied
+before a callback can mutate caller memory. The existing 16,777,216 foreign-
+element ceiling bounds list length; it is not a total path-byte or RSS bound.
 
 ## CPU sampling
 

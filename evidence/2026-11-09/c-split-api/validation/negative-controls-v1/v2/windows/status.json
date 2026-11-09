@@ -1,0 +1,208 @@
+{
+  "status": "succeeded",
+  "platform": "windows",
+  "started_utc": "2026-11-09T21:40:27.668078+00:00",
+  "execution_inputs": {
+    "files": 968,
+    "sha256": "64916247c3be60e1b31151dc4eeaa26fa0bdbc3faa4146b7a923ae1b863557bd"
+  },
+  "driver": {
+    "bytes": 7691,
+    "sha256": "531991f0e221a24ba332f502155c69c1a5313a5cdbab2cf8f33a776bef59ce35"
+  },
+  "controls": [
+    {
+      "name": "missing-zero-based-increment",
+      "production_file": "crates/ffi/src/split_path.rs",
+      "test": "split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "expected_test_failure": true,
+      "seconds": 6.400343699999212,
+      "log": {
+        "bytes": 2349,
+        "sha256": "b770753d55e618aa9a5c9e49a9660268c6efb38f4d33ad5824abbdd3dec3fb85"
+      },
+      "preimage": {
+        "bytes": 9569,
+        "sha256": "e704365019ba14b420eef6beab610c5f04a7acfa1629b628634e07ca6ef940ab"
+      },
+      "mutant": {
+        "bytes": 9569,
+        "sha256": "e30dcd7dcaf83342de7087e901979a7a8364365c9955fa2ac187b4bf2c4f8fd5"
+      }
+    },
+    {
+      "name": "prefix-short-output-returns-zero",
+      "production_file": "crates/ffi/src/split_path.rs",
+      "test": "split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "expected_test_failure": true,
+      "seconds": 2.458819700004824,
+      "log": {
+        "bytes": 1032,
+        "sha256": "5f93d27889b60c9ce0ed9b6b435880d3290baebb191aafa38aebd330fda7a271"
+      },
+      "preimage": {
+        "bytes": 9569,
+        "sha256": "e704365019ba14b420eef6beab610c5f04a7acfa1629b628634e07ca6ef940ab"
+      },
+      "mutant": {
+        "bytes": 9613,
+        "sha256": "83d114771515d9f52af27244664010bd413924ba00feddedcd7a7a25a3013b08"
+      }
+    },
+    {
+      "name": "explicit-list-replaced-by-discovery",
+      "production_file": "crates/ffi/src/model.rs",
+      "test": "model_shard_tests::split_list_tests::original_explicit_split_lists_getters_paths_and_inference",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "model_shard_tests::split_list_tests::original_explicit_split_lists_getters_paths_and_inference",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "expected_test_failure": true,
+      "seconds": 2.7143814000010025,
+      "log": {
+        "bytes": 1267,
+        "sha256": "d2ba66e234cd015c8a475049913a8821673bcefe586770c306ec7ebe3a513df5"
+      },
+      "preimage": {
+        "bytes": 19090,
+        "sha256": "30b7fb16ca6b299848d8f6f5ddf79c35493e2461ef24e278690e9abc54c9a666"
+      },
+      "mutant": {
+        "bytes": 19086,
+        "sha256": "8cb49920b5a0731af3f4aaaa64551c03a36384a1d6a7ff04d9c1e1daf0fbf178"
+      }
+    },
+    {
+      "name": "only-primary-owned-before-callback",
+      "production_file": "crates/ffi/src/model.rs",
+      "test": "model_shard_tests::split_list_tests::explicit_split_list_copies_every_shard_before_foreign_callbacks",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib",
+        "model_shard_tests::split_list_tests::explicit_split_list_copies_every_shard_before_foreign_callbacks",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "expected_test_failure": true,
+      "seconds": 2.573995400001877,
+      "log": {
+        "bytes": 1085,
+        "sha256": "f4f0aae2bf2ec9a7841d4a93de1ba26360a4bb1f6bd1b2fdba51924fdd9034ce"
+      },
+      "preimage": {
+        "bytes": 19090,
+        "sha256": "30b7fb16ca6b299848d8f6f5ddf79c35493e2461ef24e278690e9abc54c9a666"
+      },
+      "mutant": {
+        "bytes": 19014,
+        "sha256": "fd599975f48878310baf97d8c8f73df51336e3c78a4e8e6d90a178388ae4a0a4"
+      }
+    }
+  ],
+  "qualification": "Isolated test-sensitivity mutations of production Rust only. Original expectations and primary candidate remain unchanged. The late-copy control snapshots pointer values before callbacks, so it checks live mutated string buffers without reading the mutated foreign pointer array or keeping live shared borrows across callbacks.",
+  "fixture_projection_before": {
+    "status": "succeeded",
+    "created_utc": "2026-11-09T21:40:27.663155+00:00",
+    "original_files_verified": 756,
+    "original_inventory_sha256": "1939c406723f105fe33d50100b54f6332414a6c7270507b0c2905656d772c091",
+    "helper_cases": 7807,
+    "helper_observed_bytes": 506563,
+    "profiles": {
+      "msvc": {
+        "cases": 104,
+        "accepted": 55,
+        "rejected": 49,
+        "logit_words": 172032,
+        "unique_numeric_bytes": 65536
+      },
+      "gnu": {
+        "cases": 106,
+        "accepted": 57,
+        "rejected": 49,
+        "logit_words": 180224,
+        "unique_numeric_bytes": 65536
+      }
+    },
+    "fixture_files": 14,
+    "expected_bytes_changed": false,
+    "qualification": "Independent seal-bound verification of existing v1 projections. The v1 packer lacked explicit rehash guards; its source and output remain preserved. No Rust output is read here."
+  },
+  "fixture_projection_after": {
+    "status": "succeeded",
+    "created_utc": "2026-11-09T21:40:53.029393+00:00",
+    "original_files_verified": 756,
+    "original_inventory_sha256": "1939c406723f105fe33d50100b54f6332414a6c7270507b0c2905656d772c091",
+    "helper_cases": 7807,
+    "helper_observed_bytes": 506563,
+    "profiles": {
+      "msvc": {
+        "cases": 104,
+        "accepted": 55,
+        "rejected": 49,
+        "logit_words": 172032,
+        "unique_numeric_bytes": 65536
+      },
+      "gnu": {
+        "cases": 106,
+        "accepted": 57,
+        "rejected": 49,
+        "logit_words": 180224,
+        "unique_numeric_bytes": 65536
+      }
+    },
+    "fixture_files": 14,
+    "expected_bytes_changed": false,
+    "qualification": "Independent seal-bound verification of existing v1 projections. The v1 packer lacked explicit rehash guards; its source and output remain preserved. No Rust output is read here."
+  },
+  "unchanged_primary_and_clone_inputs": true,
+  "finished_utc": "2026-11-09T21:40:54.785542+00:00"
+}

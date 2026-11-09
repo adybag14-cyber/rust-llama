@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "reviewer": "/root/audit_core_progress",
+  "kind": "read-only source and fixture adapter review",
+  "files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\rust-draft-v1\\crates\\ffi\\src\\split_path.rs",
+      "bytes": 9203,
+      "sha256": "ec8e16b034cae1190f39b98fb7f5b07a6357bc8679c67b70ffef96efa2aac8ce"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\rust-draft-v1\\crates\\ffi\\src\\model.rs",
+      "bytes": 19089,
+      "sha256": "69964f1caa9cabfc6854beb72c215b170db9c296bea5a80e0654b7af8a94f3d9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\rust-draft-v1\\crates\\ffi\\src\\model_split_list_tests.rs",
+      "bytes": 6940,
+      "sha256": "4456a67be5cac934be202b1271a5a71a00231dda1fab96d05da8b33e35c88fe4"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\rust-draft-v1\\crates\\ffi\\src\\model_shard_tests.rs",
+      "bytes": 17378,
+      "sha256": "946ff89438bb4317a29a5565f0b4e187dce50876d0483ab2bfabcee57a5b73a0"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\c-split-api-port\\pack-fixtures-v1.py",
+      "bytes": 10708,
+      "sha256": "07c901f0c1418c61867f287e4208f08c9065a7b721cb7c0e330923e1bb9982a3"
+    }
+  ],
+  "production_findings": [],
+  "reviewed_contracts": [
+    "Signed minimum-width decimal formatting, INT32_MIN and explicit INT32_MAX ordinal-overflow rejection.",
+    "Source 32-byte snprintf postfix buffer truncation to31 bytes in prefix matching.",
+    "Distinct path/prefix zero/short output return values, terminator placement and untouched output guards.",
+    "Every path and pointer-array entry copied into fallibly reserved owned storage before callbacks; single-file ownership fix retains prior UTF-8 boundary.",
+    "Unix explicit-list filenames preserve raw bytes; measured-target parent module guards numerical profile selection.",
+    "Original source-profile raw F32 comparisons retained exactly; no tolerance widening."
+  ],
+  "fixture_finding": {
+    "file": "pack-fixtures-v1.py",
+    "description": "Reads sealed-review status without asserting all recorded report/pool/matrix identities; adapt_output reads native.json without verifying original output identity. Parent accepted separate v2 verification that pins originals, reconstructs projections exactly and rehashes after."
+  },
+  "regression_recommendation": "Use an actual multi-shard list in callback-mutation regression and mutate every foreign path/slot; current one-element test would not detect a future primary-only ownership regression.",
+  "qualification": "Foreign element ceiling remains16M and pointer validity remains caller-owned. Owned path copies have no aggregate byte/RSS budget; no global recoverable-OOM or unlimited native ABI claim.",
+  "no_edits": true
+}

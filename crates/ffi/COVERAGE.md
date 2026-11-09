@@ -1,25 +1,26 @@
 # Frozen C ABI export coverage
 
-The frozen header declares 255 llama C functions and the original DLL contains
+The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust DLL implements **184**, leaves **71 unexported**, and
-adds **4 diagnostic/layout extensions**. This is symbol coverage; accepted
-configurations and behavioral limits are in README.md, SAMPLERS.md and STATE.md.
+this public C-header inventory. The Rust library implements **187**, leaves
+**68 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+coverage; accepted configurations and behavioral limits remain in README.md,
+SAMPLERS.md, STATE.md, EXECUTION.md and SPLITS.md.
 
-This inventory comes from actual PE export tables. The independently validated
-candidate and the integrated product release DLL export the same surface. Machine-readable symbols, DLL/import hashes and
-source hashes are under evidence/2026-11-09/native-context. Previous 155- and
-137-export checkpoints remain preserved in sampler-cpu and sampler-ffi evidence.
-Fresh integrated-product C results and DLL hashes are in the integrated-windows
-subdirectory. Whole-workspace validation is recorded separately by root release
-gates; no unimplemented function is represented by a placeholder export.
+Current debug/release PE and ELF export tables are checked against the original
+255-symbol inventory. The explicit-split checkpoint adds only
+`llama_model_load_from_splits`, `llama_split_path` and `llama_split_prefix`.
+Its exact library identities, C caller results and complete symbol sets are
+recorded in `evidence/2026-11-09/c-split-api`. No absent function is represented
+by a placeholder export. Symbol presence does not close all behavioral or
+platform requirements.
 
-The native microbatch/flash extension retains exactly the same 184 C exports
-and four extensions on Windows and GNU in debug and release. It expands the
-verified behavior of existing context, worker, decode and state functions.
-The exact PE/ELF symbol comparison and DLL/shared-object hashes are recorded in
-evidence/2026-11-09/native-flash-context/export-verification.json. It does not
-claim to implement the separate native C++ symbols.
+The earlier native microbatch/flash checkpoint retained 184 source C exports
+and the same four extensions. It expanded existing context, worker, decode
+and state behavior; its PE/ELF evidence remains unchanged in
+`evidence/2026-11-09/native-flash-context`. Earlier native-context, sampler-cpu
+and sampler-ffi inventories are also preserved as historical checkpoints.
+The separate native C++ symbol surface is not claimed here.
 
 ## Implemented frozen exports
 
@@ -74,6 +75,7 @@ claim to implement the separate native C++ symbols.
 | `llama_model_is_hybrid` |
 | `llama_model_is_recurrent` |
 | `llama_model_load_from_file` |
+| `llama_model_load_from_splits` |
 | `llama_model_n_ctx_train` |
 | `llama_model_n_embd` |
 | `llama_model_n_embd_inp` |
@@ -144,6 +146,8 @@ claim to implement the separate native C++ symbols.
 | `llama_set_embeddings` |
 | `llama_set_n_threads` |
 | `llama_set_state_data` |
+| `llama_split_path` |
+| `llama_split_prefix` |
 | `llama_state_get_data` |
 | `llama_state_get_size` |
 | `llama_state_load_file` |
@@ -266,7 +270,6 @@ claim to implement the separate native C++ symbols.
 | `llama_model_cls_label` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
-| `llama_model_load_from_splits` |
 | `llama_model_meta_count` |
 | `llama_model_meta_key_by_index` |
 | `llama_model_meta_key_str` |
@@ -292,6 +295,4 @@ claim to implement the separate native C++ symbols.
 | `llama_set_adapters_lora` |
 | `llama_set_sampler` |
 | `llama_set_warmup` |
-| `llama_split_path` |
-| `llama_split_prefix` |
 

@@ -5,11 +5,11 @@
 
 //! Frozen-header original C API regression for automatic shard discovery.
 //! Expected getters, token bytes and logits are independent native captures.
-//! See fixtures/ffi/shards-provenance.json; split-list exports are outside scope.
+//! See fixtures/ffi/shards-provenance.json and split-list-provenance.json.
 use crate::{batch::*, context::*, memory::*, model::*, vocab::*, *};
 use llama_behavior::json::{self, Value};
 use std::fs;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -69,6 +69,9 @@ struct Corpus {
 }
 impl Corpus {
     fn new() -> Self {
+        Self::from_data(REFERENCE, INPUTS)
+    }
+    fn from_data(reference: &str, inputs: &[u8]) -> Self {
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let root = std::env::temp_dir().join(format!(
             "rust-llama-ffi-shards-{}-{}-{}",
@@ -80,9 +83,27 @@ impl Corpus {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&root).unwrap();
-        let document = json::parse(REFERENCE).unwrap();
+        let document = json::parse(reference).unwrap();
         for item in array(field(&document, "materializations")) {
-            let relative = Path::new(text(field(item, "path")));
+            if let Some(profiles) = item.get("profiles")
+                && !array(profiles).iter().any(|value| text(value) == PROFILE)
+            {
+                continue;
+            }
+            let relative = if let Some(encoded) = item.get("path_hex") {
+                let bytes = unhex(encoded);
+                #[cfg(unix)]
+                {
+                    use std::os::unix::ffi::OsStringExt;
+                    PathBuf::from(std::ffi::OsString::from_vec(bytes))
+                }
+                #[cfg(not(unix))]
+                {
+                    PathBuf::from(String::from_utf8(bytes).unwrap())
+                }
+            } else {
+                PathBuf::from(text(field(item, "path")))
+            };
             assert!(
                 relative
                     .components()
@@ -90,7 +111,7 @@ impl Corpus {
             );
             let offset = number(field(item, "offset"));
             let bytes = number(field(item, "bytes"));
-            let mut payload = INPUTS[offset..offset.checked_add(bytes).unwrap()].to_vec();
+            let mut payload = inputs[offset..offset.checked_add(bytes).unwrap()].to_vec();
             if let Some(patch) = item.get("patch").filter(|v| !matches!(v, Value::Null)) {
                 let before = unhex(field(patch, "from_hex"));
                 let after = unhex(field(patch, "to_hex"));
@@ -167,13 +188,13 @@ impl Drop for BatchOwner {
         unsafe { llama_batch_free(self.0) }
     }
 }
-fn compare_row(actual: &[f32], block: &Value, row: usize) {
+fn compare_row(actual: &[f32], block: &Value, row: usize, numbers: &[u8]) {
     assert!(row < number(field(block, "rows")));
     assert_eq!(actual.len(), number(field(block, "columns")));
     let start = number(field(block, "offset")) + row * actual.len() * 4;
     for (column, (actual, expected)) in actual
         .iter()
-        .zip(NUMBERS[start..start + actual.len() * 4].as_chunks::<4>().0)
+        .zip(numbers[start..start + actual.len() * 4].as_chunks::<4>().0)
         .enumerate()
     {
         assert_eq!(
@@ -202,7 +223,7 @@ fn piece(vocab: *const VocabHandle, token: i32, special: bool) -> Vec<u8> {
         output
     }
 }
-fn compare_model(model: &ModelOwner, expected: &Value, vocab_only: bool) -> usize {
+fn compare_model(model: &ModelOwner, expected: &Value, vocab_only: bool, numbers: &[u8]) -> usize {
     unsafe {
         assert_eq!(
             llama_model_size(model.0),
@@ -348,7 +369,7 @@ fn compare_model(model: &ModelOwner, expected: &Value, vocab_only: bool) -> usiz
                 let mut logits = Vec::new();
                 for (position, &token) in tokens.iter().enumerate() {
                     logits = batch.decode(context, token, position as i32, n_vocab);
-                    compare_row(&logits, prompt_rows, position);
+                    compare_row(&logits, prompt_rows, position, numbers);
                     words += n_vocab;
                 }
                 let greedy = array(field(item, "greedy_tokens"));
@@ -357,7 +378,7 @@ fn compare_model(model: &ModelOwner, expected: &Value, vocab_only: bool) -> usiz
                 let mut generated = Vec::new();
                 let mut ended = false;
                 for (index, expected_token) in greedy.iter().enumerate() {
-                    compare_row(&logits, rows, index);
+                    compare_row(&logits, rows, index, numbers);
                     words += n_vocab;
                     let mut selected = 0;
                     for id in 1..logits.len() {
@@ -441,8 +462,12 @@ fn original_auto_shard_loading_getters_and_inference() {
         let model = ModelOwner(pointer);
         let index = number(field(field(case, "reference"), PROFILE));
         let expected = &array(field(field(&corpus.document, "references"), PROFILE))[index];
-        words += compare_model(&model, expected, vocab_only);
+        words += compare_model(&model, expected, vocab_only, NUMBERS);
         accepted += 1;
     }
     assert_eq!((accepted, rejected, words), (53, 43, 163_840));
 }
+
+// Reuse the same getter/token/logit assertions for the explicit-list entry point.
+#[path = "model_split_list_tests.rs"]
+mod split_list_tests;

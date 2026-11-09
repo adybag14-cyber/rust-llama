@@ -14,7 +14,7 @@ The merged workspace has local path dependencies. Optional OS/driver/vendor inte
 
 | Track | Current implementation and evidence | Requirements still open |
 | --- | --- | --- |
-| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 184/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 71 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
+| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 187/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 68 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
 | T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 76 executable operation IDs plus NONE leaves, including the checked shared CPU FLASH_ATTN_EXT adapter; the earlier 3,240-graph corpus remains preserved. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
 | T04: formats/conversion/tokenizers | Bounded shared raw/text GGUF v2/v3 reader, native byte/NUL alias and nonzero-boolean semantics, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, byte-preserving ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, raw/indexed Safetensors reading with retained capabilities, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Architecture checkpoint conversion; arbitrary-byte metadata across every high-level model/vocabulary consumer; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
@@ -60,7 +60,7 @@ and infill, with 165 independent scenarios and 42 real contexts / 585 generated
 tokens. Candidate order, flags, float bits, selected indices and lifecycle
 operations match the frozen Windows DLL. Native BPE/FIM getter, piece and
 detokenization checks add 1,505,576 vocabulary records and 7,598 tokenization cases.
-The context/memory extension raises the implemented inventory to 184 exported source symbols; 71 remain absent. Its independent 80-case cohort covers 400 checks, 61,440 continuation logits and 1,223,532 state bytes. Restoring and reserializing original state payloads is byte-exact on both platforms. Windows generated floats are exact; Linux retains the original fixed tolerance. Native sessions, per-sequence state, memory operations, bounded copies and file edge cases have separate frozen-header checks. An additional family C getter cohort covers 347,066 vocabulary records and 27,508 tokenization cases, with 176 physical-metadata cases covering 23,903 records and 480 outputs. Nonnull metadata override lists and native recurrent C memory remain explicitly unsupported.
+The earlier context/memory extension established 184 exported source symbols, with 71 then absent. Its independent 80-case cohort covers 400 checks, 61,440 continuation logits and 1,223,532 state bytes. Restoring and reserializing original state payloads is byte-exact on both platforms. Windows generated floats are exact; Linux retains the original fixed tolerance. Native sessions, per-sequence state, memory operations, bounded copies and file edge cases have separate frozen-header checks. An additional family C getter cohort covers 347,066 vocabulary records and 27,508 tokenization cases, with 176 physical-metadata cases covering 23,903 records and 480 outputs. Nonnull metadata override lists and native recurrent C memory remain explicitly unsupported.
 
 The server embedding corpora exercise 256 ordinary tiny-model requests and
 27 explicit pretrained BGE requests per original build. Both verified profiles
@@ -118,7 +118,7 @@ system erff boundary is independently verified on the captured x86_64 dynamic
 UCRT/glibc profiles; other providers, static targets and remaining ISA behavior
 retain explicit unverified or fallback qualifications.
 
-Automatic shard loading now uses a single validated file-set owner through the C facade as well. The new frozen-header regression checks 96 cases per profile, with 53 accepted and 43 rejected loads, exact aggregate getters and 163,840 exact F32 continuation words. All 184 frozen exports and four diagnostic extensions remain unchanged; explicit C split-list and filename helpers stay open.
+Automatic shard loading now uses a single validated file-set owner through the C facade as well. The new frozen-header regression checks 96 cases per profile, with 53 accepted and 43 rejected loads, exact aggregate getters and 163,840 exact F32 continuation words. That automatic-discovery checkpoint retained 184 frozen exports and four diagnostic extensions. The following explicit-list/filename checkpoint adds three exports as recorded below.
 
 ## Dense Qwen3 and native F16 cache support
 
@@ -297,3 +297,39 @@ raw logs and run/job identities are retained with the next checkpoint.
 The source audit checks implementation roles and dependency metadata; it reports unsafe review candidates instead of claiming every unsafe block is proven sound. Fixture integrity checks hashes, declared lengths, provenance fields and complete fixture inventory. Numerical tests check semantics separately.
 
 `release/gates.tsv` is the active mandatory gate list. `cargo xtask release-check` must return nonzero until all full-port requirements have independent closure evidence. A green build or a checkpoint commit cannot close that gate.
+
+
+## Explicit C split lists and byte-oriented filename helpers
+
+The public C surface now contains 187 of the 255 frozen exports, plus the same
+four diagnostic/layout extensions; 68 source exports remain unavailable.
+`llama_model_load_from_splits` uses the existing owned GGUF file-set loader and
+the current C model execution/vocabulary contracts. It retains every supplied
+path before foreign progress callbacks, accepts raw Unix path bytes, and uses
+checked UTF-8 paths on Windows. Automatic file loading also retains its path
+before callbacks.
+
+The frozen-header native corpus contains 104 Windows / 106 GNU explicit-list
+cases: 55 / 57 accepted, with 49 checked errors on each host. Two errors per
+host replace original source assertions. Successful cases compare model and
+vocabulary getters, token bytes and 172,032 / 180,224 F32 continuation words
+against their own original compiler profile. Those totals include repeated
+model/list configurations. Original MSVC/GNU values stay separate.
+
+`llama_split_path` and `llama_split_prefix` operate on C-string bytes without a
+UTF-8 requirement. All 7,807 original calls and 506,563 complete output-buffer
+bytes agree per profile, including signed minimum-width formatting, embedded
+NUL termination, all input byte values, short/zero/null-zero buffers and the
+source prefix helper's 32-byte local postfix truncation. Source signed overflow
+and null pointer/count errors produce explicit checked diagnostics.
+
+Both measured hosts run the FFI crate tests in debug/release, strict Clippy,
+source/fixture audits, built-library C replays and exact 187+4 export checks.
+Four isolated mutation controls exercise zero-based numbering, prefix return
+semantics, actual caller-list use and ownership of every path before callbacks.
+See `crates/ffi/SPLITS.md` and `evidence/2026-11-09/c-split-api`.
+
+Twenty mandatory full-port release gates remain open across twelve ownership
+tracks. Complete C ABI semantics, architectures, backends, platform coverage
+and performance remain open. Earlier evidence and release-gate reason records
+are retained with their original checkpoint counts.

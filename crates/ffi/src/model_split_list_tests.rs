@@ -1,0 +1,284 @@
+// The parent module shares exact original getter, tokenizer, context and
+// raw-logit assertions with automatic discovery.
+use super::*;
+const SPLIT_LIST_REFERENCE: &str = include_str!("../../../fixtures/ffi/split-list-reference.json");
+#[cfg(target_env = "msvc")]
+const SPLIT_LIST_NUMBERS: &[u8] =
+    include_bytes!("../../../fixtures/ffi/split-list-msvc-values.f32le.bin");
+#[cfg(not(target_env = "msvc"))]
+const SPLIT_LIST_NUMBERS: &[u8] =
+    include_bytes!("../../../fixtures/ffi/split-list-gnu-values.f32le.bin");
+
+fn split_list_os_path(bytes: Vec<u8>) -> PathBuf {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStringExt;
+        PathBuf::from(std::ffi::OsString::from_vec(bytes))
+    }
+    #[cfg(not(unix))]
+    {
+        PathBuf::from(String::from_utf8(bytes).unwrap())
+    }
+}
+fn split_list_c_path(path: &std::path::Path) -> Vec<u8> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt;
+        path.as_os_str().as_bytes().to_vec()
+    }
+    #[cfg(not(unix))]
+    {
+        path.to_str().unwrap().as_bytes().to_vec()
+    }
+}
+
+#[test]
+fn original_explicit_split_lists_getters_paths_and_inference() {
+    let corpus = Corpus::from_data(SPLIT_LIST_REFERENCE, INPUTS);
+    let mut accepted = 0;
+    let mut rejected = 0;
+    let mut words = 0;
+    for case in array(field(&corpus.document, "cases")) {
+        if !array(field(case, "profiles"))
+            .iter()
+            .any(|value| text(value) == PROFILE)
+        {
+            continue;
+        }
+        let name = text(field(case, "name"));
+        let paths: Vec<_> = array(field(case, "paths_hex"))
+            .iter()
+            .map(|value| {
+                let relative = split_list_os_path(unhex(value));
+                assert!(
+                    relative
+                        .components()
+                        .all(|component| matches!(component, Component::Normal(_)))
+                );
+                CString::new(split_list_c_path(&corpus.root.join(relative))).unwrap()
+            })
+            .collect();
+        let pointers: Vec<_> = paths.iter().map(|path| path.as_ptr()).collect();
+        let vocab_only = flag(field(case, "vocab_only"));
+        let params = LlamaModelParams {
+            n_gpu_layers: 0,
+            load_mode: 0,
+            vocab_only: u8::from(vocab_only),
+            use_extra_bufts: 0,
+            check_tensors: 1,
+            ..LlamaModelParams::default()
+        };
+        clean();
+        let pointer = unsafe {
+            llama_model_load_from_splits(
+                if pointers.is_empty() {
+                    ptr::null()
+                } else {
+                    pointers.as_ptr()
+                },
+                pointers.len(),
+                params,
+            )
+        };
+        let should_load = flag(field(field(case, "accepted"), PROFILE));
+        assert_eq!(
+            !pointer.is_null(),
+            should_load,
+            "{name}: {}",
+            unsafe { CStr::from_ptr(llama_rust_last_error()) }.to_string_lossy()
+        );
+        if !should_load {
+            assert!(
+                !unsafe { CStr::from_ptr(llama_rust_last_error()) }
+                    .to_bytes()
+                    .is_empty(),
+                "{name}"
+            );
+            rejected += 1;
+            continue;
+        }
+        okay();
+        let model = ModelOwner(pointer);
+        let index = number(field(field(case, "reference"), PROFILE));
+        let expected = &array(field(field(&corpus.document, "references"), PROFILE))[index];
+        words += compare_model(&model, expected, vocab_only, SPLIT_LIST_NUMBERS);
+        accepted += 1;
+    }
+    let expected = if PROFILE == "msvc" {
+        (55, 49, 172_032)
+    } else {
+        (57, 49, 180_224)
+    };
+    assert_eq!((accepted, rejected, words), expected);
+    println!(
+        "Explicit C split lists: profile={PROFILE} accepted={accepted} checked_errors={rejected} exact_logit_words={words}"
+    );
+}
+
+#[test]
+fn explicit_split_list_argument_guards_are_checked() {
+    let params = LlamaModelParams {
+        n_gpu_layers: 0,
+        load_mode: 0,
+        ..LlamaModelParams::default()
+    };
+    for count in [0, 1, MAX_FOREIGN_ELEMENTS + 1] {
+        clean();
+        let model = unsafe { llama_model_load_from_splits(ptr::null(), count, params) };
+        assert!(model.is_null());
+        assert!(
+            !unsafe { CStr::from_ptr(llama_rust_last_error()) }
+                .to_bytes()
+                .is_empty()
+        );
+    }
+    let null_path: [*const c_char; 1] = [ptr::null()];
+    clean();
+    assert!(unsafe { llama_model_load_from_splits(null_path.as_ptr(), 1, params) }.is_null());
+    assert!(
+        !unsafe { CStr::from_ptr(llama_rust_last_error()) }
+            .to_bytes()
+            .is_empty()
+    );
+}
+
+#[test]
+fn model_path_owners_survive_foreign_callback_input_changes() {
+    struct Mutation {
+        path: *mut u8,
+        slot: *mut *const c_char,
+        called: bool,
+    }
+    unsafe extern "C" fn mutate(_progress: f32, userdata: *mut std::ffi::c_void) -> bool {
+        // SAFETY: this test passes its live exclusive Mutation record and
+        // owned path/array buffers; callbacks are synchronous and non-reentrant.
+        let state = unsafe { &mut *userdata.cast::<Mutation>() };
+        if !state.called {
+            unsafe {
+                *state.path = b'?';
+                *state.slot = ptr::null();
+            }
+            state.called = true;
+        }
+        true
+    }
+    let corpus = Corpus::new();
+    for explicit in [false, true] {
+        let mut path = split_list_c_path(
+            &corpus
+                .root
+                .join("rust-draft/fixtures/ffi/native-context-model.gguf"),
+        );
+        path.push(0);
+        let mut pointers = [path.as_ptr().cast::<c_char>()];
+        let mut state = Mutation {
+            path: path.as_mut_ptr(),
+            slot: pointers.as_mut_ptr(),
+            called: false,
+        };
+        let params = LlamaModelParams {
+            n_gpu_layers: 0,
+            load_mode: 0,
+            vocab_only: 1,
+            use_extra_bufts: 0,
+            check_tensors: 1,
+            progress_callback: Some(mutate),
+            progress_callback_user_data: (&mut state as *mut Mutation).cast(),
+            ..LlamaModelParams::default()
+        };
+        clean();
+        let pointer = unsafe {
+            if explicit {
+                llama_model_load_from_splits(pointers.as_ptr(), 1, params)
+            } else {
+                llama_model_load_from_file(path.as_ptr().cast(), params)
+            }
+        };
+        assert!(
+            !pointer.is_null(),
+            "{}",
+            unsafe { CStr::from_ptr(llama_rust_last_error()) }.to_string_lossy()
+        );
+        let _model = ModelOwner(pointer);
+        assert!(state.called);
+        assert_eq!(path[0], b'?');
+        assert!(pointers[0].is_null());
+        okay();
+    }
+}
+
+#[test]
+fn explicit_split_list_copies_every_shard_before_foreign_callbacks() {
+    struct Mutation {
+        paths: Vec<*mut u8>,
+        slots: *mut *const c_char,
+        called: bool,
+    }
+    unsafe extern "C" fn mutate(_progress: f32, userdata: *mut std::ffi::c_void) -> bool {
+        // SAFETY: the test retains this exclusive record and every pointed-to
+        // path/slot allocation for the complete synchronous loading call.
+        let state = unsafe { &mut *userdata.cast::<Mutation>() };
+        if !state.called {
+            for (index, &path) in state.paths.iter().enumerate() {
+                unsafe {
+                    *path = b'?';
+                    *state.slots.add(index) = ptr::null();
+                }
+            }
+            state.called = true;
+        }
+        true
+    }
+    let corpus = Corpus::from_data(SPLIT_LIST_REFERENCE, INPUTS);
+    let case = array(field(&corpus.document, "cases"))
+        .iter()
+        .find(|case| {
+            text(field(case, "name")) == "unicode-arbitrary-names-vocab"
+                && flag(field(field(case, "accepted"), PROFILE))
+        })
+        .expect("independent accepted three-shard custom-path fixture");
+    let mut paths: Vec<Vec<u8>> = array(field(case, "paths_hex"))
+        .iter()
+        .map(|value| {
+            let relative = split_list_os_path(unhex(value));
+            assert!(
+                relative
+                    .components()
+                    .all(|component| matches!(component, Component::Normal(_)))
+            );
+            let mut bytes = split_list_c_path(&corpus.root.join(relative));
+            assert!(!bytes.contains(&0));
+            bytes.push(0);
+            bytes
+        })
+        .collect();
+    assert_eq!(paths.len(), 3);
+    let mut slots: Vec<*const c_char> = paths.iter().map(|path| path.as_ptr().cast()).collect();
+    let mut state = Mutation {
+        paths: paths.iter_mut().map(|path| path.as_mut_ptr()).collect(),
+        slots: slots.as_mut_ptr(),
+        called: false,
+    };
+    let params = LlamaModelParams {
+        n_gpu_layers: 0,
+        load_mode: 0,
+        vocab_only: 1,
+        use_extra_bufts: 0,
+        check_tensors: 1,
+        progress_callback: Some(mutate),
+        progress_callback_user_data: (&mut state as *mut Mutation).cast(),
+        ..LlamaModelParams::default()
+    };
+    clean();
+    let pointer = unsafe { llama_model_load_from_splits(slots.as_ptr(), slots.len(), params) };
+    assert!(
+        !pointer.is_null(),
+        "{}",
+        unsafe { CStr::from_ptr(llama_rust_last_error()) }.to_string_lossy()
+    );
+    let _model = ModelOwner(pointer);
+    assert!(state.called);
+    assert!(paths.iter().all(|path| path[0] == b'?'));
+    assert!(slots.iter().all(|path| path.is_null()));
+    okay();
+}

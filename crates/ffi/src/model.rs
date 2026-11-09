@@ -182,15 +182,74 @@ unsafe fn progress(p: &LlamaModelParams, amount: f32) -> Result<()> {
     }
     Ok(())
 }
+fn owned_path(path: &std::path::Path) -> Result<std::path::PathBuf> {
+    let mut owned = std::path::PathBuf::new();
+    owned
+        .try_reserve_exact(path.as_os_str().len())
+        .map_err(|_| "foreign model path allocation failed")?;
+    owned.push(path);
+    Ok(owned)
+}
+unsafe fn owned_split_path(path: *const c_char) -> Result<std::path::PathBuf> {
+    if path.is_null() {
+        return Err("null path in explicit model split list".into());
+    }
+    // SAFETY: each caller-supplied path is a live NUL-terminated string.
+    let bytes = unsafe { CStr::from_ptr(path) }.to_bytes();
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt;
+        owned_path(std::path::Path::new(std::ffi::OsStr::from_bytes(bytes)))
+    }
+    #[cfg(not(unix))]
+    {
+        let text = std::str::from_utf8(bytes).map_err(|_| "model split path is not UTF-8")?;
+        owned_path(std::path::Path::new(text))
+    }
+}
 pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*mut ModelHandle> {
     let vocab_only = validate_params(&p)?;
-    let path = unsafe { c_string(path)? };
+    // Retain an owned path before invoking foreign callbacks, as the original
+    // C++ entry point retains its std::string. The existing UTF-8 single-file
+    // entry contract is unchanged.
+    let path = owned_path(std::path::Path::new(unsafe { c_string(path)? }))?;
     unsafe {
         progress(&p, 0.0)?;
     }
+    let files = GgufSet::open(path).map_err(|e| e.to_string())?;
+    unsafe { load_set(files, p, vocab_only) }
+}
+unsafe fn load_splits(
+    paths: *const *const c_char,
+    n_paths: usize,
+    p: LlamaModelParams,
+) -> Result<*mut ModelHandle> {
+    if n_paths == 0 {
+        return Err("explicit model split list is empty".into());
+    }
+    let vocab_only = validate_params(&p)?;
+    // SAFETY: the foreign caller supplies n_paths live pointer elements.
+    let supplied = unsafe { input_slice(paths, n_paths)? };
+    let mut owned = Vec::new();
+    owned
+        .try_reserve_exact(supplied.len())
+        .map_err(|_| "explicit model split path list allocation failed")?;
+    for &path in supplied {
+        owned.push(unsafe { owned_split_path(path)? });
+    }
+    unsafe {
+        progress(&p, 0.0)?;
+    }
+    let files = GgufSet::open_splits(&owned).map_err(|e| e.to_string())?;
+    unsafe { load_set(files, p, vocab_only) }
+}
+unsafe fn load_set(
+    files: GgufSet,
+    p: LlamaModelParams,
+    vocab_only: bool,
+) -> Result<*mut ModelHandle> {
     // Vocabulary-only loading also validates every declared shard. Metadata is
     // taken only from the primary file; statistics cover the validated set.
-    let files = GgufSet::open(path).map_err(|e| e.to_string())?;
     let m = files.metadata();
     let architecture = m
         .get("general.architecture")
@@ -390,6 +449,15 @@ ffi!(
     llama_model_load_from_file(path: *const c_char, p: LlamaModelParams) -> *mut ModelHandle,
     ptr::null_mut(),
     { unsafe { load(path, p) } }
+);
+ffi!(
+    llama_model_load_from_splits(
+        paths: *const *const c_char,
+        n_paths: usize,
+        p: LlamaModelParams,
+    ) -> *mut ModelHandle,
+    ptr::null_mut(),
+    { unsafe { load_splits(paths, n_paths, p) } }
 );
 ffi!(
     llama_load_model_from_file(path: *const c_char, p: LlamaModelParams) -> *mut ModelHandle,
