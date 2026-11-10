@@ -418,9 +418,15 @@ impl Value {
     }
 }
 pub fn parse(bytes: &[u8], limits: Limits) -> Result<Value> {
+    parse_with_usage(bytes, limits).map(|(value, _)| value)
+}
+/// Return actual parser work, including discarded duplicate values. Callers
+/// parsing several sidecars can supply the remaining budgets before each parse.
+pub fn parse_with_usage(bytes: &[u8], limits: Limits) -> Result<(Value, crate::Usage)> {
     let mut budget = Budget::new(limits)?;
     budget.header(bytes.len() as u64)?;
-    parse_charged(bytes, &mut budget)
+    let value = parse_charged(bytes, &mut budget)?;
+    Ok((value, budget.used))
 }
 pub(crate) fn parse_charged(bytes: &[u8], budget: &mut Budget) -> Result<Value> {
     std::str::from_utf8(bytes).map_err(|_| Error::Invalid("JSON header is not UTF-8"))?;

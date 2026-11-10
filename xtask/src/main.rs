@@ -1,5 +1,6 @@
 //! Rust-authored build, inventory, validation and deterministic packaging tasks.
 #![forbid(unsafe_code)]
+mod dependencies;
 use llama_conformance::{
     benchmark, compare, digest, fixtures as fixture_integrity, inventory, package, process,
 };
@@ -12,7 +13,7 @@ use std::process::{Command, ExitCode};
 use std::time::Duration;
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
-const HELP: &str = "llama rewrite xtask (Rust 1.99.1; offline)\n\nCommands:\n  doctor                                compiler identity and installed targets\n  baseline REFERENCE_DIR [OUTPUT_DIR]     hash and assign every original file; extract registries\n  verify-source REFERENCE_DIR [LEDGER]    report added, removed and changed files\n  audit [--write]                        audit source languages and offline Cargo dependency graph\n  fixtures                              verify independent fixture manifests, when present\n  check | test | build                   offline, locked workspace operations\n  fmt                                   rustfmt check\n  compare EXPECTED ACTUAL                exact byte comparison\n  numeric EXPECTED ACTUAL ABS REL        numeric whitespace/CSV comparison\n  capture OUTPUT_STEM PROGRAM [ARGS...]  single-process evidence (30-second direct-child timeout)\n  storage [DIR]                          count disk bytes, without deleting anything\n  benchmark-hash                         2 warmups and 9 SHA-256 host measurements\n  release-check                         fail while mandatory release gates remain open\n  package OUTPUT.zip                    deterministic source ZIP; refuses overwrite\n  verify-package [ROOT]                  verify every extracted package file hash\n";
+const HELP: &str = "llama rewrite xtask (Rust 1.99.1; offline)\n\nCommands:\n  doctor                                compiler identity and installed targets\n  baseline REFERENCE_DIR [OUTPUT_DIR]     hash and assign every original file; extract registries\n  verify-source REFERENCE_DIR [LEDGER]    report added, removed and changed files\n  audit [--write]                        audit source languages and offline Cargo dependency graph\n  dependencies                          verify exact reviewed Cargo sources and default features\n  fixtures                              verify independent fixture manifests, when present\n  check | test | build                   offline, locked workspace operations\n  fmt                                   rustfmt check\n  compare EXPECTED ACTUAL                exact byte comparison\n  numeric EXPECTED ACTUAL ABS REL        numeric whitespace/CSV comparison\n  capture OUTPUT_STEM PROGRAM [ARGS...]  single-process evidence (30-second direct-child timeout)\n  storage [DIR]                          count disk bytes, without deleting anything\n  benchmark-hash                         2 warmups and 9 SHA-256 host measurements\n  release-check                         fail while mandatory release gates remain open\n  package OUTPUT.zip                    deterministic source ZIP; refuses overwrite\n  verify-package [ROOT]                  verify every extracted package file hash\n";
 fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
@@ -131,26 +132,7 @@ fn audit(write: bool) -> Result<()> {
     for item in &result.errors {
         eprintln!("FAIL: {item}");
     }
-    let metadata = Command::new(cargo())
-        .args(["metadata", "--offline", "--locked", "--format-version", "1"])
-        .current_dir(root())
-        .output()?;
-    if !metadata.status.success() {
-        return Err(format!(
-            "Cargo dependency audit failed: {}",
-            String::from_utf8_lossy(&metadata.stderr)
-        )
-        .into());
-    }
-    let metadata = String::from_utf8(metadata.stdout)?;
-    // Cargo metadata emits compact JSON. There are no external crates in this
-    // checkpoint. Source-less workspace/path packages are the only allowed graph.
-    if metadata.contains("\"source\":\"registry+") || metadata.contains("\"source\":\"git+") {
-        return Err("external dependency requires an explicit audit before release".into());
-    }
-    if metadata.contains("\"kind\":[\"custom-build\"]") {
-        return Err("custom build scripts require a separate native-dependency audit".into());
-    }
+    dependencies::audit(&root(), &cargo())?.print();
     if !result.errors.is_empty() {
         return Err("source-language audit failed".into());
     }
@@ -166,7 +148,7 @@ fn audit(write: bool) -> Result<()> {
         )?;
     }
     println!(
-        "Source audit passed; Cargo graph contains only local packages. This is a host-checkpoint audit, not all-feature/backend closure."
+        "Source audit passed; the default Cargo graph and materialized dependency bytes match the pinned review. All-feature/backend closure remains separate."
     );
     Ok(())
 }
@@ -312,6 +294,11 @@ fn execute() -> Result<()> {
                 return Err("audit accepts only --write".into());
             }
             audit(!args.is_empty())
+        }
+        "dependencies" => {
+            require_len(&args, 0, 0)?;
+            dependencies::audit(&root(), &cargo())?.print();
+            Ok(())
         }
         "fixtures" => {
             require_len(&args, 0, 0)?;

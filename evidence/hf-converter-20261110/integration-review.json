@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "reviewed_utc": "2026-11-10T20:26:18.270679+00:00",
+  "kind": "read-only selective integration review",
+  "root": "C:\\Users\\adyba\\rust-llama",
+  "findings": [],
+  "conclusions": [
+    "All 115 original handoff additions retain their exact imported SHA-256.",
+    "All 62 converter fixture files are declared and match sizes/hashes; largest is 13163408 bytes.",
+    "Shared writer differs from the validated isolated writer only by two ByteString match arms; the converter uses RawValue and the checked encoded_header_bytes field.",
+    "Cargo.lock contains exactly the five reviewed registry identities and retains llama-ffi dependency on llama-conformance.",
+    "CI fetches locked dependencies before all offline gates.",
+    "README and NOTICE accurately describe converter scope, dependency bootstrap and component license locations."
+  ],
+  "boundaries": "This review launched no build and did not alter product root. Root integrated workspace validation is recorded separately; these execution logs validate the isolated recovered converter workspace.",
+  "sampled_files": [
+    {
+      "path": "Cargo.toml",
+      "bytes": 297,
+      "sha256": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 3578,
+      "sha256": "36120e28e36fb291179428683a327c3268cfef1d2fce94e61ddddc5cd3dd014b"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 4630,
+      "sha256": "d45ad32a592884702838cc0e6fa430a6ec69bda4e7ed84c60676cfe62cfead18"
+    },
+    {
+      "path": "README.md",
+      "bytes": 23905,
+      "sha256": "dd0b0632ea359c8f6a74597cc506ee6152e32d8d5f5485e419285b67756470ca"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 1133,
+      "sha256": "0d25586a95cee9dc58a2f788edc1f6ab1901d10a50ff5fd07aadba4039db2750"
+    },
+    {
+      "path": "crates/convert/Cargo.toml",
+      "bytes": 530,
+      "sha256": "470e7c224ef0860ec29b19407a967ca27b96bc75883eb02a61bece77e87ac274"
+    },
+    {
+      "path": "crates/convert/README.md",
+      "bytes": 12645,
+      "sha256": "e2aebf96d5308b63b8e868f371e26ba04b5cfe261c0cefabd2db65c924fe49d2"
+    },
+    {
+      "path": "crates/gguf/src/writer.rs",
+      "bytes": 22757,
+      "sha256": "6f07aa440a31663cd77adb8afe1bf2f10868d512257a4f928acaf08b846fd486"
+    },
+    {
+      "path": "xtask/src/dependencies.rs",
+      "bytes": 27223,
+      "sha256": "b299045cb72b6ed4124aeece8425938cbab10d688b69c7e1f87e435f9e209823"
+    },
+    {
+      "path": "release/reviewed-dependencies.json",
+      "bytes": 25288,
+      "sha256": "85ee48966a886f28fe38ed8dba424b72f6dd0ea3e2ae606fa8af0c8ad2beddaa"
+    },
+    {
+      "path": "docs/convert-fixture-manifest.tsv",
+      "bytes": 14729,
+      "sha256": "2971d255f63009b6d42f2221be529b21a4c7eee9a7af5f3d8d1632324bff40d6"
+    }
+  ]
+}

@@ -157,6 +157,9 @@ fn compare_metadata(actual: &BTreeMap<String, Metadata>, expected: &Value) {
         let e = field(item, "value");
         match a {
             Metadata::String(v) => assert_eq!(v, string(e), "{key}"),
+            Metadata::ByteString(_) => {
+                panic!("text-only shard fixture returned a byte string: {key}")
+            }
             Metadata::Bool(v) => assert_eq!(*v, boolean(e), "{key}"),
             Metadata::F32(v) => assert_eq!(
                 hex(&v.to_le_bytes()),
@@ -559,6 +562,7 @@ fn cumulative_limits_include_every_shard_and_reads_remain_lazy() {
     let usage = original.header_usage();
     let exact = ShardLimits {
         max_shards: paths.len(),
+        max_metadata_storage_bytes: ShardLimits::default().max_metadata_storage_bytes,
         gguf: Limits {
             max_metadata_bytes: usage.bytes,
             max_metadata_entries: usage.metadata_entries,

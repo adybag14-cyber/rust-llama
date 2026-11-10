@@ -6,6 +6,7 @@ mod cpu_conv;
 mod cpu_extra;
 mod cpu_flash;
 mod cpu_index;
+mod cpu_recurrent;
 mod graph;
 mod native_sort;
 mod registry;

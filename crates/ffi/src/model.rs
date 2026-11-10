@@ -32,7 +32,7 @@ pub(crate) struct ModelData {
     pub parameters: u64,
     pub ftype: i32,
     pub description: String,
-    pub strings: BTreeMap<String, Vec<u8>>,
+    pub metadata: crate::model_metadata::MetadataCache,
 }
 fn integer(meta: &BTreeMap<String, Value>, key: &str, default: i32) -> Result<i32> {
     match meta.get(key) {
@@ -251,10 +251,12 @@ unsafe fn load_set(
     // Vocabulary-only loading also validates every declared shard. Metadata is
     // taken only from the primary file; statistics cover the validated set.
     let m = files.metadata();
-    let architecture = m
-        .get("general.architecture")
-        .and_then(Value::as_str)
-        .unwrap_or("llama");
+    let architecture = match m.get("general.architecture") {
+        None => "llama",
+        Some(value) => value
+            .as_str()
+            .ok_or("general.architecture must be a UTF-8 STRING")?,
+    };
     // These frozen architectures share the implemented tokenizer families. Their
     // vocabulary-only source path does not load tensor hyperparameters.
     if ![
@@ -393,10 +395,7 @@ unsafe fn load_set(
     } else {
         format!("{architecture} {family} {}", file_type_name(ftype))
     };
-    let strings = m
-        .iter()
-        .filter_map(|(key, value)| value.as_str().map(|v| (key.clone(), nul_bytes(v))))
-        .collect();
+    let metadata = crate::model_metadata::MetadataCache::build(&files)?;
     let architecture = architecture.to_owned();
     let model = if vocab_only {
         None
@@ -440,7 +439,7 @@ unsafe fn load_set(
         parameters,
         ftype,
         description,
-        strings,
+        metadata,
     });
     Ok(Box::into_raw(Box::new(ModelHandle { data, owned: true })))
 }
@@ -583,16 +582,33 @@ ffi!(
     llama_model_chat_template(model: *const ModelHandle, name: *const c_char) -> *const c_char,
     ptr::null(),
     {
-        let key = if name.is_null() {
-            "tokenizer.chat_template".into()
+        let name = if name.is_null() {
+            None
         } else {
-            format!("tokenizer.chat_template.{}", unsafe { c_string(name)? })
+            // SAFETY: the foreign caller supplies a live NUL-terminated name.
+            Some(unsafe { CStr::from_ptr(name) }.to_bytes())
         };
+        let prefix = b"tokenizer.chat_template";
+        let length = prefix
+            .len()
+            .checked_add(name.map_or(0, |name| name.len().saturating_add(1)))
+            .ok_or("chat template name length overflow")?;
+        if length > MAX_FOREIGN_ELEMENTS {
+            return Err("chat template name exceeds safety limit".into());
+        }
+        let mut key = Vec::new();
+        key.try_reserve_exact(length)
+            .map_err(|_| "chat template name allocation")?;
+        key.extend_from_slice(prefix);
+        if let Some(name) = name {
+            key.push(b'.');
+            key.extend_from_slice(name);
+        }
         Ok(unsafe { reference(model)? }
             .data
-            .strings
-            .get(&key)
-            .map_or(ptr::null(), |v| v.as_ptr().cast()))
+            .metadata
+            .chat_template(&key)
+            .unwrap_or(ptr::null()))
     }
 );
 macro_rules! flag {

@@ -1,0 +1,298 @@
+{
+  "status": "succeeded",
+  "host": "linux",
+  "started_utc": "2026-11-10T20:10:40.828108+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "original_seal": {
+    "bytes": 2336,
+    "sha256": "f98154ddae1fe2f3a26891f77db339372eccdc58de2a65e5fcbcbb18e84d913d"
+  },
+  "execution_input_count": 272,
+  "execution_inputs": {
+    "bytes": 40199,
+    "sha256": "d3ee93a067da65350755a3b0856f8461af77e7c5233e2bc3133815ed059d27e4"
+  },
+  "validator": {
+    "bytes": 5811,
+    "sha256": "6a7f71e6b963d6e1cfc6a2496b082b3940d88454aaa2a197e745342e64a06af8"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.0745196060000008,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.469529210000005,
+      "log": {
+        "bytes": 9476,
+        "sha256": "35c59d6a0a07001e1d2f4ab8bc41a49ecb83944305cf2f7a38f3b5ab49f6b961"
+      },
+      "test_summaries": [
+        {
+          "passed": 45,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 39,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "passed_tests": 93
+    },
+    {
+      "name": "release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 34.207044349,
+      "log": {
+        "bytes": 9476,
+        "sha256": "9c2360ea05cfad48ab0e41994ebe50fc56006016b73a93db45d14c30339c5fc5"
+      },
+      "test_summaries": [
+        {
+          "passed": 45,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 39,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "passed_tests": 93
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.8822783079999965,
+      "log": {
+        "bytes": 880,
+        "sha256": "2bd0b63b416f8c71cf70d0975cdd948230684d9c2f71ee436c24645a3065a18e"
+      }
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.8733367529999896,
+      "log": {
+        "bytes": 178,
+        "sha256": "c96e5d13bea5ee854760ca44d2f59a60ce89954426890c9a64edf5f1f68bd128"
+      }
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 12.147098735,
+      "log": {
+        "bytes": 871,
+        "sha256": "8cf1ab1aaa10579b69db524dd4a924c5b07bd660c6b8dc007b2d8e2392b3f200"
+      }
+    },
+    {
+      "name": "audit",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 108.17009155300002,
+      "log": {
+        "bytes": 44020,
+        "sha256": "e095535d8bf0786399217736cd07ef83423364c4dbdab6d5c5d3d098721b0160"
+      }
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 107.40046603300001,
+      "log": {
+        "bytes": 349,
+        "sha256": "f800413bf903286bda61ab5195858d5557b156f8629e7f789d3b3d99d7656f81"
+      }
+    }
+  ],
+  "library_replays": [
+    {
+      "profile": "debug",
+      "library": {
+        "bytes": 34658496,
+        "sha256": "705d010f599c55f1a9806be38b47fafd47426f23d1c5c544d9f28f449ebdc761"
+      },
+      "caller": {
+        "bytes": 27608,
+        "sha256": "3b6a306ae6b6bd07e70cf07f53c135f20ab621c17b02cf13761f978cea9eae2d"
+      },
+      "command": [
+        "/home/tdamre/.cache/rust-llama-chat-oracle-20261110/chat-oracle",
+        "/home/tdamre/.cache/rust-llama-chat-20261110/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/inputs-v1.bin",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/validation-v1-linux/debug-c-replay.bin"
+      ],
+      "exit_code": 0,
+      "exact_original_bytes": true,
+      "result": {
+        "bytes": 3937927,
+        "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+      },
+      "log": {
+        "bytes": 42,
+        "sha256": "96411fc3f2eb793caba495ddad3dbf05edc27315f4695030a824c153a05cf630"
+      },
+      "cases": 35946,
+      "complete_buffer_bytes": 3361503
+    },
+    {
+      "profile": "release",
+      "library": {
+        "bytes": 2421776,
+        "sha256": "c009ba1b712a046fa646729afd072bcc84895c5aa447e70bbfb00ef255d0b4a3"
+      },
+      "caller": {
+        "bytes": 27608,
+        "sha256": "3b6a306ae6b6bd07e70cf07f53c135f20ab621c17b02cf13761f978cea9eae2d"
+      },
+      "command": [
+        "/home/tdamre/.cache/rust-llama-chat-oracle-20261110/chat-oracle",
+        "/home/tdamre/.cache/rust-llama-chat-20261110/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/inputs-v1.bin",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/validation-v1-linux/release-c-replay.bin"
+      ],
+      "exit_code": 0,
+      "exact_original_bytes": true,
+      "result": {
+        "bytes": 3937927,
+        "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+      },
+      "log": {
+        "bytes": 42,
+        "sha256": "96411fc3f2eb793caba495ddad3dbf05edc27315f4695030a824c153a05cf630"
+      },
+      "cases": 35946,
+      "complete_buffer_bytes": 3361503
+    }
+  ],
+  "finished_utc": "2026-11-10T20:16:00.748908+00:00",
+  "candidate_inputs_unchanged": true,
+  "original_inputs_unchanged": true
+}

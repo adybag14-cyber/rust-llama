@@ -1,0 +1,188 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/quant)
+   Compiling llama-checkpoint v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/checkpoint)
+   Compiling foldhash v0.2.0
+   Compiling llama-conformance v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/llama-conformance)
+   Compiling arraydeque v0.5.1
+   Compiling llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/llama-behavior)
+   Compiling hashbrown v0.17.1
+   Compiling hashlink v0.12.2
+   Compiling yaml-rust2 v0.13.0
+   Compiling llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/gguf)
+   Compiling xtask v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/xtask)
+   Compiling llama-tokenizer v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/tokenizer)
+   Compiling llama-convert v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft/crates/convert)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.41s
+     Running unittests src/lib.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/llama_checkpoint-00fe59c27f7d1f39)
+
+running 11 tests
+test tests::cumulative_header_index_and_descriptor_budgets ... ok
+test tests::directory_path_policies_and_unicode_names ... ok
+test tests::decoded_nodes_text_depth_dimensions_and_numeric_limits ... ok
+test tests::index_override_global_set_and_capability_selection_are_distinct ... ok
+test tests::non_utf8_filesystem_labels_roundtrip_source_surrogateescape ... ok
+test tests::owned_file_survives_path_replacement_and_checked_truncation ... ok
+test tests::raw_read_limit_does_not_disable_bounded_streaming ... ok
+test tests::streaming_ranges_seek_and_separate_typed_validation ... ok
+test tests::subdirectory_enumeration_handles_and_swaps ... ok
+test tests::fifo_is_rejected_without_opening_data ... ok
+test tests::handles_failures_and_swaps ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/native_reference.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/native_reference-ec884fc1c52b74d7)
+
+running 4 tests
+test frozen_source_additive_metadata_and_numeric_edges ... ok
+test frozen_source_additive_index_edges ... ok
+test frozen_source_file_metadata_and_ranges ... ok
+test frozen_source_index_selection_and_overwrites ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/source_directory.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/source_directory-56f0c542e83108ec)
+
+running 7 tests
+test parser_usage_includes_discarded_duplicate_values ... ok
+test cached_sidecars_charge_once_and_cumulative_limit_precedes_read ... ok
+test optional_subdirectory_links_are_explicit_errors ... ok
+test checked_subdirectory_enumeration_and_followup_sidecars ... ok
+test same_retained_root_opens_sidecars_and_checkpoint ... ok
+test sidecar_single_file_and_owner_limits_are_checked ... ok
+test replacing_root_path_cannot_redirect_sidecars_or_shards ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/llama_convert-d58b27c6810be692)
+
+running 24 tests
+test dense_reference::native_dense_llama_converter_full_bytes ... ignored, requires frozen original corpus in LLAMA_TEST_HF_CORPUS and a fresh output directory
+test dense_reference::pretrained_smollm2_complete_conversions ... ignored, requires pinned SmolLM2 HF weights in LLAMA_TEST_HF_MODEL and a fresh output directory
+test hf_reference::pretrained_smollm2_hf_vocabulary_and_probe ... ignored, requires the pinned HF SmolLM2 input directory in LLAMA_TEST_HF_MODEL
+test model_card::tests::ignored_cycles_remain_graph_edges ... ok
+test rope::tests::dimension_and_length_arithmetic_is_checked_without_allocation ... ok
+test model_card::tests::bounded_aliases_merges_depth_and_scalar_inputs ... ok
+test rope::tests::native::short_long_and_partial_component_outputs_are_atomic_errors ... ok
+test rope::tests::parameter_errors_are_transactional ... ok
+test rope::tests::unavailable_profile_is_an_explicit_atomic_error ... ok
+test sentencepiece::tests::wire_resource_limits_reject_before_growth ... ok
+test rope::tests::native::original_large_index_arange_and_power_windows_are_exact ... ok
+test rope::tests::native::original_structured_torch_generator_and_all_seven_stages_are_exact ... ok
+test model_card::tests::frozen_model_card_frontmatter_graphs ... ok
+test hf_reference::native_bytelevel_digits_bpe_and_decoder ... ok
+test hf_reference::native_hf_ingestion_and_saved_token_flags ... ok
+test hf_schema_reference::original_transformers_class_postprocessors ... ok
+test rope::tests::native::original_random_extreme_and_nan_generator_stages_are_exact ... ok
+test python_unicode::tests::original_full_case_expansions_for_metadata_domain ... ok
+test sentencepiece::tests::original_sentencepiece_model_acceptance_and_pieces ... ok
+test hf_reference::exhaustive_hf_unicode_and_added_boundaries ... ok
+test special::tests::original_special_vocab_ordered_header_bytes ... ok
+test authorship::tests::original_authorship_precedence_and_raw_ordered_headers ... ok
+test hf_schema_reference::original_hf_schema_and_postprocessor_contracts ... ok
+test python_unicode::tests::exhaustive_original_unicode_flags_and_decimal_values ... ok
+
+test result: ok. 21 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 0.72s
+
+     Running unittests src/bin/convert-hf-to-gguf.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/convert_hf_to_gguf-4333c112b26f2d16)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/codec.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/codec-8de505715d5cb0b9)
+
+running 8 tests
+test checked_errors_leave_output_unchanged ... ok
+test promotion_and_numpy_cast_are_distinct_and_noop_bits_are_preserved ... ok
+test unmeasured_nonfinite_profile_rejects_entire_input_transactionally ... ok
+test every_half_pattern_through_one_element_source_promotion ... ok
+test original_nan_reductions_and_special_cast_tails ... ok
+test actual_mixed_qkv_concatenation_and_post_permutation_tails ... ok
+test original_torch_numpy_linux_bytes ... ok
+test original_torch_numpy_windows_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/pipeline.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/pipeline-989d3a2742359ee5)
+
+running 3 tests
+test atomic_publication_preserves_destination_and_source_on_failure ... ok
+test command_line_converts_exact_bytes_and_dry_run_does_not_publish ... ok
+test complete_files_match_original_converter_for_native_source_profile ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.03s
+
+     Running unittests src/lib.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/llama_gguf-76324372a0335494)
+
+running 14 tests
+test tests::arrays_preflight_the_remaining_header_budget_before_reservation ... ok
+test tests::big_endian_metadata_and_scalar_payload ... ok
+test tests::buffered_headers_preserve_short_reads_io_errors_and_payload_seeks ... ok
+test tests::every_truncated_header_and_payload_is_rejected ... ok
+test tests::metadata_budget_and_counts_are_enforced ... ok
+test tests::overlap_is_rejected ... ok
+test tests::roundtrip_preserves_types_and_payload ... ok
+test tests::tensor_counts_preflight_the_remaining_header_and_file_before_reservation ... ok
+test tests::writer_rejects_invalid_arrays ... ok
+test writer::tests::all_header_validation_precedes_output_and_enforces_padding_budget ... ok
+test tests::header_read_ahead_never_exceeds_the_remaining_byte_budget ... ok
+test writer::tests::impossible_header_budget_rejects_before_tensor_layout_reservations ... ok
+test writer::tests::ordered_streaming_header_preserves_order_nan_bits_and_custom_alignment ... ok
+test tests::large_metadata_uses_bounded_batched_reads_and_preserves_reader_position ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/raw_native.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/raw_native-92791c122a86e1c2)
+
+running 2 tests
+test original_all_boolean_encodings_scalar_and_array ... ok
+test original_all_byte_values_keys_names_strings_and_aliases ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/raw_tools.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/raw_tools-f2c9bedc1288b7c3)
+
+running 2 tests
+test original_reserved_key_aliases_and_tensor_prefix_collisions ... ok
+test original_raw_strings_and_booleans_split_and_merge ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.86s
+
+     Running tests/split_limits.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/split_limits-3efbe3d0414cc9ac)
+
+running 5 tests
+test split_cannot_truncate_input_through_a_hard_link ... ok
+test minimal_streaming_buffer_keeps_payload_bytes ... ok
+test merge_cumulative_limits_and_zero_buffer_preserve_inputs ... ok
+test split_checks_retained_handles_after_path_preflight ... ok
+test split_resource_failures_precede_file_mutation ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/tdamre/rust-llama-hf-converter-target/debug/deps/xtask-53ea6f79cb7116c8)
+
+running 4 tests
+test dependencies::tests::source_inventory_rejects_mutation_untracked_files_and_cache_marker_drift ... ok
+test dependencies::tests::policy_and_current_lock_have_exact_reviewed_identities ... ok
+test dependencies::tests::lock_rejects_unknown_version_checksum_source_and_duplicate_drift ... ok
+test dependencies::tests::metadata_rejects_features_native_builds_links_and_source_drift ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_checkpoint
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_convert
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests llama_gguf
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

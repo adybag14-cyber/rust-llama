@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned compiler and review tools
         run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt,clippy
+      - name: Fetch checksum-pinned reviewed dependencies
+        run: cargo fetch --locked
       - name: Formatting
         run: cargo fmt --all -- --check
       - name: Debug tests

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "host": "linux",
+  "status": "failed",
+  "started_utc": "2026-11-10T20:27:03.138376+00:00",
+  "inputs": {
+    "bytes": 20871,
+    "sha256": "3cf7ee81ec4946eedc86d308775562f9b6d3833d9fc4ac1ad5e1643458225747"
+  },
+  "input_count": 136,
+  "validator": {
+    "bytes": 3285,
+    "sha256": "1405d7624f5d2bb73011d14f31b1fa2a3d29dbd7a93931d7977a6e56ed3b99b2"
+  },
+  "original_seal": {
+    "bytes": 1583,
+    "sha256": "e43392cec3e9f12f8730edc16ac0a6c1a9d747df2dfa3d66f3f2cf415b90246e"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-tokenizer",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7269654389999971,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 101,
+      "seconds": 0.43504078999999507,
+      "log": {
+        "bytes": 463,
+        "sha256": "bcb3d29b2eb2033a2a1d686af0476020fbdcdb429018d7ce4640af51e79785cc"
+      },
+      "test_summaries": []
+    }
+  ],
+  "error": "RuntimeError('debug failed')",
+  "finished_utc": "2026-11-10T20:27:05.174573+00:00"
+}

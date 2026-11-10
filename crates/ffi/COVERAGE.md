@@ -2,13 +2,25 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **191**, leaves
-**64 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **198**, leaves
+**57 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md and ENUMS.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md and CHAT.md.
 
-Current debug/release PE and ELF export tables are checked against the original
-255-symbol inventory. The static enum-helper checkpoint adds only
+The model-metadata/chat extension adds five scalar metadata exports and two
+byte-oriented chat exports. Their independent fixtures and native client checks
+are documented in METADATA.md and CHAT.md. Symbol presence does not remove their
+explicit platform, resource or semantic boundaries.
+
+The final integrated debug/release PE and ELF export tables were inspected on
+both hosts and contain exactly the 198 frozen exports and four extensions
+listed here. All 57 missing exports remain absent. The independent original
+libraries still expose the complete 255-symbol set. Original-header chat,
+metadata and raw-name clients pass against all four integrated Rust builds;
+see `evidence/2026-11-10/continued-port`.
+
+Earlier debug/release PE and ELF export tables were checked against the original
+255-symbol inventory. The static enum-helper checkpoint added only
 `llama_ftype_name`, `llama_flash_attn_type_name`, `llama_load_mode_name` and
 `llama_load_mode_from_str`. Its independent native results and complete symbol
 sets are recorded in `evidence/2026-11-09/c-enum-api`. Descriptive helper
@@ -39,6 +51,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_batch_free` |
 | `llama_batch_get_one` |
 | `llama_batch_init` |
+| `llama_chat_apply_template` |
+| `llama_chat_builtin_templates` |
 | `llama_context_default_params` |
 | `llama_copy_state_data` |
 | `llama_decode` |
@@ -86,6 +100,11 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_model_is_recurrent` |
 | `llama_model_load_from_file` |
 | `llama_model_load_from_splits` |
+| `llama_model_meta_count` |
+| `llama_model_meta_key_by_index` |
+| `llama_model_meta_key_str` |
+| `llama_model_meta_val_str` |
+| `llama_model_meta_val_str_by_index` |
 | `llama_model_n_ctx_train` |
 | `llama_model_n_embd` |
 | `llama_model_n_embd_inp` |
@@ -259,8 +278,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_batch_ext_set_output_embd` |
 | `llama_batch_ext_set_output_logits` |
 | `llama_batch_ext_set_pos` |
-| `llama_chat_apply_template` |
-| `llama_chat_builtin_templates` |
 | `llama_detach_threadpool` |
 | `llama_encode` |
 | `llama_get_embeddings_seq` |
@@ -276,11 +293,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_model_cls_label` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
-| `llama_model_meta_count` |
-| `llama_model_meta_key_by_index` |
-| `llama_model_meta_key_str` |
-| `llama_model_meta_val_str` |
-| `llama_model_meta_val_str_by_index` |
 | `llama_model_n_cls_out` |
 | `llama_model_quantize` |
 | `llama_model_quantize_default_params` |

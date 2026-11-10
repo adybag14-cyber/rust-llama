@@ -169,7 +169,7 @@ pub(super) fn details(
     g: &GgufSet,
     path: &Path,
     options: &LoadOptions,
-) -> Result<(String, Option<String>, usize)> {
+) -> Result<(String, Option<Vec<u8>>, usize)> {
     let m = g.metadata();
     let id = m
         .get("general.name")
@@ -183,7 +183,16 @@ pub(super) fn details(
                 .into_owned()
         });
     let template = match m.get("tokenizer.chat_template") {
-        Some(Value::String(s)) => Some(s.clone()),
+        Some(value @ (Value::String(_) | Value::ByteString(_))) => {
+            let bytes = value.as_bytes().ok_or_else(|| {
+                Error::Invalid("string metadata has no byte representation".into())
+            })?;
+            let mut copy = Vec::new();
+            copy.try_reserve_exact(bytes.len())
+                .map_err(|_| Error::Invalid("chat template byte allocation".into()))?;
+            copy.extend_from_slice(bytes);
+            Some(copy)
+        }
         Some(_) => return Err(unsupported("multiple/nonstrings chat templates")),
         None => None,
     };

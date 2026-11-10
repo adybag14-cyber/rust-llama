@@ -89,6 +89,25 @@ impl Root {
     pub fn entries(&self, budget: &mut Budget) -> Result<Vec<Text>> {
         host::entries(&self.owner, budget)
     }
+    pub fn entries_under(&self, name: &Text, budget: &mut Budget) -> Result<Option<Vec<Text>>> {
+        let parts = components(name, budget)?;
+        let owner = match host::relative_directory(&self.owner, &parts, budget) {
+            Ok(owner) => owner,
+            Err(Error::Io(e))
+                if matches!(
+                    e.kind(),
+                    io::ErrorKind::NotFound | io::ErrorKind::NotADirectory
+                ) =>
+            {
+                return Ok(None);
+            }
+            Err(error) => return Err(error),
+        };
+        if !owner.metadata()?.is_dir() {
+            return Err(Error::Path("sidecar entry owner is not a directory"));
+        }
+        host::entries(&owner, budget).map(Some)
+    }
     pub fn open_relative(&self, name: &Text, budget: &mut Budget) -> Result<File> {
         let components = components(name, budget)?;
         host::relative(&self.owner, &components, budget)
@@ -176,7 +195,6 @@ mod host {
     use std::os::unix::fs::MetadataExt;
     // Linux UAPI values, independently checked against the pinned GNU host's
     // bits/fcntl-linux.h. No O_CREAT: openat has no mode argument here.
-    const O_DIRECTORY: c_int = 0o200000;
     const O_NOFOLLOW: c_int = 0o400000;
     const O_CLOEXEC: c_int = 0o2000000;
     const O_PATH: c_int = 0o10000000;
@@ -290,7 +308,7 @@ mod host {
         Ok(result)
     }
     fn open_component(parent: &File, name: &[u8], directory: bool) -> Result<File> {
-        let flags = O_PATH | O_NOFOLLOW | O_CLOEXEC | if directory { O_DIRECTORY } else { 0 };
+        let flags = O_PATH | O_NOFOLLOW | O_CLOEXEC;
         // SAFETY: parent remains owned, name is a live NUL-terminated vector
         // without interior NUL, and flags never create a file. On success this
         // is the sole owner of the returned descriptor.
@@ -299,7 +317,39 @@ mod host {
             return Err(io::Error::last_os_error().into());
         }
         // SAFETY: a nonnegative openat result is a new descriptor owned here.
-        Ok(unsafe { File::from_raw_fd(raw) })
+        let owner = unsafe { File::from_raw_fd(raw) };
+        if directory {
+            // Inspect the retained no-follow capability before classifying a
+            // directory. O_DIRECTORY would collapse a symlink into ENOTDIR,
+            // causing an optional read to hide a link as a missing path.
+            let metadata = owner.metadata()?;
+            if metadata.file_type().is_symlink() {
+                return Err(Error::Path("relative directory component is a symlink"));
+            }
+            if !metadata.is_dir() {
+                return Err(io::Error::from(io::ErrorKind::NotADirectory).into());
+            }
+        }
+        Ok(owner)
+    }
+    pub(super) fn relative_directory(
+        root: &File,
+        parts: &[Text],
+        budget: &mut Budget,
+    ) -> Result<File> {
+        let mut parent = None;
+        for (index, part) in parts.iter().enumerate() {
+            hook(index);
+            let name = name_bytes(part, budget)?;
+            parent = Some(open_component(
+                parent.as_ref().unwrap_or(root),
+                &name,
+                true,
+            )?);
+        }
+        let owner = parent.ok_or(Error::Path("relative directory path is empty"))?;
+        hook(parts.len());
+        Ok(owner)
     }
     pub(super) fn relative(root: &File, parts: &[Text], budget: &mut Budget) -> Result<File> {
         let mut parent = None;
@@ -459,6 +509,21 @@ mod host {
         Ok(wide)
     }
     pub(super) fn relative(root: &File, parts: &[Text], budget: &mut Budget) -> Result<File> {
+        relative_kind(root, parts, budget, false)
+    }
+    pub(super) fn relative_directory(
+        root: &File,
+        parts: &[Text],
+        budget: &mut Budget,
+    ) -> Result<File> {
+        relative_kind(root, parts, budget, true)
+    }
+    fn relative_kind(
+        root: &File,
+        parts: &[Text],
+        budget: &mut Budget,
+        directory: bool,
+    ) -> Result<File> {
         let mut wide = wide_path(parts, budget)?;
         let length =
             u16::try_from(wide.len() * 2).map_err(|_| Error::Limit("native path length"))?;
@@ -487,7 +552,9 @@ mod host {
         // is a retained directory. No path component can reparse or escape.
         // FILE_GENERIC_READ includes SYNCHRONIZE; FILE_SHARE_READ denies
         // write/delete. FILE_OPEN never creates/truncates. Options require a
-        // non-directory synchronous owner (FILE_NON_DIRECTORY_FILE|...NONALERT).
+        // synchronous owner: FILE_DIRECTORY_FILE or FILE_NON_DIRECTORY_FILE,
+        // both with FILE_SYNCHRONOUS_IO_NONALERT. The same no-reparse boundary
+        // and read-only sharing apply to retained enumeration capabilities.
         let status = unsafe {
             NtCreateFile(
                 &mut handle,
@@ -498,7 +565,7 @@ mod host {
                 0,
                 1,
                 1,
-                0x40 | 0x20,
+                (if directory { 0x1 } else { 0x40 }) | 0x20,
                 std::ptr::null_mut(),
                 0,
             )
@@ -519,8 +586,13 @@ mod host {
                 "synchronous native open unexpectedly pending",
             ));
         }
-        if !owner.metadata()?.is_file() {
-            return Err(Error::Path("indexed owner is not a regular file"));
+        let metadata = owner.metadata()?;
+        if if directory {
+            !metadata.is_dir()
+        } else {
+            !metadata.is_file()
+        } {
+            return Err(Error::Path("relative owner has an unexpected file type"));
         }
         hook(1);
         Ok(owner)
@@ -653,6 +725,11 @@ mod host {
     pub(super) fn entries(_: &File, _: &mut Budget) -> Result<Vec<Text>> {
         Err(Error::Unsupported(
             "directory capabilities require the verified x86_64 Linux or Windows opener",
+        ))
+    }
+    pub(super) fn relative_directory(_: &File, _: &[Text], _: &mut Budget) -> Result<File> {
+        Err(Error::Unsupported(
+            "relative directory capabilities require the verified x86_64 Linux or Windows opener",
         ))
     }
     pub(super) fn relative(_: &File, _: &[Text], _: &mut Budget) -> Result<File> {

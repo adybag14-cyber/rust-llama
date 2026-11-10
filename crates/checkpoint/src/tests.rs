@@ -762,3 +762,156 @@ fn fifo_is_rejected_without_opening_data() {
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
 }
+
+#[test]
+fn subdirectory_enumeration_handles_and_swaps() {
+    if std::env::var_os("LLAMA_CHECKPOINT_DIRECTORY_CHILD").is_none() {
+        let result = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "tests::subdirectory_enumeration_handles_and_swaps",
+                "--test-threads=1",
+                "--nocapture",
+            ])
+            .env("LLAMA_CHECKPOINT_DIRECTORY_CHILD", "1")
+            .output()
+            .unwrap();
+        assert!(
+            result.status.success(),
+            "child failed:\n{}\n{}",
+            String::from_utf8_lossy(&result.stdout),
+            String::from_utf8_lossy(&result.stderr)
+        );
+        return;
+    }
+    let temp = Temp::new();
+    let model = temp.0.join("model");
+    let outside = temp.0.join("outside");
+    fs::create_dir_all(model.join("nested/deep")).unwrap();
+    fs::create_dir_all(outside.join("deep")).unwrap();
+    put(&model.join("nested/deep/original.jinja"), b"inside");
+    put(&outside.join("deep/outside.jinja"), b"outside");
+    let baseline = handle_count();
+    {
+        let root = platform::Root::open(&model).unwrap();
+        let retained = handle_count();
+        let prior_hook = std::panic::take_hook();
+        std::panic::set_hook(Box::new(|_| {}));
+        for injected in 0..if cfg!(windows) { 2 } else { 3 } {
+            for _ in 0..8 {
+                platform::set_open_hook(Some(Box::new(move |stage| {
+                    assert_ne!(stage, injected, "injected directory open failure")
+                })));
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    root.entries_under(
+                        &text("nested/deep"),
+                        &mut Budget::new(Limits::default()).unwrap(),
+                    )
+                }));
+                platform::set_open_hook(None);
+                assert!(result.is_err());
+                assert_count(retained);
+            }
+        }
+        std::panic::set_hook(prior_hook);
+        for _ in 0..16 {
+            assert!(matches!(
+                root.entries_under(
+                    &text("nested/deep"),
+                    &mut Budget::new(Limits {
+                        max_directory_entries: 0,
+                        ..Limits::default()
+                    })
+                    .unwrap()
+                ),
+                Err(Error::Limit("directory entries"))
+            ));
+            assert!(
+                root.entries_under(
+                    &text("nested/missing"),
+                    &mut Budget::new(Limits::default()).unwrap()
+                )
+                .unwrap()
+                .is_none()
+            );
+            assert_count(retained);
+        }
+        let nested = model.join("nested");
+        let parked = model.join("parked");
+        let from = nested.clone();
+        let to = parked.clone();
+        let destination = outside.clone();
+        platform::set_open_hook(Some(Box::new(move |stage| {
+            if stage == 0 {
+                fs::rename(&from, &to).unwrap();
+                symlink_directory(&destination, &from);
+            }
+        })));
+        let result = root.entries_under(
+            &text("nested/deep"),
+            &mut Budget::new(Limits::default()).unwrap(),
+        );
+        platform::set_open_hook(None);
+        assert!(
+            result.is_err(),
+            "directory link cannot be hidden as missing"
+        );
+        assert_count(retained);
+        fs::remove_dir(&nested)
+            .or_else(|_| fs::remove_file(&nested))
+            .unwrap();
+        fs::rename(&parked, &nested).unwrap();
+        #[cfg(target_os = "linux")]
+        {
+            for swap_stage in [1, 2] {
+                let from = nested.clone();
+                let to = parked.clone();
+                let destination = outside.clone();
+                platform::set_open_hook(Some(Box::new(move |stage| {
+                    if stage == swap_stage {
+                        fs::rename(&from, &to).unwrap();
+                        symlink_directory(&destination, &from);
+                    }
+                })));
+                let names = root
+                    .entries_under(
+                        &text("nested/deep"),
+                        &mut Budget::new(Limits::default()).unwrap(),
+                    )
+                    .unwrap()
+                    .unwrap();
+                platform::set_open_hook(None);
+                assert_eq!(names.len(), 1);
+                assert_eq!(names[0].as_str(), Some("original.jinja"));
+                assert_count(retained);
+                fs::remove_file(&nested).unwrap();
+                fs::rename(&parked, &nested).unwrap();
+            }
+        }
+        #[cfg(windows)]
+        {
+            let from = nested.join("deep");
+            let to = nested.join("moved");
+            platform::set_open_hook(Some(Box::new(move |stage| {
+                if stage == 1 {
+                    assert!(
+                        fs::rename(&from, &to).is_err(),
+                        "retained enumeration owner must deny deletion"
+                    );
+                }
+            })));
+            let names = root
+                .entries_under(
+                    &text("nested/deep"),
+                    &mut Budget::new(Limits::default()).unwrap(),
+                )
+                .unwrap()
+                .unwrap();
+            platform::set_open_hook(None);
+            assert_eq!(names.len(), 1);
+            assert_eq!(names[0].as_str(), Some("original.jinja"));
+            assert_count(retained);
+        }
+    }
+    assert_count(baseline);
+}

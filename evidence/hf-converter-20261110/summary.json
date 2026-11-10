@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "status": "all_checked_gates_passed",
+  "scope": "Recovered dense Llama converter slice; not full upstream conversion or runtime/release parity",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "handoff_manifest_sha256": "044e6be5e63a26453cc8eeac66a7c09139e093e811d08ef19cc9d1fb0cc8ef0b",
+  "all_115_handoff_additions_match_tested_draft": true,
+  "validation_report_sha256": "5196674c13061c593384a6c07390f4d9fb66df81f1817a46cd3c644de626f2da",
+  "source_unchanged_during_final_validation": true,
+  "earlier_windows_debug_strict_clippy_job": "job-1794341851495-cc04ec00-e57",
+  "earlier_windows_debug_strict_clippy_log_sha256": "de18769f711ae9fe5529bec9ff121f789f7091ef69ae590d10f5aebbf0c02d00",
+  "runs": [
+    {
+      "name": "windows-fmt",
+      "exit": 0,
+      "seconds": 0.6957552999997461,
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "fmt",
+        "-p",
+        "llama-convert",
+        "-p",
+        "llama-checkpoint",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "xtask",
+        "--",
+        "--check"
+      ],
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "windows-release",
+      "exit": 0,
+      "seconds": 27.638374499999827,
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-convert",
+        "-p",
+        "llama-checkpoint",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "xtask",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "log_sha256": "d75de4e1f0866d0b6db02ee834e998069556b22dd8b02c877f9fcdb56667de7b",
+      "aggregate_tests": {
+        "passed": 79,
+        "failed": 0,
+        "ignored": 3
+      }
+    },
+    {
+      "name": "windows-pretrained",
+      "exit": 0,
+      "seconds": 7.365128700000241,
+      "command": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--lib",
+        "pretrained_smollm2_complete_conversions",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "log_sha256": "d7de05e48d199851cfad7df8d429c31ebcb77a5802c80fd6f1d3b582528a594d",
+      "aggregate_tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "linux-debug",
+      "exit": 0,
+      "seconds": 16.456875299999865,
+      "command": [
+        "wsl",
+        "--cd",
+        "/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft",
+        "--exec",
+        "env",
+        "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+        "CARGO_TARGET_DIR=/home/tdamre/rust-llama-hf-converter-target",
+        "CARGO_HOME=/home/tdamre/rust-llama-hf-converter-cargo-home",
+        "cargo",
+        "test",
+        "-p",
+        "llama-convert",
+        "-p",
+        "llama-checkpoint",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "xtask",
+        "--offline",
+        "--locked"
+      ],
+      "log_sha256": "e5a0cedbe5c6e602e3d324a1e168b0640cfb64de2b093b1b7cffd44306d87565",
+      "aggregate_tests": {
+        "passed": 81,
+        "failed": 0,
+        "ignored": 3
+      }
+    },
+    {
+      "name": "linux-dependencies",
+      "exit": 0,
+      "seconds": 1.4111542999999074,
+      "command": [
+        "wsl",
+        "--cd",
+        "/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft",
+        "--exec",
+        "env",
+        "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+        "CARGO_TARGET_DIR=/home/tdamre/rust-llama-hf-converter-target",
+        "CARGO_HOME=/home/tdamre/rust-llama-hf-converter-cargo-home",
+        "cargo",
+        "run",
+        "-p",
+        "xtask",
+        "--offline",
+        "--locked",
+        "--",
+        "dependencies"
+      ],
+      "log_sha256": "2743b7a63181c60e67fbca3d3d49cdad938e3642415e812664697c8a77d78a75"
+    },
+    {
+      "name": "linux-clippy",
+      "exit": 0,
+      "seconds": 7.772299499999917,
+      "command": [
+        "wsl",
+        "--cd",
+        "/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft",
+        "--exec",
+        "env",
+        "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+        "CARGO_TARGET_DIR=/home/tdamre/rust-llama-hf-converter-target",
+        "CARGO_HOME=/home/tdamre/rust-llama-hf-converter-cargo-home",
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-convert",
+        "-p",
+        "llama-checkpoint",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "xtask",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "log_sha256": "781b5eaade98466285ca9209e72baff4f999a1bde3042af8cf1cbd73358bc1b6"
+    },
+    {
+      "name": "linux-release",
+      "exit": 0,
+      "seconds": 15.870867399999952,
+      "command": [
+        "wsl",
+        "--cd",
+        "/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft",
+        "--exec",
+        "env",
+        "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+        "CARGO_TARGET_DIR=/home/tdamre/rust-llama-hf-converter-target",
+        "CARGO_HOME=/home/tdamre/rust-llama-hf-converter-cargo-home",
+        "cargo",
+        "test",
+        "-p",
+        "llama-convert",
+        "-p",
+        "llama-checkpoint",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "xtask",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "log_sha256": "eab9672de9e2bbf40f7b39720e6c70c8e94edd0b047a5155693fa2178156978f",
+      "aggregate_tests": {
+        "passed": 81,
+        "failed": 0,
+        "ignored": 3
+      }
+    },
+    {
+      "name": "linux-pretrained",
+      "exit": 0,
+      "seconds": 18.506632199999785,
+      "command": [
+        "wsl",
+        "--cd",
+        "/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/rust-draft",
+        "--exec",
+        "env",
+        "PATH=/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+        "CARGO_TARGET_DIR=/home/tdamre/rust-llama-hf-converter-target",
+        "CARGO_HOME=/home/tdamre/rust-llama-hf-converter-cargo-home",
+        "LLAMA_TEST_HF_MODEL=/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/pretrained-smollm2/model",
+        "LLAMA_TEST_HF_OUTPUT=/mnt/c/Users/adyba/rust-llama-reference/hf-converter-port/resume-20261110-v1/final-validation/linux-pretrained-outputs",
+        "cargo",
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--lib",
+        "pretrained_smollm2_complete_conversions",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "log_sha256": "8fda1e870a539a207c0e856dd4df49af5f9cba50537de61e1635c50dca5b2aa9",
+      "aggregate_tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  ],
+  "pretrained_reference_outputs": [
+    {
+      "mode": "auto",
+      "bytes": 270885472,
+      "sha256": "fe1577d217495a72101bdb43c2cc70dead8c9454479b2d460021c2b520d5cbae",
+      "file_type": 32
+    },
+    {
+      "mode": "f16",
+      "bytes": 270885472,
+      "sha256": "de0e89f1ab67ae10cc5eeb1e4f1ed0a5ca52eb9c0c915c0dacae9ccdb15a80d6",
+      "file_type": 1
+    },
+    {
+      "mode": "q8_0",
+      "bytes": 144810592,
+      "sha256": "3481f5c4868f779eca2c724ab9c84af304299a9c96feb42403302902723b41d1",
+      "file_type": 7
+    }
+  ],
+  "pretrained_total_exact_bytes_per_host": 686581536,
+  "remaining_integration": "Parent has integrated selective hashes/patches and is running complete main workspace gates. No code changes since handoff."
+}

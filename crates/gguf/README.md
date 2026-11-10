@@ -357,3 +357,7 @@ port.
 Implementation follows the supplied llama.cpp/ggml MIT-licensed source. Preserve
 LICENSE-UPSTREAM and NOTICE; fixture provenance identifies inherited model
 vocabulary metadata and the deterministic synthetic weight generators.
+
+## Unpadded converter headers
+
+WriteLayout::encoded_header_bytes exposes the checked header size before alignment padding. The HF vocabulary-only converter uses that boundary to match the frozen original metadata-only output. data_offset, tensor offsets and normal aligned writer behavior are unchanged.

@@ -10,10 +10,12 @@ mod index;
 pub mod json;
 #[allow(unsafe_code)]
 mod platform;
+mod source;
 
 pub use file::{DType, RawTensorInfo, SafetensorsFile, TensorReader, TypedLayout};
 pub use index::{Checkpoint, CheckpointOptions, NamePolicy, TensorRef};
 pub use json::{Integer, Number, Object, Text, Value};
+pub use source::{SourceDirectory, SourceLimits, SourceUsage};
 
 use std::fmt;
 use std::io;

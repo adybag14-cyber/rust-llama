@@ -1,0 +1,578 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-10T20:22:09.264183+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_files": {
+    "include/llama.h": {
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    },
+    "src/llama-vocab.cpp": {
+      "bytes": 208197,
+      "sha256": "ac6fd43eca27c67a213a98e27b87e8ca1f26d8d82a63e79543a06ca64ef10a95"
+    },
+    "src/llama-model-loader.cpp": {
+      "bytes": 82846,
+      "sha256": "b856b513340e9e86ab81e2d8d110fedd07b60f508e0e4f8513690150f8efd7e1"
+    },
+    "ggml/src/gguf.cpp": {
+      "bytes": 60086,
+      "sha256": "51bd966ab0494aa20d4087975f17d8b9b8ed9c4b63d7cbffe9315ed45de5dd78"
+    }
+  },
+  "base_model": {
+    "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf",
+    "bytes": 31328,
+    "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+  },
+  "variant_count": 38,
+  "vocabulary_tokens": 512,
+  "text_count_per_variant": 42,
+  "tokenization_count_per_variant": 168,
+  "raw_char_scope": "All non-ASCII general.name bytes are 0xff, the defined EOF argument to std::tolower on signed-char targets. Cases 0x80..0xfe remain outside the source defined domain.",
+  "model_construction": "Only general.name payload is varied after renaming three final normal tokens to [MASK], <|endoftext|>, [user] and types to USER_DEFINED, CONTROL, USER_DEFINED; all tensor metadata and payload bytes are unchanged.",
+  "cases": [
+    {
+      "name": "missing",
+      "general_name_hex": null,
+      "model": {
+        "path": "models/missing.gguf",
+        "bytes": 31264,
+        "sha256": "9bf131155e1e7c1b9f6943dac360c436061b8bf5038704cdbb099fedece2823a"
+      },
+      "request": {
+        "path": "requests/missing.json",
+        "bytes": 1032,
+        "sha256": "fb1214a6e4fd9b0d20c39c7241c73f248f4da3dc3df1ea72881de43179266259"
+      }
+    },
+    {
+      "name": "empty",
+      "general_name_hex": "",
+      "model": {
+        "path": "models/empty.gguf",
+        "bytes": 31296,
+        "sha256": "c155ee7b3f055f6792738306f9c6b3148b3c3fb3d8515298d1fe690eddc5410e"
+      },
+      "request": {
+        "path": "requests/empty.json",
+        "bytes": 1030,
+        "sha256": "aabde76a749961d19722c7d86dee0e141339e64eecdf0b79ba15e9d0f3dd0a54"
+      }
+    },
+    {
+      "name": "plain",
+      "general_name_hex": "6f7264696e617279206d6f64656c",
+      "model": {
+        "path": "models/plain.gguf",
+        "bytes": 31296,
+        "sha256": "cf718cceb01039a1595a6bbd572d5b840712cc3f5cf82123448ec56d3edecfae"
+      },
+      "request": {
+        "path": "requests/plain.json",
+        "bytes": 1030,
+        "sha256": "c9a86f3e28c2e8e1c7d6fe9d405d93b1591df1f5137f00d8fc5433a3b203c969"
+      }
+    },
+    {
+      "name": "ff-control",
+      "general_name_hex": "6f7264696e617279ff6d6f64656c",
+      "model": {
+        "path": "models/ff-control.gguf",
+        "bytes": 31296,
+        "sha256": "7c7c0645d8e1d1317a9773feadc8d80a0a96152be49f110d7dff5b8d2542ca80"
+      },
+      "request": {
+        "path": "requests/ff-control.json",
+        "bytes": 1035,
+        "sha256": "7003c67cb2148969fbee25984c7d8b7a2859cf715f5a0764d7bfb27815a8851c"
+      }
+    },
+    {
+      "name": "phi3",
+      "general_name_hex": "70686933",
+      "model": {
+        "path": "models/phi3.gguf",
+        "bytes": 31296,
+        "sha256": "f62acb3c14c398b6f16d6088337a8126a256f74b0b0d1e86b8af075f00983977"
+      },
+      "request": {
+        "path": "requests/phi3.json",
+        "bytes": 1029,
+        "sha256": "8e4db2bbda592a81d4074031af34821bf7920b6c2a82beeee2bdfc751ab3857e"
+      }
+    },
+    {
+      "name": "phi3-upper",
+      "general_name_hex": "50484933",
+      "model": {
+        "path": "models/phi3-upper.gguf",
+        "bytes": 31296,
+        "sha256": "b177001c59ca299f670dbb24e256bdedccec8ea4151adf8895398aea45e4f630"
+      },
+      "request": {
+        "path": "requests/phi3-upper.json",
+        "bytes": 1035,
+        "sha256": "ed12cd2ff05ed405153d292ee271472325188d2bbf6accaeda3f3551eb8d477d"
+      }
+    },
+    {
+      "name": "phi3-ff-prefix",
+      "general_name_hex": "ff70686933",
+      "model": {
+        "path": "models/phi3-ff-prefix.gguf",
+        "bytes": 31296,
+        "sha256": "66ef652131cbae0e01735705538b9f840a53a564d0ae1f69233968bb110277d1"
+      },
+      "request": {
+        "path": "requests/phi3-ff-prefix.json",
+        "bytes": 1039,
+        "sha256": "7bd8bdc644ab33a7db50b3afcaabddce0632288ee26039b710286179fe1315e3"
+      }
+    },
+    {
+      "name": "phi3-ff-suffix",
+      "general_name_hex": "70686933ff",
+      "model": {
+        "path": "models/phi3-ff-suffix.gguf",
+        "bytes": 31296,
+        "sha256": "860bff29193853bf4c305d73c801bd1d0b183f7d4a596f3f809f89712e164fe4"
+      },
+      "request": {
+        "path": "requests/phi3-ff-suffix.json",
+        "bytes": 1039,
+        "sha256": "5e5175470c749f06c095794a94da7e34a4991c7f1dd7763cbef1c25bdaf4b258"
+      }
+    },
+    {
+      "name": "phi3-ff-both-upper",
+      "general_name_hex": "ff50484933ff",
+      "model": {
+        "path": "models/phi3-ff-both-upper.gguf",
+        "bytes": 31296,
+        "sha256": "4becfdc0fe9392a9fb52e373dbd5aee2f59dcb2fe7800ae6cdbe409f999d0ac2"
+      },
+      "request": {
+        "path": "requests/phi3-ff-both-upper.json",
+        "bytes": 1043,
+        "sha256": "a32aa400983a0bd57edd1e25a474eec951feedd1dd073220a2984b48ba4677ca"
+      }
+    },
+    {
+      "name": "phi3-ff-mid",
+      "general_name_hex": "7068ff6933",
+      "model": {
+        "path": "models/phi3-ff-mid.gguf",
+        "bytes": 31296,
+        "sha256": "f50bc923c9afcbfb264be1cce9dbcd0d5794e1093ed73e270e49a37bede51c07"
+      },
+      "request": {
+        "path": "requests/phi3-ff-mid.json",
+        "bytes": 1036,
+        "sha256": "7041fcdae6912ee48367ec928ff36b60f4795e1f55412898cfafad425937c648"
+      }
+    },
+    {
+      "name": "phi3-nul-before",
+      "general_name_hex": "636f6e74726f6c0070686933",
+      "model": {
+        "path": "models/phi3-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "75a116103c68b325a39d39e7232aec544bd994abffcc9b46252eeb9d6dd54d18"
+      },
+      "request": {
+        "path": "requests/phi3-nul-before.json",
+        "bytes": 1040,
+        "sha256": "f5c95c031a84b4da87f0654ed1ce1fcb32a75c9177a3b1d4b8ddbac05950c318"
+      }
+    },
+    {
+      "name": "phi3-ff-nul-before",
+      "general_name_hex": "ff636f6e74726f6c0070686933",
+      "model": {
+        "path": "models/phi3-ff-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "5dad709cefb00612a8dc4aecdcb92c2812af4f1a72ef75be2e29754ddbb1497f"
+      },
+      "request": {
+        "path": "requests/phi3-ff-nul-before.json",
+        "bytes": 1043,
+        "sha256": "975ce695d15b99d329bbb326a74f6b50b2ff62ce785ac879ed6977ebaac13734"
+      }
+    },
+    {
+      "name": "phi3-nul-after",
+      "general_name_hex": "7068693300636f6e74726f6c",
+      "model": {
+        "path": "models/phi3-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "e0db3c1e5255bd4e449050b59b69ce5edee95fde1496bbcc2d5a177c8c666161"
+      },
+      "request": {
+        "path": "requests/phi3-nul-after.json",
+        "bytes": 1039,
+        "sha256": "757463a4adedb488d7774a9705dfd8db7c713dc1694ce6a2974ed5c2f8882587"
+      }
+    },
+    {
+      "name": "phi3-ff-nul-after",
+      "general_name_hex": "ff7068693300636f6e74726f6c",
+      "model": {
+        "path": "models/phi3-ff-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "1de1955d4aa82be307b777aca4e031607e51f134c0e1bc5dd3322679600ce2ea"
+      },
+      "request": {
+        "path": "requests/phi3-ff-nul-after.json",
+        "bytes": 1042,
+        "sha256": "08687e292a3a862a8e7e1b49e15a3f1fba3f22527f8928cca0de9a1f430513bb"
+      }
+    },
+    {
+      "name": "phi-3",
+      "general_name_hex": "7068692d33",
+      "model": {
+        "path": "models/phi-3.gguf",
+        "bytes": 31296,
+        "sha256": "4f81311d303a7c49e9fd6549a227d326efd7c2f6fa877854e8710dd6a01f94a8"
+      },
+      "request": {
+        "path": "requests/phi-3.json",
+        "bytes": 1030,
+        "sha256": "73eb622ea5f01912bf7b7cc2904b048206a15ca1a0f20154b9ac6dfb4da16bef"
+      }
+    },
+    {
+      "name": "phi-3-upper",
+      "general_name_hex": "5048492d33",
+      "model": {
+        "path": "models/phi-3-upper.gguf",
+        "bytes": 31296,
+        "sha256": "7b240742f771bcb7d9709d77a7cd9264dd05826cf78a0b4f4cc219286787e488"
+      },
+      "request": {
+        "path": "requests/phi-3-upper.json",
+        "bytes": 1036,
+        "sha256": "2a4c1ea25fe3ec08dad672669b90f01b3af73fa9b69d49de9684ca655f4847de"
+      }
+    },
+    {
+      "name": "phi-3-ff-prefix",
+      "general_name_hex": "ff7068692d33",
+      "model": {
+        "path": "models/phi-3-ff-prefix.gguf",
+        "bytes": 31296,
+        "sha256": "fb3035ff0fccc3b9fe7af1302c4bac2c9969c11cf34052dd4fd3d02d8e444257"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-prefix.json",
+        "bytes": 1040,
+        "sha256": "9efc9c40db2576606978341491a2d7e2a9e41e1eae0fa9d9dd0a67ef5bf10049"
+      }
+    },
+    {
+      "name": "phi-3-ff-suffix",
+      "general_name_hex": "7068692d33ff",
+      "model": {
+        "path": "models/phi-3-ff-suffix.gguf",
+        "bytes": 31296,
+        "sha256": "e7c81d5190e54f08fb4d1099b146b17b44ce2a05e783ba7219509c951cfe57ab"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-suffix.json",
+        "bytes": 1040,
+        "sha256": "86fbc67ff44e03f32e33c9aba6f3b211da75523c73d6a1079ebbaf60c38213ed"
+      }
+    },
+    {
+      "name": "phi-3-ff-both-upper",
+      "general_name_hex": "ff5048492d33ff",
+      "model": {
+        "path": "models/phi-3-ff-both-upper.gguf",
+        "bytes": 31296,
+        "sha256": "4f58382b7802b4231764c79d86ad394b221f193ab6f222f514646a570bc9425b"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-both-upper.json",
+        "bytes": 1044,
+        "sha256": "944dacb908c7660dc06665a6e93f3c38a16b12b226fa13df37ab153a09e7b0d4"
+      }
+    },
+    {
+      "name": "phi-3-ff-mid",
+      "general_name_hex": "7068ff692d33",
+      "model": {
+        "path": "models/phi-3-ff-mid.gguf",
+        "bytes": 31296,
+        "sha256": "08c2d49838d6378500ccf2c505bf4060f86bb03d851456305c48dda8fd4642e7"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-mid.json",
+        "bytes": 1037,
+        "sha256": "2cb750df544747ae06148fb41c042e076f473f68a05c6f679d940196d6dd0f8d"
+      }
+    },
+    {
+      "name": "phi-3-nul-before",
+      "general_name_hex": "636f6e74726f6c007068692d33",
+      "model": {
+        "path": "models/phi-3-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "b38acbe8e2f85665023dfb2ac298c4f20ef07a7abe69d2f392ddba8aed42708c"
+      },
+      "request": {
+        "path": "requests/phi-3-nul-before.json",
+        "bytes": 1041,
+        "sha256": "6e933aa1c470f46b8fbc194e88d8f92dd410470bd24bb240b69aa66cee0f152b"
+      }
+    },
+    {
+      "name": "phi-3-ff-nul-before",
+      "general_name_hex": "ff636f6e74726f6c007068692d33",
+      "model": {
+        "path": "models/phi-3-ff-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "9365ebd1894d800a56761acd7e9fd662233ec40201f96b433f63d67c0f16c835"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-nul-before.json",
+        "bytes": 1044,
+        "sha256": "f21c48a56225ad155acced8068b19f4b4c9cebc26e2efa46c5a8db3667824fbf"
+      }
+    },
+    {
+      "name": "phi-3-nul-after",
+      "general_name_hex": "7068692d3300636f6e74726f6c",
+      "model": {
+        "path": "models/phi-3-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "ec6e505d6a0c83b803b7698e6b68e5e8b535b3d7ab3092baf03718a67101dc86"
+      },
+      "request": {
+        "path": "requests/phi-3-nul-after.json",
+        "bytes": 1040,
+        "sha256": "1b210c15c42583469697a302306721ed49f1ff121dfdec926889e15cf88e167d"
+      }
+    },
+    {
+      "name": "phi-3-ff-nul-after",
+      "general_name_hex": "ff7068692d3300636f6e74726f6c",
+      "model": {
+        "path": "models/phi-3-ff-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "5e9dfb4ec90d80b2a339d5a980da7a9a7ff4db86bfd8cf633aba5d9b8447a989"
+      },
+      "request": {
+        "path": "requests/phi-3-ff-nul-after.json",
+        "bytes": 1043,
+        "sha256": "2766d5101c3e112bc7e0b5f625fbd27223c342c877c5c3243c596c8f70e641ef"
+      }
+    },
+    {
+      "name": "modern-bert",
+      "general_name_hex": "6d6f6465726e2d62657274",
+      "model": {
+        "path": "models/modern-bert.gguf",
+        "bytes": 31296,
+        "sha256": "0d9b07856d1d46bd0e7d35617f9ccb95b25a627ddc0b7e0042e16bc548c73f10"
+      },
+      "request": {
+        "path": "requests/modern-bert.json",
+        "bytes": 1036,
+        "sha256": "773ec0e245cf5093f4bbd739841d9afcfaa1dcdf384e46066b028af206787090"
+      }
+    },
+    {
+      "name": "modern-bert-upper",
+      "general_name_hex": "4d4f4445524e2d42455254",
+      "model": {
+        "path": "models/modern-bert-upper.gguf",
+        "bytes": 31296,
+        "sha256": "391cf8424fa5d50adb6232136474ef8763cd72cdd0ebfc659a419edb6baa0fb7"
+      },
+      "request": {
+        "path": "requests/modern-bert-upper.json",
+        "bytes": 1042,
+        "sha256": "f65431c6e69fe34e3afdca404421422b2a263e8763ccce6b6f6f28c6965d387b"
+      }
+    },
+    {
+      "name": "modern-bert-ff-prefix",
+      "general_name_hex": "ff6d6f6465726e2d62657274",
+      "model": {
+        "path": "models/modern-bert-ff-prefix.gguf",
+        "bytes": 31296,
+        "sha256": "aeed220aa4751755dba89705eca051057d38cba66fc8ed2463896e745950f67c"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-prefix.json",
+        "bytes": 1046,
+        "sha256": "cc7477451a2ba38ad7db0b693a6deab57f0511c8fbb448ae670bc7c9a9e36b9f"
+      }
+    },
+    {
+      "name": "modern-bert-ff-suffix",
+      "general_name_hex": "6d6f6465726e2d62657274ff",
+      "model": {
+        "path": "models/modern-bert-ff-suffix.gguf",
+        "bytes": 31296,
+        "sha256": "1c54875fecdf1014edc7a9131e83be2528c7f2f76bbf8c0ef2e7563eee14ba27"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-suffix.json",
+        "bytes": 1046,
+        "sha256": "4ca2c9101da90f136c2930745855c3c00e55d24a08a98f799e9e3a07fa5b141a"
+      }
+    },
+    {
+      "name": "modern-bert-ff-both-upper",
+      "general_name_hex": "ff4d4f4445524e2d42455254ff",
+      "model": {
+        "path": "models/modern-bert-ff-both-upper.gguf",
+        "bytes": 31296,
+        "sha256": "f101855e018a58b0da3592646225ce81244ea13391a7551f69815270ddda37ec"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-both-upper.json",
+        "bytes": 1050,
+        "sha256": "997a02874b366050f9e1608d2964757839a96f7020ca1f72b22eaa0734861a19"
+      }
+    },
+    {
+      "name": "modern-bert-ff-mid",
+      "general_name_hex": "6d6fff6465726e2d62657274",
+      "model": {
+        "path": "models/modern-bert-ff-mid.gguf",
+        "bytes": 31296,
+        "sha256": "d29ebb4cea7874307d64ecdd53b70e555f3ca09844f9d298c7278ca2cb25f88c"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-mid.json",
+        "bytes": 1043,
+        "sha256": "0a67f6ce4fd184d879528068b0de35d7fac4ea45cb32d4c0e1c4b0478981d744"
+      }
+    },
+    {
+      "name": "modern-bert-nul-before",
+      "general_name_hex": "636f6e74726f6c006d6f6465726e2d62657274",
+      "model": {
+        "path": "models/modern-bert-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "1eea47917a845c4d8f044707cc11259e6222e10aec010cc728c751fec23c3a2e"
+      },
+      "request": {
+        "path": "requests/modern-bert-nul-before.json",
+        "bytes": 1047,
+        "sha256": "d7dd2717cf2259b99be70c057b9858203f3502f509f0be9d91b86076957da0f7"
+      }
+    },
+    {
+      "name": "modern-bert-ff-nul-before",
+      "general_name_hex": "ff636f6e74726f6c006d6f6465726e2d62657274",
+      "model": {
+        "path": "models/modern-bert-ff-nul-before.gguf",
+        "bytes": 31296,
+        "sha256": "9d6447098bbc13f6721c96870e9b8d38910ce6215b4467a9b9b8d5de583a18c0"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-nul-before.json",
+        "bytes": 1050,
+        "sha256": "fba35f34b5e5a5515f3c4f7d1e77f9001fb60fc749f9739dfdb80d85e8a636f1"
+      }
+    },
+    {
+      "name": "modern-bert-nul-after",
+      "general_name_hex": "6d6f6465726e2d6265727400636f6e74726f6c",
+      "model": {
+        "path": "models/modern-bert-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "a2c2f44c99f92dccc91f6278d5920a9804e364beee005dcf347864deb62afbe6"
+      },
+      "request": {
+        "path": "requests/modern-bert-nul-after.json",
+        "bytes": 1046,
+        "sha256": "ba4e4594e321f46388ca7718d221207101fc626825a68c7ed186bdd07f5b8209"
+      }
+    },
+    {
+      "name": "modern-bert-ff-nul-after",
+      "general_name_hex": "ff6d6f6465726e2d6265727400636f6e74726f6c",
+      "model": {
+        "path": "models/modern-bert-ff-nul-after.gguf",
+        "bytes": 31296,
+        "sha256": "87d6965236e19c243bc6a104db808c31335939799e297d0effc46cbea96b7e7e"
+      },
+      "request": {
+        "path": "requests/modern-bert-ff-nul-after.json",
+        "bytes": 1049,
+        "sha256": "f72aae8bd5ca96e362f5dc80b5795b666e92a6bb833b6b0b1f8862dd8cf18a6d"
+      }
+    },
+    {
+      "name": "phi-before-modern",
+      "general_name_hex": "ff706869332d6d6f6465726e2d62657274",
+      "model": {
+        "path": "models/phi-before-modern.gguf",
+        "bytes": 31296,
+        "sha256": "68c6414e5015f03e573f5f23d86fa799512507a887377c58b643739f971b2db9"
+      },
+      "request": {
+        "path": "requests/phi-before-modern.json",
+        "bytes": 1042,
+        "sha256": "522d808c45e7e7171c4e4a50501e9ccee96666b1fa0d9a42062eed863c9e9b35"
+      }
+    },
+    {
+      "name": "modern-before-phi",
+      "general_name_hex": "ff6d6f6465726e2d626572742d70686933",
+      "model": {
+        "path": "models/modern-before-phi.gguf",
+        "bytes": 31296,
+        "sha256": "c4932b7d90bb3a4837d2dbe2323e4af75fd6ad1500ff4e14e65fe73977632998"
+      },
+      "request": {
+        "path": "requests/modern-before-phi.json",
+        "bytes": 1042,
+        "sha256": "1aa31b0ede674eac3947f804192ecefba7185f7974576f19b1d64f8585dc39ad"
+      }
+    },
+    {
+      "name": "nul-marker-empty",
+      "general_name_hex": "0070686933",
+      "model": {
+        "path": "models/nul-marker-empty.gguf",
+        "bytes": 31296,
+        "sha256": "c8393987953b29f469b6ecdc8dbc62f048e72fc47cc54d62ab42ca05ad616bbb"
+      },
+      "request": {
+        "path": "requests/nul-marker-empty.json",
+        "bytes": 1041,
+        "sha256": "f4df46dd11fe7ec9d8ba3d09827479fe4f8781118ed30ebff8d07e9cf24c3804"
+      }
+    },
+    {
+      "name": "nul-ff-then-marker",
+      "general_name_hex": "706c61696e00ff70686933",
+      "model": {
+        "path": "models/nul-ff-then-marker.gguf",
+        "bytes": 31296,
+        "sha256": "bead2a321e207ea71d276b1ea8c2eb0592fa4ed0439712340a18271e29bb6195"
+      },
+      "request": {
+        "path": "requests/nul-ff-then-marker.json",
+        "bytes": 1043,
+        "sha256": "e4713bf8a59029304c87ab45a9d4cf7930138b0a1bc7a653e13a8ffd8c572b71"
+      }
+    }
+  ],
+  "generator": {
+    "path": "prepare-inputs.py",
+    "bytes": 5130,
+    "sha256": "5a1b33b1172697d7dac31544cd4f73663cea1fac90874d35ae45758674fbc0dd"
+  },
+  "oracle": {
+    "path": "oracle.cpp",
+    "bytes": 17669,
+    "sha256": "6d8c1386bbf5579db3f2098c75aae385f2f1248797b9f18ce7301a0fd9d5f237"
+  }
+}

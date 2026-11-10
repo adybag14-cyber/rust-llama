@@ -14,16 +14,17 @@ Its 4,082 regular files have a complete ownership and hash inventory in [ledger/
 
 ## Build
 
-Rust 1.99.1 is pinned in `rust-toolchain.toml`. The workspace uses local Cargo path dependencies and no downloaded Cargo packages.
+Rust 1.99.1 is pinned in `rust-toolchain.toml`. The workspace uses local Cargo path dependencies and five checksum-pinned Rust registry packages for the converter's YAML parser. Their complete source, feature and license review is enforced by the dependency audit.
 
 ```sh
 git clone https://github.com/adybag14-cyber/rust-llama.git
 cd rust-llama
 rustup toolchain install 1.99.1 --profile minimal --component rustfmt,clippy
+cargo fetch --locked
 cargo build --workspace --release --offline --locked
 ```
 
-The compiler, platform linker and standard library must already be installed for an offline build. Windows builds use the MSVC toolchain; Linux builds use the native Linux toolchain. No original llama/ggml library, C/C++ project build, Python or Node runtime is part of CPU inference.
+The initial fetch acquires the locked dependency archives. The compiler, platform linker, standard library and those archives must already be installed for subsequent offline builds. Windows builds use the MSVC toolchain; Linux builds use the native Linux toolchain. No original llama/ggml library, C/C++ project build, Python or Node runtime is part of CPU inference.
 
 ## Run a model
 
@@ -64,7 +65,28 @@ complete merge are supported. Destructive cleanup requires stable paths under
 the caller's control. See [the precise format and tool contract](crates/gguf/README.md)
 for resource limits and original producer quirks. The [raw byte-string contract](docs/GGUF_BYTE_STRINGS.md)
 covers non-UTF-8/NUL wire strings, native alias semantics and boolean normalization;
-the current high-level model loaders retain their checked text-metadata boundary.
+model loading now retains raw primary metadata and its native C-prefix projection,
+with checked boundaries for consumed settings and tensor names.
+
+## Convert a Hugging Face Llama checkpoint
+
+The native Rust converter accepts local dense Llama Safetensors checkpoints:
+
+~~~sh
+cargo run --release --offline --locked -p llama-convert --bin convert-hf-to-gguf -- \
+  /path/to/checkpoint --outfile /path/to/model-f16.gguf --outtype f16
+~~~
+
+It supports SentencePiece and the documented Hugging Face BPE paths, indexed
+shards, model-card metadata, optional QKV fusion, vocabulary-only output, and
+auto/F32/F16/BF16/Q8_0/TQ1_0/TQ2_0 output. A completed temporary output is synced
+before replacing the destination. `--dry-run` reports the validated plan without
+publishing a file. Python and Torch are not runtime dependencies.
+
+See [the converter contract](crates/convert/README.md) for input and allocation
+limits, native source profiles and unsupported modes. Other architecture
+converters remain open. Conversion of scaled-RoPE metadata does not establish
+scaled-RoPE inference support.
 
 ## Encode a BERT sequence
 
@@ -105,10 +127,11 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | Area | Executable implementation |
 | --- | --- |
 | Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
-| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 76 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
+| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 81 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, five recurrent operators, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
 | Formats and vocabulary | Bounded shared raw/text GGUF v2/v3 reader and owned shard sets, byte-preserving ordered little-endian streaming writer, bounded split/merge executable, raw/indexed Safetensors reading with retained file capabilities, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
 | Model runtime | Llama, Qwen2, Qwen3, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
-| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 191 implemented frozen C API exports. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 198 implemented frozen C API exports. |
+| Checkpoint conversion | Native dense Llama HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior, seven output type selections and complete-file publication. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
 | Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
@@ -116,9 +139,30 @@ Detailed support boundaries are in the crate READMEs and [PORT_STATUS.md](docs/P
 
 ## Independent comparisons
 
+The complete 10 November integration passed **592 Windows / 597 Linux ordinary
+tests in each of debug and release**, strict Clippy, formatting, release builds
+and the dependency audit. Each host also passed nine explicit pretrained
+inference/server tests and the complete converter test. All 4,082 supplied source
+files and 720 fixture files were verified. Debug/release libraries passed the
+original-header C clients and exact 198-export inventories. The 22 ordinary-suite
+ignored entries keep their external-data/device prerequisites; the separately
+executed pretrained tests are recorded explicitly. See the
+[integrated verification](evidence/2026-11-10/continued-port/README.md) for raw
+logs, input hashes, retained failure diagnoses and the 20 still-open full-port gates.
+
 Reference C/C++ is built and executed outside this product. Committed fixtures contain data and provenance; runtime crates do not call the reference implementation.
 
-The recorded 9 November 2026 evidence includes:
+The 10 November extension adds independently captured model metadata, byte-oriented
+C chat APIs, and a native dense Llama checkpoint converter. The metadata corpus
+contains 171 model requests, over 334,000 buffer calls and 144,384 continuation
+logit words per profile; the chat corpus contains 35,946 cases per profile.
+The converter's ordinary suite compares 57 complete files totaling 8,091,032
+bytes and seven original rejections. Its separate pinned SmolLM2 test verifies
+three complete outputs totaling 686,581,536 bytes. See
+[metadata](crates/ffi/METADATA.md), [chat](crates/ffi/CHAT.md), and
+[conversion](crates/convert/README.md) for the exact boundaries and provenance.
+
+The retained 9 November 2026 evidence includes:
 
 - **Pretrained F32 inference:** six prompts, 96 matching greedy token IDs and 62,976 compared logits. Matching source accumulation and physical attention-row layout gives bit-identical results against the corresponding Windows and GNU captures.
 - **Pretrained Q4_0 inference:** 640,000 unique logits and sixteen greedy IDs match the corresponding original profiles. Packed Q8 activation conversion is retained; the earlier failed all-F32 comparison remains recorded.
@@ -129,7 +173,7 @@ The recorded 9 November 2026 evidence includes:
 - **F16 native caches:** independent F32/F16 key and value storage preserves raw half words in memory, sequence state and sessions. The ordinary original-C corpus compares 258,048 exact logits and 1,048 state/session buffers per profile across all four type pairs; a separate external trained/tiny C cohort checks 491,520 exact logits. The native microbatch/flash path now accepts the original default CPU configuration for admitted dense Llama models. Its 228 frozen-header cases contain 226 defined native returns and two source initialization assertions converted to checked errors, with 2,917,888 exact logit words and 14,171,045 exact binary bytes per profile. Separate flash/nonflash state replay checks 8,459,616 exact bytes. The strict high-level Context retains its existing execution contract.
 - **BERT embeddings:** 13,056 token/pooled values match the corresponding original profiles. The GNU correction preserves the source's four-lane variance reduction. All 122 captured stages of the Windows diagnostic sequence match exactly; 46,080 independent attention outputs remain in the ordinary suite.
 - **Sharded loading:** 90 native model/index configurations, including 65 admitted sets and 25 rejections; 64 model configurations compare 464,272 logits/embedding values and 590 greedy IDs per native profile. First-file metadata, per-file tensor origins, cumulative resource limits and retained file handles are checked independently. Architecture-specific checkpoint converters and remaining format boundaries stay open.
-- **GGUF streaming tools:** all 103 independent original CLI cases per compiler profile pass, with 63 defined successes and 40 checked errors. Complete post-operation comparisons cover 12,179,168 exact file bytes. Cumulative budgets, one-byte copy buffers, retained-handle alias protection and pre-completion input preservation are checked separately. The [raw GGUF extension](docs/GGUF_BYTE_STRINGS.md) adds 1,605 native reader/getter cases, 269,184 exact native serialization bytes, 1,073 public-writer inputs and 3,218 byte/NUL tool cases per native profile. Raw APIs and split/merge preserve full wire bytes and the original prefix/overwrite rules; model/vocabulary consumers still use checked text metadata. Source UB produces checked errors.
+- **GGUF streaming tools:** all 103 independent original CLI cases per compiler profile pass, with 63 defined successes and 40 checked errors. Complete post-operation comparisons cover 12,179,168 exact file bytes. Cumulative budgets, one-byte copy buffers, retained-handle alias protection and pre-completion input preservation are checked separately. The [raw GGUF extension](docs/GGUF_BYTE_STRINGS.md) adds 1,605 native reader/getter cases, 269,184 exact native serialization bytes, 1,073 public-writer inputs and 3,218 byte/NUL tool cases per native profile. Raw APIs and split/merge preserve full wire bytes and the original prefix/overwrite rules; the later model-metadata extension adds a raw primary owner and native model projection. Source UB produces checked errors.
 - **Vocabulary behavior:** the preserved SPM/WordPiece corpora plus 1,499,449 complete BPE vocabulary records across all 14 original BPE models; 5,096 real-model token/piece/detokenization cases; 18,018 GPT-2 alias cases; 23,754 synthetic configuration cases; 22,518 raw-byte cases; 126,896 regex splits. All 64 reachable profiles and 99 aliases are covered on Windows and Linux. Source-inferred special IDs preserve the measured platform container ordering.
 - **Remaining tokenizer families:** Unigram, RWKV and PLaMo2/PLaMo3 have 91,476 synthetic family cases, 346,112 original vocabulary records, 10,412 real-vocabulary tokenization cases and 4,067,668 exact normalizer outputs. Invalid source assertion/nonprogress inputs return bounded errors. The no-vocabulary mode is explicit.
 - **Unicode behavior:** all 1,114,112 codepoints, 15,957 normalization sequences and 65,809 valid/malformed UTF-8 cases checked against the original source.
@@ -138,7 +182,7 @@ The recorded 9 November 2026 evidence includes:
 - **Shared flash and tensor adapter:** 3,746 original graphs check 7,060,000 raw default/forced output words per compiler profile, including source NaN operand selection. One-chunk, tiled and split-KV paths retain original geometry, physical masks, row maps and real worker partitions. The tensor adapter separately checks 114 new admitted graphs plus 896 reused sealed cases, with 3,032,980 exact output words per profile. Unsupported domains remain explicit; the tensor DAG has no aggregate retained-memory budget.
 - **Checkpoint foundation:** raw/indexed Safetensors reading, bounded positioned reads and a retained-directory capability boundary. Independent original file/index corpora and safe checked path-policy differences are recorded in [the checkpoint crate](crates/checkpoint/README.md). Architecture conversion remains open.
 - **Actual devices:** 138 CUDA dispatches on RTX 4090 with zero recorded error; OpenCL kernel cases on RTX 4090 and AMD gfx1036 with recorded numerical bounds.
-- **C ABI:** 191 of 255 frozen exports, plus four diagnostic extensions, are exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The [coverage inventory](crates/ffi/COVERAGE.md) retains all 64 absent exports and the remaining semantic restrictions.
+- **C ABI:** At that checkpoint, 191 of 255 frozen exports, plus four diagnostic extensions, were exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The current [coverage inventory](crates/ffi/COVERAGE.md) retains all 57 absent exports and the remaining semantic restrictions.
 - **Server:** 37 real-model generation requests plus 283 embedding HTTP transcripts per original build (256 tiny-model, 27 pretrained BGE). Both verified profiles require exact corresponding F32 bits and all seven base64 vectors. Direct normalization checks cover another 4,608 values. Real TCP lifecycle tests cover configured load bounds, limits, provider failures, disconnects, shutdown and complete deadline errors.
 
 The original MSVC and GNU builds do not use identical row arithmetic: the verified GNU build enables source SSE2 exponentiation, reductions and variance, while the verified MSVC build uses scalar rows. Separate expected captures preserve those differences. Test expectations select their profile independently of runtime dispatch. The model runtime also preserves 256-column attention padding and physical cache holes. None of these results establishes every CPU instruction-set path.
@@ -168,6 +212,6 @@ cargo xtask verify-source /path/to/llama.cpp-master
 
 ## Provenance and license
 
-The integration reuses and audits the supplied T05â€“T08 and T09â€“T12 Rust progress archives. Their hashes and imported files are recorded in [docs/imports/manifest.json](docs/imports/manifest.json). Historical reports are preserved under `docs/imports/`; current claims require current evidence.
+The integration reuses and audits the supplied T05-T08 and T09-T12 Rust progress archives. Their hashes and imported files are recorded in [docs/imports/manifest.json](docs/imports/manifest.json). Historical reports are preserved under `docs/imports/`; current claims require current evidence.
 
 Original project code is MIT licensed. Original ggml attribution is retained in [LICENSE-UPSTREAM](LICENSE-UPSTREAM) and [NOTICE](NOTICE). Component notices identify separately licensed adapted code, including the native tied-sort helpers. Fixture provenance records additional source identities and qualifications.

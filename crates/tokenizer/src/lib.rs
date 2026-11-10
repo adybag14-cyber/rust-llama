@@ -7,6 +7,8 @@
 mod bpe;
 mod byte_trie;
 mod plamo;
+#[cfg(test)]
+mod raw_name_reference;
 mod rwkv;
 mod ugm;
 #[cfg(test)]
@@ -628,11 +630,20 @@ impl Tokenizer {
             }
         }
         {
+            // The native loader retrieves a first-NUL byte string. Invalid
+            // UTF-8 must not hide ASCII model-name markers. Match the C-locale
+            // lowercasing without allocating or changing other bytes.
             let name = m
                 .get("general.name")
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .to_ascii_lowercase();
+                .and_then(Value::as_bytes)
+                .unwrap_or_default()
+                .split(|byte| *byte == 0)
+                .next()
+                .unwrap_or_default();
+            let name_contains = |needle: &[u8]| {
+                name.windows(needle.len())
+                    .any(|part| part.eq_ignore_ascii_case(needle))
+            };
             let pre = m
                 .get("tokenizer.ggml.pre")
                 .and_then(Value::as_str)
@@ -651,7 +662,7 @@ impl Tokenizer {
                 if let Some(&mask) = lookup.get("<mask>") {
                     tokens[mask as usize].attributes |= 128;
                 }
-            } else if name.contains("phi-3") || name.contains("phi3") {
+            } else if name_contains(b"phi-3") || name_contains(b"phi3") {
                 for token in &mut tokens {
                     if token.attributes & (1 | 8 | 16) != 0 || token.text == "</s>" {
                         token.attributes |= 256;
@@ -662,7 +673,7 @@ impl Tokenizer {
                         tokens[id as usize].attributes &= !256;
                     }
                 }
-            } else if name.contains("modern-bert")
+            } else if name_contains(b"modern-bert")
                 && let Some(&mask) = lookup.get("[MASK]")
             {
                 tokens[mask as usize].attributes |= 128;

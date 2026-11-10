@@ -76,13 +76,29 @@ impl Message {
     }
 }
 
+/// Borrowed byte strings for native chat formatting. Embedded NULs are rejected;
+/// C callers pass only the bytes preceding their first terminator.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ByteMessage<'a> {
+    pub role: &'a [u8],
+    pub content: &'a [u8],
+}
+
+/// UTF-8 convenience entry point for the same byte-oriented detection rules.
+pub fn detect_template(template: &str) -> Option<&'static str> {
+    detect_template_bytes(template.as_bytes())
+}
+
 /// Same ordered heuristics as the original native formatter. The returned
 /// `dots1` tag is an internal dispatch tag, not a newly registered alias.
-pub fn detect_template(template: &str) -> Option<&'static str> {
-    if let Some(&name) = BUILTIN_TEMPLATES.iter().find(|&&name| name == template) {
+pub fn detect_template_bytes(template: &[u8]) -> Option<&'static str> {
+    if let Some(&name) = BUILTIN_TEMPLATES
+        .iter()
+        .find(|&&name| name.as_bytes() == template)
+    {
         return Some(name);
     }
-    let has = |s: &str| template.contains(s);
+    let has = |s: &str| template.windows(s.len()).any(|part| part == s.as_bytes());
     Some(if has("<|im_start|>") {
         if has("<|im_sep|>") {
             "phi4"
@@ -91,7 +107,7 @@ pub fn detect_template(template: &str) -> Option<&'static str> {
         } else {
             "chatml"
         }
-    } else if template.starts_with("mistral") || has("[INST]") {
+    } else if template.starts_with(b"mistral") || has("[INST]") {
         if has("[SYSTEM_PROMPT]") {
             "mistral-v7"
         } else if has("' [INST] ' + system_message") || has("[AVAILABLE_TOOLS]") {
@@ -215,16 +231,43 @@ pub fn detect_template(template: &str) -> Option<&'static str> {
     })
 }
 
-fn trim(value: &str) -> &str {
-    value.trim_matches([' ', '\t', '\n', '\r', '\u{b}', '\u{c}'])
+fn trim(value: &[u8]) -> &[u8] {
+    let whitespace = |b: &u8| matches!(*b, b' ' | b'\t' | b'\n' | b'\r' | 0x0b | 0x0c);
+    let start = value
+        .iter()
+        .position(|b| !whitespace(b))
+        .unwrap_or(value.len());
+    let end = value
+        .iter()
+        .rposition(|b| !whitespace(b))
+        .map_or(start, |i| i + 1);
+    &value[start..end]
+}
+
+fn copy_bytes(value: &[u8]) -> Result<Vec<u8>> {
+    let mut out = Vec::new();
+    append_bytes(&mut out, value)?;
+    Ok(out)
+}
+fn append_bytes(target: &mut Vec<u8>, value: &[u8]) -> Result<()> {
+    target
+        .try_reserve(value.len())
+        .map_err(|_| Error::new("chat byte allocation failed"))?;
+    target.extend_from_slice(value);
+    Ok(())
+}
+fn uppercase(value: &[u8]) -> Result<Vec<u8>> {
+    let mut out = copy_bytes(value)?;
+    out.make_ascii_uppercase();
+    Ok(out)
 }
 
 struct Output {
-    value: String,
+    value: Vec<u8>,
     limit: usize,
 }
 impl Output {
-    fn add(&mut self, parts: &[&str]) -> Result<()> {
+    fn add(&mut self, parts: &[&[u8]]) -> Result<()> {
         let total = parts
             .iter()
             .try_fold(self.value.len(), |total, p| total.checked_add(p.len()))
@@ -232,8 +275,11 @@ impl Output {
         if total > self.limit {
             return Err(Error::new("chat output exceeds byte limit"));
         }
+        self.value
+            .try_reserve(total - self.value.len())
+            .map_err(|_| Error::new("chat output allocation failed"))?;
         for part in parts {
-            self.value.push_str(part);
+            self.value.extend_from_slice(part);
         }
         Ok(())
     }
@@ -243,26 +289,68 @@ pub fn render(template: &str, messages: &[Message], add_assistant: bool) -> Resu
     render_with_limit(template, messages, add_assistant, 16 * 1024 * 1024)
 }
 
+/// Preserve the safe UTF-8 API's empty-role/NUL validation and ASCII case policy.
 pub fn render_with_limit(
     template: &str,
     messages: &[Message],
     add_assistant: bool,
     max_bytes: usize,
 ) -> Result<String> {
+    if messages.len() > 65_536 {
+        return Err(Error::new("chat message count exceeds limit"));
+    }
+    let mut borrowed = Vec::new();
+    borrowed
+        .try_reserve_exact(messages.len())
+        .map_err(|_| Error::new("chat message allocation failed"))?;
+    for message in messages {
+        if message.role.is_empty() {
+            return Err(Error::new("empty chat role is invalid"));
+        }
+        borrowed.push(ByteMessage {
+            role: message.role.as_bytes(),
+            content: message.content.as_bytes(),
+        });
+    }
+    String::from_utf8(render_bytes_with_limit(
+        template.as_bytes(),
+        &borrowed,
+        add_assistant,
+        max_bytes,
+    )?)
+    .map_err(|_| Error::new("UTF-8 chat formatter produced invalid text"))
+}
+
+/// Byte-preserving native formatter under the verified C locale. Empty roles
+/// are retained. Case conversion is ASCII-only; the C ABI separately rejects
+/// source-undefined signed-negative arguments to toupper.
+pub fn render_bytes(
+    template: &[u8],
+    messages: &[ByteMessage<'_>],
+    add_assistant: bool,
+) -> Result<Vec<u8>> {
+    render_bytes_with_limit(template, messages, add_assistant, 16 * 1024 * 1024)
+}
+
+/// Format byte strings with a checked output and per-message byte ceiling.
+/// No source C/C++ code or foreign formatter is linked by this implementation.
+pub fn render_bytes_with_limit(
+    template: &[u8],
+    messages: &[ByteMessage<'_>],
+    add_assistant: bool,
+    max_bytes: usize,
+) -> Result<Vec<u8>> {
     if template.len() > 1024 * 1024 {
         return Err(Error::new("template exceeds 1 MiB limit"));
     }
-    let name = detect_template(template).ok_or_else(|| {
+    let name = detect_template_bytes(template).ok_or_else(|| {
         Error::new("unrecognized native chat template; full Jinja evaluation is not implemented")
     })?;
     if messages.len() > 65_536 {
         return Err(Error::new("chat message count exceeds limit"));
     }
     for message in messages {
-        if message.role.is_empty() {
-            return Err(Error::new("empty chat role is invalid"));
-        }
-        if message.role.contains('\0') || message.content.contains('\0') {
+        if message.role.contains(&0) || message.content.contains(&0) {
             return Err(Error::new(
                 "NUL in chat message cannot be represented by the source C-string contract",
             ));
@@ -272,57 +360,84 @@ pub fn render_with_limit(
         }
     }
     let mut out = Output {
-        value: String::new(),
+        value: Vec::new(),
         limit: max_bytes,
     };
     match name {
         "chatml" | "phi4" => {
-            let separator = if name == "phi4" { "<|im_sep|>" } else { "\n" };
-            let suffix = if name == "phi4" {
-                "<|im_end|>"
+            let separator = if name == "phi4" {
+                "<|im_sep|>".as_bytes()
             } else {
-                "<|im_end|>\n"
+                "\n".as_bytes()
+            };
+            let suffix = if name == "phi4" {
+                "<|im_end|>".as_bytes()
+            } else {
+                "<|im_end|>\n".as_bytes()
             };
             for m in messages {
-                out.add(&["<|im_start|>", &m.role, separator, &m.content, suffix])?;
+                out.add(&[
+                    "<|im_start|>".as_bytes(),
+                    m.role,
+                    separator,
+                    m.content,
+                    suffix,
+                ])?;
             }
             if add_assistant {
-                out.add(&["<|im_start|>assistant", separator])?;
+                out.add(&["<|im_start|>assistant".as_bytes(), separator])?;
             }
         }
         "mistral-v7" | "mistral-v7-tekken" => {
-            let space = if name == "mistral-v7" { " " } else { "" };
+            let space = if name == "mistral-v7" {
+                " ".as_bytes()
+            } else {
+                "".as_bytes()
+            };
             for m in messages {
-                match m.role.as_str() {
-                    "system" => {
-                        out.add(&["[SYSTEM_PROMPT]", space, &m.content, "[/SYSTEM_PROMPT]"])?
+                match m.role {
+                    b"system" => out.add(&[
+                        "[SYSTEM_PROMPT]".as_bytes(),
+                        space,
+                        m.content,
+                        "[/SYSTEM_PROMPT]".as_bytes(),
+                    ])?,
+                    b"user" => {
+                        out.add(&["[INST]".as_bytes(), space, m.content, "[/INST]".as_bytes()])?
                     }
-                    "user" => out.add(&["[INST]", space, &m.content, "[/INST]"])?,
-                    _ => out.add(&[space, &m.content, "</s>"])?,
+                    _ => out.add(&[space, m.content, "</s>".as_bytes()])?,
                 }
             }
         }
         "mistral-v1" | "mistral-v3" | "mistral-v3-tekken" => {
-            let leading = if name == "mistral-v1" { " " } else { "" };
-            let trailing = if name == "mistral-v3-tekken" { "" } else { " " };
+            let leading = if name == "mistral-v1" {
+                " ".as_bytes()
+            } else {
+                "".as_bytes()
+            };
+            let trailing = if name == "mistral-v3-tekken" {
+                "".as_bytes()
+            } else {
+                " ".as_bytes()
+            };
             let mut inside = false;
             for m in messages {
                 if !inside {
-                    out.add(&[leading, "[INST]", trailing])?;
+                    out.add(&[leading, "[INST]".as_bytes(), trailing])?;
                     inside = true;
                 }
-                match m.role.as_str() {
-                    "system" => out.add(&[&m.content, "\n\n"])?,
-                    "user" => out.add(&[&m.content, leading, "[/INST]"])?,
+                match m.role {
+                    b"system" => out.add(&[m.content, "\n\n".as_bytes()])?,
+                    b"user" => out.add(&[m.content, leading, "[/INST]".as_bytes()])?,
                     _ => {
                         out.add(&[
                             trailing,
                             if name == "mistral-v3" {
-                                trim(&m.content)
+                                trim(m.content)
                             } else {
-                                &m.content
+                                m.content
                             },
-                            "</s>",
+                            "</s>".as_bytes(),
                         ])?;
                         inside = false;
                     }
@@ -331,32 +446,36 @@ pub fn render_with_limit(
         }
         "llama2" | "llama2-sys" | "llama2-sys-bos" | "llama2-sys-strip" => {
             let mut inside = true;
-            out.add(&["[INST] "])?;
+            out.add(&["[INST] ".as_bytes()])?;
             for m in messages {
                 let content = if name == "llama2-sys-strip" {
-                    trim(&m.content)
+                    trim(m.content)
                 } else {
-                    &m.content
+                    m.content
                 };
                 if !inside {
                     out.add(&[if name == "llama2-sys-bos" {
-                        "<s>[INST] "
+                        "<s>[INST] ".as_bytes()
                     } else {
-                        "[INST] "
+                        "[INST] ".as_bytes()
                     }])?;
                     inside = true;
                 }
-                match m.role.as_str() {
-                    "system" => {
+                match m.role {
+                    b"system" => {
                         if name != "llama2" {
-                            out.add(&["<<SYS>>\n", content, "\n<</SYS>>\n\n"])?;
+                            out.add(&[
+                                "<<SYS>>\n".as_bytes(),
+                                content,
+                                "\n<</SYS>>\n\n".as_bytes(),
+                            ])?;
                         } else {
-                            out.add(&[content, "\n"])?;
+                            out.add(&[content, "\n".as_bytes()])?;
                         }
                     }
-                    "user" => out.add(&[content, " [/INST]"])?,
+                    b"user" => out.add(&[content, " [/INST]".as_bytes()])?,
                     _ => {
-                        out.add(&[content, "</s>"])?;
+                        out.add(&[content, "</s>".as_bytes()])?;
                         inside = false;
                     }
                 }
@@ -364,21 +483,40 @@ pub fn render_with_limit(
         }
         "phi3" | "falcon3" | "zephyr" | "glmedge" | "chatglm3" | "chatglm4" => {
             if name == "chatglm3" {
-                out.add(&["[gMASK]sop"])?;
+                out.add(&["[gMASK]sop".as_bytes()])?;
             }
             if name == "chatglm4" {
-                out.add(&["[gMASK]<sop>"])?;
+                out.add(&["[gMASK]<sop>".as_bytes()])?;
             }
             let (start, end, prompt) = match name {
-                "phi3" => ("\n", "<|end|>\n", "<|assistant|>\n"),
-                "falcon3" => ("\n", "\n", "<|assistant|>\n"),
-                "zephyr" => ("\n", "<|endoftext|>\n", "<|assistant|>\n"),
-                "chatglm3" => ("\n ", "", "<|assistant|>"),
-                "chatglm4" => ("\n", "", "<|assistant|>\n"),
-                _ => ("\n", "", "<|assistant|>"),
+                "phi3" => (
+                    "\n".as_bytes(),
+                    "<|end|>\n".as_bytes(),
+                    "<|assistant|>\n".as_bytes(),
+                ),
+                "falcon3" => (
+                    "\n".as_bytes(),
+                    "\n".as_bytes(),
+                    "<|assistant|>\n".as_bytes(),
+                ),
+                "zephyr" => (
+                    "\n".as_bytes(),
+                    "<|endoftext|>\n".as_bytes(),
+                    "<|assistant|>\n".as_bytes(),
+                ),
+                "chatglm3" => ("\n ".as_bytes(), "".as_bytes(), "<|assistant|>".as_bytes()),
+                "chatglm4" => ("\n".as_bytes(), "".as_bytes(), "<|assistant|>\n".as_bytes()),
+                _ => ("\n".as_bytes(), "".as_bytes(), "<|assistant|>".as_bytes()),
             };
             for m in messages {
-                out.add(&["<|", &m.role, "|>", start, &m.content, end])?;
+                out.add(&[
+                    "<|".as_bytes(),
+                    m.role,
+                    "|>".as_bytes(),
+                    start,
+                    m.content,
+                    end,
+                ])?;
             }
             if add_assistant {
                 out.add(&[prompt])?;
@@ -387,52 +525,56 @@ pub fn render_with_limit(
         "monarch" => {
             for (i, m) in messages.iter().enumerate() {
                 out.add(&[
-                    if i == 0 { "" } else { "<s>" },
-                    &m.role,
-                    "\n",
-                    &m.content,
-                    "</s>\n",
+                    if i == 0 {
+                        "".as_bytes()
+                    } else {
+                        "<s>".as_bytes()
+                    },
+                    m.role,
+                    "\n".as_bytes(),
+                    m.content,
+                    "</s>\n".as_bytes(),
                 ])?;
             }
             if add_assistant {
-                out.add(&["<s>assistant\n"])?;
+                out.add(&["<s>assistant\n".as_bytes()])?;
             }
         }
         "gemma" => {
-            let mut system = String::new();
+            let mut system = Vec::new();
             for m in messages {
-                if m.role == "system" {
+                if m.role == b"system" {
                     if system
                         .len()
-                        .checked_add(trim(&m.content).len())
+                        .checked_add(trim(m.content).len())
                         .is_none_or(|n| n > max_bytes)
                     {
                         return Err(Error::new("system prompt exceeds limit"));
                     }
-                    system.push_str(trim(&m.content));
+                    append_bytes(&mut system, trim(m.content))?;
                     continue;
                 }
-                let role = if m.role == "assistant" {
-                    "model"
+                let role = if m.role == b"assistant" {
+                    b"model"
                 } else {
-                    &m.role
+                    m.role
                 };
-                out.add(&["<start_of_turn>", role, "\n"])?;
-                if !system.is_empty() && role != "model" {
-                    out.add(&[&system, "\n\n"])?;
+                out.add(&["<start_of_turn>".as_bytes(), role, "\n".as_bytes()])?;
+                if !system.is_empty() && role != b"model" {
+                    out.add(&[&system, "\n\n".as_bytes()])?;
                     system.clear();
                 }
-                out.add(&[trim(&m.content), "<end_of_turn>\n"])?;
+                out.add(&[trim(m.content), "<end_of_turn>\n".as_bytes()])?;
             }
             if add_assistant {
-                out.add(&["<start_of_turn>model\n"])?;
+                out.add(&["<start_of_turn>model\n".as_bytes()])?;
             }
         }
         "orion" => {
-            let mut system = String::new();
+            let mut system = Vec::new();
             for m in messages {
-                match m.role.as_str() {
-                    "system" => {
+                match m.role {
+                    b"system" => {
                         if system
                             .len()
                             .checked_add(m.content.len())
@@ -440,462 +582,528 @@ pub fn render_with_limit(
                         {
                             return Err(Error::new("system prompt exceeds limit"));
                         }
-                        system.push_str(&m.content);
+                        append_bytes(&mut system, m.content)?;
                     }
-                    "user" => {
-                        out.add(&["Human: "])?;
+                    b"user" => {
+                        out.add(&["Human: ".as_bytes()])?;
                         if !system.is_empty() {
-                            out.add(&[&system, "\n\n"])?;
+                            out.add(&[&system, "\n\n".as_bytes()])?;
                             system.clear();
                         }
-                        out.add(&[&m.content, "\n\nAssistant: </s>"])?;
+                        out.add(&[m.content, "\n\nAssistant: </s>".as_bytes()])?;
                     }
-                    _ => out.add(&[&m.content, "</s>"])?,
+                    _ => out.add(&[m.content, "</s>".as_bytes()])?,
                 }
             }
         }
         "openchat" => {
             for m in messages {
-                if m.role == "system" {
-                    out.add(&[&m.content, "<|end_of_turn|>"])?;
+                if m.role == b"system" {
+                    out.add(&[m.content, "<|end_of_turn|>".as_bytes()])?;
                 } else {
-                    let mut role = m.role.clone();
-                    if role.as_bytes()[0].is_ascii() {
-                        role[0..1].make_ascii_uppercase();
+                    let mut role = copy_bytes(m.role)?;
+                    if let Some(first) = role.first_mut() {
+                        first.make_ascii_uppercase();
                     }
-                    out.add(&["GPT4 Correct ", &role, ": ", &m.content, "<|end_of_turn|>"])?;
+                    out.add(&[
+                        "GPT4 Correct ".as_bytes(),
+                        &role,
+                        ": ".as_bytes(),
+                        m.content,
+                        "<|end_of_turn|>".as_bytes(),
+                    ])?;
                 }
             }
             if add_assistant {
-                out.add(&["GPT4 Correct Assistant:"])?;
+                out.add(&["GPT4 Correct Assistant:".as_bytes()])?;
             }
         }
         "vicuna" | "vicuna-orca" => {
             for m in messages {
-                match m.role.as_str() {
-                    "system" => {
+                match m.role {
+                    b"system" => {
                         if name == "vicuna-orca" {
-                            out.add(&["SYSTEM: ", &m.content, "\n"])?;
+                            out.add(&["SYSTEM: ".as_bytes(), m.content, "\n".as_bytes()])?;
                         } else {
-                            out.add(&[&m.content, "\n\n"])?;
+                            out.add(&[m.content, "\n\n".as_bytes()])?;
                         }
                     }
-                    "user" => out.add(&["USER: ", &m.content, "\n"])?,
-                    "assistant" => out.add(&["ASSISTANT: ", &m.content, "</s>\n"])?,
+                    b"user" => out.add(&["USER: ".as_bytes(), m.content, "\n".as_bytes()])?,
+                    b"assistant" => {
+                        out.add(&["ASSISTANT: ".as_bytes(), m.content, "</s>\n".as_bytes()])?
+                    }
                     _ => {}
                 }
             }
             if add_assistant {
-                out.add(&["ASSISTANT:"])?;
+                out.add(&["ASSISTANT:".as_bytes()])?;
             }
         }
         "deepseek" => {
             for m in messages {
-                match m.role.as_str() {
-                    "system" => out.add(&[&m.content])?,
-                    "user" => out.add(&["### Instruction:\n", &m.content, "\n"])?,
-                    "assistant" => out.add(&["### Response:\n", &m.content, "\n<|EOT|>\n"])?,
+                match m.role {
+                    b"system" => out.add(&[m.content])?,
+                    b"user" => {
+                        out.add(&["### Instruction:\n".as_bytes(), m.content, "\n".as_bytes()])?
+                    }
+                    b"assistant" => out.add(&[
+                        "### Response:\n".as_bytes(),
+                        m.content,
+                        "\n<|EOT|>\n".as_bytes(),
+                    ])?,
                     _ => {}
                 }
             }
             if add_assistant {
-                out.add(&["### Response:\n"])?;
+                out.add(&["### Response:\n".as_bytes()])?;
             }
         }
         "command-r" => {
             for m in messages {
-                let role = match m.role.as_str() {
-                    "system" => "<|SYSTEM_TOKEN|>",
-                    "user" => "<|USER_TOKEN|>",
-                    "assistant" => "<|CHATBOT_TOKEN|>",
+                let role = match m.role {
+                    b"system" => "<|SYSTEM_TOKEN|>".as_bytes(),
+                    b"user" => "<|USER_TOKEN|>".as_bytes(),
+                    b"assistant" => "<|CHATBOT_TOKEN|>".as_bytes(),
                     _ => continue,
                 };
                 out.add(&[
-                    "<|START_OF_TURN_TOKEN|>",
+                    "<|START_OF_TURN_TOKEN|>".as_bytes(),
                     role,
-                    trim(&m.content),
-                    "<|END_OF_TURN_TOKEN|>",
+                    trim(m.content),
+                    "<|END_OF_TURN_TOKEN|>".as_bytes(),
                 ])?;
             }
             if add_assistant {
-                out.add(&["<|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"])?;
+                out.add(&["<|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>".as_bytes()])?;
             }
         }
         "llama3" | "llama4" => {
             let (start, end, eot) = if name == "llama3" {
-                ("<|start_header_id|>", "<|end_header_id|>", "<|eot_id|>")
+                (
+                    "<|start_header_id|>".as_bytes(),
+                    "<|end_header_id|>".as_bytes(),
+                    "<|eot_id|>".as_bytes(),
+                )
             } else {
-                ("<|header_start|>", "<|header_end|>", "<|eot|>")
+                (
+                    "<|header_start|>".as_bytes(),
+                    "<|header_end|>".as_bytes(),
+                    "<|eot|>".as_bytes(),
+                )
             };
             for m in messages {
-                out.add(&[start, &m.role, end, "\n\n", trim(&m.content), eot])?;
+                out.add(&[start, m.role, end, "\n\n".as_bytes(), trim(m.content), eot])?;
             }
             if add_assistant {
-                out.add(&[start, "assistant", end, "\n\n"])?;
+                out.add(&[start, b"assistant", end, "\n\n".as_bytes()])?;
             }
         }
         "minicpm" => {
             for m in messages {
-                if m.role == "user" {
-                    out.add(&["<用户>", trim(&m.content), "<AI>"])?;
+                if m.role == b"user" {
+                    out.add(&["<用户>".as_bytes(), trim(m.content), "<AI>".as_bytes()])?;
                 } else {
-                    out.add(&[trim(&m.content)])?;
+                    out.add(&[trim(m.content)])?;
                 }
             }
         }
         "deepseek2" | "deepseek3" => {
             for m in messages {
-                match m.role.as_str() {
-                    "system" => out.add(&[&m.content, "\n\n"])?,
-                    "user" => {
+                match m.role {
+                    b"system" => out.add(&[m.content, "\n\n".as_bytes()])?,
+                    b"user" => {
                         if name == "deepseek2" {
-                            out.add(&["User: ", &m.content, "\n\n"])?;
+                            out.add(&["User: ".as_bytes(), m.content, "\n\n".as_bytes()])?;
                         } else {
-                            out.add(&["<｜User｜>", &m.content])?;
+                            out.add(&["<｜User｜>".as_bytes(), m.content])?;
                         }
                     }
-                    "assistant" => out.add(&[
+                    b"assistant" => out.add(&[
                         if name == "deepseek2" {
-                            "Assistant: "
+                            "Assistant: ".as_bytes()
                         } else {
-                            "<｜Assistant｜>"
+                            "<｜Assistant｜>".as_bytes()
                         },
-                        &m.content,
-                        "<｜end▁of▁sentence｜>",
+                        m.content,
+                        "<｜end▁of▁sentence｜>".as_bytes(),
                     ])?,
                     _ => {}
                 }
             }
             if add_assistant {
                 out.add(&[if name == "deepseek2" {
-                    "Assistant:"
+                    "Assistant:".as_bytes()
                 } else {
-                    "<｜Assistant｜>"
+                    "<｜Assistant｜>".as_bytes()
                 }])?;
             }
         }
         "deepseek-ocr" => {
             for m in messages {
-                out.add(&[&m.content])?;
+                out.add(&[m.content])?;
             }
         }
         "exaone3" | "exaone4" => {
             for m in messages {
-                if !matches!(m.role.as_str(), "system" | "user" | "assistant")
-                    && !(m.role == "tool" && name == "exaone4")
+                if !matches!(m.role, b"system" | b"user" | b"assistant")
+                    && !(m.role == b"tool" && name == "exaone4")
                 {
                     continue;
                 }
                 out.add(&[
-                    "[|",
-                    &m.role,
-                    "|]",
-                    trim(&m.content),
-                    if m.role == "user" {
-                        "\n"
+                    "[|".as_bytes(),
+                    m.role,
+                    "|]".as_bytes(),
+                    trim(m.content),
+                    if m.role == b"user" {
+                        "\n".as_bytes()
                     } else {
-                        "[|endofturn|]\n"
+                        "[|endofturn|]\n".as_bytes()
                     },
                 ])?;
             }
             if add_assistant {
-                out.add(&["[|assistant|]"])?;
+                out.add(&["[|assistant|]".as_bytes()])?;
             }
         }
         "exaone-moe" => {
             for m in messages {
-                if matches!(m.role.as_str(), "system" | "user" | "assistant" | "tool") {
-                    out.add(&["<|", &m.role, "|>\n", trim(&m.content), "<|endofturn|>\n"])?;
+                if matches!(m.role, b"system" | b"user" | b"assistant" | b"tool") {
+                    out.add(&[
+                        "<|".as_bytes(),
+                        m.role,
+                        "|>\n".as_bytes(),
+                        trim(m.content),
+                        "<|endofturn|>\n".as_bytes(),
+                    ])?;
                 }
             }
             if add_assistant {
-                out.add(&["<|assistant|>\n"])?;
+                out.add(&["<|assistant|>\n".as_bytes()])?;
             }
         }
         "rwkv-world" => {
             for (i, m) in messages.iter().enumerate() {
-                let role = match m.role.as_str() {
-                    "system" => "System",
-                    "user" => "User",
-                    "assistant" => "Assistant",
+                let role = match m.role {
+                    b"system" => "System".as_bytes(),
+                    b"user" => "User".as_bytes(),
+                    b"assistant" => "Assistant".as_bytes(),
                     _ => continue,
                 };
-                out.add(&[role, ": ", trim(&m.content), "\n\n"])?;
-                if m.role == "user" && i + 1 == messages.len() {
-                    out.add(&["Assistant:"])?;
+                out.add(&[role, ": ".as_bytes(), trim(m.content), "\n\n".as_bytes()])?;
+                if m.role == b"user" && i + 1 == messages.len() {
+                    out.add(&["Assistant:".as_bytes()])?;
                 }
             }
         }
         "granite" | "granite-4.0" | "granite-4.1" => {
             for m in messages {
-                let role = if name != "granite" && m.role == "assistant_tool_call" {
-                    "assistant"
+                let role = if name != "granite" && m.role == b"assistant_tool_call" {
+                    b"assistant"
                 } else {
-                    &m.role
+                    m.role
                 };
-                out.add(&["<|start_of_role|>", role, "<|end_of_role|>"])?;
-                if m.role == "assistant_tool_call" {
-                    out.add(&["<|tool_call|>"])?;
+                out.add(&[
+                    "<|start_of_role|>".as_bytes(),
+                    role,
+                    "<|end_of_role|>".as_bytes(),
+                ])?;
+                if m.role == b"assistant_tool_call" {
+                    out.add(&["<|tool_call|>".as_bytes()])?;
                 }
-                out.add(&[&m.content, "<|end_of_text|>\n"])?;
+                out.add(&[m.content, "<|end_of_text|>\n".as_bytes()])?;
             }
             if add_assistant {
-                out.add(&["<|start_of_role|>assistant<|end_of_role|>"])?;
+                out.add(&["<|start_of_role|>assistant<|end_of_role|>".as_bytes()])?;
             }
         }
         "gigachat" => {
-            let system = messages.first().is_some_and(|m| m.role == "system");
-            out.add(&["<s>"])?;
+            let system = messages.first().is_some_and(|m| m.role == b"system");
+            out.add(&["<s>".as_bytes()])?;
             if system {
-                out.add(&[&messages[0].content, "<|message_sep|>"])?;
+                out.add(&[messages[0].content, "<|message_sep|>".as_bytes()])?;
             }
             for m in &messages[usize::from(system)..] {
-                match m.role.as_str() {
-                    "user" => out.add(&[
-                        "user<|role_sep|>",
-                        &m.content,
-                        "<|message_sep|>available functions<|role_sep|>[]<|message_sep|>",
+                match m.role {
+                    b"user" => out.add(&[
+                        "user<|role_sep|>".as_bytes(),
+                        m.content,
+                        "<|message_sep|>available functions<|role_sep|>[]<|message_sep|>"
+                            .as_bytes(),
                     ])?,
-                    "assistant" => {
-                        out.add(&["assistant<|role_sep|>", &m.content, "<|message_sep|>"])?
-                    }
+                    b"assistant" => out.add(&[
+                        "assistant<|role_sep|>".as_bytes(),
+                        m.content,
+                        "<|message_sep|>".as_bytes(),
+                    ])?,
                     _ => {}
                 }
             }
             if add_assistant {
-                out.add(&["assistant<|role_sep|>"])?;
+                out.add(&["assistant<|role_sep|>".as_bytes()])?;
             }
         }
         "megrez" => {
             for m in messages {
                 out.add(&[
-                    "<|role_start|>",
-                    &m.role,
-                    "<|role_end|>",
-                    &m.content,
-                    "<|turn_end|>",
+                    "<|role_start|>".as_bytes(),
+                    m.role,
+                    "<|role_end|>".as_bytes(),
+                    m.content,
+                    "<|turn_end|>".as_bytes(),
                 ])?;
             }
             if add_assistant {
-                out.add(&["<|role_start|>assistant<|role_end|>"])?;
+                out.add(&["<|role_start|>assistant<|role_end|>".as_bytes()])?;
             }
         }
         "yandex" => {
             for m in messages {
-                match m.role.as_str() {
-                    "user" => out.add(&[" Пользователь: ", &m.content, "\n\n"])?,
-                    "assistant" => out.add(&[" Ассистент: ", &m.content, "\n\n"])?,
+                match m.role {
+                    b"user" => {
+                        out.add(&[" Пользователь: ".as_bytes(), m.content, "\n\n".as_bytes()])?
+                    }
+                    b"assistant" => {
+                        out.add(&[" Ассистент: ".as_bytes(), m.content, "\n\n".as_bytes()])?
+                    }
                     _ => {}
                 }
             }
             if add_assistant {
-                out.add(&[" Ассистент:[SEP]"])?;
+                out.add(&[" Ассистент:[SEP]".as_bytes()])?;
             }
         }
         "bailing" | "bailing-think" | "bailing2" => {
-            if name == "bailing2" && !messages.first().is_some_and(|m| m.role == "system") {
-                out.add(&["<role>SYSTEM</role>detailed thinking off<|role_end|>"])?;
+            if name == "bailing2" && !messages.first().is_some_and(|m| m.role == b"system") {
+                out.add(&["<role>SYSTEM</role>detailed thinking off<|role_end|>".as_bytes()])?;
             }
             for m in messages {
-                let role = if m.role == "user" {
-                    "HUMAN".to_owned()
+                let role = if m.role == b"user" {
+                    copy_bytes(b"HUMAN")?
                 } else {
-                    m.role.to_ascii_uppercase()
+                    uppercase(m.role)?
                 };
                 out.add(&[
-                    "<role>",
+                    "<role>".as_bytes(),
                     &role,
-                    "</role>",
-                    &m.content,
+                    "</role>".as_bytes(),
+                    m.content,
                     if name == "bailing2" {
-                        "<|role_end|>"
+                        "<|role_end|>".as_bytes()
                     } else {
-                        ""
+                        "".as_bytes()
                     },
                 ])?;
             }
             if add_assistant {
                 out.add(&[
-                    "<role>ASSISTANT</role>",
+                    "<role>ASSISTANT</role>".as_bytes(),
                     if name == "bailing-think" {
-                        "<think>"
+                        "<think>".as_bytes()
                     } else {
-                        ""
+                        "".as_bytes()
                     },
                 ])?;
             }
         }
         "smolvlm" => {
-            out.add(&["<|im_start|>"])?;
+            out.add(&["<|im_start|>".as_bytes()])?;
             for m in messages {
-                if m.role == "system" {
-                    out.add(&[&m.content, "\n\n"])?;
+                if m.role == b"system" {
+                    out.add(&[m.content, "\n\n".as_bytes()])?;
                 } else {
                     out.add(&[
-                        if m.role == "user" {
-                            "User: "
+                        if m.role == b"user" {
+                            "User: ".as_bytes()
                         } else {
-                            "Assistant: "
+                            "Assistant: ".as_bytes()
                         },
-                        &m.content,
-                        "<end_of_utterance>\n",
+                        m.content,
+                        "<end_of_utterance>\n".as_bytes(),
                     ])?;
                 }
             }
             if add_assistant {
-                out.add(&["Assistant:"])?;
+                out.add(&["Assistant:".as_bytes()])?;
             }
         }
         "dots1" => {
             for m in messages {
-                let (start, end) = match m.role.as_str() {
-                    "system" => ("<|system|>", "<|endofsystem|>"),
-                    "user" => ("<|userprompt|>", "<|endofuserprompt|>"),
-                    _ => ("<|response|>", "<|endofresponse|>"),
+                let (start, end) = match m.role {
+                    b"system" => ("<|system|>".as_bytes(), "<|endofsystem|>".as_bytes()),
+                    b"user" => (
+                        "<|userprompt|>".as_bytes(),
+                        "<|endofuserprompt|>".as_bytes(),
+                    ),
+                    _ => ("<|response|>".as_bytes(), "<|endofresponse|>".as_bytes()),
                 };
-                out.add(&[start, &m.content, end])?;
+                out.add(&[start, m.content, end])?;
             }
             if add_assistant {
-                out.add(&["<|response|>"])?;
+                out.add(&["<|response|>".as_bytes()])?;
             }
         }
         "hunyuan-moe" => {
             for m in messages {
-                match m.role.as_str() {
-                    "system" => out.add(&["<|startoftext|>", &m.content, "<|extra_4|>"])?,
-                    "assistant" => out.add(&[&m.content, "<|eos|>"])?,
-                    _ => out.add(&["<|startoftext|>", &m.content, "<|extra_0|>"])?,
+                match m.role {
+                    b"system" => out.add(&[
+                        "<|startoftext|>".as_bytes(),
+                        m.content,
+                        "<|extra_4|>".as_bytes(),
+                    ])?,
+                    b"assistant" => out.add(&[m.content, "<|eos|>".as_bytes()])?,
+                    _ => out.add(&[
+                        "<|startoftext|>".as_bytes(),
+                        m.content,
+                        "<|extra_0|>".as_bytes(),
+                    ])?,
                 }
             }
         }
         "gpt-oss" => {
             for m in messages {
                 out.add(&[
-                    "<|start|>",
-                    &m.role,
-                    "<|message|>",
-                    &m.content,
-                    if m.role == "assistant" {
-                        "<|return|>"
+                    "<|start|>".as_bytes(),
+                    m.role,
+                    "<|message|>".as_bytes(),
+                    m.content,
+                    if m.role == b"assistant" {
+                        "<|return|>".as_bytes()
                     } else {
-                        "<|end|>"
+                        "<|end|>".as_bytes()
                     },
                 ])?;
             }
             if add_assistant {
-                out.add(&["<|start|>assistant"])?;
+                out.add(&["<|start|>assistant".as_bytes()])?;
             }
         }
         "hunyuan-dense" => {
             for (i, m) in messages.iter().enumerate() {
-                if i == 0 && m.role == "system" {
-                    out.add(&[&m.content, "<｜hy_place▁holder▁no▁3｜>"])?;
+                if i == 0 && m.role == b"system" {
+                    out.add(&[m.content, "<｜hy_place▁holder▁no▁3｜>".as_bytes()])?;
                 }
-                if m.role == "assistant" {
+                if m.role == b"assistant" {
                     out.add(&[
-                        "<｜hy_Assistant｜>",
-                        &m.content,
-                        "<｜hy_place▁holder▁no▁2｜>",
+                        "<｜hy_Assistant｜>".as_bytes(),
+                        m.content,
+                        "<｜hy_place▁holder▁no▁2｜>".as_bytes(),
                     ])?;
-                } else if m.role == "user" {
-                    out.add(&["<｜hy_User｜>", &m.content, "<｜hy_Assistant｜>"])?;
+                } else if m.role == b"user" {
+                    out.add(&[
+                        "<｜hy_User｜>".as_bytes(),
+                        m.content,
+                        "<｜hy_Assistant｜>".as_bytes(),
+                    ])?;
                 }
             }
         }
         "hunyuan-vl" => {
-            out.add(&["<｜hy_begin▁of▁sentence｜>"])?;
+            out.add(&["<｜hy_begin▁of▁sentence｜>".as_bytes()])?;
             for (i, m) in messages.iter().enumerate() {
-                if i == 0 && m.role == "system" {
-                    out.add(&[&m.content, "<｜hy_place▁holder▁no▁3｜>"])?;
+                if i == 0 && m.role == b"system" {
+                    out.add(&[m.content, "<｜hy_place▁holder▁no▁3｜>".as_bytes()])?;
                     continue;
                 }
-                if m.role == "user" {
-                    out.add(&[&m.content, "<｜hy_User｜>"])?;
-                } else if m.role == "assistant" {
-                    out.add(&[&m.content, "<｜hy_Assistant｜>"])?;
+                if m.role == b"user" {
+                    out.add(&[m.content, "<｜hy_User｜>".as_bytes()])?;
+                } else if m.role == b"assistant" {
+                    out.add(&[m.content, "<｜hy_Assistant｜>".as_bytes()])?;
                 }
             }
         }
         "kimi-k2" => {
             for m in messages {
-                let prefix = match m.role.as_str() {
-                    "system" => "<|im_system|>system<|im_middle|>",
-                    "user" => "<|im_user|>user<|im_middle|>",
-                    "assistant" => "<|im_assistant|>assistant<|im_middle|>",
-                    "tool" => "<|im_system|>tool<|im_middle|>",
-                    _ => "",
+                let prefix = match m.role {
+                    b"system" => "<|im_system|>system<|im_middle|>".as_bytes(),
+                    b"user" => "<|im_user|>user<|im_middle|>".as_bytes(),
+                    b"assistant" => "<|im_assistant|>assistant<|im_middle|>".as_bytes(),
+                    b"tool" => "<|im_system|>tool<|im_middle|>".as_bytes(),
+                    _ => "".as_bytes(),
                 };
-                out.add(&[prefix, &m.content, "<|im_end|>"])?;
+                out.add(&[prefix, m.content, "<|im_end|>".as_bytes()])?;
             }
             if add_assistant {
-                out.add(&["<|im_assistant|>assistant<|im_middle|>"])?;
+                out.add(&["<|im_assistant|>assistant<|im_middle|>".as_bytes()])?;
             }
         }
         "seed_oss" => {
             for m in messages {
                 out.add(&[
-                    "<seed:bos>",
-                    &m.role,
-                    "\n",
-                    if m.role == "assistant" {
-                        trim(&m.content)
+                    "<seed:bos>".as_bytes(),
+                    m.role,
+                    "\n".as_bytes(),
+                    if m.role == b"assistant" {
+                        trim(m.content)
                     } else {
-                        &m.content
+                        m.content
                     },
-                    "<seed:eos>",
+                    "<seed:eos>".as_bytes(),
                 ])?;
             }
             if add_assistant {
-                out.add(&["<seed:bos>assistant\n"])?;
+                out.add(&["<seed:bos>assistant\n".as_bytes()])?;
             }
         }
         "grok-2" => {
             for m in messages {
-                let prefix = match m.role.as_str() {
-                    "system" => "System: ",
-                    "user" => "Human: ",
-                    "assistant" => "Assistant: ",
+                let prefix = match m.role {
+                    b"system" => "System: ".as_bytes(),
+                    b"user" => "Human: ".as_bytes(),
+                    b"assistant" => "Assistant: ".as_bytes(),
                     _ => continue,
                 };
                 out.add(&[
                     prefix,
-                    if m.role == "assistant" {
-                        &m.content
+                    if m.role == b"assistant" {
+                        m.content
                     } else {
-                        trim(&m.content)
+                        trim(m.content)
                     },
-                    "<|separator|>\n\n",
+                    "<|separator|>\n\n".as_bytes(),
                 ])?;
             }
             if add_assistant {
-                out.add(&["Assistant:"])?;
+                out.add(&["Assistant:".as_bytes()])?;
             }
         }
         "pangu-embedded" => {
             for (i, m) in messages.iter().enumerate() {
-                if i == 0 && m.role != "system" {
-                    out.add(&["[unused9]系统：[unused10]"])?;
+                if i == 0 && m.role != b"system" {
+                    out.add(&["[unused9]系统：[unused10]".as_bytes()])?;
                 }
-                let role = match m.role.as_str() {
-                    "system" => "系统",
-                    "user" => "用户",
-                    "assistant" => "助手",
-                    "tool" => "工具",
-                    "function" => "方法",
+                let role = match m.role {
+                    b"system" => "系统".as_bytes(),
+                    b"user" => "用户".as_bytes(),
+                    b"assistant" => "助手".as_bytes(),
+                    b"tool" => "工具".as_bytes(),
+                    b"function" => "方法".as_bytes(),
                     _ => continue,
                 };
-                out.add(&["[unused9]", role, "：", &m.content, "[unused10]"])?;
+                out.add(&[
+                    "[unused9]".as_bytes(),
+                    role,
+                    "：".as_bytes(),
+                    m.content,
+                    "[unused10]".as_bytes(),
+                ])?;
             }
             if add_assistant {
-                out.add(&["[unused9]助手："])?;
+                out.add(&["[unused9]助手：".as_bytes()])?;
             }
         }
         "solar-open" => {
             for m in messages {
-                out.add(&["<|begin|>", &m.role, "<|content|>", &m.content, "<|end|>"])?;
+                out.add(&[
+                    "<|begin|>".as_bytes(),
+                    m.role,
+                    "<|content|>".as_bytes(),
+                    m.content,
+                    "<|end|>".as_bytes(),
+                ])?;
             }
             if add_assistant {
-                out.add(&["<|begin|>assistant"])?;
+                out.add(&["<|begin|>assistant".as_bytes()])?;
             }
         }
         _ => return Err(Error::new("native template dispatch is not implemented")),

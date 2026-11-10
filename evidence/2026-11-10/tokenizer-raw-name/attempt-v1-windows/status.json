@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "host": "windows",
+  "status": "failed",
+  "started_utc": "2026-11-10T20:27:02.010184+00:00",
+  "inputs": {
+    "bytes": 20871,
+    "sha256": "f06b2ea21bee4fc84c04c3490073a43517911c47e68d46fb7db2d0c4fe11bdf2"
+  },
+  "input_count": 136,
+  "validator": {
+    "bytes": 3285,
+    "sha256": "1405d7624f5d2bb73011d14f31b1fa2a3d29dbd7a93931d7977a6e56ed3b99b2"
+  },
+  "original_seal": {
+    "bytes": 1583,
+    "sha256": "e43392cec3e9f12f8730edc16ac0a6c1a9d747df2dfa3d66f3f2cf415b90246e"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-tokenizer",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2638438000003589,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 2.387516599999799,
+      "log": {
+        "bytes": 521,
+        "sha256": "db2e977fc916521c5bbc13736fbb1661af941e61404d4af76b68889e510e6320"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 16.08054699999957,
+      "log": {
+        "bytes": 833,
+        "sha256": "f362b1801b3da4ae79c500e5b6ef9043d82bd53111a59e2f7a4aeab2e78ee6bb"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 1.483452500000567,
+      "log": {
+        "bytes": 1081,
+        "sha256": "8f7852fdaa074af67179c82d90be8e14039bd234be784b93d8b6001dbbfeae3d"
+      }
+    }
+  ],
+  "error": "RuntimeError('clippy failed')",
+  "finished_utc": "2026-11-10T20:27:22.288308+00:00"
+}

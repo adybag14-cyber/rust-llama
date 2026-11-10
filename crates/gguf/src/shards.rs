@@ -2,8 +2,8 @@
 //! Secondary metadata never replaces or augments the primary model metadata.
 
 use crate::{
-    Endian, Error, Gguf, HeaderUsage, Limits, Result, TensorInfo, Value, invalid, read_tensor_f32,
-    read_tensor_payload,
+    Endian, Error, HeaderUsage, Limits, RawGguf, RawValue, Result, TensorInfo, Value, invalid,
+    model_metadata,
 };
 use std::{
     collections::BTreeMap,
@@ -17,6 +17,11 @@ pub struct ShardLimits {
     /// Maximum simultaneously owned files. This is an explicit resource limit,
     /// not a restriction of the GGUF UINT16 split-count field.
     pub max_shards: usize,
+    /// Retained raw primary metadata plus its model C-prefix projection, and
+    /// subsidiary metadata while its header is checked. This is a conservative
+    /// owned-payload/collection budget, separate from parser wire/read-ahead
+    /// limits; it is not a process RSS or recoverable-OOM guarantee.
+    pub max_metadata_storage_bytes: usize,
     /// Header bytes, metadata entries/values and tensor descriptors are charged
     /// cumulatively across the complete set. String, array and payload-read
     /// limits still apply to each individual object/read.
@@ -26,6 +31,7 @@ impl Default for ShardLimits {
     fn default() -> Self {
         Self {
             max_shards: 1024,
+            max_metadata_storage_bytes: 512 * 1024 * 1024,
             gguf: Limits::default(),
         }
     }
@@ -47,7 +53,7 @@ pub struct ShardInfo {
 
 struct Shard {
     info: ShardInfo,
-    file: Gguf<File>,
+    file: RawGguf<File>,
 }
 
 /// A complete validated model-file set, retaining the handles that were parsed.
@@ -55,6 +61,8 @@ struct Shard {
 /// any malformed/missing shard drops all staged handles and returns an error.
 pub struct GgufSet {
     metadata: BTreeMap<String, Value>,
+    metadata_storage_bytes: usize,
+    metadata_storage_limit: usize,
     shards: Vec<Shard>,
     tensors: Vec<TensorInfo>,
     tensor_shards: Vec<usize>,
@@ -103,8 +111,10 @@ impl GgufSet {
         if limits.max_shards == 0 {
             return Err(Error::Limit("maximum GGUF shard count is zero".into()));
         }
-        let mut first = Gguf::open_with_limits(first_path, limits.gguf.clone())?;
-        let declared_count = u16_key(&first.metadata, "split.count", Some(0))?;
+        let first = RawGguf::open_with_limits(first_path, limits.gguf.clone())?;
+        let (metadata, metadata_storage_bytes) =
+            model_metadata::project(&first, limits.max_metadata_storage_bytes)?;
+        let declared_count = u16_key(&first, "split.count", Some(0))?;
         let count = usize::from(declared_count).max(1);
         if count > limits.max_shards {
             return Err(Error::Limit(format!(
@@ -113,7 +123,7 @@ impl GgufSet {
             )));
         }
         let prefix = if declared_count > 1 {
-            if u16_key(&first.metadata, "split.no", None)? != 0 {
+            if u16_key(&first, "split.no", None)? != 0 {
                 return Err(invalid(
                     "model must be loaded with the first split (split.no=0)",
                 ));
@@ -135,7 +145,9 @@ impl GgufSet {
         };
 
         let mut set = Self {
-            metadata: std::mem::take(&mut first.metadata),
+            metadata,
+            metadata_storage_bytes,
+            metadata_storage_limit: limits.max_metadata_storage_bytes,
             shards: Vec::new(),
             tensors: Vec::new(),
             tensor_shards: Vec::new(),
@@ -163,11 +175,15 @@ impl GgufSet {
                 )?,
             };
             let remaining = remaining_limits(&limits.gguf, set.usage)?;
-            let file = Gguf::open_with_limits(&path, remaining)?;
+            let file = RawGguf::open_with_limits(&path, remaining)?;
+            model_metadata::within_budget(
+                model_metadata::add(set.metadata_storage_bytes, file.model_metadata_storage()?)?,
+                set.metadata_storage_limit,
+            )?;
             // This is the ONLY subsidiary model metadata field consulted by
             // the original loader. In particular split.count, total, arch,
             // tokenizer and other primary metadata must not be merged.
-            if usize::from(u16_key(&file.metadata, "split.no", None)?) != index {
+            if usize::from(u16_key(&file, "split.no", None)?) != index {
                 return Err(invalid(format!("split.no differs from expected {index}")));
             }
             set.append(&path, file)?;
@@ -203,9 +219,9 @@ impl GgufSet {
         Ok(set)
     }
 
-    fn append(&mut self, path: &Path, mut file: Gguf<File>) -> Result<()> {
+    fn append(&mut self, path: &Path, mut file: RawGguf<File>) -> Result<()> {
         let shard_index = self.shards.len();
-        self.usage = add_usage(self.usage, file.header_usage)?;
+        self.usage = add_usage(self.usage, file.header_usage())?;
         self.file_bytes = self
             .file_bytes
             .checked_add(file.file_len)
@@ -234,20 +250,45 @@ impl GgufSet {
             data_offset: file.data_offset,
             file_len: file.file_len,
             tensor_count: file.tensors.len(),
-            header_usage: file.header_usage,
+            header_usage: file.header_usage(),
         };
         self.tensor_shards
             .extend(std::iter::repeat_n(shard_index, file.tensors.len()));
-        self.tensors.append(&mut file.tensors);
+        self.tensors.append(&mut file.take_model_tensors()?);
         // Secondary headers have already been validated and charged. Retain
         // only primary metadata and file-specific layout, as the source does.
-        file.metadata.clear();
+        if shard_index != 0 {
+            file.discard_model_metadata();
+        }
         self.shards.push(Shard { info, file });
         Ok(())
     }
 
+    /// Model getter view: first original-order C-prefix key wins; string
+    /// values and string-array elements use their C prefixes. Non-UTF-8 string
+    /// payloads are ByteString. Non-UTF-8 keys remain in raw_metadata().
     pub fn metadata(&self) -> &BTreeMap<String, Value> {
         &self.metadata
+    }
+    /// Complete original primary wire metadata, including NUL suffixes and
+    /// non-UTF-8 keys/values. Subsidiary fields are never merged.
+    pub fn raw_metadata(&self) -> &BTreeMap<Vec<u8>, RawValue> {
+        &self.shards[0].file.metadata
+    }
+    /// Complete primary key bytes in original serialized order.
+    pub fn raw_metadata_order(&self) -> impl Iterator<Item = &[u8]> {
+        self.shards[0].file.metadata_order()
+    }
+    /// First original-order primary field with the requested C-string prefix.
+    pub fn raw_metadata_native(&self, key: &[u8]) -> Option<&RawValue> {
+        self.shards[0].file.metadata_native(key)
+    }
+    /// Conservative retained raw/projection charge, for aggregating consumers.
+    pub fn metadata_storage_bytes(&self) -> usize {
+        self.metadata_storage_bytes
+    }
+    pub fn metadata_storage_limit(&self) -> usize {
+        self.metadata_storage_limit
     }
     pub fn tensors(&self) -> &[TensorInfo] {
         &self.tensors
@@ -297,33 +338,20 @@ impl GgufSet {
             .tensor_index(name)
             .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
         let shard = &mut self.shards[self.tensor_shards[index]].file;
-        read_tensor_payload(
-            &mut shard.reader,
-            shard.data_offset,
-            shard.file_len,
-            &shard.limits,
-            &self.tensors[index],
-        )
+        shard.read_model_tensor(&self.tensors[index])
     }
     pub fn read_f32(&mut self, name: &str) -> Result<Vec<f32>> {
         let index = self
             .tensor_index(name)
             .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
         let shard = &mut self.shards[self.tensor_shards[index]].file;
-        read_tensor_f32(
-            &mut shard.reader,
-            shard.data_offset,
-            shard.file_len,
-            shard.endian,
-            &shard.limits,
-            &self.tensors[index],
-        )
+        shard.read_model_f32(&self.tensors[index])
     }
 }
 
-fn u16_key(metadata: &BTreeMap<String, Value>, key: &str, default: Option<u16>) -> Result<u16> {
-    match metadata.get(key) {
-        Some(Value::U16(value)) => Ok(*value),
+fn u16_key(file: &RawGguf<File>, key: &str, default: Option<u16>) -> Result<u16> {
+    match file.metadata_native(key.as_bytes()) {
+        Some(RawValue::U16(value)) => Ok(*value),
         Some(_) => Err(invalid(format!("{key} must be UINT16"))),
         None => default.ok_or_else(|| invalid(format!("missing {key}"))),
     }

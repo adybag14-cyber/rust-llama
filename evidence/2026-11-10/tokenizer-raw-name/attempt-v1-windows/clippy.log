@@ -1,0 +1,17 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\quant)
+    Checking llama-conformance v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-conformance)
+    Checking llama-behavior v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-behavior)
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama\crates\gguf)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+error: using `chunks_exact` with a constant chunk size
+  --> crates\tokenizer\src\raw_name_reference.rs:15:10
+   |
+15 |         .chunks_exact(2)
+   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `llama-tokenizer` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

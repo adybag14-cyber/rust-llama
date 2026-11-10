@@ -51,6 +51,9 @@ impl WireBytes for Vec<u8> {
 /// Checked offsets for streaming payloads after an independently written header.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WriteLayout {
+    /// Exact encoded header bytes before alignment padding. Producers such as
+    /// the frozen HF vocab-only converter intentionally stop at this boundary.
+    pub encoded_header_bytes: u64,
     pub data_offset: u64,
     pub alignment: u32,
     pub tensor_offsets: Vec<u64>,
@@ -159,6 +162,7 @@ fn value_size<S: WireBytes>(
         MetadataValue::U32(_) | MetadataValue::I32(_) | MetadataValue::F32(_) => 4,
         MetadataValue::U64(_) | MetadataValue::I64(_) | MetadataValue::F64(_) => 8,
         MetadataValue::String(text) => string_size(text.wire_bytes(), limits, policy)?,
+        MetadataValue::ByteString(bytes) => string_size(bytes, limits, policy)?,
         MetadataValue::Array {
             element_type,
             values,
@@ -323,6 +327,7 @@ fn layout_inner<N: WireBytes + ?Sized, S: WireBytes>(
         .checked_add(offset)
         .ok_or_else(|| invalid("output file size overflow"))?;
     Ok(WriteLayout {
+        encoded_header_bytes: header,
         data_offset,
         alignment,
         tensor_offsets,
@@ -370,6 +375,7 @@ impl<W: Write> Encoder<'_, W> {
             MetadataValue::F32(value) => self.raw(&value.to_le_bytes()),
             MetadataValue::Bool(value) => self.raw(&[u8::from(*value)]),
             MetadataValue::String(value) => self.string(value.wire_bytes()),
+            MetadataValue::ByteString(value) => self.string(value),
             MetadataValue::U64(value) => self.raw(&value.to_le_bytes()),
             MetadataValue::I64(value) => self.raw(&value.to_le_bytes()),
             MetadataValue::F64(value) => self.raw(&value.to_le_bytes()),

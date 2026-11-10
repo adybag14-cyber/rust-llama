@@ -1,0 +1,87 @@
+{
+  "schema": "original-only-fixture-provenance-v1",
+  "upstream_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "oracle": "SentencePiece 0.2.1 actual LoadFromFile/IdToPiece/GetScore/flags/special-ID getters; one separate process per case",
+  "reports": [
+    {
+      "path": "original-spm-model-v2/windows/report.json",
+      "bytes": 1886898,
+      "sha256": "c39334335cd10dbce2f6388f37d0603590e367186d61214cc1e344f395339e92"
+    },
+    {
+      "path": "original-spm-model-v2/linux/report.json",
+      "bytes": 1817041,
+      "sha256": "457226e7d250f70354dee1eabc5ff9e1f9911c3f1c7fe8277d0bee54f1ce0626"
+    },
+    {
+      "path": "original-spm-model-addon-v1/windows/report.json",
+      "bytes": 1260043,
+      "sha256": "1f9cbfa5e357b22526cf49753d7236776630267e8e0096f32948ec67c030da39"
+    },
+    {
+      "path": "original-spm-model-addon-v1/linux/report.json",
+      "bytes": 1213392,
+      "sha256": "44761cf095936f1b81d9194d7dcb598b0164235d883d8f86596ef841306bb368"
+    }
+  ],
+  "cases": 79,
+  "accepted": 45,
+  "reference_bytes": 2353433,
+  "reference_sha256": "71cfd0ca5dae0ee6d95e300c88bfd53b8e8dd47e4beeced843f0f10c9b83cba7",
+  "compaction": "Retains every input wire byte and every successful returned piece/score bit/flag/special ID. Failure status retained; platform diagnostic wording and native stdout/stderr retained externally. No Rust output contributes expected data.",
+  "boundaries": [
+    "The converter borrows bounded ModelProto bytes and reports checked errors for malformed data.",
+    "SentencePiece embedded nonempty self-tests require an execution contract and are explicitly unsupported in this conversion slice; no silently skipped tests.",
+    "Malformed normalization blobs that cause native pointer underflow are checked errors; this corpus does not rely on successful undefined behavior."
+  ],
+  "scripts": [
+    {
+      "path": "spm-model-worker.py",
+      "sha256": "fe9e161ce661757c03bb755a780418ce8899ee45e18e0e231ba1af42063ff57c"
+    },
+    {
+      "path": "capture-spm-model-v2.py",
+      "sha256": "a2166fb80827de4ee14a8b665485187e88b686619ef22a91226b8bda4f880f38"
+    },
+    {
+      "path": "capture-spm-addon-v1.py",
+      "sha256": "25d8e1f78c92812dbddd4b0f7cce1e84e92d2a70bb42c675bee800e3b06de321"
+    },
+    {
+      "path": "package-spm-v1.py",
+      "sha256": "ebf841a751a9a565c4fd0fc9ddc43e7bc47cbea6c2ed4cfd19dacce7ba7cb771"
+    }
+  ],
+  "primary_source_identity": [
+    {
+      "path": "src/model_interface.cc",
+      "url": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.1/src/model_interface.cc",
+      "bytes": 7123,
+      "sha256": "abcf06f3218931515f40c46e316b79f74ad8d43e1ad46502e1a4f0cee40f3069"
+    },
+    {
+      "path": "src/normalizer.cc",
+      "url": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.1/src/normalizer.cc",
+      "bytes": 12139,
+      "sha256": "3f6b39fba709d60c7be65a7c3192ee9c3c8ba84eb89213a36a79d050d9172420"
+    },
+    {
+      "path": "src/sentencepiece_processor.cc",
+      "url": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.1/src/sentencepiece_processor.cc",
+      "bytes": 39526,
+      "sha256": "29b94d664c942b97563e7b3057da0758440d0cce6da96a61d7c855a4de4914ea"
+    },
+    {
+      "path": "src/sentencepiece_model.proto",
+      "url": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.1/src/sentencepiece_model.proto",
+      "bytes": 14023,
+      "sha256": "798fb346a2934cc58a0f905be120f6710d0585847edf5425b7a1cf68102979bc"
+    },
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/google/sentencepiece/v0.2.1/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+  ]
+}

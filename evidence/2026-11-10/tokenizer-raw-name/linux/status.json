@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "host": "linux",
+  "status": "succeeded",
+  "started_utc": "2026-11-10T20:29:18.317908+00:00",
+  "inputs": {
+    "bytes": 20871,
+    "sha256": "8a223285b89e0aeae5f0afa5e46046a9b62dae0e90ff16cb9e0d8a4583a4c916"
+  },
+  "input_count": 136,
+  "validator": {
+    "bytes": 3364,
+    "sha256": "9b76de81a0a0021073df55d6a61dc8fb22278563a51d080ee3ffed1bdc6e200d"
+  },
+  "original_seal": {
+    "bytes": 1583,
+    "sha256": "e43392cec3e9f12f8730edc16ac0a6c1a9d747df2dfa3d66f3f2cf415b90246e"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-tokenizer",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8427084459999996,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 5.373157709999999,
+      "log": {
+        "bytes": 838,
+        "sha256": "cf5eafbde05e6639f94cad8ab162065ad3c93c1c07a5a599b09e97bd7c234e82"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 10.708547788,
+      "log": {
+        "bytes": 830,
+        "sha256": "94caf60df27feb8a1b01908c057768bdd7d292cf522495b682dfa3029ab127e5"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.38763492,
+      "log": {
+        "bytes": 493,
+        "sha256": "3f7c296a3f949ceb74e039368af0f880f629ea897ba01f49ddd61d82c92a6ae6"
+      }
+    }
+  ],
+  "inputs_unchanged": true,
+  "original_seal_unchanged": true,
+  "finished_utc": "2026-11-10T20:29:39.728178+00:00"
+}

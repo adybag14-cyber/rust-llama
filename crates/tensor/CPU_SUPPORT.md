@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **76 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **25 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **81 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **20 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -82,15 +82,15 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 73 | `FILL` | Implemented slice | F32 / F16 | Explicit slope or fill value. |
 | 74 | `FLASH_ATTN_EXT` | Implemented slice | F32 Q; F32/F16 K/V; optional F16 mask, F32 sinks, I32 row map → F32 | Shared native-profile kernel, physical views, actual scoped workers, source precision/hint fields and empty-output dispatcher behavior; local byte/work limits. See FLASH_ATTENTION.md. |
 | 75 | `FLASH_ATTN_BACK` | Pending | — | No executable Op constructor; no fallback result. |
-| 76 | `SSM_CONV` | Pending | — | No executable Op constructor; no fallback result. |
-| 77 | `SSM_SCAN` | Pending | — | No executable Op constructor; no fallback result. |
+| 76 | `SSM_CONV` | Implemented slice | F32 | Three-dimensional input and matching coefficient matrix; physical sequence strides, source one-worker flat coefficient rows, F32 accumulation, empty-output dispatch. See RECURRENT.md. |
+| 77 | `SSM_SCAN` | Implemented slice | F32 + I32 state IDs → F32 | Grouped Mamba1/Mamba2 scan, source state remapping and reverse snapshots; packed inner planes and physical outer strides; output plus owned state. Checked snapshot/ID and NaN boundaries. See RECURRENT.md. |
 | 78 | `WIN_PART` | Pending | — | No executable Op constructor; no fallback result. |
 | 79 | `WIN_UNPART` | Pending | — | No executable Op constructor; no fallback result. |
 | 80 | `GET_REL_POS` | Pending | — | No executable Op constructor; no fallback result. |
 | 81 | `ADD_REL_POS` | Pending | — | No executable Op constructor; no fallback result. |
-| 82 | `RWKV_WKV6` | Pending | — | No executable Op constructor; no fallback result. |
-| 83 | `GATED_LINEAR_ATTN` | Pending | — | No executable Op constructor; no fallback result. |
-| 84 | `RWKV_WKV7` | Pending | — | No executable Op constructor; no fallback result. |
+| 82 | `RWKV_WKV6` | Implemented slice | F32 | Contiguous token tensors, time-first vector and per-sequence state; equal nonempty sequence runs, source output/final-state concatenation. See RECURRENT.md. |
+| 83 | `GATED_LINEAR_ATTN` | Implemented slice | F32 | Contiguous K/V/Q/gate/state with explicit F32 scale; equal nonempty sequence runs and owned final state. See RECURRENT.md. |
+| 84 | `RWKV_WKV7` | Implemented slice | F32 | Contiguous R/W/K/V/A/B/state; source two-pass state update and complete final state. Checked arithmetic with competing NaN payloads. See RECURRENT.md. |
 | 85 | `SOLVE_TRI` | Pending | — | No executable Op constructor; no fallback result. |
 | 86 | `GATED_DELTA_NET` | Pending | — | No executable Op constructor; no fallback result. |
 | 87 | `LIGHTNING_INDEXER` | Pending | — | No executable Op constructor; no fallback result. |
@@ -184,3 +184,16 @@ failures. MathPolicy changes vector grouping but keeps the target's scalar CRT.
 ## Flash attention DAG execution
 
 Operation 74 uses the single maintained llama_quant::flash_attention module. The adapter preserves source masks, physical sink-prefix reads, row maps, source query geometry and output permutation. It compares 3,032,980 default/forced F32 words per matching host, including reused sealed NaN corpora. The local allocation/work and cancellation boundaries, exact source controls and remaining dtype/empty-input restrictions are described in [FLASH_ATTENTION.md](FLASH_ATTENTION.md). This adds scoped workers to this operator; general DAG parallel scheduling and aggregate memory planning remain open.
+
+## Recurrent state-space and RWKV bounds
+
+Five recurrent IDs execute in `cpu_recurrent.rs`. Their input order, physical
+addressing, grouping, snapshots and concatenated state format are documented in
+[RECURRENT.md](RECURRENT.md). They preserve source scalar F32 arithmetic on the
+two measured x86_64 MSVC/GNU profiles. Empty scan/recurrence, invalid state IDs,
+unequal sequence runs, unwritten snapshot slots and out-of-view addresses return
+checked errors. A multiply/add involving two different quieted NaN encodings
+returns an explicit unsupported error; source compiler payload selection is not
+replaced with an invented portable policy. Input storage remains immutable and
+cancellation never publishes partial output. General CPU scheduling and other
+ISA profiles remain open.

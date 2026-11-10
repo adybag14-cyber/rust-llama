@@ -148,6 +148,10 @@ fn metadata(v: &llama_gguf::Value) -> Value {
     use llama_gguf::Value as G;
     match v {
         G::String(x) => Value::String(x.clone()),
+        G::ByteString(x) => Value::object([
+            ("gguf_type", Value::String("STRING".into())),
+            ("bytes_hex", Value::String(hex(x))),
+        ]),
         G::Bool(x) => Value::Bool(*x),
         G::Array {
             element_type,

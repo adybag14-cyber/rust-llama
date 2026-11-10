@@ -2,6 +2,7 @@
 //! Tensor payloads remain on disk until explicitly requested. No native code is linked.
 #![forbid(unsafe_code)]
 
+mod model_metadata;
 mod raw;
 mod shards;
 pub use raw::{RawGguf, RawTensorInfo};
@@ -66,6 +67,10 @@ pub enum MetadataValue<S> {
     F32(f32),
     Bool(bool),
     String(S),
+    /// An exact GGUF STRING payload that is not represented by this facade's
+    /// text type. The wire type remains STRING (8); no replacement characters
+    /// are inserted. Model views use this for non-UTF-8 C-string prefixes.
+    ByteString(Vec<u8>),
     Array {
         element_type: u32,
         values: Vec<MetadataValue<S>>,
@@ -87,7 +92,7 @@ impl<S> MetadataValue<S> {
             Self::I32(_) => 5,
             Self::F32(_) => 6,
             Self::Bool(_) => 7,
-            Self::String(_) => 8,
+            Self::String(_) | Self::ByteString(_) => 8,
             Self::Array { .. } => 9,
             Self::U64(_) => 10,
             Self::I64(_) => 11,
@@ -136,6 +141,14 @@ impl<S> MetadataValue<S> {
 }
 
 impl Value {
+    /// Exact string bytes, including values that cannot be exposed as UTF-8.
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self {
+            Self::String(value) => Some(value.as_bytes()),
+            Self::ByteString(value) => Some(value),
+            _ => None,
+        }
+    }
     pub fn as_str(&self) -> Option<&str> {
         if let Self::String(v) = self {
             Some(v)
@@ -146,10 +159,9 @@ impl Value {
 }
 impl RawValue {
     pub fn as_bytes(&self) -> Option<&[u8]> {
-        if let Self::String(v) = self {
-            Some(v)
-        } else {
-            None
+        match self {
+            Self::String(value) | Self::ByteString(value) => Some(value),
+            _ => None,
         }
     }
     /// C getter view; the stored byte string remains unchanged.

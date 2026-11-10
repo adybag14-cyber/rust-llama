@@ -1,0 +1,15 @@
+{
+  "host": "linux",
+  "torch": "2.11.0+cpu",
+  "numpy": "2.2.6",
+  "threads": 1,
+  "cpu_capability": "AVX512",
+  "cases": 65536,
+  "format": "HSCL0001 + u32 count65536; F32LE original torch.cat([one F16 value, empty F32]) output for each increasing u16 bit pattern; then independent F32LE Tensor.to(float32) diagnostic in the same input order. Only cat is converter promotion behavior.",
+  "reference": {
+    "bytes": 524300,
+    "sha256": "bdb36ed3a255507b30c7db0cdfecaa389432b41f0d6150a59c0d11141c7dfc62"
+  },
+  "promotion_vs_to_float_different_words": 0,
+  "seconds": 0.41427884600125253
+}

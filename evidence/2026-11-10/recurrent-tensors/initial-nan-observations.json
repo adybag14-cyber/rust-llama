@@ -1,0 +1,37 @@
+{
+  "format": "observed-diagnostics-summary-v1",
+  "note": "Transcribed observed test diagnostics from the initial ordinary-F32 implementation; this is not a raw runner log. Original binary fixtures remain unchanged.",
+  "initial_source": "initial-cpu_recurrent.rs",
+  "cases_per_host": 944,
+  "captured_output_state_bytes": 1147172,
+  "observed_runs": [
+    {
+      "profile": "MSVC debug",
+      "mismatching_cases": [
+        "nan_payloads_ssm_scan",
+        "nan_payloads_rwkv_wkv6",
+        "nan_payloads_gated_linear_attn"
+      ]
+    },
+    {
+      "profile": "MSVC release",
+      "mismatching_cases": [
+        "nan_payloads_rwkv_wkv6",
+        "nan_payloads_gated_linear_attn",
+        "nan_payloads_rwkv_wkv7"
+      ]
+    },
+    {
+      "profile": "GNU debug",
+      "mismatching_cases": [
+        "nan_payloads_ssm_scan",
+        "nan_payloads_rwkv_wkv6",
+        "nan_payloads_gated_linear_attn",
+        "nan_payloads_rwkv_wkv7"
+      ]
+    }
+  ],
+  "decision": "Native C succeeds on all these cases. Rust now returns explicit Unsupported if a multiply/add actually meets two different quieted NaN encodings. These are source-success domains outside the supported Rust slice, not native error fixtures.",
+  "preserved_expected_values": "native-v1/{msvc,gnu}/recurrent-reference.bin",
+  "followup": "All main finite/layout/snapshot/single-NaN cases and 450 separate raw IEEE graphs per host match exact output/state bytes in debug and release."
+}

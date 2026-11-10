@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "linux-gnu",
+  "tag": "v2",
+  "started_utc": "2026-11-10T20:31:26.791440+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 5.783,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 101,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 33.509,
+      "stdout": {
+        "bytes": 22143,
+        "sha256": "ce6fde15a70e54ca491dee60a42e9f1a875d7235adaebf8741cf46b8ed668924"
+      },
+      "stderr": {
+        "bytes": 5359,
+        "sha256": "57e61ae28d4598b41806ba8536531bf636f19656a34ebd3be69f1321d4b66fd2"
+      },
+      "tests": {
+        "passed": 232,
+        "failed": 0,
+        "ignored": 5,
+        "suites": 26
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1047,
+    "bytes": 156764,
+    "sha256": "ee6e4e97fad48048d0ad60ac4e80e2d7e991a693744f4bde04d35767af82846e"
+  },
+  "git_head": "b658976bd6200b8aa4b29f29f6a896b126dd756b",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "error": "RuntimeError('debug-tests failed 101')",
+  "finished_utc": "2026-11-10T20:32:19.718840+00:00"
+}

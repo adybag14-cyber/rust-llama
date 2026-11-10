@@ -69,6 +69,23 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Inputs: sliding convolution window, per-channel weights. F32 output.
+    /// Preserves the original one-worker flattened weight row addressing.
+    SsmConv,
+    /// Inputs: state, X, delta, A, B, C, I32 state sequence IDs.
+    /// Returns flattened Y followed by final state, then reverse-time snapshots.
+    SsmScan {
+        snapshots: usize,
+    },
+    /// Inputs: K, V, receptance, time-first, time-decay, initial state.
+    /// Returns token output followed by final head-matrix states.
+    RwkvWkv6,
+    /// Inputs: K, V, Q, gate, initial state; returns output and final state.
+    GatedLinearAttn {
+        scale: f32,
+    },
+    /// Inputs: R, W, K, V, A, B, initial state; returns output and final state.
+    RwkvWkv7,
     /// Inputs: Q, K, V, then enabled mask, sinks and I32 row map.
     /// Calls the shared native-profile kernel with actual scoped workers.
     FlashAttnExt {
@@ -342,6 +359,11 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            SsmConv => OpCode::SSM_CONV,
+            SsmScan { .. } => OpCode::SSM_SCAN,
+            RwkvWkv6 => OpCode::RWKV_WKV6,
+            GatedLinearAttn { .. } => OpCode::GATED_LINEAR_ATTN,
+            RwkvWkv7 => OpCode::RWKV_WKV7,
             Dup => OpCode::DUP,
             FlashAttnExt { .. } => OpCode::FLASH_ATTN_EXT,
 
@@ -430,6 +452,10 @@ impl Op {
     fn arity(&self) -> usize {
         match self {
             Self::Arange { .. } => 0,
+            Self::SsmConv => 2,
+            Self::SsmScan { .. } | Self::RwkvWkv7 => 7,
+            Self::RwkvWkv6 => 6,
+            Self::GatedLinearAttn { .. } => 5,
             Self::FlashAttnExt {
                 with_mask,
                 with_sinks,

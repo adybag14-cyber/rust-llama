@@ -1,0 +1,1783 @@
+{
+  "schema": 1,
+  "independent_source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "sealed_originals": {
+    "path": "sealed-originals-v2/report.json",
+    "bytes": 282464,
+    "sha256": "f8d6a8e8e12d0716e0d0cc92db5075f1222026b9a46afd533a2c5aab027a59b3"
+  },
+  "authoring_erratum": {
+    "path": "input-authoring-erratum-v1.json",
+    "bytes": 2971,
+    "sha256": "a694358df96d401faea264b8248974ec64844a2ff2139377907bfd6734aaad88"
+  },
+  "adapter": {
+    "path": "pack-fixtures-v1.py",
+    "bytes": 9071,
+    "sha256": "710de1b4fe1096b6058e3b2e9a87215e9ec823a76259d475f41d86b4ff9bae29"
+  },
+  "scope": "Complete 171 original requests per profile, including all raw output buffers and canaries, indexed metadata, tokens/pieces, enum keys and logits. Six malformed tensor-payload requests are retained with an explicit authoring erratum; corrected pairs are additional cases. No expectation is generated from Rust.",
+  "format": "MMEX0001 + u64 records_len + records + u64 pool_len + literal pooled bytes; all little-endian integer fields. models.bin deduplicates only complete byte-identical input files. The adapter reconstructs every original typed JSON value before success.",
+  "profiles": {
+    "windows-msvc": {
+      "cases": 171,
+      "admitted": 151,
+      "calls": 334369,
+      "metadata_entries": 12507,
+      "tokenization_cases": 3020,
+      "logit_words": 144384,
+      "record_bytes": 10498079,
+      "pool_bytes": 1167914,
+      "unique_blob_count": 15803,
+      "lossless_full_json_reconstruction": true,
+      "native_json_identities": [
+        {
+          "path": "capture-v1/windows-msvc/cases/baseline-vocab/native.json",
+          "bytes": 158736,
+          "sha256": "24c6daba5c1c8f95e9b226a787777cbd699555bac039f59b0fbece6d08c66d18"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/baseline-full/native.json",
+          "bytes": 183587,
+          "sha256": "d14a2374edfc390541019533bab4e2978910f794f4f90a7fff942f78ba7a35fd"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/scalar-types-and-bits-vocab/native.json",
+          "bytes": 856887,
+          "sha256": "d26aca245e56dab50b490afa920d8f1c691dc9e2a26b6ed101f50d416c8eb687"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/scalar-types-and-bits-full/native.json",
+          "bytes": 881738,
+          "sha256": "0b02365beaabe832f00f26519e2b5e0264675c65883562abf047c9f56f0c96ca"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/raw-string-values-vocab/native.json",
+          "bytes": 421987,
+          "sha256": "8e364affbb171cf445c76f2c51dfd85e1496f38c19739e8ec3ebe410633f1149"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/raw-string-values-full/native.json",
+          "bytes": 446838,
+          "sha256": "645837ac57a249a570f46ad5386b1b3da887620b83628279f820682eccc05b79"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-002-vocab/native.json",
+          "bytes": 167276,
+          "sha256": "37586698bd674a1de9dc36c63918dd2ebaecdae107eb38be3766ba58f67eefd5"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-002-full/native.json",
+          "bytes": 192127,
+          "sha256": "4b18c0588b8efe60643a35c7f694fb6814944b672fb90cde5417af6e4c63d2f3"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-127-vocab/native.json",
+          "bytes": 167276,
+          "sha256": "4a99bf37fd73409b4ab6c502339efc3ec3a20febfc795abf0bf07ff7f17e10a6"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-127-full/native.json",
+          "bytes": 192127,
+          "sha256": "f180ab5e29bb0badcbf475f1cc16a8857fb81b2a8aa4869fe176f3b58389322b"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-128-vocab/native.json",
+          "bytes": 167276,
+          "sha256": "764174dcb74169a71e944e5f7f1fdafb7dc28c5d56c9a0350967bad09699e7d7"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-128-full/native.json",
+          "bytes": 192127,
+          "sha256": "1412e56743452b1394396eaee350abf68fcabd96fb79a3f0610ec03702a7ce98"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-255-vocab/native.json",
+          "bytes": 167276,
+          "sha256": "b56f27d31f1cab5b01d554ba8f5a3467cd40503ff3b5da9733ff9e4f1e00f82a"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/bool-byte-255-full/native.json",
+          "bytes": 192127,
+          "sha256": "340f898b3182892cbfe67543792fb9fac4d5077a25bb60f9a28aec04c96dfd3c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/unused-array-types-vocab/native.json",
+          "bytes": 200378,
+          "sha256": "a248c88facfe9c2a196a7d89e36379c0fb2fcb50c94d4730789d4bc03424d124"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/unused-array-types-full/native.json",
+          "bytes": 225229,
+          "sha256": "c7bb0f42c83c8754e23b52f50596943f0a31f4ae6b5a7ce97f0717e125065a0e"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/value-byte-grid-vocab/native.json",
+          "bytes": 1672696,
+          "sha256": "8220ecbad353ccbe22c24bdf95cff31e7d40acf9f4963955fe4780accd373b4c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/value-byte-grid-full/native.json",
+          "bytes": 1697547,
+          "sha256": "893509a04047b01a68b1f0e7087eb95dded3a5e72fc1237eb52518094e81b17f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/key-byte-grid-vocab/native.json",
+          "bytes": 1651755,
+          "sha256": "5d2e427ecfe243a0da114fa885c8783844609caf1d7119a50c7f9213c1d656d5"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/key-byte-grid-full/native.json",
+          "bytes": 1676606,
+          "sha256": "904cca078d8cc31cd16cc89c8f0581368f0e6573dc37c3ec95a800d7a5de88ce"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/raw-empty-and-long-keys-vocab/native.json",
+          "bytes": 102,
+          "sha256": "cb70de969fb1012b3ebe7c221b939f995c4f25f091aac5e1cdcffce1dc2adc14"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/raw-empty-and-long-keys-full/native.json",
+          "bytes": 102,
+          "sha256": "c9bb4aed9f33ae8f7a0bf2ebd5a8d968a5b6a6ff743e3e157e8ebafe47f3c0ac"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/two-nul-scalar-keys-vocab/native.json",
+          "bytes": 180100,
+          "sha256": "c56921c500dd437adde15bcea40e7c8b2e17501698a8ab7c5d01cfe25cdfc9d1"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/two-nul-scalar-keys-full/native.json",
+          "bytes": 204951,
+          "sha256": "d14157ce8b9eccc61115b928d513880f648ffee4ced3252b1b8db93611e615db"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/nul-before-plain-vocab/native.json",
+          "bytes": 177185,
+          "sha256": "f330ed8743fa5779a96b0f45544bab1774aedcc15a1b36da702cb7c34e3bed49"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/nul-before-plain-full/native.json",
+          "bytes": 202036,
+          "sha256": "e8f4ed39ed62bba061117f196716ac8c86f9574183ca1dd67804015cbe5156d6"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/plain-before-nul-vocab/native.json",
+          "bytes": 177207,
+          "sha256": "e11907b1f1543678f9c5c4f5746f13dfa9dff2028e065d00fe016368318d2e91"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/plain-before-nul-full/native.json",
+          "bytes": 202058,
+          "sha256": "6daf8557d0b2975d64b4df358166d89b95245b32eafb6add350f8dab16a577ac"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/array-nul-before-scalar-vocab/native.json",
+          "bytes": 175912,
+          "sha256": "300f91fd674a53d75426021de3590213ecbc0bc1222dfee4bb1837ddb1a5294d"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/array-nul-before-scalar-full/native.json",
+          "bytes": 200763,
+          "sha256": "5fd76d85eb9bc8645988f2184a1dbdce26df0381614134c1fc72e3b474c855d1"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/scalar-nul-before-array-vocab/native.json",
+          "bytes": 175932,
+          "sha256": "0a27d94cebe3c668d4d123cc2644811b1f68bc27efba87d5a14f297f5aa33003"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/scalar-nul-before-array-full/native.json",
+          "bytes": 200783,
+          "sha256": "fe79cf66bac9178649b2de6b434b3224863c934f1cfb101a90f7e319db74a507"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/array-plain-before-scalar-nul-vocab/native.json",
+          "bytes": 175938,
+          "sha256": "9f7e553d5b5a41beac8dcad7086c778419f560dd2845ae73a4cdbe8e2fabff37"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/array-plain-before-scalar-nul-full/native.json",
+          "bytes": 200789,
+          "sha256": "798bd9bd33986d64e2a91ff6457751f2f5fd749f615fe88c6d650a7db331fa0f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/empty-prefix-aliases-vocab/native.json",
+          "bytes": 99,
+          "sha256": "20cfb21675f512b2d1a5e0b669ad2b972082df27f4202e9801a3ff5deb9e6b66"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/empty-prefix-aliases-full/native.json",
+          "bytes": 99,
+          "sha256": "5b860f19803ad983f0ee5d8acffe6f2eccd42389a2464ee732133d1f8767d094"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/exact-duplicate-key-vocab/native.json",
+          "bytes": 98,
+          "sha256": "ceb649e620d805a041d69f7d42a29153a8f121bebe8e3afff4937ca6e071e199"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/exact-duplicate-key-full/native.json",
+          "bytes": 98,
+          "sha256": "8c8aa01a42c872a975410bc574c18c197652a3e44ac6613c533b237dfbdc0966"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-raw-vocab/native.json",
+          "bytes": 159382,
+          "sha256": "15a14e86f2a01dc55cd9013131ccbcf9f47db683ce72464f7a62cb3309f90f51"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-raw-full/native.json",
+          "bytes": 184233,
+          "sha256": "a58b4bac3d75b8f22eed4e6150c6de510fa4b72ac803bf04882d6d9fe50fc583"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-nul-vocab/native.json",
+          "bytes": 158412,
+          "sha256": "52403f8a00d7a417cfdc5d8b5e208276221db8ec95e868aee64b6108769de641"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-nul-full/native.json",
+          "bytes": 183263,
+          "sha256": "2c68da466e5d28009990c1be76ca365aabd8878ef97304adcd196c8ea261e6b6"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-empty-vocab/native.json",
+          "bytes": 156837,
+          "sha256": "4ac969880ade9e02b7ec90285331e1aa99242d876944e2c6f16b5af03061de08"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-name-empty-full/native.json",
+          "bytes": 181688,
+          "sha256": "a8b50d952fa423d4b635b86c1582884717f73fa9de54e9c4f072bbf44e988c57"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-raw-vocab/native.json",
+          "bytes": 168782,
+          "sha256": "2d745341ea967f12c62445e2e602eead03d30d06758e1e671c0eb32a49dff34f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-raw-full/native.json",
+          "bytes": 193633,
+          "sha256": "106a1bace689dd9c1d80583028a8a6f452c1e911d673c68584067cb201102725"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-nul-vocab/native.json",
+          "bytes": 167768,
+          "sha256": "0878b69f27d17dc0b1df6d3a75e653b1ddbc8f715e7ff30c51aec22b3dda3a8c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-nul-full/native.json",
+          "bytes": 192619,
+          "sha256": "8e582fa4a9d4fd68f577364e5feea9ec8531a167afe7aa805b4b92142df08015"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-empty-vocab/native.json",
+          "bytes": 166105,
+          "sha256": "21259af56ae2a7eb4a5fb971f979dad7dab58683f224d3cf55f1a9eaad6ad0c8"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-chat_template-empty-full/native.json",
+          "bytes": 190956,
+          "sha256": "d0841bf2a38d0c34d879854d0ac83334a2fac3506222def27fe46f9759d960db"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-architecture-nul-suffix-vocab/native.json",
+          "bytes": 157209,
+          "sha256": "cbbec8e4a6d6919798561928cff13d8863b5ee76fc4ffa8ba1e70ce7ddbba990"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-architecture-nul-suffix-full/native.json",
+          "bytes": 182060,
+          "sha256": "72698eaf1d23be8233f81408f76f508c9da9b5f7bb9b52685c749480898bcb30"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-architecture-raw-prefix-vocab/native.json",
+          "bytes": 110,
+          "sha256": "dbea767908e0e830b802d498634e4c27d35aace6445486f65e94cf5424225061"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/general-architecture-raw-prefix-full/native.json",
+          "bytes": 110,
+          "sha256": "92d218c0b29734ba0dc196085a8ed849fb4a45949705b6a960bb1f0922087605"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-ggml-model-nul-suffix-vocab/native.json",
+          "bytes": 160165,
+          "sha256": "9b5aaf83c6f3e8d93022eb44af4812613e985608a96918183638ea48dbb32848"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-ggml-model-nul-suffix-full/native.json",
+          "bytes": 185016,
+          "sha256": "3fdecf9305534d5597a65e4c08f487e35311db10786aca1196cf46a6339d931f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-ggml-model-raw-prefix-vocab/native.json",
+          "bytes": 110,
+          "sha256": "838b1c5689c9c79c5b102dcc10dc186ba19536248fca58d251e8f3ecb78b0f95"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/tokenizer-ggml-model-raw-prefix-full/native.json",
+          "bytes": 110,
+          "sha256": "61022177637d8cac8a806eb0dd01dc7f010183aa0d9697ca175a9629d72efe2d"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/hparam-key-alias-before-vocab/native.json",
+          "bytes": 158900,
+          "sha256": "5fdd71439e287309ab588d7e5c10670faa9d153ce8a7bc4e5c00db3cc57c5ec0"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/hparam-key-alias-before-full/native.json",
+          "bytes": 183751,
+          "sha256": "857682584c633d355df99024495e40eb738f9f145a2010058647b32bc2e62ec2"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/hparam-key-alias-after-vocab/native.json",
+          "bytes": 159704,
+          "sha256": "537a0b5bac58ffca406354d8e9c908d43c693283e4db42345bf2fd82e345874d"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/hparam-key-alias-after-full/native.json",
+          "bytes": 184555,
+          "sha256": "bd21156706cb4c7d4a6a576710739d8480663f69ff9db92e85e5d0f0e0207586"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/architecture-key-alias-before-vocab/native.json",
+          "bytes": 160295,
+          "sha256": "285d895d3bbb45730f1ec8a9ab87458d452366faa999a22804a2ca4617509fc7"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/architecture-key-alias-before-full/native.json",
+          "bytes": 185146,
+          "sha256": "3314fe3c7a19e187a0e74b305e67748652011b41f6b274d198cd9e619f93e657"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/architecture-key-alias-after-vocab/native.json",
+          "bytes": 160294,
+          "sha256": "ca188537917dbb5fb68f3849d476026ef9bc66a8ac63daedf027ca6c96b0e098"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/architecture-key-alias-after-full/native.json",
+          "bytes": 185145,
+          "sha256": "9cc39a1ec9dff08a50cfaae36b8fcd7b386112f710eea81cabf11fed37779583"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0001-forward-vocab/native.json",
+          "bytes": 93530,
+          "sha256": "eb977c1f4c675b33df45fb76dbb836a2c4b9282cadb83b0422276953dcdd2b18"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0001-reverse-vocab/native.json",
+          "bytes": 93530,
+          "sha256": "c8e48f26ee671e84f98cb69c7dc6a026a9a09b661aab523f01c5e0568f013044"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0001-shuffled-vocab/native.json",
+          "bytes": 93531,
+          "sha256": "dc97869206357a2ff0df776a34c63539d170f3ff3ba755d537496b9a9da668f9"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0002-forward-vocab/native.json",
+          "bytes": 99807,
+          "sha256": "d64dcfabed0991707a44d126a3cf759df84b8160bb36c637af21baa6762006a9"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0002-reverse-vocab/native.json",
+          "bytes": 99807,
+          "sha256": "4cdc584a9405b929525b33bb628f9df47fe71d9ae164928ed9811e9870093576"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0002-shuffled-vocab/native.json",
+          "bytes": 99808,
+          "sha256": "06ab481282e1193e56d6aaf64fb9baaf30f240f04fb0b1af415495dfaaa58780"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0007-forward-vocab/native.json",
+          "bytes": 131192,
+          "sha256": "51518705ecb01338ed47fb897060dae097ee65de6e4b0c0cdc3f37f6769bd51a"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0007-reverse-vocab/native.json",
+          "bytes": 131192,
+          "sha256": "69c4c8f13e0228c568bb348f7890f878b4efe3ce85d2284829f70f6371293248"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0007-shuffled-vocab/native.json",
+          "bytes": 131193,
+          "sha256": "9378540ce60912ecb6b78bbf1f3305d29cd503925e22c968033a0bc0b12c8602"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0008-forward-vocab/native.json",
+          "bytes": 137469,
+          "sha256": "8f83f1f5975a526bbed2807fca4983f0d495e3d225a133ed99807f85b0aa20ac"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0008-reverse-vocab/native.json",
+          "bytes": 137469,
+          "sha256": "6f3f1395e085ef4279b95201bdadfc35ca00bd30dfa11939647058408ab2850b"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0008-shuffled-vocab/native.json",
+          "bytes": 137470,
+          "sha256": "157168e8ef2e9a424021effd55ed148255a25f55199901be7361514b32f07cbc"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0012-forward-vocab/native.json",
+          "bytes": 162613,
+          "sha256": "7c67bb52b676b31e20b42e42c9bdc9135de8d8b488e2073db9caafc7e9314c98"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0012-reverse-vocab/native.json",
+          "bytes": 162613,
+          "sha256": "9544b66a7144c8f9305c5c9f186f4755c07ecfb0e39d1e73644b6a4a7fa3f26d"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0012-shuffled-vocab/native.json",
+          "bytes": 162614,
+          "sha256": "afd1e90fc1af949cdf1a962bc1ec048705421e8607b52dc52b3a73092bf8837c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0013-forward-vocab/native.json",
+          "bytes": 168908,
+          "sha256": "14d8a12fc00deb52cd3a02e4893597075a8f1d18120ffb6a4bda56f882345f5f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0013-reverse-vocab/native.json",
+          "bytes": 168908,
+          "sha256": "c9f84cfe4d1d82a3d16fabbc65866e0427ad266ef009f7685a7f8b6c0b3db1c7"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0013-shuffled-vocab/native.json",
+          "bytes": 168909,
+          "sha256": "fc1427ba28beef53122048941dc00387ac543d224ef996e4e8afd77b535f70ed"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0014-forward-vocab/native.json",
+          "bytes": 175203,
+          "sha256": "f2cd01fcb7897a091b18cd4d5b839883cbc8d41b7beb61cd00f6199906a97d7b"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0014-reverse-vocab/native.json",
+          "bytes": 175203,
+          "sha256": "f82ab548f3c9e439259d1d71d252c2504f2d05b7817b12f657c94a22fb190d70"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0014-shuffled-vocab/native.json",
+          "bytes": 175204,
+          "sha256": "2e97bb2483e6f8776c518e4a808071bd3fc105e67070f0ad0e578b626994e2cc"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0028-forward-vocab/native.json",
+          "bytes": 263331,
+          "sha256": "9a976088ef3c1cbff3fef15b6db2847b39174a0557b876678024184d69db7ab0"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0028-reverse-vocab/native.json",
+          "bytes": 263331,
+          "sha256": "2b830f782a02ea15c5f416e7bd39b8e8b626f17e697be37cb7e40798718c9b7f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0028-shuffled-vocab/native.json",
+          "bytes": 263332,
+          "sha256": "b8df60c582a79dcacf12503c28ae1bcf6d62f85d77bc96e4fd4c56a53b6f1dd4"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0029-forward-vocab/native.json",
+          "bytes": 269626,
+          "sha256": "a0c805e44b7f2edf928b07a8d0d1ccb8043349c77e1bd119edcadf0d947fd581"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0029-reverse-vocab/native.json",
+          "bytes": 269626,
+          "sha256": "d86075e3a24bc2e85d88335de58d26cf3bbaed6a4c00f1bc61a2d0ea8f9e8f36"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0029-shuffled-vocab/native.json",
+          "bytes": 269627,
+          "sha256": "c8d5a3f8b504f0333a9af2d9a4eec88c97f2342a5621f0d2db33aea1e2b46ce7"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0030-forward-vocab/native.json",
+          "bytes": 275921,
+          "sha256": "284626df32cc260fcecedf0b9dc27b1112a2aa2125dbf761c568f4c1349be059"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0030-reverse-vocab/native.json",
+          "bytes": 275921,
+          "sha256": "28db82bc95b8b8fc5348cb200a52c830626c8b490587d9e3ebb623498e8dce46"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0030-shuffled-vocab/native.json",
+          "bytes": 275922,
+          "sha256": "1e7c082aea98e666c57c283e25e5e6defd8a40229acf9b9158501ab7a2fe55fe"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0058-forward-vocab/native.json",
+          "bytes": 452181,
+          "sha256": "ba06f509b0d4569a0ae6e61e9d7c2d4c62a9872e801bff8ec3c5cedca3e3eb6c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0058-reverse-vocab/native.json",
+          "bytes": 452181,
+          "sha256": "3c0f973f79f36d2ee2ecee591a8055ba2f0bb42e2e49f6d4d66db36957e45e28"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0058-shuffled-vocab/native.json",
+          "bytes": 452182,
+          "sha256": "3f06cd2f780e5ad6a03044b44ad02f3b37e7fc4c716ec233a60817710109edea"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0059-forward-vocab/native.json",
+          "bytes": 458476,
+          "sha256": "49688aa7e8ba944ae52d7df90c0951e732a75695483ac877e80507289b0c9bda"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0059-reverse-vocab/native.json",
+          "bytes": 458476,
+          "sha256": "b393b4119e68221f922edac027750bd355fc7852b1d7f6a5a50421b426a155c8"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0059-shuffled-vocab/native.json",
+          "bytes": 458477,
+          "sha256": "4c2c4bde76be9caa817f9c26a68b9eace1e17ea2f48b0ac3db94c86c59010af8"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0060-forward-vocab/native.json",
+          "bytes": 464771,
+          "sha256": "be0baa1303a015bee1fa8ede108886c74e28dad07023006e52d39703f284743e"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0060-reverse-vocab/native.json",
+          "bytes": 464771,
+          "sha256": "167c56df7afe54f5ecf57be4371e778da4992d68b6a4c6d4dc3dbd93ff92b46c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0060-shuffled-vocab/native.json",
+          "bytes": 464772,
+          "sha256": "d2b282e50f5708af61bd9c180924498233c89daa16c1d3f93e7cad99b4be24f8"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0126-forward-vocab/native.json",
+          "bytes": 888751,
+          "sha256": "ec526ee6828654b1079ca41b7d6c0574f1a0019acdb84213d10372ac6bde0516"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0126-reverse-vocab/native.json",
+          "bytes": 888751,
+          "sha256": "27e397b8b8025c7273681676dedaecabed704a3c0f80cb4a42b9075fedadc290"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0126-shuffled-vocab/native.json",
+          "bytes": 888751,
+          "sha256": "ada1b3c9fd5ea7762d1c06a318d33380c7484481ab57f28f31f82e1114372fd5"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0127-forward-vocab/native.json",
+          "bytes": 895365,
+          "sha256": "fd740f3f33319bfdd1b95c31beda7171e4c208cdbe45f6da9db953ba844e7113"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0127-reverse-vocab/native.json",
+          "bytes": 895365,
+          "sha256": "0a65f68a2e61c4df146b58a34df420c7c7cc70175027fa4461fe266762428916"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0127-shuffled-vocab/native.json",
+          "bytes": 895364,
+          "sha256": "a01191aca306a02a105cd701010220b3c222d453da769065139d87eac9d10a42"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0128-forward-vocab/native.json",
+          "bytes": 901979,
+          "sha256": "1f81257477750692fd30b98066d4a2a5193a0212fed6fb57e27d123e94101b89"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0128-reverse-vocab/native.json",
+          "bytes": 901979,
+          "sha256": "a8d2f4690a54d5a78db7b86f122edbeae2578159d1621b10afa61d03f03e5cb8"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0128-shuffled-vocab/native.json",
+          "bytes": 901980,
+          "sha256": "5fa6611c288ce9e3bf0b34779a1b30dd473344802d601a8fb5c6f0a966d2c52d"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0256-forward-vocab/native.json",
+          "bytes": 1748570,
+          "sha256": "ff604e1bdf1fced55451d13f2359d83f9613b0763e48b76f993dad5ccd1cdb04"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0256-reverse-vocab/native.json",
+          "bytes": 1748572,
+          "sha256": "3a8262c134667639233b02c932947c51c592e88e2cabc894323ff3903ae926bc"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0256-shuffled-vocab/native.json",
+          "bytes": 1748573,
+          "sha256": "d8fa533a32ba036eafd615e408a89cc750f57db605beb95c0eecfb7dd2615b0f"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0512-forward-vocab/native.json",
+          "bytes": 3441752,
+          "sha256": "b6fdeff60214638f6536c4724d09fcfc0ac59ee597052c2d6f1ae57d4b8465c1"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0512-reverse-vocab/native.json",
+          "bytes": 3441753,
+          "sha256": "b3b89609ee856ad631d9d2796d59d38ad4ab871467edc8fc84bdbda8d72b0c68"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-0512-shuffled-vocab/native.json",
+          "bytes": 3441754,
+          "sha256": "39deabd3475e50d25ef357486b8010c751b96f1d6a53fb6884d5e12d38f97f41"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-1024-forward-vocab/native.json",
+          "bytes": 6829608,
+          "sha256": "216327bd529470e9048d378b25c345924dc854683b4431f480aa424471f30f40"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-1024-reverse-vocab/native.json",
+          "bytes": 6829608,
+          "sha256": "96cfff9a6eb7f8e8aa4efab8d7816b4a7811e89c68552d2a6eed091e75cf4b4c"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/order-1024-shuffled-vocab/native.json",
+          "bytes": 6829609,
+          "sha256": "dc938c70fd5294f2d0e0d8f8e8f2877ab8276d778058ec48a6d00ac0e38a5beb"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/all-base-metadata-reversed-vocab/native.json",
+          "bytes": 87262,
+          "sha256": "a841dde44f8bab2c0d29a4f19a83f5c5d6f3d0926290377f20d083e395afb19a"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/all-base-metadata-reversed-full/native.json",
+          "bytes": 112113,
+          "sha256": "b1bb0d2aea1e10a7e593f090bccc16e923d1f3b63f7c8fe2e8a801f4d057e482"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/all-base-metadata-shuffled-vocab/native.json",
+          "bytes": 87261,
+          "sha256": "9448397f0e8630b303df8a10ff22a7e5289c79e8bcf9327346df58ea480be9a1"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/all-base-metadata-shuffled-full/native.json",
+          "bytes": 112112,
+          "sha256": "ae6d7bc367a8432fa1aae71f406abeeebd88330a1f2668e0f19f1f1317dceea4"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/unknown-scalar-type-vocab/native.json",
+          "bytes": 98,
+          "sha256": "5ad30564312d5c1f34be32ddc9a0491fd07059b80368b15ab365e72041b0f869"
+        },
+        {
+          "path": "capture-v1/windows-msvc/cases/nested-array-type-vocab/native.json",
+          "bytes": 96,
+          "sha256": "abbbe3491a9cb39104e665298e31146a0725b7c29976e4e29fac9f8a0f27a848"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/baseline-addon-vocab/native.json",
+          "bytes": 157192,
+          "sha256": "51d013d8febc8f1c1ec9875bdbe495eb67340e90d6adc9f0220a3166b1e86108"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/baseline-addon-full/native.json",
+          "bytes": 182043,
+          "sha256": "c825761e878394dfead2c7ba0d9b09e8e778803798de22bf079da9d9b0a855ff"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/empty-key-vocab/native.json",
+          "bytes": 88,
+          "sha256": "49c0b0ef9192238577bea254c097cd990cfc57378699d6f79f0b5a1ac349bb8c"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/empty-key-full/native.json",
+          "bytes": 88,
+          "sha256": "e5318b99b70520810d773c08740683801b1a9433beccd75142a8b5607890110e"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/single-nul-key-vocab/native.json",
+          "bytes": 170300,
+          "sha256": "a69a532ae1d3f36f83992152cc1c4b3e0532068a79765245906ab4013f901787"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/single-nul-key-full/native.json",
+          "bytes": 195151,
+          "sha256": "08be6f343d127474e7b504474730bcca1a7b18d3be16e5dd489acbf2c5daa589"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-key-vocab/native.json",
+          "bytes": 170565,
+          "sha256": "459df7bc34f98621c82befa49d99c6b77093d2e9f61556440f73f2d369101d72"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-key-full/native.json",
+          "bytes": 195416,
+          "sha256": "80d728547a8905ec4a940a38ea07c04c7ba6595c50cc8802223ddc1ec67a93ec"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/invalid-utf8-key-vocab/native.json",
+          "bytes": 169439,
+          "sha256": "0cd2a7426e0236535945c44e52d6c828aab0cee96485c7f43fb0577d1fdb2c3a"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/invalid-utf8-key-full/native.json",
+          "bytes": 194290,
+          "sha256": "2b788c28a432840acb80d6f8373aee986ad7ab61d3c49f4350a3f4ac64b643b1"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/long-key-4097-vocab/native.json",
+          "bytes": 481394,
+          "sha256": "bf9886667613b338fda39bc798e04f2c9fc408f8e87fd9cc0b7e2f1be5b23c84"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/long-key-4097-full/native.json",
+          "bytes": 506245,
+          "sha256": "9edf59aa972f7f576f434524c434112759f0f3653167236ffb165f8fad23366d"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-aliases-vocab/native.json",
+          "bytes": 173107,
+          "sha256": "eb0d4c6c601d15cb9b02576d0f766a994b9218f30a96a094077718e785a1be17"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-aliases-full/native.json",
+          "bytes": 197958,
+          "sha256": "6c380d544b877da1e95d3614716b66ee857dab9980e4a330203597a65ed7ab93"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-array-then-scalar-vocab/native.json",
+          "bytes": 171674,
+          "sha256": "e5ad64499f9fbc863d6861aec47f5ac139e8c2f7889c37968d5a7b7ce0131bc9"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-array-then-scalar-full/native.json",
+          "bytes": 196525,
+          "sha256": "f97e1d3bfefadc3d1568c3d85bbdc18f1b56dc6fbf6251ace92e00f0a201cd64"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-scalar-then-array-vocab/native.json",
+          "bytes": 171674,
+          "sha256": "0c7504e8fa41491563d78d1bf7559237aac4f69c6c723b8b3eea70a3befd6bc0"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/leading-nul-scalar-then-array-full/native.json",
+          "bytes": 196525,
+          "sha256": "bd9a489a10503345f5b749dc8c62e658497163eee3c60b1a5b9e79cf7041f154"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-name-array-vocab/native.json",
+          "bytes": 160654,
+          "sha256": "52746e7b5851f64431e55ad8439dbacf933628b1abfd2420838282c2d678d67a"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-name-array-full/native.json",
+          "bytes": 185505,
+          "sha256": "017b588b0d4d3981300be2f4cebe1bfa2154b8106ba09bf00c4b6aaae69576fe"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/float-format-boundaries-vocab/native.json",
+          "bytes": 4233939,
+          "sha256": "280cccfce124b70e378242441bac26fb583e4e68795864e376a5b481ac5328ca"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/float-format-boundaries-full/native.json",
+          "bytes": 4258790,
+          "sha256": "e6bc12a611ade5ea3a63bd62e6625f556d52aa8cd863979d774c09ecbd68852c"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-general-description-vocab/native.json",
+          "bytes": 102,
+          "sha256": "62517c147fc39c9b6834d0b2197b740ca283bcf8a5490621e7be78734c72b813"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-general-description-full/native.json",
+          "bytes": 102,
+          "sha256": "b804c6b295e9ceb364260da101aa6115652f99d7a1d162f27219df9d9844d362"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-array-key-vocab/native.json",
+          "bytes": 92,
+          "sha256": "cd7f84c4f63b7613ce5906f6805eea2d20c92e24cb5107e8c1e2adb1f58cdc8e"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/raw-array-key-full/native.json",
+          "bytes": 92,
+          "sha256": "758012b22b1d31e6a887d187e6cc5f297da24977d62db6046525790bf2a5c369"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/empty-unused-string-array-vocab/native.json",
+          "bytes": 104,
+          "sha256": "2df832705eaaac76d43c9130b28e2ec4fb68fb655fc00f1475c58ff1e4fc9b9c"
+        },
+        {
+          "path": "capture-addon-v1/windows-msvc/cases/empty-unused-string-array-full/native.json",
+          "bytes": 104,
+          "sha256": "98dc24643498d66042da5489bc82196179f8b05be13e9c11048f4cb32da818fa"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/raw-general-description-corrected-vocab/native.json",
+          "bytes": 169962,
+          "sha256": "771e96466bdb03be1b2b8a9685f4e07bf4aa68961c01d27666f97b730dcac8f3"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/raw-general-description-corrected-full/native.json",
+          "bytes": 194813,
+          "sha256": "a080cf335bdb112da09b453d9b10e0d39e8e55a0d8d10e9ca98c6e6bc458a490"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/raw-array-key-corrected-vocab/native.json",
+          "bytes": 163033,
+          "sha256": "82ef778ff0eb2a33f734f5017fbc889d9f4d059cb95438da8c41938a619828c7"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/raw-array-key-corrected-full/native.json",
+          "bytes": 187884,
+          "sha256": "d8151ff42aadf6c49d9f572f3e45c0160ec0f721a1e485b1ed5160c0b9a71dc3"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/empty-unused-string-array-corrected-vocab/native.json",
+          "bytes": 163045,
+          "sha256": "2fae8ce4442db31b22394f7b4fe865f5b73fe5076a8531469622d0eb5902f9a0"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/empty-unused-string-array-corrected-full/native.json",
+          "bytes": 187896,
+          "sha256": "7ead3a6e5bf3f7674add235a92052c203f680094d9fe84ddf5539eca4ed8f163"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-raw-subsidiary-vocab/native.json",
+          "bytes": 186109,
+          "sha256": "5b5fe37f5b84be14e467127ea4d56d709f2fb2a93271be36784a148156869f84"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-raw-subsidiary-full/native.json",
+          "bytes": 210960,
+          "sha256": "17605feace9d8a7a285a43ca20f6e697d703b3c23c59b04608ad8c4b0bd892d5"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-raw-primary-and-subsidiary-vocab/native.json",
+          "bytes": 202665,
+          "sha256": "15ff14de81d98e5953d23e45ae7897119dd499a95d59fd05015ce692efc07779"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-raw-primary-and-subsidiary-full/native.json",
+          "bytes": 227516,
+          "sha256": "6d0ec9c789095e7d1310860aff8ff8ee0742974c914137797498fc9fb47166b6"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/metadata-first-raw-primary-and-subsidiary-vocab/native.json",
+          "bytes": 202674,
+          "sha256": "9b83c5533a27b0cae35e51016415789ca6ad27040acc3c3a089340d24209deee"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/metadata-first-raw-primary-and-subsidiary-full/native.json",
+          "bytes": 227525,
+          "sha256": "af53eeddbe8bbbb00ea4ff6f8468dc1a87dc48b4edc4675e6b002e150c743b12"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-subsidiary-split-no-prefix-vocab/native.json",
+          "bytes": 186121,
+          "sha256": "db41d64b541cf10515565f6ec2a3ea42a5056d7b92809b25bdcc4efc457446bc"
+        },
+        {
+          "path": "capture-corrected-v1/windows-msvc/cases/three-subsidiary-split-no-prefix-full/native.json",
+          "bytes": 210972,
+          "sha256": "6e2af3f476512c8fef14018f7ac0734910463e63f784d1e86b556714453d876c"
+        }
+      ]
+    },
+    "linux-gnu": {
+      "cases": 171,
+      "admitted": 151,
+      "calls": 334341,
+      "metadata_entries": 12507,
+      "tokenization_cases": 3020,
+      "logit_words": 144384,
+      "record_bytes": 10497239,
+      "pool_bytes": 1166957,
+      "unique_blob_count": 15789,
+      "lossless_full_json_reconstruction": true,
+      "native_json_identities": [
+        {
+          "path": "capture-v1/linux-gnu/cases/baseline-vocab/native.json",
+          "bytes": 158734,
+          "sha256": "598c3b1bb7e6beb89a087419a2228366ea5e93447910357472526eaa89b6ed7a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/baseline-full/native.json",
+          "bytes": 183585,
+          "sha256": "8a1da1e69a4453d2411504a7a4e3f4289a89cb06a79a554a7451281268a94fa6"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/scalar-types-and-bits-vocab/native.json",
+          "bytes": 855227,
+          "sha256": "bb58bfca7ab77514e676daa84dee0cdb8ee5d313ce027513b16bf52e905bfa77"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/scalar-types-and-bits-full/native.json",
+          "bytes": 880078,
+          "sha256": "bb28e73ec703fe60ff35aff97a0f498055dbe182563c8eb115aa301c8e4220a4"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/raw-string-values-vocab/native.json",
+          "bytes": 421990,
+          "sha256": "dc7e44279601b75af6b841b45b25e0f9ff065657c7944d544a7015f2d0a5b133"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/raw-string-values-full/native.json",
+          "bytes": 446841,
+          "sha256": "7e4662b45ec1eefe8d6194bf6030db5f3f680f4bba7fdf0c38d44aac9579a2a7"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-002-vocab/native.json",
+          "bytes": 167272,
+          "sha256": "bae6888400517126428793e00ff50055df35dc56903286c43d40ad3417704a7d"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-002-full/native.json",
+          "bytes": 192123,
+          "sha256": "16e9e4e2e492e9d023b4dd6e93dc9ecc8c7b8c05fa2669e04252a0af346633f2"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-127-vocab/native.json",
+          "bytes": 167272,
+          "sha256": "92831b965f99d2647daaef46c53c80a59b2e5619361f967f9a13676089e2b721"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-127-full/native.json",
+          "bytes": 192123,
+          "sha256": "0fbffeca8f87d9930ecce707fc3f2f8d6807bf3ef099b3a9ebb936a1b2dfb44a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-128-vocab/native.json",
+          "bytes": 167272,
+          "sha256": "16ecea50f15647949b3b30926639cf5396a806be566fc5239aad14fb1af80604"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-128-full/native.json",
+          "bytes": 192123,
+          "sha256": "8182a3938c848a8ac1552169e4d25f419cc027a8a8facf32f3b98858e024d616"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-255-vocab/native.json",
+          "bytes": 167272,
+          "sha256": "8d4c64ffcf8a618ffa414b4005f4f9e853d3f59da1b35360ddaef58605c67df4"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/bool-byte-255-full/native.json",
+          "bytes": 192123,
+          "sha256": "b27c8daec51e42e9fb0a036bbc25e4981ef39b3b3b7815a7e14a83bb21100203"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/unused-array-types-vocab/native.json",
+          "bytes": 200376,
+          "sha256": "a9a88aeb66ba3644d166e97920a0ae98f155f8e3215ddf1075b0dccfee3e97d2"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/unused-array-types-full/native.json",
+          "bytes": 225227,
+          "sha256": "bbf09afa74ca20dc3ae47a79607a797e2a7ce2cc1ec48e08a362162043b52497"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/value-byte-grid-vocab/native.json",
+          "bytes": 1672688,
+          "sha256": "710185fbbd85a72d68003d8c248503fcc85073cf9e8e8da3340f61950483d81a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/value-byte-grid-full/native.json",
+          "bytes": 1697539,
+          "sha256": "34b53d263d0724578a38387cb666cad248df89e6155eb4cb551421c256307d90"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/key-byte-grid-vocab/native.json",
+          "bytes": 1651744,
+          "sha256": "f45720d9c9c3bfbc8c02b605083509e07e5d86f722e4ef8e36f02d66f084ee5a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/key-byte-grid-full/native.json",
+          "bytes": 1676595,
+          "sha256": "975be18c9aca6e9c593faa1a6b6e371c65db3d88b8f991ef9131158e280193f2"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/raw-empty-and-long-keys-vocab/native.json",
+          "bytes": 102,
+          "sha256": "cb70de969fb1012b3ebe7c221b939f995c4f25f091aac5e1cdcffce1dc2adc14"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/raw-empty-and-long-keys-full/native.json",
+          "bytes": 102,
+          "sha256": "c9bb4aed9f33ae8f7a0bf2ebd5a8d968a5b6a6ff743e3e157e8ebafe47f3c0ac"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/two-nul-scalar-keys-vocab/native.json",
+          "bytes": 180095,
+          "sha256": "c214762f3e086387a157115ec2c2a54e53981f8e4fedf6f5c08d5b5e8aea4bcf"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/two-nul-scalar-keys-full/native.json",
+          "bytes": 204946,
+          "sha256": "9292c4aee2ba24bd6e7b7de58cf10a6f5f139b98ca69551d0fa534e18c54c293"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/nul-before-plain-vocab/native.json",
+          "bytes": 177180,
+          "sha256": "89705b5f5426eb3251edfe803f825cad8da8057be0b590957c0d0fbe70083338"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/nul-before-plain-full/native.json",
+          "bytes": 202031,
+          "sha256": "7a85660f860b4715a6d2b6b655392ea753e3ca80871e527177d9988c3866a09a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/plain-before-nul-vocab/native.json",
+          "bytes": 177202,
+          "sha256": "4e80b054563b891f06540af8510861a0644eb91a8dbbe4b07d46462c5848e5be"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/plain-before-nul-full/native.json",
+          "bytes": 202053,
+          "sha256": "6fbd2db46ca4abea42c56e90390526c93882fb7f99680441a2304e6717d3a3ed"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/array-nul-before-scalar-vocab/native.json",
+          "bytes": 175908,
+          "sha256": "5c8b0c1329955a92b0b1ab6780f9fd5a8ce6972fd19fe0bf743b75845c727766"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/array-nul-before-scalar-full/native.json",
+          "bytes": 200759,
+          "sha256": "876c66d62899bc635fa3f216a9f182185e76da4fbecc10ff5db2b1165a990fe7"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/scalar-nul-before-array-vocab/native.json",
+          "bytes": 175928,
+          "sha256": "711641dec49bacb8968d4350a4435e18392ae1e1b406825b3efac279d5277c8b"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/scalar-nul-before-array-full/native.json",
+          "bytes": 200779,
+          "sha256": "d0b5d524d3eeb02d838a0542b4dc1320c562af038158c4964da00e1b2fb57437"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/array-plain-before-scalar-nul-vocab/native.json",
+          "bytes": 175934,
+          "sha256": "1914521d3a185a171210708c426bf15d19028888385c36e2184294d9b80c2480"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/array-plain-before-scalar-nul-full/native.json",
+          "bytes": 200785,
+          "sha256": "946dc7ba98658d5fe3a0829e0a4bdda9098400953840c336bd82cb1a02adfb41"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/empty-prefix-aliases-vocab/native.json",
+          "bytes": 99,
+          "sha256": "20cfb21675f512b2d1a5e0b669ad2b972082df27f4202e9801a3ff5deb9e6b66"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/empty-prefix-aliases-full/native.json",
+          "bytes": 99,
+          "sha256": "5b860f19803ad983f0ee5d8acffe6f2eccd42389a2464ee732133d1f8767d094"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/exact-duplicate-key-vocab/native.json",
+          "bytes": 98,
+          "sha256": "ceb649e620d805a041d69f7d42a29153a8f121bebe8e3afff4937ca6e071e199"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/exact-duplicate-key-full/native.json",
+          "bytes": 98,
+          "sha256": "8c8aa01a42c872a975410bc574c18c197652a3e44ac6613c533b237dfbdc0966"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-raw-vocab/native.json",
+          "bytes": 159379,
+          "sha256": "1e39420560027720f29c09f6adf52057e3a8d48198dc39ea72003c706bbe867d"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-raw-full/native.json",
+          "bytes": 184230,
+          "sha256": "85157fa6e9b3fc5dd75335106c2fc74847b793745d94647f6fe6ea63fd1ba48a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-nul-vocab/native.json",
+          "bytes": 158410,
+          "sha256": "88f7df1ff37a5c8cec9d0041a515e43ccc5c7712f0d28c6249303ecc31b19d4a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-nul-full/native.json",
+          "bytes": 183261,
+          "sha256": "634b5664ed844adfdec4868d5837a4696b24058962148dac65fb9f001f91aa44"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-empty-vocab/native.json",
+          "bytes": 156837,
+          "sha256": "40f0f520a2460e86c77220ee99c2c67b541e72828532545bb214ab66cb21dce0"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-name-empty-full/native.json",
+          "bytes": 181688,
+          "sha256": "f4117e8054057a3085fa4c82707a9a9d66534f5541d7ef5a61871a06570296cb"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-raw-vocab/native.json",
+          "bytes": 168777,
+          "sha256": "560c102b34f103ef98a0cc3acc588596ba36538d57262e5ce41dd4ad09f94eec"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-raw-full/native.json",
+          "bytes": 193628,
+          "sha256": "90a88200b0a664306185b4bec5e78030c1dee45f4970c2859721ba26990c7a7f"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-nul-vocab/native.json",
+          "bytes": 167764,
+          "sha256": "b31eb7c0cf27b43c1c56603ca091c8032e7be8c09e258afb52a1bb2e4650696c"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-nul-full/native.json",
+          "bytes": 192615,
+          "sha256": "03b0217c545c4e797e08f59e19c1e9e5efc2df93458136d0a6f7796c2ddae48d"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-empty-vocab/native.json",
+          "bytes": 166103,
+          "sha256": "119a47c155780e8fa2fe50cc3838d2f2c598f44eb8abd194276fd32864c73ed6"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-chat_template-empty-full/native.json",
+          "bytes": 190954,
+          "sha256": "d07903dffa2269206ef256ea7fe68d148c37c6a9d8bbe2e3a4d9b8ce7b6123fb"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-architecture-nul-suffix-vocab/native.json",
+          "bytes": 157207,
+          "sha256": "7522b2aee499888480c85975c832953ec77d80cadfdfcf63207fef9b3d885fb2"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-architecture-nul-suffix-full/native.json",
+          "bytes": 182058,
+          "sha256": "983be4c11d730aba9d2b4fedb96bdb96b14f156edf99f9085868d7ce4797be93"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-architecture-raw-prefix-vocab/native.json",
+          "bytes": 110,
+          "sha256": "dbea767908e0e830b802d498634e4c27d35aace6445486f65e94cf5424225061"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/general-architecture-raw-prefix-full/native.json",
+          "bytes": 110,
+          "sha256": "92d218c0b29734ba0dc196085a8ed849fb4a45949705b6a960bb1f0922087605"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-ggml-model-nul-suffix-vocab/native.json",
+          "bytes": 160163,
+          "sha256": "146188d03c1a9afffcac0803c6b32ec2040a2a0cb0c8b3333273ca12f717d460"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-ggml-model-nul-suffix-full/native.json",
+          "bytes": 185014,
+          "sha256": "9399968e80987cb3f82aa903e78ace6eb1a4709c896baf6ff449fe41c11afec9"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-ggml-model-raw-prefix-vocab/native.json",
+          "bytes": 110,
+          "sha256": "838b1c5689c9c79c5b102dcc10dc186ba19536248fca58d251e8f3ecb78b0f95"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/tokenizer-ggml-model-raw-prefix-full/native.json",
+          "bytes": 110,
+          "sha256": "61022177637d8cac8a806eb0dd01dc7f010183aa0d9697ca175a9629d72efe2d"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/hparam-key-alias-before-vocab/native.json",
+          "bytes": 158898,
+          "sha256": "9b8ce1db3965a306bf7010c44f8d4f2b8a348aa8947f540f87713e6e9fd43939"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/hparam-key-alias-before-full/native.json",
+          "bytes": 183749,
+          "sha256": "e155e670b9463366101ac654f046299c1f70f738e45bfe0cad0f935d41832700"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/hparam-key-alias-after-vocab/native.json",
+          "bytes": 159702,
+          "sha256": "76eab5a85301dbf12aa0010cfc7475506d5da25e4417e60f9ef7a26fb6194548"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/hparam-key-alias-after-full/native.json",
+          "bytes": 184553,
+          "sha256": "ccc0c5c2f675824117e8993d4b388ce689a00982cad162b270362e02582b448a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/architecture-key-alias-before-vocab/native.json",
+          "bytes": 160293,
+          "sha256": "f299ddff605901fa0493f0f54178bf082395266e8a90a60bd5afe620ed7c2415"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/architecture-key-alias-before-full/native.json",
+          "bytes": 185144,
+          "sha256": "d811babd1ec73766f905aba5d95f6c54e5eeca029008d93cf3a65474c3b12b4e"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/architecture-key-alias-after-vocab/native.json",
+          "bytes": 160292,
+          "sha256": "161ed23e09902064fcbca811cdebc775745d5a7f11ae675336ccf81fb9e0bf2e"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/architecture-key-alias-after-full/native.json",
+          "bytes": 185143,
+          "sha256": "7989744e13d45626792debf70a050759e2df40e3f85f482b0f528ec88bf4b132"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0001-forward-vocab/native.json",
+          "bytes": 93528,
+          "sha256": "30e22b5eec7ec644a1be7cb7fff90a8cd8c7e8e0fbaa4605b774966162bc12a8"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0001-reverse-vocab/native.json",
+          "bytes": 93528,
+          "sha256": "c3f968d9ea01c301430e33bb1a5c7474a107cf937b6959220266f139ee1c4987"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0001-shuffled-vocab/native.json",
+          "bytes": 93529,
+          "sha256": "4688f2499df21da330e0a18459e171192994bc4a63c57578e54b1512e9534c43"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0002-forward-vocab/native.json",
+          "bytes": 99804,
+          "sha256": "91e48118947bc6336249e5b10605e7fcf595e9bf4ea4fc98c5c1d9860764a252"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0002-reverse-vocab/native.json",
+          "bytes": 99804,
+          "sha256": "c30fe9438a68cbe5fb8e06fbbed435cbb3e7ed7b9ecaa85315f4aafdfd07ca76"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0002-shuffled-vocab/native.json",
+          "bytes": 99805,
+          "sha256": "59f59fd73014c46494d30a0bd56c23940f691c42016b9fbd9c5ffb65fb3af5ce"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0007-forward-vocab/native.json",
+          "bytes": 131188,
+          "sha256": "2f265ff001b815e3d8a48f2d3832c2d7d6967dae26c38f6dc8f1a845d73a60cf"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0007-reverse-vocab/native.json",
+          "bytes": 131188,
+          "sha256": "a3e93d838a67f2a3f58282163118a97c264c0e38480f6e81928d08733e0ef796"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0007-shuffled-vocab/native.json",
+          "bytes": 131189,
+          "sha256": "8c71284be38a39ed18bb23e9b7404a54ef396b4313810c62694c17cca1a096ff"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0008-forward-vocab/native.json",
+          "bytes": 137465,
+          "sha256": "40ae7d0d313ddc93850523e7bcc51e6881fae79d96a7d3bf9133fadb511bab88"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0008-reverse-vocab/native.json",
+          "bytes": 137465,
+          "sha256": "3a9d65ea4090b1016bfc7333684d73b5cf2c282d74dddcb016f69d3b65800191"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0008-shuffled-vocab/native.json",
+          "bytes": 137466,
+          "sha256": "e2cc1f4a78fbb839da6375bfea268de26f2a6fcfb3708208cfae152ecb9947b6"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0012-forward-vocab/native.json",
+          "bytes": 162609,
+          "sha256": "7fbc8ab743cd45eebf7edb483959177506e5ded534f8c7d1442404a6e2ba0b4e"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0012-reverse-vocab/native.json",
+          "bytes": 162609,
+          "sha256": "7c71ddce980827ce60056b96c8d3ba1c38747423e93432202326f288ddb21539"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0012-shuffled-vocab/native.json",
+          "bytes": 162610,
+          "sha256": "166d54f910892beb3291e092110fcdf479309561416ab4e4b384edf0a027b864"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0013-forward-vocab/native.json",
+          "bytes": 168910,
+          "sha256": "9e1f42ad9feb48ef873be7722a6334979eee6395cad2f120941731dbbab87eda"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0013-reverse-vocab/native.json",
+          "bytes": 168910,
+          "sha256": "aeeece2a19b9b4a239d3f6b38f656965280e55fbe99234bb2c10b1e43ea5f394"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0013-shuffled-vocab/native.json",
+          "bytes": 168911,
+          "sha256": "61f1306c001d89c39a19274675be2c66c3f3b03c7ba3a1ce2b84cf8ab487242f"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0014-forward-vocab/native.json",
+          "bytes": 175205,
+          "sha256": "0f5ad43312eddd4119e8d2ce7eddb9f50fbf135a5df48e830b333aac218ca071"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0014-reverse-vocab/native.json",
+          "bytes": 175204,
+          "sha256": "e035ab656f31e300ca6592a40523165ebb4bdea9ab4ca67891eb4ac02c1753f6"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0014-shuffled-vocab/native.json",
+          "bytes": 175206,
+          "sha256": "22b803fcb3ec198c7cd71ff043aa0c18f8e50862cadd536572299b2c9a2ac3eb"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0028-forward-vocab/native.json",
+          "bytes": 263328,
+          "sha256": "60c1817f6445b41f37438c4cfe3f26a560074a63ca7fe2cdf7188e6a49e595cc"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0028-reverse-vocab/native.json",
+          "bytes": 263328,
+          "sha256": "3622914df182ee3060c16be607f7e8ce247df7522e238abfbaa83846787ea491"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0028-shuffled-vocab/native.json",
+          "bytes": 263330,
+          "sha256": "85a968a929e1a1a569a0a0586fea660e36cd003a4d8fc3076b72edae76f44686"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0029-forward-vocab/native.json",
+          "bytes": 269623,
+          "sha256": "668515631db805b0aa27c14d9d720a47a657c5a7de6b5757cccc6bdb37b19c23"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0029-reverse-vocab/native.json",
+          "bytes": 269623,
+          "sha256": "897eae99b34ac5598584918c9ac1dfa1c455a5a342f3a39290dbaa4912146712"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0029-shuffled-vocab/native.json",
+          "bytes": 269625,
+          "sha256": "fa52f27e697c0d71332366d3e5d55ca1b3fe6c6f722d0b3df2aa33fb5c265f0c"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0030-forward-vocab/native.json",
+          "bytes": 275918,
+          "sha256": "028969e191d00c46f1e7d72334fc33a6646856892f101ed47759cf3ce7f8e648"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0030-reverse-vocab/native.json",
+          "bytes": 275918,
+          "sha256": "13372e63cddcb809868d1ad69619e879b064e0cca46c824218982c452318619c"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0030-shuffled-vocab/native.json",
+          "bytes": 275919,
+          "sha256": "42f38933ac5a4238c35c4564bcec99d2a747415a73c747dd89f2ebb1b5798d53"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0058-forward-vocab/native.json",
+          "bytes": 452178,
+          "sha256": "fa69547c7cbb7a8fe51a676c7301115850484814725d6983c662c3f8c48ab796"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0058-reverse-vocab/native.json",
+          "bytes": 452178,
+          "sha256": "1c02713a7ccde65841c67cbb5aa372ad83f61ce664a6f72db6c62c3e51b4bd8c"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0058-shuffled-vocab/native.json",
+          "bytes": 452179,
+          "sha256": "ad9e806b48a812aff5935582b02c5fbda7971b3f23d9b95ae581abf5836a8297"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0059-forward-vocab/native.json",
+          "bytes": 458473,
+          "sha256": "0e06ae74c6f1bfefe073612ef046e91bbf0fa7609297cd8e50647304af82a286"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0059-reverse-vocab/native.json",
+          "bytes": 458473,
+          "sha256": "dfe71701439de0899ec73e4fca44f5ba901ed05e57eb3608cf570e8a7c624f6d"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0059-shuffled-vocab/native.json",
+          "bytes": 458474,
+          "sha256": "b7bef831bde9295b42253d52151f71b5286b671dda7142ea8e61cfd06e5b4672"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0060-forward-vocab/native.json",
+          "bytes": 464768,
+          "sha256": "4355b5a013999a893ad442433bd64f39b8018d10d90008d956b45cd3b407e3bc"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0060-reverse-vocab/native.json",
+          "bytes": 464768,
+          "sha256": "35786fb955a8d0d60cde8092f9f2eebfb429e650cd52b10e36fa1830e0653ddb"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0060-shuffled-vocab/native.json",
+          "bytes": 464769,
+          "sha256": "152c20a78bdc07aaa4ba59ec0cb07eba48636f1b59858a914ea61360365b7d2f"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0126-forward-vocab/native.json",
+          "bytes": 888746,
+          "sha256": "31a1ebd3ee1f1fe2833e7ba90328e6f77be5b974bf1132d5b10cd0c28e518d64"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0126-reverse-vocab/native.json",
+          "bytes": 888747,
+          "sha256": "1614437cfe06c2e676ee2d9771e526e0fb0317525a0bc6681b7d21e76a224576"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0126-shuffled-vocab/native.json",
+          "bytes": 888748,
+          "sha256": "9be62d1332664820c0f315e34cec79688eecaed6f41ef5e1c89028738e1092ab"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0127-forward-vocab/native.json",
+          "bytes": 895360,
+          "sha256": "6e61540717785494df208d4524e60bb98b963e5f3d48787b3fcc1f7ca4cf5b32"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0127-reverse-vocab/native.json",
+          "bytes": 895361,
+          "sha256": "f62546883eba7e0a1df9b15db7d0b34e98772a88ba3cc9b46faf4bcc005ea8f6"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0127-shuffled-vocab/native.json",
+          "bytes": 895362,
+          "sha256": "4fb08be280dfae6e903be53f512ab3a9f58e0c975b049871c8fddc3e6e28ac36"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0128-forward-vocab/native.json",
+          "bytes": 901974,
+          "sha256": "3f782e83ff0d127a624e6ede8973e55b7790b434590d274551d7b5845fd30da7"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0128-reverse-vocab/native.json",
+          "bytes": 901975,
+          "sha256": "6906a04ea2b5d93420a95fb272bbf27f51d5dbdefef4aeb760701f9e1afbe8ec"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0128-shuffled-vocab/native.json",
+          "bytes": 901975,
+          "sha256": "724c28a5033e490db48232560a15ef51003184ecc1cf8d9b81a3e7d193c32e5f"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0256-forward-vocab/native.json",
+          "bytes": 1748561,
+          "sha256": "b1da2338165180850a455ec40705c6060fe59fddcdef0a8aaeb52d0b0a99e30a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0256-reverse-vocab/native.json",
+          "bytes": 1748561,
+          "sha256": "0c4e42bb0e6bc77d51e15a32a5f3af685af7e720598c4351569fb7782337ecd3"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0256-shuffled-vocab/native.json",
+          "bytes": 1748562,
+          "sha256": "ca2938dc590c4adda97b387813a360bba03a5727079a687988f836603765da89"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0512-forward-vocab/native.json",
+          "bytes": 3441742,
+          "sha256": "3f7327e513da1444b996414d8c54af458fbca2e75a3640d271384a381188b970"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0512-reverse-vocab/native.json",
+          "bytes": 3441742,
+          "sha256": "55bad076b988f72279065e6ef5443323e771d446a2d492c7a4159953d24e340a"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-0512-shuffled-vocab/native.json",
+          "bytes": 3441743,
+          "sha256": "83f98952746b655c893372de8a6dd75b701ea3a88949f5bd05085e6b8fc61de2"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-1024-forward-vocab/native.json",
+          "bytes": 6829596,
+          "sha256": "94431ddf0da2f96aba3254254b001749e03a53d117b4bc28ace840729eb685a9"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-1024-reverse-vocab/native.json",
+          "bytes": 6829598,
+          "sha256": "548a4205cc941526c1ea098c16226cf062e50912b05c1db00ef0fcd85c318fef"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/order-1024-shuffled-vocab/native.json",
+          "bytes": 6829599,
+          "sha256": "70fef5d131fd689f7eb63ac6f8b44f1246be5d224862ea54de0df74e273a103e"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/all-base-metadata-reversed-vocab/native.json",
+          "bytes": 87262,
+          "sha256": "a1f5189889286eeafa6efe9391bcd37607fc361345f2415d9162c019885bf274"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/all-base-metadata-reversed-full/native.json",
+          "bytes": 112113,
+          "sha256": "5986075152c1c2fbda6af99e6184b087144b3b1f0775237a43ac4a96ce4c44cb"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/all-base-metadata-shuffled-vocab/native.json",
+          "bytes": 87260,
+          "sha256": "387735e363dcfaa41afd626c7ed317834ead359298dad41fa6787fb8159962e5"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/all-base-metadata-shuffled-full/native.json",
+          "bytes": 112111,
+          "sha256": "8ac9b30366333cc793432e0279640c6a24e46c7879d3bbc263c495c4117cf957"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/unknown-scalar-type-vocab/native.json",
+          "bytes": 98,
+          "sha256": "5ad30564312d5c1f34be32ddc9a0491fd07059b80368b15ab365e72041b0f869"
+        },
+        {
+          "path": "capture-v1/linux-gnu/cases/nested-array-type-vocab/native.json",
+          "bytes": 96,
+          "sha256": "abbbe3491a9cb39104e665298e31146a0725b7c29976e4e29fac9f8a0f27a848"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/baseline-addon-vocab/native.json",
+          "bytes": 157190,
+          "sha256": "d376c771728e689a762e9831ae07b2d143846d7e24d583be8f528a4dc65bca83"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/baseline-addon-full/native.json",
+          "bytes": 182041,
+          "sha256": "48ab604179253d054cba7a94259b25b78b433bcf2ba84aa204f58b424779720a"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/empty-key-vocab/native.json",
+          "bytes": 88,
+          "sha256": "49c0b0ef9192238577bea254c097cd990cfc57378699d6f79f0b5a1ac349bb8c"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/empty-key-full/native.json",
+          "bytes": 88,
+          "sha256": "e5318b99b70520810d773c08740683801b1a9433beccd75142a8b5607890110e"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/single-nul-key-vocab/native.json",
+          "bytes": 170298,
+          "sha256": "4ec7efaebbd094d7215a3a40ee2f2fdd7ff1a2784b4fd3d618f4feb9026a7e28"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/single-nul-key-full/native.json",
+          "bytes": 195149,
+          "sha256": "f23259dfcf990867efd10642a65e7d4058778aa238aac073f834526adcef55dd"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-key-vocab/native.json",
+          "bytes": 170563,
+          "sha256": "76cb0bd37b396a7dd3d66a0677afe9556dc8e6cd4500d7123cbcb636f2fd5864"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-key-full/native.json",
+          "bytes": 195414,
+          "sha256": "bb3d1a59f2487cf0db7feab04430702f6b276922ae02e54c8f740dac17351259"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/invalid-utf8-key-vocab/native.json",
+          "bytes": 169437,
+          "sha256": "82045025e7b922eee931184721a16d1d06265624ab4e54b9065f58965ac0f0e5"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/invalid-utf8-key-full/native.json",
+          "bytes": 194288,
+          "sha256": "abf7a4a7b3b369982eeb924138041bd39853dde40868d4e3df237191f04799d3"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/long-key-4097-vocab/native.json",
+          "bytes": 481391,
+          "sha256": "abce9abd81116eaac0f4fc291989692f97db63e80839e88bfa00fd6fc3231847"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/long-key-4097-full/native.json",
+          "bytes": 506242,
+          "sha256": "1c766ca9bb8bcc6597dd304ebbe3709d0252bc43528b0b3dc105cd0093e2c312"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-aliases-vocab/native.json",
+          "bytes": 173105,
+          "sha256": "be9025a836b2c982533a7a5fde5dc00fdb9387af574dd21bedba7e508b339087"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-aliases-full/native.json",
+          "bytes": 197956,
+          "sha256": "b6b22ab7af9eee4220d3895527f8ff5e732bd6d2af78a6190dcacb8a2fb6fd84"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-array-then-scalar-vocab/native.json",
+          "bytes": 171673,
+          "sha256": "5b44e3e80967df8d6bb64224b5c6f5103e3cd7a85e214713b4a96b2973908837"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-array-then-scalar-full/native.json",
+          "bytes": 196524,
+          "sha256": "3d721e593357d4d7c35e79b37577e4e59acfa5df48242d0b5e575c8fa8ca88fd"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-scalar-then-array-vocab/native.json",
+          "bytes": 171673,
+          "sha256": "407ed2e4b2a3ac0f722061e938e96345e750a550a4ca75ec0b8013aebda134d5"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/leading-nul-scalar-then-array-full/native.json",
+          "bytes": 196524,
+          "sha256": "c114cdf6473ca512bc6842403db40cf7dcc5790d24e75a420553c9879fec01ed"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-name-array-vocab/native.json",
+          "bytes": 160652,
+          "sha256": "6dbe5cfa68e51e9d04a36704e152eeb0753c35b3d322569031e5649195c953fe"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-name-array-full/native.json",
+          "bytes": 185503,
+          "sha256": "bc33975b47c50cca86599bb9c6a6bd2ba8bbbaa43a63a86a4a4cf4801415d96a"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/float-format-boundaries-vocab/native.json",
+          "bytes": 4231213,
+          "sha256": "5f24ed58ccc18a79c5fb7ea5307e2927a48d6937a9bbf3b82e9f6e7254615a9a"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/float-format-boundaries-full/native.json",
+          "bytes": 4256064,
+          "sha256": "6d52469d7e2894369d53b823d6f5863fe75aa988c7ea05a502ba23000b9d4ab8"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-general-description-vocab/native.json",
+          "bytes": 102,
+          "sha256": "62517c147fc39c9b6834d0b2197b740ca283bcf8a5490621e7be78734c72b813"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-general-description-full/native.json",
+          "bytes": 102,
+          "sha256": "b804c6b295e9ceb364260da101aa6115652f99d7a1d162f27219df9d9844d362"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-array-key-vocab/native.json",
+          "bytes": 92,
+          "sha256": "cd7f84c4f63b7613ce5906f6805eea2d20c92e24cb5107e8c1e2adb1f58cdc8e"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/raw-array-key-full/native.json",
+          "bytes": 92,
+          "sha256": "758012b22b1d31e6a887d187e6cc5f297da24977d62db6046525790bf2a5c369"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/empty-unused-string-array-vocab/native.json",
+          "bytes": 104,
+          "sha256": "2df832705eaaac76d43c9130b28e2ec4fb68fb655fc00f1475c58ff1e4fc9b9c"
+        },
+        {
+          "path": "capture-addon-v1/linux-gnu/cases/empty-unused-string-array-full/native.json",
+          "bytes": 104,
+          "sha256": "98dc24643498d66042da5489bc82196179f8b05be13e9c11048f4cb32da818fa"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/raw-general-description-corrected-vocab/native.json",
+          "bytes": 169960,
+          "sha256": "9b036e7ffdc49ad756cef656c9c7caa08de54ff71ab886c2c60afd537e3534a8"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/raw-general-description-corrected-full/native.json",
+          "bytes": 194811,
+          "sha256": "ff387f709b018be30ea6317aef894a68648bb0e7692927c4bec2b33990461ab2"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/raw-array-key-corrected-vocab/native.json",
+          "bytes": 163031,
+          "sha256": "851107c3866ed710c42466e8f5c9dc29063882904a04931236c252c75ba11b93"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/raw-array-key-corrected-full/native.json",
+          "bytes": 187882,
+          "sha256": "edd504b28af4eb84cb8a41967355160ee9320d75a3f68c34e43524c1ea76717b"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/empty-unused-string-array-corrected-vocab/native.json",
+          "bytes": 163043,
+          "sha256": "62ed4fe65011c4fcd5a1ac63b3871354eed6015a9f97d27458d6d6b06daf3760"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/empty-unused-string-array-corrected-full/native.json",
+          "bytes": 187894,
+          "sha256": "71db3c2d7a66f13e27c1c67f708941c74e9c25ae4d0d6a078290d10e8a065cea"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-raw-subsidiary-vocab/native.json",
+          "bytes": 186106,
+          "sha256": "7318024dcf9d7b7227b4e3e864bdcf862cd3dfad880f42e02389e47029bb9e24"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-raw-subsidiary-full/native.json",
+          "bytes": 210957,
+          "sha256": "97e491e54d72ede4802de41807f3abf979e807f26c26100eb02ffacbc271d071"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-raw-primary-and-subsidiary-vocab/native.json",
+          "bytes": 202661,
+          "sha256": "ddc8a443025068ed49b063ed826a8eb5cae63861ecab0e04680dcd3f995bbd13"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-raw-primary-and-subsidiary-full/native.json",
+          "bytes": 227512,
+          "sha256": "26f596fccfaec2c6c98ca893249f69c61c834ee153d15705f5ce41f2a9150191"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/metadata-first-raw-primary-and-subsidiary-vocab/native.json",
+          "bytes": 202670,
+          "sha256": "4abbe0890abe3fc54f15c74fd3f0234c5d9a91d196506f7295af3550430356fa"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/metadata-first-raw-primary-and-subsidiary-full/native.json",
+          "bytes": 227521,
+          "sha256": "081ee3210c1ac0679db4cc14ce5b042c1961f7b927e72e9d153d6ac5c30e6462"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-subsidiary-split-no-prefix-vocab/native.json",
+          "bytes": 186118,
+          "sha256": "0e7e0294b0fb33761214fa9e40a2b583e2ff78ff7dd5d87a5b50fcb651780d20"
+        },
+        {
+          "path": "capture-corrected-v1/linux-gnu/cases/three-subsidiary-split-no-prefix-full/native.json",
+          "bytes": 210969,
+          "sha256": "6477d0c547e64778ea9f60d2a7e29c972a38ca2c1395faf2569c7704d0f02f6e"
+        }
+      ]
+    }
+  },
+  "fixtures": [
+    {
+      "path": "inputs.json",
+      "bytes": 71801,
+      "sha256": "07308fd37b10827c8ea79e5b5a11b4c7c901e62add9fe65163ab7fdbd65b508c"
+    },
+    {
+      "path": "models.bin",
+      "bytes": 3843034,
+      "sha256": "dfaa9e52e0fe1f4960693f61e3d9965e7050a7be59e915a91a9cf5291fe9fa5d"
+    },
+    {
+      "path": "reference-gnu.bin",
+      "bytes": 11664220,
+      "sha256": "decaa2895c07d9669e523a850a9df4e92c2f98d0b17bd2050c1168449edae808"
+    },
+    {
+      "path": "reference-msvc.bin",
+      "bytes": 11666017,
+      "sha256": "9791b612c9b2e0eba1115eeb3fab23084cab02a20c4eb852fce716f748da08d6"
+    }
+  ]
+}

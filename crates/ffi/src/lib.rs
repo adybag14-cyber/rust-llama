@@ -17,10 +17,13 @@
 
 pub mod abi;
 mod batch;
+mod chat;
 mod context;
 mod enum_names;
 mod memory;
 mod model;
+mod model_metadata;
+mod native_metadata_policy;
 mod sampler;
 mod sampler_grammar;
 mod sampler_vocab;
@@ -251,3 +254,13 @@ mod f16_context_reference_tests;
     )
 ))]
 mod native_microbatch_reference_tests;
+
+#[cfg(all(
+    test,
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+mod model_metadata_reference_tests;

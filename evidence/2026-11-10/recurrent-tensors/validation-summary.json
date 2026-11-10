@@ -1,0 +1,327 @@
+{
+  "scope": "Five recurrent tensor operators, original native-success graphs and explicit checked Rust boundaries",
+  "ops": {
+    "SSM_CONV": 76,
+    "SSM_SCAN": 77,
+    "RWKV_WKV6": 82,
+    "GATED_LINEAR_ATTN": 83,
+    "RWKV_WKV7": 84
+  },
+  "constructor_coverage": {
+    "executable_ids": 81,
+    "input_leaf_ids": 1,
+    "pending_ids": 20,
+    "registry_total": 102
+  },
+  "captures_per_host": 1394,
+  "exact_graphs_per_host": 1389,
+  "source_success_graphs_rejected_by_rust": 5,
+  "captured_output_state_bytes_per_host": 1279508,
+  "exact_output_state_bytes_per_host": 1278140,
+  "main_corpus": {
+    "cases": 944,
+    "exact_cases": 939,
+    "exact_bytes": 1145804
+  },
+  "ieee_extension": {
+    "cases": 450,
+    "exact_cases": 450,
+    "exact_bytes": 132336
+  },
+  "source_success_rejections": [
+    "nan_payloads_ssm_conv",
+    "nan_payloads_ssm_scan",
+    "nan_payloads_rwkv_wkv6",
+    "nan_payloads_gated_linear_attn",
+    "nan_payloads_rwkv_wkv7"
+  ],
+  "current_product_files": [
+    {
+      "path": "crates/tensor/CPU_SUPPORT.md",
+      "bytes": 22668,
+      "sha256": "085e30ef6116466364f51ca67a878f9555031bd1055a1d053b0f0478f0781b1f"
+    },
+    {
+      "path": "crates/tensor/README.md",
+      "bytes": 27323,
+      "sha256": "6843c0aca2c6a730e3d9a39313ba8b6d0da5259be6cb33bbdfa25535852328a8"
+    },
+    {
+      "path": "crates/tensor/RECURRENT.md",
+      "bytes": 11686,
+      "sha256": "8eee5792cdb8c209dda5a6afdaa44f8d5cfc7fd0d6373c2fc09e008071f60820"
+    },
+    {
+      "path": "crates/tensor/src/cpu.rs",
+      "bytes": 17385,
+      "sha256": "135b7d0e36b5328e52dd32db3163c9f4f1ff0386a25d27751f965fdab8742cde"
+    },
+    {
+      "path": "crates/tensor/src/cpu_recurrent.rs",
+      "bytes": 20369,
+      "sha256": "6382fd33281a26f25b75b92bb080a5b6bc3952b41223e2bff5adeb9082020dc8"
+    },
+    {
+      "path": "crates/tensor/src/graph.rs",
+      "bytes": 18032,
+      "sha256": "535626db0e2827790c1867711a1ad8639d67d040c5f13ce6084d87e48c61c686"
+    },
+    {
+      "path": "crates/tensor/src/lib.rs",
+      "bytes": 13194,
+      "sha256": "a6c4121b48def87aa337870be947731c532f1eb73cc3ba0c235ab3af0820f07b"
+    },
+    {
+      "path": "crates/tensor/tests/recurrent.rs",
+      "bytes": 7453,
+      "sha256": "a785348be3599234d1f35ab461f5bb1990a321f01181a712091c764523322161"
+    },
+    {
+      "path": "crates/tensor/tests/recurrent_checked.rs",
+      "bytes": 11393,
+      "sha256": "6343065a1385a29cc6fb7913adc25fa3dec642ba51165018b0f0ad7537c2b9ab"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/gnu/provenance-ieee.json",
+      "bytes": 3140,
+      "sha256": "897c0f5a5c11c4d80abb4e5665828c979e32d9e7bc082d25878e1d2476667f14"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/gnu/provenance.json",
+      "bytes": 3194,
+      "sha256": "939e5aef1a47c05d288f76df6c68eb85c622e8511222a0b016365dd8070d6772"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/gnu/recurrent-ieee-reference.bin",
+      "bytes": 758880,
+      "sha256": "3651a4cedc8fe64d137be0c02987633829bd2bb6a4171c400be12d04298a20d9"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/gnu/recurrent-reference.bin",
+      "bytes": 4148299,
+      "sha256": "4628aced7c2ba465391b89d045c8facc7b0ad2d44d763dfcbf5346ee10de9945"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/msvc/provenance-ieee.json",
+      "bytes": 3178,
+      "sha256": "102605354c5fd1f524d1121092903fcd50416d08a6d665b79d9729b171ef13a9"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/msvc/provenance.json",
+      "bytes": 3231,
+      "sha256": "f1e4a1ebfee8874d051ecd34af02399c24880b970e928541e947131a57401df7"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/msvc/recurrent-ieee-reference.bin",
+      "bytes": 758880,
+      "sha256": "3651a4cedc8fe64d137be0c02987633829bd2bb6a4171c400be12d04298a20d9"
+    },
+    {
+      "path": "crates/tensor/tests/fixtures/recurrent/msvc/recurrent-reference.bin",
+      "bytes": 4148299,
+      "sha256": "cbb30b51df847adfbbb6978bed5b537c493d9a6f6629f8c572075877ebbc9e89"
+    }
+  ],
+  "validation": {
+    "msvc": {
+      "steps": [
+        {
+          "name": "test-debug",
+          "argv": [
+            "cargo",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 27.15,
+          "stdout": "msvc-test-debug.stdout.txt",
+          "stderr": "msvc-test-debug.stderr.txt",
+          "stdout_sha256": "67440d34037ffda491d20c880bdab5f6b3e83b72e3b4f3220f87dafc6e0dc50b",
+          "stderr_sha256": "587b9b928706e657f873d8aa5a26d37f13ad3ce05004cc6ecf35d5f5bfd75288"
+        },
+        {
+          "name": "test-release",
+          "argv": [
+            "cargo",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--offline",
+            "--locked",
+            "--release",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 14.059,
+          "stdout": "msvc-test-release.stdout.txt",
+          "stderr": "msvc-test-release.stderr.txt",
+          "stdout_sha256": "64d3650421d1185a89ecffa653865f13ad34612fff4b19201a431fb6b531bd49",
+          "stderr_sha256": "074c4b33749ac439c10f17d0c911c5386e544fef6f8dccc75698cf8f8e03ff91"
+        },
+        {
+          "name": "clippy",
+          "argv": [
+            "cargo",
+            "clippy",
+            "-p",
+            "llama-tensor",
+            "--all-targets",
+            "--offline",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.313,
+          "stdout": "msvc-clippy.stdout.txt",
+          "stderr": "msvc-clippy.stderr.txt",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "f0788aa36d1c86b6ccdfb7f4042a5574102d82061c046422a2d42e008a1e4710"
+        },
+        {
+          "name": "fmt",
+          "argv": [
+            "cargo",
+            "fmt",
+            "-p",
+            "llama-tensor",
+            "--check"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.307,
+          "stdout": "msvc-fmt.stdout.txt",
+          "stderr": "msvc-fmt.stderr.txt",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "tests": {
+        "debug": {
+          "passed": 48,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 48,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "post_validation_nonsemantic_changes": [
+        {
+          "path": "crates/tensor/tests/recurrent.rs",
+          "kind": "documentation comment only",
+          "validated_sha256": "71d0f393175392bbdbd56183fe07c12bab2eef5c7989b0412d99247049d4fcfe",
+          "current_sha256": "a785348be3599234d1f35ab461f5bb1990a321f01181a712091c764523322161"
+        }
+      ]
+    },
+    "gnu": {
+      "steps": [
+        {
+          "name": "test-debug",
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 27.221,
+          "stdout": "gnu-test-debug.stdout.txt",
+          "stderr": "gnu-test-debug.stderr.txt",
+          "stdout_sha256": "6c566efd75f58a7dd66f77d21f5d4970b37c3a41baf7173838b91ac5fbf07533",
+          "stderr_sha256": "a96c74db28403bbb4c62d1dab3b37cce810aa0449a4c1f4bcfe5e385c7b7123c"
+        },
+        {
+          "name": "test-release",
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "-p",
+            "llama-tensor",
+            "--offline",
+            "--locked",
+            "--release",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 19.28,
+          "stdout": "gnu-test-release.stdout.txt",
+          "stderr": "gnu-test-release.stderr.txt",
+          "stdout_sha256": "4550cba27a7c68706c617aa333de39aaaa9fb665c72383733d3ce20398705087",
+          "stderr_sha256": "260ed8bfc03b66ef3c13328333204a52b1a9654e7a22219d13c0c09a7c4008cc"
+        },
+        {
+          "name": "clippy",
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "clippy",
+            "-p",
+            "llama-tensor",
+            "--all-targets",
+            "--offline",
+            "--locked",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 3.063,
+          "stdout": "gnu-clippy.stdout.txt",
+          "stderr": "gnu-clippy.stderr.txt",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "860fa8b6a93e5f7087b37f2f81d95f33f3cf7faa96200c06bff190fa42475bc8"
+        },
+        {
+          "name": "fmt",
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "fmt",
+            "-p",
+            "llama-tensor",
+            "--check"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.98,
+          "stdout": "gnu-fmt.stdout.txt",
+          "stderr": "gnu-fmt.stderr.txt",
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "tests": {
+        "debug": {
+          "passed": 48,
+          "failed": 0,
+          "ignored": 0
+        },
+        "release": {
+          "passed": 48,
+          "failed": 0,
+          "ignored": 0
+        }
+      },
+      "post_validation_nonsemantic_changes": [
+        {
+          "path": "crates/tensor/tests/recurrent.rs",
+          "kind": "documentation comment only",
+          "validated_sha256": "71d0f393175392bbdbd56183fe07c12bab2eef5c7989b0412d99247049d4fcfe",
+          "current_sha256": "a785348be3599234d1f35ab461f5bb1990a321f01181a712091c764523322161"
+        }
+      ]
+    }
+  }
+}

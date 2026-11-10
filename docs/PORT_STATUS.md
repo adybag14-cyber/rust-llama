@@ -1,6 +1,6 @@
 # Current port status
 
-Updated 9 November 2026. The user objective remains a complete native Rust port of the frozen ZIP. **The full port is not complete.** This document records actual executable scope and the work still required. No overall completion percentage is assigned.
+Updated 10 November 2026. The user objective remains a complete native Rust port of the frozen ZIP. **The full port is not complete.** This document records actual executable scope and the work still required. No overall completion percentage is assigned.
 
 ## Source and product boundary
 
@@ -8,22 +8,43 @@ The baseline ZIP SHA-256 is `2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04
 
 The product's maintained implementation is Rust. Frozen C/C++ reference builds, model downloads and oracle generators remain outside the repository. Numeric tables, tokenizer-only GGUF, reference float/byte arrays, media examples and synthetic binary parser inputs are declared fixture data. Minimal Cargo/CI configuration, licenses and documentation retain their actual formats.
 
-The merged workspace has local path dependencies. Optional OS/driver/vendor interfaces remain named external boundaries. They do not import the original llama.cpp implementation. See `release/dependency-inventory.tsv`.
+The merged workspace has local path dependencies plus five exactly reviewed Rust registry packages for converter YAML parsing. Locked dependency acquisition precedes offline gates; the audit verifies the actual archives, extracted source, versions, features and licenses. Optional OS/driver/vendor interfaces remain named external boundaries. They do not import the original llama.cpp implementation. See `release/dependency-inventory.tsv`.
+
+## Integrated verification — 10 November
+
+The final integrated input manifest covers 1,047 code, fixture and execution
+configuration files and is identical on Windows MSVC and Linux GNU. The complete
+ordinary debug and release suites pass 592 tests per Windows profile and 597 per
+GNU profile, with zero failures and 22 explicitly ignored external/device tests.
+Each host separately passes nine pretrained inference/server tests and the
+complete SmolLM2 converter test (three outputs; 686,581,536 exact bytes).
+
+Formatting, strict Clippy, release builds and the actual-cache dependency audit
+pass. All 4,082 supplied frozen source files match; all 720 fixture files have
+integrity declarations across nine manifests. Original-header clients validate
+both debug and release libraries: 35,946 chat cases, 171 model-metadata requests,
+38 raw-name models, and actual PE/ELF export inventories of 198 frozen symbols plus
+four extensions. The 57 absent C symbols remain absent.
+
+The retained reports distinguish earlier integration failures, their corrections
+and the final successful run. The full-port release check still fails as required
+with 20 open mandatory gates. See
+[evidence/2026-11-10/continued-port](../evidence/2026-11-10/continued-port/README.md).
 
 ## Track-by-track scope
 
 | Track | Current implementation and evidence | Requirements still open |
 | --- | --- | --- |
-| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 191/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 64 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
-| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 76 executable operation IDs plus NONE leaves, including the checked shared CPU FLASH_ATTN_EXT adapter; the earlier 3,240-graph corpus remains preserved. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
+| T01: ABI/platform/integration | Shared workspace/loader contracts, real system symbol loading and 198/255 frozen C exports with independent header, ownership, raw-tokenizer and real-context sampler checks. | The remaining 57 exports, full semantics of every implemented export, all platform contracts and cross-platform ABI execution. |
+| T02: tensor engine | Four-dimensional GGML layouts and strides, block-aware views, immutable storage lifetime, scalar DAG execution, cancellation, 81 executable operation IDs plus NONE leaves, including the checked shared CPU FLASH_ATTN_EXT adapter; the earlier 3,240-graph corpus remains preserved. | Full operator set; writable/imported/device buffers; scheduler, allocation planning/reuse, events; autodiff and optimizers; advanced RoPE and softmax modes. |
 | T03: CPU/quantization | All 36 active dtype decoders; all 29 source model quantizers with required/optional weights; 32 non-integer codec formats including activation/F64 helpers; three checked integer setters; all 29 scalar CPU weight-dot types. | General CPU operators and all ISA implementations; dispatch, numerical and performance parity across ISAs. Source-undefined codec paths have documented safe behavior. |
-| T04: formats/conversion/tokenizers | Bounded shared raw/text GGUF v2/v3 reader, native byte/NUL alias and nonzero-boolean semantics, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, byte-preserving ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, raw/indexed Safetensors reading with retained capabilities, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Architecture checkpoint conversion; arbitrary-byte metadata across every high-level model/vocabulary consumer; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
+| T04: formats/conversion/tokenizers | Bounded shared raw/text GGUF v2/v3 reader, native byte/NUL alias and nonzero-boolean semantics, owned automatic/explicit shard sets, cumulative parser limits, tensor validation, byte-preserving ordered streaming little-endian writer, bounded split/merge executable, scalar endian conversion, raw/indexed Safetensors reading with retained capabilities, native dense Llama HF conversion with checked publication, raw primary model metadata and native scalar C ordering, SPM, WordPiece, BPE with all 64 metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, native raw-byte behavior and exhaustive Unicode checks. | Other architecture checkpoint converters; remaining arbitrary-byte metadata semantics across model/vocabulary consumers; remaining metadata tools and quantization applications. Big-endian packed arithmetic and remaining platform-specific behavior. |
 | T05: models/runtime | Typed Llama/Qwen2/Qwen3/Mamba/BERT graphs, state/cache transactions, sequence isolation, adapters and independent small graph checks. Dense Llama GGUF executes pretrained F32/Q4_0/BPE-Q4_K_M models; Qwen2 GGUF executes pretrained Q4_K_M generation; Qwen3 GGUF executes pretrained Q8_0 generation with independent head width and per-head Q/K normalization; Mamba-1 GGUF executes pretrained F16 recurrence; dense BERT GGUF executes pretrained F16 embeddings with all supported pooling modes. | Remaining named architectures among the baseline's 172 entries; full metadata/graph variants and scaled RoPE; memory/cache modes, speculation, batching, model placement and GPU model integration. |
 | T06: CUDA/HIP/MUSA | Rust driver interfaces and typed PTX generation; actual CUDA kernels including matvec, stride/broadcast/tail coverage; 138 recorded dispatches on RTX 4090. | Full tensor/backend scheduler integration, upstream operation and dtype coverage, memory/collective modes, optimized kernels; HIP and MUSA hardware execution/parity. |
 | T07: portable GPU | Typed kernel IR; generated OpenCL kernels executed on NVIDIA and AMD; Vulkan/other host foundations. | Complete Metal, Vulkan, OpenCL and WebGPU implementation; full compiler/device/OS matrix, scheduler integration and numerical/performance parity. |
 | T08: specialty/remote | Checked RPC 8.0.1 subset with transactional scalar graph execution; CBLAS interfaces, DSP ELF/SWIV and virtual-device utilities with explicit capability handling. | Complete BLAS, CANN, ET, SYCL, zDNN, Hexagon, ZenDNN, OpenVINO, RPC and VirtGPU backend semantics and actual required device/vendor testing. |
 | T09: multimodal/media | Selected Rust image/audio decode, preprocessing and resampling; independent media fixtures. | All 58 multimodal graph builders; model projections, audio/video model execution and speech generation; full codec/container/device capability coverage. |
-| T10: behavior/tools | Safe scalar sampler APIs and a separate native C sampler path; DRY, adaptive-p, infill and lazy/raw-byte GBNF with independent DLL masks/state/context generation; 54 native chat formatters; inference CLI. | Complete PEG/Jinja/custom-regex and remaining sampler semantics, complete common options, all tools/examples, converter/updater/unified-app functionality. |
+| T10: behavior/tools | Safe scalar sampler APIs and a separate native C sampler path; DRY, adaptive-p, infill and lazy/raw-byte GBNF with independent DLL masks/state/context generation; 54 native chat formatters and two byte-oriented C chat exports; inference and dense Llama conversion CLIs. | Complete PEG/Jinja/custom-regex and remaining sampler semantics, complete common options, all tools/examples, converter/updater/unified-app functionality. |
 | T11: server/UI/clients | Real-model native/OpenAI completions and SSE; BERT embedding endpoints with all pooling modes, normalization, base64, typed/batched input and usage; bounded HTTP, auth/CORS, replay, cancellation and deadline checks. | Full routing/scheduling/protocols, multimodal and decoder embeddings, reranking, tools/MCP, TLS, browser features/storage migrations/WASM, native clients and connect integration. |
 | T12: validation/release | Original ownership/registry ledger, source/fixture audits, independent fixtures, offline Rust tasks and deterministic source packaging; Windows/Linux CI configuration. | Full capability-linked file disposition review; all model/platform/device suites; clean distribution verification, memory/quality/performance budgets and complete release closure. |
 
@@ -110,7 +131,9 @@ operand selection; the earlier GNU mismatch in ten cases and 66 F32 words is
 retained in the evidence.
 Shape, stride and parameter/error behavior are tested separately. Tensor
 coverage before the flash adapter was 75 executable IDs plus NONE. The adapter
-raises this to 76 executable IDs plus NONE, with 25 operation IDs still pending. Across the tensor corpus there are 3,240 distinct graph inputs and
+checkpoint raised this to 76 executable IDs plus NONE, with 25 then pending.
+The later recurrent extension reaches 81 executable IDs plus NONE, with 20 pending.
+The earlier tensor corpus retains 3,240 distinct graph inputs and
 6,118 native captures; repeated platform executions are not counted as new
 graph cases. Shared scalar/SSE2 row math now serves model-runtime and tensor;
 1,007 additional original graphs require exact matching-profile bytes. The
@@ -124,7 +147,7 @@ Automatic shard loading now uses a single validated file-set owner through the C
 
 Dense causal Qwen3 now executes through the Rust inference facade and strict Context, with separate or fused Q/K/V, the source bias precedence, independent attention width, learned Q/K RMS vectors and full-head NeoX RoPE. The pinned official Qwen3-0.6B Q8_0 model contributes 5,469,696 exact logits and 24 greedy IDs per native profile. Ordinary dense/split/vector cases compare another 294,912 logits and 400 IDs. Active non-F32 norms/biases rejected by the original CPU graph return checked errors; ignored partial fused-bias groups remain admissible. Qwen3 participates in the strict state/cancellation/allocation regressions. Its 2,384,199,680 decoded-weight bytes require an explicit 3 GiB budget. [QWEN3_IMPLEMENTATION.md](QWEN3_IMPLEMENTATION.md) records model identity, numerical evidence and the remaining graph variants.
 
-The separate Llama NativeContext now owns F32 or raw-u16 F16 K/V independently. Explicit nonflash execution with one generation and one batch worker is admitted. Copies, deferred rotation, transposition and native state/session I/O preserve all 65,536 half bit patterns. Ordinary C regressions cover 258,048 exact logits, 1,048 buffers and all four K/V type pairs per profile. Evaluation retains checked nonfinite-result rejection; raw NaN state preservation does not imply original NaN-logit parity. The original C defaults remain F16/F16, AUTO and four/four workers, and are rejected until the separate flash/worker implementation is complete. The previous manual F32/single-worker AUTO-to-nonflash fallback is also rejected explicitly.
+The separate Llama NativeContext now owns F32 or raw-u16 F16 K/V independently. Explicit nonflash execution with one generation and one batch worker is admitted. Copies, deferred rotation, transposition and native state/session I/O preserve all 65,536 half bit patterns. Ordinary C regressions cover 258,048 exact logits, 1,048 buffers and all four K/V type pairs per profile. Evaluation retains checked nonfinite-result rejection; raw NaN state preservation does not imply original NaN-logit parity. The later flash/worker implementation admits the original F16/F16, AUTO and four/four defaults for supported dense-Llama configurations, as described below. The previous manual AUTO-to-nonflash substitution has been replaced by source capability resolution.
 
 ## GGUF streaming tool checkpoint
 
@@ -158,9 +181,11 @@ reader/getter cases, 269,184 exact native serialization bytes, 1,073 public-writ
 inputs and 3,218 byte-string/NUL tool cases. The published 103-case streaming
 corpus and its output/deletion/undefined-behavior qualifications remain intact.
 
-Gguf, GgufSet and the current high-level model/vocabulary loaders retain checked
-UTF-8 metadata and reject NUL keys/names. Extending those consumers to the entire
-raw byte domain, checkpoint conversion and the rest of T04 remain open. All
+The strict Gguf entry point retains its text contract. GgufSet now retains raw
+primary metadata and a first-C-prefix model projection, including ByteString
+values for non-UTF-8 payloads. Consumed settings and tensor names retain checked
+boundaries. Dense Llama checkpoint conversion is now implemented; other
+converters, remaining raw-byte semantics and the rest of T04 stay open. All
 twenty mandatory release gates remain open.
 
 ## Native CPU flash and checkpoint foundation
@@ -231,7 +256,7 @@ Generation currently supports greedy or temperature/distribution sampling with a
 
 ## Validation and honest failure reporting
 
-Current validation logs are under `evidence/2026-11-09/`; historical archive logs remain under `docs/imports/`. Test outputs are associated with their command, platform and inputs. A test marked ignored requires an explicit external model, native reference library, installed compiler or vendor service. Ordinary workspace tests do not substitute for those explicit runs.
+Current continuation logs are under `evidence/2026-11-10/` and `evidence/hf-converter-20261110/`. The preceding checkpoint logs remain under `evidence/2026-11-09/`, with earlier imported archive logs under `docs/imports/`. Test outputs are associated with their command, platform and inputs. A test marked ignored requires an explicit external model, native reference library, installed compiler or vendor service. Ordinary workspace tests do not substitute for those explicit runs.
 
 The earlier expanded checkpoint passed 384 ordinary tests on Windows and 385 on Linux in both debug and release, with 17 explicitly gated tests left out of ordinary execution. Seven pretrained tests run separately and pass on both platforms. The 195 fixture declarations, source tree, strict Clippy, offline release builds, 37 generation HTTP checks, embedding CLI lifecycle and SmolLM2/Mamba generation CLI checks also pass. The same 396 execution inputs have SHA-256 050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9. The preserved audit/driver failures and same-fingerprint continuation are explained in evidence/2026-11-09/expanded-runtime/README.md.
 
@@ -336,7 +361,7 @@ are retained with their original checkpoint counts.
 
 ## Static C enum names and load-mode parsing
 
-The public C surface contains 191 of 255 frozen functions and four diagnostic
+At the static-enum checkpoint, the public C surface contained 191 of 255 frozen functions and four diagnostic
 extensions; 64 functions remain unavailable. This checkpoint adds
 `llama_ftype_name`, `llama_flash_attn_type_name`, `llama_load_mode_name` and
 `llama_load_mode_from_str` as native Rust static helpers. Returning a mode name
@@ -355,3 +380,44 @@ scope. `fixtures/ffi/enums` contains independently captured expected values;
 `evidence/2026-11-09/c-enum-api` records the validation provenance. Earlier
 checkpoint counts and evidence remain historical. All twenty complete-port
 release gates remain open.
+
+## 10 November continuation
+
+The recovered dense Llama HF converter is integrated as `llama-convert` and
+`convert-hf-to-gguf`. Its ordinary suite retains all 64 original pipeline cases
+per native profile: 57 complete files totaling 8,091,032 bytes and seven original
+rejections. The independent schema and Transformers class corpora include
+1,080 and 76 admission cases respectively. Fresh isolated Windows/GNU pretrained
+checks reproduce three complete SmolLM2 outputs totaling 686,581,536 bytes per
+host. This is the documented dense Llama conversion path; remaining architecture
+converters and runtime scaled RoPE stay open. The five reviewed Rust YAML
+packages require an initial locked fetch, followed by offline builds and an
+exact archive/source/feature/license audit.
+
+The C surface adds five model metadata functions and two chat functions, reaching
+198/255 frozen exports plus four diagnostic extensions, with 57 still absent.
+Raw primary GGUF metadata, the first-prefix model projection and the first-scalar
+C map remain separate. Native map order and decimal strings follow the measured
+MSVC/GNU policies. Their corpus retains 171 model requests, more than 334,000
+buffer calls, 12,507 scalar entries, 3,020 tokenizations and 144,384 exact
+continuation logit words per profile. Policy tests cover 282 maps through one
+million entries and 222,262 raw float patterns per profile. See
+[the metadata contract](../crates/ffi/METADATA.md) and
+[component evidence](../evidence/2026-11-10/c-model-metadata/summary.json).
+
+The C chat corpus compares 35,946 cases and complete output buffers against both
+original hosts. The original frozen-header client also executes both debug and
+release Rust libraries. See [the chat contract](../crates/ffi/CHAT.md) and
+[component evidence](../evidence/2026-11-10/c-chat-api).
+
+Review of the metadata integration caught a tokenizer behavior regression:
+non-UTF-8 `general.name` bytes had silently lost Phi/ModernBERT name markers.
+Byte-oriented ASCII matching now preserves the source first-NUL view. Separate
+original controls retain 19,456 token attributes and 6,384 tokenizations per
+host, including defined 0xff, marker precedence and whitespace effects.
+
+These component results establish their stated scopes. The integrated workspace
+verification is recorded separately; all twenty full-port release gates remain
+open until their complete requirements are met.
+
+The recurrent tensor extension adds SSM_CONV, SSM_SCAN, RWKV_WKV6, GATED_LINEAR_ATTN and RWKV_WKV7, reaching 81 executable IDs plus NONE, with 20 pending. Of 1,394 independently successful original graphs per host, Rust executes 1,389 with 1,278,140 exact output/state bytes and explicitly rejects five graphs whose competing NaN payloads depend on compiler optimization. All original outputs remain retained. This boundary is documented in crates/tensor/RECURRENT.md; it does not establish additional complete model architectures.

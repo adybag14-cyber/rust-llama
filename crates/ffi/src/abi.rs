@@ -357,3 +357,11 @@ pub fn sampler_layout(index: usize) -> usize {
     ];
     values.get(index).copied().unwrap_or(usize::MAX)
 }
+
+/// Borrowed NUL-terminated native chat strings. The caller owns both strings.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaChatMessage {
+    pub role: *const std::ffi::c_char,
+    pub content: *const std::ffi::c_char,
+}

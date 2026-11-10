@@ -136,7 +136,7 @@ pub struct Model {
     pub(crate) runtime: Executor,
     pub(crate) tokenizer: Tokenizer,
     pub(crate) id: String,
-    pub(crate) template: Option<String>,
+    pub(crate) template: Option<Vec<u8>>,
     pub(crate) decoded_weight_bytes: usize,
     pub(crate) context_limit: usize,
     pub(crate) embedding_pooling: Option<Pooling>,
@@ -260,9 +260,17 @@ impl Model {
             )
         })
     }
+    /// Original model C-string bytes; non-UTF-8 templates are retained even
+    /// when a caller only wants logits or embeddings.
+    pub fn chat_template_bytes(&self) -> Option<&[u8]> {
+        self.template.as_deref()
+    }
     pub fn render_chat(&self, messages: &[(&str, &str)], add_assistant: bool) -> Result<String> {
-        let template = self.template.as_deref().ok_or_else(|| {
+        let bytes = self.chat_template_bytes().ok_or_else(|| {
             Error::Unsupported("model has no chat template; use a text completion prompt".into())
+        })?;
+        let template = std::str::from_utf8(bytes).map_err(|_| {
+            Error::Unsupported("model chat template is not UTF-8; raw bytes are available through chat_template_bytes".into())
         })?;
         if chat::detect_template(template).is_none() {
             return Err(Error::Unsupported("model requires a chat template not implemented by the native formatter; full Jinja is pending".into()));

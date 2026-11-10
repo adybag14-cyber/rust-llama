@@ -1,6 +1,6 @@
 # Rust tensor layouts and scalar CPU graphs
 
-This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **76 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
+This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **81 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
 
 ## Flash attention through the CPU DAG
 
@@ -250,8 +250,25 @@ The old model-runtime native-row tests still run through its unchanged public
 module path, now a re-export of the quant implementation. The 96,910
 mathematical ERF checks remain independent of the new platform boundary.
 
+## Recurrent state-space and RWKV execution
+
+Five additional IDs now execute through `SsmConv`, `SsmScan { snapshots }`,
+`RwkvWkv6`, `GatedLinearAttn { scale }` and `RwkvWkv7`. They preserve source
+input order, physical scalar addressing, grouped/remapped SSM state, Mamba1 and
+Mamba2 decay, reverse-ordered snapshots, equal recurrent sequence runs and
+concatenated final state. Every output owns independent storage.
+
+The initial independent corpus contains **944 original graphs per host** and
+**1,147,172 captured output/state bytes**. The five graphs containing competing
+NaN payloads remain unchanged and exercise an explicit checked unsupported
+boundary; the other **939 graphs** require exact equality for **1,145,804 bytes**.
+No original expected value is regenerated from Rust, no tolerance is added, and
+the complete source outputs for rejected graphs remain in the frozen fixtures.
+See [RECURRENT.md](RECURRENT.md) for the precise source fields, shape/stride
+contracts, additional IEEE controls and tested arithmetic/worker scope.
+
 ## Open T02 gates
 
-The remaining 25 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+The remaining 20 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
 
 Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.

@@ -68,9 +68,28 @@ impl Checkpoint {
         options: CheckpointOptions,
         limits: Limits,
     ) -> Result<Self> {
+        let root = platform::Root::open(path.as_ref())?;
+        Self::from_root(&root, options, limits)
+    }
+
+    /// Read tensor shards through the same retained root used for configuration
+    /// and vocabulary sidecars. Checkpoint/index limits remain cumulative within
+    /// this checkpoint and separate from SourceDirectory sidecar limits.
+    pub fn open_source(
+        source: &crate::SourceDirectory,
+        options: CheckpointOptions,
+        limits: Limits,
+    ) -> Result<Self> {
+        Self::from_root(source.root(), options, limits)
+    }
+
+    fn from_root(
+        root: &platform::Root,
+        options: CheckpointOptions,
+        limits: Limits,
+    ) -> Result<Self> {
         let mut budget = Budget::new(limits)?;
         validate_prefix(&options.prefix, &budget)?;
-        let root = platform::Root::open(path.as_ref())?;
         let entries = root.entries(&mut budget)?;
         let has_pickle = entries.iter().any(|name| {
             name.as_wtf8().starts_with(b"pytorch_model") && name.as_wtf8().ends_with(b".bin")

@@ -1,0 +1,144 @@
+{
+  "assembled_utc": "2026-11-10T20:19:29.700975+00:00",
+  "base_commit": "b658976bd6200b8aa4b29f29f6a896b126dd756b",
+  "builtin_templates": 54,
+  "execution_input_count": 272,
+  "external_validation_tools": {
+    "CMakeLists.txt": {
+      "bytes": 505,
+      "sha256": "fea3d3e820d38f9a8e56bcd14cdb0c38cf48e03df7409d51730349eb9e7d15ef"
+    },
+    "chat-oracle.cpp": {
+      "bytes": 6654,
+      "sha256": "6819b61fcea40f0381cdef34a9c140476ae76d895c23b537349f5d0f6a76ae8b"
+    },
+    "generate-inputs.py": {
+      "bytes": 5637,
+      "sha256": "1924cfd12a3c2744525dbf557dac86d4343f5f790a9cdaa0378a27a0fe27a339"
+    },
+    "validate-chat.py": {
+      "bytes": 5811,
+      "sha256": "6a7f71e6b963d6e1cfc6a2496b082b3940d88454aaa2a197e745342e64a06af8"
+    }
+  },
+  "fixture_cases_per_run": 35946,
+  "hosts": {
+    "linux": {
+      "c_library_profiles": [
+        {
+          "cases": 35946,
+          "complete_buffer_bytes": 3361503,
+          "exact_original_bytes": true,
+          "library": {
+            "bytes": 34658496,
+            "sha256": "705d010f599c55f1a9806be38b47fafd47426f23d1c5c544d9f28f449ebdc761"
+          },
+          "profile": "debug",
+          "result": {
+            "bytes": 3937927,
+            "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+          }
+        },
+        {
+          "cases": 35946,
+          "complete_buffer_bytes": 3361503,
+          "exact_original_bytes": true,
+          "library": {
+            "bytes": 2421776,
+            "sha256": "c009ba1b712a046fa646729afd072bcc84895c5aa447e70bbfb00ef255d0b4a3"
+          },
+          "profile": "release",
+          "result": {
+            "bytes": 3937927,
+            "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+          }
+        }
+      ],
+      "finished_utc": "2026-11-10T20:16:00.748908+00:00",
+      "started_utc": "2026-11-10T20:10:40.828108+00:00",
+      "status": "succeeded",
+      "test_profiles": {
+        "debug": 93,
+        "release": 93
+      },
+      "tests_failed": 0,
+      "tests_ignored": 0
+    },
+    "windows": {
+      "c_library_profiles": [
+        {
+          "cases": 35946,
+          "complete_buffer_bytes": 3361503,
+          "exact_original_bytes": true,
+          "library": {
+            "bytes": 4748288,
+            "sha256": "9d368090d972e7a69252c04c544704f072c0f356b3b02fa50a8da4753b935c57"
+          },
+          "profile": "debug",
+          "result": {
+            "bytes": 3937927,
+            "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+          }
+        },
+        {
+          "cases": 35946,
+          "complete_buffer_bytes": 3361503,
+          "exact_original_bytes": true,
+          "library": {
+            "bytes": 2081280,
+            "sha256": "cbed05c79816df745d37b3864944de59cfb7c6c0162e9d478bab0042b083fa59"
+          },
+          "profile": "release",
+          "result": {
+            "bytes": 3937927,
+            "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+          }
+        }
+      ],
+      "finished_utc": "2026-11-10T20:13:59.662387+00:00",
+      "started_utc": "2026-11-10T20:10:33.072597+00:00",
+      "status": "succeeded",
+      "test_profiles": {
+        "debug": 95,
+        "release": 95
+      },
+      "tests_failed": 0,
+      "tests_ignored": 0
+    }
+  },
+  "locale": "C",
+  "normalized_execution_input_encoding": "UTF-8 JSON sorted keys, compact separators comma/colon, no trailing newline",
+  "normalized_execution_input_sha256": "80df6d051f7b3092dd943ac1bf536ee047a5ff6ce8b1f8f7b56b16e7e0b21cf7",
+  "original_capture": {
+    "bytes": 3937927,
+    "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+  },
+  "original_seal": {
+    "bytes": 2336,
+    "sha256": "f98154ddae1fe2f3a26891f77db339372eccdc58de2a65e5fcbcbb18e84d913d"
+  },
+  "prevalidation_corrections": [
+    "The initial Windows-only C++ caller build failed due to windows.h min/max macros. Added NOMINMAX in external CMake configuration before any original captures; frozen header and original source unchanged.",
+    "The first strict Clippy run rejected a test-only c_char::MIN >= 0 comparison. Changed it to c_char::MIN == 0; the final strict Clippy run passed."
+  ],
+  "same_input_map_on_both_hosts": true,
+  "schema": 1,
+  "scope": [
+    "llama_chat_apply_template",
+    "llama_chat_builtin_templates",
+    "llama_chat_message layout",
+    "shared byte-preserving Rust formatter"
+  ],
+  "scope_limits": [
+    "Independent observations cover the C locale and the frozen native formatter interface; other locales remain unverified.",
+    "Checked C boundaries reject source-undefined signed-negative toupper inputs other than EOF, malformed foreign inputs, and inputs exceeding documented logical-byte/message limits.",
+    "Full Jinja, chat parsing, tool/reasoning extraction and broad T10/T01 release gates remain open.",
+    "This is component validation based on the recorded uncommitted source inputs, not a claim that all full-port release gates passed."
+  ],
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_detection_marker_pairs": 2775,
+  "source_detection_markers": 75,
+  "successful_cases": 34349,
+  "unknown_template_cases": 1597,
+  "worktree": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat"
+}

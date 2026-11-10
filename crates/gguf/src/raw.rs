@@ -388,6 +388,64 @@ impl<R: Read + Seek> RawGguf<R> {
         )
     }
 
+    /// Internal model loader storage accounting; the public raw parser retains
+    /// its existing independent wire/header limits.
+    pub(crate) fn model_metadata_storage(&self) -> Result<usize> {
+        crate::model_metadata::raw_storage(
+            &self.metadata,
+            &self.metadata_order,
+            self.metadata_order.capacity(),
+        )
+    }
+
+    pub(crate) fn discard_model_metadata(&mut self) {
+        self.metadata.clear();
+        self.metadata_order = Vec::new();
+    }
+
+    /// Model tensor names retain the checked text facade's admission domain.
+    /// This intentionally does not apply C-prefix lookup to tensor names.
+    pub(crate) fn take_model_tensors(&mut self) -> Result<Vec<TensorInfo>> {
+        let mut result = Vec::new();
+        result
+            .try_reserve_exact(self.tensors.len())
+            .map_err(|_| Error::Limit("model tensor descriptors allocation".into()))?;
+        for tensor in std::mem::take(&mut self.tensors) {
+            if tensor.name.contains(&0) {
+                return Err(invalid("tensor name contains NUL"));
+            }
+            result.push(TensorInfo {
+                name: text(tensor.name)?,
+                dimensions: tensor.dimensions,
+                dtype: tensor.dtype,
+                offset: tensor.offset,
+                byte_len: tensor.byte_len,
+            });
+        }
+        Ok(result)
+    }
+
+    pub(crate) fn read_model_tensor(&mut self, info: &TensorInfo) -> Result<Vec<u8>> {
+        read_tensor_payload_info(
+            &mut self.reader,
+            self.data_offset,
+            self.file_len,
+            &self.limits,
+            &TensorReadInfo::from(info),
+        )
+    }
+
+    pub(crate) fn read_model_f32(&mut self, info: &TensorInfo) -> Result<Vec<f32>> {
+        read_tensor_f32_info(
+            &mut self.reader,
+            self.data_offset,
+            self.file_len,
+            self.endian,
+            &self.limits,
+            &TensorReadInfo::from(info),
+        )
+    }
+
     /// Consume the same owner into the existing UTF-8/non-NUL text facade.
     /// Failure releases the staged owner; no partially converted file escapes.
     pub fn into_text(self) -> Result<Gguf<R>> {
@@ -450,7 +508,7 @@ fn text_value(value: Value) -> Result<TextValue> {
         Value::I32(v) => TextValue::I32(v),
         Value::F32(v) => TextValue::F32(v),
         Value::Bool(v) => TextValue::Bool(v),
-        Value::String(v) => TextValue::String(text(v)?),
+        Value::String(v) | Value::ByteString(v) => TextValue::String(text(v)?),
         Value::Array {
             element_type,
             values,

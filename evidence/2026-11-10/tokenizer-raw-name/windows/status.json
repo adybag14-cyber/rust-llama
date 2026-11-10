@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "host": "windows",
+  "status": "succeeded",
+  "started_utc": "2026-11-10T20:29:13.921166+00:00",
+  "inputs": {
+    "bytes": 20871,
+    "sha256": "c13fd1ba88ea29ce915faab0fdafc1a1cc50e744bccf13f2fc08ad021793857b"
+  },
+  "input_count": 136,
+  "validator": {
+    "bytes": 3364,
+    "sha256": "9b76de81a0a0021073df55d6a61dc8fb22278563a51d080ee3ffed1bdc6e200d"
+  },
+  "original_seal": {
+    "bytes": 1583,
+    "sha256": "e43392cec3e9f12f8730edc16ac0a6c1a9d747df2dfa3d66f3f2cf415b90246e"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-tokenizer",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2316370000007737,
+      "log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 2.185017400000106,
+      "log": {
+        "bytes": 521,
+        "sha256": "7db3c5a6d52f5c8650e9099465634071cffead4dc7adde54fa9abe306217080d"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-tokenizer",
+        "--lib",
+        "raw_name_c_prefix_attributes_and_tokenization_match_original"
+      ],
+      "exit_code": 0,
+      "seconds": 10.930273300000408,
+      "log": {
+        "bytes": 513,
+        "sha256": "de89eae1f4d908fccb48536991c5ef05b610613d4989f27ad4d53c9275b49fb1"
+      },
+      "test_summaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-tokenizer",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7303002000007837,
+      "log": {
+        "bytes": 153,
+        "sha256": "3a2fc1b6353454e144d9ffc260756cd758cdf4002499a393d9b375c8e35a541e"
+      }
+    }
+  ],
+  "inputs_unchanged": true,
+  "original_seal_unchanged": true,
+  "finished_utc": "2026-11-10T20:29:28.071336+00:00"
+}

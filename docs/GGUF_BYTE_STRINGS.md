@@ -34,9 +34,12 @@ in the raw representation; original native lookup returns the first `x`.
 
 Both raw and text APIs use one wire parser, shared layout validation and shared
 payload readers. This does not create a second parser whose rules can diverge.
-`Gguf`, `GgufSet` and the current high-level model loaders keep checked text
-metadata. Extending every model/vocabulary consumer to arbitrary byte strings
-remains separate work.
+`Gguf` keeps its strict text contract. `GgufSet` now retains the primary raw
+metadata and creates a native-prefix model projection with `Value::ByteString`
+for non-UTF-8 values. Unused raw metadata no longer rejects an otherwise valid
+model. Consumed settings and tensor names retain explicit checked boundaries.
+The separate scalar C cache preserves native ordering and formatting as described
+in [the model metadata contract](../crates/ffi/METADATA.md).
 
 ## Boolean bytes and serialization
 
@@ -127,8 +130,8 @@ checked arithmetic. Raw name indexing and ordered writer descriptor lists use
 fallible reservations. Limits bound declared work and payload reads; they are
 not a total-process memory budget.
 
-The format slice does not claim full checkpoint conversion, arbitrary-byte
-high-level model/vocabulary loading, remote loading, every file utility, all
-architectures or every backend. Source undefined behavior and assertions remain
+The format slice does not claim every arbitrary-byte model feature, remote
+loading, every checkpoint conversion or file utility, all architectures or
+every backend. Source undefined behavior and assertions remain
 checked errors rather than portable success requirements. All twenty release
 gates stay open.

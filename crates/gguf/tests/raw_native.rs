@@ -35,7 +35,7 @@ fn numeric(value: &RawValue) -> Vec<u8> {
         RawValue::I64(v) => v.to_le_bytes().to_vec(),
         RawValue::F64(v) => v.to_bits().to_le_bytes().to_vec(),
         RawValue::Array { values, .. } => values.iter().flat_map(numeric).collect(),
-        RawValue::String(_) => panic!("numeric getter used on string"),
+        RawValue::String(_) | RawValue::ByteString(_) => panic!("numeric getter used on string"),
     }
 }
 fn has_bool(value: &RawValue) -> bool {

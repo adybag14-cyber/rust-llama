@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "tag": "v3",
+  "started_utc": "2026-11-10T20:33:41.389273+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.507,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 295.571,
+      "stdout": {
+        "bytes": 58850,
+        "sha256": "745b4aaffa0976f5fa43292323a21b8757d8c10ee1cf41df428f335fc04e46c1"
+      },
+      "stderr": {
+        "bytes": 10205,
+        "sha256": "c3bb642ae9522c4950afba24c87ed737fee9a5e7163785275991c1d73182e6ab"
+      },
+      "tests": {
+        "passed": 592,
+        "failed": 0,
+        "ignored": 22,
+        "suites": 103
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 310.276,
+      "stdout": {
+        "bytes": 58734,
+        "sha256": "964297239837e910f3567e597cf03c5117ef69d5b7c52f1e837aedb6c5fcd294"
+      },
+      "stderr": {
+        "bytes": 11547,
+        "sha256": "45969a57d57a6c5270b650bf3a36ee745289bef7682857d389a4ddc6aace9bd7"
+      },
+      "tests": {
+        "passed": 592,
+        "failed": 0,
+        "ignored": 22,
+        "suites": 103
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 4.531,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1153,
+        "sha256": "474dd78092100126a2e3bad6ae4bd3ac6a6fac49267ea415f1fff18d4f57f0bb"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.982,
+      "stdout": {
+        "bytes": 46754,
+        "sha256": "8399c54b54a48bde21c45e8f11972f1352b8c752e17e06babbb10e90e6bfafc2"
+      },
+      "stderr": {
+        "bytes": 1909,
+        "sha256": "9d376614e89e2f4d8cdb64489ce7bb9e74955581b809d0696365d64b6dca117b"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1047,
+    "bytes": 156764,
+    "sha256": "1dfe31c3c3bd33924206b69111bfc60c7460f3f4a84f7c7540525ec0cf2ce1a6"
+  },
+  "git_head": "b658976bd6200b8aa4b29f29f6a896b126dd756b",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "error": "RuntimeError('audit failed 1')",
+  "finished_utc": "2026-11-10T20:44:01.342999+00:00"
+}
