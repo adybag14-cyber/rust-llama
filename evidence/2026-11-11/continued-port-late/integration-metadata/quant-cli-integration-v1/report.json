@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "source_commit": "5f741cce80663045239282ef9555d1ef4c86953d",
+  "started_utc": "2026-11-11T20:20:50.538280+00:00",
+  "steps": [
+    {
+      "name": "cherry-pick",
+      "argv": [
+        "git",
+        "cherry-pick",
+        "5f741cce80663045239282ef9555d1ef4c86953d"
+      ],
+      "exit_code": 0,
+      "seconds": 0.340057373046875,
+      "stdout": {
+        "bytes": 23323,
+        "sha256": "b7ebd6d3343d76621853dc037bfa60aad280c221712da8eb0358ae33253a688e"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "maintained-whitespace",
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--check",
+        "HEAD^",
+        "HEAD",
+        "--",
+        "*.rs",
+        "*.toml",
+        "*.md",
+        "Cargo.lock"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04049849510192871,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "parent": "60eac14ae51f410917acc0764bfb19b92667cd62",
+  "worker_files_manifest": {
+    "bytes": 45341,
+    "sha256": "36a0bc65455abbcaf9c27d92e92a03764fd680fb79386a21c7d1873419ebe1a6"
+  },
+  "worker_files": 212,
+  "driver": {
+    "bytes": 2980,
+    "sha256": "96a77a1fa69c47613c253f52199c904c2e179e68cc9141767844cdc8ecba26da"
+  },
+  "result_commit": "b28541f931e00be231211c491efcf2ad889f9f62",
+  "all_worker_blobs_preserved_exactly": true,
+  "combined_runtime_validation": "pending final integrated gate",
+  "finished_utc": "2026-11-11T20:21:03.174606+00:00"
+}

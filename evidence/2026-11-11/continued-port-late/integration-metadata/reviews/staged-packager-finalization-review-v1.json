@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "status": "reviewed-no-blocking-findings",
+  "reviewer": "port_gap_audit",
+  "scope": "Static read-only review of the external finalization driver after fixes. No verify, commit, publish, packager, build, or native-client execution was performed by this reviewer.",
+  "reviewed_inputs": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\finalize-integration.py",
+      "bytes": 11814,
+      "sha256": "6067d2c150851e0c4e04914de67abd4bedd043fba159ad0cacc20fab897be796"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\run-staged-integrated-packager.py",
+      "bytes": 2072,
+      "sha256": "efc6d80b4bdcdac26653aeeb10aab24f7d1b40cf9270f6a37d4b13370f753999"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\.cargo\\config.toml",
+      "bytes": 82,
+      "sha256": "a6423c59897b2381acd65a330a4b6a49df98d05b0065da49192d6eb4818ae4e7"
+    }
+  ],
+  "linked_previously_reviewed_packager": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\package-staged-integrated-evidence.py",
+    "bytes": 49157,
+    "sha256": "7701812481c8d34b2f6e708e42f7ef06f85568ff9641ba800b923ca4fcad1934"
+  },
+  "findings": [],
+  "resolved_review_findings": [
+    {
+      "id": "finalization-evidence-parent-link",
+      "origin": "Root identified; independently reviewed after correction",
+      "problem": "The initial version checked the evidence inventory against itself without linking its identities to the successful staged packager outcome.",
+      "resolution": "evidence() requires the successful packaging wrapper, reviewed driver and runner identities, both raw log identities, parsed stdout equal to the recorded result, the intended destination, and current summary/inventory identities equal to the successful result."
+    },
+    {
+      "id": "finalization-push-destination",
+      "origin": "Independent review",
+      "problem": "The initial publication phase checked origin's fetch URL but git push can use separate or multiple configured push URLs.",
+      "resolution": "The final version checks git remote get-url --push --all origin and requires exactly one URL for the authorized repository, in addition to checking the fetch URL."
+    },
+    {
+      "id": "finalization-committed-byte-proof",
+      "origin": "Independent review",
+      "problem": "The original post-commit helper compared committed blobs to current worktree bytes, allowing both to diverge from frozen verified rows.",
+      "resolution": "verify_blobs compares both worktree and committed bytes directly with the frozen verification rows. The actual commit path delta must equal the approved path list."
+    },
+    {
+      "id": "finalization-verification-window",
+      "origin": "Independent review",
+      "problem": "The initial verify phase recorded approved file bytes only after audit and whitespace checks.",
+      "resolution": "The final version snapshots approved paths and bytes before gates and requires the exact path and byte set to remain unchanged afterwards."
+    },
+    {
+      "id": "finalization-timeout-receipt",
+      "origin": "Independent review",
+      "problem": "A subprocess timeout could omit captured partial output and the attempted command from its receipt, especially during publication.",
+      "resolution": "The final version retains partial stdout/stderr with identities, argv, elapsed time, timed_out=true and exit_code=null, then rethrows TimeoutExpired. A push timeout marks remote_outcome_uncertain=true and does not retry or fabricate success."
+    }
+  ],
+  "checked_contracts": {
+    "separate_phases": [
+      "verify",
+      "commit",
+      "publish"
+    ],
+    "allowed_final_commit_paths": [
+      "README.md",
+      "docs/PORT_STATUS.md",
+      "evidence/2026-11-11/continued-port-late/**"
+    ],
+    "integration_parent": "dfdac838365426d843094a9e4c9c3d03611f56aa",
+    "expected_remote_main_before_publication": "37ba10da13aff8bc10bfe1ecb7b650b1c68029a7",
+    "selected_inputs": {
+      "files": 1677,
+      "bytes": 250998,
+      "sha256": "1ab73dd93269bcfc9b25f647ea06474568aaffc9e73c145b54d93a392c56acf0"
+    },
+    "evidence_schema": 3,
+    "original_attempt_statuses_required": {
+      "windows-msvc": "failed",
+      "linux-gnu": "failed"
+    },
+    "continuation_statuses_required": {
+      "windows-msvc": "succeeded",
+      "linux-gnu": "succeeded"
+    },
+    "full_port_complete": false,
+    "open_mandatory_gates": 20,
+    "inventory_membership_and_every_file_identity_checked": true,
+    "successful_packaging_receipt_recorded": true,
+    "formatting_audit_alias": "cargo xtask resolves to cargo run --offline --locked -p xtask --",
+    "verification_inventory_checked_before_staging": true,
+    "exact_staged_paths_and_blob_bytes_checked": true,
+    "exact_commit_parent_path_delta_and_blob_bytes_checked": true,
+    "publication_requires_successful_same_driver_commit_receipt_and_exact_current_head": true,
+    "publication_requires_clean_worktree": true,
+    "fetch_and_effective_push_destinations_checked": true,
+    "remote_baseline_and_ancestor_relationship_checked": true,
+    "push_uses_explicit_commit_to_main_refspec": true,
+    "force_push_requested": false,
+    "published_remote_main_must_equal_verified_commit": true,
+    "selected_inputs_and_packaged_evidence_checked_again_after_phase": true,
+    "failed_or_uncertain_outcomes_remain_failed": true
+  },
+  "runner_schema_review": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\run-staged-integrated-packager.py",
+    "bytes": 2072,
+    "sha256": "efc6d80b4bdcdac26653aeeb10aab24f7d1b40cf9270f6a37d4b13370f753999",
+    "successful_result_schema_matches_finalizer": true,
+    "reviewed_packager_identity_enforced": true,
+    "both_continuation_success_guards_required_before_packaging": true,
+    "complete_packager_stdout_json_linked_to_result": true
+  },
+  "limitations": [
+    "This is a static source and schema review, not an execution receipt.",
+    "The finalization driver was neither imported nor run by this reviewer.",
+    "Final staged evidence, verification, commit and publication must produce their own successful receipts; this review does not claim those outcomes.",
+    "Publication remains root-owned and user-authorized.",
+    "The review applies only to the exact identities recorded above. Later edits require a delta review."
+  ]
+}

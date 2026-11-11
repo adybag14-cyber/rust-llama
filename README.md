@@ -166,7 +166,7 @@ Detailed support boundaries are in the crate READMEs and [PORT_STATUS.md](docs/P
 
 ## Independent comparisons
 
-The new component continuation adds BLOOM inference and checkpoint conversion,
+This continuation adds BLOOM inference and checkpoint conversion,
 native BERT encoder/classifier C execution, and bounded model-file quantization.
 The frozen MSVC/GNU BLOOM captures compare 13,074,432 pretrained F32 words and
 24 greedy IDs per host. Its unchanged official checkpoint also produces three
@@ -178,6 +178,32 @@ corpus. The quantizer covers all 35 source file modes, 463 type/default cases,
 76 primary complete outputs and 150 metadata/NextN complete outputs per
 profile. Both additions have original-header debug/release C checks on Windows
 and Linux. See the [current scope and qualifications](docs/PORT_STATUS.md).
+
+The latest integrated checkpoint passed **728 Windows MSVC / 732 Linux GNU
+ordinary tests in each of debug and release**, with zero failures. Each
+ordinary run recorded 33 ignored prerequisites and 133 test-result suites.
+Separate continuation checks passed thirteen pretrained inference/server tests,
+six converter tests, one native BGE encoder test and one official Qwen tokenizer
+test per host. Both hosts verified **1,062 fixture files and declarations across
+nineteen manifests**, both 4,082-file frozen source trees, and the debug/release
+C libraries' exact 232 frozen exports plus four extensions. Twenty-three frozen
+exports remain absent.
+
+Verification was staged. Both original full attempts passed formatting,
+the ordinary suites and strict Clippy, then failed the packaging audit because
+the CLI fixture's `LICENSE` filename was unclassified. The correction preserved
+all 1,078 license bytes while renaming it to `LICENSE.md`, updated its one
+fixture-manifest path, and raised the CPU CI timeout from 45 to 60 minutes.
+Rust implementation and numerical fixture content did not change.
+
+The schema-3 receipt preserves both failed attempts, the separate post-attempt
+input check, the exact correction and the successful continuation checks.
+Each host has 33 required successful stages with explicit provenance.
+The ordinary suites were not repeated after this packaging and CI configuration
+correction. All twenty mandatory full-port gates remain open. See
+[the latest staged integrated evidence](evidence/2026-11-11/continued-port-late/README.md)
+for stage provenance, input hashes and qualifications. Published-commit CI is
+reported separately by GitHub Actions.
 
 The preceding integrated continuation passed **691 Windows / 696 GNU ordinary
 tests in each of debug and release**, with zero failures and 29 explicit

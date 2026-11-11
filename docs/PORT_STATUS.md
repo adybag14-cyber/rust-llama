@@ -10,6 +10,69 @@ The product's maintained implementation is Rust. Frozen C/C++ reference builds, 
 
 The merged workspace has local path dependencies plus five exactly reviewed Rust registry packages for converter YAML parsing. Locked dependency acquisition precedes offline gates; the audit verifies the actual archives, extracted source, versions, features and licenses. Optional OS/driver/vendor interfaces remain named external boundaries. They do not import the original llama.cpp implementation. See `release/dependency-inventory.tsv`.
 
+## Latest integrated verification — 11 November
+
+The original full attempts passed **728 Windows MSVC / 732 Linux GNU ordinary
+tests in each of debug and release**, with zero failures, 33 ignored
+prerequisites and 133 test-result suites per run, plus formatting and strict
+Clippy. Both attempts then failed the packaging audit because
+`crates/model-quant/tests/fixtures/cli/LICENSE` was not classified as an
+admitted non-Rust item. Their original reports remain failed, and neither
+report records a completed final input guard.
+
+After both attempts stopped, a separate boundary check verified the original
+selected inputs before the correction. The correction renamed the license to
+`LICENSE.md` without changing its 1,078 bytes, changed only that path in
+`docs/model-quant-cli-fixture-manifest.tsv`, and increased the CPU GitHub Actions
+timeout from 45 to 60 minutes. All 1,674 other selected files remained
+byte-identical. The selected set retained 1,677 files. No Rust implementation
+or numerical fixture content changed, and the sealed component evidence was
+not replaced.
+
+The Windows and GNU continuations then passed all 29 remaining required
+stages with their corrected selected inputs unchanged. Each host separately
+passed thirteen pretrained inference/server tests, six converter tests, one
+native BGE encoder test and one official Qwen tokenizer replay. These explicit
+runs do not imply that every ignored device or external-data test ran.
+Formatting, strict Clippy, the actual-cache dependency/source audit, release
+builds, and both 4,082-file frozen-tree verifications have successful receipts.
+Both hosts verified **1,062 fixture files and declarations across nineteen
+manifests**.
+
+All four final debug/release C libraries passed the retained original-header
+clients. Each BERT encoder replay covers 192 primary scenarios and 37,384
+bit-identical values, plus nine vector-admission cases with 137 compared values
+and explicit bounded-error cases. Each quantization replay covers 88 requests,
+77 successful cases, eleven rejections and 76 exact complete output files.
+Each final export inventory contains **232 frozen exports plus four diagnostic
+extensions**, leaving **23 frozen exports absent**. These counts describe the
+documented execution scope, not complete semantics for every export.
+
+The schema-3 receipt assigns each of 33 required successful stages to its
+actual report and input set: formatting, ordinary debug, ordinary release and
+strict Clippy come from the successful stages of the failed original attempts;
+the remaining checks come from the successful continuations. Each host has
+34 attempted commands including the retained failed audit. The ordinary suites
+were not repeated after the correction.
+
+This is selected-input verification. The guard excludes evidence and the two
+progress documents, README.md and docs/PORT_STATUS.md; it is not a
+whole-repository immutable guard. Both final continuations and the evidence
+packager match the 1,677-file manifest with SHA-256
+`1ab73dd93269bcfc9b25f647ea06474568aaffc9e73c145b54d93a392c56acf0`.
+The original component receipts retain their tested filenames and hashes, with
+the old CLI fixture-manifest reference resolved through the retained
+pre-correction snapshot. The packaged record contains 534 files and 7,417
+verified recorded identity links; historical logs without capture-time hashes
+remain explicitly labeled as having packaging-time identities.
+
+All **twenty mandatory full-port gates remain open**. The full-port release
+check retains its expected nonzero result, and published-commit CI is reported
+separately by GitHub Actions. See
+[the schema-3 integrated receipt](../evidence/2026-11-11/continued-port-late/README.md)
+and
+[the exact correction](../evidence/2026-11-11/continued-port-late/integration-metadata/packaging-correction/report.json).
+
 ## Previous integrated verification — 11 November
 
 The integrated continuation passed **691 Windows MSVC / 696 Linux GNU ordinary
@@ -26,7 +89,7 @@ files and declarations across fourteen manifests, and all 4,082 files in each
 of the supplied and reference frozen trees. Original-header clients exercised
 both debug and release C libraries, including the adapter replay, with exact
 inventories of 226 frozen exports plus four diagnostic extensions. Twenty-nine
-frozen exports remain absent.
+frozen exports were absent at that checkpoint.
 
 Verification was staged, and the original reports retain their actual outcomes.
 Both first attempts passed the ordinary suites, formatting and strict Clippy,
@@ -61,7 +124,7 @@ Both native hosts passed the complete ordinary debug and release suites:
 Separate release checks passed eleven pretrained inference/server tests,
 three complete-file converter tests and one official Qwen tokenizer replay.
 Both debug and release C libraries passed the retained native clients and exact
-216-frozen-plus-four-extension export checks; 39 frozen symbols remain absent.
+216-frozen-plus-four-extension export checks; 39 frozen symbols were absent at that checkpoint.
 
 Rust 1.99.1 / LLVM 23.1.1 builds, strict Clippy, formatting and the reviewed
 dependency audit passed. Both hosts verified all 4,082 source files in each
@@ -97,7 +160,7 @@ pass. All 4,082 supplied frozen source files match; all 720 fixture files have
 integrity declarations across nine manifests. Original-header clients validate
 both debug and release libraries: 35,946 chat cases, 171 model-metadata requests,
 38 raw-name models, and actual PE/ELF export inventories of 198 frozen symbols plus
-four extensions. The 57 absent C symbols remain absent.
+four extensions. Fifty-seven frozen C symbols were absent at that checkpoint.
 
 The retained reports distinguish earlier integration failures, their corrections
 and the final successful run. The full-port release check still fails as required

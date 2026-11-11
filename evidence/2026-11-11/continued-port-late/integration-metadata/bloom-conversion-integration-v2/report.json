@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "source_commit": "d843a54aeef4c350ea5fc06e61ce3eb46c64981f",
+  "parent": "40c6573994019bbab9aadff0992988ea3b0c0dfd",
+  "started_utc": "2026-11-11T19:41:07.308595+00:00",
+  "driver": {
+    "bytes": 4101,
+    "sha256": "28e7759892c43d8cf901ec60f592f70bccc0206725c244273835ec76a0825f15"
+  },
+  "steps": [
+    {
+      "name": "format",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-convert",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6768405437469482,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "stage",
+      "argv": [
+        "git",
+        "add",
+        "--",
+        "crates/gguf/src/lib.rs",
+        "crates/gguf/src/writer.rs",
+        "docs/BLOOM_HF_CONVERSION.md"
+      ],
+      "exit_code": 0,
+      "seconds": 0.14645123481750488,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "authored-whitespace",
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        "*.rs",
+        "*.toml",
+        "*.md"
+      ],
+      "exit_code": 0,
+      "seconds": 0.039489030838012695,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "merged_functions_preserved_exactly": true,
+  "unchanged_worker_files": 165,
+  "resolution_files": [
+    {
+      "path": "crates/gguf/src/lib.rs",
+      "bytes": 30174,
+      "sha256": "28eddf270b5a8c7f7afef6724de1ab89b6da3fd2b7b5da0b568fe103b25fef2e"
+    },
+    {
+      "path": "crates/gguf/src/writer.rs",
+      "bytes": 24692,
+      "sha256": "487166a916e448e18706b9501dda92cb5d2dab5e3e59345c3b7be377dfc95ca4"
+    },
+    {
+      "path": "docs/BLOOM_HF_CONVERSION.md",
+      "bytes": 14789,
+      "sha256": "bb530beee9788a1a670d9c9c750b1fe93415598aacb7ae43e49aed28ecb8928a"
+    }
+  ],
+  "resolution": "Retain the quantizer FROZEN_TOOL writer and converter SOURCE_CONVERSION writer as separate functions and exports; retain worker policy implementation. Document the official-hf basename required by the frozen complete-file reproduction.",
+  "ci_preserved": true,
+  "result_commit": "f902ba82efb0f125bf679bb0a47f65724177d811",
+  "remaining_git_status": " M .github/workflows/ci.yml\n",
+  "combined_runtime_validation": "pending final integration gate",
+  "finished_utc": "2026-11-11T19:41:13.648803+00:00"
+}

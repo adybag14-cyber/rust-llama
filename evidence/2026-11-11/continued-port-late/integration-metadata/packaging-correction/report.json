@@ -1,0 +1,263 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "started_utc": "2026-11-11T20:55:05.009522+00:00",
+  "steps": [
+    {
+      "name": "stage",
+      "argv": [
+        "git",
+        "add",
+        "--",
+        "crates/model-quant/tests/fixtures/cli/LICENSE",
+        "crates/model-quant/tests/fixtures/cli/LICENSE.md",
+        "docs/model-quant-cli-fixture-manifest.tsv",
+        ".github/workflows/ci.yml"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04497241973876953,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "diff",
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--find-renames",
+        "--",
+        "crates/model-quant/tests/fixtures/cli/LICENSE",
+        "crates/model-quant/tests/fixtures/cli/LICENSE.md",
+        "docs/model-quant-cli-fixture-manifest.tsv",
+        ".github/workflows/ci.yml"
+      ],
+      "exit_code": 0,
+      "seconds": 0.03477168083190918,
+      "stdout": {
+        "bytes": 2881,
+        "sha256": "c13204745a5f7a2776174bb10e22e041671246d29167f432da45188738b6a4ab"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "whitespace",
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=cr-at-eol",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.032532691955566406,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "commit",
+      "argv": [
+        "git",
+        "commit",
+        "-m",
+        "Classify CLI fixture license and allow time for expanded CPU CI suite"
+      ],
+      "exit_code": 0,
+      "seconds": 0.17086338996887207,
+      "stdout": {
+        "bytes": 240,
+        "sha256": "22d01a8ea100a212bcf7449dd24dca436c33ea800c58fd39692416d4031760af"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "scope": "Post-attempt/pre-correction input proof, byte-preserving fixture-license rename, exact manifest path replacement, and CPU job timeout only. No Rust source or numerical/protocol fixture modification.",
+  "parent": "b28541f931e00be231211c491efcf2ad889f9f62",
+  "original_reports": {
+    "windows-msvc": {
+      "report": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\full-validation\\integrated-v1\\windows-msvc\\report.json",
+        "bytes": 4399,
+        "sha256": "4dfc11ee63c0d6837dd1c8e4df8fe88c6b6d807147932fb9c855fa9112b7a897"
+      },
+      "execution_inputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\full-validation\\integrated-v1\\windows-msvc\\execution-inputs.json",
+        "bytes": 250995,
+        "sha256": "e1cdb7d8b8ea3a00052490f9d37f667c635c42a15f2c04da32e031e6f30a38f2"
+      },
+      "original_status": "failed",
+      "completed_stages": [
+        "fmt",
+        "debug-tests",
+        "release-tests",
+        "clippy"
+      ]
+    },
+    "linux-gnu": {
+      "report": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\full-validation\\integrated-v1\\linux-gnu\\report.json",
+        "bytes": 4416,
+        "sha256": "e3b65d655045b8914647e5b19f0c8165b7f342d522576bcca6cb635696d9d505"
+      },
+      "execution_inputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\full-validation\\integrated-v1\\linux-gnu\\execution-inputs.json",
+        "bytes": 250995,
+        "sha256": "e1cdb7d8b8ea3a00052490f9d37f667c635c42a15f2c04da32e031e6f30a38f2"
+      },
+      "original_status": "failed",
+      "completed_stages": [
+        "fmt",
+        "debug-tests",
+        "release-tests",
+        "clippy"
+      ]
+    }
+  },
+  "before_manifest": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\execution-inputs-before.json",
+    "bytes": 250995,
+    "sha256": "e1cdb7d8b8ea3a00052490f9d37f667c635c42a15f2c04da32e031e6f30a38f2",
+    "files": 1677
+  },
+  "post_attempt_pre_correction_matches_both_original_manifests": true,
+  "qualification": "The original failed reports lack a completed final guard. This separate post-attempt/pre-correction snapshot matches both recorded starting manifests; original reports are not rewritten.",
+  "driver": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\correct-integration-packaging.py",
+    "bytes": 9915,
+    "sha256": "be92ebc46cb55cb08d9eef7c1be2b0d2dee107b56f5059bf5b3cbba4716063bf"
+  },
+  "ci_budget": {
+    "previous_ci_checks": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\previous-ci-checks.json",
+      "bytes": 2601,
+      "sha256": "4ed46efa14d88e1f158f270dcb1a71ffff79346e4d76e5d2c49d850851a9fc0f"
+    },
+    "previous_local_report": {
+      "path": "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-11\\continued-port-next\\stages\\integrated-v1\\windows-msvc\\report.json",
+      "bytes": 4398,
+      "sha256": "033213403f71afb56a0304da9d28341906348aa00068b23697f02337fb05d476"
+    },
+    "previous_ci_windows_seconds": 1863.0,
+    "local_stage_increases_seconds": {
+      "debug": 486.09900000000005,
+      "release": 295.23
+    },
+    "illustrative_cpu_seconds": 2644.329,
+    "qualification": "Illustrative additive estimate holding other CI steps constant, not a measurement of the future runner. Observed workload growth leaves little margin under45minutes."
+  },
+  "license_rename": {
+    "from": "crates/model-quant/tests/fixtures/cli/LICENSE",
+    "to": "crates/model-quant/tests/fixtures/cli/LICENSE.md",
+    "before": {
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    "after": {
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    "content_identical": true,
+    "retained_original": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\license-before.md",
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    }
+  },
+  "fixture_manifest": {
+    "product_path": "docs/model-quant-cli-fixture-manifest.tsv",
+    "before": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\cli-fixture-manifest-before.tsv",
+      "bytes": 4070,
+      "sha256": "97ef1a4647c17f74e05d9629da469c6e0528c3cc774c3af19334ead8238fe64e"
+    },
+    "after": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\cli-fixture-manifest-after.tsv",
+      "bytes": 4073,
+      "sha256": "2220e05e19d0bada4d60cc3823c4ef49b5aa9be2f296c2555ce45a33f772837f"
+    },
+    "transformation": "Exactly one LICENSE path becomes LICENSE.md; every other byte is preserved; all17 declarations remain."
+  },
+  "workflow": {
+    "product_path": ".github/workflows/ci.yml",
+    "before": {
+      "bytes": 15746,
+      "sha256": "e40010a81b2cad4569879cfc525dcbc3e14f92fd5f3e660eb94fff198046ca17"
+    },
+    "after": {
+      "bytes": 15746,
+      "sha256": "e24687e825e68e5bbd75f2964e0cfbc14c4ac3e738d72539a54af110ca63e579"
+    },
+    "before_snapshot": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\ci-workflow-before.json",
+      "bytes": 16278,
+      "sha256": "c0872391a801efa457872b4b8912d6aafc0054a5cadb322f2d697ea5e2cb55bc"
+    },
+    "after_snapshot": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\ci-workflow-after.json",
+      "bytes": 16278,
+      "sha256": "91eaea00e62090d80df9ea9c14fd86ecdb29e6a9e2519c2ed1a24d4e3219fb93"
+    },
+    "transformation": "Only the cpu job timeout-minutes changes from45 to60; all test commands and other job budgets remain byte-identical.",
+    "reason": "The prior31m03s GitHub CPU job plus observed local debug/release increases gives an illustrative44m04s before changed non-test costs; allow60minutes for the expanded CPU suite."
+  },
+  "after_manifest": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\integration-packaging-correction-v1\\execution-inputs-after.json",
+    "bytes": 250998,
+    "sha256": "1ab73dd93269bcfc9b25f647ea06474568aaffc9e73c145b54d93a392c56acf0",
+    "files": 1677
+  },
+  "removed_paths": [
+    "crates/model-quant/tests/fixtures/cli/LICENSE"
+  ],
+  "added_paths": [
+    "crates/model-quant/tests/fixtures/cli/LICENSE.md"
+  ],
+  "changed_paths": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "before": {
+        "bytes": 15746,
+        "sha256": "e40010a81b2cad4569879cfc525dcbc3e14f92fd5f3e660eb94fff198046ca17"
+      },
+      "after": {
+        "bytes": 15746,
+        "sha256": "e24687e825e68e5bbd75f2964e0cfbc14c4ac3e738d72539a54af110ca63e579"
+      }
+    },
+    {
+      "path": "docs/model-quant-cli-fixture-manifest.tsv",
+      "before": {
+        "bytes": 4070,
+        "sha256": "97ef1a4647c17f74e05d9629da469c6e0528c3cc774c3af19334ead8238fe64e"
+      },
+      "after": {
+        "bytes": 4073,
+        "sha256": "2220e05e19d0bada4d60cc3823c4ef49b5aa9be2f296c2555ce45a33f772837f"
+      }
+    }
+  ],
+  "unchanged_selected_files": 1674,
+  "every_other_selected_file_byte_identical": true,
+  "all_selected_runtime_sources_and_numerical_protocol_fixtures_unchanged": true,
+  "commit": "dfdac838365426d843094a9e4c9c3d03611f56aa",
+  "finished_utc": "2026-11-11T20:55:08.936380+00:00"
+}

@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "component": "Native llama-quantize CLI and bounded legacy/GGUF importance loader",
+  "product_base": "40c6573994019bbab9aadff0992988ea3b0c0dfd",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "created_utc": "2026-11-11T20:19:21.114897+00:00",
+  "status": "verified",
+  "scope": [
+    "Rust CLI and source scalar parsing",
+    "legacy and GGUF imatrix normalization/filtering/metadata",
+    "all admitted model-file modes through the existing Rust quantizer",
+    "safe real Windows file identity via the existing platform OS boundary"
+  ],
+  "input_guard": {
+    "count": 226,
+    "bytes": 153007925,
+    "sha256": "d246a9035d53f5cf6b5d3ff6dcccf61c24de64974a4083f382a93a8c4a1c544a"
+  },
+  "validation": {
+    "windows-msvc": {
+      "report": {
+        "host": "windows-msvc",
+        "tag": "final-v2",
+        "started_utc": "2026-11-11T20:11:45.660492+00:00",
+        "inputs": {
+          "count": 226,
+          "bytes": 153007925,
+          "sha256": "d246a9035d53f5cf6b5d3ff6dcccf61c24de64974a4083f382a93a8c4a1c544a"
+        },
+        "commands": [
+          {
+            "name": "format",
+            "argv": [
+              "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+              "fmt",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--check"
+            ],
+            "stdout": "format-stdout.log",
+            "stderr": "format-stderr.log",
+            "exit_code": 0,
+            "seconds": 0.18598110000311863,
+            "stdout_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+              "clippy",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "stdout": "clippy-stdout.log",
+            "stderr": "clippy-stderr.log",
+            "exit_code": 0,
+            "seconds": 0.25662179999926593,
+            "stdout_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr_identity": {
+              "bytes": 200,
+              "sha256": "8c2f0a76447f53a0732ceb0a361959ef99ff3684be7c3c4771a7a24a80199bbf"
+            }
+          },
+          {
+            "name": "debug",
+            "argv": [
+              "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+              "test",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--nocapture"
+            ],
+            "stdout": "debug-stdout.log",
+            "stderr": "debug-stderr.log",
+            "exit_code": 0,
+            "seconds": 38.16988880000281,
+            "stdout_identity": {
+              "bytes": 2594,
+              "sha256": "bb8d88f96b12c4946072b43025465f6b106b33ff5d85aeb700d1002ff2d2b4c2"
+            },
+            "stderr_identity": {
+              "bytes": 1451,
+              "sha256": "4873aaedacdf7c76ec45ebfb8e5d0ab6f83e258f9c09e9fc2c190650fb705477"
+            }
+          },
+          {
+            "name": "release",
+            "argv": [
+              "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+              "test",
+              "--offline",
+              "--locked",
+              "--release",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--nocapture"
+            ],
+            "stdout": "release-stdout.log",
+            "stderr": "release-stderr.log",
+            "exit_code": 0,
+            "seconds": 51.305334899996524,
+            "stdout_identity": {
+              "bytes": 2593,
+              "sha256": "19e914ee2931cb2ec28acb8ab1bd299cc4e01d90cc6d4631291b1d9eba0b3b5a"
+            },
+            "stderr_identity": {
+              "bytes": 2081,
+              "sha256": "cfb3bcd1d9ac6c5f2f068334374c2cbb3848b66268f9b516373ea0dd2d7bd6c8"
+            }
+          }
+        ],
+        "status": "succeeded",
+        "driver_sha256": "4cf803b2602dc80684e8e5f2518d858dbf83a131c52bd0306ff5669e86350b0e",
+        "inputs_unchanged": true,
+        "completed_utc": "2026-11-11T20:13:15.755972+00:00"
+      },
+      "modes": {
+        "debug": {
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 8,
+          "cli_cases": 188,
+          "complete_outputs": 117,
+          "complete_bytes": 2600128,
+          "capability_skips": 0,
+          "helper_cases": 517,
+          "native_accepted_helper_results": 389,
+          "corrected_private_helper_results": 3,
+          "checked_domain_helper_exclusions": 15
+        },
+        "release": {
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 8,
+          "cli_cases": 188,
+          "complete_outputs": 117,
+          "complete_bytes": 2600128,
+          "capability_skips": 0,
+          "helper_cases": 517,
+          "native_accepted_helper_results": 389,
+          "corrected_private_helper_results": 3,
+          "checked_domain_helper_exclusions": 15
+        }
+      }
+    },
+    "linux-gnu": {
+      "report": {
+        "host": "linux-gnu",
+        "tag": "final-v2",
+        "started_utc": "2026-11-11T20:11:50.852162+00:00",
+        "inputs": {
+          "count": 226,
+          "bytes": 153007925,
+          "sha256": "d246a9035d53f5cf6b5d3ff6dcccf61c24de64974a4083f382a93a8c4a1c544a"
+        },
+        "commands": [
+          {
+            "name": "format",
+            "argv": [
+              "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+              "fmt",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--check"
+            ],
+            "stdout": "format-stdout.log",
+            "stderr": "format-stderr.log",
+            "exit_code": 0,
+            "seconds": 1.0229491770000152,
+            "stdout_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+              "clippy",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "stdout": "clippy-stdout.log",
+            "stderr": "clippy-stderr.log",
+            "exit_code": 0,
+            "seconds": 1.0213445450000336,
+            "stdout_identity": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr_identity": {
+              "bytes": 204,
+              "sha256": "6524a04bbed935f2da737200bd870998f8dd09e03112a3701dad267e60b08d10"
+            }
+          },
+          {
+            "name": "debug",
+            "argv": [
+              "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--nocapture"
+            ],
+            "stdout": "debug-stdout.log",
+            "stderr": "debug-stderr.log",
+            "exit_code": 0,
+            "seconds": 30.23935384799995,
+            "stdout_identity": {
+              "bytes": 2518,
+              "sha256": "1f510f91d4dae66d16f43d96deee6734639641c758dcd3600a94fa0a31aa0947"
+            },
+            "stderr_identity": {
+              "bytes": 1097,
+              "sha256": "4b65964ae11602c8af0c7246bd6912ae784488a9e0b5e0cbfc4058ea6632103f"
+            }
+          },
+          {
+            "name": "release",
+            "argv": [
+              "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+              "test",
+              "--offline",
+              "--locked",
+              "--release",
+              "-p",
+              "llama-model-quant",
+              "-p",
+              "llama-platform-loader",
+              "--",
+              "--nocapture"
+            ],
+            "stdout": "release-stdout.log",
+            "stderr": "release-stderr.log",
+            "exit_code": 0,
+            "seconds": 32.79598519599995,
+            "stdout_identity": {
+              "bytes": 2517,
+              "sha256": "56bea93d96ac50244cc55b15a192d6a0f1d30bc68a15774cbc3a585a627bbd9d"
+            },
+            "stderr_identity": {
+              "bytes": 1747,
+              "sha256": "7dbafea7e40635b6b266bd0d05831068cec1a5aade4382afcbecf9a20c24518a"
+            }
+          }
+        ],
+        "status": "succeeded",
+        "driver_sha256": "4cf803b2602dc80684e8e5f2518d858dbf83a131c52bd0306ff5669e86350b0e",
+        "inputs_unchanged": true,
+        "completed_utc": "2026-11-11T20:12:58.122926+00:00"
+      },
+      "modes": {
+        "debug": {
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 8,
+          "cli_cases": 188,
+          "complete_outputs": 118,
+          "complete_bytes": 2658656,
+          "capability_skips": 0,
+          "helper_cases": 517,
+          "native_accepted_helper_results": 398,
+          "corrected_private_helper_results": 0,
+          "checked_domain_helper_exclusions": 8
+        },
+        "release": {
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0,
+          "suites": 8,
+          "cli_cases": 188,
+          "complete_outputs": 118,
+          "complete_bytes": 2658656,
+          "capability_skips": 0,
+          "helper_cases": 517,
+          "native_accepted_helper_results": 398,
+          "corrected_private_helper_results": 0,
+          "checked_domain_helper_exclusions": 8
+        }
+      }
+    }
+  },
+  "fixture_manifest": {
+    "path": "docs/model-quant-cli-fixture-manifest.tsv",
+    "bytes": 4070,
+    "sha256": "97ef1a4647c17f74e05d9629da469c6e0528c3cc774c3af19334ead8238fe64e",
+    "files": 17
+  },
+  "independent_review": {
+    "path": "reviews/independent-cli-review-v3.json",
+    "bytes": 13846,
+    "sha256": "0d2f746f57576a3af87cfe4603d7574046c70062934f6cf96e9a856297a1ed18"
+  },
+  "new_registry_dependencies": 0,
+  "local_dependency": "llama-model-quant -> llama-platform-loader",
+  "native_capture_before_corresponding_implementation": true,
+  "source_and_pinned_inputs_preserved": true,
+  "explicit_corrections": [
+    {
+      "kind": "native_undefined_integer_and_count_domains",
+      "detail": "Checked errors for C atol/atoi overflow and nonfinite/out-of-native-long count rounding; original observations retained."
+    },
+    {
+      "kind": "ucrt_private_hex_subnormal_carry",
+      "detail": "Correct IEEE F64 rounding for the measured UCRT carry defect, including sign. Only three duplicated MSVC private helper observations are corrected; four complete public CLI files remain exact, including F32 signed zero."
+    },
+    {
+      "kind": "core_requires_imatrix_report",
+      "detail": "Include eligible unchanged IQ tensors in the preliminary requirement scan, exclude COPY/ineligible tensors; no type/codec change."
+    },
+    {
+      "kind": "write_time_file_identity",
+      "detail": "Real Windows 128-bit file identity fixes a measured hard-link rejection gap. GNU destructive/aborting original C alias writes remain explicitly replaced by checked rejection."
+    },
+    {
+      "kind": "dry_run_destination_independence",
+      "detail": "Original alias and directory dry runs accepted on both hosts; no-publication core planning skips write-time alias/directory guards."
+    }
+  ],
+  "retained_development_failures": [
+    "Original executable build v1 expected help exit 0; frozen help actually exits 1. Postflight v2 verifies correct exit and source/binary identity.",
+    "First MSVC direct-helper link omitted llama-common-base.lib; corrected external build v2 retained separately.",
+    "First helper generator attempted unrepresentable F16 data before capture; external helper-native-v1 root is retained; corrected v2 uses representable wrong-dtype data.",
+    "First compact fixture packer and first evidence packer each had a Python lexical typo before output; external script identities and the evidence-job error are retained. Corrected v2 packers do not modify product source or native captures.",
+    "Focused replay v1 detected Windows hard-link admission and a supplemental GNU boundary test selecting a valid GNU long value.",
+    "Guarded final v1 stopped at a fixed-size-chunk test lint. Inputs remained unchanged; final v2 uses canonical path ordering for cross-host guard identity and passes.",
+    "Evidence packaging v2 rejected a stale test-helper review hash; independent review v3 proves the exact Clippy-only substitution and refreshes that one identity before publication."
+  ],
+  "limitations": [
+    "Timing/build/progress text is not an exact output interface; public statuses, warning classes and complete files are tested.",
+    "Resource limits and checked input domains are explicit in crates/model-quant/CLI.md.",
+    "Original producers, binaries, source libraries, full per-case console logs and model-free disposable payloads remain external; no reference implementation is shipped.",
+    "This component does not close full architecture, backend, ISA, performance or full-port release gates."
+  ],
+  "external_reference_root": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle"
+}

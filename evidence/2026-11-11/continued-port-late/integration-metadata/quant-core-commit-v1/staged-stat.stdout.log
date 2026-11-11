@@ -1,0 +1,47 @@
+ .gitattributes                                     |    3 +
+ .gitignore                                         |    1 +
+ Cargo.lock                                         |   12 +
+ crates/ffi/Cargo.toml                              |    8 +-
+ crates/ffi/src/lib.rs                              |    5 +
+ crates/ffi/src/quantization.rs                     |  321 +++++
+ crates/gguf/src/lib.rs                             |    2 +-
+ crates/gguf/src/raw.rs                             |   34 +
+ crates/gguf/src/shards.rs                          |    9 +
+ crates/gguf/src/writer.rs                          |   13 +
+ crates/llama-behavior/src/native_regex.rs          |  155 ++-
+ crates/model-quant/Cargo.toml                      |   17 +
+ crates/model-quant/README.md                       |  209 +++
+ crates/model-quant/src/architectures.rs            |  176 +++
+ crates/model-quant/src/file.rs                     |  876 +++++++++++++
+ crates/model-quant/src/lib.rs                      |  323 +++++
+ crates/model-quant/src/metadata.rs                 |  750 +++++++++++
+ crates/model-quant/src/planner.rs                  |  578 ++++++++
+ ...775b06739a25d9219fdaca7e494bee851bc8b71421.gguf |  Bin 0 -> 58176 bytes
+ ...88bd1465dde90e8cf273c441498abfdbc3b8d8f787.gguf |  Bin 0 -> 26432 bytes
+ ...7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d.gguf |  Bin 0 -> 29920 bytes
+ ...b72c7a0c147e82f8038bbae837216f19774d861392.gguf |  Bin 0 -> 30528 bytes
+ ...a255a2a342d72688913010f4ab943e8ea511135390.gguf |  Bin 0 -> 58464 bytes
+ ...e5484e3b68e100278e386413fdaded748289a61c3c.gguf |  Bin 0 -> 32256 bytes
+ ...1148e0a6d65627a1011010eb1b92597b8ac5e77876.gguf |  Bin 0 -> 17568 bytes
+ ...7954ca012dd082d56844ec6acc69f28308c2394441.gguf |  Bin 0 -> 13632 bytes
+ ...dc60d528e809413ff0e3dd6fefb05df4cacd2bfafe.gguf |  Bin 0 -> 30528 bytes
+ ...dc600a24d333678b93a422f19146cb3a7b1da261bd.gguf |  Bin 0 -> 11520 bytes
+ ...ab9a5bc2b4ac471a72622d7361278217108f755aff.gguf |  Bin 0 -> 58432 bytes
+ .../tests/fixtures/linux-gnu/files.json            |    1 +
+ .../fixtures/linux-gnu/preimplementation-seal.json | 1383 ++++++++++++++++++++
+ .../tests/fixtures/linux-gnu/provenance.json       |   85 ++
+ .../tests/fixtures/linux-gnu/types.json            |    1 +
+ .../tests/fixtures/metadata/admission-cases.json   |    1 +
+ .../tests/fixtures/metadata/admission-gnu.json     |    1 +
+ .../tests/fixtures/metadata/admission-msvc.json    |    1 +
+ .../fixtures/metadata/classification-cases.json    |    1 +
+ .../fixtures/metadata/classification-gnu.json      |    1 +
+ .../fixtures/metadata/classification-msvc.json     |    1 +
+ .../tests/fixtures/metadata/provenance.json        |  147 +++
+ .../tests/fixtures/windows-msvc/files.json         |    1 +
+ .../windows-msvc/preimplementation-seal.json       | 1383 ++++++++++++++++++++
+ .../tests/fixtures/windows-msvc/provenance.json    |   85 ++
+ .../tests/fixtures/windows-msvc/types.json         |    1 +
+ crates/model-quant/tests/native_reference.rs       |  372 ++++++
+ docs/model-quant-fixture-manifest.tsv              |   27 +
+ 46 files changed, 6927 insertions(+), 57 deletions(-)
