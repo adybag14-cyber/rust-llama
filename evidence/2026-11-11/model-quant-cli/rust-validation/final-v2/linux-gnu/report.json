@@ -1,0 +1,125 @@
+{
+  "host": "linux-gnu",
+  "tag": "final-v2",
+  "started_utc": "2026-11-11T20:11:50.852162+00:00",
+  "inputs": {
+    "count": 226,
+    "bytes": 153007925,
+    "sha256": "d246a9035d53f5cf6b5d3ff6dcccf61c24de64974a4083f382a93a8c4a1c544a"
+  },
+  "commands": [
+    {
+      "name": "format",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--check"
+      ],
+      "stdout": "format-stdout.log",
+      "stderr": "format-stderr.log",
+      "exit_code": 0,
+      "seconds": 1.0229491770000152,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stdout": "clippy-stdout.log",
+      "stderr": "clippy-stderr.log",
+      "exit_code": 0,
+      "seconds": 1.0213445450000336,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 204,
+        "sha256": "6524a04bbed935f2da737200bd870998f8dd09e03112a3701dad267e60b08d10"
+      }
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--nocapture"
+      ],
+      "stdout": "debug-stdout.log",
+      "stderr": "debug-stderr.log",
+      "exit_code": 0,
+      "seconds": 30.23935384799995,
+      "stdout_identity": {
+        "bytes": 2518,
+        "sha256": "1f510f91d4dae66d16f43d96deee6734639641c758dcd3600a94fa0a31aa0947"
+      },
+      "stderr_identity": {
+        "bytes": 1097,
+        "sha256": "4b65964ae11602c8af0c7246bd6912ae784488a9e0b5e0cbfc4058ea6632103f"
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--nocapture"
+      ],
+      "stdout": "release-stdout.log",
+      "stderr": "release-stderr.log",
+      "exit_code": 0,
+      "seconds": 32.79598519599995,
+      "stdout_identity": {
+        "bytes": 2517,
+        "sha256": "56bea93d96ac50244cc55b15a192d6a0f1d30bc68a15774cbc3a585a627bbd9d"
+      },
+      "stderr_identity": {
+        "bytes": 1747,
+        "sha256": "7dbafea7e40635b6b266bd0d05831068cec1a5aade4382afcbecf9a20c24518a"
+      }
+    }
+  ],
+  "status": "succeeded",
+  "driver_sha256": "4cf803b2602dc80684e8e5f2518d858dbf83a131c52bd0306ff5669e86350b0e",
+  "inputs_unchanged": true,
+  "completed_utc": "2026-11-11T20:12:58.122926+00:00"
+}

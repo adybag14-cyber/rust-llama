@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "review": "Coordinator approved correct finite IEEE rounding under plan section 8.1 before Rust implementation; preserve the original UCRT observation and compare the public F32 metadata and complete file.",
+  "native_private_intermediates": [
+    {
+      "host": "windows-msvc",
+      "id": "helper-scalar-extra-v3/014",
+      "text": "key=float:0x1.fffffffffffffp-1023",
+      "kind": "ucrt_hex_subnormal_carry",
+      "original_f64_bits": "0000000000000000",
+      "correct_f64_bits": "0010000000000000"
+    },
+    {
+      "host": "windows-msvc",
+      "id": "helper-rounding-correction-v4/000",
+      "text": "key=float:0x1.fffffffffffffp-1023",
+      "kind": "ucrt_hex_subnormal_carry",
+      "original_f64_bits": "0000000000000000",
+      "correct_f64_bits": "0010000000000000"
+    },
+    {
+      "host": "windows-msvc",
+      "id": "helper-rounding-correction-v4/001",
+      "text": "key=float:-0x1.fffffffffffffp-1023",
+      "kind": "ucrt_hex_subnormal_carry",
+      "original_f64_bits": "8000000000000000",
+      "correct_f64_bits": "8010000000000000"
+    }
+  ],
+  "native_public_output_comparisons": [
+    {
+      "case": 0,
+      "native_complete_file": {
+        "bytes": 58560,
+        "sha256": "0fbe791912c6c61f9faa8a15d735e0d07e8fdc9f58d4ea6c6a52a38aedb252c2"
+      },
+      "f32_metadata_little_endian_hex": "00000000"
+    },
+    {
+      "case": 1,
+      "native_complete_file": {
+        "bytes": 58560,
+        "sha256": "5144cde03966719b8026e5321304f65451294372de0df2e5a097163463034b30"
+      },
+      "f32_metadata_little_endian_hex": "00000080"
+    },
+    {
+      "case": 2,
+      "native_complete_file": {
+        "bytes": 58560,
+        "sha256": "0fbe791912c6c61f9faa8a15d735e0d07e8fdc9f58d4ea6c6a52a38aedb252c2"
+      },
+      "f32_metadata_little_endian_hex": "00000000"
+    },
+    {
+      "case": 3,
+      "native_complete_file": {
+        "bytes": 58560,
+        "sha256": "5144cde03966719b8026e5321304f65451294372de0df2e5a097163463034b30"
+      },
+      "f32_metadata_little_endian_hex": "00000080"
+    }
+  ],
+  "rust_execution_pending": false,
+  "rust_executions": [
+    {
+      "host": "windows-msvc",
+      "test": "reviewed_hex_carry_keeps_public_f32_signed_zero plus all four original executable complete-file comparisons",
+      "report": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\rust-validation\\focus-v2\\windows-msvc\\report.json",
+        "bytes": 980,
+        "sha256": "a653d545910fad93dc888322fb06a1bfbd16397e2484e25234cbc13e067f85cb"
+      },
+      "stdout_sha256": "c9ef31ce8d11a4b30176b8a94559662434d56b718b89ece8b5cbb2cf751ef410",
+      "all_four_public_outputs_exact": true,
+      "f32_sign_bits_checked": true
+    },
+    {
+      "host": "linux-gnu",
+      "test": "reviewed_hex_carry_keeps_public_f32_signed_zero plus all four original executable complete-file comparisons",
+      "report": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\rust-validation\\focus-v2\\linux-gnu\\report.json",
+        "bytes": 996,
+        "sha256": "6a60d7367b0c590ca2b2c83f5412c407c5042c42726ee500536083decb1373f6"
+      },
+      "stdout_sha256": "8b21f0740d550c86f571e967aec583417e93025e693a6a908db7c176bda465e1",
+      "all_four_public_outputs_exact": true,
+      "f32_sign_bits_checked": true
+    }
+  ]
+}

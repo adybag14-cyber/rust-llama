@@ -1,0 +1,71 @@
+{
+  "host": "linux-gnu",
+  "tag": "final-v1",
+  "started_utc": "2026-11-11T20:10:46.805859+00:00",
+  "inputs": {
+    "count": 226,
+    "bytes": 153007897,
+    "sha256": "162c2bda77f0229f69b1b326e74b26627ff0068f72debad26c69d19fd1a88535"
+  },
+  "commands": [
+    {
+      "name": "format",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--check"
+      ],
+      "stdout": "format-stdout.log",
+      "stderr": "format-stderr.log",
+      "exit_code": 0,
+      "seconds": 0.924489871999981,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stdout": "clippy-stdout.log",
+      "stderr": "clippy-stderr.log",
+      "exit_code": 101,
+      "seconds": 2.474328053999983,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 1477,
+        "sha256": "c4906aebd12523c53c8a9c38e302dd2906f4ef01baf597689a20133ff19cc908"
+      }
+    }
+  ],
+  "status": "failed",
+  "driver_sha256": "a07905911524a08ffd17ddcc9934779630c7cef32678c0f8caf5cc0982290ecd",
+  "error": "clippy failed",
+  "inputs_unchanged": true,
+  "completed_utc": "2026-11-11T20:10:52.367314+00:00"
+}

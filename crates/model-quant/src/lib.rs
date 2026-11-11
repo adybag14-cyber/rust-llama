@@ -7,7 +7,10 @@
 //! Independent MSVC/GNU type and complete-file captures precede this port.
 #![forbid(unsafe_code)]
 mod architectures;
+pub mod cli;
+mod cli_scalar;
 mod file;
+pub mod imatrix;
 mod metadata;
 mod planner;
 pub use file::{QuantizationReport, TensorReport, quantize_file, quantize_file_with_limits};

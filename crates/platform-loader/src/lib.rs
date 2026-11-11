@@ -3,6 +3,7 @@
 //! This is an integration seam pending T01 platform integration. It never loads
 //! llama/ggml and is intentionally not Send or Sync. Symbols must not outlive
 //! the library that owns them.
+pub mod file_identity;
 pub mod math;
 
 use std::ffi::{CStr, CString, c_void};

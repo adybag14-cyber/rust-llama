@@ -1,0 +1,276 @@
+{
+  "schema": 1,
+  "host": "linux-gnu",
+  "status": "captured",
+  "started_utc": "2026-11-11T19:43:25.262729+00:00",
+  "executable": {
+    "bytes": 17856,
+    "sha256": "16f470cf3a2986cf15834d294e11f76a925d0ed0274599e47551bad238f92808"
+  },
+  "build_postflight": {
+    "bytes": 4673,
+    "sha256": "617bc9f86c5267f8f0d87ead22ed42867200952f873e322a754d8d752c0aa01f"
+  },
+  "capture": {
+    "bytes": 5653,
+    "sha256": "16fdcb79cf5985c86a7179597ca03b5e8a8ce89e32c44e2304abd001ba83a284"
+  },
+  "reused_input_manifest": {
+    "bytes": 883727,
+    "sha256": "5cfbbdd12491549a3a2c602417c8e2c03746ebffebcb816e4226fe8a4174d0df"
+  },
+  "cases": [
+    {
+      "name": "same-iq-copy-dry",
+      "argv": [
+        "--dry-run",
+        "model.gguf",
+        "out.gguf",
+        "COPY",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03593494000000064,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 89,
+        "sha256": "880fb4109b34b18a11357d6c22700a0551d8863920ef009ad5b199475c5de2eb"
+      },
+      "stderr": {
+        "bytes": 4549,
+        "sha256": "9cff7a8d8964eec2b04f6c2be044d4dd4d4ebcda0819e382885224bfa429fba0"
+      },
+      "usage": false,
+      "dry_run_message": true,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "same-iq-dry-with-matrix",
+      "argv": [
+        "--dry-run",
+        "--imatrix",
+        "importance.dat",
+        "model.gguf",
+        "out.gguf",
+        "IQ2_XXS",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03595256300000216,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 285,
+        "sha256": "1efea56ddc2421fb45f78577ab3b6ee5cedf4170f7c5cc014be4b62d8fe46df4"
+      },
+      "stderr": {
+        "bytes": 4964,
+        "sha256": "92e7487c5d8ab35db5a516f13afe67ea419306990915808dfe3dde9c5bd345d4"
+      },
+      "usage": false,
+      "dry_run_message": true,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "same-iq-dry-override-all-f32",
+      "argv": [
+        "--dry-run",
+        "--tensor-type",
+        ".*=f32",
+        "model.gguf",
+        "out.gguf",
+        "IQ2_XXS",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03584139399999842,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 89,
+        "sha256": "121c0a5ee65450646082fba2be0224a6c770f7c99e8845ca7a9ba650defc9a41"
+      },
+      "stderr": {
+        "bytes": 6428,
+        "sha256": "ce461c6ae19d880cc84c618416a863eb43462bd6bbe2626acc229576093c8664"
+      },
+      "usage": false,
+      "dry_run_message": true,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "same-iq-dry-f32",
+      "argv": [
+        "--dry-run",
+        "model.gguf",
+        "out.gguf",
+        "F32",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03619736099999926,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 89,
+        "sha256": "3f2a350753c6c16a11f599b3a437145c89a2b59db1c13f9991b52c2a4a312da7"
+      },
+      "stderr": {
+        "bytes": 4879,
+        "sha256": "b69ed0aaa028af6d5acd5a296414643e617e1ef012e7b9dcbadb77a32e448bde"
+      },
+      "usage": false,
+      "dry_run_message": true,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "same-iq-write-no-matrix",
+      "argv": [
+        "model.gguf",
+        "out.gguf",
+        "IQ2_XXS",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 1,
+      "status": "rejected",
+      "seconds": 0.03624767499999848,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 3094,
+        "sha256": "5df26413fed978aa898ef06dd14e58265d12cb594bd0c12252c853dc4ea91571"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": [
+        "llama_model_quantize: failed to quantize: this quantization requires an imatrix!"
+      ]
+    },
+    {
+      "name": "same-iq-copy-write",
+      "argv": [
+        "model.gguf",
+        "out.gguf",
+        "COPY",
+        "1"
+      ],
+      "source_case": "captured-iq",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 8096,
+          "sha256": "af4ca9f8858d942ee483c4ea5895c557160bd70daa193b871dd32308f4ef9caa"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.037115640999999755,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 8096,
+          "sha256": "9423ec3457bb6cef136e3033023c1646d5d05be5829c5b65b0580ed356498a2b"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 89,
+        "sha256": "e676c0b8b5758c85d066bbe376ede57edad27ab6293c9f41685a86ba3bdf9111"
+      },
+      "stderr": {
+        "bytes": 4540,
+        "sha256": "79318908a06a91a5dae1ca1f9e238755e587f44db6e677779f79af66ed7f1541"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    }
+  ],
+  "completed_utc": "2026-11-11T19:43:26.074475+00:00",
+  "executable_unchanged": true
+}

@@ -1,0 +1,71 @@
+{
+  "host": "windows-msvc",
+  "tag": "final-v1",
+  "started_utc": "2026-11-11T20:10:43.573804+00:00",
+  "inputs": {
+    "count": 226,
+    "bytes": 153007897,
+    "sha256": "b600c52d15fb037075b46b79712f1affbc5592d39fb7fa213713f6713749adfa"
+  },
+  "commands": [
+    {
+      "name": "format",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--check"
+      ],
+      "stdout": "format-stdout.log",
+      "stderr": "format-stderr.log",
+      "exit_code": 0,
+      "seconds": 0.5835961000047973,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stdout": "clippy-stdout.log",
+      "stderr": "clippy-stderr.log",
+      "exit_code": 101,
+      "seconds": 2.3500242000009166,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 1463,
+        "sha256": "9466c7082aaca04b9adf060beb6b16a5af1992cf89ca14bd3b26c0d12f3279d0"
+      }
+    }
+  ],
+  "status": "failed",
+  "driver_sha256": "a07905911524a08ffd17ddcc9934779630c7cef32678c0f8caf5cc0982290ecd",
+  "error": "clippy failed",
+  "inputs_unchanged": true,
+  "completed_utc": "2026-11-11T20:10:46.670071+00:00"
+}

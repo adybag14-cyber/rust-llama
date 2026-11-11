@@ -1,0 +1,125 @@
+{
+  "host": "windows-msvc",
+  "tag": "final-v2",
+  "started_utc": "2026-11-11T20:11:45.660492+00:00",
+  "inputs": {
+    "count": 226,
+    "bytes": 153007925,
+    "sha256": "d246a9035d53f5cf6b5d3ff6dcccf61c24de64974a4083f382a93a8c4a1c544a"
+  },
+  "commands": [
+    {
+      "name": "format",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--check"
+      ],
+      "stdout": "format-stdout.log",
+      "stderr": "format-stderr.log",
+      "exit_code": 0,
+      "seconds": 0.18598110000311863,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stdout": "clippy-stdout.log",
+      "stderr": "clippy-stderr.log",
+      "exit_code": 0,
+      "seconds": 0.25662179999926593,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 200,
+        "sha256": "8c2f0a76447f53a0732ceb0a361959ef99ff3684be7c3c4771a7a24a80199bbf"
+      }
+    },
+    {
+      "name": "debug",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--nocapture"
+      ],
+      "stdout": "debug-stdout.log",
+      "stderr": "debug-stderr.log",
+      "exit_code": 0,
+      "seconds": 38.16988880000281,
+      "stdout_identity": {
+        "bytes": 2594,
+        "sha256": "bb8d88f96b12c4946072b43025465f6b106b33ff5d85aeb700d1002ff2d2b4c2"
+      },
+      "stderr_identity": {
+        "bytes": 1451,
+        "sha256": "4873aaedacdf7c76ec45ebfb8e5d0ab6f83e258f9c09e9fc2c190650fb705477"
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-platform-loader",
+        "--",
+        "--nocapture"
+      ],
+      "stdout": "release-stdout.log",
+      "stderr": "release-stderr.log",
+      "exit_code": 0,
+      "seconds": 51.305334899996524,
+      "stdout_identity": {
+        "bytes": 2593,
+        "sha256": "19e914ee2931cb2ec28acb8ab1bd299cc4e01d90cc6d4631291b1d9eba0b3b5a"
+      },
+      "stderr_identity": {
+        "bytes": 2081,
+        "sha256": "cfb3bcd1d9ac6c5f2f068334374c2cbb3848b66268f9b516373ea0dd2d7bd6c8"
+      }
+    }
+  ],
+  "status": "succeeded",
+  "driver_sha256": "4cf803b2602dc80684e8e5f2518d858dbf83a131c52bd0306ff5669e86350b0e",
+  "inputs_unchanged": true,
+  "completed_utc": "2026-11-11T20:13:15.755972+00:00"
+}

@@ -8,6 +8,10 @@ The authoritative source archive SHA-256 is
 `2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122`.
 The original code is MIT-licensed; see the repository license and source ledger.
 
+The package also provides a native [llama-quantize CLI](CLI.md) with bounded
+legacy/GGUF importance ingestion, source argument rules and independent
+complete-file fixtures.
+
 ## Library use
 
 ~~~rust,no_run
@@ -145,7 +149,13 @@ payloads must remain finite; integer copy payloads retain their bytes.
 Each destination gets a unique `create_new` temporary file in its own directory.
 All tensors and all output shards are converted, flushed, synced and size-checked
 before publication starts. Conversion failure preserves existing destinations
-and removes unpublished temporary files. Input/output aliases are rejected.
+and removes unpublished temporary files. Write-time input/output aliases are
+rejected using OS file identity, including hard links on Windows and Unix.
+Dry-run plans a layout without examining or opening the output destination,
+so an existing aliased file or directory is permitted. The original GNU C API
+can modify an aliased input or abort; checked rejection preserves the Rust
+input-safety contract. Independent disposable-copy observations retain that
+explicit safety correction.
 
 Each final rename is atomic on the supported local filesystems. Publication of
 several shard files is not a filesystem-wide transaction: a later rename can

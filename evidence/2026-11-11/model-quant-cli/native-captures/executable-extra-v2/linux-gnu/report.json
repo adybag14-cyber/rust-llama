@@ -1,0 +1,743 @@
+{
+  "schema": 1,
+  "host": "linux-gnu",
+  "status": "captured",
+  "started_utc": "2026-11-11T19:40:47.169773+00:00",
+  "executable": {
+    "bytes": 17856,
+    "sha256": "16f470cf3a2986cf15834d294e11f76a925d0ed0274599e47551bad238f92808"
+  },
+  "build_postflight": {
+    "bytes": 4673,
+    "sha256": "617bc9f86c5267f8f0d87ead22ed42867200952f873e322a754d8d752c0aa01f"
+  },
+  "capture": {
+    "bytes": 7995,
+    "sha256": "a5fbbc695009cdfee9d254ee3bf622c181c866170a1493262b4f06c2fa54f8ba"
+  },
+  "reused_input_manifest": {
+    "bytes": 883727,
+    "sha256": "5cfbbdd12491549a3a2c602417c8e2c03746ebffebcb816e4226fe8a4174d0df"
+  },
+  "cases": [
+    {
+      "name": "q1-valid-shape-with-matrix",
+      "argv": [
+        "--tensor-type",
+        "odd.weight=f16",
+        "--imatrix",
+        "importance.dat",
+        "model.gguf",
+        "out.gguf",
+        "Q1_0",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.0693560360000447,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 6176,
+          "sha256": "abf63c6d8ab41a4d1c2ded744434f53b326a5b39d00ad285abda58f48450ac31"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 285,
+        "sha256": "a2b2955766c092e8120c340bc706710e299a871aaf42f495692f040175349a8a"
+      },
+      "stderr": {
+        "bytes": 4611,
+        "sha256": "ad93b25d00d3c02307a8d12413312f03e666b6b6ed6343604e2a86f27c818ed4"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "q1-valid-shape-no-matrix",
+      "argv": [
+        "--tensor-type",
+        "odd.weight=f16",
+        "model.gguf",
+        "out.gguf",
+        "Q1_0",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03703101900009642,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 5984,
+          "sha256": "206de64257692f3778313fd5d80927207af5fcec375a37ae12306c0a7c816516"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 89,
+        "sha256": "2d724e154a25c094ea99afd997590c72d33fd2f826f5ff76f8ca52493a1d9c67"
+      },
+      "stderr": {
+        "bytes": 4466,
+        "sha256": "0cce5e6ef107102be8460dcd69b137de3d25b785efc788bd5601b06fa7bb96de"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-matrix-F32",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "F32",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.037078111000028,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 58720,
+          "sha256": "42671b6399021849e464b59990cf33f7554af1d869772a4929d9948ca7f149ae"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "2aec11aca014b293d207a6bd09e4433b73856a26b205915200fd824e738425cf"
+      },
+      "stderr": {
+        "bytes": 3869,
+        "sha256": "c79cc9120cd0a7caf7a256563b205a8b5c8dd69d31acc46a45f20fc78aecfda3"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-matrix-Q4_K",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03629251699976521,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11936,
+          "sha256": "dc96c35446abdacb8e07877c5427ca691880ea4fa2d221c5a299037b2e56a950"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "09db1cc30f472ab8dbcd768e91f8e616a5cd2863f391ab8c96880158773f43e1"
+      },
+      "stderr": {
+        "bytes": 4705,
+        "sha256": "ab93e5b6890a0ec244751a5bc8b40388925dc34e3aeae70b703ae52228ce2bf5"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-matrix-IQ2_XXS",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "IQ2_XXS",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.620048375999886,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 8096,
+          "sha256": "878d6fc92b7bed6d830bcd6591782531f94a708dfad41aed099c243169659181"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "acad248511e1fc729a35518c20e965c6731fa84f73ba816e2e72e394ab489b18"
+      },
+      "stderr": {
+        "bytes": 4735,
+        "sha256": "602bd224f902991f6f0e5eaeb609f4da639b88ba8a6463f78cb34afae7f524b0"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-include",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "--include-weights",
+        "attn",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03695335900010832,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11936,
+          "sha256": "31a0d8dad3807ea245479c93338e738a8628be8567e73f34328ef4cfcd2693fe"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 308,
+        "sha256": "b337944b8217ef260edbf4d819995b6057a5f2df8949c5bbbc3ea876cff23147"
+      },
+      "stderr": {
+        "bytes": 5579,
+        "sha256": "63efe420c49cc95cd96f3079e95e6da99458cd966b37ef713679ff528a0089ee"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-exclude",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "--exclude-weights",
+        "attn",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.037021905000074184,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11936,
+          "sha256": "acc189d6fb9d7e4a70123f92d4fed0d00f69fb29297d46404404070fd80fd551"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "47518c84d68fd1f71ce2c242df03c5ece3e1df89dc2f05f6332625e17c64819e"
+      },
+      "stderr": {
+        "bytes": 5030,
+        "sha256": "0cd72661a2934d5b0f52d69093a205bcc97c4722ea6472fa065822501699e2d8"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-all-excluded",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "--exclude-weights",
+        "",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03639540200038027,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 258,
+        "sha256": "151cc961cb98c8fc2db6c5df0aa5ee85e0714deee48caa7e6714e3bb7714fd22"
+      },
+      "stderr": {
+        "bytes": 4633,
+        "sha256": "68845f395560f2b140a5fbfb329437a6090776978378e63e22bfa4889ef589a7"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-dry-run",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "--dry-run",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.0370581619999939,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "9510ca20846609ae14093d2762facc48a2a86ac4f6347c34296e99bb21f0b8f8"
+      },
+      "stderr": {
+        "bytes": 4489,
+        "sha256": "8d5bfb47a7dbd9e4bd5bb03d27d98860458561d468c8cf5542592408f11e0ba6"
+      },
+      "usage": false,
+      "dry_run_message": true,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-user-metadata-first",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "--override-kv",
+        "quantize.imatrix.dataset=str:user",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "9baf22a251c0b704a9200ae20037df4bfbd78e81409b8fdfc49461f68ca09d62"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03664710900011414,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11936,
+          "sha256": "dc96c35446abdacb8e07877c5427ca691880ea4fa2d221c5a299037b2e56a950"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "7e3c9edec0e49b7d08cabb5e09d98664b9055af8036fd908948010d0b06b169c"
+      },
+      "stderr": {
+        "bytes": 4705,
+        "sha256": "ab93e5b6890a0ec244751a5bc8b40388925dc34e3aeae70b703ae52228ce2bf5"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-long-strings",
+      "argv": [
+        "--imatrix",
+        "long-iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.gguf",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "long-iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii.gguf",
+          "bytes": 18208,
+          "sha256": "dee15e9194740d321cd0f4422f7dd0925354c85cb58882251d487a552f56062e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.036856982999779575,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 12160,
+          "sha256": "de8d8f18fa27d5aaa3335e7782966a7e876f45c6789cc1e86befc5a44d719a18"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 553,
+        "sha256": "dd4684f8d8e3dbbf6044b16ba01ea3f4a8d1f6bf076f6054bc4b3498bbc1c0a8"
+      },
+      "stderr": {
+        "bytes": 4705,
+        "sha256": "ab93e5b6890a0ec244751a5bc8b40388925dc34e3aeae70b703ae52228ce2bf5"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-missing-datasets",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 17984,
+          "sha256": "081e03711eb4eeefafd06e95f2028340d22d1bd65e72a5fa49f6c660cb10f37e"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 1,
+      "status": "rejected",
+      "seconds": 0.02108353299990995,
+      "outputs": [],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 63,
+        "sha256": "5f00172440d9eafdb9f4cddb02bc32e77255b7d7b39d04a96ae2cd234c481f45"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-datasets-string",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18016,
+          "sha256": "f8e7cb2a3dc97acce3c0871ed3876d54aa3204297c178ed448dd982238586ffd"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.07053035399985674,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11872,
+          "sha256": "24a4a9af134f0bf99fcb111dfaf50220e8744849f97d9f80b41ea3325df5d933"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 232,
+        "sha256": "ab39d587546e0cab493c1eea8dad9da3954262bb3c5296d7010d811318c8a5ec"
+      },
+      "stderr": {
+        "bytes": 4705,
+        "sha256": "ab93e5b6890a0ec244751a5bc8b40388925dc34e3aeae70b703ae52228ce2bf5"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    },
+    {
+      "name": "gguf-chunk-size-zero",
+      "argv": [
+        "--imatrix",
+        "importance.gguf",
+        "model.gguf",
+        "out.gguf",
+        "Q4_K",
+        "1"
+      ],
+      "source_case": "quant-15",
+      "setup": null,
+      "inputs": [
+        {
+          "path": "importance.dat",
+          "bytes": 16013,
+          "sha256": "6cda7d08058cafa0048a5da3699ab48857ca9edd3a477116278b79b6a839760e"
+        },
+        {
+          "path": "importance.gguf",
+          "bytes": 18080,
+          "sha256": "4254c31d4e6a1e0bdccc5ba031168a0b9a26547295cf015e89a28f859ccb1910"
+        },
+        {
+          "path": "model.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "exit_code": 0,
+      "status": "accepted",
+      "seconds": 0.03695777299981273,
+      "outputs": [
+        {
+          "path": "out.gguf",
+          "bytes": 11936,
+          "sha256": "dc96c35446abdacb8e07877c5427ca691880ea4fa2d221c5a299037b2e56a950"
+        }
+      ],
+      "inputs_unchanged": true,
+      "stdout": {
+        "bytes": 309,
+        "sha256": "abb9e9de5880921aa73ec89756fd66bdfd5eb48415501247ed6a3698b8cbde7d"
+      },
+      "stderr": {
+        "bytes": 4705,
+        "sha256": "ab93e5b6890a0ec244751a5bc8b40388925dc34e3aeae70b703ae52228ce2bf5"
+      },
+      "usage": false,
+      "dry_run_message": false,
+      "imatrix_warnings": []
+    }
+  ],
+  "completed_utc": "2026-11-11T19:40:49.818842+00:00",
+  "executable_unchanged": true
+}

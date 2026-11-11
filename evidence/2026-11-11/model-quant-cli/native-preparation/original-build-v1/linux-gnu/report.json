@@ -1,0 +1,105 @@
+{
+  "profile": "linux-gnu",
+  "started_utc": "2026-11-11T19:02:43.332844+00:00",
+  "source_inputs": {
+    "bytes": 587311,
+    "sha256": "9846b1176edf1d470cc2352c364df448ede381f2e9e764375e6967d8ddf22379"
+  },
+  "driver": {
+    "bytes": 3230,
+    "sha256": "a42c8c9693b17ced5318abd495615f5aeed73ba55c83d6ab95e0bf686ecb2277"
+  },
+  "status": "failed",
+  "steps": [
+    {
+      "name": "configure",
+      "args": [
+        "cmake",
+        "-S",
+        "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master",
+        "-B",
+        "/home/tdamre/.cache/rust-llama-quantize-cli-late",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DLLAMA_BUILD_COMMON=ON",
+        "-DLLAMA_BUILD_TOOLS=ON",
+        "-DLLAMA_BUILD_TESTS=OFF",
+        "-DLLAMA_BUILD_EXAMPLES=OFF",
+        "-DLLAMA_BUILD_APP=OFF",
+        "-DLLAMA_BUILD_SERVER=OFF",
+        "-DLLAMA_BUILD_MTMD=OFF",
+        "-DLLAMA_BUILD_UI=OFF",
+        "-DLLAMA_OPENSSL=OFF",
+        "-DGGML_NATIVE=OFF",
+        "-DGGML_AVX=OFF",
+        "-DGGML_AVX2=OFF",
+        "-DGGML_AVX512=OFF",
+        "-DGGML_AVX512_VBMI=OFF",
+        "-DGGML_AVX512_VNNI=OFF",
+        "-DGGML_AVX512_BF16=OFF",
+        "-DGGML_AVX_VNNI=OFF",
+        "-DGGML_F16C=OFF",
+        "-DGGML_FMA=OFF",
+        "-DGGML_OPENMP=OFF"
+      ],
+      "exit_code": 0,
+      "seconds": 13.753997802734375,
+      "stdout": {
+        "bytes": 1277,
+        "sha256": "2415197c5cb7a4532f03508fdc75bec4561dc6c39c3fd8581b29681735d58902"
+      },
+      "stderr": {
+        "bytes": 504,
+        "sha256": "444411aa8d2df2266f95170499f472ce992bbdd99bbbdedacd9a74bc3483e9e7"
+      }
+    },
+    {
+      "name": "build",
+      "args": [
+        "cmake",
+        "--build",
+        "/home/tdamre/.cache/rust-llama-quantize-cli-late",
+        "--config",
+        "Release",
+        "--target",
+        "llama-quantize",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 60.317508935928345,
+      "stdout": {
+        "bytes": 11342,
+        "sha256": "357b82c540d06872fabf6143d438c9917087a16c107b22bcaf457f66538d65e9"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "help",
+      "args": [
+        "/home/tdamre/.cache/rust-llama-quantize-cli-late/bin/llama-quantize",
+        "--help"
+      ],
+      "exit_code": 1,
+      "seconds": 0.020651578903198242,
+      "stdout": {
+        "bytes": 5522,
+        "sha256": "feb2b3d13f542710a16eaa3408a4950cb38066ce335f842fb7ace8e86c6d260a"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "executable": {
+    "path": "/home/tdamre/.cache/rust-llama-quantize-cli-late/bin/llama-quantize",
+    "bytes": 17856,
+    "sha256": "16f470cf3a2986cf15834d294e11f76a925d0ed0274599e47551bad238f92808"
+  },
+  "error": "RuntimeError('help failed')",
+  "finished_utc": "2026-11-11T19:03:57.480556+00:00"
+}

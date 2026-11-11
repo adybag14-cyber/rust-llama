@@ -231,14 +231,8 @@ fn reject_input_output_alias(set: &GgufSet, path: &Path) -> Result<()> {
             if fs::canonicalize(input)? == target {
                 return Err(invalid("output aliases an input file"));
             }
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::MetadataExt;
-                let a = fs::metadata(input)?;
-                let b = fs::metadata(path)?;
-                if a.dev() == b.dev() && a.ino() == b.ino() {
-                    return Err(invalid("output is a hard link to an input file"));
-                }
+            if llama_platform_loader::file_identity::same_file(input, path)? {
+                return Err(invalid("output is an alias of an input file"));
             }
         }
     }
@@ -383,12 +377,9 @@ pub fn quantize_file_with_limits(
                     a.checked_mul(b)
                         .ok_or_else(|| invalid("tensor size overflow"))
                 })?;
-        let requires = requires_imatrix(name, target, params.ftype);
-        if !params.dry_run
-            && params.imatrix.is_none()
-            && requires
-            && crate::allows_quantization(params, &model.architecture, spec)
-        {
+        let requires = requires_imatrix(name, target, params.ftype)
+            && crate::allows_quantization(params, &model.architecture, spec);
+        if !params.dry_run && params.imatrix.is_none() && requires {
             return Err(invalid(format!(
                 "{name}: quantization requires an importance matrix"
             )));
@@ -468,8 +459,10 @@ pub fn quantize_file_with_limits(
         } else {
             output.as_ref().to_path_buf()
         };
-        reject_input_output_alias(&set, &path)?;
-        if path.is_dir() {
+        if !params.dry_run {
+            reject_input_output_alias(&set, &path)?;
+        }
+        if !params.dry_run && path.is_dir() {
             return Err(invalid("output path is a directory"));
         }
         total_files = total_files
@@ -488,10 +481,7 @@ pub fn quantize_file_with_limits(
         requires_imatrix: false,
         written: false,
     };
-    report.requires_imatrix = report
-        .tensors
-        .iter()
-        .any(|t| t.requires_imatrix && t.target_type != t.source_type);
+    report.requires_imatrix = report.tensors.iter().any(|t| t.requires_imatrix);
     if params.dry_run {
         return Ok(report);
     }

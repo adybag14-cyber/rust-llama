@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "reviewer": "/root/port_gap_audit",
+  "status": "one acknowledged bound finding pending correction",
+  "scope": "Independent read-only static review; no builds, native executions or product edits. Product files are identified at their reviewed byte versions. This receipt does not claim later formatted or modified files were reviewed.",
+  "product_base": "40c6573994019bbab9aadff0992988ea3b0c0dfd",
+  "reviewed_product": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\src\\cli_scalar.rs",
+      "bytes": 11470,
+      "sha256": "db12a4090029d1f5ecc756a2810491616a57d9642223c8c006e3400d945a9acb"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\src\\imatrix.rs",
+      "bytes": 14742,
+      "sha256": "1be02e36c07465cd1b41e1dc7af919cce0ac87addc517347959c1be0699a7264"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\src\\cli.rs",
+      "bytes": 15233,
+      "sha256": "149bb18840800e7b2426cfbd178f0856d1dc1d8aba4eae53d58ab97930901c7e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\src\\bin\\llama-quantize.rs",
+      "bytes": 958,
+      "sha256": "4c22e16baa7707a601ca05582cc9d83f57b971582bebab58b747a947c5ea2a8e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\tests\\cli_native_reference.rs",
+      "bytes": 19373,
+      "sha256": "2a2fb7547c97490161ad9d6bc5fa741efbfadd1aef152e80148d8b411bfbb5f3"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\src\\lib.rs",
+      "bytes": 9429,
+      "sha256": "0ba086afa82ddaa2677b2f399a998594dcfcaadec7a0bdfa627a3bbb965de1d0"
+    }
+  ],
+  "reviewed_reference": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\common\\imatrix-loader.cpp",
+      "bytes": 6838,
+      "sha256": "416f8cb0b76164d8b961eb31c04aea402a94306de10250a2263f0807716f9bd6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\common\\imatrix-loader.h",
+      "bytes": 1005,
+      "sha256": "8c234ab44071191b5f6951c2658d652b35605a2617e7af4c1e7daba656d591eb"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\tools\\quantize\\quantize.cpp",
+      "bytes": 28028,
+      "sha256": "2f51f78351c61415dbf757f05fe471cf833878f868922738d963b7b414e77eae"
+    }
+  ],
+  "reviewed_fixture_receipts": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\tests\\fixtures\\cli\\rounding-correction.json",
+      "bytes": 2095,
+      "sha256": "b5c213c11a140f64c48a9fcb73e896768c9c9c4af5353d97160333e21c3c4b4a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli\\crates\\model-quant\\tests\\fixtures\\cli\\provenance.json",
+      "bytes": 6744,
+      "sha256": "55b62c5efe63e721258ec8299e107c1064b4fb218d06b907fe8e1bc8125db573"
+    }
+  ],
+  "additional_source_reading": [
+    "common/common.h specialized string_split<std::string> retains empty fields; common/common.cpp string_parse_kv_override uses host-long atol and atof",
+    "ggml/src/gguf.cpp tensor name limit, contiguous descriptor offsets and final padding",
+    "crates/gguf/src/raw.rs validates names, checked offsets/lengths, retained File and bounded header parsing",
+    "Narrow file.rs requires_imatrix diff: eligibility conjunction plus any eligible requiring tensor, including equal source/target dtype, matches the frozen preliminary loop"
+  ],
+  "findings": [
+    {
+      "id": "CLI-ALLOC-1",
+      "severity": "medium",
+      "status": "acknowledged by owner; correction pending",
+      "path": "crates/model-quant/src/cli.rs",
+      "function": "tensor_type_file",
+      "issue": "The first file.metadata().len() is checked, but a second metadata sample is used by try_reserve_exact without a bound check. Growth between those samples can reserve beyond max_tensor_type_file_bytes before the capped read rejects the input.",
+      "requested_fix": "Retain and check one metadata length; convert it to usize with checked conversion; reserve only that admitted length. Keep take(max+1) and the post-read bound for later file growth.",
+      "source_contract": "AGENTS.md bounded inputs; docs/plan.md 8.1 intentional checked behavior rather than native unsafe allocation."
+    }
+  ],
+  "confirmed": [
+    "Source option parsing ends at the first positional argument; importance loading happens before ftype interpretation.",
+    "Source table order and alias spelling control generated names; numeric 0 selects F32 before COPY; trailing arguments after the optional thread count are ignored.",
+    "Explicit split output removes the last five bytes whenever '.gguf' is anywhere in the path. Invalid UTF-8 boundary is an explicit unsupported path domain.",
+    "Empty metadata override keys terminate later overrides, including generated importance provenance.",
+    "Pruning preserves empty-token rejection, decimal-prefix conversion, sorting and deduplication.",
+    "GGUF importance counts use host-long ties-away rounding in a documented finite range; division uses per-count floor row widths; remainder values become +0 and nonpositive counts fill 1.",
+    "Legacy positive ncall divides as F32; nonpositive counts retain sums; optional partial little-endian chunk trailer and incomplete dataset handling match source.",
+    "GGUF final padding and tensor layout are checked; sums/counts require F32; activation reinterpretation never reads beyond its tensor.",
+    "Scalar and input lengths, entry/value counts and filter work are bounded. Filter errors cannot hide malformed loaded entries.",
+    "Correct IEEE hex rounding preserves the subnormal-to-min-normal carry; the original UCRT observation stays in rounding-correction.json, and independently captured public F32 metadata has exact signed-zero output hashes."
+  ],
+  "qualifications": [
+    "Integer atol overflow and nonfinite/out-of-range lround domains are marked rust_boundary in original fixtures; they are checked rejections, not exact native-return claims.",
+    "The three recorded private F64 correction rows refer to the measured UCRT carry defect. Original output observations remain retained, and the public complete-file tests remain exact.",
+    "Runtime validation belongs to the owner. Both 517-case helper replays were reported passed by the owner; I did not execute or independently certify those build runs.",
+    "Source usage prose, build banners and timings are outside byte-exact CLI claims. Status, usage/dry-run/warning classes and complete output bytes are the maintained oracle contract."
+  ]
+}

@@ -1,0 +1,18 @@
+    Checking llama-platform-loader v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/platform-loader)
+    Checking llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/quant)
+    Checking llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/llama-behavior)
+    Checking llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/gguf)
+    Checking llama-conformance v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/llama-conformance)
+    Checking llama-model-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-cli/crates/model-quant)
+error: using `chunks_exact` with a constant chunk size
+  --> crates/model-quant/tests/cli_native_reference.rs:72:10
+   |
+72 | ...  .chunk...ct(2)
+   |       ^^^^^...^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `llama-model-quant` (test "cli_native_reference") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

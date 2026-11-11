@@ -1,0 +1,109 @@
+{
+  "profile": "windows-msvc",
+  "started_utc": "2026-11-11T19:00:47.456774+00:00",
+  "source_inputs": {
+    "bytes": 587312,
+    "sha256": "a4e615e854de6fb32e259ec5cd42fcfc7cd8d362281800833339d82062739410"
+  },
+  "driver": {
+    "bytes": 3230,
+    "sha256": "a42c8c9693b17ced5318abd495615f5aeed73ba55c83d6ab95e0bf686ecb2277"
+  },
+  "status": "failed",
+  "steps": [
+    {
+      "name": "configure",
+      "args": [
+        "cmake",
+        "-S",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DLLAMA_BUILD_COMMON=ON",
+        "-DLLAMA_BUILD_TOOLS=ON",
+        "-DLLAMA_BUILD_TESTS=OFF",
+        "-DLLAMA_BUILD_EXAMPLES=OFF",
+        "-DLLAMA_BUILD_APP=OFF",
+        "-DLLAMA_BUILD_SERVER=OFF",
+        "-DLLAMA_BUILD_MTMD=OFF",
+        "-DLLAMA_BUILD_UI=OFF",
+        "-DLLAMA_OPENSSL=OFF",
+        "-DGGML_NATIVE=OFF",
+        "-DGGML_AVX=OFF",
+        "-DGGML_AVX2=OFF",
+        "-DGGML_AVX512=OFF",
+        "-DGGML_AVX512_VBMI=OFF",
+        "-DGGML_AVX512_VNNI=OFF",
+        "-DGGML_AVX512_BF16=OFF",
+        "-DGGML_AVX_VNNI=OFF",
+        "-DGGML_F16C=OFF",
+        "-DGGML_FMA=OFF",
+        "-DGGML_OPENMP=ON",
+        "-G",
+        "Visual Studio 18 2026",
+        "-A",
+        "x64"
+      ],
+      "exit_code": 0,
+      "seconds": 10.12316083908081,
+      "stdout": {
+        "bytes": 2037,
+        "sha256": "fe4aa171e371c511d80272d8070024f16b1d721251d62107c5230c64cd8c17f6"
+      },
+      "stderr": {
+        "bytes": 821,
+        "sha256": "94de0786094893945af9d3ed865a9be1810f3b459b88b8a6494b78d1e59e7f93"
+      }
+    },
+    {
+      "name": "build",
+      "args": [
+        "cmake",
+        "--build",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows",
+        "--config",
+        "Release",
+        "--target",
+        "llama-quantize",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 62.50375032424927,
+      "stdout": {
+        "bytes": 19120,
+        "sha256": "6ea0eba7a3d47297db0d33cd7313277b08b5319802b73b4fd40844da64a1b31f"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "help",
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-quantize.exe",
+        "--help"
+      ],
+      "exit_code": 1,
+      "seconds": 0.0444340705871582,
+      "stdout": {
+        "bytes": 5667,
+        "sha256": "b706969185ae9e1c3bff87f0307ef07c5164f147bf2cee74e8eb2316795178ad"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "executable": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-quantize.exe",
+    "bytes": 10752,
+    "sha256": "976183027aff34743b0e836d3e1870b767c4d0d1f6db6b03f1a038f293e31083"
+  },
+  "error": "RuntimeError('help failed')",
+  "finished_utc": "2026-11-11T19:02:00.133761+00:00"
+}
