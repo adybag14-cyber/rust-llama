@@ -75,6 +75,38 @@ impl Matrix {
             .as_ref()
             .map(|(dtype, bytes)| (dtype.id(), bytes.as_slice()))
     }
+    pub fn owned_bytes(&self) -> Result<usize> {
+        self.values
+            .capacity()
+            .checked_mul(4)
+            .and_then(|bytes| {
+                bytes.checked_add(
+                    self.packed
+                        .as_ref()
+                        .map_or(0, |(_, bytes)| bytes.capacity()),
+                )
+            })
+            .ok_or_else(|| Error::Shape("matrix storage accounting overflow".into()))
+    }
+    pub fn try_clone(&self) -> Result<Self> {
+        fn copy<T: Copy>(source: &[T]) -> Result<Vec<T>> {
+            let mut out = Vec::new();
+            out.try_reserve_exact(source.len())
+                .map_err(|_| Error::Shape("matrix copy allocation".into()))?;
+            out.extend_from_slice(source);
+            Ok(out)
+        }
+        Ok(Self {
+            rows: self.rows,
+            cols: self.cols,
+            values: copy(&self.values)?,
+            packed: self
+                .packed
+                .as_ref()
+                .map(|(dtype, bytes)| Ok((*dtype, copy(bytes)?)))
+                .transpose()?,
+        })
+    }
     pub fn storage_dtype(&self) -> llama_quant::DType {
         self.packed
             .as_ref()

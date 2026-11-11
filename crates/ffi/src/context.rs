@@ -8,7 +8,8 @@ use std::ffi::c_void;
 
 pub struct ContextHandle {
     // A distinct borrowed handle preserves model access after its original owner is freed.
-    model_handle: Box<ModelHandle>,
+    pub(crate) model_handle: Box<ModelHandle>,
+    pub(crate) adapters: crate::adapter::ContextAdapters,
     pub(crate) runtime: NativeContext,
     pub(crate) state_snapshots: BTreeMap<i32, Vec<u8>>,
     n_ctx: u32,
@@ -136,6 +137,7 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     let n_ctx_seq = runtime.context_tokens_per_sequence() as u32;
     Ok(Box::into_raw(Box::new(ContextHandle {
         model_handle: Box::new(ModelHandle { data, owned: false }),
+        adapters: crate::adapter::ContextAdapters::default(),
         runtime,
         state_snapshots: BTreeMap::new(),
         n_ctx,

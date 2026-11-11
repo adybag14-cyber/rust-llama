@@ -220,7 +220,7 @@ struct Stream {
 pub struct NativeContext {
     model: Arc<Model>,
     options: NativeContextOptions,
-    adapters: AdapterSet,
+    adapters: Arc<AdapterSet>,
     streams: Vec<Stream>,
     pending_copies: Vec<(usize, usize)>,
     capacity: usize,
@@ -374,7 +374,7 @@ impl NativeContext {
         Ok(Self {
             model,
             options,
-            adapters: AdapterSet::default(),
+            adapters: Arc::new(AdapterSet::default()),
             streams: all,
             pending_copies: Vec::new(),
             capacity,
@@ -412,6 +412,9 @@ impl NativeContext {
                     .ok_or_else(|| invalid("native tensor accounting overflow"))?;
             }
         }
+        bytes = bytes
+            .checked_add(self.adapters.owned_bytes()?)
+            .ok_or_else(|| invalid("native adapter byte accounting overflow"))?;
         Ok(bytes)
     }
     fn check_work(&self, extra: usize) -> Result<()> {
@@ -517,6 +520,19 @@ impl NativeContext {
     }
     pub fn set_embeddings(&mut self, enabled: bool) {
         self.execution.embeddings = enabled;
+    }
+    /// Replace adapters atomically without clearing already evaluated KV state.
+    /// Existing contexts and transactional copies share immutable adapter weights.
+    /// Check replacement payload before a C facade allocates its execution copy.
+    pub fn preflight_adapter_storage(&self, bytes: usize) -> Result<()> {
+        self.check_work(bytes)
+    }
+    pub fn set_adapters(&mut self, adapters: AdapterSet) -> Result<()> {
+        adapters.validate(&self.model)?;
+        let bytes = adapters.owned_bytes()?;
+        self.check_work(bytes)?;
+        self.adapters = Arc::new(adapters);
+        Ok(())
     }
     pub fn model(&self) -> &Arc<Model> {
         &self.model

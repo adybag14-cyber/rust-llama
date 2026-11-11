@@ -33,6 +33,13 @@ pub(crate) struct ModelData {
     pub ftype: i32,
     pub description: String,
     pub metadata: crate::model_metadata::MetadataCache,
+    pub adapters: std::sync::Mutex<BTreeMap<usize, usize>>,
+    pub tensor_names: std::collections::BTreeSet<String>,
+}
+impl Drop for ModelData {
+    fn drop(&mut self) {
+        crate::adapter::release_model_adapters(self);
+    }
 }
 fn integer(meta: &BTreeMap<String, Value>, key: &str, default: i32) -> Result<i32> {
     match meta.get(key) {
@@ -396,6 +403,11 @@ unsafe fn load_set(
         format!("{architecture} {family} {}", file_type_name(ftype))
     };
     let metadata = crate::model_metadata::MetadataCache::build(&files)?;
+    let tensor_names = files
+        .tensors()
+        .iter()
+        .map(|tensor| tensor.name.clone())
+        .collect();
     let architecture = architecture.to_owned();
     let model = if vocab_only {
         None
@@ -440,6 +452,8 @@ unsafe fn load_set(
         ftype,
         description,
         metadata,
+        adapters: std::sync::Mutex::new(BTreeMap::new()),
+        tensor_names,
     });
     Ok(Box::into_raw(Box::new(ModelHandle { data, owned: true })))
 }

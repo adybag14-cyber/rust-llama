@@ -202,6 +202,10 @@ impl<'a> NativeMap<'a> {
         let key = self.keys[input];
         self.charge_work(key.len() as u64 + 1)?;
         let hash = string_hash(key, self.profile);
+        self.insert_hash(input, hash)
+    }
+    fn insert_hash(&mut self, input: usize, hash: u64) -> Result<(u64, bool)> {
+        let key = self.keys[input];
         let bucket = self.bucket(hash);
         let mut node = self.buckets[bucket];
         while node != NONE && self.bucket(self.nodes[node].hash) == bucket {
@@ -244,6 +248,30 @@ pub(crate) fn default_map_order(keys: &[&[u8]], profile: Profile, limits: Limits
         result_bytes,
         work_units: map.work,
     })
+}
+/// Frozen std::hash<uintptr_t> and default pointer-map list ordering.
+pub(crate) fn pointer_map_order(keys: &[usize], profile: Profile) -> Result<Vec<usize>> {
+    if keys.len() > 256 {
+        return Err("native adapter set exceeds 256 handles".into());
+    }
+    let words: Vec<_> = keys.iter().map(|key| (*key as u64).to_le_bytes()).collect();
+    let refs: Vec<_> = words.iter().map(|word| word.as_slice()).collect();
+    let mut map = NativeMap::new(
+        &refs,
+        profile,
+        Limits {
+            max_bytes: 128 * 1024,
+            max_work: 1_000_000,
+        },
+    )?;
+    for (index, key) in keys.iter().enumerate() {
+        let hash = match profile {
+            Profile::Msvc => string_hash(&words[index], Profile::Msvc),
+            Profile::Gnu => *key as u64,
+        };
+        map.insert_hash(index, hash)?;
+    }
+    map.order()
 }
 fn string_hash(bytes: &[u8], profile: Profile) -> u64 {
     match profile {

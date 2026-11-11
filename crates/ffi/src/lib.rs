@@ -16,6 +16,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
 pub mod abi;
+mod adapter;
 mod batch;
 mod batch_ext;
 mod chat;
@@ -33,6 +34,7 @@ mod split_path;
 mod state;
 mod vocab;
 pub use abi::*;
+pub use adapter::AdapterHandle;
 pub use context::ContextHandle;
 pub use model::{ModelHandle, VocabHandle};
 

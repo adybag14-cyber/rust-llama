@@ -378,7 +378,7 @@ impl MetadataCache {
             _work_units: work,
         })
     }
-    fn exact(&self) -> Result<&Self> {
+    pub(crate) fn exact(&self) -> Result<&Self> {
         if self.exact_profile {
             Ok(self)
         } else {
@@ -391,11 +391,49 @@ impl MetadataCache {
             .ok()
             .map(|position| &self.entries[self.by_key[position]])
     }
+    pub(crate) fn owned_bytes(&self) -> Result<usize> {
+        let mut bytes = add(
+            size_of::<Self>(),
+            add(
+                multiply(self.entries.capacity(), size_of::<Entry>())?,
+                multiply(self.by_key.capacity(), size_of::<usize>())?,
+            )?,
+        )?;
+        for entry in &self.entries {
+            bytes = add(bytes, add(entry.key.capacity(), entry.value.capacity())?)?;
+        }
+        Ok(bytes)
+    }
+    pub(crate) fn count(&self) -> Result<i32> {
+        i32::try_from(self.exact()?.entries.len())
+            .map_err(|_| "metadata count exceeds INT32_MAX".into())
+    }
+    pub(crate) fn value(&self, key: &[u8]) -> Result<Option<&[u8]>> {
+        Ok(self.exact()?.get(key).map(value_bytes))
+    }
+    pub(crate) fn key_at(&self, index: i32) -> Result<Option<&[u8]>> {
+        self.exact()?;
+        Ok(usize::try_from(index)
+            .ok()
+            .and_then(|index| self.entries.get(index))
+            .map(|entry| entry.key.as_slice()))
+    }
+    pub(crate) fn value_at(&self, index: i32) -> Result<Option<&[u8]>> {
+        self.exact()?;
+        Ok(usize::try_from(index)
+            .ok()
+            .and_then(|index| self.entries.get(index))
+            .map(value_bytes))
+    }
     pub(crate) fn chat_template(&self, key: &[u8]) -> Option<*const c_char> {
         self.get(key).map(|entry| entry.value.as_ptr().cast())
     }
 }
-unsafe fn copy_optional(value: Option<&[u8]>, output: *mut c_char, capacity: usize) -> Result<i32> {
+pub(crate) unsafe fn copy_optional(
+    value: Option<&[u8]>,
+    output: *mut c_char,
+    capacity: usize,
+) -> Result<i32> {
     if capacity > isize::MAX as usize {
         return Err("metadata output capacity exceeds pointer arithmetic range".into());
     }

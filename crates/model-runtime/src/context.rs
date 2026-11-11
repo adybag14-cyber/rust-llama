@@ -429,7 +429,9 @@ impl Context {
                     .expect("complete batch was validated before allocation");
                 debug_assert_eq!(state.position, item.position);
                 let input = match &item.input {
-                    Input::Token(token) => self.model.embedding(*token)?,
+                    Input::Token(token) => self
+                        .adapters
+                        .embedding(*token, self.model.embedding(*token)?)?,
                     Input::Embedding(values) => {
                         let mut copy = owned::allocate(values.len(), "external embedding copy")?;
                         copy.extend_from_slice(values);

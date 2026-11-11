@@ -1,0 +1,1044 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "profile": "windows",
+  "started": "2026-11-11T13:12:11.464370+00:00",
+  "commands": [
+    {
+      "name": "format",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7471665000011853
+    },
+    {
+      "name": "test-debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 20.524429200002487
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.2594022000012046
+    },
+    {
+      "name": "build-debug",
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3112323000023025
+    },
+    {
+      "name": "client-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\capture.py",
+        "rust-final-v3-debug",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\ffi-target\\debug\\llama_ffi.dll"
+      ],
+      "exit_code": 0,
+      "seconds": 3.445054400002846
+    },
+    {
+      "name": "test-release",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 110.71335700000054
+    },
+    {
+      "name": "build-release",
+      "argv": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "llama-ffi",
+        "--release"
+      ],
+      "exit_code": 0,
+      "seconds": 0.4897361000003002
+    },
+    {
+      "name": "client-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\capture.py",
+        "rust-final-v3-release",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\ffi-target\\release\\llama_ffi.dll"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9657305000000633
+    }
+  ],
+  "builds": {
+    "debug": {
+      "library": {
+        "bytes": 5321728,
+        "sha256": "2005eeaa812c14d5a6c600b33dfe6b771534f2ff8af46a1238fb4e1a2e31f72c"
+      },
+      "client_results": {
+        "bytes": 19290770,
+        "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+      },
+      "exact_original_match": true,
+      "loads": 44,
+      "accepted": 34,
+      "scenarios": 107,
+      "decodes": 333,
+      "f32_words": 170496,
+      "frozen_exports": 226,
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "absent": [
+        "llama_adapter_lora_init_from_file_ptr",
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_encode",
+        "llama_get_embeddings_seq",
+        "llama_get_sampled_candidates_count_ith",
+        "llama_get_sampled_candidates_ith",
+        "llama_get_sampled_logits_count_ith",
+        "llama_get_sampled_logits_ith",
+        "llama_get_sampled_probs_count_ith",
+        "llama_get_sampled_probs_ith",
+        "llama_get_sampled_token_ith",
+        "llama_model_cls_label",
+        "llama_model_init_from_user",
+        "llama_model_load_from_file_ptr",
+        "llama_model_n_cls_out",
+        "llama_model_quantize",
+        "llama_model_quantize_default_params",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all",
+        "llama_perf_context",
+        "llama_perf_context_print",
+        "llama_perf_context_reset",
+        "llama_print_system_info",
+        "llama_set_sampler",
+        "llama_set_warmup"
+      ],
+      "exports": [
+        "llama_adapter_get_alora_invocation_tokens",
+        "llama_adapter_get_alora_n_invocation_tokens",
+        "llama_adapter_lora_free",
+        "llama_adapter_lora_init",
+        "llama_adapter_meta_count",
+        "llama_adapter_meta_key_by_index",
+        "llama_adapter_meta_val_str",
+        "llama_adapter_meta_val_str_by_index",
+        "llama_add_bos_token",
+        "llama_add_eos_token",
+        "llama_backend_free",
+        "llama_backend_init",
+        "llama_batch_ext_add",
+        "llama_batch_ext_add_embd",
+        "llama_batch_ext_add_seq",
+        "llama_batch_ext_add_token",
+        "llama_batch_ext_clear",
+        "llama_batch_ext_free",
+        "llama_batch_ext_init",
+        "llama_batch_ext_set_embd_state",
+        "llama_batch_ext_set_embd_token",
+        "llama_batch_ext_set_output_embd",
+        "llama_batch_ext_set_output_logits",
+        "llama_batch_ext_set_pos",
+        "llama_batch_free",
+        "llama_batch_get_one",
+        "llama_batch_init",
+        "llama_chat_apply_template",
+        "llama_chat_builtin_templates",
+        "llama_context_default_params",
+        "llama_copy_state_data",
+        "llama_decode",
+        "llama_detokenize",
+        "llama_flash_attn_type_name",
+        "llama_free",
+        "llama_free_model",
+        "llama_ftype_name",
+        "llama_get_causal_attn",
+        "llama_get_embeddings",
+        "llama_get_embeddings_ith",
+        "llama_get_logits",
+        "llama_get_logits_ith",
+        "llama_get_memory",
+        "llama_get_model",
+        "llama_get_state_size",
+        "llama_init_from_model",
+        "llama_load_mode_from_str",
+        "llama_load_mode_name",
+        "llama_load_model_from_file",
+        "llama_load_session_file",
+        "llama_log_get",
+        "llama_log_set",
+        "llama_max_devices",
+        "llama_max_parallel_sequences",
+        "llama_max_tensor_buft_overrides",
+        "llama_memory_can_shift",
+        "llama_memory_clear",
+        "llama_memory_seq_add",
+        "llama_memory_seq_cp",
+        "llama_memory_seq_div",
+        "llama_memory_seq_keep",
+        "llama_memory_seq_pos_max",
+        "llama_memory_seq_pos_min",
+        "llama_memory_seq_rm",
+        "llama_model_chat_template",
+        "llama_model_decoder_start_token",
+        "llama_model_default_params",
+        "llama_model_desc",
+        "llama_model_free",
+        "llama_model_ftype",
+        "llama_model_get_vocab",
+        "llama_model_has_decoder",
+        "llama_model_has_encoder",
+        "llama_model_is_diffusion",
+        "llama_model_is_hybrid",
+        "llama_model_is_recurrent",
+        "llama_model_load_from_file",
+        "llama_model_load_from_splits",
+        "llama_model_meta_count",
+        "llama_model_meta_key_by_index",
+        "llama_model_meta_key_str",
+        "llama_model_meta_val_str",
+        "llama_model_meta_val_str_by_index",
+        "llama_model_n_ctx_train",
+        "llama_model_n_embd",
+        "llama_model_n_embd_inp",
+        "llama_model_n_embd_out",
+        "llama_model_n_head",
+        "llama_model_n_head_kv",
+        "llama_model_n_layer",
+        "llama_model_n_layer_nextn",
+        "llama_model_n_params",
+        "llama_model_n_swa",
+        "llama_model_rope_freq_scale_train",
+        "llama_model_rope_type",
+        "llama_model_size",
+        "llama_n_batch",
+        "llama_n_ctx",
+        "llama_n_ctx_seq",
+        "llama_n_ctx_train",
+        "llama_n_embd",
+        "llama_n_head",
+        "llama_n_layer",
+        "llama_n_rs_seq",
+        "llama_n_seq_max",
+        "llama_n_threads",
+        "llama_n_threads_batch",
+        "llama_n_ubatch",
+        "llama_n_vocab",
+        "llama_new_context_with_model",
+        "llama_perf_sampler",
+        "llama_perf_sampler_print",
+        "llama_perf_sampler_reset",
+        "llama_pooling_type",
+        "llama_process",
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout",
+        "llama_sampler_accept",
+        "llama_sampler_apply",
+        "llama_sampler_chain_add",
+        "llama_sampler_chain_default_params",
+        "llama_sampler_chain_get",
+        "llama_sampler_chain_init",
+        "llama_sampler_chain_n",
+        "llama_sampler_chain_remove",
+        "llama_sampler_clone",
+        "llama_sampler_copy",
+        "llama_sampler_free",
+        "llama_sampler_get_seed",
+        "llama_sampler_init",
+        "llama_sampler_init_adaptive_p",
+        "llama_sampler_init_dist",
+        "llama_sampler_init_dry",
+        "llama_sampler_init_grammar",
+        "llama_sampler_init_grammar_lazy",
+        "llama_sampler_init_grammar_lazy_patterns",
+        "llama_sampler_init_greedy",
+        "llama_sampler_init_infill",
+        "llama_sampler_init_logit_bias",
+        "llama_sampler_init_min_p",
+        "llama_sampler_init_mirostat",
+        "llama_sampler_init_mirostat_v2",
+        "llama_sampler_init_penalties",
+        "llama_sampler_init_temp",
+        "llama_sampler_init_temp_ext",
+        "llama_sampler_init_top_k",
+        "llama_sampler_init_top_n_sigma",
+        "llama_sampler_init_top_p",
+        "llama_sampler_init_typical",
+        "llama_sampler_init_xtc",
+        "llama_sampler_name",
+        "llama_sampler_reset",
+        "llama_sampler_sample",
+        "llama_save_session_file",
+        "llama_set_abort_callback",
+        "llama_set_adapter_cvec",
+        "llama_set_adapters_lora",
+        "llama_set_causal_attn",
+        "llama_set_embeddings",
+        "llama_set_n_threads",
+        "llama_set_state_data",
+        "llama_split_path",
+        "llama_split_prefix",
+        "llama_state_get_data",
+        "llama_state_get_size",
+        "llama_state_load_file",
+        "llama_state_save_file",
+        "llama_state_seq_get_data",
+        "llama_state_seq_get_data_ext",
+        "llama_state_seq_get_size",
+        "llama_state_seq_get_size_ext",
+        "llama_state_seq_load_file",
+        "llama_state_seq_save_file",
+        "llama_state_seq_set_data",
+        "llama_state_seq_set_data_ext",
+        "llama_state_set_data",
+        "llama_supports_gpu_offload",
+        "llama_supports_mlock",
+        "llama_supports_mmap",
+        "llama_supports_rpc",
+        "llama_synchronize",
+        "llama_time_us",
+        "llama_token_bos",
+        "llama_token_cls",
+        "llama_token_eos",
+        "llama_token_eot",
+        "llama_token_fim_mid",
+        "llama_token_fim_pad",
+        "llama_token_fim_pre",
+        "llama_token_fim_rep",
+        "llama_token_fim_sep",
+        "llama_token_fim_suf",
+        "llama_token_get_attr",
+        "llama_token_get_score",
+        "llama_token_get_text",
+        "llama_token_is_control",
+        "llama_token_is_eog",
+        "llama_token_nl",
+        "llama_token_pad",
+        "llama_token_sep",
+        "llama_token_to_piece",
+        "llama_tokenize",
+        "llama_version",
+        "llama_vocab_bos",
+        "llama_vocab_cls",
+        "llama_vocab_eos",
+        "llama_vocab_eot",
+        "llama_vocab_fim_mid",
+        "llama_vocab_fim_pad",
+        "llama_vocab_fim_pre",
+        "llama_vocab_fim_rep",
+        "llama_vocab_fim_sep",
+        "llama_vocab_fim_suf",
+        "llama_vocab_get_add_bos",
+        "llama_vocab_get_add_eos",
+        "llama_vocab_get_add_sep",
+        "llama_vocab_get_attr",
+        "llama_vocab_get_score",
+        "llama_vocab_get_suppress_tokens",
+        "llama_vocab_get_text",
+        "llama_vocab_is_control",
+        "llama_vocab_is_eog",
+        "llama_vocab_mask",
+        "llama_vocab_n_tokens",
+        "llama_vocab_nl",
+        "llama_vocab_pad",
+        "llama_vocab_sep",
+        "llama_vocab_type"
+      ]
+    },
+    "release": {
+      "library": {
+        "bytes": 2349056,
+        "sha256": "5cc82c906a128502831936c8242996e30898cbda2deefc9730ef26faab287bf4"
+      },
+      "client_results": {
+        "bytes": 19290770,
+        "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+      },
+      "exact_original_match": true,
+      "loads": 44,
+      "accepted": 34,
+      "scenarios": 107,
+      "decodes": 333,
+      "f32_words": 170496,
+      "frozen_exports": 226,
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "absent": [
+        "llama_adapter_lora_init_from_file_ptr",
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_encode",
+        "llama_get_embeddings_seq",
+        "llama_get_sampled_candidates_count_ith",
+        "llama_get_sampled_candidates_ith",
+        "llama_get_sampled_logits_count_ith",
+        "llama_get_sampled_logits_ith",
+        "llama_get_sampled_probs_count_ith",
+        "llama_get_sampled_probs_ith",
+        "llama_get_sampled_token_ith",
+        "llama_model_cls_label",
+        "llama_model_init_from_user",
+        "llama_model_load_from_file_ptr",
+        "llama_model_n_cls_out",
+        "llama_model_quantize",
+        "llama_model_quantize_default_params",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all",
+        "llama_perf_context",
+        "llama_perf_context_print",
+        "llama_perf_context_reset",
+        "llama_print_system_info",
+        "llama_set_sampler",
+        "llama_set_warmup"
+      ],
+      "exports": [
+        "llama_adapter_get_alora_invocation_tokens",
+        "llama_adapter_get_alora_n_invocation_tokens",
+        "llama_adapter_lora_free",
+        "llama_adapter_lora_init",
+        "llama_adapter_meta_count",
+        "llama_adapter_meta_key_by_index",
+        "llama_adapter_meta_val_str",
+        "llama_adapter_meta_val_str_by_index",
+        "llama_add_bos_token",
+        "llama_add_eos_token",
+        "llama_backend_free",
+        "llama_backend_init",
+        "llama_batch_ext_add",
+        "llama_batch_ext_add_embd",
+        "llama_batch_ext_add_seq",
+        "llama_batch_ext_add_token",
+        "llama_batch_ext_clear",
+        "llama_batch_ext_free",
+        "llama_batch_ext_init",
+        "llama_batch_ext_set_embd_state",
+        "llama_batch_ext_set_embd_token",
+        "llama_batch_ext_set_output_embd",
+        "llama_batch_ext_set_output_logits",
+        "llama_batch_ext_set_pos",
+        "llama_batch_free",
+        "llama_batch_get_one",
+        "llama_batch_init",
+        "llama_chat_apply_template",
+        "llama_chat_builtin_templates",
+        "llama_context_default_params",
+        "llama_copy_state_data",
+        "llama_decode",
+        "llama_detokenize",
+        "llama_flash_attn_type_name",
+        "llama_free",
+        "llama_free_model",
+        "llama_ftype_name",
+        "llama_get_causal_attn",
+        "llama_get_embeddings",
+        "llama_get_embeddings_ith",
+        "llama_get_logits",
+        "llama_get_logits_ith",
+        "llama_get_memory",
+        "llama_get_model",
+        "llama_get_state_size",
+        "llama_init_from_model",
+        "llama_load_mode_from_str",
+        "llama_load_mode_name",
+        "llama_load_model_from_file",
+        "llama_load_session_file",
+        "llama_log_get",
+        "llama_log_set",
+        "llama_max_devices",
+        "llama_max_parallel_sequences",
+        "llama_max_tensor_buft_overrides",
+        "llama_memory_can_shift",
+        "llama_memory_clear",
+        "llama_memory_seq_add",
+        "llama_memory_seq_cp",
+        "llama_memory_seq_div",
+        "llama_memory_seq_keep",
+        "llama_memory_seq_pos_max",
+        "llama_memory_seq_pos_min",
+        "llama_memory_seq_rm",
+        "llama_model_chat_template",
+        "llama_model_decoder_start_token",
+        "llama_model_default_params",
+        "llama_model_desc",
+        "llama_model_free",
+        "llama_model_ftype",
+        "llama_model_get_vocab",
+        "llama_model_has_decoder",
+        "llama_model_has_encoder",
+        "llama_model_is_diffusion",
+        "llama_model_is_hybrid",
+        "llama_model_is_recurrent",
+        "llama_model_load_from_file",
+        "llama_model_load_from_splits",
+        "llama_model_meta_count",
+        "llama_model_meta_key_by_index",
+        "llama_model_meta_key_str",
+        "llama_model_meta_val_str",
+        "llama_model_meta_val_str_by_index",
+        "llama_model_n_ctx_train",
+        "llama_model_n_embd",
+        "llama_model_n_embd_inp",
+        "llama_model_n_embd_out",
+        "llama_model_n_head",
+        "llama_model_n_head_kv",
+        "llama_model_n_layer",
+        "llama_model_n_layer_nextn",
+        "llama_model_n_params",
+        "llama_model_n_swa",
+        "llama_model_rope_freq_scale_train",
+        "llama_model_rope_type",
+        "llama_model_size",
+        "llama_n_batch",
+        "llama_n_ctx",
+        "llama_n_ctx_seq",
+        "llama_n_ctx_train",
+        "llama_n_embd",
+        "llama_n_head",
+        "llama_n_layer",
+        "llama_n_rs_seq",
+        "llama_n_seq_max",
+        "llama_n_threads",
+        "llama_n_threads_batch",
+        "llama_n_ubatch",
+        "llama_n_vocab",
+        "llama_new_context_with_model",
+        "llama_perf_sampler",
+        "llama_perf_sampler_print",
+        "llama_perf_sampler_reset",
+        "llama_pooling_type",
+        "llama_process",
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout",
+        "llama_sampler_accept",
+        "llama_sampler_apply",
+        "llama_sampler_chain_add",
+        "llama_sampler_chain_default_params",
+        "llama_sampler_chain_get",
+        "llama_sampler_chain_init",
+        "llama_sampler_chain_n",
+        "llama_sampler_chain_remove",
+        "llama_sampler_clone",
+        "llama_sampler_copy",
+        "llama_sampler_free",
+        "llama_sampler_get_seed",
+        "llama_sampler_init",
+        "llama_sampler_init_adaptive_p",
+        "llama_sampler_init_dist",
+        "llama_sampler_init_dry",
+        "llama_sampler_init_grammar",
+        "llama_sampler_init_grammar_lazy",
+        "llama_sampler_init_grammar_lazy_patterns",
+        "llama_sampler_init_greedy",
+        "llama_sampler_init_infill",
+        "llama_sampler_init_logit_bias",
+        "llama_sampler_init_min_p",
+        "llama_sampler_init_mirostat",
+        "llama_sampler_init_mirostat_v2",
+        "llama_sampler_init_penalties",
+        "llama_sampler_init_temp",
+        "llama_sampler_init_temp_ext",
+        "llama_sampler_init_top_k",
+        "llama_sampler_init_top_n_sigma",
+        "llama_sampler_init_top_p",
+        "llama_sampler_init_typical",
+        "llama_sampler_init_xtc",
+        "llama_sampler_name",
+        "llama_sampler_reset",
+        "llama_sampler_sample",
+        "llama_save_session_file",
+        "llama_set_abort_callback",
+        "llama_set_adapter_cvec",
+        "llama_set_adapters_lora",
+        "llama_set_causal_attn",
+        "llama_set_embeddings",
+        "llama_set_n_threads",
+        "llama_set_state_data",
+        "llama_split_path",
+        "llama_split_prefix",
+        "llama_state_get_data",
+        "llama_state_get_size",
+        "llama_state_load_file",
+        "llama_state_save_file",
+        "llama_state_seq_get_data",
+        "llama_state_seq_get_data_ext",
+        "llama_state_seq_get_size",
+        "llama_state_seq_get_size_ext",
+        "llama_state_seq_load_file",
+        "llama_state_seq_save_file",
+        "llama_state_seq_set_data",
+        "llama_state_seq_set_data_ext",
+        "llama_state_set_data",
+        "llama_supports_gpu_offload",
+        "llama_supports_mlock",
+        "llama_supports_mmap",
+        "llama_supports_rpc",
+        "llama_synchronize",
+        "llama_time_us",
+        "llama_token_bos",
+        "llama_token_cls",
+        "llama_token_eos",
+        "llama_token_eot",
+        "llama_token_fim_mid",
+        "llama_token_fim_pad",
+        "llama_token_fim_pre",
+        "llama_token_fim_rep",
+        "llama_token_fim_sep",
+        "llama_token_fim_suf",
+        "llama_token_get_attr",
+        "llama_token_get_score",
+        "llama_token_get_text",
+        "llama_token_is_control",
+        "llama_token_is_eog",
+        "llama_token_nl",
+        "llama_token_pad",
+        "llama_token_sep",
+        "llama_token_to_piece",
+        "llama_tokenize",
+        "llama_version",
+        "llama_vocab_bos",
+        "llama_vocab_cls",
+        "llama_vocab_eos",
+        "llama_vocab_eot",
+        "llama_vocab_fim_mid",
+        "llama_vocab_fim_pad",
+        "llama_vocab_fim_pre",
+        "llama_vocab_fim_rep",
+        "llama_vocab_fim_sep",
+        "llama_vocab_fim_suf",
+        "llama_vocab_get_add_bos",
+        "llama_vocab_get_add_eos",
+        "llama_vocab_get_add_sep",
+        "llama_vocab_get_attr",
+        "llama_vocab_get_score",
+        "llama_vocab_get_suppress_tokens",
+        "llama_vocab_get_text",
+        "llama_vocab_is_control",
+        "llama_vocab_is_eog",
+        "llama_vocab_mask",
+        "llama_vocab_n_tokens",
+        "llama_vocab_nl",
+        "llama_vocab_pad",
+        "llama_vocab_sep",
+        "llama_vocab_type"
+      ]
+    }
+  },
+  "tested_git_head": "91589e125d2232e9de7c4791fe88abd4ba184b1f",
+  "tested_sources": {
+    "crates/ffi/ABI_LAYOUT.md": {
+      "bytes": 5746,
+      "sha256": "3d53d22eb99db8db7920ed00435d3d429be40ab5473d209947913a49eaf30a33"
+    },
+    "crates/ffi/ADAPTERS.md": {
+      "bytes": 11107,
+      "sha256": "8f8f25f00bb043df33b5ac7feccb4e32d398216e07885b61da7a33c8b3f2397d"
+    },
+    "crates/ffi/BATCH_EXT.md": {
+      "bytes": 4749,
+      "sha256": "7ce0aab50350b8ddef74056b8f7ef82b02e31444e85216c7e1bc92118ca9521e"
+    },
+    "crates/ffi/Cargo.toml": {
+      "bytes": 543,
+      "sha256": "e148f8cc3fa2ddcee6dd7dc8d5c53c8f0cffea3e5e855a2d072d5e88b845148f"
+    },
+    "crates/ffi/CHAT.md": {
+      "bytes": 6085,
+      "sha256": "97faed6022ab4371808a6ddfe87e16fb796b0320d726dda4376cfd6e3a7d8c7a"
+    },
+    "crates/ffi/COVERAGE.md": {
+      "bytes": 11304,
+      "sha256": "ea33a7ca22f05fedcca93e0c43ccee3efa32da231f23b9838f26a7e223cf4615"
+    },
+    "crates/ffi/ENUMS.md": {
+      "bytes": 3642,
+      "sha256": "65b0e6ec948f8239ebf3031e954c8d0cebf829f8615f84e19dd6ecc2a5f91381"
+    },
+    "crates/ffi/EXECUTION.md": {
+      "bytes": 9231,
+      "sha256": "3b92ea35f24cee006fb25d4ecb8d05feab006937174a333c37f3af85d915c5e6"
+    },
+    "crates/ffi/METADATA.md": {
+      "bytes": 6615,
+      "sha256": "0da595a8ec64f29ab68a4ebd3be30b56f649f618c946263c0c33d21cf9264b0e"
+    },
+    "crates/ffi/PERFORMANCE.md": {
+      "bytes": 5736,
+      "sha256": "b65f1c56a5fafcb162e9e25a6bdd2e25f167459c02430128c10f64a491d97d9c"
+    },
+    "crates/ffi/README.md": {
+      "bytes": 22475,
+      "sha256": "f3134da1a5f085f36f61eeb83b3111a491db7168be48d0fa8c1eda4098c7dc5c"
+    },
+    "crates/ffi/SAMPLERS.md": {
+      "bytes": 15301,
+      "sha256": "8a0e1e2d228958b2b3c7eb35694fcdccec42a3bab32f56a1b74f00ea6d83af33"
+    },
+    "crates/ffi/SPLITS.md": {
+      "bytes": 6843,
+      "sha256": "4439bf9abdaaeb5f3125c7becd30106e85fa667cc823c3a516f574b77e5c2b91"
+    },
+    "crates/ffi/src/abi.rs": {
+      "bytes": 11506,
+      "sha256": "7ea634b3170214ced2aac82c47680a9124481dda799a02a6505a8a8a46d2b3c4"
+    },
+    "crates/ffi/src/adapter.rs": {
+      "bytes": 22144,
+      "sha256": "77c1934026779475838336180db4d7f97519f8300fc23586393a654d0f5b538e"
+    },
+    "crates/ffi/src/adapter_reference_tests.rs": {
+      "bytes": 21361,
+      "sha256": "9ac5193b35f4a44717807b9ee46bd21508a7bc27b621ea45113c3e89ec56d5f9"
+    },
+    "crates/ffi/src/batch.rs": {
+      "bytes": 6439,
+      "sha256": "c77300e45bab5615ba2605142ba056a9dd7d09329cd630d6647aea6b0cd543f0"
+    },
+    "crates/ffi/src/batch_ext/tests.rs": {
+      "bytes": 13957,
+      "sha256": "369200bdd200e6f4c063753db5b25a6266d8abe812a6dcbcc89807cfbe16cdf7"
+    },
+    "crates/ffi/src/batch_ext.rs": {
+      "bytes": 12142,
+      "sha256": "47506e74e956d4106292de2d6de98237aeda35d2a6651ea656a0d9b9afc03f0b"
+    },
+    "crates/ffi/src/chat/tests.rs": {
+      "bytes": 11087,
+      "sha256": "7ff0778d83e9e698d7f559e9c73c416aa7e6d1c00934a9e2086208598489d733"
+    },
+    "crates/ffi/src/chat.rs": {
+      "bytes": 6034,
+      "sha256": "af9d197f785d53fa16e0fce26c5945fad04d48401e143a55a161893dcda7b4c3"
+    },
+    "crates/ffi/src/context.rs": {
+      "bytes": 17418,
+      "sha256": "a6c456d8d63c8fa527145003613109eca5a6ce38c9c0ee69de068e59b36f557b"
+    },
+    "crates/ffi/src/context_reference_tests.rs": {
+      "bytes": 36378,
+      "sha256": "d113732919d01a37321723de02a48681d34773f080e79e605eb0b9a44a1b5f54"
+    },
+    "crates/ffi/src/enum_names.rs": {
+      "bytes": 9625,
+      "sha256": "befa6dc208f2572d57ec09edd63998f8797a5f0cf35595b7009e8551acb727d7"
+    },
+    "crates/ffi/src/f16_context_reference_tests.rs": {
+      "bytes": 28332,
+      "sha256": "36ba8d15003df664759273e28f6f9586552531293b0099acf39fdcf415936b75"
+    },
+    "crates/ffi/src/lib.rs": {
+      "bytes": 9518,
+      "sha256": "c587eaca28377d9beea0926a11a98db2e4ac0e64a09b4b3349d5359691488d96"
+    },
+    "crates/ffi/src/logging.rs": {
+      "bytes": 3119,
+      "sha256": "241ce0fb4ad562fffcb2c06b9936dafd4a73e5217e3c59a8e43b23df7df53445"
+    },
+    "crates/ffi/src/memory.rs": {
+      "bytes": 2568,
+      "sha256": "34037f594e285ede4dc21f3e6f231870d6e7a5d58429c4311666410c125cc6f1"
+    },
+    "crates/ffi/src/model.rs": {
+      "bytes": 20229,
+      "sha256": "0f21b12acd53e32bfb96a29577b8a5625c95edc8ce2eb8b969cd8ebe8ad128d9"
+    },
+    "crates/ffi/src/model_metadata.rs": {
+      "bytes": 22287,
+      "sha256": "397ad6300eda5d1db3c2caef73f960fe57f6ba5ad14f31f1d3681f570d6f978c"
+    },
+    "crates/ffi/src/model_metadata_reference_tests.rs": {
+      "bytes": 15570,
+      "sha256": "746bc43e772113434e0c8dcbfad41f8f204c3df71ff9d1bd3b3b624773a73615"
+    },
+    "crates/ffi/src/model_shard_tests.rs": {
+      "bytes": 17380,
+      "sha256": "14e705f05ac51eb670db176d98b5053f308f3fdc68861ce13f93e8f729ff47d8"
+    },
+    "crates/ffi/src/model_split_list_tests.rs": {
+      "bytes": 9685,
+      "sha256": "dde4f8c41df868adb26693d894418d43407fe7c28f791dd24bc1e3aafeca1377"
+    },
+    "crates/ffi/src/native_metadata_policy.rs": {
+      "bytes": 11787,
+      "sha256": "6d02256460a16f7ddc56d2698ed781eb07834ecb39357bd3c29d6d2e31b74d18"
+    },
+    "crates/ffi/src/native_metadata_policy_tests.rs": {
+      "bytes": 8350,
+      "sha256": "d06ade563034253541956cb69b09ce2b40622a46479d2e24c71bb90726bce788"
+    },
+    "crates/ffi/src/native_microbatch_reference_tests.rs": {
+      "bytes": 19876,
+      "sha256": "75670f1c828b80a18359281e857fbc04a8ad4de597a906b54b5f172b54dee5bf"
+    },
+    "crates/ffi/src/sampler.rs": {
+      "bytes": 54085,
+      "sha256": "9a7d28780c09b0a808d49385da86004c8af089f81e5607c6c8df2dff9fdbc2bf"
+    },
+    "crates/ffi/src/sampler_grammar.rs": {
+      "bytes": 9794,
+      "sha256": "d5bcac15f46998536cc3b67f206c6fc590bc67a19e3008dfd7c82e1df66ef7a7"
+    },
+    "crates/ffi/src/sampler_perf_reference_tests.rs": {
+      "bytes": 19164,
+      "sha256": "b2a9c55ca42e39aa4aff148590f31128b40b832e7c76a65fd11cc468f935477d"
+    },
+    "crates/ffi/src/sampler_reference_tests.rs": {
+      "bytes": 17817,
+      "sha256": "a81bc49f0649fc9f4d9bdfe5afff13894e6cb4caa1503fbedbb4760e6bde01e2"
+    },
+    "crates/ffi/src/sampler_vocab.rs": {
+      "bytes": 5771,
+      "sha256": "7a9d1bad7bdc3d8973762aba199dc303f4dc09c4cbb914a4dbb264611581c5de"
+    },
+    "crates/ffi/src/split_path.rs": {
+      "bytes": 9569,
+      "sha256": "e704365019ba14b420eef6beab610c5f04a7acfa1629b628634e07ca6ef940ab"
+    },
+    "crates/ffi/src/state.rs": {
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    "crates/ffi/src/vocab.rs": {
+      "bytes": 12340,
+      "sha256": "162efe3c5489688a9d1448ab11de179c5303078582e0ed3515f835b3d8d8d588"
+    },
+    "crates/ffi/STATE.md": {
+      "bytes": 11863,
+      "sha256": "aab516fec6c2dcca5cd48f6ed8d0b228fa7731456b125c5445134c5f219eda88"
+    },
+    "crates/ffi/THIRD_PARTY_LICENSES.md": {
+      "bytes": 13415,
+      "sha256": "b2bdacf08e6284bc4e357cf0dc7eda97d4bc9d843d8365093aac0db65200ea11"
+    },
+    "crates/model-runtime/Cargo.toml": {
+      "bytes": 313,
+      "sha256": "f34cf87596889d08d688a8c3baf8e221f39ebf7c9571c02ab70aeaa444fe4e82"
+    },
+    "crates/model-runtime/examples/build_reference.rs": {
+      "bytes": 4243,
+      "sha256": "3a36ad7621515f55e616db039c9882efbcaf4462c26532adf80e4d17406a1a05"
+    },
+    "crates/model-runtime/examples/reference_oracle.rs": {
+      "bytes": 25068,
+      "sha256": "d8e4138bdebb0177c1531b34d36fe114652e406d1d65daef64d2dd89ac59e9e1"
+    },
+    "crates/model-runtime/examples/registry_audit.rs": {
+      "bytes": 486,
+      "sha256": "58db8564d69caccab7556b124af4841c98e24523b7c1b721b6e9fd88e9591f7d"
+    },
+    "crates/model-runtime/examples/smoke.rs": {
+      "bytes": 126,
+      "sha256": "5c9db86c433063d5f5e769f5b487320185916868e3bd71ec2023471720cd2d14"
+    },
+    "crates/model-runtime/src/adapters.rs": {
+      "bytes": 6296,
+      "sha256": "5dcffde418b204e3c89d2d91b2ae29df6bf96df822af989ba5c3cf0676722010"
+    },
+    "crates/model-runtime/src/bert.rs": {
+      "bytes": 11368,
+      "sha256": "fdf7faeadb86e40e779ae1cad3f4f9f034f96d533fbc7fec85e6ced941482c3a"
+    },
+    "crates/model-runtime/src/context/allocation_tests.rs": {
+      "bytes": 17001,
+      "sha256": "e754eeb47645b796e02ca0e1bcaa39904934e380183899f542d594140159dc8e"
+    },
+    "crates/model-runtime/src/context/native.rs": {
+      "bytes": 46771,
+      "sha256": "b450c44d2923c0ea9e672825aacb0d7d154fce71b379afe04787fb004f8a9574"
+    },
+    "crates/model-runtime/src/context/native_batch.rs": {
+      "bytes": 10451,
+      "sha256": "69022f994e32daaba06acbd0612270cd28e1c4153f373add8e8bb0037dc70ef4"
+    },
+    "crates/model-runtime/src/context/native_decode.rs": {
+      "bytes": 30386,
+      "sha256": "9b9882ba7af8a11999426fdcbab8daa0cb41109f218600a137c036c8541c616b"
+    },
+    "crates/model-runtime/src/context/native_kv.rs": {
+      "bytes": 6052,
+      "sha256": "397f50d500c13a5304e568000364d8758f5f858ea04088517d8abb3bedb8ed5d"
+    },
+    "crates/model-runtime/src/context/native_row_map.rs": {
+      "bytes": 9988,
+      "sha256": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+    },
+    "crates/model-runtime/src/context/native_state.rs": {
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    "crates/model-runtime/src/context/owned.rs": {
+      "bytes": 16925,
+      "sha256": "110011f7d8c4bdeda83ed651ebfd8340c8159a8f64afed8bb62ab83121cb8b3b"
+    },
+    "crates/model-runtime/src/context.rs": {
+      "bytes": 19814,
+      "sha256": "af7e8afa99eda841360360053525c31e2d3b78a7999f471a06f0f8886b1513f7"
+    },
+    "crates/model-runtime/src/fixtures.rs": {
+      "bytes": 10556,
+      "sha256": "5b19fbb1430aaba3760c1387a702690fb4312c1458a70adda19f9eb44af7d3a5"
+    },
+    "crates/model-runtime/src/gpt2.rs": {
+      "bytes": 11481,
+      "sha256": "3b4fa7165025c7ac07dd9c0853e2b463d8e4a23754e2d09a7f74dee0a11117e3"
+    },
+    "crates/model-runtime/src/gptneox.rs": {
+      "bytes": 12034,
+      "sha256": "252e87728827ab3fd4c3a23f3dededf69e056000b686465186b4c66af598c65f"
+    },
+    "crates/model-runtime/src/lib.rs": {
+      "bytes": 10143,
+      "sha256": "96e6e4d7905504b3413b3ed52dbe58d2ff094d59e0111f7ece6739ef8b878132"
+    },
+    "crates/model-runtime/src/llama.rs": {
+      "bytes": 16032,
+      "sha256": "98736b2ea7d2b894c14ff523f148869621ceecdbbe57638123ea5b8e0c8f1984"
+    },
+    "crates/model-runtime/src/mamba.rs": {
+      "bytes": 12825,
+      "sha256": "8f2517e0d16d201bef6857485dce7aa7c81877413165241848114e5240cc760b"
+    },
+    "crates/model-runtime/src/math/native_rows.rs": {
+      "bytes": 243,
+      "sha256": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90"
+    },
+    "crates/model-runtime/src/math.rs": {
+      "bytes": 25884,
+      "sha256": "b73c56f989f8f5df7863bfdb730446cd701c20652f927c99bfac3a02fc60d1ed"
+    },
+    "crates/model-runtime/src/qwen2.rs": {
+      "bytes": 15274,
+      "sha256": "d87be80dc22d048ca2af9386580dffd6674eb8b44eed380f4ffe21fc141708c2"
+    },
+    "crates/model-runtime/src/qwen3.rs": {
+      "bytes": 17320,
+      "sha256": "16c744baed3bb2bc90eecc6028ee76e5434b86211d9d4a380d5fa8a56fa5f473"
+    },
+    "crates/model-runtime/src/registry.rs": {
+      "bytes": 160130,
+      "sha256": "fcb8c791ea5969e3f3ebc000c19d3e473a7909bb16c05cd462f81daf98e97c46"
+    },
+    "crates/model-runtime/src/state.rs": {
+      "bytes": 9741,
+      "sha256": "608a9e953256829ed9baea306b4a4e8ed987c158b81b160b532ee26b7e881115"
+    },
+    "crates/model-runtime/tests/gpt2.rs": {
+      "bytes": 3844,
+      "sha256": "43b1db1babdfb513330565e72535a0f265e2e533eaee431df56a79f2d4b7029c"
+    },
+    "crates/model-runtime/tests/gptneox.rs": {
+      "bytes": 4028,
+      "sha256": "174f46e291304ac70f6e38abc03cca0553e5370449b72f2c5b5d2b22ad67cc65"
+    },
+    "crates/model-runtime/tests/native_rows_graphs.rs": {
+      "bytes": 4413,
+      "sha256": "9b147da9d7b039125923c8b26be5e130b8465d04974257ee37e52a36f1722433"
+    },
+    "crates/model-runtime/tests/native_rows_native.rs": {
+      "bytes": 4603,
+      "sha256": "22468ee5029f43816e9c9c9f266d4d9f71f855340ddd7c8197736858330092b9"
+    },
+    "crates/model-runtime/tests/native_rows_variance.rs": {
+      "bytes": 6523,
+      "sha256": "e2da0dec649cd72a11e68d342dff0315213b1681ca96f7622ce0273da405c195"
+    },
+    "crates/model-runtime/tests/numerical_reference.rs": {
+      "bytes": 2391,
+      "sha256": "1cbf5db254317e5b7afd3ba19a3b969c18df0e4322a9145f34abc65a19405d32"
+    },
+    "crates/model-runtime/tests/qwen2.rs": {
+      "bytes": 2741,
+      "sha256": "51347a6efd9736dc89efa6d37fabafc5a90fa68777bf1115c6532045c7835bfe"
+    },
+    "crates/model-runtime/tests/qwen3.rs": {
+      "bytes": 11115,
+      "sha256": "dcb215ea3a6f1ca8a0072378820b8d0d25c00110017800d38b5bd9461aab6135"
+    },
+    "crates/model-runtime/tests/runtime.rs": {
+      "bytes": 24495,
+      "sha256": "3db2e4140c2dd1944febd68f592502220ea96c4a39410f946d6f9f1d2618af6b"
+    }
+  },
+  "original_capture": {
+    "bytes": 19290770,
+    "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+  },
+  "fixture_provenance": {
+    "bytes": 37696,
+    "sha256": "d30d8ff818ead5777334dc6dfe3a3fd123705041ae331a51c9648578600e1d5e"
+  },
+  "validator": {
+    "bytes": 6596,
+    "sha256": "2a3031efab91ce4af478077b39e63e58884fcb2c41e546a333793145c279648c"
+  },
+  "completed": "2026-11-11T13:14:31.157493+00:00"
+}

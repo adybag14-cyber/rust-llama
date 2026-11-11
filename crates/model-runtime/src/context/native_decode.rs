@@ -86,6 +86,8 @@ fn owned_work(context: &NativeContext, batch: &[NativeBatchToken]) -> Result<usi
         bytes = add(bytes, mul(context.capacity, 4)?)?; // one physical score row
         bytes = add(bytes, mul(model.config().head_dim()?, 8)?)?; // F64 PV sum
     }
+    // LoRA rank is independent of model width and may exceed its projections.
+    bytes = add(bytes, context.adapters.scratch_bytes()?)?;
     // Per-token projection/normalization/FFN and final vocabulary temporaries.
     // These do not scale with the number of live hidden/query rows above.
     bytes = add(bytes, mul(width, 128)?)?;
@@ -234,7 +236,7 @@ impl NativeContext {
         let mut hidden = zeros::<f32>(mul(chunk.indices.len(), width)?)?;
         for (within, &original) in chunk.indices.iter().enumerate() {
             let input = match &batch[original].input {
-                Input::Token(token) => model.embedding(*token)?,
+                Input::Token(token) => self.adapters.embedding(*token, model.embedding(*token)?)?,
                 Input::Embedding(values) => copy_values(values)?,
             };
             hidden[within * width..(within + 1) * width].copy_from_slice(&input);

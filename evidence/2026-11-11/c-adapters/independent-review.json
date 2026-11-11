@@ -1,0 +1,53 @@
+{
+  "reviewed_utc": "2026-11-11T13:15:16.461Z",
+  "role": "Independent read-only source review by attention worker; no ffi worktree mutation or extra builds",
+  "reviewed_sha256": {
+    "crates/ffi/src/adapter.rs": "77c1934026779475838336180db4d7f97519f8300fc23586393a654d0f5b538e",
+    "crates/ffi/src/adapter_reference_tests.rs": "9ac5193b35f4a44717807b9ee46bd21508a7bc27b621ea45113c3e89ec56d5f9",
+    "crates/model-runtime/src/adapters.rs": "5dcffde418b204e3c89d2d91b2ae29df6bf96df822af989ba5c3cf0676722010",
+    "crates/ffi/src/model.rs": "0f21b12acd53e32bfb96a29577b8a5625c95edc8ce2eb8b969cd8ebe8ad128d9",
+    "crates/ffi/ADAPTERS.md": "8f8f25f00bb043df33b5ac7feccb4e32d398216e07885b61da7a33c8b3f2397d",
+    "crates/model-runtime/src/math.rs": "b73c56f989f8f5df7863bfdb730446cd701c20652f927c99bfac3a02fc60d1ed",
+    "crates/ffi/src/native_metadata_policy.rs": "6d02256460a16f7ddc56d2698ed781eb07834ecb39357bd3c29d6d2e31b74d18",
+    "crates/model-runtime/src/context/native_decode.rs": "9b9882ba7af8a11999426fdcbab8daa0cb41109f218600a137c036c8541c616b",
+    "crates/model-runtime/src/context/native.rs": "b450c44d2923c0ea9e672825aacb0d7d154fce71b379afe04787fb004f8a9574"
+  },
+  "blocking_findings": [],
+  "resolved_findings": [
+    {
+      "title": "Freed active handle address reuse could retain retired execution payload",
+      "original_sha256": "9a2c32b2605649604db89ad13fd5e3f6c4e03d2ed8217329203af87ba8278225",
+      "detail": "A live replacement handle reusing an old active handle address could satisfy pointer-and-scale equality. The stronger Rust active-payload ownership path then retained the old adapter. The original caller-lifetime rule excludes freeing active handles, but the Rust ownership extension needs a data-identity distinction.",
+      "resolution": "Worker added Arc::ptr_eq on live handle data before no-change return. Deterministic slot replacement test compares actual decode with separately loaded replacement and proves retired data released.",
+      "status": "Final formatted fix and test reviewed; implementing worker reports both native debug suites, strict Clippy, original-header debug clients and 226 + 4 export checks passed. Release validation was still running when this review refreshed."
+    }
+  ],
+  "conclusions": [
+    "Weak handle-to-model references avoid a registry ownership cycle; model drop frees registered handles; manual free removes registry entry. Contexts retain base model strongly and active payloads through Arc, preventing dangling weights when the owning model handle or selected adapter handle is released.",
+    "Source first nonzero duplicate insertion, zero-scale skipping and count/identity/scale no-change predicate are preserved. Host-specific pointer-map order is measured by independent fixture traces; source operand order is retained.",
+    "Control-vector null disable, inclusive range, zero-length reactivation, complete-row updates and incomplete-row retention match frozen llama-adapter.cpp. State replacement follows successful composition and runtime validation, preserving old adapters/control/KV/output on errors.",
+    "LoRA ordinary and token embedding shapes, rank scaling and sequential application order agree with frozen source within admitted dense Llama paths. Tied-head embedding mismatch is explicitly rejected and documented.",
+    "Per-object metadata/tensor decoded+packed bounds precede matrix reads; execution-copy preflight precedes matrix cloning. Native adapter storage and rank-dependent scratch enter the existing work ledger; staged contexts share immutable Arc execution weights.",
+    "The Rust pretrained/execution fixture tests use actual metadata byte buffers and F32 words. Review inspected tests and retained source, not fresh execution of the 107-scenario final corpus."
+  ],
+  "qualifications": [
+    "This refresh pins formatted source. Comparison against the prior reviewed fix found only whitespace plus an equivalent free-handle nested-if to let-chain rewrite; all other reviewed files retained their prior hashes.",
+    "The model 512 MiB aggregate limit is a retained-payload limit checked before publication; loading an incoming adapter and retained-control clones can precede aggregate/compose checks. It is not a simultaneous process allocation ceiling; documentation correctly distinguishes payload budgets from peak RSS and allocator overhead.",
+    "Live aligned caller buffers, correct lengths, exclusive context access and no stale-handle use remain required. The stronger payload lifetime does not make stale foreign pointer calls valid.",
+    "No release gate, full C ABI, complete scheduler or all-model claim follows from this source review."
+  ],
+  "previous_reviewed_utc": "2026-11-11T13:10:42.726Z",
+  "refresh_comparison": {
+    "adapter_only_whitespace_and_equivalent_free_let_chain": true,
+    "tests_only_whitespace": true
+  },
+  "execution_status_at_refresh": {
+    "source": "Implementing worker context_metrics report; independent reviewer did not rerun builds",
+    "msvc_debug_full_affected_crates": "passed",
+    "gnu_debug_full_affected_crates": "passed",
+    "strict_clippy_both": "passed",
+    "original_header_debug_clients_both": "passed",
+    "exports_both": "226 original plus 4 extensions verified",
+    "release_suites": "running"
+  }
+}

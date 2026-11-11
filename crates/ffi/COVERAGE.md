@@ -2,10 +2,16 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **216**, leaves
-**39 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **226**, leaves
+**29 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md and PERFORMANCE.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md and ADAPTERS.md.
+
+The adapter checkpoint adds ten real LoRA/control-vector functions. Owned GGUF
+weights, scalar metadata, invocation-token storage, native ordered composition
+and retained partial control vectors are independently checked on MSVC/GNU.
+ADAPTERS.md records source behavior, numerical fixtures and resource/lifetime
+boundaries. The FILE* adapter loader remains absent.
 
 The sampler-performance checkpoint adds real per-chain CPU time/counts and
 three perf functions, plus two global logger functions. PERFORMANCE.md records
@@ -58,6 +64,14 @@ The separate native C++ symbol surface is not claimed here.
 
 | Symbol |
 |---|
+| `llama_adapter_get_alora_invocation_tokens` |
+| `llama_adapter_get_alora_n_invocation_tokens` |
+| `llama_adapter_lora_free` |
+| `llama_adapter_lora_init` |
+| `llama_adapter_meta_count` |
+| `llama_adapter_meta_key_by_index` |
+| `llama_adapter_meta_val_str` |
+| `llama_adapter_meta_val_str_by_index` |
 | `llama_add_bos_token` |
 | `llama_add_eos_token` |
 | `llama_backend_free` |
@@ -203,6 +217,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_sampler_sample` |
 | `llama_save_session_file` |
 | `llama_set_abort_callback` |
+| `llama_set_adapter_cvec` |
+| `llama_set_adapters_lora` |
 | `llama_set_causal_attn` |
 | `llama_set_embeddings` |
 | `llama_set_n_threads` |
@@ -288,15 +304,7 @@ The separate native C++ symbol surface is not claimed here.
 
 | Symbol |
 |---|
-| `llama_adapter_get_alora_invocation_tokens` |
-| `llama_adapter_get_alora_n_invocation_tokens` |
-| `llama_adapter_lora_free` |
-| `llama_adapter_lora_init` |
 | `llama_adapter_lora_init_from_file_ptr` |
-| `llama_adapter_meta_count` |
-| `llama_adapter_meta_key_by_index` |
-| `llama_adapter_meta_val_str` |
-| `llama_adapter_meta_val_str_by_index` |
 | `llama_attach_threadpool` |
 | `llama_detach_threadpool` |
 | `llama_encode` |
@@ -323,7 +331,5 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_perf_context_print` |
 | `llama_perf_context_reset` |
 | `llama_print_system_info` |
-| `llama_set_adapter_cvec` |
-| `llama_set_adapters_lora` |
 | `llama_set_sampler` |
 | `llama_set_warmup` |

@@ -161,8 +161,9 @@ data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32/F16 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
-adapters, encoder entry points, model saving and context performance APIs remain absent. Source custom chat-template lookup
-is implemented; template application is not exported.
+encoder entry points, model saving and context performance APIs remain absent.
+ADAPTERS.md documents the owned LoRA loader and control-vector application.
+CHAT.md documents byte-oriented custom/built-in template application and its limits.
 
 ## Automatic shard regression
 
@@ -196,6 +197,17 @@ independent 36-entry layout check. PERFORMANCE.md covers real sampler-chain
 timing/counts, their reset/clone/copy behavior and global logging callbacks.
 Backend-attached sampling and llguidance integration remain unavailable. Source-undefined pending
 adaptive clone/copy is rejected with a diagnostic.
+
+## LoRA and control vectors
+
+ADAPTERS.md covers native adapter files, scalar metadata and invocation-token
+getters, multiple LoRA scales and post-layer control vectors. Adapters own their
+validated GGUF weights. Native context updates retain existing KV state and
+preserve the source's first-nonzero duplicate and pointer-map iteration rules.
+The independent original MSVC/GNU corpus verifies 44 load cases and 107 execution
+scenarios, including F32/F16/BF16 adapters, token and direct-embedding inputs,
+scale changes, removal, retained partial control-vector updates and overlapping
+adapters. The FILE* loader remains absent.
 
 ## Memory, lifetime and error contract
 

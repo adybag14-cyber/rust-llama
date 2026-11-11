@@ -181,6 +181,9 @@ impl LlamaModel {
         &self.weights
     }
     pub fn weight(&self, name: &str) -> Option<&Matrix> {
+        if name == "token_embd.weight" {
+            return Some(&self.weights.token_embedding);
+        }
         if name == "output.weight" {
             return Some(
                 self.weights
