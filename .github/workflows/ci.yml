@@ -108,9 +108,6 @@ jobs:
       CARGO_BUILD_JOBS: '2'
       RUST_TEST_THREADS: '1'
       QWEN_MODEL: ${{ matrix.model.name }}
-      LLAMA_TEST_QWEN_HF_ROOT: ${{ runner.temp }}/qwen-hf
-      LLAMA_TEST_QWEN_OUTPUT_ROOT: ${{ runner.temp }}/qwen-converter-output
-      LLAMA_TEST_QWEN_TOKENIZER_ROOT: ${{ runner.temp }}/qwen-hf
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install pinned compiler
@@ -118,6 +115,8 @@ jobs:
       - name: Fetch checksum-pinned reviewed dependencies
         run: cargo fetch --locked
       - name: Fetch and verify unchanged official Qwen inputs
+        env:
+          LLAMA_TEST_QWEN_HF_ROOT: ${{ runner.temp }}/qwen-hf
         run: |
           $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json
           $selected = @($manifest.models | Where-Object { $_.name -eq $env:QWEN_MODEL })
@@ -145,6 +144,11 @@ jobs:
             }
           }
       - name: Replay official Qwen tokenizer references
+        env:
+          LLAMA_TEST_QWEN_TOKENIZER_ROOT: ${{ runner.temp }}/qwen-hf
         run: cargo test --release --offline --locked -p llama-convert --lib pretrained_qwen_tokenizer_reference -- --ignored --nocapture
       - name: Compare all three complete GGUF files with the frozen converter
+        env:
+          LLAMA_TEST_QWEN_HF_ROOT: ${{ runner.temp }}/qwen-hf
+          LLAMA_TEST_QWEN_OUTPUT_ROOT: ${{ runner.temp }}/qwen-converter-output
         run: cargo test --release --offline --locked -p llama-convert --test qwen_pretrained ${{ matrix.model.test }} -- --ignored --exact --nocapture

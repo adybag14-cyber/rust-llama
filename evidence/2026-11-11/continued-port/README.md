@@ -127,6 +127,15 @@ they are not whole-repository prose, license and release-policy guards.
 
 ## Publication and remaining work
 
+The first published workflow was rejected before any job started in
+[run 43005930716](https://github.com/adybag14-cyber/rust-llama/actions/runs/43005930716).
+Its Qwen paths used the runner context at job-level environment scope. The
+correction moves those same values to the consuming steps, preserving every
+command, model pin and expected output. The [correction record](ci-workflow-context-fix/correction.json)
+retains the failure and corrected workflow/input identities. All 1,279 non-CI
+selected inputs remain unchanged. The earlier YAML/PowerShell static review did
+not validate GitHub expression-context availability.
+
 The [CI review](qwen-ci-review.json) checks the four isolated Windows/GNU by
 Qwen-model jobs, pinned downloads, input hashes and explicit release commands.
 The original CPU job, GPT-2/Pythia preparation and complete ignored

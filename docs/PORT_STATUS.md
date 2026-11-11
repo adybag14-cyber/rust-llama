@@ -32,6 +32,14 @@ verification, not a whole-repository immutable guard or a published CI result.
 All twenty mandatory full-port gates remain open. See
 [the complete receipt](../evidence/2026-11-11/continued-port/README.md).
 
+The first published workflow was rejected before scheduling because three
+Qwen paths used the runner context at job-level environment scope. The
+workflow-only correction moves the same values to their consuming steps;
+all 1,279 selected non-CI inputs remain unchanged. The original local
+postflight records and failed GitHub run are preserved in the
+[correction receipt](../evidence/2026-11-11/continued-port/ci-workflow-context-fix/correction.json).
+The corrected published workflow is verified separately by GitHub Actions.
+
 ## Historical integrated verification — 10 November
 
 The final integrated input manifest covers 1,047 code, fixture and execution
