@@ -1,0 +1,170 @@
+[
+  {
+    "label": "initial-rust-windows-v1",
+    "job_id": "job-op-90bd90c247890390e67f1bc20f64367f962f936ca7034cfbffbe0d54ba65bb1b",
+    "result": {
+      "ok": true,
+      "summary": "Read logs for background job job-op-90bd90c247890390e67f1bc20f64367f962f936ca7034cfbffbe0d54ba65bb1b.",
+      "data": {
+        "id": "job-op-90bd90c247890390e67f1bc20f64367f962f936ca7034cfbffbe0d54ba65bb1b",
+        "status": "failed",
+        "stdout": "\nrunning 2 tests\ntest frozen_gpt2_complete_files ... FAILED\ntest frozen_gptneox_complete_files ... FAILED\n\nfailures:\n\nfailures:\n    frozen_gpt2_complete_files\n    frozen_gptneox_complete_files\n\ntest result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.89s\n\n",
+        "stderr": "   Compiling foldhash v0.2.0\n   Compiling llama-quant v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\quant)\n   Compiling hashbrown v0.17.1\n   Compiling hashlink v0.12.2\n   Compiling llama-gguf v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\gguf)\n   Compiling arraydeque v0.5.1\n   Compiling yaml-rust2 v0.13.0\n   Compiling llama-tokenizer v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\tokenizer)\n   Compiling llama-checkpoint v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\checkpoint)\n   Compiling llama-conformance v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\llama-conformance)\n   Compiling llama-behavior v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\llama-behavior)\n   Compiling llama-convert v0.1.0 (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\convert)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.30s\n     Running tests\\gpt_conversion.rs (C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert-target-windows\\debug\\deps\\gpt_conversion-f9bb15421284d195.exe)\n\nthread 'frozen_gpt2_complete_files' (33368) panicked at crates\\convert\\tests\\gpt_conversion.rs:54:49:\ngpt2-base-f32: invalid conversion input: tokenizer model type is absent\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\nthread 'frozen_gptneox_complete_files' (13112) panicked at crates\\convert\\tests\\gpt_conversion.rs:54:49:\ngptneox-base-f32: unsupported conversion input: AutoTokenizer class outside reviewed dense converter ingestion\nerror: test failed, to rerun pass `-p llama-convert --test gpt_conversion`\n",
+        "maxChars": 12000,
+        "logs": {
+          "stdout": {
+            "totalBytes": 293,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 293
+              }
+            ],
+            "rotated": false
+          },
+          "stderr": {
+            "totalBytes": 1787,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 1787
+              }
+            ],
+            "rotated": false
+          },
+          "maxBytesPerSegment": 33554432,
+          "rotations": 2,
+          "truncated": false
+        }
+      },
+      "exitCode": null,
+      "truncated": false
+    }
+  },
+  {
+    "label": "initial-pretrained-reference-windows-v1",
+    "job_id": "job-op-b01f2347376237b81bbe04a94a18e09db4025afa030743504cb5f32c58b27772",
+    "result": {
+      "ok": true,
+      "summary": "Read logs for background job job-op-b01f2347376237b81bbe04a94a18e09db4025afa030743504cb5f32c58b27772.",
+      "data": {
+        "id": "job-op-b01f2347376237b81bbe04a94a18e09db4025afa030743504cb5f32c58b27772",
+        "status": "failed",
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\gpt-converter-oracle\\capture-pretrained.py\", line 26, in <module>\r\n    m=cls(model,ftype,target,is_big_endian=False,use_temp_file=False,eager=False,fuse_qkv=False,model_name=None);m.write()\r\n                                                                                                                 ~~~~~~~^^\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\base.py\", line 1647, in write\r\n    self.prepare_tensors()\r\n    ~~~~~~~~~~~~~~~~~~~~^^\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\base.py\", line 1515, in prepare_tensors\r\n    for new_name, data_torch in (self.modify_tensors(data_torch, name, bid)):\r\n                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\gpt2.py\", line 30, in modify_tensors\r\n    yield from super().modify_tensors(data_torch, name, bid)\r\n               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\base.py\", line 1057, in modify_tensors\r\n    new_name = self.map_tensor_name(name)\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\base.py\", line 808, in map_tensor_name\r\n    raise ValueError(f\"Can not map tensor {name!r}\")\r\nValueError: Can not map tensor 'h.0.attn.bias'\r\n",
+        "maxChars": 12000,
+        "logs": {
+          "stdout": {
+            "totalBytes": 0,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 0
+              }
+            ],
+            "rotated": false
+          },
+          "stderr": {
+            "totalBytes": 1449,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 1449
+              }
+            ],
+            "rotated": false
+          },
+          "maxBytesPerSegment": 33554432,
+          "rotations": 2,
+          "truncated": false
+        }
+      },
+      "exitCode": null,
+      "truncated": false
+    }
+  },
+  {
+    "label": "initial-class-capture-windows-v1",
+    "job_id": "job-op-84c3c32db578acfe0a0c5f2847ae6ef13cc555e34fc5f42ede33c8bf2831d2f3",
+    "result": {
+      "ok": true,
+      "summary": "Read logs for background job job-op-84c3c32db578acfe0a0c5f2847ae6ef13cc555e34fc5f42ede33c8bf2831d2f3.",
+      "data": {
+        "id": "job-op-84c3c32db578acfe0a0c5f2847ae6ef13cc555e34fc5f42ede33c8bf2831d2f3",
+        "status": "failed",
+        "stdout": "baseline accepted\r\nslow-name accepted\r\ninferred accepted\r\nadd_bos_token-False accepted\r\nadd_bos_token-True accepted\r\nadd_bos_token-None accepted\r\nadd_bos_token-0 accepted\r\nadd_bos_token-1 accepted\r\nadd_bos_token-'yes' accepted\r\nadd_bos_token-'' accepted\r\nadd_eos_token-False accepted\r\nadd_eos_token-True accepted\r\nadd_eos_token-None accepted\r\nadd_eos_token-0 accepted\r\nadd_eos_token-1 accepted\r\nadd_eos_token-'yes' accepted\r\nadd_eos_token-'' accepted\r\nboth-True-True accepted\r\nboth-False-False accepted\r\nboth-True-False accepted\r\nboth-False-True accepted\r\nbos_token-None rejected\r\n",
+        "stderr": "Traceback (most recent call last):\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\gpt-converter-oracle\\capture-class.py\", line 55, in <module>\r\n    add(key+'-'+str(v),{key:v,'add_bos_token':True,'add_eos_token':True})\r\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\gpt-converter-oracle\\capture-class.py\", line 27, in add\r\n    folder=out/name;folder.mkdir()\r\n                    ~~~~~~~~~~~~^^\r\n  File \"C:\\Python314\\Lib\\pathlib\\__init__.py\", line 1011, in mkdir\r\n    os.mkdir(self, mode)\r\n    ~~~~~~~~^^^^^^^^^^^^\r\nOSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'C:\\\\Users\\\\adyba\\\\rust-llama-reference\\\\continue-20261111-next\\\\gpt-converter-oracle\\\\class-native-v1\\\\windows\\\\bos_token-<unknown-special>'\r\n",
+        "maxChars": 12000,
+        "logs": {
+          "stdout": {
+            "totalBytes": 581,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 581
+              }
+            ],
+            "rotated": false
+          },
+          "stderr": {
+            "totalBytes": 865,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 865
+              }
+            ],
+            "rotated": false
+          },
+          "maxBytesPerSegment": 33554432,
+          "rotations": 2,
+          "truncated": false
+        }
+      },
+      "exitCode": null,
+      "truncated": false
+    }
+  },
+  {
+    "label": "initial-class-error-text-comparison-v1",
+    "job_id": "job-op-af81efb5d54af6945ab4c698ef8ab73907a2e887ee8179e0a9c25eb52b421dad",
+    "result": {
+      "ok": true,
+      "summary": "Read logs for background job job-op-af81efb5d54af6945ab4c698ef8ab73907a2e887ee8179e0a9c25eb52b421dad.",
+      "data": {
+        "id": "job-op-af81efb5d54af6945ab4c698ef8ab73907a2e887ee8179e0a9c25eb52b421dad",
+        "status": "failed",
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\gpt-converter-oracle\\run-class-rust-windows.py\", line 6, in <module>\r\n    assert a==b,'independent class reports differ'\r\n           ^^^^\r\nAssertionError: independent class reports differ\r\n",
+        "maxChars": 12000,
+        "logs": {
+          "stdout": {
+            "totalBytes": 0,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 0
+              }
+            ],
+            "rotated": false
+          },
+          "stderr": {
+            "totalBytes": 292,
+            "segments": [
+              {
+                "index": 0,
+                "bytes": 292
+              }
+            ],
+            "rotated": false
+          },
+          "maxBytesPerSegment": 33554432,
+          "rotations": 2,
+          "truncated": false
+        }
+      },
+      "exitCode": null,
+      "truncated": false
+    }
+  }
+]

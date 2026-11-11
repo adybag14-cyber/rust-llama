@@ -1,0 +1,40 @@
+{
+  "reviewed_utc": "2026-11-11T13:12:40.887Z",
+  "role": "Independent read-only source review by attention worker; no converter checkout edits or extra builds",
+  "reviewed_sha256": {
+    "crates/convert/src/gpt.rs": "6e8789273c991bd6a163b4dd9fcf96d9e298ed12615036a69d258f569d4d9724",
+    "crates/convert/tests/gpt_pretrained.rs": "e41fcd46f997636671eec2f96a18bd7f7e60aa5449cd08e7f7a7649a23a317e0",
+    "crates/convert/src/hf_gpt_reference.rs": "a5327b83de2723cb422bfe3b812dd19f1f45906de1e61325ad6f9926f6dc921c",
+    "crates/convert/src/config.rs": "a5b00d4151cdc3d2ddc4c5f85c0d387bd526af9ac4644692a276cabc1d21b128",
+    "crates/convert/src/tensors.rs": "11a291ee18a69e5104c7345cfb2a6e474e6d799bc9aa6391943e78af457b591c",
+    "crates/convert/src/hf_bpe.rs": "9d7f0e1bf560a2957ecf1dbe4c805b5a0a8420c645de925637a672b3a55f4da7",
+    "crates/convert/src/vocab.rs": "e8028f347a44c45fc0df26f9787ee9ac9fda28ac724142f882f202fc7f87c73f",
+    "crates/convert/src/qwen.rs": "3b22559dec6b63d82a09d4cc041e3a1063f83c38b94835f89ea0ed3f68216726",
+    "crates/convert/src/lib.rs": "d829888f7a0545766e3629fe26f647cbd7afbbf5a729d449310ad67667133dac",
+    "crates/convert/tests/gpt_conversion.rs": "fbba89bb5c8b758a5a712c227b5536b67bab0e68ddbebee7c9cb89409b79edd0",
+    "crates/convert/README.md": "3a2aacdb28e7c9edae928f5b8181c91de589872ca12af1e478381c796ad5e3f9",
+    "docs/GPT_HF_CONVERSION.md": "a98ca1f77afb457f7646a3f66d99348da7229a8cfbffc074680c162328c37281",
+    "crates/convert/src/gpt_tables.rs": "2e8768889ab54310d430c9c3adf6669ce1010fc0ef9514b3b4ba316a72e45189",
+    "crates/convert/src/hf_backend.rs": "2896f75998348dcdbf5bdb82b4481906f9675387f4fdf6354bc5409b11ed732b"
+  },
+  "original_source_sha256": {
+    "gpt2.py": "b6c57b549c5545fb228b28e863e29a8b449e59d8370f94f0c3c781d40806e03b",
+    "gptneox.py": "63e06a691f471828e1cd2671b6dd0749953bb347aab525a260ad4c0b2b81e6c2"
+  },
+  "blocking_findings": [],
+  "conclusions": [
+    "GPT-2 swaps the first two tensor axes while copying intact trailing blocks. NeoX treats original [head,QKV,head_width,row_width] storage as a head/QKV block transpose; the resulting Q/K/V major order matches frozen conversion/gptneox.py. Bias reshape additionally requires hidden divisibility, while the original weight reshape can admit zero-row/nondivisible edge shapes with an exact element count.",
+    "Only source Conv1D suffixes and the original NeoX raw prefix trigger transforms. Canonical mapped aliases remain unchanged. NeoX checks explicit null head/embedding aliases before tensor-name dispatch, preserving the original unconditional assertions.",
+    "Family metadata override order is preserved: GPT-2 requires n_ctx, uses 4*n_embd regardless of n_inner and emits file_type. NeoX truncates rotary_pct times floor-divided head width and intentionally omits generic file_type/RoPE-base/scaling fields. Qwen-only sidecar paths are guarded away from GPT families.",
+    "Scalar preparation precedes byte permutation and shared output encoding. Checked products establish every block-copy index; transformed buffers are charged to the existing conservative cumulative budget before allocation. Empty prepared buffers exit before leading-dimension loops.",
+    "GPTNeoX class defaults and disabled default BOS/EOS feed existing checked fast-tokenizer behavior. Mandatory model.type remains enforced for non-GPT converter paths; the legacy absent tag exception is confined to the source GPT vocabulary families. Explicit null or unsupported type is not reinterpreted as BPE.",
+    "Complete-file tests verify packed input blob digests, output length and SHA-256, plus fixed accepted/rejected/byte counts. The class test verifies exact encoding/decoding records and cursor-independent aggregate counts. No new expected numerical data is computed by product code.",
+    "The ignored GPT-2 helper verifies the complete official input set before and after, recognizes exactly twelve pinned static mask names/shapes, retains 148 tensor ranges unchanged, recreates the derivative through Rust I/O, and verifies its independently captured whole-file hash. It does not alter product converter behavior: unmodified official source rejection is still tested, and accepted conversions require complete output hashes."
+  ],
+  "qualifications": [
+    "This is source, test-helper and contract review; worker owns final debug/release, strict lint and pretrained execution reports. No independent test rerun or build was performed for this review.",
+    "Generated alias tables were inspected as declarative data and pinned by full-file hash; this review is not a second exhaustive regeneration of all 553 source mapping rows.",
+    "Source rejections are compared as admission failures; tests do not require identical Python exception messages. Tokenizer non-deterministic native error word order is explicitly excluded by the corpus contract.",
+    "The pretrained helper is specific to hash-pinned original inputs and a fresh external output directory. Model weights remain external, and conversion support does not close inference, full converter, ABI or release gates."
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "host": "windows",
+  "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert",
+  "stages": [
+    {
+      "name": "format",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6292703151702881,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-convert",
+        "--offline",
+        "--locked",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1704092025756836,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 72,
+          "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6"
+        }
+      }
+    },
+    {
+      "name": "release-all",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 86.1869649887085,
+      "logs": {
+        "stdout": {
+          "bytes": 12559,
+          "sha256": "d41887309ef440463f35396d59505275f2da1af6e8b6e506d7362f6ca93c0c5c"
+        },
+        "stderr": {
+          "bytes": 2006,
+          "sha256": "c1a88cc188fa4bd3709e17fff2f3c1c44e02e3c70b80079918baa6226035f7a8"
+        }
+      }
+    }
+  ]
+}

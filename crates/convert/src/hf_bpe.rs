@@ -191,7 +191,8 @@ pub(crate) fn prepare<'a>(
     let is_llama = matches!(class, "LlamaTokenizer" | "LlamaTokenizerFast");
     let is_gpt2 = matches!(class, "GPT2Tokenizer" | "GPT2TokenizerFast");
     let is_qwen2 = matches!(class, "Qwen2Tokenizer" | "Qwen2TokenizerFast");
-    if !is_llama && !is_gpt2 && !is_qwen2 && class != "PreTrainedTokenizerFast" {
+    let is_neox = matches!(class, "GPTNeoXTokenizer" | "GPTNeoXTokenizerFast");
+    if !is_llama && !is_gpt2 && !is_qwen2 && !is_neox && class != "PreTrainedTokenizerFast" {
         return Err(Error::Unsupported(
             "AutoTokenizer class outside reviewed dense converter ingestion",
         ));
@@ -228,18 +229,19 @@ pub(crate) fn prepare<'a>(
     reserve(&mut attributes, SPECIAL.len(), "special token attributes")?;
     for (index, key) in SPECIAL.iter().enumerate() {
         let mut value = Vec::new();
-        let default = if (is_qwen2 && matches!(index, 1 | 2 | 4)) || (is_gpt2 && index < 3) {
-            Some("<|endoftext|>")
-        } else if is_llama {
-            match index {
-                0 => Some("<s>"),
-                1 => Some("</s>"),
-                2 => Some("<unk>"),
-                _ => None,
-            }
-        } else {
-            None
-        };
+        let default =
+            if (is_qwen2 && matches!(index, 1 | 2 | 4)) || ((is_gpt2 || is_neox) && index < 3) {
+                Some("<|endoftext|>")
+            } else if is_llama {
+                match index {
+                    0 => Some("<s>"),
+                    1 => Some("</s>"),
+                    2 => Some("<unk>"),
+                    _ => None,
+                }
+            } else {
+                None
+            };
         if let Some(default) = default {
             reserve(&mut value, 1, "default special token")?;
             value.push(Added::plain(default, true));
@@ -393,7 +395,7 @@ pub(crate) fn prepare<'a>(
         }
     }
     backend.add_tokens(&updates)?;
-    if is_llama {
+    if is_llama || is_neox {
         let enabled = |key: &str, default| config.and_then(|c| c.get(key)).map_or(default, truth);
         let resolve = |index: usize, enabled: bool| -> Result<Option<(&str, u32)>> {
             if !enabled {
@@ -415,7 +417,7 @@ pub(crate) fn prepare<'a>(
                 ))?;
             Ok(Some((name, id)))
         };
-        let bos = resolve(0, enabled("add_bos_token", true))?;
+        let bos = resolve(0, enabled("add_bos_token", is_llama))?;
         let eos = resolve(1, enabled("add_eos_token", false))?;
         backend.set_llama_post(bos, eos)?;
     }
@@ -443,11 +445,18 @@ pub(crate) fn write(
         root.get("model")
             .ok_or(Error::Invalid("tokenizer model is absent"))?,
     )?;
-    let bpe = text(
-        model
-            .get("type")
-            .ok_or(Error::Invalid("tokenizer model type is absent"))?,
-    )? == "BPE";
+    let gpt_family = matches!(
+        config.family,
+        crate::config::Architecture::Gpt2 | crate::config::Architecture::GptNeoX
+    );
+    // These source subclasses directly use the GPT2 vocabulary routine,
+    // whose native Tokenizers deserializer admits legacy untagged BPE.
+    // Keep the existing mandatory-type boundary for other source paths.
+    let bpe = match model.get("type") {
+        Some(value) => text(value)? == "BPE",
+        None if gpt_family => true,
+        None => return Err(Error::Invalid("tokenizer model type is absent")),
+    };
     let ignore = model.get("ignore_merges").is_some_and(truth);
     let fallback = model.get("byte_fallback").is_some_and(truth);
     let sequence = matches!(
@@ -457,7 +466,7 @@ pub(crate) fn write(
             .map(text),
         Some(Ok("Sequence"))
     );
-    let llama_hf = bpe && fallback && sequence && !(ignore && !fallback);
+    let llama_hf = !gpt_family && bpe && fallback && sequence && !(ignore && !fallback);
     let (mut backend, specials) = prepare(files, map.as_ref(), limits, profile, Some(config))?;
     let (mut tokens, mut scores, mut types) = (Vec::new(), Vec::new(), Vec::new());
     if llama_hf {

@@ -1,0 +1,332 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "base_commit": "91589e125d2232e9de7c4791fe88abd4ba184b1f",
+  "scope": [
+    "GPT2LMHeadModel",
+    "GPTNeoXForCausalLM"
+  ],
+  "ordinary_per_profile": {
+    "cases": 101,
+    "accepted": 77,
+    "rejected": 24,
+    "exact_output_bytes": 143810730
+  },
+  "tokenizer_class": {
+    "cases": 46,
+    "accepted": 40,
+    "rejected": 6,
+    "encoding_decoder_requests": 960
+  },
+  "pretrained_per_profile": {
+    "files": 6,
+    "source_rejections": 3,
+    "exact_output_bytes": 718209760
+  },
+  "profiles": {
+    "windows": {
+      "ordinary_test_passed": 49,
+      "ordinary_test_ignored": 8,
+      "full_crate_validation": {
+        "host": "windows",
+        "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert",
+        "stages": [
+          {
+            "name": "format",
+            "argv": [
+              "cargo",
+              "fmt",
+              "-p",
+              "llama-convert",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6292703151702881,
+            "logs": {
+              "stdout": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "cargo",
+              "clippy",
+              "-p",
+              "llama-convert",
+              "--offline",
+              "--locked",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1704092025756836,
+            "logs": {
+              "stdout": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr": {
+                "bytes": 72,
+                "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6"
+              }
+            }
+          },
+          {
+            "name": "release-all",
+            "argv": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-convert",
+              "--release",
+              "--offline",
+              "--locked",
+              "--",
+              "--nocapture",
+              "--test-threads=1"
+            ],
+            "exit_code": 0,
+            "seconds": 86.1869649887085,
+            "logs": {
+              "stdout": {
+                "bytes": 12559,
+                "sha256": "d41887309ef440463f35396d59505275f2da1af6e8b6e506d7362f6ca93c0c5c"
+              },
+              "stderr": {
+                "bytes": 2006,
+                "sha256": "c1a88cc188fa4bd3709e17fff2f3c1c44e02e3c70b80079918baa6226035f7a8"
+              }
+            }
+          }
+        ]
+      },
+      "pretrained_automatic_input_helper": {
+        "argv": [
+          "cargo",
+          "test",
+          "-p",
+          "llama-convert",
+          "--release",
+          "--offline",
+          "--locked",
+          "--test",
+          "gpt_pretrained",
+          "--",
+          "--ignored",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert",
+        "environment": {
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_TARGET_DIR": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert-target-windows",
+          "LLAMA_TEST_GPT2_HF": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\official-hf",
+          "LLAMA_TEST_GPTNEOX_HF": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\official-hf",
+          "LLAMA_TEST_GPT_OUTPUT_ROOT": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\gpt-converter-oracle\\pretrained-rust-v2\\windows"
+        },
+        "exit_code": 0
+      },
+      "native_tokenizer_class_capture": {
+        "bytes": 725536,
+        "sha256": "6661be8f6be1b6ca590b87bb7679a1795ea6de4c0e849cbd02a19bb5c3f2a64a"
+      }
+    },
+    "linux": {
+      "ordinary_test_passed": 49,
+      "ordinary_test_ignored": 8,
+      "full_crate_validation": {
+        "host": "linux",
+        "cwd": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-next/convert",
+        "stages": [
+          {
+            "name": "format",
+            "argv": [
+              "cargo",
+              "fmt",
+              "-p",
+              "llama-convert",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "seconds": 1.4693458080291748,
+            "logs": {
+              "stdout": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              }
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "cargo",
+              "clippy",
+              "-p",
+              "llama-convert",
+              "--offline",
+              "--locked",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "seconds": 3.8575189113616943,
+            "logs": {
+              "stdout": {
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "stderr": {
+                "bytes": 194,
+                "sha256": "0861a1123086e7fb04d226d73032c51de37ce9faf9d4f20aefec5660aef49975"
+              }
+            }
+          },
+          {
+            "name": "release-all",
+            "argv": [
+              "cargo",
+              "test",
+              "-p",
+              "llama-convert",
+              "--release",
+              "--offline",
+              "--locked",
+              "--",
+              "--nocapture",
+              "--test-threads=1"
+            ],
+            "exit_code": 0,
+            "seconds": 55.78140306472778,
+            "logs": {
+              "stdout": {
+                "bytes": 12353,
+                "sha256": "4d963d067edc630873bb434ffdb2af340e3d94d79c8936e3dd1f98d55a1f1b01"
+              },
+              "stderr": {
+                "bytes": 1722,
+                "sha256": "487e643cc6b3317b09e21d03e87d464f1634feec36a323fb7b204e84998810c9"
+              }
+            }
+          }
+        ]
+      },
+      "pretrained_automatic_input_helper": {
+        "argv": [
+          "cargo",
+          "test",
+          "-p",
+          "llama-convert",
+          "--release",
+          "--offline",
+          "--locked",
+          "--test",
+          "gpt_pretrained",
+          "--",
+          "--ignored",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "cwd": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-next/convert",
+        "environment": {
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_TARGET_DIR": "/home/tdamre/rust-llama-gpt-converter-next-target",
+          "CARGO_HOME": "/home/tdamre/rust-llama-hf-converter-cargo-home",
+          "LLAMA_TEST_GPT2_HF": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/official-hf",
+          "LLAMA_TEST_GPTNEOX_HF": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/official-hf",
+          "LLAMA_TEST_GPT_OUTPUT_ROOT": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-next/gpt-converter-oracle/pretrained-rust-v2/linux"
+        },
+        "exit_code": 0
+      },
+      "native_tokenizer_class_capture": {
+        "bytes": 694574,
+        "sha256": "1ecf4b0d6e84db290f11ba7db284329c50db8f773a4d0e9dc9ff810729ec8399"
+      }
+    }
+  },
+  "failures_retained": "initial-failures.json",
+  "failure_explanations": [
+    "Initial Rust corpus exposed official GPT-2 untagged BPE and GPTNeoXTokenizer sidecar alias; implemented source-defined behavior without changing expectations.",
+    "Initial complete official GPT-2 reference rejected h.0.attn.bias. Preserved this source error in both profiles; an exact disclosed derivative removes only 12 masks.",
+    "Initial tokenizer capture used colon/angle-bracket display names as Windows directories. Corrected the external harness to use numeric folders before capturing the final corpus.",
+    "Cross-host class result equality originally compared unordered native error-message token order. Final comparisons exclude error text only, retaining exact admission, IDs and decoded text.",
+    "Final source review narrowed legacy untagged BPE admission to GPT families to preserve the existing mandatory-type behavior of other conversion paths."
+  ],
+  "source_files": [
+    {
+      "path": "crates/convert/src/bin/convert-hf-to-gguf.rs",
+      "bytes": 6913,
+      "sha256": "63b0a31c2b2095794101acf54c00db6d1f4d147dd8907801beb366cfe3c4187f"
+    },
+    {
+      "path": "crates/convert/src/config.rs",
+      "bytes": 28648,
+      "sha256": "a5b00d4151cdc3d2ddc4c5f85c0d387bd526af9ac4644692a276cabc1d21b128"
+    },
+    {
+      "path": "crates/convert/src/gpt.rs",
+      "bytes": 10391,
+      "sha256": "6e8789273c991bd6a163b4dd9fcf96d9e298ed12615036a69d258f569d4d9724"
+    },
+    {
+      "path": "crates/convert/src/gpt_tables.rs",
+      "bytes": 90364,
+      "sha256": "2e8768889ab54310d430c9c3adf6669ce1010fc0ef9514b3b4ba316a72e45189"
+    },
+    {
+      "path": "crates/convert/src/hf_bpe.rs",
+      "bytes": 24150,
+      "sha256": "9d7f0e1bf560a2957ecf1dbe4c805b5a0a8420c645de925637a672b3a55f4da7"
+    },
+    {
+      "path": "crates/convert/src/hf_gpt_reference.rs",
+      "bytes": 3256,
+      "sha256": "a5327b83de2723cb422bfe3b812dd19f1f45906de1e61325ad6f9926f6dc921c"
+    },
+    {
+      "path": "crates/convert/src/lib.rs",
+      "bytes": 5953,
+      "sha256": "d829888f7a0545766e3629fe26f647cbd7afbbf5a729d449310ad67667133dac"
+    },
+    {
+      "path": "crates/convert/src/qwen.rs",
+      "bytes": 7979,
+      "sha256": "66293cbbee55f2e385063b323d43e5fa8adc1f13ff5ad82d4ab7fb649202f4c7"
+    },
+    {
+      "path": "crates/convert/src/tensors.rs",
+      "bytes": 24505,
+      "sha256": "11a291ee18a69e5104c7345cfb2a6e474e6d799bc9aa6391943e78af457b591c"
+    },
+    {
+      "path": "crates/convert/src/vocab.rs",
+      "bytes": 11149,
+      "sha256": "e8028f347a44c45fc0df26f9787ee9ac9fda28ac724142f882f202fc7f87c73f"
+    },
+    {
+      "path": "crates/convert/tests/gpt_conversion.rs",
+      "bytes": 4758,
+      "sha256": "fbba89bb5c8b758a5a712c227b5536b67bab0e68ddbebee7c9cb89409b79edd0"
+    },
+    {
+      "path": "crates/convert/tests/gpt_pretrained.rs",
+      "bytes": 9222,
+      "sha256": "95fbe29cd4664a5b9b3dc7c36419bca8544e9ea2772b67a2653c9e278e4c67a8"
+    }
+  ]
+}

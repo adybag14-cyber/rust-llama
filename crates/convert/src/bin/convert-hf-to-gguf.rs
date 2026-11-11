@@ -3,7 +3,7 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 const HELP: &str =
-    "Convert a supported dense Hugging Face Llama, Qwen2 or Qwen3 Safetensors directory to GGUF.
+    "Convert a supported dense Hugging Face Llama, Qwen, GPT-2 or GPT-NeoX Safetensors directory to GGUF.
 
 Usage: convert-hf-to-gguf [OPTIONS] MODEL_DIRECTORY
 
@@ -22,7 +22,8 @@ Options:
   --version              Show this program's version
 
 The admitted architectures are LlamaForCausalLM, LLaMAForCausalLM, LlamaModel,
-Qwen2ForCausalLM, Qwen2Model, Qwen3ForCausalLM and Qwen3Model.
+Qwen2ForCausalLM, Qwen2Model, Qwen3ForCausalLM, Qwen3Model, GPT2LMHeadModel
+and GPTNeoXForCausalLM.
 See crates/convert/README.md for tokenizer, dtype and conversion boundaries.
 Other upstream converters and options remain explicit unsupported work.
 ";

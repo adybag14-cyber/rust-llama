@@ -1,0 +1,217 @@
+
+running 35 tests
+test authorship::tests::original_authorship_precedence_and_raw_ordered_headers ... ok
+test dense_reference::native_dense_llama_converter_full_bytes ... ignored, requires frozen original corpus in LLAMA_TEST_HF_CORPUS and a fresh output directory
+test dense_reference::pretrained_smollm2_complete_conversions ... ignored, requires pinned SmolLM2 HF weights in LLAMA_TEST_HF_MODEL and a fresh output directory
+test hf_gpt_reference::native_gptneox_fast_class_semantics ... ok
+test hf_reference::exhaustive_hf_unicode_and_added_boundaries ... ok
+test hf_reference::native_bytelevel_digits_bpe_and_decoder ... ok
+test hf_reference::native_hf_ingestion_and_saved_token_flags ... ok
+test hf_reference::pretrained_smollm2_hf_vocabulary_and_probe ... ignored, requires the pinned HF SmolLM2 input directory in LLAMA_TEST_HF_MODEL
+test hf_reference::qwen::native_auto_tokenizer_class_resolution ... ok
+test hf_reference::qwen::native_fast_prefix_resolution ... ok
+test hf_reference::qwen::native_missing_sidecar_and_sequence_prefixes ... ok
+test hf_reference::qwen::native_nfc_added_token_flags_and_collisions ... ok
+test hf_reference::qwen::native_nfc_every_scalar_and_sequences ... ok
+test hf_reference::qwen::native_nfc_unicode9_conformance ... ok
+test hf_reference::qwen::native_qwen_fast_generic_flags ... ok
+test hf_reference::qwen::native_qwen_split_nfc_and_bpe ... ok
+test hf_reference::qwen::pretrained_qwen_tokenizer_reference ... ignored, requires unchanged official Qwen tokenizer sidecars via LLAMA_TEST_QWEN_TOKENIZER_ROOT
+test hf_reference::qwen::qwen_split_scope_and_normalization_budgets ... ok
+test hf_schema_reference::original_hf_schema_and_postprocessor_contracts ... ok
+test hf_schema_reference::original_transformers_class_postprocessors ... ok
+test model_card::tests::bounded_aliases_merges_depth_and_scalar_inputs ... ok
+test model_card::tests::frozen_model_card_frontmatter_graphs ... ok
+test model_card::tests::ignored_cycles_remain_graph_edges ... ok
+test python_unicode::tests::exhaustive_original_unicode_flags_and_decimal_values ... ok
+test python_unicode::tests::original_full_case_expansions_for_metadata_domain ... ok
+test rope::tests::dimension_and_length_arithmetic_is_checked_without_allocation ... ok
+test rope::tests::native::original_large_index_arange_and_power_windows_are_exact ... 852 original operator windows; 72270 exact stage words; 42 direct-cast counterexamples
+ok
+test rope::tests::native::original_random_extreme_and_nan_generator_stages_are_exact ... 1336 original cases; 28 original errors; 446584 exact output bytes; 679181 exact diagnostic stage words
+ok
+test rope::tests::native::original_structured_torch_generator_and_all_seven_stages_are_exact ... 579 original cases; 3 original errors; 90880 exact output bytes; 137896 exact diagnostic stage words
+ok
+test rope::tests::native::short_long_and_partial_component_outputs_are_atomic_errors ... ok
+test rope::tests::parameter_errors_are_transactional ... ok
+test rope::tests::unavailable_profile_is_an_explicit_atomic_error ... ok
+test sentencepiece::tests::original_sentencepiece_model_acceptance_and_pieces ... ok
+test sentencepiece::tests::wire_resource_limits_reject_before_growth ... ok
+test special::tests::original_special_vocab_ordered_header_bytes ... ok
+
+test result: ok. 31 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 1.05s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test actual_mixed_qkv_concatenation_and_post_permutation_tails ... WindowsTorch211Numpy246: 158 actual mixed QKV cats, 2427672 exact output bytes
+LinuxTorch211Numpy226: 158 actual mixed QKV cats, 2427672 exact output bytes
+ok
+test checked_errors_leave_output_unchanged ... ok
+test every_half_pattern_through_one_element_source_promotion ... ok
+test original_nan_reductions_and_special_cast_tails ... WindowsTorch211Numpy246: 1206 cases, 1206 successes/0 source errors, 94720 checked output bytes
+LinuxTorch211Numpy226: 1206 cases, 1206 successes/0 source errors, 94720 checked output bytes
+ok
+test original_torch_numpy_linux_bytes ... LinuxTorch211Numpy226: 1510 cases, 1376 successes/134 source errors, 4372488 checked output bytes
+ok
+test original_torch_numpy_windows_bytes ... WindowsTorch211Numpy246: 1510 cases, 1376 successes/134 source errors, 4372488 checked output bytes
+ok
+test promotion_and_numpy_cast_are_distinct_and_noop_bits_are_preserved ... ok
+test unmeasured_nonfinite_profile_rejects_entire_input_transactionally ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 2 tests
+test frozen_gpt2_complete_files ... linux gpt2-base-f32: original result reproduced
+linux gpt2-base-f16: original result reproduced
+linux gpt2-base-bf16: original result reproduced
+linux gpt2-base-q8_0: original result reproduced
+linux gpt2-base-tq1_0: original result reproduced
+linux gpt2-base-tq2_0: original result reproduced
+linux gpt2-base-auto: original result reproduced
+linux gpt2-input-f16: original result reproduced
+linux gpt2-input-bf16: original result reproduced
+linux gpt2-input-f64: original result reproduced
+linux gpt2-input-i8: original result reproduced
+linux gpt2-input-u8: original result reproduced
+linux gpt2-input-i16: original result reproduced
+linux gpt2-input-i32: original result reproduced
+linux gpt2-input-i64: original result reproduced
+linux gpt2-input-bool: original result reproduced
+linux gpt2-tail-q8_0: original result reproduced
+linux gpt2-tail-tq1_0: original result reproduced
+linux gpt2-tail-tq2_0: original result reproduced
+linux gpt2-full-block-tq1_0: original result reproduced
+linux gpt2-full-block-tq2_0: original result reproduced
+linux gpt2-fuse-request: original result reproduced
+linux gpt2-vocab-only: original result reproduced
+linux gpt2-raw-config: original result reproduced
+linux gpt2-explicit-null-model-type: original result reproduced
+linux gpt2-missing-model-type: original result reproduced
+linux gpt2-nested-config: original result reproduced
+linux gpt2-class-inference: original result reproduced
+linux gpt2-generic-tokenizer: original result reproduced
+linux gpt2-ignore-sentencepiece-sidecar: original result reproduced
+linux gpt2-vocab-0: original result reproduced
+linux gpt2-vocab-50000: original result reproduced
+linux gpt2-vocab-50308: original result reproduced
+linux gpt2-unknown-tensor: original result reproduced
+linux gpt2-indexed-shards: original result reproduced
+linux gpt2-output-alias: original result reproduced
+linux gpt2-short-names: original result reproduced
+linux gpt2-missing-nctx: original result reproduced
+linux gpt2-custom-inner: original result reproduced
+linux gpt2-null-epsilon: original result reproduced
+linux gpt2-alias-embedding: original result reproduced
+linux gpt2-bad-transpose-rank: original result reproduced
+linux gpt2-rank3-transpose: original result reproduced
+linux gpt2-empty-transpose: original result reproduced
+linux gpt2-buffer-transformer-h-0-attn-bias: original result reproduced
+linux gpt2-buffer-h-0-attn-masked_bias: original result reproduced
+linux gpt2: 34 complete files, 12 errors, 63715842 bytes
+ok
+test frozen_gptneox_complete_files ... linux gptneox-base-f32: original result reproduced
+linux gptneox-base-f16: original result reproduced
+linux gptneox-base-bf16: original result reproduced
+linux gptneox-base-q8_0: original result reproduced
+linux gptneox-base-tq1_0: original result reproduced
+linux gptneox-base-tq2_0: original result reproduced
+linux gptneox-base-auto: original result reproduced
+linux gptneox-input-f16: original result reproduced
+linux gptneox-input-bf16: original result reproduced
+linux gptneox-input-f64: original result reproduced
+linux gptneox-input-i8: original result reproduced
+linux gptneox-input-u8: original result reproduced
+linux gptneox-input-i16: original result reproduced
+linux gptneox-input-i32: original result reproduced
+linux gptneox-input-i64: original result reproduced
+linux gptneox-input-bool: original result reproduced
+linux gptneox-tail-q8_0: original result reproduced
+linux gptneox-tail-tq1_0: original result reproduced
+linux gptneox-tail-tq2_0: original result reproduced
+linux gptneox-full-block-tq1_0: original result reproduced
+linux gptneox-full-block-tq2_0: original result reproduced
+linux gptneox-fuse-request: original result reproduced
+linux gptneox-vocab-only: original result reproduced
+linux gptneox-raw-config: original result reproduced
+linux gptneox-explicit-null-model-type: original result reproduced
+linux gptneox-missing-model-type: original result reproduced
+linux gptneox-nested-config: original result reproduced
+linux gptneox-class-inference: original result reproduced
+linux gptneox-generic-tokenizer: original result reproduced
+linux gptneox-ignore-sentencepiece-sidecar: original result reproduced
+linux gptneox-vocab-0: original result reproduced
+linux gptneox-vocab-50000: original result reproduced
+linux gptneox-vocab-50308: original result reproduced
+linux gptneox-unknown-tensor: original result reproduced
+linux gptneox-indexed-shards: original result reproduced
+linux gptneox-output-alias: original result reproduced
+linux gptneox-short-names: original result reproduced
+linux gptneox-sequential-residual: original result reproduced
+linux gptneox-integer-residual: original result reproduced
+linux gptneox-partial-rope: original result reproduced
+linux gptneox-missing-rotary: original result reproduced
+linux gptneox-missing-maxpos: original result reproduced
+linux gptneox-raw-missing-rotary: original result reproduced
+linux gptneox-nhead-precedence: original result reproduced
+linux gptneox-bad-qkv-elements: original result reproduced
+linux gptneox-rank3-qkv: original result reproduced
+linux gptneox-empty-qkv: original result reproduced
+linux gptneox-nhead-null-with-qkv: original result reproduced
+linux gptneox-nhead-zero-with-qkv: original result reproduced
+linux gptneox-nhead-negative-with-qkv: original result reproduced
+linux gptneox-nhead-string-with-qkv: original result reproduced
+linux gptneox-nhead-null-no-qkv: original result reproduced
+linux gptneox-nhead-zero-no-qkv: original result reproduced
+linux gptneox-nhead-negative-no-qkv: original result reproduced
+linux gptneox-nhead-string-no-qkv: original result reproduced
+linux gptneox: 43 complete files, 12 errors, 80094888 bytes
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.64s
+
+
+running 2 tests
+test pretrained_gpt2_native_files_and_original_rejection ... ignored, requires pinned external original/filtered GPT-2 checkpoints and fresh output root; run in release mode
+test pretrained_gptneox_native_files ... ignored, requires pinned external Pythia checkpoint and fresh output root; run in release mode
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test atomic_publication_preserves_destination_and_source_on_failure ... ok
+test command_line_converts_exact_bytes_and_dry_run_does_not_publish ... ok
+test complete_files_match_original_converter_for_native_source_profile ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+
+running 5 tests
+test qwen2_and_qwen3_complete_native_files ... Qwen complete converter: 104 accepted, 8 rejected, 25723552 exact bytes
+ok
+test qwen_autoconfig_fallbacks_match_original_files ... Qwen complete converter: 32 accepted, 0 rejected, 5318912 exact bytes
+ok
+test qwen_model_type_presence_matches_original_files ... Qwen complete converter: 8 accepted, 0 rejected, 1329824 exact bytes
+ok
+test qwen_publication_limits_and_sidecar_paths ... ok
+test specialized_qwen_variants_do_not_silently_become_dense_models ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
+
+
+running 2 tests
+test pretrained_qwen2_native_files ... ignored, requires pinned external Qwen checkpoint and fresh output root; run in release mode
+test pretrained_qwen3_native_files ... ignored, requires pinned external Qwen checkpoint and fresh output root; run in release mode
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

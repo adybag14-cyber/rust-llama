@@ -23,6 +23,7 @@ pub(crate) struct Component {
     input_bytes: usize,
     pub shape: Vec<u64>,
     heads: Option<usize>,
+    transform: crate::gpt::Transform,
 }
 #[derive(Debug)]
 pub(crate) struct Tensor {
@@ -168,13 +169,16 @@ impl Plan {
             if input_bytes > limits.max_tensor_input_bytes {
                 return Err(Error::Limit("source tensor bytes"));
             }
+            let mut shape = layout.shape;
+            let transform = crate::gpt::Transform::plan(config, &raw_name, &mut shape)?;
             let component = Component {
                 file: value.file,
                 tensor: value.tensor,
                 source: layout.dtype,
                 input_bytes,
-                shape: layout.shape,
+                shape,
                 heads,
+                transform,
             };
             if options.fuse_qkv
                 && let Some((layer, slot, bias)) = qkv_slot(&mapped.name)
@@ -619,6 +623,12 @@ impl Tensor {
             let mut prepared = budget.buffer(prepared_bytes)?;
             codec::prepare_into_with_profile(part.source, &raw, false, profile, &mut prepared)?;
             drop(raw);
+            if !part.transform.is_identity() {
+                let mut transformed = budget.buffer(prepared.len())?;
+                part.transform
+                    .apply(&prepared, &mut transformed, kind.bytes())?;
+                prepared = transformed;
+            }
             if let Some(heads) = part.heads {
                 let rows =
                     usize::try_from(part.shape[0]).map_err(|_| Error::Limit("permutation rows"))?;

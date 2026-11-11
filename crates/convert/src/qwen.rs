@@ -59,7 +59,7 @@ pub(crate) fn validate_variant(
     budget: &mut JsonBudget,
     profile: SourceProfile,
 ) -> Result<()> {
-    if config.family == Architecture::Llama {
+    if !matches!(config.family, Architecture::Qwen2 | Architecture::Qwen3) {
         return Ok(());
     }
     if let Some(raw) = source.read_optional("tokenizer_config.json")? {
@@ -132,7 +132,7 @@ pub(crate) fn pooling_metadata(
     budget: &mut JsonBudget,
     out: &mut Metadata,
 ) -> Result<()> {
-    if config.family == Architecture::Llama {
+    if !matches!(config.family, Architecture::Qwen2 | Architecture::Qwen3) {
         return Ok(());
     }
     let modules = source

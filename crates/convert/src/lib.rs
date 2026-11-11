@@ -1,4 +1,4 @@
-//! Bounded native conversion of dense Hugging Face Llama, Qwen2 and Qwen3 checkpoints.
+//! Bounded native conversion of dense Hugging Face Llama, Qwen, GPT-2 and GPT-NeoX checkpoints.
 //! The frozen Python converter remains an external comparison oracle only.
 #![deny(unsafe_code)]
 
@@ -6,6 +6,8 @@ mod authorship;
 pub mod codec;
 mod config;
 mod frozen;
+mod gpt;
+mod gpt_tables;
 mod hf_backend;
 mod hf_bpe;
 mod hf_probe;
@@ -207,3 +209,6 @@ mod dense_reference;
 
 #[cfg(test)]
 mod hf_schema_reference;
+
+#[cfg(test)]
+mod hf_gpt_reference;

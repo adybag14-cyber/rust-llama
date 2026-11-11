@@ -13,6 +13,8 @@ pub(crate) enum Architecture {
     Llama,
     Qwen2,
     Qwen3,
+    Gpt2,
+    GptNeoX,
 }
 impl Architecture {
     pub fn name(self) -> &'static str {
@@ -20,6 +22,8 @@ impl Architecture {
             Self::Llama => "llama",
             Self::Qwen2 => "qwen2",
             Self::Qwen3 => "qwen3",
+            Self::Gpt2 => "gpt2",
+            Self::GptNeoX => "gptneox",
         }
     }
     pub fn tensor_names(self) -> &'static [crate::frozen::TensorName] {
@@ -27,6 +31,8 @@ impl Architecture {
             Self::Llama => crate::frozen::TENSOR_NAMES,
             Self::Qwen2 => crate::qwen_tables::QWEN2_TENSOR_NAMES,
             Self::Qwen3 => crate::qwen_tables::QWEN3_TENSOR_NAMES,
+            Self::Gpt2 => crate::gpt_tables::GPT2_TENSOR_NAMES,
+            Self::GptNeoX => crate::gpt_tables::GPTNEOX_TENSOR_NAMES,
         }
     }
 }
@@ -60,17 +66,23 @@ impl Config {
                 .find(|name| input_path.contains(name)),
         };
         if selected.is_some_and(|name| {
-            !matches!(name, "llama" | "qwen2" | "qwen3") && AUTO_CONFIG_PATTERNS.contains(&name)
+            !matches!(name, "llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox")
+                && AUTO_CONFIG_PATTERNS.contains(&name)
         }) {
             return Err(Error::Unsupported(
                 "AutoConfig class outside the admitted dense converter",
             ));
         }
-        let mut normalized = matches!(selected, Some("llama" | "qwen2" | "qwen3"));
+        let mut normalized = matches!(
+            selected,
+            Some("llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox")
+        );
         let mut head = None;
         if normalized {
-            normalized = auto_config_valid(root)
-                && (selected == Some("llama") || crate::qwen::valid_auto_config(root));
+            normalized = auto_config_valid(root, selected)
+                && (!matches!(selected, Some("qwen2" | "qwen3"))
+                    || crate::qwen::valid_auto_config(root))
+                && (selected != Some("gpt_neox") || crate::gpt::valid_neox_config(root));
             if normalized && selected == Some("llama") && present(root.get("head_dim")).is_none() {
                 let hidden = root
                     .get("hidden_size")
@@ -97,6 +109,8 @@ impl Config {
                     match selected {
                         Some("qwen2") => QWEN2_DEFAULTS,
                         Some("qwen3") => QWEN3_DEFAULTS,
+                        Some("gpt2") => crate::gpt_tables::GPT2_DEFAULTS,
+                        Some("gpt_neox") => crate::gpt_tables::GPTNEOX_DEFAULTS,
                         _ => LLAMA_DEFAULTS,
                     }
                     .as_bytes(),
@@ -151,6 +165,8 @@ impl Config {
             "LlamaForCausalLM" | "LLaMAForCausalLM" | "LlamaModel" => Architecture::Llama,
             "Qwen2ForCausalLM" | "Qwen2Model" => Architecture::Qwen2,
             "Qwen3ForCausalLM" | "Qwen3Model" => Architecture::Qwen3,
+            "GPT2LMHeadModel" => Architecture::Gpt2,
+            "GPTNeoXForCausalLM" => Architecture::GptNeoX,
             _ => {
                 return Err(Error::Unsupported(
                     "architecture is not an admitted dense conversion",
@@ -205,6 +221,8 @@ impl Config {
         match self.root_value_model_type() {
             Some("qwen2" | "qwen3") => Ok("Qwen2TokenizerFast"),
             Some("llama") => Ok("LlamaTokenizerFast"),
+            Some("gpt2") => Ok("GPT2TokenizerFast"),
+            Some("gpt_neox") => Ok("GPTNeoXTokenizerFast"),
             _ => Err(Error::Unsupported("AutoTokenizer root configuration class")),
         }
     }
@@ -217,6 +235,21 @@ impl Config {
             .as_str()
     }
     fn root_value(&self, key: &str) -> Option<&Json> {
+        if self.root_value_model_type() == Some("gpt2") {
+            // GPT2Config initializes n_* arguments first, then applies the
+            // inherited attribute-map aliases from **kwargs. These aliases
+            // therefore overwrite an explicitly supplied n_* value.
+            let alias = match key {
+                "n_embd" => Some("hidden_size"),
+                "n_positions" => Some("max_position_embeddings"),
+                "n_head" => Some("num_attention_heads"),
+                "n_layer" => Some("num_hidden_layers"),
+                _ => None,
+            };
+            if let Some(value) = alias.and_then(|name| self.root().get(name)) {
+                return Some(value);
+            }
+        }
         if self.defaults.is_some() {
             if key == "head_dim"
                 && let Some(value) = self.computed_head.as_ref()
@@ -320,6 +353,9 @@ impl Config {
         })
     }
     pub fn metadata(&self, out: &mut Metadata, output: OutputType) -> Result<()> {
+        if matches!(self.family, Architecture::Gpt2 | Architecture::GptNeoX) {
+            return crate::gpt::metadata(self, out, output);
+        }
         let mut fields = Metadata::default();
         self.common_metadata(&mut fields, output)?;
         for (name, value) in fields.0 {
@@ -524,7 +560,7 @@ fn first_architecture(value: &Json) -> Result<Option<&str>> {
         .ok_or(Error::Invalid("architectures must be an array"))?;
     values.first().map(text).transpose()
 }
-fn auto_config_valid(root: &Object) -> bool {
+fn auto_config_valid(root: &Object, selected: Option<&str>) -> bool {
     for key in ["label2id", "id2label"] {
         if present(root.get(key)).is_some_and(|v| v.as_object().is_none()) {
             return false;
@@ -580,6 +616,10 @@ fn auto_config_valid(root: &Object) -> bool {
         )
     {
         return false;
+    }
+    if selected == Some("gpt2") {
+        // GPT2Config does not validate a rotary configuration or head division.
+        return true;
     }
     if present(root.get("head_dim")).is_none()
         && (root.get("hidden_size").is_some_and(|v| integer(v).is_err())

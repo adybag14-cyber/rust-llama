@@ -20,6 +20,12 @@ The Qwen2/Qwen3 default configuration data and layer-type fallback contract foll
 
 The external pretrained Qwen2.5-0.5B-Instruct and Qwen3-0.6B inputs are revision and checksum pinned, with Apache 2.0 license declarations retained in provenance. Model weights are not distributed in this repository.
 
+## GPT configuration defaults and tokenizer data
+
+The GPT-2/GPT-NeoX default configurations and GPTNeoXTokenizerFast class behavior follow the pinned Transformers 4.57.6 source under its Apache-2.0 license reproduced below. `gpt_tables.rs` is a changed Rust representation of declarative defaults and frozen llama.cpp tensor aliases; checked Rust code implements configuration selection and execution. Independent native source/table identities and captures are retained in `tests/fixtures/gpt-conversion`.
+
+The ordinary GPT conversion corpus includes unchanged official tokenizer sidecars from the checksum-pinned GPT-2 and Pythia-14M inputs. Their complete original notices are retained beside the fixtures as `LICENSE.GPT2.txt` (Modified MIT) and `LICENSE.PYTHIA.txt` (Apache-2.0). Pretrained model weights remain external. The source-defined GPT-2 static-mask failure and exact derived validation input are disclosed in `docs/GPT_HF_CONVERSION.md`.
+
 ## SentencePiece schema and vocabulary
 
 Copyright 2016 Google Inc.
