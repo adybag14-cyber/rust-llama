@@ -1,0 +1,626 @@
+{
+  "status": "passed",
+  "profile": "windows",
+  "started_utc": "2026-11-11T09:30:56.633356+00:00",
+  "commands": [
+    {
+      "name": "configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\build-windows",
+        "-DFROZEN_SOURCE=C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "seconds": 2.4475290000000314,
+      "stdout": {
+        "bytes": 649,
+        "sha256": "9eb6ff54a3671e24934edd13b97c4bc8753d6a170001913550a355a4b2805cc3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cmake",
+        "--build",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\build-windows",
+        "--config",
+        "Release",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 2.7578629999998157,
+      "stdout": {
+        "bytes": 495,
+        "sha256": "d06da36be38113e83e4893453831e46c6c506df70b1fd0d65bbab88ac123372a"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "capture",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\build-windows\\Release\\context-perf-audit.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\windows-v1\\original.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0781901000000289,
+      "stdout": {
+        "bytes": 50,
+        "sha256": "49289951866607c9a81150ebec2e3ca17c675c9b64f18c4e3b923d8d01e2e2d1"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "inputs": {
+    "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\include\\llama.h": {
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    },
+    "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\ggml\\include\\ggml.h": {
+      "bytes": 119446,
+      "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+    },
+    "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\src\\llama-context.cpp": {
+      "bytes": 181137,
+      "sha256": "4a6a7b8cac76b79aa067d2aa393158ffd2dce97b06048a1d206ccad3edd0357d"
+    },
+    "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\src\\llama-context.h": {
+      "bytes": 16350,
+      "sha256": "c0ed1f0e8b47d2f001a4a8ba61d01f05b16c2972d693780ac1cc09a6d9a05d88"
+    },
+    "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\src\\llama-graph.cpp": {
+      "bytes": 167817,
+      "sha256": "62418701824f9fc78bbd47b5f8b3fd142c6aa9e243273ff9ef3878761b98048f"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\context-perf-audit.cpp": {
+      "bytes": 6607,
+      "sha256": "20b6718c553f70ad6d4c2b7878a991b3885eb8af8be3e6f9b8f28e172fcc85e3"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\CMakeLists.txt": {
+      "bytes": 586,
+      "sha256": "6c92e5598704b8e76459a26ba81f7cce8c165c10159a459d8540b18e9b5326eb"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\context-perf-audit\\capture.py": {
+      "bytes": 4405,
+      "sha256": "a80aed6892d5a0174c426ce61e85b902e84c8a0a3b49de4ed96c8a65f9d49447"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf": {
+      "bytes": 31328,
+      "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll": {
+      "bytes": 3211264,
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    }
+  },
+  "executable": {
+    "bytes": 91648,
+    "sha256": "54d1090ebaa82f9d63381e1f396ef791547578a0bcbea752039c6f8d2838c3e8"
+  },
+  "completed_utc": "2026-11-11T09:31:01.952778+00:00",
+  "output": {
+    "bytes": 38130,
+    "sha256": "d9ea761480b00357ef5c7501bf760e73b7485a4fedd459fc5cf9872293d5aeb9"
+  },
+  "summary": [
+    {
+      "no_perf": false,
+      "flash": 0,
+      "created": {
+        "t_start_ms": 2.741,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_before_sync": {
+        "t_start_ms": 4.671,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_after_sync": {
+        "t_start_ms": 4.671,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.8240000000000001,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "four_single_after_sync": {
+        "t_start_ms": 4.671,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.8240000000000001,
+        "t_eval_ms": 0.203,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 3,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_before_sync": {
+        "t_start_ms": 4.671,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.8240000000000001,
+        "t_eval_ms": 0.203,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_after_sync": {
+        "t_start_ms": 4.671,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.89,
+        "t_eval_ms": 0.203,
+        "n_p_eval": 6,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "reset": {
+        "t_start_ms": 5.816,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "post_reset_warmup_eval": {
+        "t_start_ms": 5.816,
+        "t_load_ms": 0.849,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.06,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 1,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "logs": [
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 1\n\u0000"
+        },
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 0\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        load time =       0.85 ms\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print: prompt eval time =       0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        eval time =       0.06 ms /     1 runs   (    0.06 ms per token, 16666.67 tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:       total time =       0.07 ms /     2 tokens\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:    graphs reused =          1\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:   graph reallocs =          0    /     0        (same size) / (changed size)\n\u0000"
+        }
+      ]
+    },
+    {
+      "no_perf": false,
+      "flash": 1,
+      "created": {
+        "t_start_ms": 2.741,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_before_sync": {
+        "t_start_ms": 7.0440000000000005,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_after_sync": {
+        "t_start_ms": 7.0440000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.362,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "four_single_after_sync": {
+        "t_start_ms": 7.0440000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.362,
+        "t_eval_ms": 0.193,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 3,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_before_sync": {
+        "t_start_ms": 7.0440000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.362,
+        "t_eval_ms": 0.193,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_after_sync": {
+        "t_start_ms": 7.0440000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.428,
+        "t_eval_ms": 0.193,
+        "n_p_eval": 6,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "reset": {
+        "t_start_ms": 7.7010000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "post_reset_warmup_eval": {
+        "t_start_ms": 7.7010000000000005,
+        "t_load_ms": 0.374,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.037,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 1,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "logs": [
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 1\n\u0000"
+        },
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 0\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        load time =       0.37 ms\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print: prompt eval time =       0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        eval time =       0.04 ms /     1 runs   (    0.04 ms per token, 27027.03 tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:       total time =       0.05 ms /     2 tokens\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:    graphs reused =          1\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:   graph reallocs =          0    /     0        (same size) / (changed size)\n\u0000"
+        }
+      ]
+    },
+    {
+      "no_perf": true,
+      "flash": 0,
+      "created": {
+        "t_start_ms": 2.741,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_before_sync": {
+        "t_start_ms": 8.644,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_after_sync": {
+        "t_start_ms": 8.644,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "four_single_after_sync": {
+        "t_start_ms": 8.644,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 3,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_before_sync": {
+        "t_start_ms": 8.644,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_after_sync": {
+        "t_start_ms": 8.644,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 6,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "reset": {
+        "t_start_ms": 9.08,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "post_reset_warmup_eval": {
+        "t_start_ms": 9.08,
+        "t_load_ms": 0.182,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 1,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "logs": [
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 1\n\u0000"
+        },
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 0\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        load time =       0.18 ms\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print: prompt eval time =       0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:       total time =       0.06 ms /     2 tokens\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:    graphs reused =          1\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:   graph reallocs =          0    /     0        (same size) / (changed size)\n\u0000"
+        }
+      ]
+    },
+    {
+      "no_perf": true,
+      "flash": 1,
+      "created": {
+        "t_start_ms": 2.741,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_before_sync": {
+        "t_start_ms": 10.108,
+        "t_load_ms": 0.873,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "prompt_after_sync": {
+        "t_start_ms": 10.108,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "four_single_after_sync": {
+        "t_start_ms": 10.108,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 3,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_before_sync": {
+        "t_start_ms": 10.108,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 4,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "two_queued_after_sync": {
+        "t_start_ms": 10.108,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 6,
+        "n_eval": 4,
+        "n_reused": 5,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "reset": {
+        "t_start_ms": 10.533,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 0,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "post_reset_warmup_eval": {
+        "t_start_ms": 10.533,
+        "t_load_ms": 0.165,
+        "t_p_eval_ms": 0.0,
+        "t_eval_ms": 0.0,
+        "n_p_eval": 1,
+        "n_eval": 1,
+        "n_reused": 1,
+        "n_reallocs_same": 0,
+        "n_reallocs_diff": 0
+      },
+      "logs": [
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 1\n\u0000"
+        },
+        {
+          "level": 1,
+          "bytes": "set_warmup: value = 0\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        load time =       0.17 ms\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print: prompt eval time =       0.00 ms /     1 tokens (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:       total time =       0.04 ms /     2 tokens\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:    graphs reused =          1\n\u0000"
+        },
+        {
+          "level": 2,
+          "bytes": "llama_perf_context_print:   graph reallocs =          0    /     0        (same size) / (changed size)\n\u0000"
+        }
+      ]
+    }
+  ]
+}

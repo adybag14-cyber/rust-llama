@@ -2,7 +2,7 @@
 
 A native Rust implementation of the functionality in the supplied `llama.cpp-master.zip`.
 
-**This is an active, incomplete port.** The repository builds and runs real pretrained Llama, Qwen2, Qwen3 and Mamba-1 generation plus BERT embedding models on its Rust CPU runtime, including packed Q4 inference. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
+**This is an active, incomplete port.** The repository builds and runs real pretrained Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX and Mamba-1 generation plus BERT embedding models on its Rust CPU runtime, including packed Q4 inference. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
 
 The authoritative source input is the 41,458,461-byte ZIP with SHA-256:
 
@@ -37,7 +37,7 @@ cargo run --release --offline --locked -p rust-llama-cli -- generate \
 
 On PowerShell, put the command on one line. Generated text is written to stdout; token counts and timing are written to stderr.
 
-The high-level generation loader supports dense `llama` models with native SPM or BPE tokenization, full adjacent-pair RoPE without scaling, and F32 KV storage. Dense `qwen2` models add half-pair NeoX RoPE, separate or fused Q/K/V projections, source bias handling, and tied or separate output weights. Dense `qwen3` adds independent attention head width and learned per-head Q/K RMS normalization before full-head NeoX RoPE. It also loads Mamba-1 GGUF models with causal convolution, selective recurrent state, optional dt/B/C RMS normalization and tied or separate output weights. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
+The high-level generation loader supports dense `llama` models with native SPM or BPE tokenization, full adjacent-pair RoPE without scaling, and F32 KV storage. Dense `qwen2` models add half-pair NeoX RoPE, separate or fused Q/K/V projections, source bias handling, and tied or separate output weights. Dense `qwen3` adds independent attention head width and learned per-head Q/K RMS normalization before full-head NeoX RoPE. Dense `gpt2` adds learned position embeddings and biased affine-LayerNorm blocks; dense `gptneox` adds partial NeoX RoPE and the original parallel or sequential residual order. See the [GPT-2](docs/GPT2_IMPLEMENTATION.md) and [GPT-NeoX](docs/GPTNEOX_IMPLEMENTATION.md) contracts for supported variants. It also loads Mamba-1 GGUF models with causal convolution, selective recurrent state, optional dt/B/C RMS normalization and tied or separate output weights. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
 
 The runtime retains decoded F32 weights for row access and original packed bytes for native quantized matrix arithmetic. The default decoded-weight budget is 2 GiB; packed storage and runtime/cache allocations are additional. The default context bound is 1,024 tokens and is capped to the model's training limit. Both applications accept the first file of a supported GGUF shard set and automatically discover its declared siblings. The Rust API also accepts explicit ordered paths with cumulative parser limits. Both applications accept `--ctx-size` and `--max-weight-mib`; the pinned Qwen2.5-0.5B Q4_K_M and Qwen3-0.6B Q8_0 corpora need `--max-weight-mib 3072` because its decoded F32 row cache exceeds 2 GiB. These are explicit allocation bounds, not total process memory limits. Generation is currently CPU-based; the separately verified CUDA and OpenCL kernel APIs are not yet a complete GPU model backend.
 
@@ -68,9 +68,9 @@ covers non-UTF-8/NUL wire strings, native alias semantics and boolean normalizat
 model loading now retains raw primary metadata and its native C-prefix projection,
 with checked boundaries for consumed settings and tensor names.
 
-## Convert a Hugging Face Llama checkpoint
+## Convert a Hugging Face checkpoint
 
-The native Rust converter accepts local dense Llama Safetensors checkpoints:
+The native Rust converter accepts local dense Llama, Qwen2 and Qwen3 Safetensors checkpoints:
 
 ~~~sh
 cargo run --release --offline --locked -p llama-convert --bin convert-hf-to-gguf -- \
@@ -127,11 +127,11 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | Area | Executable implementation |
 | --- | --- |
 | Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
-| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 81 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, five recurrent operators, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
+| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 94 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, recurrent and gated-delta operators, hyper-connections, Lightning Indexer, backward RoPE, vision/loss kernels, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
 | Formats and vocabulary | Bounded shared raw/text GGUF v2/v3 reader and owned shard sets, byte-preserving ordered little-endian streaming writer, bounded split/merge executable, raw/indexed Safetensors reading with retained file capabilities, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
-| Model runtime | Llama, Qwen2, Qwen3, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
-| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 198 implemented frozen C API exports. |
-| Checkpoint conversion | Native dense Llama HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior, seven output type selections and complete-file publication. |
+| Model runtime | Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 216 implemented frozen C API exports. |
+| Checkpoint conversion | Native dense Llama/Qwen2/Qwen3 HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior including the Qwen Split expression, pinned NFC and class resolution, seven output type selections and complete-file publication. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
 | Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
@@ -200,7 +200,7 @@ cargo xtask audit
 cargo xtask fixtures
 ```
 
-Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Qwen2, Qwen3, Mamba-1 and BERT model inputs for explicit numerical comparisons. Hardware/vendor tests retain their own explicit prerequisites. The corresponding verified original profiles produce exact results for the exercised model cases; unchanged portable error budgets remain available for unverified targets. See [fixtures/inference/README.md](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
+Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Qwen2, Qwen3, Mamba-1 and BERT model inputs for explicit numerical comparisons. CI also downloads exact official GPT-2 and Pythia Safetensors revisions and uses the Rust xtask preparer to reconstruct the pinned GGUF test inputs before inference comparisons. This preparer is a fixed test-data route; the general converter families are Llama, Qwen2 and Qwen3. Hardware/vendor tests retain their own explicit prerequisites. The corresponding verified original profiles produce exact results for the exercised model cases; unchanged portable error budgets remain available for unverified targets. See [fixtures/inference/README.md](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
 
 With the frozen source extracted separately:
 

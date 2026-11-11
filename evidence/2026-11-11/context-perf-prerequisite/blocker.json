@@ -1,0 +1,83 @@
+{
+  "status": "blocked_before_product_changes",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "exports_left_absent": [
+    "llama_perf_context",
+    "llama_perf_context_reset",
+    "llama_perf_context_print",
+    "llama_set_warmup"
+  ],
+  "decisive_prerequisite": "Native Rust graph construction/reuse and scheduler allocation lifecycle, with genuine event counters; current NativeContext directly executes microbatches and has no equivalent graph cache or scheduler allocator.",
+  "observations": {
+    "profiles": [
+      "MSVC Windows",
+      "GNU Linux"
+    ],
+    "cases_per_profile": 4,
+    "no_perf": [
+      false,
+      true
+    ],
+    "flash": [
+      false,
+      true
+    ],
+    "after_four_individually_synchronized_single_token_calls": {
+      "n_eval": 4,
+      "n_reused": 3
+    },
+    "after_two_more_unsynchronized_single_token_calls_then_sync": {
+      "n_p_eval": 6,
+      "n_eval": 4,
+      "n_reused": 5
+    },
+    "after_perf_reset": {
+      "n_p_eval": 1,
+      "n_eval": 1,
+      "n_reused": 0,
+      "load_time_preserved": true,
+      "graph_cache_not_reset": true
+    },
+    "after_reset_then_one_warmup_decode_and_sync": {
+      "n_reused": 1
+    },
+    "no_perf_true": "Disables only elapsed eval/prompt measurements; token/reuse counters and first-evaluation load-time update remain active.",
+    "graph_realloc_counters": "Both remained zero in these small captures; their source definitions still depend on actual scheduler callbacks. Source reset deliberately preserves their lifetime totals.",
+    "warmup": "Deprecated setter stores a flag and logs its value. Its graph use selects all experts for MoE; admitted dense Llama has no expert activation to implement."
+  },
+  "other_prerequisites": [
+    "Record actual model loading start/elapsed times on the retained model; context construction inherits them.",
+    "Keep queued token/time accounting until synchronization; perf getter and print do not synchronize.",
+    "Preserve source reset behavior: update start time and clear eval/prompt/reuse counters while preserving load time, graph cache, lifetime reallocations, first-evaluation state, and pending queued work.",
+    "Use actual monotonic elapsed measurements and native log callback formatting; expected numeric durations must remain relational."
+  ],
+  "source_locations": {
+    "include/llama.h": "1686–1708: full public performance struct and exports; 1121–1127: deprecated warmup semantics",
+    "src/llama-context.cpp": "194–195: model timing inheritance; 948–979: synchronization accounting; 1692–1728: actual graph reuse; 2937–2953: scheduler reallocation counters; 3946–3970: get/reset; 4920–4949: public functions",
+    "src/llama-graph.cpp": "1566: warmup selects n_expert rather than n_expert_used",
+    "crates/model-runtime/src/context/native.rs": "NativeContext direct microbatch executor; no graph reuse/allocation event ownership"
+  },
+  "native_captures": {
+    "windows": {
+      "output": {
+        "bytes": 38130,
+        "sha256": "d9ea761480b00357ef5c7501bf760e73b7485a4fedd459fc5cf9872293d5aeb9"
+      },
+      "executable": {
+        "bytes": 91648,
+        "sha256": "54d1090ebaa82f9d63381e1f396ef791547578a0bcbea752039c6f8d2838c3e8"
+      }
+    },
+    "linux": {
+      "output": {
+        "bytes": 38788,
+        "sha256": "ac4fbbb0fa65226494ec7ae89dd6d47596cd898091ceba2226d7cf359da95039"
+      },
+      "executable": {
+        "bytes": 123624,
+        "sha256": "0a4cdb56d16cd92b5b4c0c086231dc710ff31e0877265d0a1c9995d67e9aeb58"
+      }
+    }
+  },
+  "conclusion": "Do not add context performance exports with hard-coded zero graph counters, or infer graph reuse from repeated token calls. No product code or coverage counts changed."
+}

@@ -53,6 +53,14 @@ pub fn role(path: &str) -> Option<&'static str> {
             | "crates/tensor/LICENSE-MIT.txt"
             | "crates/tensor/LICENSE-LLAMA-CPP.txt"
             | "crates/tensor/LICENSE-MICROSOFT-STL.txt"
+            | "licenses/unicode-normalization-alignments-0.1.12/COPYRIGHT"
+            | "licenses/unicode-normalization-alignments-0.1.12/LICENSE-APACHE"
+            | "licenses/unicode-normalization-alignments-0.1.12/LICENSE-MIT"
+            | "crates/convert/tests/fixtures/hf-qwen/Qwen2.5-0.5B-Instruct-LICENSE"
+            | "crates/convert/tests/fixtures/hf-qwen/Qwen3-0.6B-LICENSE"
+            | "crates/convert/tests/fixtures/hf-qwen/TOKENIZERS-LICENSE"
+            | "crates/convert/tests/fixtures/hf-qwen/UNICODE-LICENSE"
+            | "crates/convert/tests/fixtures/hf-qwen/TRANSFORMERS-LICENSE"
     ) || path.ends_with(".md")
     {
         return Some("documentation or license");
