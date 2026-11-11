@@ -1,4 +1,4 @@
-# Native adapter evidence — initial integration handoff
+# Native adapter evidence
 
 This checkpoint adds ten implemented LoRA/control-vector C exports. The exact
 fixture corpus and ownership/resource boundaries are described in
@@ -6,19 +6,20 @@ fixture corpus and ownership/resource boundaries are described in
 fixture files. No complete-port, performance or unqualified-platform gate is
 claimed.
 
-## Completed validation at the handoff
+## Completed validation
 
 | Profile | Debug crate suites | Release crate suites | Strict Clippy / format | Original-header C caller | C export inventory |
 |---|---:|---:|---|---|---|
 | Windows x64 / MSVC | 140 passed | 140 passed | Passed | Debug and release exact | Both: 226 frozen + 4 existing extensions; 29 absent |
-| Linux x64 / GNU | 138 passed | Pending | Passed | Debug exact | Debug: 226 frozen + 4 existing extensions; 29 absent |
+| Linux x64 / GNU | 139 passed | 139 passed | Passed | Debug and release exact | Both: 226 frozen + 4 existing extensions; 29 absent |
 
-The Linux optimized run launched in a detached guest was interrupted during
-compilation. Its retained `linux-debug/report.json` explicitly records
-`interrupted`; it provides no release result. Completed debug, Clippy and C
-caller results remain individually recorded. A durable foreground GNU run and
-the parent integration's whole-workspace release check will supply subsequent
-release evidence. The Windows report is complete and passed.
+The final Linux run used a durable foreground guest process and completed all
+debug/release crate suites, strict Clippy, formatting, exact C callers and symbol
+inventories. Its complete passed receipt is `linux/report.json`. The initial
+detached optimized run was interrupted during compilation; the historical
+`linux-debug/report.json` explicitly records that interruption and supplies no
+release result. Both final host reports are complete and passed. Platform-only
+existing tests account for the different full-suite totals.
 
 Each C caller run checks all 44 load cases (34 accepted, 10 rejected), metadata
 buffer writes, invocation-token bits, 107 execution scenarios, 333 decodes and
@@ -35,13 +36,14 @@ crate suites additionally retain their broader model, state and kernel checks.
 
 ## Records and source identity
 
-`windows/report.json` records the completed commands, debug/release library
-hashes, original C output identity, exact export sets and tested source-file
-hashes. `linux-debug/report.json` preserves the completed GNU debug evidence and
-the explicit release interruption. The recorded Git HEAD is the base checkout;
-source-file identities pin the actual changed code under test before its final
-commit. Initial failure logs and all original builds stay external; the retained
-original fixture provenance includes source, client, model and library hashes.
+`windows/report.json` and `linux/report.json` record completed commands,
+debug/release library hashes, original C output identities, exact export sets and
+tested source-file hashes. `linux-debug/report.json` preserves the earlier GNU
+debug evidence and explicit release interruption. The recorded Git HEAD is the
+base checkout; source-file identities pin the actual changed code under test
+before its final commit. Initial failure logs and all original builds stay
+external; retained original fixture provenance includes source, client, model
+and library hashes.
 
 `independent-review.json` pins the formatted implementation reviewed by a
 separate agent. It records the resolved address-reuse issue: an adapter selected
