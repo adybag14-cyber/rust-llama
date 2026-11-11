@@ -1,0 +1,3252 @@
+.gitignore:8: trailing whitespace.
++!crates/model-quant/tests/fixtures/inputs/*.gguf
+crates/ffi/Cargo.toml:12: trailing whitespace.
++llama-model-quant = { path = "../model-quant" }
+crates/ffi/Cargo.toml:13: trailing whitespace.
++llama-quant = { path = "../quant" }
+crates/ffi/Cargo.toml:22: trailing whitespace.
++
+crates/ffi/Cargo.toml:23: trailing whitespace.
++[dev-dependencies]
+crates/ffi/Cargo.toml:24: trailing whitespace.
++llama-conformance = { path = "../llama-conformance" }
+crates/gguf/src/lib.rs:1: trailing whitespace.
++//! Bounded, seekable GGUF v2/v3 I/O, derived from the frozen `ggml/src/gguf.cpp`.
+crates/gguf/src/lib.rs:2: trailing whitespace.
++//! Tensor payloads remain on disk until explicitly requested. No native code is linked.
+crates/gguf/src/lib.rs:3: trailing whitespace.
++#![forbid(unsafe_code)]
+crates/gguf/src/lib.rs:4: trailing whitespace.
++
+crates/gguf/src/lib.rs:5: trailing whitespace.
++mod model_metadata;
+crates/gguf/src/lib.rs:6: trailing whitespace.
++mod raw;
+crates/gguf/src/lib.rs:7: trailing whitespace.
++mod shards;
+crates/gguf/src/lib.rs:8: trailing whitespace.
++pub use raw::{RawGguf, RawTensorInfo};
+crates/gguf/src/lib.rs:9: trailing whitespace.
++pub mod split;
+crates/gguf/src/lib.rs:10: trailing whitespace.
++mod writer;
+crates/gguf/src/lib.rs:11: trailing whitespace.
++pub use shards::{GgufSet, ShardInfo, ShardLimits};
+crates/gguf/src/lib.rs:12: trailing whitespace.
++pub use writer::{
+crates/gguf/src/lib.rs:13: trailing whitespace.
++    RawTensorDescriptor, TensorDescriptor, WriteLayout, write_header, write_ordered,
+crates/gguf/src/lib.rs:14: trailing whitespace.
++    write_raw_header, write_tool_header,
+crates/gguf/src/lib.rs:15: trailing whitespace.
++};
+crates/gguf/src/lib.rs:16: trailing whitespace.
++
+crates/gguf/src/lib.rs:17: trailing whitespace.
++use llama_quant::DType;
+crates/gguf/src/lib.rs:18: trailing whitespace.
++use std::{
+crates/gguf/src/lib.rs:19: trailing whitespace.
++    collections::BTreeMap,
+crates/gguf/src/lib.rs:20: trailing whitespace.
++    fmt,
+crates/gguf/src/lib.rs:21: trailing whitespace.
++    fs::File,
+crates/gguf/src/lib.rs:22: trailing whitespace.
++    io::{self, Read, Seek, SeekFrom, Write},
+crates/gguf/src/lib.rs:23: trailing whitespace.
++    path::Path,
+crates/gguf/src/lib.rs:24: trailing whitespace.
++};
+crates/gguf/src/lib.rs:25: trailing whitespace.
++
+crates/gguf/src/lib.rs:26: trailing whitespace.
++#[derive(Debug)]
+crates/gguf/src/lib.rs:27: trailing whitespace.
++pub enum Error {
+crates/gguf/src/lib.rs:28: trailing whitespace.
++    Io(io::Error),
+crates/gguf/src/lib.rs:29: trailing whitespace.
++    Invalid(String),
+crates/gguf/src/lib.rs:30: trailing whitespace.
++    Limit(String),
+crates/gguf/src/lib.rs:31: trailing whitespace.
++    Unsupported(String),
+crates/gguf/src/lib.rs:32: trailing whitespace.
++}
+crates/gguf/src/lib.rs:33: trailing whitespace.
++impl fmt::Display for Error {
+crates/gguf/src/lib.rs:34: trailing whitespace.
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+crates/gguf/src/lib.rs:35: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:36: trailing whitespace.
++            Self::Io(e) => write!(f, "{e}"),
+crates/gguf/src/lib.rs:37: trailing whitespace.
++            Self::Invalid(s) => write!(f, "invalid GGUF: {s}"),
+crates/gguf/src/lib.rs:38: trailing whitespace.
++            Self::Limit(s) => write!(f, "GGUF limit: {s}"),
+crates/gguf/src/lib.rs:39: trailing whitespace.
++            Self::Unsupported(s) => write!(f, "unsupported GGUF: {s}"),
+crates/gguf/src/lib.rs:40: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:41: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:42: trailing whitespace.
++}
+crates/gguf/src/lib.rs:43: trailing whitespace.
++impl std::error::Error for Error {}
+crates/gguf/src/lib.rs:44: trailing whitespace.
++impl From<io::Error> for Error {
+crates/gguf/src/lib.rs:45: trailing whitespace.
++    fn from(e: io::Error) -> Self {
+crates/gguf/src/lib.rs:46: trailing whitespace.
++        Self::Io(e)
+crates/gguf/src/lib.rs:47: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:48: trailing whitespace.
++}
+crates/gguf/src/lib.rs:49: trailing whitespace.
++pub type Result<T> = std::result::Result<T, Error>;
+crates/gguf/src/lib.rs:50: trailing whitespace.
++fn invalid(s: impl Into<String>) -> Error {
+crates/gguf/src/lib.rs:51: trailing whitespace.
++    Error::Invalid(s.into())
+crates/gguf/src/lib.rs:52: trailing whitespace.
++}
+crates/gguf/src/lib.rs:53: trailing whitespace.
++
+crates/gguf/src/lib.rs:54: trailing whitespace.
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+crates/gguf/src/lib.rs:55: trailing whitespace.
++pub enum Endian {
+crates/gguf/src/lib.rs:56: trailing whitespace.
++    Little,
+crates/gguf/src/lib.rs:57: trailing whitespace.
++    Big,
+crates/gguf/src/lib.rs:58: trailing whitespace.
++}
+crates/gguf/src/lib.rs:59: trailing whitespace.
++#[derive(Debug, Clone, PartialEq)]
+crates/gguf/src/lib.rs:60: trailing whitespace.
++pub enum MetadataValue<S> {
+crates/gguf/src/lib.rs:61: trailing whitespace.
++    U8(u8),
+crates/gguf/src/lib.rs:62: trailing whitespace.
++    I8(i8),
+crates/gguf/src/lib.rs:63: trailing whitespace.
++    U16(u16),
+crates/gguf/src/lib.rs:64: trailing whitespace.
++    I16(i16),
+crates/gguf/src/lib.rs:65: trailing whitespace.
++    U32(u32),
+crates/gguf/src/lib.rs:66: trailing whitespace.
++    I32(i32),
+crates/gguf/src/lib.rs:67: trailing whitespace.
++    F32(f32),
+crates/gguf/src/lib.rs:68: trailing whitespace.
++    Bool(bool),
+crates/gguf/src/lib.rs:69: trailing whitespace.
++    String(S),
+crates/gguf/src/lib.rs:70: trailing whitespace.
++    /// An exact GGUF STRING payload that is not represented by this facade's
+crates/gguf/src/lib.rs:71: trailing whitespace.
++    /// text type. The wire type remains STRING (8); no replacement characters
+crates/gguf/src/lib.rs:72: trailing whitespace.
++    /// are inserted. Model views use this for non-UTF-8 C-string prefixes.
+crates/gguf/src/lib.rs:73: trailing whitespace.
++    ByteString(Vec<u8>),
+crates/gguf/src/lib.rs:74: trailing whitespace.
++    Array {
+crates/gguf/src/lib.rs:75: trailing whitespace.
++        element_type: u32,
+crates/gguf/src/lib.rs:76: trailing whitespace.
++        values: Vec<MetadataValue<S>>,
+crates/gguf/src/lib.rs:77: trailing whitespace.
++    },
+crates/gguf/src/lib.rs:78: trailing whitespace.
++    U64(u64),
+crates/gguf/src/lib.rs:79: trailing whitespace.
++    I64(i64),
+crates/gguf/src/lib.rs:80: trailing whitespace.
++    F64(f64),
+crates/gguf/src/lib.rs:81: trailing whitespace.
++}
+crates/gguf/src/lib.rs:82: trailing whitespace.
++pub type Value = MetadataValue<String>;
+crates/gguf/src/lib.rs:83: trailing whitespace.
++pub type RawValue = MetadataValue<Vec<u8>>;
+crates/gguf/src/lib.rs:84: trailing whitespace.
++impl<S> MetadataValue<S> {
+crates/gguf/src/lib.rs:85: trailing whitespace.
++    pub fn type_id(&self) -> u32 {
+crates/gguf/src/lib.rs:86: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:87: trailing whitespace.
++            Self::U8(_) => 0,
+crates/gguf/src/lib.rs:88: trailing whitespace.
++            Self::I8(_) => 1,
+crates/gguf/src/lib.rs:89: trailing whitespace.
++            Self::U16(_) => 2,
+crates/gguf/src/lib.rs:90: trailing whitespace.
++            Self::I16(_) => 3,
+crates/gguf/src/lib.rs:91: trailing whitespace.
++            Self::U32(_) => 4,
+crates/gguf/src/lib.rs:92: trailing whitespace.
++            Self::I32(_) => 5,
+crates/gguf/src/lib.rs:93: trailing whitespace.
++            Self::F32(_) => 6,
+crates/gguf/src/lib.rs:94: trailing whitespace.
++            Self::Bool(_) => 7,
+crates/gguf/src/lib.rs:95: trailing whitespace.
++            Self::String(_) | Self::ByteString(_) => 8,
+crates/gguf/src/lib.rs:96: trailing whitespace.
++            Self::Array { .. } => 9,
+crates/gguf/src/lib.rs:97: trailing whitespace.
++            Self::U64(_) => 10,
+crates/gguf/src/lib.rs:98: trailing whitespace.
++            Self::I64(_) => 11,
+crates/gguf/src/lib.rs:99: trailing whitespace.
++            Self::F64(_) => 12,
+crates/gguf/src/lib.rs:100: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:101: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:102: trailing whitespace.
++    pub fn as_u64(&self) -> Option<u64> {
+crates/gguf/src/lib.rs:103: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:104: trailing whitespace.
++            Self::U8(v) => Some(*v as u64),
+crates/gguf/src/lib.rs:105: trailing whitespace.
++            Self::U16(v) => Some(*v as u64),
+crates/gguf/src/lib.rs:106: trailing whitespace.
++            Self::U32(v) => Some(*v as u64),
+crates/gguf/src/lib.rs:107: trailing whitespace.
++            Self::U64(v) => Some(*v),
+crates/gguf/src/lib.rs:108: trailing whitespace.
++            _ => None,
+crates/gguf/src/lib.rs:109: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:110: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:111: trailing whitespace.
++    pub fn as_i64(&self) -> Option<i64> {
+crates/gguf/src/lib.rs:112: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:113: trailing whitespace.
++            Self::I8(v) => Some(*v as i64),
+crates/gguf/src/lib.rs:114: trailing whitespace.
++            Self::I16(v) => Some(*v as i64),
+crates/gguf/src/lib.rs:115: trailing whitespace.
++            Self::I32(v) => Some(*v as i64),
+crates/gguf/src/lib.rs:116: trailing whitespace.
++            Self::I64(v) => Some(*v),
+crates/gguf/src/lib.rs:117: trailing whitespace.
++            _ => self.as_u64().and_then(|v| v.try_into().ok()),
+crates/gguf/src/lib.rs:118: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:119: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:120: trailing whitespace.
++    pub fn as_f64(&self) -> Option<f64> {
+crates/gguf/src/lib.rs:121: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:122: trailing whitespace.
++            Self::F32(v) => Some(*v as f64),
+crates/gguf/src/lib.rs:123: trailing whitespace.
++            Self::F64(v) => Some(*v),
+crates/gguf/src/lib.rs:124: trailing whitespace.
++            _ => None,
+crates/gguf/src/lib.rs:125: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:126: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:127: trailing whitespace.
++    pub fn as_bool(&self) -> Option<bool> {
+crates/gguf/src/lib.rs:128: trailing whitespace.
++        if let Self::Bool(v) = self {
+crates/gguf/src/lib.rs:129: trailing whitespace.
++            Some(*v)
+crates/gguf/src/lib.rs:130: trailing whitespace.
++        } else {
+crates/gguf/src/lib.rs:131: trailing whitespace.
++            None
+crates/gguf/src/lib.rs:132: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:133: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:134: trailing whitespace.
++    pub fn as_array(&self) -> Option<&[MetadataValue<S>]> {
+crates/gguf/src/lib.rs:135: trailing whitespace.
++        if let Self::Array { values, .. } = self {
+crates/gguf/src/lib.rs:136: trailing whitespace.
++            Some(values)
+crates/gguf/src/lib.rs:137: trailing whitespace.
++        } else {
+crates/gguf/src/lib.rs:138: trailing whitespace.
++            None
+crates/gguf/src/lib.rs:139: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:140: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:141: trailing whitespace.
++}
+crates/gguf/src/lib.rs:142: trailing whitespace.
++
+crates/gguf/src/lib.rs:143: trailing whitespace.
++impl Value {
+crates/gguf/src/lib.rs:144: trailing whitespace.
++    /// Exact string bytes, including values that cannot be exposed as UTF-8.
+crates/gguf/src/lib.rs:145: trailing whitespace.
++    pub fn as_bytes(&self) -> Option<&[u8]> {
+crates/gguf/src/lib.rs:146: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:147: trailing whitespace.
++            Self::String(value) => Some(value.as_bytes()),
+crates/gguf/src/lib.rs:148: trailing whitespace.
++            Self::ByteString(value) => Some(value),
+crates/gguf/src/lib.rs:149: trailing whitespace.
++            _ => None,
+crates/gguf/src/lib.rs:150: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:151: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:152: trailing whitespace.
++    pub fn as_str(&self) -> Option<&str> {
+crates/gguf/src/lib.rs:153: trailing whitespace.
++        if let Self::String(v) = self {
+crates/gguf/src/lib.rs:154: trailing whitespace.
++            Some(v)
+crates/gguf/src/lib.rs:155: trailing whitespace.
++        } else {
+crates/gguf/src/lib.rs:156: trailing whitespace.
++            None
+crates/gguf/src/lib.rs:157: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:158: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:159: trailing whitespace.
++}
+crates/gguf/src/lib.rs:160: trailing whitespace.
++impl RawValue {
+crates/gguf/src/lib.rs:161: trailing whitespace.
++    pub fn as_bytes(&self) -> Option<&[u8]> {
+crates/gguf/src/lib.rs:162: trailing whitespace.
++        match self {
+crates/gguf/src/lib.rs:163: trailing whitespace.
++            Self::String(value) | Self::ByteString(value) => Some(value),
+crates/gguf/src/lib.rs:164: trailing whitespace.
++            _ => None,
+crates/gguf/src/lib.rs:165: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:166: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:167: trailing whitespace.
++    /// C getter view; the stored byte string remains unchanged.
+crates/gguf/src/lib.rs:168: trailing whitespace.
++    pub fn as_c_string(&self) -> Option<&[u8]> {
+crates/gguf/src/lib.rs:169: trailing whitespace.
++        self.as_bytes().map(raw::c_string)
+crates/gguf/src/lib.rs:170: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:171: trailing whitespace.
++}
+crates/gguf/src/lib.rs:172: trailing whitespace.
++
+crates/gguf/src/lib.rs:173: trailing whitespace.
++#[derive(Debug, Clone)]
+crates/gguf/src/lib.rs:174: trailing whitespace.
++pub struct Limits {
+crates/gguf/src/lib.rs:175: trailing whitespace.
++    pub max_metadata_bytes: u64,
+crates/gguf/src/lib.rs:176: trailing whitespace.
++    pub max_string_bytes: usize,
+crates/gguf/src/lib.rs:177: trailing whitespace.
++    pub max_array_values: usize,
+crates/gguf/src/lib.rs:178: trailing whitespace.
++    pub max_total_values: usize,
+crates/gguf/src/lib.rs:179: trailing whitespace.
++    pub max_tensors: usize,
+crates/gguf/src/lib.rs:180: trailing whitespace.
++    pub max_metadata_entries: usize,
+crates/gguf/src/lib.rs:181: trailing whitespace.
++    pub max_tensor_read_bytes: usize,
+crates/gguf/src/lib.rs:182: trailing whitespace.
++}
+crates/gguf/src/lib.rs:183: trailing whitespace.
++impl Default for Limits {
+crates/gguf/src/lib.rs:184: trailing whitespace.
++    fn default() -> Self {
+crates/gguf/src/lib.rs:185: trailing whitespace.
++        Self {
+crates/gguf/src/lib.rs:186: trailing whitespace.
++            max_metadata_bytes: 256 * 1024 * 1024,
+crates/gguf/src/lib.rs:187: trailing whitespace.
++            max_string_bytes: 16 * 1024 * 1024,
+crates/gguf/src/lib.rs:188: trailing whitespace.
++            max_array_values: 1_000_000,
+crates/gguf/src/lib.rs:189: trailing whitespace.
++            max_total_values: 4_000_000,
+crates/gguf/src/lib.rs:190: trailing whitespace.
++            max_tensors: 100_000,
+crates/gguf/src/lib.rs:191: trailing whitespace.
++            max_metadata_entries: 100_000,
+crates/gguf/src/lib.rs:192: trailing whitespace.
++            max_tensor_read_bytes: 2 * 1024 * 1024 * 1024,
+crates/gguf/src/lib.rs:193: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:194: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:195: trailing whitespace.
++}
+crates/gguf/src/lib.rs:196: trailing whitespace.
++/// Parser work charged to one header, including data-section alignment padding.
+crates/gguf/src/lib.rs:197: trailing whitespace.
++/// A shard set applies its limits to the cumulative values across all files.
+crates/gguf/src/lib.rs:198: trailing whitespace.
++#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+crates/gguf/src/lib.rs:199: trailing whitespace.
++pub struct HeaderUsage {
+crates/gguf/src/lib.rs:200: trailing whitespace.
++    pub bytes: u64,
+crates/gguf/src/lib.rs:201: trailing whitespace.
++    pub metadata_entries: usize,
+crates/gguf/src/lib.rs:202: trailing whitespace.
++    pub metadata_values: usize,
+crates/gguf/src/lib.rs:203: trailing whitespace.
++    pub tensors: usize,
+crates/gguf/src/lib.rs:204: trailing whitespace.
++}
+crates/gguf/src/lib.rs:205: trailing whitespace.
++
+crates/gguf/src/lib.rs:206: trailing whitespace.
++#[derive(Debug, Clone, PartialEq, Eq)]
+crates/gguf/src/lib.rs:207: trailing whitespace.
++pub struct TensorInfo {
+crates/gguf/src/lib.rs:208: trailing whitespace.
++    pub name: String,
+crates/gguf/src/lib.rs:209: trailing whitespace.
++    /// GGML order: dimension zero is contiguous and determines quantization rows.
+crates/gguf/src/lib.rs:210: trailing whitespace.
++    pub dimensions: Vec<u64>,
+crates/gguf/src/lib.rs:211: trailing whitespace.
++    pub dtype: DType,
+crates/gguf/src/lib.rs:212: trailing whitespace.
++    pub offset: u64,
+crates/gguf/src/lib.rs:213: trailing whitespace.
++    pub byte_len: u64,
+crates/gguf/src/lib.rs:214: trailing whitespace.
++}
+crates/gguf/src/lib.rs:215: trailing whitespace.
++impl TensorInfo {
+crates/gguf/src/lib.rs:216: trailing whitespace.
++    pub fn elements(&self) -> Result<usize> {
+crates/gguf/src/lib.rs:217: trailing whitespace.
++        dimension_elements(&self.dimensions)
+crates/gguf/src/lib.rs:218: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:219: trailing whitespace.
++}
+crates/gguf/src/lib.rs:220: trailing whitespace.
++
+crates/gguf/src/lib.rs:221: trailing whitespace.
++pub struct Gguf<R: Read + Seek> {
+crates/gguf/src/lib.rs:222: trailing whitespace.
++    reader: R,
+crates/gguf/src/lib.rs:223: trailing whitespace.
++    pub version: u32,
+crates/gguf/src/lib.rs:224: trailing whitespace.
++    pub endian: Endian,
+crates/gguf/src/lib.rs:225: trailing whitespace.
++    pub alignment: u32,
+crates/gguf/src/lib.rs:226: trailing whitespace.
++    pub metadata: BTreeMap<String, Value>,
+crates/gguf/src/lib.rs:227: trailing whitespace.
++    metadata_order: Vec<String>,
+crates/gguf/src/lib.rs:228: trailing whitespace.
++    pub tensors: Vec<TensorInfo>,
+crates/gguf/src/lib.rs:229: trailing whitespace.
++    pub data_offset: u64,
+crates/gguf/src/lib.rs:230: trailing whitespace.
++    pub file_len: u64,
+crates/gguf/src/lib.rs:231: trailing whitespace.
++    limits: Limits,
+crates/gguf/src/lib.rs:232: trailing whitespace.
++    header_usage: HeaderUsage,
+crates/gguf/src/lib.rs:233: trailing whitespace.
++}
+crates/gguf/src/lib.rs:234: trailing whitespace.
++impl Gguf<File> {
+crates/gguf/src/lib.rs:235: trailing whitespace.
++    pub fn open(path: impl AsRef<Path>) -> Result<Self> {
+crates/gguf/src/lib.rs:236: trailing whitespace.
++        Self::read(File::open(path)?, Limits::default())
+crates/gguf/src/lib.rs:237: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:238: trailing whitespace.
++    pub fn open_with_limits(path: impl AsRef<Path>, limits: Limits) -> Result<Self> {
+crates/gguf/src/lib.rs:239: trailing whitespace.
++        Self::read(File::open(path)?, limits)
+crates/gguf/src/lib.rs:240: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:241: trailing whitespace.
++}
+crates/gguf/src/lib.rs:242: trailing whitespace.
++impl<R: Read + Seek> Gguf<R> {
+crates/gguf/src/lib.rs:243: trailing whitespace.
++    pub fn read(reader: R, limits: Limits) -> Result<Self> {
+crates/gguf/src/lib.rs:244: trailing whitespace.
++        RawGguf::read(reader, limits)?.into_text()
+crates/gguf/src/lib.rs:245: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:246: trailing whitespace.
++    /// Original on-disk metadata key order. The public map remains available for lookup.
+crates/gguf/src/lib.rs:247: trailing whitespace.
++    /// Keys removed from that map are omitted; new map entries have no on-disk position.
+crates/gguf/src/lib.rs:248: trailing whitespace.
++    pub fn metadata_order(&self) -> impl Iterator<Item = &str> {
+crates/gguf/src/lib.rs:249: trailing whitespace.
++        self.metadata_order
+crates/gguf/src/lib.rs:250: trailing whitespace.
++            .iter()
+crates/gguf/src/lib.rs:251: trailing whitespace.
++            .filter(|key| self.metadata.contains_key(*key))
+crates/gguf/src/lib.rs:252: trailing whitespace.
++            .map(String::as_str)
+crates/gguf/src/lib.rs:253: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:254: trailing whitespace.
++    pub fn header_usage(&self) -> HeaderUsage {
+crates/gguf/src/lib.rs:255: trailing whitespace.
++        self.header_usage
+crates/gguf/src/lib.rs:256: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:257: trailing whitespace.
++    pub fn tensor(&self, name: &str) -> Option<&TensorInfo> {
+crates/gguf/src/lib.rs:258: trailing whitespace.
++        self.tensors.iter().find(|t| t.name == name)
+crates/gguf/src/lib.rs:259: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:260: trailing whitespace.
++    pub fn read_tensor(&mut self, name: &str) -> Result<Vec<u8>> {
+crates/gguf/src/lib.rs:261: trailing whitespace.
++        let info = self
+crates/gguf/src/lib.rs:262: trailing whitespace.
++            .tensors
+crates/gguf/src/lib.rs:263: trailing whitespace.
++            .iter()
+crates/gguf/src/lib.rs:264: trailing whitespace.
++            .find(|t| t.name == name)
+crates/gguf/src/lib.rs:265: trailing whitespace.
++            .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
+crates/gguf/src/lib.rs:266: trailing whitespace.
++        read_tensor_payload(
+crates/gguf/src/lib.rs:267: trailing whitespace.
++            &mut self.reader,
+crates/gguf/src/lib.rs:268: trailing whitespace.
++            self.data_offset,
+crates/gguf/src/lib.rs:269: trailing whitespace.
++            self.file_len,
+crates/gguf/src/lib.rs:270: trailing whitespace.
++            &self.limits,
+crates/gguf/src/lib.rs:271: trailing whitespace.
++            info,
+crates/gguf/src/lib.rs:272: trailing whitespace.
++        )
+crates/gguf/src/lib.rs:273: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:274: trailing whitespace.
++    pub fn read_f32(&mut self, name: &str) -> Result<Vec<f32>> {
+crates/gguf/src/lib.rs:275: trailing whitespace.
++        let info = self
+crates/gguf/src/lib.rs:276: trailing whitespace.
++            .tensors
+crates/gguf/src/lib.rs:277: trailing whitespace.
++            .iter()
+crates/gguf/src/lib.rs:278: trailing whitespace.
++            .find(|t| t.name == name)
+crates/gguf/src/lib.rs:279: trailing whitespace.
++            .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
+crates/gguf/src/lib.rs:280: trailing whitespace.
++        read_tensor_f32(
+crates/gguf/src/lib.rs:281: trailing whitespace.
++            &mut self.reader,
+crates/gguf/src/lib.rs:282: trailing whitespace.
++            self.data_offset,
+crates/gguf/src/lib.rs:283: trailing whitespace.
++            self.file_len,
+crates/gguf/src/lib.rs:284: trailing whitespace.
++            self.endian,
+crates/gguf/src/lib.rs:285: trailing whitespace.
++            &self.limits,
+crates/gguf/src/lib.rs:286: trailing whitespace.
++            info,
+crates/gguf/src/lib.rs:287: trailing whitespace.
++        )
+crates/gguf/src/lib.rs:288: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:289: trailing whitespace.
++}
+crates/gguf/src/lib.rs:290: trailing whitespace.
++
+crates/gguf/src/lib.rs:291: trailing whitespace.
++fn dimension_elements(dimensions: &[u64]) -> Result<usize> {
+crates/gguf/src/lib.rs:292: trailing whitespace.
++    dimensions.iter().try_fold(1usize, |count, &dimension| {
+crates/gguf/src/lib.rs:293: trailing whitespace.
++        if dimension > i64::MAX as u64 {
+crates/gguf/src/lib.rs:294: trailing whitespace.
++            return Err(invalid("dimension exceeds signed GGML range"));
+crates/gguf/src/lib.rs:295: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:296: trailing whitespace.
++        let dimension =
+crates/gguf/src/lib.rs:297: trailing whitespace.
++            usize::try_from(dimension).map_err(|_| invalid("dimension exceeds usize"))?;
+crates/gguf/src/lib.rs:298: trailing whitespace.
++        let result = count
+crates/gguf/src/lib.rs:299: trailing whitespace.
++            .checked_mul(dimension)
+crates/gguf/src/lib.rs:300: trailing whitespace.
++            .ok_or_else(|| invalid("element count overflow"))?;
+crates/gguf/src/lib.rs:301: trailing whitespace.
++        if result as u64 > i64::MAX as u64 {
+crates/gguf/src/lib.rs:302: trailing whitespace.
++            return Err(invalid("element count exceeds signed GGML range"));
+crates/gguf/src/lib.rs:303: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:304: trailing whitespace.
++        Ok(result)
+crates/gguf/src/lib.rs:305: trailing whitespace.
++    })
+crates/gguf/src/lib.rs:306: trailing whitespace.
++}
+crates/gguf/src/lib.rs:307: trailing whitespace.
++
+crates/gguf/src/lib.rs:308: trailing whitespace.
++struct TensorReadInfo<'a> {
+crates/gguf/src/lib.rs:309: trailing whitespace.
++    name: std::borrow::Cow<'a, str>,
+crates/gguf/src/lib.rs:310: trailing whitespace.
++    dimensions: &'a [u64],
+crates/gguf/src/lib.rs:311: trailing whitespace.
++    dtype: DType,
+crates/gguf/src/lib.rs:312: trailing whitespace.
++    offset: u64,
+crates/gguf/src/lib.rs:313: trailing whitespace.
++    byte_len: u64,
+crates/gguf/src/lib.rs:314: trailing whitespace.
++}
+crates/gguf/src/lib.rs:315: trailing whitespace.
++impl<'a> From<&'a TensorInfo> for TensorReadInfo<'a> {
+crates/gguf/src/lib.rs:316: trailing whitespace.
++    fn from(info: &'a TensorInfo) -> Self {
+crates/gguf/src/lib.rs:317: trailing whitespace.
++        Self {
+crates/gguf/src/lib.rs:318: trailing whitespace.
++            name: std::borrow::Cow::Borrowed(&info.name),
+crates/gguf/src/lib.rs:319: trailing whitespace.
++            dimensions: &info.dimensions,
+crates/gguf/src/lib.rs:320: trailing whitespace.
++            dtype: info.dtype,
+crates/gguf/src/lib.rs:321: trailing whitespace.
++            offset: info.offset,
+crates/gguf/src/lib.rs:322: trailing whitespace.
++            byte_len: info.byte_len,
+crates/gguf/src/lib.rs:323: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:324: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:325: trailing whitespace.
++}
+crates/gguf/src/lib.rs:326: trailing whitespace.
++fn read_tensor_payload<R: Read + Seek>(
+crates/gguf/src/lib.rs:327: trailing whitespace.
++    reader: &mut R,
+crates/gguf/src/lib.rs:328: trailing whitespace.
++    data_offset: u64,
+crates/gguf/src/lib.rs:329: trailing whitespace.
++    file_len: u64,
+crates/gguf/src/lib.rs:330: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/lib.rs:331: trailing whitespace.
++    info: &TensorInfo,
+crates/gguf/src/lib.rs:332: trailing whitespace.
++) -> Result<Vec<u8>> {
+crates/gguf/src/lib.rs:333: trailing whitespace.
++    read_tensor_payload_info(reader, data_offset, file_len, limits, &info.into())
+crates/gguf/src/lib.rs:334: trailing whitespace.
++}
+crates/gguf/src/lib.rs:335: trailing whitespace.
++fn read_tensor_f32<R: Read + Seek>(
+crates/gguf/src/lib.rs:336: trailing whitespace.
++    reader: &mut R,
+crates/gguf/src/lib.rs:337: trailing whitespace.
++    data_offset: u64,
+crates/gguf/src/lib.rs:338: trailing whitespace.
++    file_len: u64,
+crates/gguf/src/lib.rs:339: trailing whitespace.
++    endian: Endian,
+crates/gguf/src/lib.rs:340: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/lib.rs:341: trailing whitespace.
++    info: &TensorInfo,
+crates/gguf/src/lib.rs:342: trailing whitespace.
++) -> Result<Vec<f32>> {
+crates/gguf/src/lib.rs:343: trailing whitespace.
++    read_tensor_f32_info(reader, data_offset, file_len, endian, limits, &info.into())
+crates/gguf/src/lib.rs:344: trailing whitespace.
++}
+crates/gguf/src/lib.rs:345: trailing whitespace.
++
+crates/gguf/src/lib.rs:346: trailing whitespace.
++fn read_tensor_payload_info<R: Read + Seek>(
+crates/gguf/src/lib.rs:347: trailing whitespace.
++    reader: &mut R,
+crates/gguf/src/lib.rs:348: trailing whitespace.
++    data_offset: u64,
+crates/gguf/src/lib.rs:349: trailing whitespace.
++    file_len: u64,
+crates/gguf/src/lib.rs:350: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/lib.rs:351: trailing whitespace.
++    info: &TensorReadInfo<'_>,
+crates/gguf/src/lib.rs:352: trailing whitespace.
++) -> Result<Vec<u8>> {
+crates/gguf/src/lib.rs:353: trailing whitespace.
++    let n = usize::try_from(info.byte_len)
+crates/gguf/src/lib.rs:354: trailing whitespace.
++        .map_err(|_| Error::Limit("tensor length exceeds usize".into()))?;
+crates/gguf/src/lib.rs:355: trailing whitespace.
++    if n > limits.max_tensor_read_bytes {
+crates/gguf/src/lib.rs:356: trailing whitespace.
++        return Err(Error::Limit(format!(
+crates/gguf/src/lib.rs:357: trailing whitespace.
++            "tensor {} read exceeds {} bytes",
+crates/gguf/src/lib.rs:358: trailing whitespace.
++            info.name, limits.max_tensor_read_bytes
+crates/gguf/src/lib.rs:359: trailing whitespace.
++        )));
+crates/gguf/src/lib.rs:360: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:361: trailing whitespace.
++    let offset = data_offset
+crates/gguf/src/lib.rs:362: trailing whitespace.
++        .checked_add(info.offset)
+crates/gguf/src/lib.rs:363: trailing whitespace.
++        .ok_or_else(|| invalid("tensor absolute offset overflow"))?;
+crates/gguf/src/lib.rs:364: trailing whitespace.
++    if offset
+crates/gguf/src/lib.rs:365: trailing whitespace.
++        .checked_add(n as u64)
+crates/gguf/src/lib.rs:366: trailing whitespace.
++        .is_none_or(|end| end > file_len)
+crates/gguf/src/lib.rs:367: trailing whitespace.
++    {
+crates/gguf/src/lib.rs:368: trailing whitespace.
++        return Err(invalid("tensor read exceeds file length"));
+crates/gguf/src/lib.rs:369: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:370: trailing whitespace.
++    let mut bytes = Vec::new();
+crates/gguf/src/lib.rs:371: trailing whitespace.
++    bytes
+crates/gguf/src/lib.rs:372: trailing whitespace.
++        .try_reserve_exact(n)
+crates/gguf/src/lib.rs:373: trailing whitespace.
++        .map_err(|_| Error::Limit("tensor allocation".into()))?;
+crates/gguf/src/lib.rs:374: trailing whitespace.
++    bytes.resize(n, 0);
+crates/gguf/src/lib.rs:375: trailing whitespace.
++    reader.seek(SeekFrom::Start(offset))?;
+crates/gguf/src/lib.rs:376: trailing whitespace.
++    reader.read_exact(&mut bytes)?;
+crates/gguf/src/lib.rs:377: trailing whitespace.
++    Ok(bytes)
+crates/gguf/src/lib.rs:378: trailing whitespace.
++}
+crates/gguf/src/lib.rs:379: trailing whitespace.
++
+crates/gguf/src/lib.rs:380: trailing whitespace.
++fn read_tensor_f32_info<R: Read + Seek>(
+crates/gguf/src/lib.rs:381: trailing whitespace.
++    reader: &mut R,
+crates/gguf/src/lib.rs:382: trailing whitespace.
++    data_offset: u64,
+crates/gguf/src/lib.rs:383: trailing whitespace.
++    file_len: u64,
+crates/gguf/src/lib.rs:384: trailing whitespace.
++    endian: Endian,
+crates/gguf/src/lib.rs:385: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/lib.rs:386: trailing whitespace.
++    info: &TensorReadInfo<'_>,
+crates/gguf/src/lib.rs:387: trailing whitespace.
++) -> Result<Vec<f32>> {
+crates/gguf/src/lib.rs:388: trailing whitespace.
++    let n = dimension_elements(info.dimensions)?;
+crates/gguf/src/lib.rs:389: trailing whitespace.
++    let decoded = n
+crates/gguf/src/lib.rs:390: trailing whitespace.
++        .checked_mul(4)
+crates/gguf/src/lib.rs:391: trailing whitespace.
++        .ok_or_else(|| Error::Limit("decoded tensor size overflow".into()))?;
+crates/gguf/src/lib.rs:392: trailing whitespace.
++    if decoded > limits.max_tensor_read_bytes {
+crates/gguf/src/lib.rs:393: trailing whitespace.
++        return Err(Error::Limit("decoded tensor exceeds read budget".into()));
+crates/gguf/src/lib.rs:394: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:395: trailing whitespace.
++    let mut bytes = read_tensor_payload_info(reader, data_offset, file_len, limits, info)?;
+crates/gguf/src/lib.rs:396: trailing whitespace.
++    if endian == Endian::Big {
+crates/gguf/src/lib.rs:397: trailing whitespace.
++        let size = match info.dtype.id() {
+crates/gguf/src/lib.rs:398: trailing whitespace.
++            0 | 26 => 4,
+crates/gguf/src/lib.rs:399: trailing whitespace.
++            1 | 25 | 30 => 2,
+crates/gguf/src/lib.rs:400: trailing whitespace.
++            24 => 1,
+crates/gguf/src/lib.rs:401: trailing whitespace.
++            27 | 28 => 8,
+crates/gguf/src/lib.rs:402: trailing whitespace.
++            _ => {
+crates/gguf/src/lib.rs:403: trailing whitespace.
++                return Err(Error::Unsupported(
+crates/gguf/src/lib.rs:404: trailing whitespace.
++                    "big-endian quantized tensor payload".into(),
+crates/gguf/src/lib.rs:405: trailing whitespace.
++                ));
+crates/gguf/src/lib.rs:406: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:407: trailing whitespace.
++        };
+crates/gguf/src/lib.rs:408: trailing whitespace.
++        for part in bytes.chunks_exact_mut(size) {
+crates/gguf/src/lib.rs:409: trailing whitespace.
++            part.reverse();
+crates/gguf/src/lib.rs:410: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:411: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:412: trailing whitespace.
++    llama_quant::dequantize(info.dtype, &bytes, n).map_err(|e| invalid(e.to_string()))
+crates/gguf/src/lib.rs:413: trailing whitespace.
++}
+crates/gguf/src/lib.rs:414: trailing whitespace.
++
+crates/gguf/src/lib.rs:415: trailing whitespace.
++fn align(n: u64, a: u64) -> Result<u64> {
+crates/gguf/src/lib.rs:416: trailing whitespace.
++    n.checked_add(a - 1)
+crates/gguf/src/lib.rs:417: trailing whitespace.
++        .map(|v| v & !(a - 1))
+crates/gguf/src/lib.rs:418: trailing whitespace.
++        .ok_or_else(|| invalid("alignment overflow"))
+crates/gguf/src/lib.rs:419: trailing whitespace.
++}
+crates/gguf/src/lib.rs:420: trailing whitespace.
++/// Header-only read-ahead. The owned file/reader remains in Gguf<R>.
+crates/gguf/src/lib.rs:421: trailing whitespace.
++/// Unlike an unbounded convenience buffer, this allocation is fallible and
+crates/gguf/src/lib.rs:422: trailing whitespace.
++/// each refill is capped by the remaining physical file and header allowance.
+crates/gguf/src/lib.rs:423: trailing whitespace.
++struct HeaderReader<'a, R: Read + Seek> {
+crates/gguf/src/lib.rs:424: trailing whitespace.
++    reader: &'a mut R,
+crates/gguf/src/lib.rs:425: trailing whitespace.
++    buffer: Vec<u8>,
+crates/gguf/src/lib.rs:426: trailing whitespace.
++    begin: usize,
+crates/gguf/src/lib.rs:427: trailing whitespace.
++    end: usize,
+crates/gguf/src/lib.rs:428: trailing whitespace.
++    remaining: u64,
+crates/gguf/src/lib.rs:429: trailing whitespace.
++    position: u64,
+crates/gguf/src/lib.rs:430: trailing whitespace.
++}
+crates/gguf/src/lib.rs:431: trailing whitespace.
++impl<'a, R: Read + Seek> HeaderReader<'a, R> {
+crates/gguf/src/lib.rs:432: trailing whitespace.
++    fn new(
+crates/gguf/src/lib.rs:433: trailing whitespace.
++        reader: &'a mut R,
+crates/gguf/src/lib.rs:434: trailing whitespace.
++        position: u64,
+crates/gguf/src/lib.rs:435: trailing whitespace.
++        file_remaining: u64,
+crates/gguf/src/lib.rs:436: trailing whitespace.
++        header_remaining: u64,
+crates/gguf/src/lib.rs:437: trailing whitespace.
++    ) -> Result<Self> {
+crates/gguf/src/lib.rs:438: trailing whitespace.
++        let remaining = file_remaining.min(header_remaining);
+crates/gguf/src/lib.rs:439: trailing whitespace.
++        let capacity = remaining.min(64 * 1024) as usize;
+crates/gguf/src/lib.rs:440: trailing whitespace.
++        let mut buffer = Vec::new();
+crates/gguf/src/lib.rs:441: trailing whitespace.
++        buffer
+crates/gguf/src/lib.rs:442: trailing whitespace.
++            .try_reserve_exact(capacity)
+crates/gguf/src/lib.rs:443: trailing whitespace.
++            .map_err(|_| Error::Limit("GGUF header read buffer allocation".into()))?;
+crates/gguf/src/lib.rs:444: trailing whitespace.
++        buffer.resize(capacity, 0);
+crates/gguf/src/lib.rs:445: trailing whitespace.
++        Ok(Self {
+crates/gguf/src/lib.rs:446: trailing whitespace.
++            reader,
+crates/gguf/src/lib.rs:447: trailing whitespace.
++            buffer,
+crates/gguf/src/lib.rs:448: trailing whitespace.
++            begin: 0,
+crates/gguf/src/lib.rs:449: trailing whitespace.
++            end: 0,
+crates/gguf/src/lib.rs:450: trailing whitespace.
++            remaining,
+crates/gguf/src/lib.rs:451: trailing whitespace.
++            position,
+crates/gguf/src/lib.rs:452: trailing whitespace.
++        })
+crates/gguf/src/lib.rs:453: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:454: trailing whitespace.
++    fn finish(self) -> Result<()> {
+crates/gguf/src/lib.rs:455: trailing whitespace.
++        self.reader.seek(SeekFrom::Start(self.position))?;
+crates/gguf/src/lib.rs:456: trailing whitespace.
++        Ok(())
+crates/gguf/src/lib.rs:457: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:458: trailing whitespace.
++}
+crates/gguf/src/lib.rs:459: trailing whitespace.
++impl<R: Read + Seek> Read for HeaderReader<'_, R> {
+crates/gguf/src/lib.rs:460: trailing whitespace.
++    fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+crates/gguf/src/lib.rs:461: trailing whitespace.
++        if output.is_empty() {
+crates/gguf/src/lib.rs:462: trailing whitespace.
++            return Ok(0);
+crates/gguf/src/lib.rs:463: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:464: trailing whitespace.
++        if self.begin == self.end {
+crates/gguf/src/lib.rs:465: trailing whitespace.
++            if self.remaining == 0 {
+crates/gguf/src/lib.rs:466: trailing whitespace.
++                return Ok(0);
+crates/gguf/src/lib.rs:467: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:468: trailing whitespace.
++            let request = self.remaining.min(self.buffer.len() as u64) as usize;
+crates/gguf/src/lib.rs:469: trailing whitespace.
++            let received = self.reader.read(&mut self.buffer[..request])?;
+crates/gguf/src/lib.rs:470: trailing whitespace.
++            if received > request {
+crates/gguf/src/lib.rs:471: trailing whitespace.
++                return Err(io::Error::new(
+crates/gguf/src/lib.rs:472: trailing whitespace.
++                    io::ErrorKind::InvalidData,
+crates/gguf/src/lib.rs:473: trailing whitespace.
++                    "reader returned more bytes than requested",
+crates/gguf/src/lib.rs:474: trailing whitespace.
++                ));
+crates/gguf/src/lib.rs:475: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:476: trailing whitespace.
++            self.remaining -= received as u64;
+crates/gguf/src/lib.rs:477: trailing whitespace.
++            self.begin = 0;
+crates/gguf/src/lib.rs:478: trailing whitespace.
++            self.end = received;
+crates/gguf/src/lib.rs:479: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:480: trailing whitespace.
++        let count = output.len().min(self.end - self.begin);
+crates/gguf/src/lib.rs:481: trailing whitespace.
++        output[..count].copy_from_slice(&self.buffer[self.begin..self.begin + count]);
+crates/gguf/src/lib.rs:482: trailing whitespace.
++        self.begin += count;
+crates/gguf/src/lib.rs:483: trailing whitespace.
++        self.position += count as u64;
+crates/gguf/src/lib.rs:484: trailing whitespace.
++        Ok(count)
+crates/gguf/src/lib.rs:485: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:486: trailing whitespace.
++}
+crates/gguf/src/lib.rs:487: trailing whitespace.
++
+crates/gguf/src/lib.rs:488: trailing whitespace.
++struct Parser<'a, R> {
+crates/gguf/src/lib.rs:489: trailing whitespace.
++    reader: &'a mut R,
+crates/gguf/src/lib.rs:490: trailing whitespace.
++    endian: Endian,
+crates/gguf/src/lib.rs:491: trailing whitespace.
++    position: u64,
+crates/gguf/src/lib.rs:492: trailing whitespace.
++    file_len: u64,
+crates/gguf/src/lib.rs:493: trailing whitespace.
++    limits: &'a Limits,
+crates/gguf/src/lib.rs:494: trailing whitespace.
++    total_values: usize,
+crates/gguf/src/lib.rs:495: trailing whitespace.
++}
+crates/gguf/src/lib.rs:496: trailing whitespace.
++impl<R: Read> Parser<'_, R> {
+crates/gguf/src/lib.rs:497: trailing whitespace.
++    fn bytes<const N: usize>(&mut self) -> Result<[u8; N]> {
+crates/gguf/src/lib.rs:498: trailing whitespace.
++        self.charge(N)?;
+crates/gguf/src/lib.rs:499: trailing whitespace.
++        let mut b = [0; N];
+crates/gguf/src/lib.rs:500: trailing whitespace.
++        self.reader.read_exact(&mut b)?;
+crates/gguf/src/lib.rs:501: trailing whitespace.
++        Ok(b)
+crates/gguf/src/lib.rs:502: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:503: trailing whitespace.
++    fn charge(&mut self, n: usize) -> Result<()> {
+crates/gguf/src/lib.rs:504: trailing whitespace.
++        self.position = self
+crates/gguf/src/lib.rs:505: trailing whitespace.
++            .position
+crates/gguf/src/lib.rs:506: trailing whitespace.
++            .checked_add(n as u64)
+crates/gguf/src/lib.rs:507: trailing whitespace.
++            .ok_or_else(|| invalid("metadata size overflow"))?;
+crates/gguf/src/lib.rs:508: trailing whitespace.
++        if self.position > self.file_len {
+crates/gguf/src/lib.rs:509: trailing whitespace.
++            return Err(invalid("truncated metadata"));
+crates/gguf/src/lib.rs:510: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:511: trailing whitespace.
++        if self.position > self.limits.max_metadata_bytes {
+crates/gguf/src/lib.rs:512: trailing whitespace.
++            return Err(Error::Limit("metadata byte budget".into()));
+crates/gguf/src/lib.rs:513: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:514: trailing whitespace.
++        Ok(())
+crates/gguf/src/lib.rs:515: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:516: trailing whitespace.
++    fn minimum_encoded(&self, count: usize, bytes_each: u64, label: &str) -> Result<()> {
+crates/gguf/src/lib.rs:517: trailing whitespace.
++        let minimum = (count as u64)
+crates/gguf/src/lib.rs:518: trailing whitespace.
++            .checked_mul(bytes_each)
+crates/gguf/src/lib.rs:519: trailing whitespace.
++            .ok_or_else(|| Error::Limit(format!("{label} minimum encoded size overflow")))?;
+crates/gguf/src/lib.rs:520: trailing whitespace.
++        if minimum > self.file_len.saturating_sub(self.position) {
+crates/gguf/src/lib.rs:521: trailing whitespace.
++            return Err(invalid(format!(
+crates/gguf/src/lib.rs:522: trailing whitespace.
++                "{label} minimum encoded size exceeds remaining file bytes"
+crates/gguf/src/lib.rs:523: trailing whitespace.
++            )));
+crates/gguf/src/lib.rs:524: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:525: trailing whitespace.
++        if minimum > self.limits.max_metadata_bytes.saturating_sub(self.position) {
+crates/gguf/src/lib.rs:526: trailing whitespace.
++            return Err(Error::Limit(format!(
+crates/gguf/src/lib.rs:527: trailing whitespace.
++                "{label} minimum encoded size exceeds remaining metadata budget"
+crates/gguf/src/lib.rs:528: trailing whitespace.
++            )));
+crates/gguf/src/lib.rs:529: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:530: trailing whitespace.
++        Ok(())
+crates/gguf/src/lib.rs:531: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:532: trailing whitespace.
++    fn u8(&mut self) -> Result<u8> {
+crates/gguf/src/lib.rs:533: trailing whitespace.
++        Ok(self.bytes::<1>()?[0])
+crates/gguf/src/lib.rs:534: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:535: trailing whitespace.
++    fn u16(&mut self) -> Result<u16> {
+crates/gguf/src/lib.rs:536: trailing whitespace.
++        let b = self.bytes()?;
+crates/gguf/src/lib.rs:537: trailing whitespace.
++        Ok(match self.endian {
+crates/gguf/src/lib.rs:538: trailing whitespace.
++            Endian::Little => u16::from_le_bytes(b),
+crates/gguf/src/lib.rs:539: trailing whitespace.
++            Endian::Big => u16::from_be_bytes(b),
+crates/gguf/src/lib.rs:540: trailing whitespace.
++        })
+crates/gguf/src/lib.rs:541: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:542: trailing whitespace.
++    fn u32(&mut self) -> Result<u32> {
+crates/gguf/src/lib.rs:543: trailing whitespace.
++        let b = self.bytes()?;
+crates/gguf/src/lib.rs:544: trailing whitespace.
++        Ok(match self.endian {
+crates/gguf/src/lib.rs:545: trailing whitespace.
++            Endian::Little => u32::from_le_bytes(b),
+crates/gguf/src/lib.rs:546: trailing whitespace.
++            Endian::Big => u32::from_be_bytes(b),
+crates/gguf/src/lib.rs:547: trailing whitespace.
++        })
+crates/gguf/src/lib.rs:548: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:549: trailing whitespace.
++    fn u64(&mut self) -> Result<u64> {
+crates/gguf/src/lib.rs:550: trailing whitespace.
++        let b = self.bytes()?;
+crates/gguf/src/lib.rs:551: trailing whitespace.
++        Ok(match self.endian {
+crates/gguf/src/lib.rs:552: trailing whitespace.
++            Endian::Little => u64::from_le_bytes(b),
+crates/gguf/src/lib.rs:553: trailing whitespace.
++            Endian::Big => u64::from_be_bytes(b),
+crates/gguf/src/lib.rs:554: trailing whitespace.
++        })
+crates/gguf/src/lib.rs:555: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:556: trailing whitespace.
++    fn count(&mut self, max: usize, label: &str) -> Result<usize> {
+crates/gguf/src/lib.rs:557: trailing whitespace.
++        let n = self.u64()?;
+crates/gguf/src/lib.rs:558: trailing whitespace.
++        let n = usize::try_from(n).map_err(|_| Error::Limit(label.into()))?;
+crates/gguf/src/lib.rs:559: trailing whitespace.
++        if n > max {
+crates/gguf/src/lib.rs:560: trailing whitespace.
++            Err(Error::Limit(label.into()))
+crates/gguf/src/lib.rs:561: trailing whitespace.
++        } else {
+crates/gguf/src/lib.rs:562: trailing whitespace.
++            Ok(n)
+crates/gguf/src/lib.rs:563: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:564: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:565: trailing whitespace.
++    fn string(&mut self) -> Result<Vec<u8>> {
+crates/gguf/src/lib.rs:566: trailing whitespace.
++        let n = self.count(self.limits.max_string_bytes, "string length")?;
+crates/gguf/src/lib.rs:567: trailing whitespace.
++        self.charge(n)?;
+crates/gguf/src/lib.rs:568: trailing whitespace.
++        let mut b = Vec::new();
+crates/gguf/src/lib.rs:569: trailing whitespace.
++        b.try_reserve_exact(n)
+crates/gguf/src/lib.rs:570: trailing whitespace.
++            .map_err(|_| Error::Limit("string allocation".into()))?;
+crates/gguf/src/lib.rs:571: trailing whitespace.
++        b.resize(n, 0);
+crates/gguf/src/lib.rs:572: trailing whitespace.
++        self.reader.read_exact(&mut b)?;
+crates/gguf/src/lib.rs:573: trailing whitespace.
++        Ok(b)
+crates/gguf/src/lib.rs:574: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:575: trailing whitespace.
++    fn value(&mut self, ty: u32, in_array: bool) -> Result<RawValue> {
+crates/gguf/src/lib.rs:576: trailing whitespace.
++        self.total_values = self
+crates/gguf/src/lib.rs:577: trailing whitespace.
++            .total_values
+crates/gguf/src/lib.rs:578: trailing whitespace.
++            .checked_add(1)
+crates/gguf/src/lib.rs:579: trailing whitespace.
++            .ok_or_else(|| Error::Limit("value count overflow".into()))?;
+crates/gguf/src/lib.rs:580: trailing whitespace.
++        if self.total_values > self.limits.max_total_values {
+crates/gguf/src/lib.rs:581: trailing whitespace.
++            return Err(Error::Limit("total metadata values".into()));
+crates/gguf/src/lib.rs:582: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:583: trailing whitespace.
++        Ok(match ty {
+crates/gguf/src/lib.rs:584: trailing whitespace.
++            0 => RawValue::U8(self.u8()?),
+crates/gguf/src/lib.rs:585: trailing whitespace.
++            1 => RawValue::I8(self.u8()? as i8),
+crates/gguf/src/lib.rs:586: trailing whitespace.
++            2 => RawValue::U16(self.u16()?),
+crates/gguf/src/lib.rs:587: trailing whitespace.
++            3 => RawValue::I16(self.u16()? as i16),
+crates/gguf/src/lib.rs:588: trailing whitespace.
++            4 => RawValue::U32(self.u32()?),
+crates/gguf/src/lib.rs:589: trailing whitespace.
++            5 => RawValue::I32(self.u32()? as i32),
+crates/gguf/src/lib.rs:590: trailing whitespace.
++            6 => RawValue::F32(f32::from_bits(self.u32()?)),
+crates/gguf/src/lib.rs:591: trailing whitespace.
++            7 => RawValue::Bool(self.u8()? != 0),
+crates/gguf/src/lib.rs:592: trailing whitespace.
++            8 => RawValue::String(self.string()?),
+crates/gguf/src/lib.rs:593: trailing whitespace.
++            9 => {
+crates/gguf/src/lib.rs:594: trailing whitespace.
++                if in_array {
+crates/gguf/src/lib.rs:595: trailing whitespace.
++                    return Err(invalid("nested arrays are forbidden by GGUF"));
+crates/gguf/src/lib.rs:596: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:597: trailing whitespace.
++                let element_type = self.u32()?;
+crates/gguf/src/lib.rs:598: trailing whitespace.
++                if element_type > 12 || element_type == 9 {
+crates/gguf/src/lib.rs:599: trailing whitespace.
++                    return Err(invalid("invalid array element type"));
+crates/gguf/src/lib.rs:600: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:601: trailing whitespace.
++                let n = self.count(self.limits.max_array_values, "array length")?;
+crates/gguf/src/lib.rs:602: trailing whitespace.
++                if n > self
+crates/gguf/src/lib.rs:603: trailing whitespace.
++                    .limits
+crates/gguf/src/lib.rs:604: trailing whitespace.
++                    .max_total_values
+crates/gguf/src/lib.rs:605: trailing whitespace.
++                    .saturating_sub(self.total_values)
+crates/gguf/src/lib.rs:606: trailing whitespace.
++                {
+crates/gguf/src/lib.rs:607: trailing whitespace.
++                    return Err(Error::Limit("total metadata values".into()));
+crates/gguf/src/lib.rs:608: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:609: trailing whitespace.
++                let min = match element_type {
+crates/gguf/src/lib.rs:610: trailing whitespace.
++                    0 | 1 | 7 => 1,
+crates/gguf/src/lib.rs:611: trailing whitespace.
++                    2 | 3 => 2,
+crates/gguf/src/lib.rs:612: trailing whitespace.
++                    4..=6 => 4,
+crates/gguf/src/lib.rs:613: trailing whitespace.
++                    _ => 8,
+crates/gguf/src/lib.rs:614: trailing whitespace.
++                };
+crates/gguf/src/lib.rs:615: trailing whitespace.
++                self.minimum_encoded(n, min, "array")?;
+crates/gguf/src/lib.rs:616: trailing whitespace.
++                let mut values = Vec::new();
+crates/gguf/src/lib.rs:617: trailing whitespace.
++                values
+crates/gguf/src/lib.rs:618: trailing whitespace.
++                    .try_reserve_exact(n)
+crates/gguf/src/lib.rs:619: trailing whitespace.
++                    .map_err(|_| Error::Limit("array allocation".into()))?;
+crates/gguf/src/lib.rs:620: trailing whitespace.
++                for _ in 0..n {
+crates/gguf/src/lib.rs:621: trailing whitespace.
++                    values.push(self.value(element_type, true)?)
+crates/gguf/src/lib.rs:622: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:623: trailing whitespace.
++                RawValue::Array {
+crates/gguf/src/lib.rs:624: trailing whitespace.
++                    element_type,
+crates/gguf/src/lib.rs:625: trailing whitespace.
++                    values,
+crates/gguf/src/lib.rs:626: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:627: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:628: trailing whitespace.
++            10 => RawValue::U64(self.u64()?),
+crates/gguf/src/lib.rs:629: trailing whitespace.
++            11 => RawValue::I64(self.u64()? as i64),
+crates/gguf/src/lib.rs:630: trailing whitespace.
++            12 => RawValue::F64(f64::from_bits(self.u64()?)),
+crates/gguf/src/lib.rs:631: trailing whitespace.
++            _ => return Err(invalid(format!("unknown metadata type {ty}"))),
+crates/gguf/src/lib.rs:632: trailing whitespace.
++        })
+crates/gguf/src/lib.rs:633: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:634: trailing whitespace.
++}
+crates/gguf/src/lib.rs:635: trailing whitespace.
++
+crates/gguf/src/lib.rs:636: trailing whitespace.
++/// In-memory input descriptor for the little-endian streaming v3 writer.
+crates/gguf/src/lib.rs:637: trailing whitespace.
++/// The writer validates layout but does not requantize or swap payload bytes.
+crates/gguf/src/lib.rs:638: trailing whitespace.
++pub struct TensorData<'a> {
+crates/gguf/src/lib.rs:639: trailing whitespace.
++    pub name: &'a str,
+crates/gguf/src/lib.rs:640: trailing whitespace.
++    pub dimensions: &'a [u64],
+crates/gguf/src/lib.rs:641: trailing whitespace.
++    pub dtype: DType,
+crates/gguf/src/lib.rs:642: trailing whitespace.
++    pub data: &'a [u8],
+crates/gguf/src/lib.rs:643: trailing whitespace.
++}
+crates/gguf/src/lib.rs:644: trailing whitespace.
++pub fn write<W: Write>(
+crates/gguf/src/lib.rs:645: trailing whitespace.
++    out: W,
+crates/gguf/src/lib.rs:646: trailing whitespace.
++    metadata: &BTreeMap<String, Value>,
+crates/gguf/src/lib.rs:647: trailing whitespace.
++    tensors: &[TensorData<'_>],
+crates/gguf/src/lib.rs:648: trailing whitespace.
++) -> Result<()> {
+crates/gguf/src/lib.rs:649: trailing whitespace.
++    writer::write_map(out, metadata, tensors)
+crates/gguf/src/lib.rs:650: trailing whitespace.
++}
+crates/gguf/src/lib.rs:651: trailing whitespace.
++
+crates/gguf/src/lib.rs:652: trailing whitespace.
++#[cfg(test)]
+crates/gguf/src/lib.rs:653: trailing whitespace.
++mod tests {
+crates/gguf/src/lib.rs:654: trailing whitespace.
++    use super::*;
+crates/gguf/src/lib.rs:655: trailing whitespace.
++    use std::io::Cursor;
+crates/gguf/src/lib.rs:656: trailing whitespace.
++    fn sample() -> Vec<u8> {
+crates/gguf/src/lib.rs:657: trailing whitespace.
++        let mut b = Vec::new();
+crates/gguf/src/lib.rs:658: trailing whitespace.
++        let mut m = BTreeMap::new();
+crates/gguf/src/lib.rs:659: trailing whitespace.
++        m.insert("name".into(), Value::String("hello 界".into()));
+crates/gguf/src/lib.rs:660: trailing whitespace.
++        m.insert(
+crates/gguf/src/lib.rs:661: trailing whitespace.
++            "array".into(),
+crates/gguf/src/lib.rs:662: trailing whitespace.
++            Value::Array {
+crates/gguf/src/lib.rs:663: trailing whitespace.
++                element_type: 5,
+crates/gguf/src/lib.rs:664: trailing whitespace.
++                values: vec![Value::I32(-3), Value::I32(42)],
+crates/gguf/src/lib.rs:665: trailing whitespace.
++            },
+crates/gguf/src/lib.rs:666: trailing whitespace.
++        );
+crates/gguf/src/lib.rs:667: trailing whitespace.
++        write(
+crates/gguf/src/lib.rs:668: trailing whitespace.
++            &mut b,
+crates/gguf/src/lib.rs:669: trailing whitespace.
++            &m,
+crates/gguf/src/lib.rs:670: trailing whitespace.
++            &[TensorData {
+crates/gguf/src/lib.rs:671: trailing whitespace.
++                name: "x",
+crates/gguf/src/lib.rs:672: trailing whitespace.
++                dimensions: &[2],
+crates/gguf/src/lib.rs:673: trailing whitespace.
++                dtype: DType::from_id(0).unwrap(),
+crates/gguf/src/lib.rs:674: trailing whitespace.
++                data: &[0, 0, 128, 63, 0, 0, 0, 192],
+crates/gguf/src/lib.rs:675: trailing whitespace.
++            }],
+crates/gguf/src/lib.rs:676: trailing whitespace.
++        )
+crates/gguf/src/lib.rs:677: trailing whitespace.
++        .unwrap();
+crates/gguf/src/lib.rs:678: trailing whitespace.
++        b
+crates/gguf/src/lib.rs:679: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:680: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:681: trailing whitespace.
++    fn roundtrip_preserves_types_and_payload() {
+crates/gguf/src/lib.rs:682: trailing whitespace.
++        let mut g = Gguf::read(Cursor::new(sample()), Limits::default()).unwrap();
+crates/gguf/src/lib.rs:683: trailing whitespace.
++        assert_eq!(g.version, 3);
+crates/gguf/src/lib.rs:684: trailing whitespace.
++        assert_eq!(g.metadata["name"].as_str(), Some("hello 界"));
+crates/gguf/src/lib.rs:685: trailing whitespace.
++        assert_eq!(g.read_f32("x").unwrap(), vec![1., -2.]);
+crates/gguf/src/lib.rs:686: trailing whitespace.
++        assert!(g.read_tensor("missing").is_err());
+crates/gguf/src/lib.rs:687: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:688: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:689: trailing whitespace.
++    fn every_truncated_header_and_payload_is_rejected() {
+crates/gguf/src/lib.rs:690: trailing whitespace.
++        let b = sample();
+crates/gguf/src/lib.rs:691: trailing whitespace.
++        let g = Gguf::read(Cursor::new(&b), Limits::default()).unwrap();
+crates/gguf/src/lib.rs:692: trailing whitespace.
++        let required = g.data_offset as usize + 8;
+crates/gguf/src/lib.rs:693: trailing whitespace.
++        for n in 0..required {
+crates/gguf/src/lib.rs:694: trailing whitespace.
++            assert!(
+crates/gguf/src/lib.rs:695: trailing whitespace.
++                Gguf::read(Cursor::new(&b[..n]), Limits::default()).is_err(),
+crates/gguf/src/lib.rs:696: trailing whitespace.
++                "length={n}"
+crates/gguf/src/lib.rs:697: trailing whitespace.
++            )
+crates/gguf/src/lib.rs:698: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:699: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:700: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:701: trailing whitespace.
++    fn metadata_budget_and_counts_are_enforced() {
+crates/gguf/src/lib.rs:702: trailing whitespace.
++        let b = sample();
+crates/gguf/src/lib.rs:703: trailing whitespace.
++        let lim = Limits {
+crates/gguf/src/lib.rs:704: trailing whitespace.
++            max_metadata_bytes: 32,
+crates/gguf/src/lib.rs:705: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/lib.rs:706: trailing whitespace.
++        };
+crates/gguf/src/lib.rs:707: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:708: trailing whitespace.
++            Gguf::read(Cursor::new(&b), lim),
+crates/gguf/src/lib.rs:709: trailing whitespace.
++            Err(Error::Limit(_))
+crates/gguf/src/lib.rs:710: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:711: trailing whitespace.
++        let mut b = b;
+crates/gguf/src/lib.rs:712: trailing whitespace.
++        b[16..24].copy_from_slice(&u64::MAX.to_le_bytes());
+crates/gguf/src/lib.rs:713: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:714: trailing whitespace.
++            Gguf::read(Cursor::new(b), Limits::default()),
+crates/gguf/src/lib.rs:715: trailing whitespace.
++            Err(Error::Limit(_))
+crates/gguf/src/lib.rs:716: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:717: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:718: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:719: trailing whitespace.
++    fn overlap_is_rejected() {
+crates/gguf/src/lib.rs:720: trailing whitespace.
++        let mut b = Vec::new();
+crates/gguf/src/lib.rs:721: trailing whitespace.
++        let d = [0; 8];
+crates/gguf/src/lib.rs:722: trailing whitespace.
++        write(
+crates/gguf/src/lib.rs:723: trailing whitespace.
++            &mut b,
+crates/gguf/src/lib.rs:724: trailing whitespace.
++            &BTreeMap::new(),
+crates/gguf/src/lib.rs:725: trailing whitespace.
++            &[
+crates/gguf/src/lib.rs:726: trailing whitespace.
++                TensorData {
+crates/gguf/src/lib.rs:727: trailing whitespace.
++                    name: "a",
+crates/gguf/src/lib.rs:728: trailing whitespace.
++                    dimensions: &[2],
+crates/gguf/src/lib.rs:729: trailing whitespace.
++                    dtype: DType::from_id(0).unwrap(),
+crates/gguf/src/lib.rs:730: trailing whitespace.
++                    data: &d,
+crates/gguf/src/lib.rs:731: trailing whitespace.
++                },
+crates/gguf/src/lib.rs:732: trailing whitespace.
++                TensorData {
+crates/gguf/src/lib.rs:733: trailing whitespace.
++                    name: "b",
+crates/gguf/src/lib.rs:734: trailing whitespace.
++                    dimensions: &[2],
+crates/gguf/src/lib.rs:735: trailing whitespace.
++                    dtype: DType::from_id(0).unwrap(),
+crates/gguf/src/lib.rs:736: trailing whitespace.
++                    data: &d,
+crates/gguf/src/lib.rs:737: trailing whitespace.
++                },
+crates/gguf/src/lib.rs:738: trailing whitespace.
++            ],
+crates/gguf/src/lib.rs:739: trailing whitespace.
++        )
+crates/gguf/src/lib.rs:740: trailing whitespace.
++        .unwrap();
+crates/gguf/src/lib.rs:741: trailing whitespace.
++        let second_offset = 24 + (8 + 1 + 4 + 8 + 4 + 8) + (8 + 1 + 4 + 8 + 4);
+crates/gguf/src/lib.rs:742: trailing whitespace.
++        b[second_offset..second_offset + 8].fill(0);
+crates/gguf/src/lib.rs:743: trailing whitespace.
++        assert!(
+crates/gguf/src/lib.rs:744: trailing whitespace.
++            matches!(Gguf::read(Cursor::new(b),Limits::default()),Err(Error::Invalid(s)) if s.contains("overlap"))
+crates/gguf/src/lib.rs:745: trailing whitespace.
++        );
+crates/gguf/src/lib.rs:746: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:747: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:748: trailing whitespace.
++    fn big_endian_metadata_and_scalar_payload() {
+crates/gguf/src/lib.rs:749: trailing whitespace.
++        let mut b = b"GGUF".to_vec();
+crates/gguf/src/lib.rs:750: trailing whitespace.
++        b.extend(3u32.to_be_bytes());
+crates/gguf/src/lib.rs:751: trailing whitespace.
++        b.extend(1u64.to_be_bytes());
+crates/gguf/src/lib.rs:752: trailing whitespace.
++        b.extend(0u64.to_be_bytes());
+crates/gguf/src/lib.rs:753: trailing whitespace.
++        b.extend(1u64.to_be_bytes());
+crates/gguf/src/lib.rs:754: trailing whitespace.
++        b.push(b'x');
+crates/gguf/src/lib.rs:755: trailing whitespace.
++        b.extend(1u32.to_be_bytes());
+crates/gguf/src/lib.rs:756: trailing whitespace.
++        b.extend(1u64.to_be_bytes());
+crates/gguf/src/lib.rs:757: trailing whitespace.
++        b.extend(0u32.to_be_bytes());
+crates/gguf/src/lib.rs:758: trailing whitespace.
++        b.extend(0u64.to_be_bytes());
+crates/gguf/src/lib.rs:759: trailing whitespace.
++        b.resize(64, 0);
+crates/gguf/src/lib.rs:760: trailing whitespace.
++        b.extend(1.25f32.to_be_bytes());
+crates/gguf/src/lib.rs:761: trailing whitespace.
++        let mut g = Gguf::read(Cursor::new(b), Limits::default()).unwrap();
+crates/gguf/src/lib.rs:762: trailing whitespace.
++        assert_eq!(g.read_f32("x").unwrap(), vec![1.25]);
+crates/gguf/src/lib.rs:763: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:764: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:765: trailing whitespace.
++    fn writer_rejects_invalid_arrays() {
+crates/gguf/src/lib.rs:766: trailing whitespace.
++        let mut m = BTreeMap::new();
+crates/gguf/src/lib.rs:767: trailing whitespace.
++        m.insert(
+crates/gguf/src/lib.rs:768: trailing whitespace.
++            "bad".into(),
+crates/gguf/src/lib.rs:769: trailing whitespace.
++            Value::Array {
+crates/gguf/src/lib.rs:770: trailing whitespace.
++                element_type: 0,
+crates/gguf/src/lib.rs:771: trailing whitespace.
++                values: vec![Value::I8(1)],
+crates/gguf/src/lib.rs:772: trailing whitespace.
++            },
+crates/gguf/src/lib.rs:773: trailing whitespace.
++        );
+crates/gguf/src/lib.rs:774: trailing whitespace.
++        assert!(write(Vec::new(), &m, &[]).is_err());
+crates/gguf/src/lib.rs:775: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:776: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:777: trailing whitespace.
++    fn arrays_preflight_the_remaining_header_budget_before_reservation() {
+crates/gguf/src/lib.rs:778: trailing whitespace.
++        let mut bytes = b"GGUF".to_vec();
+crates/gguf/src/lib.rs:779: trailing whitespace.
++        bytes.extend(3u32.to_le_bytes());
+crates/gguf/src/lib.rs:780: trailing whitespace.
++        bytes.extend(0u64.to_le_bytes());
+crates/gguf/src/lib.rs:781: trailing whitespace.
++        bytes.extend(1u64.to_le_bytes());
+crates/gguf/src/lib.rs:782: trailing whitespace.
++        bytes.extend(1u64.to_le_bytes());
+crates/gguf/src/lib.rs:783: trailing whitespace.
++        bytes.push(b'a');
+crates/gguf/src/lib.rs:784: trailing whitespace.
++        bytes.extend(9u32.to_le_bytes());
+crates/gguf/src/lib.rs:785: trailing whitespace.
++        bytes.extend(0u32.to_le_bytes());
+crates/gguf/src/lib.rs:786: trailing whitespace.
++        bytes.extend(64u64.to_le_bytes());
+crates/gguf/src/lib.rs:787: trailing whitespace.
++        let value_start = bytes.len();
+crates/gguf/src/lib.rs:788: trailing whitespace.
++        bytes.resize(value_start + 64, 0);
+crates/gguf/src/lib.rs:789: trailing whitespace.
++        let limits = Limits {
+crates/gguf/src/lib.rs:790: trailing whitespace.
++            max_metadata_bytes: value_start as u64 + 1,
+crates/gguf/src/lib.rs:791: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/lib.rs:792: trailing whitespace.
++        };
+crates/gguf/src/lib.rs:793: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:794: trailing whitespace.
++            Gguf::read(Cursor::new(bytes), limits),
+crates/gguf/src/lib.rs:795: trailing whitespace.
++            Err(Error::Limit(message)) if message == "array minimum encoded size exceeds remaining metadata budget"
+crates/gguf/src/lib.rs:796: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:797: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:798: trailing whitespace.
++
+crates/gguf/src/lib.rs:799: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:800: trailing whitespace.
++    fn tensor_counts_preflight_the_remaining_header_and_file_before_reservation() {
+crates/gguf/src/lib.rs:801: trailing whitespace.
++        let mut bytes = b"GGUF".to_vec();
+crates/gguf/src/lib.rs:802: trailing whitespace.
++        bytes.extend(3u32.to_le_bytes());
+crates/gguf/src/lib.rs:803: trailing whitespace.
++        bytes.extend(64u64.to_le_bytes());
+crates/gguf/src/lib.rs:804: trailing whitespace.
++        bytes.extend(0u64.to_le_bytes());
+crates/gguf/src/lib.rs:805: trailing whitespace.
++        let mut enough_file = bytes.clone();
+crates/gguf/src/lib.rs:806: trailing whitespace.
++        enough_file.resize(24 + 64 * 24, 0);
+crates/gguf/src/lib.rs:807: trailing whitespace.
++        let limits = Limits {
+crates/gguf/src/lib.rs:808: trailing whitespace.
++            max_metadata_bytes: 32,
+crates/gguf/src/lib.rs:809: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/lib.rs:810: trailing whitespace.
++        };
+crates/gguf/src/lib.rs:811: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:812: trailing whitespace.
++            Gguf::read(Cursor::new(enough_file), limits),
+crates/gguf/src/lib.rs:813: trailing whitespace.
++            Err(Error::Limit(message)) if message == "tensor descriptors minimum encoded size exceeds remaining metadata budget"
+crates/gguf/src/lib.rs:814: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:815: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:816: trailing whitespace.
++            Gguf::read(Cursor::new(bytes), Limits::default()),
+crates/gguf/src/lib.rs:817: trailing whitespace.
++            Err(Error::Invalid(message)) if message == "tensor descriptors minimum encoded size exceeds remaining file bytes"
+crates/gguf/src/lib.rs:818: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:819: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:820: trailing whitespace.
++    struct ReadMeter {
+crates/gguf/src/lib.rs:821: trailing whitespace.
++        cursor: Cursor<Vec<u8>>,
+crates/gguf/src/lib.rs:822: trailing whitespace.
++        calls: usize,
+crates/gguf/src/lib.rs:823: trailing whitespace.
++        bytes: usize,
+crates/gguf/src/lib.rs:824: trailing whitespace.
++        largest_request: usize,
+crates/gguf/src/lib.rs:825: trailing whitespace.
++        max_read: usize,
+crates/gguf/src/lib.rs:826: trailing whitespace.
++        fail_at: Option<u64>,
+crates/gguf/src/lib.rs:827: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:828: trailing whitespace.
++    impl ReadMeter {
+crates/gguf/src/lib.rs:829: trailing whitespace.
++        fn new(bytes: Vec<u8>) -> Self {
+crates/gguf/src/lib.rs:830: trailing whitespace.
++            Self {
+crates/gguf/src/lib.rs:831: trailing whitespace.
++                cursor: Cursor::new(bytes),
+crates/gguf/src/lib.rs:832: trailing whitespace.
++                calls: 0,
+crates/gguf/src/lib.rs:833: trailing whitespace.
++                bytes: 0,
+crates/gguf/src/lib.rs:834: trailing whitespace.
++                largest_request: 0,
+crates/gguf/src/lib.rs:835: trailing whitespace.
++                max_read: usize::MAX,
+crates/gguf/src/lib.rs:836: trailing whitespace.
++                fail_at: None,
+crates/gguf/src/lib.rs:837: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:838: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:839: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:840: trailing whitespace.
++    impl Read for ReadMeter {
+crates/gguf/src/lib.rs:841: trailing whitespace.
++        fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+crates/gguf/src/lib.rs:842: trailing whitespace.
++            self.calls += 1;
+crates/gguf/src/lib.rs:843: trailing whitespace.
++            self.largest_request = self.largest_request.max(output.len());
+crates/gguf/src/lib.rs:844: trailing whitespace.
++            let mut count = output.len().min(self.max_read);
+crates/gguf/src/lib.rs:845: trailing whitespace.
++            if let Some(end) = self.fail_at {
+crates/gguf/src/lib.rs:846: trailing whitespace.
++                if self.cursor.position() >= end {
+crates/gguf/src/lib.rs:847: trailing whitespace.
++                    return Err(io::Error::other("injected header I/O failure"));
+crates/gguf/src/lib.rs:848: trailing whitespace.
++                }
+crates/gguf/src/lib.rs:849: trailing whitespace.
++                count = count.min((end - self.cursor.position()) as usize);
+crates/gguf/src/lib.rs:850: trailing whitespace.
++            }
+crates/gguf/src/lib.rs:851: trailing whitespace.
++            let actual = self.cursor.read(&mut output[..count])?;
+crates/gguf/src/lib.rs:852: trailing whitespace.
++            self.bytes += actual;
+crates/gguf/src/lib.rs:853: trailing whitespace.
++            Ok(actual)
+crates/gguf/src/lib.rs:854: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:855: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:856: trailing whitespace.
++    impl Seek for ReadMeter {
+crates/gguf/src/lib.rs:857: trailing whitespace.
++        fn seek(&mut self, position: SeekFrom) -> io::Result<u64> {
+crates/gguf/src/lib.rs:858: trailing whitespace.
++            self.cursor.seek(position)
+crates/gguf/src/lib.rs:859: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:860: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:861: trailing whitespace.
++
+crates/gguf/src/lib.rs:862: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:863: trailing whitespace.
++    fn large_metadata_uses_bounded_batched_reads_and_preserves_reader_position() {
+crates/gguf/src/lib.rs:864: trailing whitespace.
++        let mut metadata = BTreeMap::new();
+crates/gguf/src/lib.rs:865: trailing whitespace.
++        metadata.insert(
+crates/gguf/src/lib.rs:866: trailing whitespace.
++            "tokenizer.ggml.tokens".into(),
+crates/gguf/src/lib.rs:867: trailing whitespace.
++            Value::Array {
+crates/gguf/src/lib.rs:868: trailing whitespace.
++                element_type: 8,
+crates/gguf/src/lib.rs:869: trailing whitespace.
++                values: (0..12_000)
+crates/gguf/src/lib.rs:870: trailing whitespace.
++                    .map(|index| Value::String(format!("token-{index:06}-界")))
+crates/gguf/src/lib.rs:871: trailing whitespace.
++                    .collect(),
+crates/gguf/src/lib.rs:872: trailing whitespace.
++            },
+crates/gguf/src/lib.rs:873: trailing whitespace.
++        );
+crates/gguf/src/lib.rs:874: trailing whitespace.
++        let mut bytes = Vec::new();
+crates/gguf/src/lib.rs:875: trailing whitespace.
++        write(&mut bytes, &metadata, &[]).unwrap();
+crates/gguf/src/lib.rs:876: trailing whitespace.
++        let mut meter = ReadMeter::new(bytes);
+crates/gguf/src/lib.rs:877: trailing whitespace.
++        {
+crates/gguf/src/lib.rs:878: trailing whitespace.
++            let parsed = Gguf::read(&mut meter, Limits::default()).unwrap();
+crates/gguf/src/lib.rs:879: trailing whitespace.
++            assert_eq!(parsed.metadata, metadata);
+crates/gguf/src/lib.rs:880: trailing whitespace.
++            assert!(parsed.tensors.is_empty());
+crates/gguf/src/lib.rs:881: trailing whitespace.
++            // The original empty-directory offset is the exact logical end,
+crates/gguf/src/lib.rs:882: trailing whitespace.
++            // before any optional writer padding.
+crates/gguf/src/lib.rs:883: trailing whitespace.
++            assert_eq!(parsed.reader.cursor.position(), parsed.data_offset);
+crates/gguf/src/lib.rs:884: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:885: trailing whitespace.
++        assert!(
+crates/gguf/src/lib.rs:886: trailing whitespace.
++            meter.calls <= 100,
+crates/gguf/src/lib.rs:887: trailing whitespace.
++            "small per-value reads escaped to the backing reader: {}",
+crates/gguf/src/lib.rs:888: trailing whitespace.
++            meter.calls
+crates/gguf/src/lib.rs:889: trailing whitespace.
++        );
+crates/gguf/src/lib.rs:890: trailing whitespace.
++        assert!(meter.largest_request <= 64 * 1024);
+crates/gguf/src/lib.rs:891: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:892: trailing whitespace.
++
+crates/gguf/src/lib.rs:893: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:894: trailing whitespace.
++    fn header_read_ahead_never_exceeds_the_remaining_byte_budget() {
+crates/gguf/src/lib.rs:895: trailing whitespace.
++        let mut bytes = sample();
+crates/gguf/src/lib.rs:896: trailing whitespace.
++        bytes.resize(200_000, 0);
+crates/gguf/src/lib.rs:897: trailing whitespace.
++        let mut meter = ReadMeter::new(bytes);
+crates/gguf/src/lib.rs:898: trailing whitespace.
++        let limits = Limits {
+crates/gguf/src/lib.rs:899: trailing whitespace.
++            max_metadata_bytes: 32,
+crates/gguf/src/lib.rs:900: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/lib.rs:901: trailing whitespace.
++        };
+crates/gguf/src/lib.rs:902: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:903: trailing whitespace.
++            Gguf::read(&mut meter, limits),
+crates/gguf/src/lib.rs:904: trailing whitespace.
++            Err(Error::Limit(_))
+crates/gguf/src/lib.rs:905: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:906: trailing whitespace.
++        assert!(meter.bytes <= 32, "prefetched {} bytes", meter.bytes);
+crates/gguf/src/lib.rs:907: trailing whitespace.
++        assert!(meter.cursor.position() <= 32);
+crates/gguf/src/lib.rs:908: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:909: trailing whitespace.
++
+crates/gguf/src/lib.rs:910: trailing whitespace.
++    #[test]
+crates/gguf/src/lib.rs:911: trailing whitespace.
++    fn buffered_headers_preserve_short_reads_io_errors_and_payload_seeks() {
+crates/gguf/src/lib.rs:912: trailing whitespace.
++        let mut meter = ReadMeter::new(sample());
+crates/gguf/src/lib.rs:913: trailing whitespace.
++        meter.max_read = 3;
+crates/gguf/src/lib.rs:914: trailing whitespace.
++        {
+crates/gguf/src/lib.rs:915: trailing whitespace.
++            let mut parsed = Gguf::read(&mut meter, Limits::default()).unwrap();
+crates/gguf/src/lib.rs:916: trailing whitespace.
++            // sample(): 24-byte preamble + 37-byte array + 33-byte string
+crates/gguf/src/lib.rs:917: trailing whitespace.
++            // entry + 33-byte tensor descriptor; the data starts at 128.
+crates/gguf/src/lib.rs:918: trailing whitespace.
++            assert_eq!(parsed.reader.cursor.position(), 127);
+crates/gguf/src/lib.rs:919: trailing whitespace.
++            assert_eq!(parsed.data_offset, 128);
+crates/gguf/src/lib.rs:920: trailing whitespace.
++            assert_eq!(parsed.read_f32("x").unwrap(), [1.0, -2.0]);
+crates/gguf/src/lib.rs:921: trailing whitespace.
++        }
+crates/gguf/src/lib.rs:922: trailing whitespace.
++        assert_eq!(meter.cursor.position(), 136);
+crates/gguf/src/lib.rs:923: trailing whitespace.
++        let mut failing = ReadMeter::new(sample());
+crates/gguf/src/lib.rs:924: trailing whitespace.
++        failing.max_read = 7;
+crates/gguf/src/lib.rs:925: trailing whitespace.
++        failing.fail_at = Some(40);
+crates/gguf/src/lib.rs:926: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/lib.rs:927: trailing whitespace.
++            Gguf::read(&mut failing, Limits::default()),
+crates/gguf/src/lib.rs:928: trailing whitespace.
++            Err(Error::Io(error)) if error.kind() == io::ErrorKind::Other
+crates/gguf/src/lib.rs:929: trailing whitespace.
++        ));
+crates/gguf/src/lib.rs:930: trailing whitespace.
++        assert_eq!(failing.cursor.position(), 40);
+crates/gguf/src/lib.rs:931: trailing whitespace.
++    }
+crates/gguf/src/lib.rs:932: trailing whitespace.
++}
+crates/gguf/src/writer.rs:1: trailing whitespace.
++//! Ordered GGUF headers and bounded streaming payload layout.
+crates/gguf/src/writer.rs:2: trailing whitespace.
++//! Validation precedes the first output byte; metadata values stay borrowed.
+crates/gguf/src/writer.rs:3: trailing whitespace.
++use crate::raw::c_string;
+crates/gguf/src/writer.rs:4: trailing whitespace.
++use crate::{
+crates/gguf/src/writer.rs:5: trailing whitespace.
++    DType, Error, Limits, MetadataValue, RawValue, Result, TensorData, Value, align,
+crates/gguf/src/writer.rs:6: trailing whitespace.
++    dimension_elements, invalid,
+crates/gguf/src/writer.rs:7: trailing whitespace.
++};
+crates/gguf/src/writer.rs:8: trailing whitespace.
++use std::collections::{BTreeMap, BTreeSet};
+crates/gguf/src/writer.rs:9: trailing whitespace.
++use std::io::Write;
+crates/gguf/src/writer.rs:10: trailing whitespace.
++
+crates/gguf/src/writer.rs:11: trailing whitespace.
++/// A borrowed tensor description; its payload need not be resident in memory.
+crates/gguf/src/writer.rs:12: trailing whitespace.
++#[derive(Debug)]
+crates/gguf/src/writer.rs:13: trailing whitespace.
++pub struct TensorDescription<'a, N: ?Sized> {
+crates/gguf/src/writer.rs:14: trailing whitespace.
++    pub name: &'a N,
+crates/gguf/src/writer.rs:15: trailing whitespace.
++    pub dimensions: &'a [u64],
+crates/gguf/src/writer.rs:16: trailing whitespace.
++    pub dtype: DType,
+crates/gguf/src/writer.rs:17: trailing whitespace.
++}
+crates/gguf/src/writer.rs:18: trailing whitespace.
++impl<N: ?Sized> Copy for TensorDescription<'_, N> {}
+crates/gguf/src/writer.rs:19: trailing whitespace.
++impl<N: ?Sized> Clone for TensorDescription<'_, N> {
+crates/gguf/src/writer.rs:20: trailing whitespace.
++    fn clone(&self) -> Self {
+crates/gguf/src/writer.rs:21: trailing whitespace.
++        *self
+crates/gguf/src/writer.rs:22: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:23: trailing whitespace.
++}
+crates/gguf/src/writer.rs:24: trailing whitespace.
++pub type TensorDescriptor<'a> = TensorDescription<'a, str>;
+crates/gguf/src/writer.rs:25: trailing whitespace.
++pub type RawTensorDescriptor<'a> = TensorDescription<'a, [u8]>;
+crates/gguf/src/writer.rs:26: trailing whitespace.
++
+crates/gguf/src/writer.rs:27: trailing whitespace.
++pub(crate) trait WireBytes {
+crates/gguf/src/writer.rs:28: trailing whitespace.
++    fn wire_bytes(&self) -> &[u8];
+crates/gguf/src/writer.rs:29: trailing whitespace.
++}
+crates/gguf/src/writer.rs:30: trailing whitespace.
++impl WireBytes for str {
+crates/gguf/src/writer.rs:31: trailing whitespace.
++    fn wire_bytes(&self) -> &[u8] {
+crates/gguf/src/writer.rs:32: trailing whitespace.
++        self.as_bytes()
+crates/gguf/src/writer.rs:33: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:34: trailing whitespace.
++}
+crates/gguf/src/writer.rs:35: trailing whitespace.
++impl WireBytes for String {
+crates/gguf/src/writer.rs:36: trailing whitespace.
++    fn wire_bytes(&self) -> &[u8] {
+crates/gguf/src/writer.rs:37: trailing whitespace.
++        self.as_bytes()
+crates/gguf/src/writer.rs:38: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:39: trailing whitespace.
++}
+crates/gguf/src/writer.rs:40: trailing whitespace.
++impl WireBytes for [u8] {
+crates/gguf/src/writer.rs:41: trailing whitespace.
++    fn wire_bytes(&self) -> &[u8] {
+crates/gguf/src/writer.rs:42: trailing whitespace.
++        self
+crates/gguf/src/writer.rs:43: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:44: trailing whitespace.
++}
+crates/gguf/src/writer.rs:45: trailing whitespace.
++impl WireBytes for Vec<u8> {
+crates/gguf/src/writer.rs:46: trailing whitespace.
++    fn wire_bytes(&self) -> &[u8] {
+crates/gguf/src/writer.rs:47: trailing whitespace.
++        self
+crates/gguf/src/writer.rs:48: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:49: trailing whitespace.
++}
+crates/gguf/src/writer.rs:50: trailing whitespace.
++
+crates/gguf/src/writer.rs:51: trailing whitespace.
++/// Checked offsets for streaming payloads after an independently written header.
+crates/gguf/src/writer.rs:52: trailing whitespace.
++#[derive(Debug, Clone, PartialEq, Eq)]
+crates/gguf/src/writer.rs:53: trailing whitespace.
++pub struct WriteLayout {
+crates/gguf/src/writer.rs:54: trailing whitespace.
++    /// Exact encoded header bytes before alignment padding. Producers such as
+crates/gguf/src/writer.rs:55: trailing whitespace.
++    /// the frozen HF vocab-only converter intentionally stop at this boundary.
+crates/gguf/src/writer.rs:56: trailing whitespace.
++    pub encoded_header_bytes: u64,
+crates/gguf/src/writer.rs:57: trailing whitespace.
++    pub data_offset: u64,
+crates/gguf/src/writer.rs:58: trailing whitespace.
++    pub alignment: u32,
+crates/gguf/src/writer.rs:59: trailing whitespace.
++    pub tensor_offsets: Vec<u64>,
+crates/gguf/src/writer.rs:60: trailing whitespace.
++    pub tensor_bytes: Vec<u64>,
+crates/gguf/src/writer.rs:61: trailing whitespace.
++    pub file_bytes: u64,
+crates/gguf/src/writer.rs:62: trailing whitespace.
++}
+crates/gguf/src/writer.rs:63: trailing whitespace.
++
+crates/gguf/src/writer.rs:64: trailing whitespace.
++#[derive(Clone, Copy)]
+crates/gguf/src/writer.rs:65: trailing whitespace.
++pub(crate) struct HeaderPolicy {
+crates/gguf/src/writer.rs:66: trailing whitespace.
++    frozen_tool: bool,
+crates/gguf/src/writer.rs:67: trailing whitespace.
++    native_header: bool,
+crates/gguf/src/writer.rs:68: trailing whitespace.
++    raw_strings: bool,
+crates/gguf/src/writer.rs:69: trailing whitespace.
++    version: u32,
+crates/gguf/src/writer.rs:70: trailing whitespace.
++    physical_alignment: Option<u32>,
+crates/gguf/src/writer.rs:71: trailing whitespace.
++}
+crates/gguf/src/writer.rs:72: trailing whitespace.
++impl HeaderPolicy {
+crates/gguf/src/writer.rs:73: trailing whitespace.
++    const STANDARD: Self = Self {
+crates/gguf/src/writer.rs:74: trailing whitespace.
++        frozen_tool: false,
+crates/gguf/src/writer.rs:75: trailing whitespace.
++        native_header: false,
+crates/gguf/src/writer.rs:76: trailing whitespace.
++        raw_strings: false,
+crates/gguf/src/writer.rs:77: trailing whitespace.
++        version: 3,
+crates/gguf/src/writer.rs:78: trailing whitespace.
++        physical_alignment: None,
+crates/gguf/src/writer.rs:79: trailing whitespace.
++    };
+crates/gguf/src/writer.rs:80: trailing whitespace.
++    const RAW: Self = Self {
+crates/gguf/src/writer.rs:81: trailing whitespace.
++        raw_strings: true,
+crates/gguf/src/writer.rs:82: trailing whitespace.
++        ..Self::STANDARD
+crates/gguf/src/writer.rs:83: trailing whitespace.
++    };
+crates/gguf/src/writer.rs:84: trailing whitespace.
++    pub(crate) const FROZEN_TOOL: Self = Self {
+crates/gguf/src/writer.rs:85: trailing whitespace.
++        frozen_tool: true,
+crates/gguf/src/writer.rs:86: trailing whitespace.
++        raw_strings: true,
+crates/gguf/src/writer.rs:87: trailing whitespace.
++        physical_alignment: Some(32),
+crates/gguf/src/writer.rs:88: trailing whitespace.
++        ..Self::STANDARD
+crates/gguf/src/writer.rs:89: trailing whitespace.
++    };
+crates/gguf/src/writer.rs:90: trailing whitespace.
++    fn native(version: u32, alignment: u32) -> Self {
+crates/gguf/src/writer.rs:91: trailing whitespace.
++        Self {
+crates/gguf/src/writer.rs:92: trailing whitespace.
++            native_header: true,
+crates/gguf/src/writer.rs:93: trailing whitespace.
++            raw_strings: true,
+crates/gguf/src/writer.rs:94: trailing whitespace.
++            version,
+crates/gguf/src/writer.rs:95: trailing whitespace.
++            physical_alignment: Some(alignment),
+crates/gguf/src/writer.rs:96: trailing whitespace.
++            ..Self::STANDARD
+crates/gguf/src/writer.rs:97: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:98: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:99: trailing whitespace.
++    fn string(self, value: &[u8]) -> &[u8] {
+crates/gguf/src/writer.rs:100: trailing whitespace.
++        if self.frozen_tool {
+crates/gguf/src/writer.rs:101: trailing whitespace.
++            c_string(value)
+crates/gguf/src/writer.rs:102: trailing whitespace.
++        } else {
+crates/gguf/src/writer.rs:103: trailing whitespace.
++            value
+crates/gguf/src/writer.rs:104: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:105: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:106: trailing whitespace.
++    fn name(self, value: &[u8]) -> &[u8] {
+crates/gguf/src/writer.rs:107: trailing whitespace.
++        if self.frozen_tool || self.native_header {
+crates/gguf/src/writer.rs:108: trailing whitespace.
++            c_string(value)
+crates/gguf/src/writer.rs:109: trailing whitespace.
++        } else {
+crates/gguf/src/writer.rs:110: trailing whitespace.
++            value
+crates/gguf/src/writer.rs:111: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:112: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:113: trailing whitespace.
++    fn rank(self, dimensions: &[u64]) -> usize {
+crates/gguf/src/writer.rs:114: trailing whitespace.
++        if self.frozen_tool || self.native_header {
+crates/gguf/src/writer.rs:115: trailing whitespace.
++            dimensions
+crates/gguf/src/writer.rs:116: trailing whitespace.
++                .iter()
+crates/gguf/src/writer.rs:117: trailing whitespace.
++                .enumerate()
+crates/gguf/src/writer.rs:118: trailing whitespace.
++                .rev()
+crates/gguf/src/writer.rs:119: trailing whitespace.
++                .find(|&(i, &dimension)| i > 0 && dimension > 1)
+crates/gguf/src/writer.rs:120: trailing whitespace.
++                .map_or(1, |(i, _)| i + 1)
+crates/gguf/src/writer.rs:121: trailing whitespace.
++        } else {
+crates/gguf/src/writer.rs:122: trailing whitespace.
++            dimensions.len()
+crates/gguf/src/writer.rs:123: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:124: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:125: trailing whitespace.
++}
+crates/gguf/src/writer.rs:126: trailing whitespace.
++
+crates/gguf/src/writer.rs:127: trailing whitespace.
++fn add(total: &mut u64, count: u64, limit: u64) -> Result<()> {
+crates/gguf/src/writer.rs:128: trailing whitespace.
++    *total = total
+crates/gguf/src/writer.rs:129: trailing whitespace.
++        .checked_add(count)
+crates/gguf/src/writer.rs:130: trailing whitespace.
++        .ok_or_else(|| Error::Limit("encoded header size overflow".into()))?;
+crates/gguf/src/writer.rs:131: trailing whitespace.
++    if *total > limit {
+crates/gguf/src/writer.rs:132: trailing whitespace.
++        return Err(Error::Limit(
+crates/gguf/src/writer.rs:133: trailing whitespace.
++            "encoded header exceeds metadata byte budget".into(),
+crates/gguf/src/writer.rs:134: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:135: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:136: trailing whitespace.
++    Ok(())
+crates/gguf/src/writer.rs:137: trailing whitespace.
++}
+crates/gguf/src/writer.rs:138: trailing whitespace.
++fn string_size(text: &[u8], limits: &Limits, policy: HeaderPolicy) -> Result<u64> {
+crates/gguf/src/writer.rs:139: trailing whitespace.
++    let text = policy.string(text);
+crates/gguf/src/writer.rs:140: trailing whitespace.
++    if text.len() > limits.max_string_bytes {
+crates/gguf/src/writer.rs:141: trailing whitespace.
++        return Err(Error::Limit(
+crates/gguf/src/writer.rs:142: trailing whitespace.
++            "encoded string exceeds string byte budget".into(),
+crates/gguf/src/writer.rs:143: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:144: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:145: trailing whitespace.
++    (text.len() as u64)
+crates/gguf/src/writer.rs:146: trailing whitespace.
++        .checked_add(8)
+crates/gguf/src/writer.rs:147: trailing whitespace.
++        .ok_or_else(|| Error::Limit("encoded string size overflow".into()))
+crates/gguf/src/writer.rs:148: trailing whitespace.
++}
+crates/gguf/src/writer.rs:149: trailing whitespace.
++fn value_size<S: WireBytes>(
+crates/gguf/src/writer.rs:150: trailing whitespace.
++    value: &MetadataValue<S>,
+crates/gguf/src/writer.rs:151: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:152: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:153: trailing whitespace.
++    total_values: &mut usize,
+crates/gguf/src/writer.rs:154: trailing whitespace.
++) -> Result<u64> {
+crates/gguf/src/writer.rs:155: trailing whitespace.
++    *total_values = total_values
+crates/gguf/src/writer.rs:156: trailing whitespace.
++        .checked_add(1)
+crates/gguf/src/writer.rs:157: trailing whitespace.
++        .filter(|count| *count <= limits.max_total_values)
+crates/gguf/src/writer.rs:158: trailing whitespace.
++        .ok_or_else(|| Error::Limit("encoded metadata value budget".into()))?;
+crates/gguf/src/writer.rs:159: trailing whitespace.
++    Ok(match value {
+crates/gguf/src/writer.rs:160: trailing whitespace.
++        MetadataValue::U8(_) | MetadataValue::I8(_) | MetadataValue::Bool(_) => 1,
+crates/gguf/src/writer.rs:161: trailing whitespace.
++        MetadataValue::U16(_) | MetadataValue::I16(_) => 2,
+crates/gguf/src/writer.rs:162: trailing whitespace.
++        MetadataValue::U32(_) | MetadataValue::I32(_) | MetadataValue::F32(_) => 4,
+crates/gguf/src/writer.rs:163: trailing whitespace.
++        MetadataValue::U64(_) | MetadataValue::I64(_) | MetadataValue::F64(_) => 8,
+crates/gguf/src/writer.rs:164: trailing whitespace.
++        MetadataValue::String(text) => string_size(text.wire_bytes(), limits, policy)?,
+crates/gguf/src/writer.rs:165: trailing whitespace.
++        MetadataValue::ByteString(bytes) => string_size(bytes, limits, policy)?,
+crates/gguf/src/writer.rs:166: trailing whitespace.
++        MetadataValue::Array {
+crates/gguf/src/writer.rs:167: trailing whitespace.
++            element_type,
+crates/gguf/src/writer.rs:168: trailing whitespace.
++            values,
+crates/gguf/src/writer.rs:169: trailing whitespace.
++        } => {
+crates/gguf/src/writer.rs:170: trailing whitespace.
++            if *element_type > 12 || *element_type == 9 {
+crates/gguf/src/writer.rs:171: trailing whitespace.
++                return Err(invalid("heterogeneous or nested array"));
+crates/gguf/src/writer.rs:172: trailing whitespace.
++            }
+crates/gguf/src/writer.rs:173: trailing whitespace.
++            if values.len() > limits.max_array_values
+crates/gguf/src/writer.rs:174: trailing whitespace.
++                || values.len() > limits.max_total_values.saturating_sub(*total_values)
+crates/gguf/src/writer.rs:175: trailing whitespace.
++            {
+crates/gguf/src/writer.rs:176: trailing whitespace.
++                return Err(Error::Limit("encoded array value budget".into()));
+crates/gguf/src/writer.rs:177: trailing whitespace.
++            }
+crates/gguf/src/writer.rs:178: trailing whitespace.
++            let mut bytes = 12;
+crates/gguf/src/writer.rs:179: trailing whitespace.
++            for item in values {
+crates/gguf/src/writer.rs:180: trailing whitespace.
++                if item.type_id() != *element_type {
+crates/gguf/src/writer.rs:181: trailing whitespace.
++                    return Err(invalid("heterogeneous or nested array"));
+crates/gguf/src/writer.rs:182: trailing whitespace.
++                }
+crates/gguf/src/writer.rs:183: trailing whitespace.
++                add(
+crates/gguf/src/writer.rs:184: trailing whitespace.
++                    &mut bytes,
+crates/gguf/src/writer.rs:185: trailing whitespace.
++                    value_size(item, limits, policy, total_values)?,
+crates/gguf/src/writer.rs:186: trailing whitespace.
++                    limits.max_metadata_bytes,
+crates/gguf/src/writer.rs:187: trailing whitespace.
++                )?;
+crates/gguf/src/writer.rs:188: trailing whitespace.
++            }
+crates/gguf/src/writer.rs:189: trailing whitespace.
++            bytes
+crates/gguf/src/writer.rs:190: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:191: trailing whitespace.
++    })
+crates/gguf/src/writer.rs:192: trailing whitespace.
++}
+crates/gguf/src/writer.rs:193: trailing whitespace.
++
+crates/gguf/src/writer.rs:194: trailing whitespace.
++pub(crate) fn tensor_bytes<N: ?Sized>(tensor: &TensorDescription<'_, N>) -> Result<u64> {
+crates/gguf/src/writer.rs:195: trailing whitespace.
++    if tensor.dimensions.len() > 4 {
+crates/gguf/src/writer.rs:196: trailing whitespace.
++        return Err(invalid("tensor has more than four dimensions"));
+crates/gguf/src/writer.rs:197: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:198: trailing whitespace.
++    dimension_elements(tensor.dimensions)?;
+crates/gguf/src/writer.rs:199: trailing whitespace.
++    let row = usize::try_from(tensor.dimensions.first().copied().unwrap_or(1))
+crates/gguf/src/writer.rs:200: trailing whitespace.
++        .map_err(|_| invalid("dimension exceeds usize"))?;
+crates/gguf/src/writer.rs:201: trailing whitespace.
++    tensor.dimensions.iter().skip(1).try_fold(
+crates/gguf/src/writer.rs:202: trailing whitespace.
++        tensor
+crates/gguf/src/writer.rs:203: trailing whitespace.
++            .dtype
+crates/gguf/src/writer.rs:204: trailing whitespace.
++            .row_bytes(row)
+crates/gguf/src/writer.rs:205: trailing whitespace.
++            .map_err(|error| invalid(error.to_string()))? as u64,
+crates/gguf/src/writer.rs:206: trailing whitespace.
++        |bytes, &dimension| {
+crates/gguf/src/writer.rs:207: trailing whitespace.
++            bytes
+crates/gguf/src/writer.rs:208: trailing whitespace.
++                .checked_mul(dimension)
+crates/gguf/src/writer.rs:209: trailing whitespace.
++                .ok_or_else(|| invalid("tensor size overflow"))
+crates/gguf/src/writer.rs:210: trailing whitespace.
++        },
+crates/gguf/src/writer.rs:211: trailing whitespace.
++    )
+crates/gguf/src/writer.rs:212: trailing whitespace.
++}
+crates/gguf/src/writer.rs:213: trailing whitespace.
++
+crates/gguf/src/writer.rs:214: trailing whitespace.
++fn layout_inner<N: WireBytes + ?Sized, S: WireBytes>(
+crates/gguf/src/writer.rs:215: trailing whitespace.
++    metadata: &[(&N, &MetadataValue<S>)],
+crates/gguf/src/writer.rs:216: trailing whitespace.
++    tensors: &[TensorDescription<'_, N>],
+crates/gguf/src/writer.rs:217: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:218: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:219: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:220: trailing whitespace.
++    if metadata.len() > limits.max_metadata_entries || tensors.len() > limits.max_tensors {
+crates/gguf/src/writer.rs:221: trailing whitespace.
++        return Err(Error::Limit(
+crates/gguf/src/writer.rs:222: trailing whitespace.
++            "encoded metadata or tensor count budget".into(),
+crates/gguf/src/writer.rs:223: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:224: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:225: trailing whitespace.
++    let metadata_alignment = match metadata
+crates/gguf/src/writer.rs:226: trailing whitespace.
++        .iter()
+crates/gguf/src/writer.rs:227: trailing whitespace.
++        .find(|(key, _)| c_string(key.wire_bytes()) == b"general.alignment")
+crates/gguf/src/writer.rs:228: trailing whitespace.
++    {
+crates/gguf/src/writer.rs:229: trailing whitespace.
++        None => 32,
+crates/gguf/src/writer.rs:230: trailing whitespace.
++        Some((_, MetadataValue::U32(value))) => *value,
+crates/gguf/src/writer.rs:231: trailing whitespace.
++        _ => return Err(invalid("general.alignment must be UINT32")),
+crates/gguf/src/writer.rs:232: trailing whitespace.
++    };
+crates/gguf/src/writer.rs:233: trailing whitespace.
++    if !metadata_alignment.is_power_of_two() || metadata_alignment > 1024 * 1024 {
+crates/gguf/src/writer.rs:234: trailing whitespace.
++        return Err(invalid("invalid alignment"));
+crates/gguf/src/writer.rs:235: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:236: trailing whitespace.
++    let alignment = policy.physical_alignment.unwrap_or(metadata_alignment);
+crates/gguf/src/writer.rs:237: trailing whitespace.
++    if !alignment.is_power_of_two() || alignment > 1024 * 1024 {
+crates/gguf/src/writer.rs:238: trailing whitespace.
++        return Err(invalid("invalid physical alignment"));
+crates/gguf/src/writer.rs:239: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:240: trailing whitespace.
++    if !matches!(policy.version, 2 | 3) {
+crates/gguf/src/writer.rs:241: trailing whitespace.
++        return Err(Error::Unsupported(
+crates/gguf/src/writer.rs:242: trailing whitespace.
++            "writer supports GGUF versions 2 and 3".into(),
+crates/gguf/src/writer.rs:243: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:244: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:245: trailing whitespace.
++    let mut header = 0;
+crates/gguf/src/writer.rs:246: trailing whitespace.
++    add(&mut header, 24, limits.max_metadata_bytes)?;
+crates/gguf/src/writer.rs:247: trailing whitespace.
++    let mut keys = BTreeSet::new();
+crates/gguf/src/writer.rs:248: trailing whitespace.
++    let mut values = 0;
+crates/gguf/src/writer.rs:249: trailing whitespace.
++    for &(key, value) in metadata {
+crates/gguf/src/writer.rs:250: trailing whitespace.
++        let key = key.wire_bytes();
+crates/gguf/src/writer.rs:251: trailing whitespace.
++        if key.is_empty()
+crates/gguf/src/writer.rs:252: trailing whitespace.
++            || (!policy.raw_strings && key.contains(&0))
+crates/gguf/src/writer.rs:253: trailing whitespace.
++            || !keys.insert(policy.string(key))
+crates/gguf/src/writer.rs:254: trailing whitespace.
++        {
+crates/gguf/src/writer.rs:255: trailing whitespace.
++            return Err(invalid("empty, NUL or duplicated metadata key"));
+crates/gguf/src/writer.rs:256: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:257: trailing whitespace.
++        add(
+crates/gguf/src/writer.rs:258: trailing whitespace.
++            &mut header,
+crates/gguf/src/writer.rs:259: trailing whitespace.
++            string_size(key, limits, policy)?,
+crates/gguf/src/writer.rs:260: trailing whitespace.
++            limits.max_metadata_bytes,
+crates/gguf/src/writer.rs:261: trailing whitespace.
++        )?;
+crates/gguf/src/writer.rs:262: trailing whitespace.
++        add(&mut header, 4, limits.max_metadata_bytes)?;
+crates/gguf/src/writer.rs:263: trailing whitespace.
++        add(
+crates/gguf/src/writer.rs:264: trailing whitespace.
++            &mut header,
+crates/gguf/src/writer.rs:265: trailing whitespace.
++            value_size(value, limits, policy, &mut values)?,
+crates/gguf/src/writer.rs:266: trailing whitespace.
++            limits.max_metadata_bytes,
+crates/gguf/src/writer.rs:267: trailing whitespace.
++        )?;
+crates/gguf/src/writer.rs:268: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:269: trailing whitespace.
++    // A rank-zero tensor with an empty name still needs 24 encoded bytes.
+crates/gguf/src/writer.rs:270: trailing whitespace.
++    // Reject impossible descriptor counts before reserving per-tensor arrays.
+crates/gguf/src/writer.rs:271: trailing whitespace.
++    let minimum = u64::try_from(tensors.len())
+crates/gguf/src/writer.rs:272: trailing whitespace.
++        .ok()
+crates/gguf/src/writer.rs:273: trailing whitespace.
++        .and_then(|count| count.checked_mul(24))
+crates/gguf/src/writer.rs:274: trailing whitespace.
++        .ok_or_else(|| Error::Limit("encoded tensor descriptor count overflow".into()))?;
+crates/gguf/src/writer.rs:275: trailing whitespace.
++    if minimum > limits.max_metadata_bytes.saturating_sub(header) {
+crates/gguf/src/writer.rs:276: trailing whitespace.
++        return Err(Error::Limit(
+crates/gguf/src/writer.rs:277: trailing whitespace.
++            "tensor descriptors minimum encoded size exceeds remaining metadata budget".into(),
+crates/gguf/src/writer.rs:278: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:279: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:280: trailing whitespace.
++    #[cfg(test)]
+crates/gguf/src/writer.rs:281: trailing whitespace.
++    LAYOUT_RESERVATIONS.with(|calls| calls.set(calls.get() + 1));
+crates/gguf/src/writer.rs:282: trailing whitespace.
++    let mut tensor_offsets = Vec::new();
+crates/gguf/src/writer.rs:283: trailing whitespace.
++    let mut lengths = Vec::new();
+crates/gguf/src/writer.rs:284: trailing whitespace.
++    tensor_offsets
+crates/gguf/src/writer.rs:285: trailing whitespace.
++        .try_reserve_exact(tensors.len())
+crates/gguf/src/writer.rs:286: trailing whitespace.
++        .map_err(|_| Error::Limit("writer tensor offset allocation".into()))?;
+crates/gguf/src/writer.rs:287: trailing whitespace.
++    lengths
+crates/gguf/src/writer.rs:288: trailing whitespace.
++        .try_reserve_exact(tensors.len())
+crates/gguf/src/writer.rs:289: trailing whitespace.
++        .map_err(|_| Error::Limit("writer tensor length allocation".into()))?;
+crates/gguf/src/writer.rs:290: trailing whitespace.
++    let mut names = BTreeSet::new();
+crates/gguf/src/writer.rs:291: trailing whitespace.
++    let mut offset = 0u64;
+crates/gguf/src/writer.rs:292: trailing whitespace.
++    for tensor in tensors {
+crates/gguf/src/writer.rs:293: trailing whitespace.
++        let original_name = tensor.name.wire_bytes();
+crates/gguf/src/writer.rs:294: trailing whitespace.
++        let name = policy.name(original_name);
+crates/gguf/src/writer.rs:295: trailing whitespace.
++        let duplicate_key = if policy.frozen_tool {
+crates/gguf/src/writer.rs:296: trailing whitespace.
++            name
+crates/gguf/src/writer.rs:297: trailing whitespace.
++        } else {
+crates/gguf/src/writer.rs:298: trailing whitespace.
++            original_name
+crates/gguf/src/writer.rs:299: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:300: trailing whitespace.
++        if original_name.len() >= 64
+crates/gguf/src/writer.rs:301: trailing whitespace.
++            || (!policy.raw_strings && original_name.contains(&0))
+crates/gguf/src/writer.rs:302: trailing whitespace.
++            || !names.insert(duplicate_key)
+crates/gguf/src/writer.rs:303: trailing whitespace.
++        {
+crates/gguf/src/writer.rs:304: trailing whitespace.
++            return Err(invalid("invalid or duplicated tensor name"));
+crates/gguf/src/writer.rs:305: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:306: trailing whitespace.
++        let bytes = tensor_bytes(tensor)?;
+crates/gguf/src/writer.rs:307: trailing whitespace.
++        let rank = policy.rank(tensor.dimensions);
+crates/gguf/src/writer.rs:308: trailing whitespace.
++        add(
+crates/gguf/src/writer.rs:309: trailing whitespace.
++            &mut header,
+crates/gguf/src/writer.rs:310: trailing whitespace.
++            string_size(name, limits, policy)?,
+crates/gguf/src/writer.rs:311: trailing whitespace.
++            limits.max_metadata_bytes,
+crates/gguf/src/writer.rs:312: trailing whitespace.
++        )?;
+crates/gguf/src/writer.rs:313: trailing whitespace.
++        add(&mut header, 16 + rank as u64 * 8, limits.max_metadata_bytes)?;
+crates/gguf/src/writer.rs:314: trailing whitespace.
++        tensor_offsets.push(offset);
+crates/gguf/src/writer.rs:315: trailing whitespace.
++        lengths.push(bytes);
+crates/gguf/src/writer.rs:316: trailing whitespace.
++        offset = offset
+crates/gguf/src/writer.rs:317: trailing whitespace.
++            .checked_add(align(bytes, alignment as u64)?)
+crates/gguf/src/writer.rs:318: trailing whitespace.
++            .ok_or_else(|| invalid("tensor offset overflow"))?;
+crates/gguf/src/writer.rs:319: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:320: trailing whitespace.
++    let data_offset = align(header, alignment as u64)?;
+crates/gguf/src/writer.rs:321: trailing whitespace.
++    if data_offset > limits.max_metadata_bytes {
+crates/gguf/src/writer.rs:322: trailing whitespace.
++        return Err(Error::Limit(
+crates/gguf/src/writer.rs:323: trailing whitespace.
++            "encoded header including padding exceeds budget".into(),
+crates/gguf/src/writer.rs:324: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:325: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:326: trailing whitespace.
++    let file_bytes = data_offset
+crates/gguf/src/writer.rs:327: trailing whitespace.
++        .checked_add(offset)
+crates/gguf/src/writer.rs:328: trailing whitespace.
++        .ok_or_else(|| invalid("output file size overflow"))?;
+crates/gguf/src/writer.rs:329: trailing whitespace.
++    Ok(WriteLayout {
+crates/gguf/src/writer.rs:330: trailing whitespace.
++        encoded_header_bytes: header,
+crates/gguf/src/writer.rs:331: trailing whitespace.
++        data_offset,
+crates/gguf/src/writer.rs:332: trailing whitespace.
++        alignment,
+crates/gguf/src/writer.rs:333: trailing whitespace.
++        tensor_offsets,
+crates/gguf/src/writer.rs:334: trailing whitespace.
++        tensor_bytes: lengths,
+crates/gguf/src/writer.rs:335: trailing whitespace.
++        file_bytes,
+crates/gguf/src/writer.rs:336: trailing whitespace.
++    })
+crates/gguf/src/writer.rs:337: trailing whitespace.
++}
+crates/gguf/src/writer.rs:338: trailing whitespace.
++
+crates/gguf/src/writer.rs:339: trailing whitespace.
++pub(crate) fn zeros<W: Write>(out: &mut W, mut count: u64) -> Result<()> {
+crates/gguf/src/writer.rs:340: trailing whitespace.
++    const ZERO: [u8; 4096] = [0; 4096];
+crates/gguf/src/writer.rs:341: trailing whitespace.
++    while count != 0 {
+crates/gguf/src/writer.rs:342: trailing whitespace.
++        let part = count.min(ZERO.len() as u64) as usize;
+crates/gguf/src/writer.rs:343: trailing whitespace.
++        out.write_all(&ZERO[..part])?;
+crates/gguf/src/writer.rs:344: trailing whitespace.
++        count -= part as u64;
+crates/gguf/src/writer.rs:345: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:346: trailing whitespace.
++    Ok(())
+crates/gguf/src/writer.rs:347: trailing whitespace.
++}
+crates/gguf/src/writer.rs:348: trailing whitespace.
++struct Encoder<'a, W: Write> {
+crates/gguf/src/writer.rs:349: trailing whitespace.
++    out: &'a mut W,
+crates/gguf/src/writer.rs:350: trailing whitespace.
++    bytes: u64,
+crates/gguf/src/writer.rs:351: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:352: trailing whitespace.
++}
+crates/gguf/src/writer.rs:353: trailing whitespace.
++impl<W: Write> Encoder<'_, W> {
+crates/gguf/src/writer.rs:354: trailing whitespace.
++    fn raw(&mut self, bytes: &[u8]) -> Result<()> {
+crates/gguf/src/writer.rs:355: trailing whitespace.
++        self.out.write_all(bytes)?;
+crates/gguf/src/writer.rs:356: trailing whitespace.
++        self.bytes = self
+crates/gguf/src/writer.rs:357: trailing whitespace.
++            .bytes
+crates/gguf/src/writer.rs:358: trailing whitespace.
++            .checked_add(bytes.len() as u64)
+crates/gguf/src/writer.rs:359: trailing whitespace.
++            .ok_or_else(|| invalid("encoded byte count overflow"))?;
+crates/gguf/src/writer.rs:360: trailing whitespace.
++        Ok(())
+crates/gguf/src/writer.rs:361: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:362: trailing whitespace.
++    fn string(&mut self, value: &[u8]) -> Result<()> {
+crates/gguf/src/writer.rs:363: trailing whitespace.
++        let value = self.policy.string(value);
+crates/gguf/src/writer.rs:364: trailing whitespace.
++        self.raw(&(value.len() as u64).to_le_bytes())?;
+crates/gguf/src/writer.rs:365: trailing whitespace.
++        self.raw(value)
+crates/gguf/src/writer.rs:366: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:367: trailing whitespace.
++    fn value<S: WireBytes>(&mut self, value: &MetadataValue<S>) -> Result<()> {
+crates/gguf/src/writer.rs:368: trailing whitespace.
++        match value {
+crates/gguf/src/writer.rs:369: trailing whitespace.
++            MetadataValue::U8(value) => self.raw(&[*value]),
+crates/gguf/src/writer.rs:370: trailing whitespace.
++            MetadataValue::I8(value) => self.raw(&[*value as u8]),
+crates/gguf/src/writer.rs:371: trailing whitespace.
++            MetadataValue::U16(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:372: trailing whitespace.
++            MetadataValue::I16(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:373: trailing whitespace.
++            MetadataValue::U32(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:374: trailing whitespace.
++            MetadataValue::I32(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:375: trailing whitespace.
++            MetadataValue::F32(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:376: trailing whitespace.
++            MetadataValue::Bool(value) => self.raw(&[u8::from(*value)]),
+crates/gguf/src/writer.rs:377: trailing whitespace.
++            MetadataValue::String(value) => self.string(value.wire_bytes()),
+crates/gguf/src/writer.rs:378: trailing whitespace.
++            MetadataValue::ByteString(value) => self.string(value),
+crates/gguf/src/writer.rs:379: trailing whitespace.
++            MetadataValue::U64(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:380: trailing whitespace.
++            MetadataValue::I64(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:381: trailing whitespace.
++            MetadataValue::F64(value) => self.raw(&value.to_le_bytes()),
+crates/gguf/src/writer.rs:382: trailing whitespace.
++            MetadataValue::Array {
+crates/gguf/src/writer.rs:383: trailing whitespace.
++                element_type,
+crates/gguf/src/writer.rs:384: trailing whitespace.
++                values,
+crates/gguf/src/writer.rs:385: trailing whitespace.
++            } => {
+crates/gguf/src/writer.rs:386: trailing whitespace.
++                self.raw(&element_type.to_le_bytes())?;
+crates/gguf/src/writer.rs:387: trailing whitespace.
++                self.raw(&(values.len() as u64).to_le_bytes())?;
+crates/gguf/src/writer.rs:388: trailing whitespace.
++                for value in values {
+crates/gguf/src/writer.rs:389: trailing whitespace.
++                    self.value(value)?;
+crates/gguf/src/writer.rs:390: trailing whitespace.
++                }
+crates/gguf/src/writer.rs:391: trailing whitespace.
++                Ok(())
+crates/gguf/src/writer.rs:392: trailing whitespace.
++            }
+crates/gguf/src/writer.rs:393: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:394: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:395: trailing whitespace.
++}
+crates/gguf/src/writer.rs:396: trailing whitespace.
++fn header_with_policy_inner<W: Write, N: WireBytes + ?Sized, S: WireBytes>(
+crates/gguf/src/writer.rs:397: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:398: trailing whitespace.
++    metadata: &[(&N, &MetadataValue<S>)],
+crates/gguf/src/writer.rs:399: trailing whitespace.
++    tensors: &[TensorDescription<'_, N>],
+crates/gguf/src/writer.rs:400: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:401: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:402: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:403: trailing whitespace.
++    let layout = layout_inner(metadata, tensors, limits, policy)?;
+crates/gguf/src/writer.rs:404: trailing whitespace.
++    let mut encoder = Encoder {
+crates/gguf/src/writer.rs:405: trailing whitespace.
++        out,
+crates/gguf/src/writer.rs:406: trailing whitespace.
++        bytes: 0,
+crates/gguf/src/writer.rs:407: trailing whitespace.
++        policy,
+crates/gguf/src/writer.rs:408: trailing whitespace.
++    };
+crates/gguf/src/writer.rs:409: trailing whitespace.
++    encoder.raw(b"GGUF")?;
+crates/gguf/src/writer.rs:410: trailing whitespace.
++    encoder.raw(&policy.version.to_le_bytes())?;
+crates/gguf/src/writer.rs:411: trailing whitespace.
++    encoder.raw(&(tensors.len() as u64).to_le_bytes())?;
+crates/gguf/src/writer.rs:412: trailing whitespace.
++    encoder.raw(&(metadata.len() as u64).to_le_bytes())?;
+crates/gguf/src/writer.rs:413: trailing whitespace.
++    for &(key, value) in metadata {
+crates/gguf/src/writer.rs:414: trailing whitespace.
++        encoder.string(key.wire_bytes())?;
+crates/gguf/src/writer.rs:415: trailing whitespace.
++        encoder.raw(&value.type_id().to_le_bytes())?;
+crates/gguf/src/writer.rs:416: trailing whitespace.
++        encoder.value(value)?;
+crates/gguf/src/writer.rs:417: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:418: trailing whitespace.
++    for (tensor, &offset) in tensors.iter().zip(&layout.tensor_offsets) {
+crates/gguf/src/writer.rs:419: trailing whitespace.
++        encoder.string(policy.name(tensor.name.wire_bytes()))?;
+crates/gguf/src/writer.rs:420: trailing whitespace.
++        let rank = policy.rank(tensor.dimensions);
+crates/gguf/src/writer.rs:421: trailing whitespace.
++        encoder.raw(&(rank as u32).to_le_bytes())?;
+crates/gguf/src/writer.rs:422: trailing whitespace.
++        for dimension in 0..rank {
+crates/gguf/src/writer.rs:423: trailing whitespace.
++            encoder.raw(
+crates/gguf/src/writer.rs:424: trailing whitespace.
++                &tensor
+crates/gguf/src/writer.rs:425: trailing whitespace.
++                    .dimensions
+crates/gguf/src/writer.rs:426: trailing whitespace.
++                    .get(dimension)
+crates/gguf/src/writer.rs:427: trailing whitespace.
++                    .copied()
+crates/gguf/src/writer.rs:428: trailing whitespace.
++                    .unwrap_or(1)
+crates/gguf/src/writer.rs:429: trailing whitespace.
++                    .to_le_bytes(),
+crates/gguf/src/writer.rs:430: trailing whitespace.
++            )?;
+crates/gguf/src/writer.rs:431: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:432: trailing whitespace.
++        encoder.raw(&tensor.dtype.id().to_le_bytes())?;
+crates/gguf/src/writer.rs:433: trailing whitespace.
++        encoder.raw(&offset.to_le_bytes())?;
+crates/gguf/src/writer.rs:434: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:435: trailing whitespace.
++    let padding = layout
+crates/gguf/src/writer.rs:436: trailing whitespace.
++        .data_offset
+crates/gguf/src/writer.rs:437: trailing whitespace.
++        .checked_sub(encoder.bytes)
+crates/gguf/src/writer.rs:438: trailing whitespace.
++        .ok_or_else(|| invalid("header preflight and encoding disagree"))?;
+crates/gguf/src/writer.rs:439: trailing whitespace.
++    zeros(encoder.out, padding)?;
+crates/gguf/src/writer.rs:440: trailing whitespace.
++    Ok(layout)
+crates/gguf/src/writer.rs:441: trailing whitespace.
++}
+crates/gguf/src/writer.rs:442: trailing whitespace.
++
+crates/gguf/src/writer.rs:443: trailing whitespace.
++pub(crate) fn header_with_policy<W: Write>(
+crates/gguf/src/writer.rs:444: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:445: trailing whitespace.
++    metadata: &[(&str, &Value)],
+crates/gguf/src/writer.rs:446: trailing whitespace.
++    tensors: &[TensorDescriptor<'_>],
+crates/gguf/src/writer.rs:447: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:448: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:449: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:450: trailing whitespace.
++    header_with_policy_inner(out, metadata, tensors, limits, policy)
+crates/gguf/src/writer.rs:451: trailing whitespace.
++}
+crates/gguf/src/writer.rs:452: trailing whitespace.
++pub(crate) fn raw_header_with_policy<W: Write>(
+crates/gguf/src/writer.rs:453: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:454: trailing whitespace.
++    metadata: &[(&[u8], &RawValue)],
+crates/gguf/src/writer.rs:455: trailing whitespace.
++    tensors: &[RawTensorDescriptor<'_>],
+crates/gguf/src/writer.rs:456: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:457: trailing whitespace.
++    policy: HeaderPolicy,
+crates/gguf/src/writer.rs:458: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:459: trailing whitespace.
++    header_with_policy_inner(out, metadata, tensors, limits, policy)
+crates/gguf/src/writer.rs:460: trailing whitespace.
++}
+crates/gguf/src/writer.rs:461: trailing whitespace.
++/// Write ordered byte strings without UTF-8 conversion or C-string truncation.
+crates/gguf/src/writer.rs:462: trailing whitespace.
++/// Names and dimensions retain their supplied wire representation.
+crates/gguf/src/writer.rs:463: trailing whitespace.
++pub fn write_raw_header<W: Write>(
+crates/gguf/src/writer.rs:464: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:465: trailing whitespace.
++    metadata: &[(&[u8], &RawValue)],
+crates/gguf/src/writer.rs:466: trailing whitespace.
++    tensors: &[RawTensorDescriptor<'_>],
+crates/gguf/src/writer.rs:467: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:468: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:469: trailing whitespace.
++    raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::RAW)
+crates/gguf/src/writer.rs:470: trailing whitespace.
++}
+crates/gguf/src/writer.rs:471: trailing whitespace.
++/// Write the frozen copying tools' GGUF v3 header: native C-string projection,
+crates/gguf/src/writer.rs:472: trailing whitespace.
++/// trailing singleton rank collapse, and physical 32-byte alignment. Metadata
+crates/gguf/src/writer.rs:473: trailing whitespace.
++/// alignment is copied as data, as in the original tool. The caller is responsible
+crates/gguf/src/writer.rs:474: trailing whitespace.
++/// for setter ordering and duplicate C-prefix normalization before this call.
+crates/gguf/src/writer.rs:475: trailing whitespace.
++pub fn write_tool_header<W: Write>(
+crates/gguf/src/writer.rs:476: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:477: trailing whitespace.
++    metadata: &[(&[u8], &RawValue)],
+crates/gguf/src/writer.rs:478: trailing whitespace.
++    tensors: &[RawTensorDescriptor<'_>],
+crates/gguf/src/writer.rs:479: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:480: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:481: trailing whitespace.
++    raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::FROZEN_TOOL)
+crates/gguf/src/writer.rs:482: trailing whitespace.
++}
+crates/gguf/src/writer.rs:483: trailing whitespace.
++
+crates/gguf/src/writer.rs:484: trailing whitespace.
++pub(crate) fn native_raw_header<W: Write>(
+crates/gguf/src/writer.rs:485: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:486: trailing whitespace.
++    metadata: &[(&[u8], &RawValue)],
+crates/gguf/src/writer.rs:487: trailing whitespace.
++    tensors: &[RawTensorDescriptor<'_>],
+crates/gguf/src/writer.rs:488: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:489: trailing whitespace.
++    version: u32,
+crates/gguf/src/writer.rs:490: trailing whitespace.
++    alignment: u32,
+crates/gguf/src/writer.rs:491: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:492: trailing whitespace.
++    raw_header_with_policy(
+crates/gguf/src/writer.rs:493: trailing whitespace.
++        out,
+crates/gguf/src/writer.rs:494: trailing whitespace.
++        metadata,
+crates/gguf/src/writer.rs:495: trailing whitespace.
++        tensors,
+crates/gguf/src/writer.rs:496: trailing whitespace.
++        limits,
+crates/gguf/src/writer.rs:497: trailing whitespace.
++        HeaderPolicy::native(version, alignment),
+crates/gguf/src/writer.rs:498: trailing whitespace.
++    )
+crates/gguf/src/writer.rs:499: trailing whitespace.
++}
+crates/gguf/src/writer.rs:500: trailing whitespace.
++
+crates/gguf/src/writer.rs:501: trailing whitespace.
++/// Write a little-endian v3 header in the caller's metadata order, without
+crates/gguf/src/writer.rs:502: trailing whitespace.
++/// allocating a header-sized buffer or copying metadata arrays. The returned
+crates/gguf/src/writer.rs:503: trailing whitespace.
++/// offsets describe the payloads and their zero padding. Validation completes
+crates/gguf/src/writer.rs:504: trailing whitespace.
++/// before the first write; an output I/O failure can still leave partial bytes.
+crates/gguf/src/writer.rs:505: trailing whitespace.
++pub fn write_header<W: Write>(
+crates/gguf/src/writer.rs:506: trailing whitespace.
++    out: &mut W,
+crates/gguf/src/writer.rs:507: trailing whitespace.
++    metadata: &[(&str, &Value)],
+crates/gguf/src/writer.rs:508: trailing whitespace.
++    tensors: &[TensorDescriptor<'_>],
+crates/gguf/src/writer.rs:509: trailing whitespace.
++    limits: &Limits,
+crates/gguf/src/writer.rs:510: trailing whitespace.
++) -> Result<WriteLayout> {
+crates/gguf/src/writer.rs:511: trailing whitespace.
++    header_with_policy(out, metadata, tensors, limits, HeaderPolicy::STANDARD)
+crates/gguf/src/writer.rs:512: trailing whitespace.
++}
+crates/gguf/src/writer.rs:513: trailing whitespace.
++
+crates/gguf/src/writer.rs:514: trailing whitespace.
++/// Ordered counterpart to the existing in-memory payload writer.
+crates/gguf/src/writer.rs:515: trailing whitespace.
++pub fn write_ordered<W: Write>(
+crates/gguf/src/writer.rs:516: trailing whitespace.
++    mut out: W,
+crates/gguf/src/writer.rs:517: trailing whitespace.
++    metadata: &[(&str, &Value)],
+crates/gguf/src/writer.rs:518: trailing whitespace.
++    tensors: &[TensorData<'_>],
+crates/gguf/src/writer.rs:519: trailing whitespace.
++) -> Result<()> {
+crates/gguf/src/writer.rs:520: trailing whitespace.
++    let limits = Limits::default();
+crates/gguf/src/writer.rs:521: trailing whitespace.
++    if tensors.len() > limits.max_tensors {
+crates/gguf/src/writer.rs:522: trailing whitespace.
++        return Err(Error::Limit("encoded tensor count budget".into()));
+crates/gguf/src/writer.rs:523: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:524: trailing whitespace.
++    let mut descriptors = Vec::new();
+crates/gguf/src/writer.rs:525: trailing whitespace.
++    descriptors
+crates/gguf/src/writer.rs:526: trailing whitespace.
++        .try_reserve_exact(tensors.len())
+crates/gguf/src/writer.rs:527: trailing whitespace.
++        .map_err(|_| Error::Limit("writer tensor descriptor allocation".into()))?;
+crates/gguf/src/writer.rs:528: trailing whitespace.
++    for tensor in tensors {
+crates/gguf/src/writer.rs:529: trailing whitespace.
++        let descriptor = TensorDescriptor {
+crates/gguf/src/writer.rs:530: trailing whitespace.
++            name: tensor.name,
+crates/gguf/src/writer.rs:531: trailing whitespace.
++            dimensions: tensor.dimensions,
+crates/gguf/src/writer.rs:532: trailing whitespace.
++            dtype: tensor.dtype,
+crates/gguf/src/writer.rs:533: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:534: trailing whitespace.
++        if tensor_bytes(&descriptor)? != tensor.data.len() as u64 {
+crates/gguf/src/writer.rs:535: trailing whitespace.
++            return Err(invalid(format!(
+crates/gguf/src/writer.rs:536: trailing whitespace.
++                "tensor {} payload length mismatch",
+crates/gguf/src/writer.rs:537: trailing whitespace.
++                tensor.name
+crates/gguf/src/writer.rs:538: trailing whitespace.
++            )));
+crates/gguf/src/writer.rs:539: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:540: trailing whitespace.
++        descriptors.push(descriptor);
+crates/gguf/src/writer.rs:541: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:542: trailing whitespace.
++    let layout = write_header(&mut out, metadata, &descriptors, &limits)?;
+crates/gguf/src/writer.rs:543: trailing whitespace.
++    for (tensor, &bytes) in tensors.iter().zip(&layout.tensor_bytes) {
+crates/gguf/src/writer.rs:544: trailing whitespace.
++        out.write_all(tensor.data)?;
+crates/gguf/src/writer.rs:545: trailing whitespace.
++        zeros(&mut out, align(bytes, layout.alignment as u64)? - bytes)?;
+crates/gguf/src/writer.rs:546: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:547: trailing whitespace.
++    Ok(())
+crates/gguf/src/writer.rs:548: trailing whitespace.
++}
+crates/gguf/src/writer.rs:549: trailing whitespace.
++pub(crate) fn write_map<W: Write>(
+crates/gguf/src/writer.rs:550: trailing whitespace.
++    out: W,
+crates/gguf/src/writer.rs:551: trailing whitespace.
++    metadata: &BTreeMap<String, Value>,
+crates/gguf/src/writer.rs:552: trailing whitespace.
++    tensors: &[TensorData<'_>],
+crates/gguf/src/writer.rs:553: trailing whitespace.
++) -> Result<()> {
+crates/gguf/src/writer.rs:554: trailing whitespace.
++    if metadata.len() > Limits::default().max_metadata_entries {
+crates/gguf/src/writer.rs:555: trailing whitespace.
++        return Err(Error::Limit("encoded metadata entry budget".into()));
+crates/gguf/src/writer.rs:556: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:557: trailing whitespace.
++    let mut ordered = Vec::new();
+crates/gguf/src/writer.rs:558: trailing whitespace.
++    ordered
+crates/gguf/src/writer.rs:559: trailing whitespace.
++        .try_reserve_exact(metadata.len())
+crates/gguf/src/writer.rs:560: trailing whitespace.
++        .map_err(|_| Error::Limit("writer metadata index allocation".into()))?;
+crates/gguf/src/writer.rs:561: trailing whitespace.
++    ordered.extend(metadata.iter().map(|(key, value)| (key.as_str(), value)));
+crates/gguf/src/writer.rs:562: trailing whitespace.
++    write_ordered(out, &ordered, tensors)
+crates/gguf/src/writer.rs:563: trailing whitespace.
++}
+crates/gguf/src/writer.rs:564: trailing whitespace.
++
+crates/gguf/src/writer.rs:565: trailing whitespace.
++#[cfg(test)]
+crates/gguf/src/writer.rs:566: trailing whitespace.
++std::thread_local! {
+crates/gguf/src/writer.rs:567: trailing whitespace.
++    static LAYOUT_RESERVATIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+crates/gguf/src/writer.rs:568: trailing whitespace.
++}
+crates/gguf/src/writer.rs:569: trailing whitespace.
++
+crates/gguf/src/writer.rs:570: trailing whitespace.
++#[cfg(test)]
+crates/gguf/src/writer.rs:571: trailing whitespace.
++mod tests {
+crates/gguf/src/writer.rs:572: trailing whitespace.
++    use super::*;
+crates/gguf/src/writer.rs:573: trailing whitespace.
++    use crate::Gguf;
+crates/gguf/src/writer.rs:574: trailing whitespace.
++    use std::io::{self, Cursor};
+crates/gguf/src/writer.rs:575: trailing whitespace.
++
+crates/gguf/src/writer.rs:576: trailing whitespace.
++    #[test]
+crates/gguf/src/writer.rs:577: trailing whitespace.
++    fn ordered_streaming_header_preserves_order_nan_bits_and_custom_alignment() {
+crates/gguf/src/writer.rs:578: trailing whitespace.
++        let first = Value::String("large\0value".into());
+crates/gguf/src/writer.rs:579: trailing whitespace.
++        let nan = Value::F32(f32::from_bits(0x7fa1_2345));
+crates/gguf/src/writer.rs:580: trailing whitespace.
++        let alignment = Value::U32(64);
+crates/gguf/src/writer.rs:581: trailing whitespace.
++        let metadata = [
+crates/gguf/src/writer.rs:582: trailing whitespace.
++            ("z", &first),
+crates/gguf/src/writer.rs:583: trailing whitespace.
++            ("a", &nan),
+crates/gguf/src/writer.rs:584: trailing whitespace.
++            ("general.alignment", &alignment),
+crates/gguf/src/writer.rs:585: trailing whitespace.
++        ];
+crates/gguf/src/writer.rs:586: trailing whitespace.
++        let descriptors = [TensorDescriptor {
+crates/gguf/src/writer.rs:587: trailing whitespace.
++            name: "x",
+crates/gguf/src/writer.rs:588: trailing whitespace.
++            dimensions: &[3],
+crates/gguf/src/writer.rs:589: trailing whitespace.
++            dtype: DType::I8,
+crates/gguf/src/writer.rs:590: trailing whitespace.
++        }];
+crates/gguf/src/writer.rs:591: trailing whitespace.
++        let mut bytes = Vec::new();
+crates/gguf/src/writer.rs:592: trailing whitespace.
++        let layout = write_header(&mut bytes, &metadata, &descriptors, &Limits::default()).unwrap();
+crates/gguf/src/writer.rs:593: trailing whitespace.
++        assert_eq!(layout.data_offset % 64, 0);
+crates/gguf/src/writer.rs:594: trailing whitespace.
++        assert_eq!(bytes.len() as u64, layout.data_offset);
+crates/gguf/src/writer.rs:595: trailing whitespace.
++        bytes.extend([4, 5, 6]);
+crates/gguf/src/writer.rs:596: trailing whitespace.
++        zeros(&mut bytes, 61).unwrap();
+crates/gguf/src/writer.rs:597: trailing whitespace.
++        assert_eq!(bytes.len() as u64, layout.file_bytes);
+crates/gguf/src/writer.rs:598: trailing whitespace.
++        let parsed = Gguf::read(Cursor::new(bytes), Limits::default()).unwrap();
+crates/gguf/src/writer.rs:599: trailing whitespace.
++        assert_eq!(
+crates/gguf/src/writer.rs:600: trailing whitespace.
++            parsed.metadata_order().collect::<Vec<_>>(),
+crates/gguf/src/writer.rs:601: trailing whitespace.
++            ["z", "a", "general.alignment"]
+crates/gguf/src/writer.rs:602: trailing whitespace.
++        );
+crates/gguf/src/writer.rs:603: trailing whitespace.
++        assert_eq!(parsed.metadata["z"], first);
+crates/gguf/src/writer.rs:604: trailing whitespace.
++        assert!(matches!(parsed.metadata["a"], Value::F32(x) if x.to_bits()==0x7fa1_2345));
+crates/gguf/src/writer.rs:605: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:606: trailing whitespace.
++
+crates/gguf/src/writer.rs:607: trailing whitespace.
++    struct NoWrite;
+crates/gguf/src/writer.rs:608: trailing whitespace.
++    impl Write for NoWrite {
+crates/gguf/src/writer.rs:609: trailing whitespace.
++        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+crates/gguf/src/writer.rs:610: trailing whitespace.
++            panic!("invalid metadata must be rejected before the first output write")
+crates/gguf/src/writer.rs:611: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:612: trailing whitespace.
++        fn flush(&mut self) -> io::Result<()> {
+crates/gguf/src/writer.rs:613: trailing whitespace.
++            Ok(())
+crates/gguf/src/writer.rs:614: trailing whitespace.
++        }
+crates/gguf/src/writer.rs:615: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:616: trailing whitespace.
++    #[test]
+crates/gguf/src/writer.rs:617: trailing whitespace.
++    fn all_header_validation_precedes_output_and_enforces_padding_budget() {
+crates/gguf/src/writer.rs:618: trailing whitespace.
++        let invalid_array = Value::Array {
+crates/gguf/src/writer.rs:619: trailing whitespace.
++            element_type: 0,
+crates/gguf/src/writer.rs:620: trailing whitespace.
++            values: vec![Value::I8(2)],
+crates/gguf/src/writer.rs:621: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:622: trailing whitespace.
++        assert!(
+crates/gguf/src/writer.rs:623: trailing whitespace.
++            write_header(
+crates/gguf/src/writer.rs:624: trailing whitespace.
++                &mut NoWrite,
+crates/gguf/src/writer.rs:625: trailing whitespace.
++                &[("x", &invalid_array)],
+crates/gguf/src/writer.rs:626: trailing whitespace.
++                &[],
+crates/gguf/src/writer.rs:627: trailing whitespace.
++                &Limits::default()
+crates/gguf/src/writer.rs:628: trailing whitespace.
++            )
+crates/gguf/src/writer.rs:629: trailing whitespace.
++            .is_err()
+crates/gguf/src/writer.rs:630: trailing whitespace.
++        );
+crates/gguf/src/writer.rs:631: trailing whitespace.
++        let alignment = Value::U32(64);
+crates/gguf/src/writer.rs:632: trailing whitespace.
++        let limits = Limits {
+crates/gguf/src/writer.rs:633: trailing whitespace.
++            max_metadata_bytes: 63,
+crates/gguf/src/writer.rs:634: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/writer.rs:635: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:636: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/writer.rs:637: trailing whitespace.
++            write_header(
+crates/gguf/src/writer.rs:638: trailing whitespace.
++                &mut NoWrite,
+crates/gguf/src/writer.rs:639: trailing whitespace.
++                &[("general.alignment", &alignment)],
+crates/gguf/src/writer.rs:640: trailing whitespace.
++                &[],
+crates/gguf/src/writer.rs:641: trailing whitespace.
++                &limits
+crates/gguf/src/writer.rs:642: trailing whitespace.
++            ),
+crates/gguf/src/writer.rs:643: trailing whitespace.
++            Err(Error::Limit(_))
+crates/gguf/src/writer.rs:644: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:645: trailing whitespace.
++        let value = Value::U32(1);
+crates/gguf/src/writer.rs:646: trailing whitespace.
++        assert!(
+crates/gguf/src/writer.rs:647: trailing whitespace.
++            write_header(
+crates/gguf/src/writer.rs:648: trailing whitespace.
++                &mut NoWrite,
+crates/gguf/src/writer.rs:649: trailing whitespace.
++                &[("x", &value), ("x", &value)],
+crates/gguf/src/writer.rs:650: trailing whitespace.
++                &[],
+crates/gguf/src/writer.rs:651: trailing whitespace.
++                &Limits::default()
+crates/gguf/src/writer.rs:652: trailing whitespace.
++            )
+crates/gguf/src/writer.rs:653: trailing whitespace.
++            .is_err()
+crates/gguf/src/writer.rs:654: trailing whitespace.
++        );
+crates/gguf/src/writer.rs:655: trailing whitespace.
++        assert!(
+crates/gguf/src/writer.rs:656: trailing whitespace.
++            write_header(
+crates/gguf/src/writer.rs:657: trailing whitespace.
++                &mut NoWrite,
+crates/gguf/src/writer.rs:658: trailing whitespace.
++                &[],
+crates/gguf/src/writer.rs:659: trailing whitespace.
++                &[TensorDescriptor {
+crates/gguf/src/writer.rs:660: trailing whitespace.
++                    name: "x",
+crates/gguf/src/writer.rs:661: trailing whitespace.
++                    dimensions: &[i64::MAX as u64, 2],
+crates/gguf/src/writer.rs:662: trailing whitespace.
++                    dtype: DType::F32
+crates/gguf/src/writer.rs:663: trailing whitespace.
++                }],
+crates/gguf/src/writer.rs:664: trailing whitespace.
++                &Limits::default()
+crates/gguf/src/writer.rs:665: trailing whitespace.
++            )
+crates/gguf/src/writer.rs:666: trailing whitespace.
++            .is_err()
+crates/gguf/src/writer.rs:667: trailing whitespace.
++        );
+crates/gguf/src/writer.rs:668: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:669: trailing whitespace.
++    #[test]
+crates/gguf/src/writer.rs:670: trailing whitespace.
++    fn impossible_header_budget_rejects_before_tensor_layout_reservations() {
+crates/gguf/src/writer.rs:671: trailing whitespace.
++        let descriptor = TensorDescriptor {
+crates/gguf/src/writer.rs:672: trailing whitespace.
++            name: "x",
+crates/gguf/src/writer.rs:673: trailing whitespace.
++            dimensions: &[],
+crates/gguf/src/writer.rs:674: trailing whitespace.
++            dtype: DType::I8,
+crates/gguf/src/writer.rs:675: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:676: trailing whitespace.
++        let descriptors = vec![descriptor; 64];
+crates/gguf/src/writer.rs:677: trailing whitespace.
++        let limits = Limits {
+crates/gguf/src/writer.rs:678: trailing whitespace.
++            max_metadata_bytes: 32,
+crates/gguf/src/writer.rs:679: trailing whitespace.
++            ..Limits::default()
+crates/gguf/src/writer.rs:680: trailing whitespace.
++        };
+crates/gguf/src/writer.rs:681: trailing whitespace.
++        LAYOUT_RESERVATIONS.with(|calls| calls.set(0));
+crates/gguf/src/writer.rs:682: trailing whitespace.
++        assert!(matches!(
+crates/gguf/src/writer.rs:683: trailing whitespace.
++            write_header(&mut NoWrite, &[], &descriptors, &limits),
+crates/gguf/src/writer.rs:684: trailing whitespace.
++            Err(Error::Limit(_))
+crates/gguf/src/writer.rs:685: trailing whitespace.
++        ));
+crates/gguf/src/writer.rs:686: trailing whitespace.
++        assert_eq!(LAYOUT_RESERVATIONS.with(|calls| calls.get()), 0);
+crates/gguf/src/writer.rs:687: trailing whitespace.
++    }
+crates/gguf/src/writer.rs:688: trailing whitespace.
++}

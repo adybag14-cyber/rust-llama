@@ -1,0 +1,20 @@
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+    Checking llama-model-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\model-quant)
+    Checking llama-inference v0.1.0 (C:\Users\adyba\rust-llama\crates\inference)
+error: field assignment outside of initializer for an instance created with Default::default()
+   --> crates\model-quant\tests\native_reference.rs:105:5
+    |
+105 |     m.architecture = text(field(v, "architecture")).into();
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: consider initializing the variable with `llama_model_quant::ModelDescriptor { architecture: text(field(v, "architecture")).into(), ..Default::default() }` and removing relevant reassignments
+   --> crates\model-quant\tests\native_reference.rs:104:5
+    |
+104 |     let mut m = ModelDescriptor::default();
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#field_reassign_with_default
+    = note: `-D clippy::field-reassign-with-default` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::field_reassign_with_default)]`
+
+error: could not compile `llama-model-quant` (test "native_reference") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

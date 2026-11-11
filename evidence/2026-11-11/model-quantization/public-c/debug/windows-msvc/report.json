@@ -1,0 +1,2016 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "profile": "windows-msvc",
+  "started_utc": "2026-11-11T19:24:32.373115+00:00",
+  "scope": "Public frozen-header dynamic calls into explicit Rust library; no original llama or ggml runtime is linked into the C++ caller.",
+  "library": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-target-msvc\\debug\\llama_ffi.dll",
+    "bytes": 6015488,
+    "sha256": "9612548c971679bc2acf320f363f3bedfc6967accc1aabf239998811f3c5cbcf"
+  },
+  "artifact_profile": "debug",
+  "driver": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\replay-public-c-v1.py",
+    "bytes": 9176,
+    "sha256": "23ef115e91a758ac7a80beb6837f72fd29db25922f8a5ed576f35e629f65e0da"
+  },
+  "commands": [
+    {
+      "name": "configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client\\windows-msvc\\build",
+        "-DFROZEN=C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+      ],
+      "return_code": 0,
+      "stdout": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\configure.stdout.log",
+        "bytes": 662,
+        "sha256": "48b431446ec11545d60150f23309ea65115f40d3e7b9aaca8f724ca1d9848f19"
+      },
+      "stderr": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\configure.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cmake",
+        "--build",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client\\windows-msvc\\build",
+        "--config",
+        "Release",
+        "-j",
+        "2"
+      ],
+      "return_code": 0,
+      "stdout": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\build.stdout.log",
+        "bytes": 512,
+        "sha256": "b9cdadfce9df6fd7123c7b60f89e3eb9791bd2a54dc06b8392cc33f58ab3f497"
+      },
+      "stderr": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "replay",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client\\windows-msvc\\build\\Release\\quant-c-client.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-target-msvc\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\requests.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\results.json"
+      ],
+      "return_code": 0,
+      "stdout": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\replay.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\replay.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "quant-0",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-0.gguf",
+          "bytes": 58528,
+          "sha256": "75d94fbe7eb8ef16f9a5460488f47736542e6c4f6823ea33e58bbe2331397beb"
+        }
+      ]
+    },
+    {
+      "id": "quant-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-1.gguf",
+          "bytes": 30752,
+          "sha256": "2ec4819934eaa5eb665eac7448c2cdf59884f12eb763e6ab379be77c2d05b29e"
+        }
+      ]
+    },
+    {
+      "id": "quant-2",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-2.gguf",
+          "bytes": 11232,
+          "sha256": "1f5ba057854cd0c70d1e7ca81b4dab0a677c0ed80dd31a08c484ea293d048d75"
+        }
+      ]
+    },
+    {
+      "id": "quant-3",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-3.gguf",
+          "bytes": 11968,
+          "sha256": "7194622c39466f8c6498d486bfb74243a3ba8fae5fcd59fa09f9f83561d335d7"
+        }
+      ]
+    },
+    {
+      "id": "quant-7",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-7.gguf",
+          "bytes": 17792,
+          "sha256": "a58f6582f0705b19f84be54c72fe1fd3f809ca4f1752a4adebd6d142057e8add"
+        }
+      ]
+    },
+    {
+      "id": "quant-8",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-8.gguf",
+          "bytes": 12832,
+          "sha256": "ffe2fd225b9db1283637250df960d8cc06c4247cb67420bb41b29c2342ab1b04"
+        }
+      ]
+    },
+    {
+      "id": "quant-9",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-9.gguf",
+          "bytes": 13568,
+          "sha256": "7f3ecc61e331f5a8f37dff6ebb3078f7574c2ba2bc4574166afa3e7eeceac44a"
+        }
+      ]
+    },
+    {
+      "id": "quant-10",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-10.gguf",
+          "bytes": 8992,
+          "sha256": "a0e8f629c4ceee12d5d9324e9ecd0a0510d33ec9705f35232a1cb5b52c68d4e4"
+        }
+      ]
+    },
+    {
+      "id": "quant-11",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-11.gguf",
+          "bytes": 9568,
+          "sha256": "2549aca59804f92210063e8f4a4215f9f97a8cb75c96581fffc180646b0070d4"
+        }
+      ]
+    },
+    {
+      "id": "quant-12",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-12.gguf",
+          "bytes": 10336,
+          "sha256": "8cc7ac2488f4be347c16208aa6e5cb93a86d79330b8cb2ba8cd5011f19501850"
+        }
+      ]
+    },
+    {
+      "id": "quant-13",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-13.gguf",
+          "bytes": 10848,
+          "sha256": "a4e0f2fbcdd0e12239a625d5b9f886ae8763e3953d41b9ec8494bc581ade311c"
+        }
+      ]
+    },
+    {
+      "id": "quant-14",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-14.gguf",
+          "bytes": 11424,
+          "sha256": "f1d7624a97de01739d470dae74406bc4a8675fc234327fba17d7615436aa4ed1"
+        }
+      ]
+    },
+    {
+      "id": "quant-15",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-15.gguf",
+          "bytes": 11744,
+          "sha256": "580c18bd3f82f1a0981f7932e3a8f7ca6c4a075c69c4b84fa71c3d05dd004c7d"
+        }
+      ]
+    },
+    {
+      "id": "quant-16",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-16.gguf",
+          "bytes": 12768,
+          "sha256": "6df48fd0ae93ad4291c45a0362ed1a047b12265f747628fc85975f105715dc4a"
+        }
+      ]
+    },
+    {
+      "id": "quant-17",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-17.gguf",
+          "bytes": 13088,
+          "sha256": "1999917757c74e19c97dee90df7344bcadab387ab1c823b14e53d09822563c3b"
+        }
+      ]
+    },
+    {
+      "id": "quant-18",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-18.gguf",
+          "bytes": 14784,
+          "sha256": "507ad64f3ae5399fbd973210fefb94f195bbf895ece2c8bbdffd9c1d68631490"
+        }
+      ]
+    },
+    {
+      "id": "quant-19",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-19.gguf",
+          "bytes": 7904,
+          "sha256": "c8ba4b90b9d3c4a3861a11e4d18d4e9ae8d2ce4af78a3524397dc97e56d5a6d2"
+        }
+      ]
+    },
+    {
+      "id": "quant-20",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-20.gguf",
+          "bytes": 8160,
+          "sha256": "edaa48da45d09276e1db7361c2ae5edb47f200b59de571e063afb4e4eb93cc0d"
+        }
+      ]
+    },
+    {
+      "id": "quant-21",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-21.gguf",
+          "bytes": 8832,
+          "sha256": "2efee3c0cc9ee0ebe99612801a0be53a8486673682561a28f985b8e4d4d07302"
+        }
+      ]
+    },
+    {
+      "id": "quant-22",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-22.gguf",
+          "bytes": 9600,
+          "sha256": "ba4299e97e84fec75a6e12836a7ff69827145edfd15a31bfb267a8dda90d0e46"
+        }
+      ]
+    },
+    {
+      "id": "quant-23",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-23.gguf",
+          "bytes": 9152,
+          "sha256": "036433103fef8969c7a74c15a9d82b108b05449b262409d27d130b4600c582da"
+        }
+      ]
+    },
+    {
+      "id": "quant-24",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-24.gguf",
+          "bytes": 7424,
+          "sha256": "adc7794b38dc5752ffeac8be5e6ce3231476795d55788e38fca8a97ea9eb4e5a"
+        }
+      ]
+    },
+    {
+      "id": "quant-25",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-25.gguf",
+          "bytes": 11296,
+          "sha256": "455030599de2c0c04686bd70fbe817403edce4d0559debb73e23a89afc404620"
+        }
+      ]
+    },
+    {
+      "id": "quant-26",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-26.gguf",
+          "bytes": 9696,
+          "sha256": "2409d62b770603c54eddf2f4bcce81a0b8c677cb23c0ae508b9f1d1624d840d3"
+        }
+      ]
+    },
+    {
+      "id": "quant-27",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-27.gguf",
+          "bytes": 9952,
+          "sha256": "1dace096ff5e7bca0ff036974bccbd2188aae656841c0aba11a807de2aa7d5d1"
+        }
+      ]
+    },
+    {
+      "id": "quant-28",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-28.gguf",
+          "bytes": 8576,
+          "sha256": "6adcb649dd55ef635ede4b4f6f1e5be7ef111f5bb45b89316674da35e4a56668"
+        }
+      ]
+    },
+    {
+      "id": "quant-29",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-29.gguf",
+          "bytes": 8832,
+          "sha256": "e4fb903d7ef5805baeac89ef350394e328e583f553b199f6af155b70c6441bea"
+        }
+      ]
+    },
+    {
+      "id": "quant-30",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-30.gguf",
+          "bytes": 10944,
+          "sha256": "d67f6ea682515da015197ea90a9c60ec2413beb41e8c816cc8fcf0f2856361fb"
+        }
+      ]
+    },
+    {
+      "id": "quant-31",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-31.gguf",
+          "bytes": 7424,
+          "sha256": "cec844ceafe46a45e0bf02befe614e83fb25f9bc3fd8bede306b3c8303960ca9"
+        }
+      ]
+    },
+    {
+      "id": "quant-32",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-32.gguf",
+          "bytes": 30752,
+          "sha256": "a73fb19c0f871ddfc72cf2cd863f6ae1cc3846c1830cb172109090f3e79aae83"
+        }
+      ]
+    },
+    {
+      "id": "quant-36",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-36.gguf",
+          "bytes": 7488,
+          "sha256": "b2a1e678e579a13d786658e10e2989f569878be2d9f5ae54f32a3c2342fffb2e"
+        }
+      ]
+    },
+    {
+      "id": "quant-37",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-37.gguf",
+          "bytes": 8160,
+          "sha256": "664305e1dcdbf7d7cbd1a27a4f9cc9dff764efdfcadbc0aabd9e91acd163d699"
+        }
+      ]
+    },
+    {
+      "id": "quant-38",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-38.gguf",
+          "bytes": 17792,
+          "sha256": "577afaa0f66f36e4bf56f0812c1ef107fb25cb42ac6d2ec71c4ee08100d258eb"
+        }
+      ]
+    },
+    {
+      "id": "quant-40",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "quant-41",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\quant-41.gguf",
+          "bytes": 8160,
+          "sha256": "4a4a394ab97186c7aba1be23821da5cb1940460931df1942c8d96ce520670da6"
+        }
+      ]
+    },
+    {
+      "id": "options-file-0",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-0.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ]
+    },
+    {
+      "id": "options-file-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-1.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ]
+    },
+    {
+      "id": "options-file-2",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-2.gguf",
+          "bytes": 10880,
+          "sha256": "c732f9add03cd8a022de41f50f6b804a9802096fc8a61a1b6681cbf1ceed54d2"
+        }
+      ]
+    },
+    {
+      "id": "options-file-3",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-3.gguf",
+          "bytes": 14976,
+          "sha256": "bade028139c6fe435319e0cdff097bb49877e7f7ef0f0bd82deb3823f0fdbe26"
+        }
+      ]
+    },
+    {
+      "id": "options-file-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-4.gguf",
+          "bytes": 13952,
+          "sha256": "f56fd545108a53c6f3283fd5d374cd020c9a3aec18ae6acaaec916c8b07fe80f"
+        }
+      ]
+    },
+    {
+      "id": "options-file-5",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-5.gguf",
+          "bytes": 22048,
+          "sha256": "7393382553816ebf61419e18b144dab01bc54f6f9e5892c1154150947038f8bd"
+        }
+      ]
+    },
+    {
+      "id": "options-file-6",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-6.gguf",
+          "bytes": 58528,
+          "sha256": "75d94fbe7eb8ef16f9a5460488f47736542e6c4f6823ea33e58bbe2331397beb"
+        }
+      ]
+    },
+    {
+      "id": "options-file-7",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-8",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-8.gguf-00001-of-00001.gguf",
+          "bytes": 11744,
+          "sha256": "63df8d648618405d52ab6e3f556a47d8c5ebff0debb5702bd920ed35ec8dbb44"
+        }
+      ]
+    },
+    {
+      "id": "options-file-9",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-9.gguf",
+          "bytes": 10464,
+          "sha256": "dc0e40949aba3f64f80081ceb363332d304a58b79830fe8514fe9715f3eb7440"
+        }
+      ]
+    },
+    {
+      "id": "options-file-10",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-10.gguf",
+          "bytes": 11776,
+          "sha256": "67e83a6f9a064fa245a9d5245ccd2e5a7730fcd76cd99d5deda21f6f0ea76787"
+        }
+      ]
+    },
+    {
+      "id": "options-file-11",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-12",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-13",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-14",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-15",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "options-file-16",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\options-file-16.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ]
+    },
+    {
+      "id": "options-file-17",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "from-f16",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f16.gguf",
+          "bytes": 30528,
+          "sha256": "66abee898ff7e59e795559b72c7a0c147e82f8038bbae837216f19774d861392"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\from-f16.gguf",
+          "bytes": 11552,
+          "sha256": "6b5292055899a8a1594f0205f35bb2abf22025c4d2b4550889ec402c737fdd4f"
+        }
+      ]
+    },
+    {
+      "id": "from-f16-no-requant",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f16.gguf",
+          "bytes": 30528,
+          "sha256": "66abee898ff7e59e795559b72c7a0c147e82f8038bbae837216f19774d861392"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\from-f16-no-requant.gguf",
+          "bytes": 11552,
+          "sha256": "6b5292055899a8a1594f0205f35bb2abf22025c4d2b4550889ec402c737fdd4f"
+        }
+      ]
+    },
+    {
+      "id": "from-bf16",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-bf16.gguf",
+          "bytes": 30528,
+          "sha256": "78c9a6aaa4bd31aeaf0e98dc60d528e809413ff0e3dd6fefb05df4cacd2bfafe"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\from-bf16.gguf",
+          "bytes": 11552,
+          "sha256": "b9f7641fabb899dde0115513a97f03fface499a4276e7737eab5699aff0ef337"
+        }
+      ]
+    },
+    {
+      "id": "from-bf16-no-requant",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-bf16.gguf",
+          "bytes": 30528,
+          "sha256": "78c9a6aaa4bd31aeaf0e98dc60d528e809413ff0e3dd6fefb05df4cacd2bfafe"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\from-bf16-no-requant.gguf",
+          "bytes": 11552,
+          "sha256": "b9f7641fabb899dde0115513a97f03fface499a4276e7737eab5699aff0ef337"
+        }
+      ]
+    },
+    {
+      "id": "from-q8",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-q8.gguf",
+          "bytes": 17568,
+          "sha256": "71b695994ae717b64fe51d1148e0a6d65627a1011010eb1b92597b8ac5e77876"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\from-q8.gguf",
+          "bytes": 11552,
+          "sha256": "99ecfb122e28b01df7ee6ef29fb95dd58c51f336172b3f9f693071a7e51f0414"
+        }
+      ]
+    },
+    {
+      "id": "from-q8-no-requant",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-q8.gguf",
+          "bytes": 17568,
+          "sha256": "71b695994ae717b64fe51d1148e0a6d65627a1011010eb1b92597b8ac5e77876"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "aligned-q1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-aligned.gguf",
+          "bytes": 58176,
+          "sha256": "1101b7817e6d6481ad4908775b06739a25d9219fdaca7e494bee851bc8b71421"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\aligned-q1.gguf",
+          "bytes": 5792,
+          "sha256": "5a842ab6ab7883c0c78b2e9333be106d7f47bb50b05c1aeba671d0fe0874797d"
+        }
+      ]
+    },
+    {
+      "id": "copy-guessed",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-guessed.gguf",
+          "bytes": 58432,
+          "sha256": "bf889e2f01d165754d9e2bab9a5bc2b4ac471a72622d7361278217108f755aff"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\copy-guessed.gguf",
+          "bytes": 58528,
+          "sha256": "6406dc6b5eca85273b8ce703cd4dc56b62346785310b0c861a0a6c15671d00f3"
+        }
+      ]
+    },
+    {
+      "id": "split-merge",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-split-00001-of-00002.gguf",
+          "bytes": 32256,
+          "sha256": "6bb1e40eb572e738493feee5484e3b68e100278e386413fdaded748289a61c3c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-split-00002-of-00002.gguf",
+          "bytes": 26432,
+          "sha256": "15dee0338a0daebb52e84488bd1465dde90e8cf273c441498abfdbc3b8d8f787"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\split-merge.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ]
+    },
+    {
+      "id": "split-keep",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-split-00001-of-00002.gguf",
+          "bytes": 32256,
+          "sha256": "6bb1e40eb572e738493feee5484e3b68e100278e386413fdaded748289a61c3c"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-split-00002-of-00002.gguf",
+          "bytes": 26432,
+          "sha256": "15dee0338a0daebb52e84488bd1465dde90e8cf273c441498abfdbc3b8d8f787"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\split-keep.gguf-00001-of-00002.gguf",
+          "bytes": 6176,
+          "sha256": "09054d5ed4108d9336f8052678280b09ebc6cbf5b9fb4d17798a3ada6d7f5ef3"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\split-keep.gguf-00002-of-00002.gguf",
+          "bytes": 5760,
+          "sha256": "b0c131ce10940697eab3b238e4552c8d5968a99a15d2d19e5ed9ddc0eb7e8c33"
+        }
+      ]
+    },
+    {
+      "id": "pruning-0",
+      "original_status": "source-abort",
+      "original_return_code": null,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "pruning-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\pruning-1.gguf",
+          "bytes": 2560,
+          "sha256": "abd1c42d595208b1ed227c77677aef0f6b560a8f6067a151a03d179cab860193"
+        }
+      ]
+    },
+    {
+      "id": "pruning-2",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\pruning-2.gguf",
+          "bytes": 992,
+          "sha256": "3b7c62d61895018ab8966a9b374e0766c8a0cdc04d1c3070b8135532d21acd25"
+        }
+      ]
+    },
+    {
+      "id": "pruning-3",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\pruning-3.gguf",
+          "bytes": 2720,
+          "sha256": "5aa5e9525d2a734f37555c75724b0cb73126fbfe756fea976f212921f2bc00c2"
+        }
+      ]
+    },
+    {
+      "id": "pruning-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\pruning-4.gguf",
+          "bytes": 3424,
+          "sha256": "302a7cac95c768e189afa973d0c40403e46334110327f2e964e317880f02e5c4"
+        }
+      ]
+    },
+    {
+      "id": "pruning-5",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-pruning.gguf",
+          "bytes": 13632,
+          "sha256": "75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\pruning-5.gguf",
+          "bytes": 3424,
+          "sha256": "c1160e2a49bb705fa958767e6c2d55b9f77132be6d510b88f94c604278c9fb1b"
+        }
+      ]
+    },
+    {
+      "id": "experts-0-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-0-1.gguf",
+          "bytes": 5792,
+          "sha256": "06a0ac370f841e03fc0e778af2171b5f6c3b77b7703b5120e001ddadcb326021"
+        }
+      ]
+    },
+    {
+      "id": "experts-0-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-0-4.gguf",
+          "bytes": 5792,
+          "sha256": "06a0ac370f841e03fc0e778af2171b5f6c3b77b7703b5120e001ddadcb326021"
+        }
+      ]
+    },
+    {
+      "id": "experts-1-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-1-1.gguf",
+          "bytes": 3808,
+          "sha256": "a8ebddba1e1153a02e132925c967094c9d79c33379d6aaba7f36028c37718628"
+        }
+      ]
+    },
+    {
+      "id": "experts-1-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-1-4.gguf",
+          "bytes": 3808,
+          "sha256": "a8ebddba1e1153a02e132925c967094c9d79c33379d6aaba7f36028c37718628"
+        }
+      ]
+    },
+    {
+      "id": "experts-2-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-2-1.gguf",
+          "bytes": 5632,
+          "sha256": "15298505ea58f4c687aa233595859258b8ffac2b920a280bb4648ab3441815e0"
+        }
+      ]
+    },
+    {
+      "id": "experts-2-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-2-4.gguf",
+          "bytes": 5632,
+          "sha256": "15298505ea58f4c687aa233595859258b8ffac2b920a280bb4648ab3441815e0"
+        }
+      ]
+    },
+    {
+      "id": "experts-3-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-3-1.gguf",
+          "bytes": 5312,
+          "sha256": "32bbc9d04264ae93fdf4b77224cb12a11e9ec76a13fe99cb2d7d26a077891260"
+        }
+      ]
+    },
+    {
+      "id": "experts-3-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-experts.gguf",
+          "bytes": 29920,
+          "sha256": "5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\experts-3-4.gguf",
+          "bytes": 5312,
+          "sha256": "32bbc9d04264ae93fdf4b77224cb12a11e9ec76a13fe99cb2d7d26a077891260"
+        }
+      ]
+    },
+    {
+      "id": "extra-options-0",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\extra-options-0.gguf",
+          "bytes": 11744,
+          "sha256": "40f9a858f5d43fb0db4fa86a30f90bded2f7ac9d1c5eb052f064c365109f7543"
+        }
+      ]
+    },
+    {
+      "id": "extra-options-1",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "extra-options-2",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "extra-options-3",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\extra-options-3.gguf",
+          "bytes": 11744,
+          "sha256": "c29bb97227404304be04bfbf8aaeaa83ffe303a52976ad003658755bec552220"
+        }
+      ]
+    },
+    {
+      "id": "extra-options-4",
+      "original_status": "ok",
+      "original_return_code": 1,
+      "rust_status": "ok",
+      "rust_return_code": 1,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "id": "extra-options-5",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\input-f32.gguf",
+          "bytes": 58464,
+          "sha256": "694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\extra-options-5.gguf",
+          "bytes": 58528,
+          "sha256": "75d94fbe7eb8ef16f9a5460488f47736542e6c4f6823ea33e58bbe2331397beb"
+        }
+      ]
+    },
+    {
+      "id": "normal-pruning-0",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\input-pruning-normal.gguf",
+          "bytes": 11520,
+          "sha256": "82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\normal-pruning-0.gguf",
+          "bytes": 2208,
+          "sha256": "2dc6f67110df229b2576011061f68ffc8fd15117cf2cfae03e7896ad73403d89"
+        }
+      ]
+    },
+    {
+      "id": "normal-pruning-1",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\input-pruning-normal.gguf",
+          "bytes": 11520,
+          "sha256": "82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\normal-pruning-1.gguf",
+          "bytes": 2208,
+          "sha256": "b817486cf25ade168a437809ca6dd18d007ba7a79b75ad6d07c24bac6269316e"
+        }
+      ]
+    },
+    {
+      "id": "normal-pruning-2",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\input-pruning-normal.gguf",
+          "bytes": 11520,
+          "sha256": "82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\normal-pruning-2.gguf",
+          "bytes": 2720,
+          "sha256": "5aa5e9525d2a734f37555c75724b0cb73126fbfe756fea976f212921f2bc00c2"
+        }
+      ]
+    },
+    {
+      "id": "normal-pruning-3",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\input-pruning-normal.gguf",
+          "bytes": 11520,
+          "sha256": "82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\normal-pruning-3.gguf",
+          "bytes": 3072,
+          "sha256": "3e44f67c701995903e8f05180b0d7a653d25894d0913d64d9c8a27a1e841b8d0"
+        }
+      ]
+    },
+    {
+      "id": "normal-pruning-4",
+      "original_status": "ok",
+      "original_return_code": 0,
+      "rust_status": "ok",
+      "rust_return_code": 0,
+      "inputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\input-pruning-normal.gguf",
+          "bytes": 11520,
+          "sha256": "82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\outputs\\normal-pruning-4.gguf",
+          "bytes": 3072,
+          "sha256": "f7446f0de30577facb679bc31787bf232655e117212e39b9db9e1c48d8f727e3"
+        }
+      ]
+    }
+  ],
+  "native_sources": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\preimplementation-seal.json",
+      "bytes": 47019,
+      "sha256": "614327105da616c8daf2275e228b8e5c651b698ea4cc0c86b14fe92f64c3236b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\files.results.json",
+      "bytes": 2985781,
+      "sha256": "d933e50f8be8ce106a24d0458565c6a5f1ccd89548922aed502ed700696efdcb"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\edge-isolated\\results.json",
+      "bytes": 428510,
+      "sha256": "ca784702e8a89dddf3d80a532c79c5e718d721d76da7edeef5c98797e91d473f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\windows-msvc\\types.results.json",
+      "bytes": 4599303,
+      "sha256": "3fce6303580ebdf4a8a18982bac8f34ab9a6f6d2b37f856f1e1767e21ab4b66b"
+    }
+  ],
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "frozen_headers": [
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\include\\llama.h",
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\ggml\\include\\ggml.h",
+      "bytes": 119446,
+      "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\ggml\\include\\ggml-cpu.h",
+      "bytes": 7753,
+      "sha256": "316279e004cdeb8e6ef78599acb602bf79a8abdf897fed9fd1914808c1518c6e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\ggml\\include\\ggml-backend.h",
+      "bytes": 29047,
+      "sha256": "34464da4b46314c710cd634626578c6f2a6811431d41eddaf5e8aa77082fea2a"
+    }
+  ],
+  "json_header": {
+    "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\vendor\\nlohmann\\json.hpp",
+    "bytes": 987455,
+    "sha256": "08f19bbcc66ff3082f5caf58867b1232987dba98d82e2b29d870722fce42776b"
+  },
+  "caller": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client\\windows-msvc\\build\\Release\\quant-c-client.exe",
+    "bytes": 166912,
+    "sha256": "8fbacf54e0939c49b2acd1ada2ceaaf3e9cfbe5615b08dc267dd250bc8875e92"
+  },
+  "caller_source": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\quant-c-client.cpp",
+    "bytes": 5502,
+    "sha256": "6d84b5e4bb9bb830a51b54be8c1f2610b06690deaca19e0f87e869bdb6733a24"
+  },
+  "build_manifest": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\c-client\\CMakeLists.txt",
+    "bytes": 465,
+    "sha256": "ce1aabfe715ceace38b236819be9faf54a25959440dee19f9df07db9ebed4c28"
+  },
+  "request_artifact": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\requests.json",
+    "bytes": 3087105,
+    "sha256": "380232151e3a2542510fd442d26bdbd148acb2d25f3d3e7636113d2f6b1d79ee"
+  },
+  "result_artifact": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\public-c-replay-debug-v1\\windows-msvc\\results.json",
+    "bytes": 3414263,
+    "sha256": "5b301ce8f7912955fb6c4a3006e7c4acfb8a05e228055991256a3a78959d2c1c"
+  },
+  "defaults": {
+    "size": 64,
+    "align": 8,
+    "offsets": {
+      "nthread": 0,
+      "ftype": 4,
+      "output_tensor_type": 8,
+      "token_embedding_type": 12,
+      "allow_requantize": 16,
+      "quantize_output_tensor": 17,
+      "only_copy": 18,
+      "pure": 19,
+      "keep_split": 20,
+      "dry_run": 21,
+      "imatrix": 24,
+      "kv_overrides": 32,
+      "tt_overrides": 40,
+      "prune_layers": 48,
+      "max_buf_size": 56
+    },
+    "nthread": 0,
+    "ftype": 7,
+    "output_tensor_type": 44,
+    "token_embedding_type": 44,
+    "allow_requantize": false,
+    "quantize_output_tensor": true,
+    "only_copy": false,
+    "pure": false,
+    "keep_split": false,
+    "dry_run": false,
+    "max_buf_size": 8589934592,
+    "pointers_null": true
+  },
+  "caller_imports": [
+    "KERNEL32.dll",
+    "MSVCP140.dll",
+    "VCRUNTIME140.dll",
+    "VCRUNTIME140_1.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll"
+  ],
+  "rust_imports": [
+    "bcrypt.dll",
+    "api-ms-win-core-synch-l1-2-0.dll",
+    "bcryptprimitives.dll",
+    "KERNEL32.dll",
+    "ntdll.dll",
+    "VCRUNTIME140.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll"
+  ],
+  "counts": {
+    "file_cases": 88,
+    "successful_cases": 77,
+    "rejected_cases": 11,
+    "exact_complete_files": 76,
+    "default_struct_layouts": 1,
+    "public_exports_called": 2
+  },
+  "completed_utc": "2026-11-11T19:24:49.447260+00:00"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "msvc",
+  "tag": "v4",
+  "driver": {
+    "bytes": 4277,
+    "sha256": "28087f65ae490fa198aee9df0106f5a48d3bd023f8b172b6a4b32739e35eea1a"
+  },
+  "started_utc": "2026-11-11T19:19:31.470925+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7823736667633057,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 1.5407359600067139,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 954,
+        "sha256": "5b584a5685a781d361b60ffd0e26eda2cebcd46f8cf410ad2c41798aefec19b7"
+      }
+    }
+  ],
+  "execution_inputs": {
+    "files": 1584,
+    "bytes": 236360,
+    "sha256": "9c62c8022354539f9f5b000f197c3494af0ba7923375c792bff5b3b8cf466c20",
+    "scope": "Git-listed tracked/unignored files except evidence/ and README.md/docs/PORT_STATUS.md; captured after formatter preflight."
+  },
+  "git_head": "5b59bf49521b7b607c04d9cb33531b6d67c178d5",
+  "error": "RuntimeError('clippy failed 101')",
+  "finished_utc": "2026-11-11T19:19:37.365626+00:00"
+}

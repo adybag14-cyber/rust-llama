@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "msvc",
+  "tag": "v5",
+  "driver": {
+    "bytes": 4277,
+    "sha256": "28087f65ae490fa198aee9df0106f5a48d3bd023f8b172b6a4b32739e35eea1a"
+  },
+  "started_utc": "2026-11-11T19:21:08.537874+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5147974491119385,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.6594812870025635,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 307,
+        "sha256": "844da0b4399634b78d2db6ed9a15074abac4574f7b669fc0b4d11ce48ef0453f"
+      }
+    },
+    {
+      "name": "build-ffi-debug",
+      "args": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 8.293920040130615,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 562,
+        "sha256": "e613fbd2fd5f78fd37f32d22b5c1316a47606ef347dcbcce52866ed5de2c6331"
+      }
+    },
+    {
+      "name": "debug",
+      "args": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 47.80445599555969,
+      "stdout": {
+        "bytes": 14491,
+        "sha256": "91877ccfe334bd07f4ff338c75a2159a30f0e2289070aad3b12cd66c3ef4b018"
+      },
+      "stderr": {
+        "bytes": 19508,
+        "sha256": "1f30f1e6ee8fc1da1e9178cc9158db9dde3ef95bd281e9524c3a469ffb0a8d66"
+      },
+      "tests": {
+        "passed": 145,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 15
+      }
+    },
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 120.12858772277832,
+      "stdout": {
+        "bytes": 14490,
+        "sha256": "6301beb2c6ae7af363b6f0dfbcec0951aa829bea3ec939eb25d10b493c26c29a"
+      },
+      "stderr": {
+        "bytes": 19936,
+        "sha256": "d6f5f815d9f1e86fd9eb2feb3eab335b887ebda41e1b51664e47f2610371ffe1"
+      },
+      "tests": {
+        "passed": 145,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 15
+      }
+    },
+    {
+      "name": "build-ffi-release",
+      "args": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1272130012512207,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 62,
+        "sha256": "64d0cbd4b7e4c6329fde55978dd3d261407b55f34c21add0feebf7e0575ee531"
+      }
+    },
+    {
+      "name": "audit",
+      "args": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "xtask",
+        "--offline",
+        "--locked",
+        "--",
+        "audit"
+      ],
+      "exit_code": 1,
+      "seconds": 20.818939924240112,
+      "stdout": {
+        "bytes": 57685,
+        "sha256": "8ac25f41848fab34433a549fe4251fce7f5cf84f1d635f5d2e537f88b2db2d58"
+      },
+      "stderr": {
+        "bytes": 664,
+        "sha256": "ec0cb71fae5f231052081097e8dca389a40cb362a4b2a039a5d9bfa1d584c264"
+      }
+    }
+  ],
+  "execution_inputs": {
+    "files": 1584,
+    "bytes": 236360,
+    "sha256": "bc8a1eeb6be78388fc9fa284e7b8e7c555941b8806ce8460398a15540a2117c9",
+    "scope": "Git-listed tracked/unignored files except evidence/ and README.md/docs/PORT_STATUS.md; captured after formatter preflight."
+  },
+  "git_head": "5b59bf49521b7b607c04d9cb33531b6d67c178d5",
+  "error": "RuntimeError('audit failed 1')",
+  "finished_utc": "2026-11-11T19:24:31.930599+00:00"
+}

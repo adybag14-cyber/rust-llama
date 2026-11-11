@@ -1,0 +1,41 @@
+   Compiling llama-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama/crates/quant)
+   Compiling llama-behavior v0.1.0 (/mnt/c/Users/adyba/rust-llama/crates/llama-behavior)
+   Compiling llama-gguf v0.1.0 (/mnt/c/Users/adyba/rust-llama/crates/gguf)
+   Compiling llama-conformance v0.1.0 (/mnt/c/Users/adyba/rust-llama/crates/llama-conformance)
+   Compiling llama-model-quant v0.1.0 (/mnt/c/Users/adyba/rust-llama/crates/model-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.35s
+     Running unittests src/lib.rs (/home/tdamre/rust-llama-quant-target-late/debug/deps/llama_model_quant-c46252c6e98cbaa8)
+     Running tests/native_reference.rs (/home/tdamre/rust-llama-quant-target-late/debug/deps/native_reference-04dca6ac284098a1)
+
+thread 'independent_original_type_assignments' (951) panicked at crates/model-quant/tests/native_reference.rs:183:5:
+22 mismatches:
+regex-edge-0/foo
+bar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\nbar.weight"), "type": Integer(8)})
+regex-edge-0/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\rbar.weight"), "type": Integer(8)})
+regex-edge-0/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\u{b}bar.weight"), "type": Integer(8)})
+regex-edge-0/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\u{c}bar.weight"), "type": Integer(8)})
+regex-edge-4: Err(Invalid("native trigger regex: escape exceeds byte character range"))
+regex-edge-6/cA.weight: allowed=true, type=Q8_0; native=Object({"allowed": Bool(true), "name": String("cA.weight"), "type": Integer(1)})
+regex-edge-6/A.weight: allowed=true, type=Q8_0; native=Object({"allowed": Bool(true), "name": String("A.weight"), "type": Integer(1)})
+regex-edge-7: Err(Invalid("native trigger regex: invalid control escape"))
+regex-edge-9: Err(Invalid("native trigger regex: octal escape is not ECMAScript"))
+regex-edge-15: Err(Invalid("native trigger regex: unknown C-locale collating element"))
+regex-edge-16/cA.weight: allowed=true, type=Q8_0; native=Object({"allowed": Bool(true), "name": String("cA.weight"), "type": Integer(1)})
+regex-edge-16/A.weight: allowed=true, type=Q8_0; native=Object({"allowed": Bool(true), "name": String("A.weight"), "type": Integer(1)})
+regex-edge-18/foo bar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo bar.weight"), "type": Integer(8)})
+regex-edge-18/foo	bar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\tbar.weight"), "type": Integer(8)})
+regex-edge-18/foo
+bar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\nbar.weight"), "type": Integer(8)})
+regex-edge-18/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\rbar.weight"), "type": Integer(8)})
+regex-edge-18/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\u{b}bar.weight"), "type": Integer(8)})
+regex-edge-18/foobar.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("foo\u{c}bar.weight"), "type": Integer(8)})
+regex-edge-18/aab.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("aab.weight"), "type": Integer(8)})
+regex-edge-18/a.weight: allowed=true, type=F16; native=Object({"allowed": Bool(true), "name": String("a.weight"), "type": Integer(8)})
+regex-edge-28: Err(Invalid("native trigger regex: quantifier without atom"))
+regex-edge-29: Err(Invalid("native trigger regex: quantifier without atom"))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'independent_original_complete_files' (950) panicked at crates/model-quant/tests/native_reference.rs:281:5:
+1 mismatches:
+extra-options-1: expected checked source rejection
+error: test failed, to rerun pass `-p llama-model-quant --test native_reference`

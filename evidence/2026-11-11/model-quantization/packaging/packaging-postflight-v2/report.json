@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "driver": {
+    "bytes": 4667,
+    "sha256": "d5f89243c549fdcb41d69dbb5b1527f68f811ab6a963fa1f5985f3880609e0ea"
+  },
+  "started_utc": "2026-11-11T19:37:54.999388+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-model-quant",
+        "-p",
+        "llama-gguf",
+        "-p",
+        "llama-behavior",
+        "-p",
+        "llama-ffi",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6583783626556396,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "whitespace",
+      "args": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08591556549072266,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "prior_correction": {
+    "report": {
+      "bytes": 14276,
+      "sha256": "7e24ff65b6fe3e4073d929e21cc3f2a201717adde9af0184ae89dcd0f9f1fcfe"
+    },
+    "status_preserved": "failed",
+    "passed_stages": [
+      "audit",
+      "fixtures"
+    ],
+    "input_set_verified_unchanged_after_failure": true
+  },
+  "line_ending_correction": [
+    {
+      "path": "crates/gguf/src/lib.rs",
+      "before": {
+        "bytes": 31074,
+        "sha256": "390055823770317f9e8d347132be4c1ffdc46538cdd17b2cfb6681f0a41761dd"
+      },
+      "after": {
+        "bytes": 30142,
+        "sha256": "9a64b91e86e5e34551dd6738328f58b69e86037c64cb9b0731a732f9351fadf2"
+      },
+      "only_crlf_to_lf": true
+    },
+    {
+      "path": "crates/gguf/src/writer.rs",
+      "before": {
+        "bytes": 24035,
+        "sha256": "aa6e443e863c9464353785d49dcaf700f03db6ee7aa656d26f1bac1ea638f71a"
+      },
+      "after": {
+        "bytes": 23347,
+        "sha256": "9ee6797da8997bcfdc3adfa78d5705247e715a9c812ebbae724d2845f2cb7cc5"
+      },
+      "only_crlf_to_lf": true
+    }
+  ],
+  "all_other_selected_inputs_unchanged": true,
+  "execution_inputs": {
+    "files": 1595,
+    "bytes": 238691,
+    "sha256": "d2f21a9d6242662806545c9aff0c32f57e78a4fc6e05ce2c02329f11ada565ee"
+  },
+  "unchanged_postflight_inputs": true,
+  "qualification": "v5 MSVC/GNU runtime/lint/library stages passed, v1 audit and all fixture-integrity checks passed; their original failure statuses remain retained. This v2 proves only CRLF-to-LF byte changes in Rust files whose HEAD used LF, with no other selected input changes, and passes formatter plus whitespace checks. The cr-at-eol option recognizes intentional existing Windows line endings; all other standard whitespace checks remain enabled. Final combined-branch runtime validation remains a separate integration gate.",
+  "finished_utc": "2026-11-11T19:38:02.270426+00:00"
+}

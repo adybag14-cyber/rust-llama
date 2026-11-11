@@ -1,0 +1,17 @@
+    Checking llama-model-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\model-quant)
+    Checking llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\model-runtime)
+error: manual checked division
+   --> crates\model-quant\src\metadata.rs:432:31
+    |
+432 |     let (head_k, head_v) = if heads[0] > 0 {
+    |                               ^^^^^^^^^^^^ check performed here
+433 |         let default = n_embd / heads[0];
+    |                       ----------------- division performed here
+    |
+    = help: consider using `checked_div`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_checked_ops
+    = note: `-D clippy::manual-checked-ops` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_checked_ops)]`
+
+error: could not compile `llama-model-quant` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

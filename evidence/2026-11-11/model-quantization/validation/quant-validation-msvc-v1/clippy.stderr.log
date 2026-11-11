@@ -1,0 +1,104 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\quant)
+    Checking llama-behavior v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-behavior)
+    Checking llama-conformance v0.1.0 (C:\Users\adyba\rust-llama\crates\llama-conformance)
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama\crates\gguf)
+    Checking llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\model-runtime)
+    Checking llama-model-quant v0.1.0 (C:\Users\adyba\rust-llama\crates\model-quant)
+error: this `if` statement can be collapsed
+   --> crates\model-quant\src\file.rs:462:9
+    |
+462 | /         if params.imatrix.is_some() && !mapped.is_empty() {
+463 | |             if let Some((span, _)) = layer_span(name)? {
+464 | |                 let block = &name[span.clone()];
+465 | |                 let original = mapped
+...   |
+472 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+462 ~         if params.imatrix.is_some() && !mapped.is_empty()
+463 ~             && let Some((span, _)) = layer_span(name)? {
+464 |                 let block = &name[span.clone()];
+...
+470 |                 importance_name.replace_range(span, &original.to_string());
+471 ~             }
+    |
+
+error: using `chunks_exact` with a constant chunk size
+   --> crates\model-quant\src\file.rs:679:14
+    |
+679 |             .chunks_exact(8)
+    |              ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<8>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> crates\model-quant\src\file.rs:695:18
+    |
+695 |                 .chunks_exact(36)
+    |                  ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<36>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: manual checked division
+   --> crates\model-quant\src\planner.rs:250:22
+    |
+250 |         let gqa = if m.n_head_kv == 0 {
+    |                      ^^^^^^^^^^^^^^^^ check performed here
+...
+253 |             m.n_head / m.n_head_kv
+    |             ---------------------- division performed here
+    |
+    = help: consider using `checked_div`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_checked_ops
+    = note: `-D clippy::manual-checked-ops` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_checked_ops)]`
+
+error: this `if` statement can be collapsed
+   --> crates\model-quant\src\planner.rs:467:9
+    |
+467 | /         if let Some(dtype) = p.token_embedding_type {
+468 | |             if c == Category::Token
+469 | |                 && (t.name != "per_layer_token_embd.weight" || selected.is_none())
+...   |
+473 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+467 ~         if let Some(dtype) = p.token_embedding_type
+468 ~             && c == Category::Token
+469 |                 && (t.name != "per_layer_token_embd.weight" || selected.is_none())
+470 |             {
+471 |                 return Ok(dtype);
+472 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\model-quant\src\planner.rs:474:9
+    |
+474 | /         if c == Category::Output {
+475 | |             if let Some(dtype) = p.output_tensor_type {
+476 | |                 return Ok(dtype);
+477 | |             }
+478 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+474 ~         if c == Category::Output
+475 ~             && let Some(dtype) = p.output_tensor_type {
+476 |                 return Ok(dtype);
+477 ~             }
+    |
+
+error: could not compile `llama-model-quant` (lib) due to 6 previous errors
+warning: build failed, waiting for other jobs to finish...

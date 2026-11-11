@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "started_utc": "2026-11-11T19:35:55.932381+00:00",
+  "driver": {
+    "bytes": 6602,
+    "sha256": "c9e4f3ffab4d62ea4eb7b6f31b43da5b4024161a218692e1fbb32807563caefc"
+  },
+  "steps": [
+    {
+      "name": "audit",
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-target-msvc\\release\\xtask.exe",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 11.773877382278442,
+      "stdout": {
+        "bytes": 57835,
+        "sha256": "4b5aac6fad4a42d7bb96c835e466dfce9b0191502aa9209f89bd85c4c234246b"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "fixtures",
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-target-msvc\\release\\xtask.exe",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 9.655699491500854,
+      "stdout": {
+        "bytes": 200,
+        "sha256": "9bfc28fabc93091e0c1e0b788b50c15f9f5c1661d0b9a6a8a75647b81b0989f9"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "whitespace",
+      "args": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 2,
+      "seconds": 0.20272326469421387,
+      "stdout": {
+        "bytes": 138446,
+        "sha256": "b2500fb05b8b90c7a91b04e46f8729ff9bbf78b49943387c23124f03d0f39f37"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "previous_attempts": {
+    "msvc": {
+      "report": {
+        "bytes": 5315,
+        "sha256": "cd5f6bf13bffab948dc35527cb7caccb9101f29b9694ec05ce07dbbb8f7905f3"
+      },
+      "execution_inputs": {
+        "bytes": 236360,
+        "sha256": "bc8a1eeb6be78388fc9fa284e7b8e7c555941b8806ce8460398a15540a2117c9"
+      },
+      "input_files": 1584,
+      "runtime_steps": [
+        {
+          "name": "format",
+          "args": [
+            "cargo",
+            "fmt",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5147974491119385,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "name": "clippy",
+          "args": [
+            "cargo",
+            "clippy",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "seconds": 2.6594812870025635,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 307,
+            "sha256": "844da0b4399634b78d2db6ed9a15074abac4574f7b669fc0b4d11ce48ef0453f"
+          }
+        },
+        {
+          "name": "build-ffi-debug",
+          "args": [
+            "cargo",
+            "build",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "seconds": 8.293920040130615,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 562,
+            "sha256": "e613fbd2fd5f78fd37f32d22b5c1316a47606ef347dcbcce52866ed5de2c6331"
+          }
+        },
+        {
+          "name": "debug",
+          "args": [
+            "cargo",
+            "test",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "seconds": 47.80445599555969,
+          "stdout": {
+            "bytes": 14491,
+            "sha256": "91877ccfe334bd07f4ff338c75a2159a30f0e2289070aad3b12cd66c3ef4b018"
+          },
+          "stderr": {
+            "bytes": 19508,
+            "sha256": "1f30f1e6ee8fc1da1e9178cc9158db9dde3ef95bd281e9524c3a469ffb0a8d66"
+          },
+          "tests": {
+            "passed": 145,
+            "failed": 0,
+            "ignored": 0,
+            "suites": 15
+          }
+        },
+        {
+          "name": "release",
+          "args": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "seconds": 120.12858772277832,
+          "stdout": {
+            "bytes": 14490,
+            "sha256": "6301beb2c6ae7af363b6f0dfbcec0951aa829bea3ec939eb25d10b493c26c29a"
+          },
+          "stderr": {
+            "bytes": 19936,
+            "sha256": "d6f5f815d9f1e86fd9eb2feb3eab335b887ebda41e1b51664e47f2610371ffe1"
+          },
+          "tests": {
+            "passed": 145,
+            "failed": 0,
+            "ignored": 0,
+            "suites": 15
+          }
+        },
+        {
+          "name": "build-ffi-release",
+          "args": [
+            "cargo",
+            "build",
+            "--release",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "seconds": 0.1272130012512207,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 62,
+            "sha256": "64d0cbd4b7e4c6329fde55978dd3d261407b55f34c21add0feebf7e0575ee531"
+          }
+        }
+      ],
+      "original_status_preserved": "failed"
+    },
+    "gnu": {
+      "report": {
+        "bytes": 5129,
+        "sha256": "dd6c972f2ab67a358bef37bd51ce41e69d02bdb35635e29fc80763285e85bea4"
+      },
+      "execution_inputs": {
+        "bytes": 236360,
+        "sha256": "bc8a1eeb6be78388fc9fa284e7b8e7c555941b8806ce8460398a15540a2117c9"
+      },
+      "input_files": 1584,
+      "runtime_steps": [
+        {
+          "name": "format",
+          "args": [
+            "cargo",
+            "fmt",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--",
+            "--check"
+          ],
+          "exit_code": 0,
+          "seconds": 1.5760166645050049,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "name": "clippy",
+          "args": [
+            "cargo",
+            "clippy",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "exit_code": 0,
+          "seconds": 6.28729772567749,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 833,
+            "sha256": "5d2288e93062363c96b50a8daba3a16833a0b702f03d0aa4ad406e4ebdf3d6f4"
+          }
+        },
+        {
+          "name": "build-ffi-debug",
+          "args": [
+            "cargo",
+            "build",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "seconds": 7.038881063461304,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 586,
+            "sha256": "a7b690ca817503310c00072bc04af8ee1c55991353b901aff52fe5cab66dd9a4"
+          }
+        },
+        {
+          "name": "debug",
+          "args": [
+            "cargo",
+            "test",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "seconds": 44.633097648620605,
+          "stdout": {
+            "bytes": 14397,
+            "sha256": "af6d18900415b8d81d7c5d7be5f38cb9b4e763b93fbcf6771fe3a854863b12ea"
+          },
+          "stderr": {
+            "bytes": 18892,
+            "sha256": "0e26562a2e99cd378a98154219c3f9b087ef428a3984dc6fcd63cda1bbef29c9"
+          },
+          "tests": {
+            "passed": 144,
+            "failed": 0,
+            "ignored": 0,
+            "suites": 15
+          }
+        },
+        {
+          "name": "release",
+          "args": [
+            "cargo",
+            "test",
+            "--release",
+            "-p",
+            "llama-model-quant",
+            "-p",
+            "llama-gguf",
+            "-p",
+            "llama-behavior",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked",
+            "--",
+            "--nocapture"
+          ],
+          "exit_code": 0,
+          "seconds": 89.04990029335022,
+          "stdout": {
+            "bytes": 14396,
+            "sha256": "38fe342afa5524de1585ee43544f4055d80022abc8cc4a8d0fc1fc85daca7b33"
+          },
+          "stderr": {
+            "bytes": 19338,
+            "sha256": "e6886e52b7595bb0c050b53a242134dcf8b7c9b55f243c8f756456f183cd8166"
+          },
+          "tests": {
+            "passed": 144,
+            "failed": 0,
+            "ignored": 0,
+            "suites": 15
+          }
+        },
+        {
+          "name": "build-ffi-release",
+          "args": [
+            "cargo",
+            "build",
+            "--release",
+            "-p",
+            "llama-ffi",
+            "--offline",
+            "--locked"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7731833457946777,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 62,
+            "sha256": "ecbae6273b10970baf582ab846f37bec341e4fb5b577a88163f05f3d1bc3b923"
+          }
+        }
+      ],
+      "original_status_preserved": "failed"
+    }
+  },
+  "independent_fixture_files_verified_before_correction": 26,
+  "fixture_manifest": {
+    "bytes": 6165,
+    "sha256": "1b971f296663f756d618a66bf5160700206674352c010adf119f70df56d0fd73"
+  },
+  "correction": {
+    "removed": [
+      "crates/model-quant/fixture-manifest.tsv"
+    ],
+    "added": [
+      "crates/model-quant/tests/fixtures/inputs/1101b7817e6d6481ad4908775b06739a25d9219fdaca7e494bee851bc8b71421.gguf",
+      "crates/model-quant/tests/fixtures/inputs/15dee0338a0daebb52e84488bd1465dde90e8cf273c441498abfdbc3b8d8f787.gguf",
+      "crates/model-quant/tests/fixtures/inputs/5cb69d1fb786a1f274fa7e7bc2ba342e7e9f860ceb6da6d726f6f4873aa9269d.gguf",
+      "crates/model-quant/tests/fixtures/inputs/66abee898ff7e59e795559b72c7a0c147e82f8038bbae837216f19774d861392.gguf",
+      "crates/model-quant/tests/fixtures/inputs/694867b88f5718d56508c8a255a2a342d72688913010f4ab943e8ea511135390.gguf",
+      "crates/model-quant/tests/fixtures/inputs/6bb1e40eb572e738493feee5484e3b68e100278e386413fdaded748289a61c3c.gguf",
+      "crates/model-quant/tests/fixtures/inputs/71b695994ae717b64fe51d1148e0a6d65627a1011010eb1b92597b8ac5e77876.gguf",
+      "crates/model-quant/tests/fixtures/inputs/75da79772249ae21be87897954ca012dd082d56844ec6acc69f28308c2394441.gguf",
+      "crates/model-quant/tests/fixtures/inputs/78c9a6aaa4bd31aeaf0e98dc60d528e809413ff0e3dd6fefb05df4cacd2bfafe.gguf",
+      "crates/model-quant/tests/fixtures/inputs/82dae1fc8bbc22282bfbe4dc600a24d333678b93a422f19146cb3a7b1da261bd.gguf",
+      "crates/model-quant/tests/fixtures/inputs/bf889e2f01d165754d9e2bab9a5bc2b4ac471a72622d7361278217108f755aff.gguf",
+      "docs/model-quant-fixture-manifest.tsv"
+    ],
+    "changed": [
+      ".github/workflows/ci.yml",
+      ".gitignore"
+    ],
+    "remaining_retained_files_byte_identical": true,
+    "fixture_manifest_bytes_unchanged": true,
+    "fixture_payloads_unchanged": true,
+    "before_files": 1584,
+    "after_files": 1595,
+    "before_manifest": {
+      "bytes": 236360,
+      "sha256": "bc8a1eeb6be78388fc9fa284e7b8e7c555941b8806ce8460398a15540a2117c9"
+    },
+    "after_manifest": {
+      "bytes": 238691,
+      "sha256": "3723b23cb9efde275f3622dfc80590a1cb31a5145b8bf285f95f304407039afe"
+    },
+    "notes": [
+      "Move the fixture manifest to the existing audited docs/*-fixture-manifest.tsv convention.",
+      "Admit the eleven existing sealed GGUF inputs to Git using a narrow ignore exception.",
+      "Use the frozen converter capture's official-hf input basename in the BLOOM CI reproduction paths."
+    ]
+  },
+  "error": "AssertionError('whitespace failed')",
+  "finished_utc": "2026-11-11T19:36:29.733637+00:00"
+}
