@@ -198,6 +198,50 @@ pub fn tiny_gpt2() -> Result<Gpt2Model> {
     )
 }
 
+pub fn tiny_gptneox() -> Result<GptNeoXModel> {
+    let source = tiny_gpt2()?;
+    let c = source.config();
+    let w = source.weights();
+    GptNeoXModel::new(
+        GptNeoXConfig {
+            vocabulary: c.vocabulary,
+            width: c.width,
+            feed_forward: c.feed_forward,
+            heads: c.heads,
+            kv_heads: c.kv_heads,
+            max_context: c.max_context,
+            norm_epsilon: c.norm_epsilon,
+            rope_base: 10000.0,
+            rope_dimensions: 2,
+            parallel_residual: true,
+        },
+        GptNeoXWeights {
+            token_embedding: w.token_embedding.clone(),
+            output: w.token_embedding.clone(),
+            output_norm: w.output_norm.clone(),
+            output_norm_bias: w.output_norm_bias.clone(),
+            layers: w
+                .layers
+                .iter()
+                .map(|layer| GptNeoXLayer {
+                    attention_norm: layer.attention_norm.clone(),
+                    attention_norm_bias: layer.attention_norm_bias.clone(),
+                    qkv: layer.qkv.clone(),
+                    qkv_bias: layer.qkv_bias.clone(),
+                    attention_output: layer.attention_output.clone(),
+                    attention_output_bias: layer.attention_output_bias.clone(),
+                    feed_forward_norm: layer.feed_forward_norm.clone(),
+                    feed_forward_norm_bias: layer.feed_forward_norm_bias.clone(),
+                    up: layer.up.clone(),
+                    up_bias: layer.up_bias.clone(),
+                    down: layer.down.clone(),
+                    down_bias: layer.down_bias.clone(),
+                })
+                .collect(),
+        },
+    )
+}
+
 #[derive(Debug, Clone)]
 pub struct SmokeReport {
     pub architecture_slots: usize,

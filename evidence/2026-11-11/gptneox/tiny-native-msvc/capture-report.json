@@ -1,0 +1,360 @@
+{
+  "schema": 1,
+  "profile": "msvc",
+  "kind": "tiny",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "executable_sha256": "4ef70ca22dbf3dc6628391fd8b54fd3f8459f994be86eacdb7c68d5eef4af7b4",
+  "harness_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+  "libraries": [
+    {
+      "name": "llama.dll",
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    },
+    {
+      "name": "ggml-base.dll",
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    {
+      "name": "ggml-cpu.dll",
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    {
+      "name": "ggml.dll",
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    }
+  ],
+  "cases": [
+    {
+      "name": "f32-parallel",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "663986a60eeb6bd4134ae4a9a2db54be54174d37f51b98e029b339e75c24ae04",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\f32-parallel.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\f32-parallel.json"
+      ],
+      "reference_sha256": "6854676c6ee8184bac0437c2f7e20a69ee6753464e677238e33e43564513d93f"
+    },
+    {
+      "name": "f32-sequential",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ca732dc34213be244f62179196d5509d1561d3e214bc6d2500853c7101cf079b",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\f32-sequential.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\f32-sequential.json"
+      ],
+      "reference_sha256": "083542459452a5e94716a368f9def5289c029e8492bcda14c8f30daee7ed0e31"
+    },
+    {
+      "name": "full-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "00af0e009ff620df3c6fec1065e2fa3f61193aadf436aee3999df64c087437d0",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\full-rope.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\full-rope.json"
+      ],
+      "reference_sha256": "add4659e0ee1706ec615b79d89d060de79850d3812df3afbb8c26ccab983373d"
+    },
+    {
+      "name": "half-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "399b28e05a3f929d8c09b3dfdf798b5ae8530667d296000f01f42318d55bcd9d",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\half-rope.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\half-rope.json"
+      ],
+      "reference_sha256": "2f10f955ddf52300357b82d4cd17aec94b444804013b55f143b0570103b49468"
+    },
+    {
+      "name": "no-rope",
+      "rust_scope": "unsupported",
+      "exit_code": 3221226505,
+      "model_sha256": "8d8accdeb7ebe4326d3fe6f254697ed14dcd88d393934574ef90fc921a70230c",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\no-rope.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\no-rope.json"
+      ]
+    },
+    {
+      "name": "two-dim-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "fd6c3217f0d1327ff3949b3c62107ffa1c11977a52f48ece5c544c5e367db8f3",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\two-dim-rope.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\two-dim-rope.json"
+      ],
+      "reference_sha256": "a681a364fcc038f2b00568c7f0a699d8a71c2afaced822097107e310f7cb2698"
+    },
+    {
+      "name": "custom-base",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "14f1c0d463ce3075347db5fe349d3fc1d95470b050c45423af5226d355e3450f",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\custom-base.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\custom-base.json"
+      ],
+      "reference_sha256": "6880438e2b009cc256c0640445210d91b83763eaa4480c8d07e769dde0c7436b"
+    },
+    {
+      "name": "f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "bf73dd6305d58bfeb14c3872beab4f93528f495c751d7aedeec83bcd3af11b29",
+      "model_bytes": 281344,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\f16.json"
+      ],
+      "reference_sha256": "2698858a713832a424a43d755a7e11384797f74d84e11a49a96a834af33a2388"
+    },
+    {
+      "name": "q4-0",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ac98a8c0ad4f74ef1712c4b00b1d98975b04abdd0778ea82123393f95b47083a",
+      "model_bytes": 92928,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\q4-0.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\q4-0.json"
+      ],
+      "reference_sha256": "9a113b42fd459efe747231bc91c422b52f2307fe52a85b34beea8ab8d02b025e"
+    },
+    {
+      "name": "q4-k",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "fa7325692639ba82b87cb2da4f08410d63ffe66bb0dc260110a7dcd8c3566eb1",
+      "model_bytes": 774912,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\q4-k.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\q4-k.json"
+      ],
+      "reference_sha256": "1b76ff88f1743b616fb180147dd944e00c5a03405c878214d9ddde3ff0604d0f"
+    },
+    {
+      "name": "grouped-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "12ea136b1839475d6c5262b60db3c83ae175dbad2f7e1f5d4b3ffa8b73431da0",
+      "model_bytes": 510208,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\grouped-query.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\grouped-query.json"
+      ],
+      "reference_sha256": "331b9aba3abca1d0685eb1d5a1954314f1033973962a7889ce099055fd362fbd"
+    },
+    {
+      "name": "multi-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "299475513ba73b780d24cdc4e28cdbf17e974a588bc7ba5abbe40aa2f855e80e",
+      "model_bytes": 493568,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\multi-query.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\multi-query.json"
+      ],
+      "reference_sha256": "1072e399abc439a3c464dc25f937b9e04ff839825b5df63b54aaf44c370c5d9d"
+    },
+    {
+      "name": "single-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "97c9940f2b70e02c9044dbc48ada747c788b8639df2437a98d254eb1ca5fcf86",
+      "model_bytes": 408960,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\single-layer.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\single-layer.json"
+      ],
+      "reference_sha256": "1270552418f889829c03d6d102a546c900ac1a3ba42fe3a72b0dbc74b5a7cb5e"
+    },
+    {
+      "name": "three-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ace3741704696018df80a3185a1530ad5e94940d0765b233a16ac51e46bb6394",
+      "model_bytes": 678048,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\three-layer.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\three-layer.json"
+      ],
+      "reference_sha256": "852a888b1042559aa208fa9c19396c7e3b11cd5ab1d3f750ad1e9873b437469b"
+    },
+    {
+      "name": "odd-head-width",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "49fb0730aae3dee25afdc861a67b794e4264b19e0edd551517819ec3792e8194",
+      "model_bytes": 502976,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\odd-head-width.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\odd-head-width.json"
+      ],
+      "reference_sha256": "1487b079cb45b35a7245df9c567bbd966122198b46688fe3a20508a15a8548ae"
+    },
+    {
+      "name": "different-epsilon",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "d59e481ce2f5bdd732794c99e14f82a6e58d9a1537e2f2e1bfe87254d42025cc",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\different-epsilon.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\different-epsilon.json"
+      ],
+      "reference_sha256": "f02165427a7066a924cc7b7cb659ff125411a61e4a76ccca14327a325e1e0483"
+    },
+    {
+      "name": "implicit-kv",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "375a43227250febb5d22f35d0ef9ce3d56ee7a795f7066c6ccdad5228eb5caf1",
+      "model_bytes": 543456,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\implicit-kv.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\implicit-kv.json"
+      ],
+      "reference_sha256": "6854676c6ee8184bac0437c2f7e20a69ee6753464e677238e33e43564513d93f"
+    },
+    {
+      "name": "implicit-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "1b718f61eda397fe2b52b7a91420ba79b238a50f0e8a235041182e8d5afebd84",
+      "model_bytes": 543456,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\implicit-rope.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\implicit-rope.json"
+      ],
+      "reference_sha256": "add4659e0ee1706ec615b79d89d060de79850d3812df3afbb8c26ccab983373d"
+    },
+    {
+      "name": "norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": 3221226505,
+      "model_sha256": "d522cf3c8a370ca9b0d2163391af228d3e30b8936351801c2a6c55ed2bbc7962",
+      "model_bytes": 543360,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\norm-f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\norm-f16.json"
+      ]
+    },
+    {
+      "name": "bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": 3221226505,
+      "model_sha256": "3bd5f21e2b90e8284cda2066fefb0d084a3bb59be8f6983def52165b92a62364",
+      "model_bytes": 543104,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\bias-f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\bias-f16.json"
+      ]
+    },
+    {
+      "name": "missing-output",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "cbade9e011fa825364846ea9f038a7ed816372a63b7d413d76d5212d0d9f66ab",
+      "model_bytes": 412384,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\missing-output.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\missing-output.json"
+      ]
+    },
+    {
+      "name": "missing-norm-bias",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "f150bfdd0dadbc14e7361e3ed7d315cda261b2b4b009a972c83edfa17228e816",
+      "model_bytes": 543200,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\missing-norm-bias.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\missing-norm-bias.json"
+      ]
+    },
+    {
+      "name": "noncausal",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "5c2b7e726f8285bbde7614a72cb573575532ad5aff7da1f430da3b392ea0253a",
+      "model_bytes": 543488,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\noncausal.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\noncausal.json"
+      ],
+      "reference_sha256": "6854676c6ee8184bac0437c2f7e20a69ee6753464e677238e33e43564513d93f"
+    },
+    {
+      "name": "head-array",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "cbf108d8bf5e9dbef26ff28de3cff19bf3c9ce0449969f139547e45f9a9cd9d2",
+      "model_bytes": 543520,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-inputs\\head-array.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\tiny-native-msvc\\head-array.json"
+      ],
+      "reference_sha256": "6854676c6ee8184bac0437c2f7e20a69ee6753464e677238e33e43564513d93f"
+    }
+  ],
+  "utc": "2026-11-11T08:50:34Z"
+}

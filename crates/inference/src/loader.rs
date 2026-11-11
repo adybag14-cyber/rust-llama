@@ -247,6 +247,9 @@ pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> 
         .and_then(Value::as_str)
         .ok_or_else(|| Error::Invalid("missing general.architecture".into()))?;
     shared_metadata(m, architecture)?;
+    if architecture == "gptneox" {
+        return crate::gptneox_loader::load(g, path, options);
+    }
     if architecture == "gpt2" {
         return crate::gpt2_loader::load(g, path, options);
     }
@@ -264,7 +267,7 @@ pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> 
     }
     if architecture != "llama" {
         return Err(unsupported(format!(
-            "model architecture {architecture}; this loader currently executes dense llama, qwen2, qwen3, gpt2, bert and mamba"
+            "model architecture {architecture}; this loader currently executes dense llama, qwen2, qwen3, gpt2, gptneox, bert and mamba"
         )));
     }
     if let Some(t) = m.get("general.type").and_then(Value::as_str)

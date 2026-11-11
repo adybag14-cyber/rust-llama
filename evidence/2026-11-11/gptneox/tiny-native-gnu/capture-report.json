@@ -1,0 +1,360 @@
+{
+  "schema": 1,
+  "profile": "gnu",
+  "kind": "tiny",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "executable_sha256": "5a2ba090dde949d560cdfe3d02cd23e1cd12980f06652195608b60e88539ce2a",
+  "harness_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+  "libraries": [
+    {
+      "name": "libllama.so",
+      "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+    },
+    {
+      "name": "libggml-base.so",
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    {
+      "name": "libggml-cpu.so",
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    {
+      "name": "libggml.so",
+      "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+    }
+  ],
+  "cases": [
+    {
+      "name": "f32-parallel",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "663986a60eeb6bd4134ae4a9a2db54be54174d37f51b98e029b339e75c24ae04",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/f32-parallel.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/f32-parallel.json"
+      ],
+      "reference_sha256": "a586670b95d6e202911ba43fefbd7f77de05bb9140199822a3495f55b8dc2961"
+    },
+    {
+      "name": "f32-sequential",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ca732dc34213be244f62179196d5509d1561d3e214bc6d2500853c7101cf079b",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/f32-sequential.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/f32-sequential.json"
+      ],
+      "reference_sha256": "1d663aeea1264e59089ee8c0a4c20e9050347c5ab9fbd8e8a3847753b565c509"
+    },
+    {
+      "name": "full-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "00af0e009ff620df3c6fec1065e2fa3f61193aadf436aee3999df64c087437d0",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/full-rope.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/full-rope.json"
+      ],
+      "reference_sha256": "e08daefd41cd0e20a94f57364504f53ae81a244517dc2935942bc8eb63a834fd"
+    },
+    {
+      "name": "half-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "399b28e05a3f929d8c09b3dfdf798b5ae8530667d296000f01f42318d55bcd9d",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/half-rope.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/half-rope.json"
+      ],
+      "reference_sha256": "a67c8d9725a83c5634230d1ea8ed183f409a8d3c344d2d49030261ec600a478e"
+    },
+    {
+      "name": "no-rope",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "model_sha256": "8d8accdeb7ebe4326d3fe6f254697ed14dcd88d393934574ef90fc921a70230c",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/no-rope.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/no-rope.json"
+      ]
+    },
+    {
+      "name": "two-dim-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "fd6c3217f0d1327ff3949b3c62107ffa1c11977a52f48ece5c544c5e367db8f3",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/two-dim-rope.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/two-dim-rope.json"
+      ],
+      "reference_sha256": "4f4775a4774162535c61e113f3510d1610fed4f08ba79fe146a93f59976a7d21"
+    },
+    {
+      "name": "custom-base",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "14f1c0d463ce3075347db5fe349d3fc1d95470b050c45423af5226d355e3450f",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/custom-base.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/custom-base.json"
+      ],
+      "reference_sha256": "010450bf15303bc15b93e15b3ba7d85f071d90b79e80e15574da8205a4afebcc"
+    },
+    {
+      "name": "f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "bf73dd6305d58bfeb14c3872beab4f93528f495c751d7aedeec83bcd3af11b29",
+      "model_bytes": 281344,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/f16.json"
+      ],
+      "reference_sha256": "2a0f7aaddfed51aff7a9228af197d486d67a3c6ac6ab90a0045e07622028f459"
+    },
+    {
+      "name": "q4-0",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ac98a8c0ad4f74ef1712c4b00b1d98975b04abdd0778ea82123393f95b47083a",
+      "model_bytes": 92928,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/q4-0.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/q4-0.json"
+      ],
+      "reference_sha256": "9a113b42fd459efe747231bc91c422b52f2307fe52a85b34beea8ab8d02b025e"
+    },
+    {
+      "name": "q4-k",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "fa7325692639ba82b87cb2da4f08410d63ffe66bb0dc260110a7dcd8c3566eb1",
+      "model_bytes": 774912,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/q4-k.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/q4-k.json"
+      ],
+      "reference_sha256": "199d3c4615d7ccbce672a5df87fa71d0250fc8d5505895363ecd774ed4a1069b"
+    },
+    {
+      "name": "grouped-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "12ea136b1839475d6c5262b60db3c83ae175dbad2f7e1f5d4b3ffa8b73431da0",
+      "model_bytes": 510208,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/grouped-query.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/grouped-query.json"
+      ],
+      "reference_sha256": "ffff13566a0026ec07223a97baa240800b87f90ec6a9f32ef4cecdf3cd68aded"
+    },
+    {
+      "name": "multi-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "299475513ba73b780d24cdc4e28cdbf17e974a588bc7ba5abbe40aa2f855e80e",
+      "model_bytes": 493568,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/multi-query.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/multi-query.json"
+      ],
+      "reference_sha256": "0f890787f827137ed0758279dbd9e1f380a1bf66a8f94dfd68d8d1c43e1bced1"
+    },
+    {
+      "name": "single-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "97c9940f2b70e02c9044dbc48ada747c788b8639df2437a98d254eb1ca5fcf86",
+      "model_bytes": 408960,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/single-layer.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/single-layer.json"
+      ],
+      "reference_sha256": "1581fae7672efcffac1c1c2d9117e4c5af689e559b162f57c965959ba8113a81"
+    },
+    {
+      "name": "three-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ace3741704696018df80a3185a1530ad5e94940d0765b233a16ac51e46bb6394",
+      "model_bytes": 678048,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/three-layer.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/three-layer.json"
+      ],
+      "reference_sha256": "20c8e48ddc940dfdacad70c4264acc05473f7d3b925333f2639a2a01c0f5fbb2"
+    },
+    {
+      "name": "odd-head-width",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "49fb0730aae3dee25afdc861a67b794e4264b19e0edd551517819ec3792e8194",
+      "model_bytes": 502976,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/odd-head-width.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/odd-head-width.json"
+      ],
+      "reference_sha256": "d09ed58d7db2ca17d11fc6a2e1c3344590dc63e8db48dda35d1031741ab8399b"
+    },
+    {
+      "name": "different-epsilon",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "d59e481ce2f5bdd732794c99e14f82a6e58d9a1537e2f2e1bfe87254d42025cc",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/different-epsilon.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/different-epsilon.json"
+      ],
+      "reference_sha256": "a92a6caa0fd26f58fb58a861378efa2aebbc1b112f0cfe312abec3835da8353b"
+    },
+    {
+      "name": "implicit-kv",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "375a43227250febb5d22f35d0ef9ce3d56ee7a795f7066c6ccdad5228eb5caf1",
+      "model_bytes": 543456,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/implicit-kv.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/implicit-kv.json"
+      ],
+      "reference_sha256": "a586670b95d6e202911ba43fefbd7f77de05bb9140199822a3495f55b8dc2961"
+    },
+    {
+      "name": "implicit-rope",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "1b718f61eda397fe2b52b7a91420ba79b238a50f0e8a235041182e8d5afebd84",
+      "model_bytes": 543456,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/implicit-rope.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/implicit-rope.json"
+      ],
+      "reference_sha256": "e08daefd41cd0e20a94f57364504f53ae81a244517dc2935942bc8eb63a834fd"
+    },
+    {
+      "name": "norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "model_sha256": "d522cf3c8a370ca9b0d2163391af228d3e30b8936351801c2a6c55ed2bbc7962",
+      "model_bytes": 543360,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/norm-f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/norm-f16.json"
+      ]
+    },
+    {
+      "name": "bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "model_sha256": "3bd5f21e2b90e8284cda2066fefb0d084a3bb59be8f6983def52165b92a62364",
+      "model_bytes": 543104,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/bias-f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/bias-f16.json"
+      ]
+    },
+    {
+      "name": "missing-output",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "cbade9e011fa825364846ea9f038a7ed816372a63b7d413d76d5212d0d9f66ab",
+      "model_bytes": 412384,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/missing-output.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/missing-output.json"
+      ]
+    },
+    {
+      "name": "missing-norm-bias",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "f150bfdd0dadbc14e7361e3ed7d315cda261b2b4b009a972c83edfa17228e816",
+      "model_bytes": 543200,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/missing-norm-bias.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/missing-norm-bias.json"
+      ]
+    },
+    {
+      "name": "noncausal",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "5c2b7e726f8285bbde7614a72cb573575532ad5aff7da1f430da3b392ea0253a",
+      "model_bytes": 543488,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/noncausal.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/noncausal.json"
+      ],
+      "reference_sha256": "a586670b95d6e202911ba43fefbd7f77de05bb9140199822a3495f55b8dc2961"
+    },
+    {
+      "name": "head-array",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "cbf108d8bf5e9dbef26ff28de3cff19bf3c9ce0449969f139547e45f9a9cd9d2",
+      "model_bytes": 543520,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-inputs/head-array.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/tiny-native-gnu/head-array.json"
+      ],
+      "reference_sha256": "a586670b95d6e202911ba43fefbd7f77de05bb9140199822a3495f55b8dc2961"
+    }
+  ],
+  "utc": "2026-11-11T08:50:45Z"
+}

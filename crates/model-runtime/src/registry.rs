@@ -8,6 +8,7 @@ pub enum ExecutionSlice {
     Qwen2DenseF32,
     Qwen3DenseF32,
     Gpt2DenseF32,
+    GptNeoXDenseF32,
     LlamaDenseF32,
     Mamba1F32,
     BertDenseF32,
@@ -102,7 +103,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "gptneox",
         source_factory: Some("llama_model_gptneox"),
         source_files: &["src/models/gptneox.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::GptNeoXDenseF32),
     },
     Architecture {
         id: 10,

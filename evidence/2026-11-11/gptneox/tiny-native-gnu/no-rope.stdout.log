@@ -1,0 +1,15 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007993548ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x00007993548ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000799354efc6cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#2  0x0000799354efc862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#3  0x0000799354f16267 in ggml_backend_tensor_set () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#4  0x0000799355298580 in llm_graph_result::set_inputs(llama_ubatch const*) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0
+#5  0x000079935525c5cc in llama_context::process_ubatch(llama_ubatch const&, llm_graph_type, llama_memory_context_i*, ggml_status&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0
+#6  0x00007993552671cc in llama_context::decode(llama_batch_ext const&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0
+#7  0x000079935526896f in llama_context::decode(llama_batch const&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0
+#8  0x00007993552689c0 in llama_decode () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0
+#9  0x000057fd84ea39e5 in decode(llama_context*, Batch&, int, int, int) ()
+#10 0x000057fd84ea1f9f in main ()
+[Inferior 1 (process 804) detached]

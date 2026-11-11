@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "architecture": "gptneox",
+  "scope": "Dense causal positive even partial/full NeoX rotary graph with parallel/sequential residual in Rust Context/inference. NativeContext/FFI GPT-NeoX and GPU remain unsupported.",
+  "reports": {
+    "windows": {
+      "all_eight_stages_passed": true,
+      "runtime_debug_tests": 82,
+      "metrics": {
+        "debug-gptneox": {
+          "native_profile": "msvc",
+          "rows": 496,
+          "logits": 253952,
+          "exact_bits": 253952,
+          "greedy_ids": 192,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-gptneox": {
+          "native_profile": "msvc",
+          "rows": 496,
+          "logits": 253952,
+          "exact_bits": 253952,
+          "greedy_ids": 192,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-pretrained": {
+          "native_profile": "msvc",
+          "rows": 33,
+          "logits": 1660032,
+          "exact_bits": 1660032,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "regression-gpt2": {
+          "native_profile": "msvc",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "regression-gpt2-pretrained": {
+          "native_profile": "msvc",
+          "rows": 33,
+          "logits": 1658481,
+          "exact_bits": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        }
+      }
+    },
+    "linux": {
+      "all_eight_stages_passed": true,
+      "runtime_debug_tests": 83,
+      "metrics": {
+        "debug-gptneox": {
+          "native_profile": "gnu",
+          "rows": 496,
+          "logits": 253952,
+          "exact_bits": 253952,
+          "greedy_ids": 192,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-gptneox": {
+          "native_profile": "gnu",
+          "rows": 496,
+          "logits": 253952,
+          "exact_bits": 253952,
+          "greedy_ids": 192,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-pretrained": {
+          "native_profile": "gnu",
+          "rows": 33,
+          "logits": 1660032,
+          "exact_bits": 1660032,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "regression-gpt2": {
+          "native_profile": "gnu",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "regression-gpt2-pretrained": {
+          "native_profile": "gnu",
+          "rows": 33,
+          "logits": 1658481,
+          "exact_bits": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        }
+      }
+    }
+  },
+  "synthetic_input_cases": {
+    "supported": 16,
+    "unsupported": 6,
+    "invalid": 2
+  },
+  "model": {
+    "repository": "EleutherAI/pythia-14m",
+    "revision": "cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+    "source_safetensors_bytes": 28143920,
+    "source_safetensors_sha256": "116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1",
+    "gguf_bytes": 29929440,
+    "gguf_sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8",
+    "input_adaptation": "None; unchanged official checkpoint consumed by frozen original converter."
+  },
+  "retained_source_boundaries": [
+    "Initial zero-RoPE attempt aborts in frozen original graph before Rust implementation. Its complete stderr and scope revision are retained.",
+    "Odd head width fixture finishes in original, but the CPU RoPE pair-copy tail may cross head boundaries; explicitly unsupported in Rust.",
+    "Original MSVC/GNU aborts with F16 active norm/bias vectors and rejects missing required output/norm tensors.",
+    "Original accepts noncausal/per-layer head array fixtures; Rust explicitly defers them."
+  ],
+  "independence": "Original source outputs captured and sealed before Rust graph implementation or numeric comparison. Raw original JSONs remain external; repository stores losslessly packed original f32 bytes with source/command/library hashes.",
+  "limitations": [
+    "Parity measured only on Windows x86_64 MSVC and Linux x86_64 GNU native profiles.",
+    "Pretrained scope is official Pythia-14M F16, three prompts and 24 greedy tokens.",
+    "Scaled RoPE, PRISM/NextN and unknown tensor paths explicitly unsupported.",
+    "Full repository release gates remain open."
+  ]
+}

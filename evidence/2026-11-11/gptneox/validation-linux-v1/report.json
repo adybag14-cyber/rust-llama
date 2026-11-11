@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "profile": "linux",
+  "cwd": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/models",
+  "attempt": "v1",
+  "stages": [
+    {
+      "name": "format",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 6.986276388168335,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-gptneox",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 7.2843194007873535,
+      "log_sha256": "c3c43bb9b093842961bfab5e9b0123aa94daa3d66c0f6682cafa773262be20c9"
+    },
+    {
+      "name": "debug-runtime",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 8.036206245422363,
+      "log_sha256": "01714a005e51fb807e8ce0a925f1d71d19bcdce6aaa35329b1292cb79771b664"
+    },
+    {
+      "name": "release-gptneox",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 10.689109802246094,
+      "log_sha256": "13c8a4dfd30e7f323231c8e4e8a2319c4a5315da8654eb81c3b2311ec800904d"
+    },
+    {
+      "name": "release-pretrained",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "official_pythia",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 3.4248430728912354,
+      "log_sha256": "a4f151f4a92a93b4df5a410c5475c479bd3da68d4f75d723f95830b035ca3bdf"
+    },
+    {
+      "name": "regression-gpt2",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 8.335909128189087,
+      "log_sha256": "d97fa35ff8467ad6f3636e8f4e3f59fcac4046eedf70c832bd8563cd3dca6deb"
+    },
+    {
+      "name": "regression-gpt2-pretrained",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 35.154317140579224,
+      "log_sha256": "d7e79f2d696467efa30ca4550a00ea12033b6e594ade585d951202fbf747b369"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 3.7757034301757812,
+      "log_sha256": "e832ac67596804d614cf993f2f4ecd6e0dc3e49df52a3cf3456d39da7defd5cf"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+   Compiling llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\models\crates\platform-loader)
+   Compiling llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\models\crates\model-runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.81s
+     Running unittests src\lib.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\llama_model_runtime-3736fa5bb7b43e65.exe)
+
+running 33 tests
+test context::native::native_kv::tests::typed_copy_rejects_mismatch_without_writes ... ok
+test context::allocation_tests::explicit_default_and_zero_state_budget ... ok
+test context::native::native_row_map::tests::source_slice_conditions_and_full_batch_bound ... ok
+test context::native::tests::decode_ids_use_configured_limit_while_memory_keeps_256_ids ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+test context::native::native_batch::tests::unified_order_is_contiguous_and_empty_invalid_domains_are_checked ... ok
+test math::packed_matrix_tests::packed_matrix_preserves_storage_and_native_activation_quantization ... ok
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test context::native::native_row_map::tests::original_row_map_bytes_and_logical_query_geometry ... ok
+test state::tests::known_crc32_vector ... ok
+test context::allocation_tests::reset_removal_and_truncation_preserve_truthful_capacity_accounting ... ok
+test math::packed_matrix_tests::unsupported_dot_types_are_rejected_at_load ... ok
+test math::tests::attention_masks_and_physical_layout_bounds_fail_safely ... ok
+test context::native::native_batch::tests::both_original_compilers_select_the_same_native_input_order ... ok
+test context::allocation_tests::checked_overflow_and_concurrent_reservations_never_exceed_the_ledger ... ok
+test context::native::tests::metadata_membership_is_fixed_and_queued_copies_reuse_buffers_in_order ... ok
+test context::allocation_tests::initial_state_capacity_has_an_exact_checked_threshold ... ok
+test context::native::native_decode::tests::worker_stack_budget_and_cancelled_decode_do_not_commit ... ok
+test context::allocation_tests::live_checkpoints_and_fallible_copies_share_the_originating_budget ... ok
+test math::packed_matrix_tests::every_source_cpu_weight_type_loads_and_executes_through_matrix ... ok
+test context::allocation_tests::serialized_output_reserve_is_checked_and_then_returns_caller_owned_bytes ... ok
+test context::allocation_tests::fork_checkpoint_restore_and_serialized_restore_fail_atomically ... ok
+test context::native::tests::native_resource_limits_fail_before_allocating_or_mutating ... ok
+test context::allocation_tests::pending_kv_growth_and_sequence_multiplicity_cannot_bypass_budget ... ok
+test context::native::native_decode::tests::flash_state_uses_untransposed_raw_half_bytes_and_rejects_cross_layout ... ok
+test context::native::native_kv::tests::half_storage_preserves_every_payload_without_conversion ... ok
+test context::allocation_tests::every_fallible_state_reservation_rolls_back_when_allocation_fails ... ok
+test math::native_attention_tests::twelve_bert_layers_match_original_scalar_attention ... ok
+test context::native::native_decode::tests::configured_workers_execute_each_actual_microbatch ... ok
+test context::native::native_decode::tests::complete_logical_row_maps_are_charged_before_state_clone ... ok
+test context::native::tests::later_microbatches_are_counted_before_any_state_is_committed ... ok
+test context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows ... ok
+test context::native::tests::native_half_state_preserves_raw_payloads_and_rejects_wrong_storage_type_atomically ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests\gpt2.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\gpt2-87721da2ab2a87fc.exe)
+
+running 3 tests
+test learned_position_capacity_and_required_shapes_are_checked ... ok
+test finite_affine_weights_that_overflow_rollback_the_entire_batch ... ok
+test learned_position_and_affine_bias_changes_invalidate_saved_state ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\gptneox.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\gptneox-3dc884f3b831787a.exe)
+
+running 3 tests
+test rotary_and_affine_shape_boundaries_are_checked ... ok
+test finite_projection_overflow_rolls_back_all_sequences_in_both_residual_modes ... ok
+test residual_rope_and_affine_changes_invalidate_saved_state ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\native_rows_graphs.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\native_rows_graphs-a84a0ec3da10c32e.exe)
+
+running 1 test
+test actual_original_graphs_preserve_row_boundaries_scaling_and_platform_policy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\native_rows_native.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\native_rows_native-d2cf11b9e7562378.exe)
+
+running 1 test
+test explicit_sse2_prefix_matches_original_bits_on_either_host ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\native_rows_variance.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\native_rows_variance-a55465edca7d54f4.exe)
+
+running 2 tests
+test original_scalar_and_sse2_centered_variance_match_all_primitive_bits ... ok
+test actual_original_norm_graphs_match_native_policy_and_rounding ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\numerical_reference.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\numerical_reference-0fc8ed8e924be61b.exe)
+
+running 3 tests
+test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+test llama_outputs_match_frozen_ggml_graph ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\qwen2.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\qwen2-23d928ee1ade6877.exe)
+
+running 2 tests
+test qwen2_late_output_overflow_rolls_back_other_sequences ... ok
+test finite_qwen2_projection_and_bias_overflow_cannot_commit_state ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\qwen3.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\qwen3-d63244be7e0a8284.exe)
+
+running 5 tests
+test explicit_head_width_and_checked_shape_products ... ok
+test actual_kv_head_width_controls_growth_and_copy_budgets ... ok
+test finite_weights_with_nonfinite_execution_never_commit_partial_state ... ok
+test fork_truncate_serialization_and_model_identity_preserve_state ... ok
+test cancellation_at_every_boundary_rolls_back_all_sequences_and_reservations ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\runtime.rs (C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\target-windows\debug\deps\runtime-26cf6fa4507023e8.exe)
+
+running 29 tests
+test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+test bad_adapters_leave_configuration_and_state_unchanged ... ok
+test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+test requested_outputs_are_selected_without_dropping_state_updates ... ok
+test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+test context_limit_failure_preserves_prior_state ... ok
+test valid_control_vector_resets_cache_and_changes_model_output ... ok
+test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+test state_rejects_different_model_weights_or_adapters ... ok
+test malformed_model_shapes_and_norms_fail_before_execution ... ok
+test supplied_embeddings_match_tokens_and_validate_shape ... ok
+test kv_suffix_truncation_matches_recomputed_prefix ... ok
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+test copied_prefix_diverges_without_mutating_original_sequence ... ok
+test interleaved_sequences_remain_independent ... ok
+test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+test smoke_demo_is_real_execution_with_reproducible_state ... ok
+test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+test batching_and_microbatch_boundaries_preserve_decode ... ok
+test truncated_or_corrupted_state_never_mutates_context ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests llama_model_runtime
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

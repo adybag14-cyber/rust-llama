@@ -1,0 +1,18 @@
+{
+  "timing": "Before Rust graph implementation or numerical evaluation",
+  "model_bytes_changed": false,
+  "scope_changes": [
+    {
+      "name": "no-rope",
+      "from": "supported",
+      "to": "unsupported",
+      "reason": "Original graph aborts with tensor buffer not set for unused position input."
+    },
+    {
+      "name": "odd-head-width",
+      "from": "supported",
+      "to": "unsupported",
+      "reason": "Original CPU RoPE remaining-channel loop copies pairs, requiring an even head width to avoid one-past-head access."
+    }
+  ]
+}

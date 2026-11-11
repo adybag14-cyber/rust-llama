@@ -1,10 +1,11 @@
 //! Native Rust GGUF -> tokenizer -> model -> sampler integration.
-//! Model paths: dense Llama/Qwen2/Qwen3/GPT-2, Mamba-1 recurrence and BERT embeddings.
+//! Model paths: dense Llama/Qwen2/Qwen3/GPT-2/GPT-NeoX, Mamba-1 and BERT.
 //! Unsupported architectures and configuration modes fail before generation.
 #![forbid(unsafe_code)]
 
 mod bert_loader;
 mod gpt2_loader;
+mod gptneox_loader;
 mod loader;
 mod mamba_loader;
 mod qwen2_loader;

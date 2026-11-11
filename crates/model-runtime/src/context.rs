@@ -258,6 +258,15 @@ impl Context {
                 state.position = position;
                 Ok(())
             }
+            (Model::GptNeoX(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
             (Model::Mamba(_), SequenceMemory::Recurrent(_)) => {
                 if position == state.position {
                     Ok(())
@@ -438,6 +447,9 @@ impl Context {
                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
                     }
                     (Model::Gpt2(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
+                    (Model::GptNeoX(model), SequenceMemory::Attention(cache)) => {
                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
                     }
                     (Model::Mamba(model), SequenceMemory::Recurrent(cache)) => {

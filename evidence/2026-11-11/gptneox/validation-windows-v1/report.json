@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "profile": "windows",
+  "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\models",
+  "attempt": "v1",
+  "stages": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 1.5587043762207031,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-gptneox",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 10.011738777160645,
+      "log_sha256": "416994ca8d68e61cfb1842a63c581724a72a84a55df2d0159b0360f9357673f8"
+    },
+    {
+      "name": "debug-runtime",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 4.531903505325317,
+      "log_sha256": "ac564c449ed5aec0e4d9c0d2e4aebd30342e87c84c94ab6388c74d3da26e4539"
+    },
+    {
+      "name": "release-gptneox",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 22.44725799560547,
+      "log_sha256": "91fe7793342f15981c944fcd1f19d37f59110a4ed691d5d9856edf3d25c8448e"
+    },
+    {
+      "name": "release-pretrained",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "official_pythia",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.96264386177063,
+      "log_sha256": "c03249ea993b24ed917f649b3035e783e486a92bc4b3524e570f831f16d3a950"
+    },
+    {
+      "name": "regression-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 12.936895608901978,
+      "log_sha256": "d29338181b0bb1168c7c67f3e532190b37b60456ff83a8549e1611533efb9187"
+    },
+    {
+      "name": "regression-gpt2-pretrained",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 49.097708225250244,
+      "log_sha256": "32e2a3c0abec95367e44393569299bf71c45eda3e66b9f0cc795d5a851ac8d76"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 3.6102147102355957,
+      "log_sha256": "412ac43f21754b2fddeefe9cd246dc7662ade256870a6b9fd378c9054b7c8270"
+    }
+  ]
+}

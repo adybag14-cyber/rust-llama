@@ -1,0 +1,4180 @@
+{
+  "schema": 1,
+  "profile": "gnu",
+  "cases": [
+    {
+      "name": "f32-parallel",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144
+            ],
+            "greedy_rows": [
+              6144,
+              8192,
+              10240,
+              12288
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528,
+              24576,
+              26624
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              28672,
+              30720,
+              32768,
+              34816,
+              36864,
+              38912,
+              40960,
+              43008,
+              45056,
+              47104,
+              49152,
+              51200
+            ],
+            "greedy_rows": [
+              51200,
+              53248,
+              55296,
+              57344
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "f32-sequential",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              89,
+              89,
+              89,
+              89
+            ],
+            "greedy_pieces_hex": [
+              "56",
+              "56",
+              "56",
+              "56"
+            ],
+            "finished_eog": false,
+            "generated_hex": "56565656",
+            "prompt_rows": [
+              59392,
+              61440,
+              63488,
+              65536
+            ],
+            "greedy_rows": [
+              65536,
+              67584,
+              69632,
+              71680
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              89,
+              89,
+              89
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "56",
+              "56",
+              "56"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14565656",
+            "prompt_rows": [
+              59392,
+              73728,
+              75776,
+              77824,
+              79872
+            ],
+            "greedy_rows": [
+              79872,
+              81920,
+              83968,
+              86016
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              62,
+              23,
+              89,
+              89
+            ],
+            "greedy_pieces_hex": [
+              "3b",
+              "14",
+              "56",
+              "56"
+            ],
+            "finished_eog": false,
+            "generated_hex": "3b145656",
+            "prompt_rows": [
+              59392,
+              88064,
+              90112,
+              92160,
+              94208,
+              96256,
+              98304,
+              100352,
+              102400,
+              104448,
+              106496,
+              108544,
+              110592
+            ],
+            "greedy_rows": [
+              110592,
+              112640,
+              114688,
+              116736
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "full-rope",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40404040",
+            "prompt_rows": [
+              0,
+              118784,
+              120832,
+              122880
+            ],
+            "greedy_rows": [
+              122880,
+              124928,
+              126976,
+              129024
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              131072,
+              133120,
+              135168,
+              137216
+            ],
+            "greedy_rows": [
+              137216,
+              139264,
+              141312,
+              143360
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              68,
+              12,
+              51,
+              78
+            ],
+            "greedy_pieces_hex": [
+              "41",
+              "09",
+              "30",
+              "4b"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4109304b",
+            "prompt_rows": [
+              0,
+              145408,
+              147456,
+              149504,
+              151552,
+              153600,
+              155648,
+              157696,
+              159744,
+              161792,
+              163840,
+              165888,
+              167936
+            ],
+            "greedy_rows": [
+              167936,
+              169984,
+              172032,
+              174080
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "half-rope",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40404040",
+            "prompt_rows": [
+              0,
+              176128,
+              178176,
+              180224
+            ],
+            "greedy_rows": [
+              180224,
+              182272,
+              184320,
+              186368
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              188416,
+              190464,
+              192512,
+              194560
+            ],
+            "greedy_rows": [
+              194560,
+              196608,
+              198656,
+              200704
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              78,
+              51,
+              78,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "4b",
+              "30",
+              "4b",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4b304b30",
+            "prompt_rows": [
+              0,
+              202752,
+              204800,
+              206848,
+              208896,
+              210944,
+              212992,
+              215040,
+              217088,
+              219136,
+              221184,
+              223232,
+              225280
+            ],
+            "greedy_rows": [
+              225280,
+              227328,
+              229376,
+              231424
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-rope",
+      "exit_code": -6,
+      "rust_scope": "unsupported"
+    },
+    {
+      "name": "two-dim-rope",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40404040",
+            "prompt_rows": [
+              0,
+              233472,
+              235520,
+              237568
+            ],
+            "greedy_rows": [
+              237568,
+              239616,
+              241664,
+              243712
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              245760,
+              247808,
+              249856,
+              251904
+            ],
+            "greedy_rows": [
+              251904,
+              253952,
+              256000,
+              258048
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              65
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "3e"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f30613e",
+            "prompt_rows": [
+              0,
+              260096,
+              262144,
+              264192,
+              266240,
+              268288,
+              270336,
+              272384,
+              274432,
+              276480,
+              278528,
+              280576,
+              282624
+            ],
+            "greedy_rows": [
+              282624,
+              284672,
+              286720,
+              288768
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "custom-base",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              290816,
+              292864,
+              294912
+            ],
+            "greedy_rows": [
+              294912,
+              296960,
+              299008,
+              301056
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              303104,
+              305152,
+              307200,
+              309248
+            ],
+            "greedy_rows": [
+              309248,
+              311296,
+              313344,
+              315392
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              317440,
+              319488,
+              321536,
+              323584,
+              325632,
+              327680,
+              329728,
+              331776,
+              333824,
+              335872,
+              337920,
+              339968
+            ],
+            "greedy_rows": [
+              339968,
+              342016,
+              344064,
+              346112
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "f16",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 268288,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144
+            ],
+            "greedy_rows": [
+              6144,
+              8192,
+              10240,
+              12288
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528,
+              24576,
+              26624
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              28672,
+              30720,
+              32768,
+              34816,
+              36864,
+              38912,
+              40960,
+              43008,
+              45056,
+              47104,
+              49152,
+              51200
+            ],
+            "greedy_rows": [
+              51200,
+              53248,
+              55296,
+              57344
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "q4-0",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 79872,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              348160,
+              350208,
+              352256,
+              354304
+            ],
+            "greedy_rows": [
+              354304,
+              356352,
+              358400,
+              360448
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              348160,
+              362496,
+              364544,
+              366592,
+              368640
+            ],
+            "greedy_rows": [
+              368640,
+              370688,
+              372736,
+              374784
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              78,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "4b",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4b306130",
+            "prompt_rows": [
+              348160,
+              376832,
+              378880,
+              380928,
+              382976,
+              385024,
+              387072,
+              389120,
+              391168,
+              393216,
+              395264,
+              397312,
+              399360
+            ],
+            "greedy_rows": [
+              399360,
+              401408,
+              403456,
+              405504
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "q4-k",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 761856,
+        "model_parameters": 1316864,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              66,
+              22,
+              66,
+              22
+            ],
+            "greedy_pieces_hex": [
+              "3f",
+              "13",
+              "3f",
+              "13"
+            ],
+            "finished_eog": false,
+            "generated_hex": "3f133f13",
+            "prompt_rows": [
+              407552,
+              409600,
+              411648,
+              413696
+            ],
+            "greedy_rows": [
+              413696,
+              415744,
+              417792,
+              419840
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              10,
+              66,
+              66,
+              66
+            ],
+            "greedy_pieces_hex": [
+              "07",
+              "3f",
+              "3f",
+              "3f"
+            ],
+            "finished_eog": false,
+            "generated_hex": "073f3f3f",
+            "prompt_rows": [
+              407552,
+              421888,
+              423936,
+              425984,
+              428032
+            ],
+            "greedy_rows": [
+              428032,
+              430080,
+              432128,
+              434176
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              100,
+              66,
+              66,
+              66
+            ],
+            "greedy_pieces_hex": [
+              "61",
+              "3f",
+              "3f",
+              "3f"
+            ],
+            "finished_eog": false,
+            "generated_hex": "613f3f3f",
+            "prompt_rows": [
+              407552,
+              436224,
+              438272,
+              440320,
+              442368,
+              444416,
+              446464,
+              448512,
+              450560,
+              452608,
+              454656,
+              456704,
+              458752
+            ],
+            "greedy_rows": [
+              458752,
+              460800,
+              462848,
+              464896
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "grouped-query",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 497152,
+        "model_parameters": 124288,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              5,
+              45,
+              5,
+              45
+            ],
+            "greedy_pieces_hex": [
+              "02",
+              "2a",
+              "02",
+              "2a"
+            ],
+            "finished_eog": false,
+            "generated_hex": "022a022a",
+            "prompt_rows": [
+              466944,
+              468992,
+              471040,
+              473088
+            ],
+            "greedy_rows": [
+              473088,
+              475136,
+              477184,
+              479232
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              45,
+              67,
+              5,
+              45
+            ],
+            "greedy_pieces_hex": [
+              "2a",
+              "40",
+              "02",
+              "2a"
+            ],
+            "finished_eog": false,
+            "generated_hex": "2a40022a",
+            "prompt_rows": [
+              466944,
+              481280,
+              483328,
+              485376,
+              487424
+            ],
+            "greedy_rows": [
+              487424,
+              489472,
+              491520,
+              493568
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              86,
+              100,
+              100,
+              100
+            ],
+            "greedy_pieces_hex": [
+              "53",
+              "61",
+              "61",
+              "61"
+            ],
+            "finished_eog": false,
+            "generated_hex": "53616161",
+            "prompt_rows": [
+              466944,
+              495616,
+              497664,
+              499712,
+              501760,
+              503808,
+              505856,
+              507904,
+              509952,
+              512000,
+              514048,
+              516096,
+              518144
+            ],
+            "greedy_rows": [
+              518144,
+              520192,
+              522240,
+              524288
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "multi-query",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 480512,
+        "model_parameters": 120128,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              32,
+              32,
+              32,
+              32
+            ],
+            "greedy_pieces_hex": [
+              "1d",
+              "1d",
+              "1d",
+              "1d"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1d1d1d1d",
+            "prompt_rows": [
+              526336,
+              528384,
+              530432,
+              532480
+            ],
+            "greedy_rows": [
+              532480,
+              534528,
+              536576,
+              538624
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              32,
+              54,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "1d",
+              "33",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "141d3340",
+            "prompt_rows": [
+              526336,
+              540672,
+              542720,
+              544768,
+              546816
+            ],
+            "greedy_rows": [
+              546816,
+              548864,
+              550912,
+              552960
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              78,
+              78,
+              78,
+              100
+            ],
+            "greedy_pieces_hex": [
+              "4b",
+              "4b",
+              "4b",
+              "61"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4b4b4b61",
+            "prompt_rows": [
+              526336,
+              555008,
+              557056,
+              559104,
+              561152,
+              563200,
+              565248,
+              567296,
+              569344,
+              571392,
+              573440,
+              575488,
+              577536
+            ],
+            "greedy_rows": [
+              577536,
+              579584,
+              581632,
+              583680
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "single-layer",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 396544,
+        "model_parameters": 99136,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40404040",
+            "prompt_rows": [
+              585728,
+              587776,
+              589824,
+              591872
+            ],
+            "greedy_rows": [
+              591872,
+              593920,
+              595968,
+              598016
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              585728,
+              600064,
+              589824,
+              602112,
+              604160
+            ],
+            "greedy_rows": [
+              604160,
+              606208,
+              608256,
+              610304
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              78,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "4b",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4b306130",
+            "prompt_rows": [
+              585728,
+              612352,
+              614400,
+              616448,
+              618496,
+              620544,
+              622592,
+              624640,
+              626688,
+              628736,
+              630784,
+              632832,
+              634880
+            ],
+            "greedy_rows": [
+              634880,
+              636928,
+              638976,
+              641024
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "three-layer",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 664320,
+        "model_parameters": 166080,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              54,
+              54,
+              54,
+              54
+            ],
+            "greedy_pieces_hex": [
+              "33",
+              "33",
+              "33",
+              "33"
+            ],
+            "finished_eog": false,
+            "generated_hex": "33333333",
+            "prompt_rows": [
+              643072,
+              645120,
+              647168,
+              649216
+            ],
+            "greedy_rows": [
+              649216,
+              651264,
+              653312,
+              655360
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              54,
+              54,
+              54
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "33",
+              "33",
+              "33"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14333333",
+            "prompt_rows": [
+              643072,
+              657408,
+              659456,
+              661504,
+              663552
+            ],
+            "greedy_rows": [
+              663552,
+              665600,
+              667648,
+              669696
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              643072,
+              671744,
+              673792,
+              675840,
+              677888,
+              679936,
+              681984,
+              684032,
+              686080,
+              688128,
+              690176,
+              692224,
+              694272
+            ],
+            "greedy_rows": [
+              694272,
+              696320,
+              698368,
+              700416
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "odd-head-width",
+      "exit_code": 0,
+      "rust_scope": "unsupported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 489664,
+        "model_parameters": 122416,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              19,
+              19,
+              19,
+              19
+            ],
+            "greedy_pieces_hex": [
+              "10",
+              "10",
+              "10",
+              "10"
+            ],
+            "finished_eog": false,
+            "generated_hex": "10101010",
+            "prompt_rows": [
+              702464,
+              704512,
+              706560,
+              708608
+            ],
+            "greedy_rows": [
+              708608,
+              710656,
+              712704,
+              714752
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              75,
+              75,
+              75,
+              75
+            ],
+            "greedy_pieces_hex": [
+              "48",
+              "48",
+              "48",
+              "48"
+            ],
+            "finished_eog": false,
+            "generated_hex": "48484848",
+            "prompt_rows": [
+              702464,
+              716800,
+              718848,
+              720896,
+              722944
+            ],
+            "greedy_rows": [
+              722944,
+              724992,
+              727040,
+              729088
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              73,
+              73,
+              73,
+              73
+            ],
+            "greedy_pieces_hex": [
+              "46",
+              "46",
+              "46",
+              "46"
+            ],
+            "finished_eog": false,
+            "generated_hex": "46464646",
+            "prompt_rows": [
+              702464,
+              731136,
+              733184,
+              735232,
+              737280,
+              739328,
+              741376,
+              743424,
+              745472,
+              747520,
+              749568,
+              751616,
+              753664
+            ],
+            "greedy_rows": [
+              753664,
+              755712,
+              757760,
+              759808
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "different-epsilon",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              761856,
+              763904,
+              765952,
+              768000
+            ],
+            "greedy_rows": [
+              768000,
+              770048,
+              772096,
+              774144
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              761856,
+              776192,
+              778240,
+              780288,
+              782336
+            ],
+            "greedy_rows": [
+              782336,
+              784384,
+              786432,
+              788480
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              761856,
+              790528,
+              792576,
+              794624,
+              796672,
+              798720,
+              800768,
+              802816,
+              804864,
+              806912,
+              808960,
+              811008,
+              813056
+            ],
+            "greedy_rows": [
+              813056,
+              815104,
+              817152,
+              819200
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "implicit-kv",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144
+            ],
+            "greedy_rows": [
+              6144,
+              8192,
+              10240,
+              12288
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528,
+              24576,
+              26624
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              28672,
+              30720,
+              32768,
+              34816,
+              36864,
+              38912,
+              40960,
+              43008,
+              45056,
+              47104,
+              49152,
+              51200
+            ],
+            "greedy_rows": [
+              51200,
+              53248,
+              55296,
+              57344
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "implicit-rope",
+      "exit_code": 0,
+      "rust_scope": "supported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40404040",
+            "prompt_rows": [
+              0,
+              118784,
+              120832,
+              122880
+            ],
+            "greedy_rows": [
+              122880,
+              124928,
+              126976,
+              129024
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              131072,
+              133120,
+              135168,
+              137216
+            ],
+            "greedy_rows": [
+              137216,
+              139264,
+              141312,
+              143360
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              68,
+              12,
+              51,
+              78
+            ],
+            "greedy_pieces_hex": [
+              "41",
+              "09",
+              "30",
+              "4b"
+            ],
+            "finished_eog": false,
+            "generated_hex": "4109304b",
+            "prompt_rows": [
+              0,
+              145408,
+              147456,
+              149504,
+              151552,
+              153600,
+              155648,
+              157696,
+              159744,
+              161792,
+              163840,
+              165888,
+              167936
+            ],
+            "greedy_rows": [
+              167936,
+              169984,
+              172032,
+              174080
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "norm-f16",
+      "exit_code": -6,
+      "rust_scope": "unsupported"
+    },
+    {
+      "name": "bias-f16",
+      "exit_code": -6,
+      "rust_scope": "unsupported"
+    },
+    {
+      "name": "missing-output",
+      "exit_code": 1,
+      "rust_scope": "invalid"
+    },
+    {
+      "name": "missing-norm-bias",
+      "exit_code": 1,
+      "rust_scope": "invalid"
+    },
+    {
+      "name": "noncausal",
+      "exit_code": 0,
+      "rust_scope": "unsupported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144
+            ],
+            "greedy_rows": [
+              6144,
+              8192,
+              10240,
+              12288
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528,
+              24576,
+              26624
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              28672,
+              30720,
+              32768,
+              34816,
+              36864,
+              38912,
+              40960,
+              43008,
+              45056,
+              47104,
+              49152,
+              51200
+            ],
+            "greedy_rows": [
+              51200,
+              53248,
+              55296,
+              57344
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "head-array",
+      "exit_code": 0,
+      "rust_scope": "unsupported",
+      "reference": {
+        "schema": 1,
+        "reference": "frozen-llama.cpp-master-c-api",
+        "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+        "vocab_only": false,
+        "n_vocab": 512,
+        "model_tensor_bytes": 530432,
+        "model_parameters": 132608,
+        "n_ctx": 64,
+        "max_tokens": 4,
+        "threads": 1,
+        "kv_type": "F32",
+        "flash_attention": false,
+        "mmap": false,
+        "logits_layout": "one full vocabulary row after each prompt token; one row before each greedy prediction",
+        "detokenize_remove_special": true,
+        "detokenize_unparse_special": false,
+        "cases": [
+          {
+            "name": "hello",
+            "prompt": "Hello",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              346,
+              306,
+              414
+            ],
+            "pieces_hex": [
+              "",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204865",
+              "6c6c",
+              "6f"
+            ],
+            "detokenized_hex": "2048656c6c6f",
+            "greedy_tokens": [
+              67,
+              89,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "40",
+              "56",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "40564040",
+            "prompt_rows": [
+              0,
+              2048,
+              4096,
+              6144
+            ],
+            "greedy_rows": [
+              6144,
+              8192,
+              10240,
+              12288
+            ]
+          },
+          {
+            "name": "story",
+            "prompt": "Once upon a time",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              403,
+              407,
+              261,
+              378
+            ],
+            "pieces_hex": [
+              "",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "204f6e6365",
+              "2075706f6e",
+              "2061",
+              "2074696d65"
+            ],
+            "detokenized_hex": "204f6e63652075706f6e20612074696d65",
+            "greedy_tokens": [
+              23,
+              67,
+              67,
+              67
+            ],
+            "greedy_pieces_hex": [
+              "14",
+              "40",
+              "40",
+              "40"
+            ],
+            "finished_eog": false,
+            "generated_hex": "14404040",
+            "prompt_rows": [
+              0,
+              14336,
+              16384,
+              18432,
+              20480
+            ],
+            "greedy_rows": [
+              20480,
+              22528,
+              24576,
+              26624
+            ]
+          },
+          {
+            "name": "code",
+            "prompt": "def add(a, b):",
+            "add_special": true,
+            "parse_special": true,
+            "tokens": [
+              1,
+              279,
+              411,
+              431,
+              261,
+              418,
+              418,
+              489,
+              412,
+              432,
+              268,
+              488,
+              467
+            ],
+            "pieces_hex": [
+              "",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "pieces_special_hex": [
+              "3c733e",
+              "2064",
+              "65",
+              "66",
+              "2061",
+              "64",
+              "64",
+              "28",
+              "61",
+              "2c",
+              "2062",
+              "29",
+              "3a"
+            ],
+            "detokenized_hex": "206465662061646428612c2062293a",
+            "greedy_tokens": [
+              34,
+              51,
+              100,
+              51
+            ],
+            "greedy_pieces_hex": [
+              "1f",
+              "30",
+              "61",
+              "30"
+            ],
+            "finished_eog": false,
+            "generated_hex": "1f306130",
+            "prompt_rows": [
+              0,
+              28672,
+              30720,
+              32768,
+              34816,
+              36864,
+              38912,
+              40960,
+              43008,
+              45056,
+              47104,
+              49152,
+              51200
+            ],
+            "greedy_rows": [
+              51200,
+              53248,
+              55296,
+              57344
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "float_data": {
+    "path": "tiny-gnu-logits.f32le.bin",
+    "bytes": 821248,
+    "sha256": "b6ea4687a7e00b02b65ad6891faa0474d2445f0a93417d029e96ba5a64f633da"
+  },
+  "unique_rows": 401,
+  "row_comparisons": 646
+}

@@ -1,0 +1,44 @@
+{"case": "f32-parallel", "exit_code": 0}
+{"case": "f32-sequential", "exit_code": 0}
+{"case": "full-rope", "exit_code": 0}
+{"case": "half-rope", "exit_code": 0}
+{"case": "no-rope", "exit_code": 3221226505}
+Traceback (most recent call last):
+  File "C:\Users\adyba\rust-llama-reference\continue-20261111\gptneox-oracle\capture.py", line 36, in <module>
+    if c['rust_scope']=='supported' and p.returncode:raise RuntimeError((OUT/(name+'.stderr.log')).read_text(errors='replace')[-5000:])
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)
+graph_reserve: reserving a graph for ubatch with n_tokens =    1, n_seqs =  1, n_outputs =    1
+llama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_66' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {     1,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,     1,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)
+llama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,     1,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,     1,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {     1,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {     1,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)
+graph_reserve: reserving a graph for ubatch with n_tokens =   64, n_seqs =  1, n_outputs =   64
+llama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l0 (reshaped) (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_v_idxs' [i64, ne = {  4096,     1,     1,     1 }] is used by node 'cache_v_l1 (reshaped) (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                      inp_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'embd' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_66' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                         out_ids' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_78' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                inp_mixed_tokens' [i32, ne = {    64,     1,     1,     1 }] is used by node 'node_1' (GET_ROWS)
+llama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-0' (SOFT_MAX)
+llama_graph_n_input_tensors: input tensor '                attn_inp_kq_mask' [f32, ne = {   256,    64,     1,     1 }] is used by node 'kq_soft_max-1' (SOFT_MAX)
+llama_graph_n_input_tensors: input tensor '                  inp_mixed_embd' [f32, ne = {    64,    64,     1,     1 }] is used by node 'node_2' (DUP)
+llama_graph_n_input_tensors: input tensor '                 inp_mixed_slots' [i64, ne = {    64,     1,     1,     1 }] is used by node ' (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l0 (view)' (SET_ROWS)
+llama_graph_n_input_tensors: input tensor '                 attn_inp_k_idxs' [i64, ne = {    64,     1,     1,     1 }] is used by node 'cache_k_l1 (view)' (SET_ROWS)
+sched_reserve:        CPU compute buffer size =     0.47 MiB
+sched_reserve: graph: nodes = 84, splits = 1, input objects = 4, input tensors = 8
+sched_reserve: reserve took 1.55 ms, sched copies = 1
+C:\Users\adyba\rust-llama-reference\llama.cpp-master\ggml\src\ggml-backend.cpp:534: GGML_ASSERT(buf != NULL && "tensor buffer not set") failed
+
