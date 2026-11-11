@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "expected_head": "532125a281bee745efd86a4458852a1ef689d184",
+  "run_id": "43006508478",
+  "observed_utc": "20261111T105051.064908Z",
+  "scope": "Four Qwen conversion jobs; CPU/all-run status is monitored separately",
+  "jobs": [
+    {
+      "databaseId": 130475205690,
+      "name": "Qwen conversion / ubuntu-latest / Qwen2.5-0.5B-Instruct",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-11-11T10:47:13Z",
+      "completedAt": "2026-11-11T10:47:36Z",
+      "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/43006508478/job/130475205690",
+      "active_steps": [],
+      "failed_steps": [
+        "Fetch and verify unchanged official Qwen inputs"
+      ],
+      "raw_log": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\github-ci\\43006508478\\qwen-monitor\\job-130475205690.log",
+        "bytes": 28418,
+        "sha256": "fb50dd7ba87b15df47db84e6a5e76d2ced9743106133e2f7c9405cd5b76d3a68"
+      },
+      "error_lines": [
+        "2026-11-11T10:47:34.5918326Z curl: (63) Maximum file size exceeded",
+        "2026-11-11T10:47:34.7596543Z \u001b[31;1mException: \u001b[0m/home/runner/work/_temp/6da05d8a-73da-46fd-8c03-0371f1878fac.ps1:18\u001b[0m",
+        "2026-11-11T10:47:34.7957723Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "databaseId": 130475205751,
+      "name": "Qwen conversion / windows-latest / Qwen2.5-0.5B-Instruct",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-11T10:47:14Z",
+      "completedAt": "2026-11-11T10:50:02Z",
+      "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/43006508478/job/130475205751",
+      "active_steps": [],
+      "failed_steps": [],
+      "raw_log": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\github-ci\\43006508478\\qwen-monitor\\job-130475205751.log",
+        "bytes": 42155,
+        "sha256": "6a386528105eee280e4784653638962d8ad7835f429e347178ed666092180dc5"
+      },
+      "error_lines": []
+    },
+    {
+      "databaseId": 130475205834,
+      "name": "Qwen conversion / ubuntu-latest / Qwen3-0.6B",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-11-11T10:47:13Z",
+      "completedAt": "2026-11-11T10:47:43Z",
+      "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/43006508478/job/130475205834",
+      "active_steps": [],
+      "failed_steps": [
+        "Fetch and verify unchanged official Qwen inputs"
+      ],
+      "raw_log": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\github-ci\\43006508478\\qwen-monitor\\job-130475205834.log",
+        "bytes": 29333,
+        "sha256": "b24818ed1562fbe9918417c428a3a4eea36844b5785fa5108c25843ee92545df"
+      },
+      "error_lines": [
+        "2026-11-11T10:47:41.2021491Z curl: (63) Maximum file size exceeded",
+        "2026-11-11T10:47:41.3573100Z \u001b[31;1mException: \u001b[0m/home/runner/work/_temp/7b616162-2ccc-4d59-9953-9e14e3f9a5d0.ps1:18\u001b[0m",
+        "2026-11-11T10:47:41.4078014Z ##[error]Process completed with exit code 1."
+      ]
+    },
+    {
+      "databaseId": 130475205891,
+      "name": "Qwen conversion / windows-latest / Qwen3-0.6B",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-11T10:47:12Z",
+      "completedAt": "2026-11-11T10:50:17Z",
+      "url": "https://github.com/adybag14-cyber/rust-llama/actions/runs/43006508478/job/130475205891",
+      "active_steps": [],
+      "failed_steps": [],
+      "raw_log": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\github-ci\\43006508478\\qwen-monitor\\job-130475205891.log",
+        "bytes": 42004,
+        "sha256": "28fad5a50e3622862224bf1e704273d4175575031078daf8ce40930d2e5c6bfa"
+      },
+      "error_lines": []
+    }
+  ],
+  "download_probe": {
+    "relative_path": "download-probe/report.json",
+    "bytes": 10917,
+    "sha256": "09e1daa4d58098acd41f7ebbb8d8e147ca53f5a4b323eff8dea1eec08405448b"
+  },
+  "diagnosis": "Both Ubuntu jobs failed at generation_config.json acquisition: pinned final-file caps were smaller than HTTP 307 redirect bodies. Both Windows jobs completed the official tokenizer replay and all three complete GGUF comparisons.",
+  "changes": "None to repository, remote workflow, or job state."
+}

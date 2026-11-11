@@ -1,0 +1,365 @@
+﻿2026-11-11T10:47:14.1976233Z Current runner version: '2.338.2'
+2026-11-11T10:47:14.2003922Z ##[group]Runner Image Provisioner
+2026-11-11T10:47:14.2004861Z Hosted Compute Agent
+2026-11-11T10:47:14.2005635Z Version: 20261028.624
+2026-11-11T10:47:14.2006335Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-11T10:47:14.2007198Z Build Date: 2026-10-28T21:51:42Z
+2026-11-11T10:47:14.2007976Z Worker ID: {252eefd1-2a35-4815-ac7e-8e52ca4df12b}
+2026-11-11T10:47:14.2008926Z Region: westcentralus
+2026-11-11T10:47:14.2009624Z Cloud: Azure
+2026-11-11T10:47:14.2010236Z ##[endgroup]
+2026-11-11T10:47:14.2012032Z ##[group]Operating System
+2026-11-11T10:47:14.2012874Z Ubuntu
+2026-11-11T10:47:14.2013468Z 24.04.5
+2026-11-11T10:47:14.2014436Z LTS
+2026-11-11T10:47:14.2015032Z ##[endgroup]
+2026-11-11T10:47:14.2015677Z ##[group]Runner Image
+2026-11-11T10:47:14.2016410Z Image: ubuntu-24.04
+2026-11-11T10:47:14.2017056Z Version: 20261101.360.1
+2026-11-11T10:47:14.2018490Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-11T10:47:14.2020377Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-11T10:47:14.2021508Z ##[endgroup]
+2026-11-11T10:47:14.2022761Z ##[group]GITHUB_TOKEN Permissions
+2026-11-11T10:47:14.2025154Z Contents: read
+2026-11-11T10:47:14.2025863Z Metadata: read
+2026-11-11T10:47:14.2026558Z ##[endgroup]
+2026-11-11T10:47:14.2029405Z Secret source: Actions
+2026-11-11T10:47:14.2030508Z Cache mode: write
+2026-11-11T10:47:14.2031578Z Prepare workflow directory
+2026-11-11T10:47:14.2602055Z Prepare all required actions
+2026-11-11T10:47:14.2654990Z Getting action download info
+2026-11-11T10:47:14.5266990Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-11T10:47:14.7072384Z Complete job name: Qwen conversion / ubuntu-latest / Qwen3-0.6B
+2026-11-11T10:47:14.7924706Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-11T10:47:14.7925800Z with:
+2026-11-11T10:47:14.7926301Z   repository: adybag14-cyber/rust-llama
+2026-11-11T10:47:14.7930851Z   token: ***
+2026-11-11T10:47:14.7931330Z   ssh-strict: true
+2026-11-11T10:47:14.7931831Z   ssh-user: git
+2026-11-11T10:47:14.7932333Z   persist-credentials: true
+2026-11-11T10:47:14.7932849Z   clean: true
+2026-11-11T10:47:14.7933326Z   sparse-checkout-cone-mode: true
+2026-11-11T10:47:14.7933884Z   fetch-depth: 1
+2026-11-11T10:47:14.7934342Z   fetch-tags: false
+2026-11-11T10:47:14.7934820Z   show-progress: true
+2026-11-11T10:47:14.7935294Z   lfs: false
+2026-11-11T10:47:14.7935734Z   submodules: false
+2026-11-11T10:47:14.7936209Z   set-safe-directory: true
+2026-11-11T10:47:14.7936763Z   allow-unsafe-pr-checkout: false
+2026-11-11T10:47:14.7937490Z env:
+2026-11-11T10:47:14.7937934Z   CARGO_TERM_COLOR: always
+2026-11-11T10:47:14.7938447Z   RUST_BACKTRACE: 1
+2026-11-11T10:47:14.7939097Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:47:14.7939584Z   RUST_TEST_THREADS: 1
+2026-11-11T10:47:14.7940069Z   QWEN_MODEL: Qwen3-0.6B
+2026-11-11T10:47:14.7940560Z ##[endgroup]
+2026-11-11T10:47:15.0630293Z Syncing repository: adybag14-cyber/rust-llama
+2026-11-11T10:47:15.0633531Z ##[group]Getting Git version info
+2026-11-11T10:47:15.0634793Z Working directory is '/home/runner/work/rust-llama/rust-llama'
+2026-11-11T10:47:15.0636633Z [command]/usr/bin/git version
+2026-11-11T10:47:15.0704761Z git version 2.56.0
+2026-11-11T10:47:15.0727190Z ##[endgroup]
+2026-11-11T10:47:15.0744943Z Temporarily overriding HOME='/home/runner/work/_temp/daec0202-c707-4c36-9008-ec08a92b0d7a' before making global git config changes
+2026-11-11T10:47:15.0747742Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T10:47:15.0750083Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:47:15.0811383Z Deleting the contents of '/home/runner/work/rust-llama/rust-llama'
+2026-11-11T10:47:15.0815058Z ##[group]Determining repository object format
+2026-11-11T10:47:15.0817630Z ##[endgroup]
+2026-11-11T10:47:15.0819296Z ##[group]Initializing the repository
+2026-11-11T10:47:15.0824047Z [command]/usr/bin/git init /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:47:15.0971675Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-11T10:47:15.0973569Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-11T10:47:15.0974801Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-11T10:47:15.0975929Z hint: call:
+2026-11-11T10:47:15.0976550Z hint:
+2026-11-11T10:47:15.0977751Z hint: 	git config --global init.defaultBranch <name>
+2026-11-11T10:47:15.0979202Z hint:
+2026-11-11T10:47:15.0980136Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-11T10:47:15.0982216Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-11T10:47:15.0984010Z hint:
+2026-11-11T10:47:15.0985090Z hint: 	git branch -m <name>
+2026-11-11T10:47:15.0986414Z hint:
+2026-11-11T10:47:15.0987875Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-11T10:47:15.0990577Z Initialized empty Git repository in /home/runner/work/rust-llama/rust-llama/.git/
+2026-11-11T10:47:15.0995138Z [command]/usr/bin/git remote add origin https://github.com/adybag14-cyber/rust-llama
+2026-11-11T10:47:15.1057301Z ##[endgroup]
+2026-11-11T10:47:15.1058309Z ##[group]Disabling automatic garbage collection
+2026-11-11T10:47:15.1059356Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-11T10:47:15.1096956Z ##[endgroup]
+2026-11-11T10:47:15.1098354Z ##[group]Setting up auth
+2026-11-11T10:47:15.1099634Z Removing SSH command configuration
+2026-11-11T10:47:15.1104593Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T10:47:15.1152858Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T10:47:15.1606344Z Removing HTTP extra header
+2026-11-11T10:47:15.1613090Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T10:47:15.1670465Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T10:47:15.1953178Z Removing includeIf entries pointing to credentials config files
+2026-11-11T10:47:15.1967285Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T10:47:15.2020473Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T10:47:15.2304505Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-11T10:47:15.2363571Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path /home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:15.2413236Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:15.2463898Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:15.2515029Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:15.2571426Z ##[endgroup]
+2026-11-11T10:47:15.2573033Z ##[group]Fetching the repository
+2026-11-11T10:47:15.2575323Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +532125a281bee745efd86a4458852a1ef689d184:refs/remotes/origin/main
+2026-11-11T10:47:22.1170398Z From https://github.com/adybag14-cyber/rust-llama
+2026-11-11T10:47:22.1172704Z  * [new ref]         532125a281bee745efd86a4458852a1ef689d184 -> origin/main
+2026-11-11T10:47:22.1180061Z [command]/usr/bin/git branch --list --remote origin/main
+2026-11-11T10:47:22.1224246Z   origin/main
+2026-11-11T10:47:22.1234045Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2026-11-11T10:47:22.1275449Z 532125a281bee745efd86a4458852a1ef689d184
+2026-11-11T10:47:22.1282462Z ##[endgroup]
+2026-11-11T10:47:22.1283784Z ##[group]Determining the checkout info
+2026-11-11T10:47:22.1285165Z ##[endgroup]
+2026-11-11T10:47:22.1287750Z [command]/usr/bin/git sparse-checkout disable
+2026-11-11T10:47:22.1361763Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-11T10:47:22.1414584Z ##[group]Checking out the ref
+2026-11-11T10:47:22.1418673Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-11T10:47:23.4322608Z Updating files:   4% (589/12229)
+2026-11-11T10:47:23.5601306Z Updating files:   5% (612/12229)
+2026-11-11T10:47:23.5704704Z Updating files:   6% (734/12229)
+2026-11-11T10:47:23.5811783Z Updating files:   7% (857/12229)
+2026-11-11T10:47:23.5915954Z Updating files:   8% (979/12229)
+2026-11-11T10:47:23.5980038Z Updating files:   9% (1101/12229)
+2026-11-11T10:47:23.6050323Z Updating files:  10% (1223/12229)
+2026-11-11T10:47:23.6140425Z Updating files:  11% (1346/12229)
+2026-11-11T10:47:23.6216667Z Updating files:  12% (1468/12229)
+2026-11-11T10:47:23.6276943Z Updating files:  13% (1590/12229)
+2026-11-11T10:47:23.6383998Z Updating files:  14% (1713/12229)
+2026-11-11T10:47:23.6496783Z Updating files:  15% (1835/12229)
+2026-11-11T10:47:23.6629947Z Updating files:  16% (1957/12229)
+2026-11-11T10:47:23.6750991Z Updating files:  17% (2079/12229)
+2026-11-11T10:47:23.6843771Z Updating files:  18% (2202/12229)
+2026-11-11T10:47:23.6929536Z Updating files:  19% (2324/12229)
+2026-11-11T10:47:23.6996232Z Updating files:  20% (2446/12229)
+2026-11-11T10:47:23.7074024Z Updating files:  21% (2569/12229)
+2026-11-11T10:47:23.7160826Z Updating files:  22% (2691/12229)
+2026-11-11T10:47:23.7203804Z Updating files:  23% (2813/12229)
+2026-11-11T10:47:23.7251923Z Updating files:  24% (2935/12229)
+2026-11-11T10:47:23.7291826Z Updating files:  25% (3058/12229)
+2026-11-11T10:47:23.7335509Z Updating files:  26% (3180/12229)
+2026-11-11T10:47:23.7383391Z Updating files:  27% (3302/12229)
+2026-11-11T10:47:23.7440675Z Updating files:  28% (3425/12229)
+2026-11-11T10:47:23.7486233Z Updating files:  29% (3547/12229)
+2026-11-11T10:47:23.7580405Z Updating files:  30% (3669/12229)
+2026-11-11T10:47:23.7620027Z Updating files:  31% (3791/12229)
+2026-11-11T10:47:23.7663972Z Updating files:  32% (3914/12229)
+2026-11-11T10:47:23.7707718Z Updating files:  33% (4036/12229)
+2026-11-11T10:47:23.7749520Z Updating files:  34% (4158/12229)
+2026-11-11T10:47:23.7826709Z Updating files:  35% (4281/12229)
+2026-11-11T10:47:23.7866921Z Updating files:  36% (4403/12229)
+2026-11-11T10:47:23.7902993Z Updating files:  37% (4525/12229)
+2026-11-11T10:47:23.7943270Z Updating files:  38% (4648/12229)
+2026-11-11T10:47:23.7984502Z Updating files:  39% (4770/12229)
+2026-11-11T10:47:23.8044753Z Updating files:  40% (4892/12229)
+2026-11-11T10:47:23.8102069Z Updating files:  41% (5014/12229)
+2026-11-11T10:47:23.8171781Z Updating files:  42% (5137/12229)
+2026-11-11T10:47:23.8235717Z Updating files:  43% (5259/12229)
+2026-11-11T10:47:23.8305348Z Updating files:  44% (5381/12229)
+2026-11-11T10:47:23.8374973Z Updating files:  45% (5504/12229)
+2026-11-11T10:47:23.8439049Z Updating files:  46% (5626/12229)
+2026-11-11T10:47:23.8657649Z Updating files:  47% (5748/12229)
+2026-11-11T10:47:23.8695846Z Updating files:  48% (5870/12229)
+2026-11-11T10:47:23.8756278Z Updating files:  49% (5993/12229)
+2026-11-11T10:47:23.8796878Z Updating files:  50% (6115/12229)
+2026-11-11T10:47:23.8855488Z Updating files:  51% (6237/12229)
+2026-11-11T10:47:23.8898887Z Updating files:  52% (6360/12229)
+2026-11-11T10:47:23.8943628Z Updating files:  53% (6482/12229)
+2026-11-11T10:47:23.8982022Z Updating files:  54% (6604/12229)
+2026-11-11T10:47:23.9048526Z Updating files:  55% (6726/12229)
+2026-11-11T10:47:23.9118186Z Updating files:  56% (6849/12229)
+2026-11-11T10:47:23.9187467Z Updating files:  57% (6971/12229)
+2026-11-11T10:47:23.9238614Z Updating files:  58% (7093/12229)
+2026-11-11T10:47:23.9276910Z Updating files:  59% (7216/12229)
+2026-11-11T10:47:23.9352409Z Updating files:  60% (7338/12229)
+2026-11-11T10:47:23.9415919Z Updating files:  61% (7460/12229)
+2026-11-11T10:47:23.9471883Z Updating files:  62% (7582/12229)
+2026-11-11T10:47:23.9511387Z Updating files:  63% (7705/12229)
+2026-11-11T10:47:23.9576938Z Updating files:  64% (7827/12229)
+2026-11-11T10:47:23.9619491Z Updating files:  65% (7949/12229)
+2026-11-11T10:47:23.9683709Z Updating files:  66% (8072/12229)
+2026-11-11T10:47:23.9737453Z Updating files:  67% (8194/12229)
+2026-11-11T10:47:23.9831329Z Updating files:  68% (8316/12229)
+2026-11-11T10:47:23.9905709Z Updating files:  69% (8439/12229)
+2026-11-11T10:47:23.9988380Z Updating files:  70% (8561/12229)
+2026-11-11T10:47:24.0070698Z Updating files:  71% (8683/12229)
+2026-11-11T10:47:24.0165820Z Updating files:  72% (8805/12229)
+2026-11-11T10:47:24.0277717Z Updating files:  73% (8928/12229)
+2026-11-11T10:47:24.0354043Z Updating files:  74% (9050/12229)
+2026-11-11T10:47:24.0431192Z Updating files:  75% (9172/12229)
+2026-11-11T10:47:24.0474550Z Updating files:  76% (9295/12229)
+2026-11-11T10:47:24.0522186Z Updating files:  77% (9417/12229)
+2026-11-11T10:47:24.0599468Z Updating files:  78% (9539/12229)
+2026-11-11T10:47:24.0649503Z Updating files:  79% (9661/12229)
+2026-11-11T10:47:24.0696597Z Updating files:  80% (9784/12229)
+2026-11-11T10:47:24.0729123Z Updating files:  81% (9906/12229)
+2026-11-11T10:47:24.0769742Z Updating files:  82% (10028/12229)
+2026-11-11T10:47:24.0801808Z Updating files:  83% (10151/12229)
+2026-11-11T10:47:24.0836395Z Updating files:  84% (10273/12229)
+2026-11-11T10:47:24.0869160Z Updating files:  85% (10395/12229)
+2026-11-11T10:47:24.0906273Z Updating files:  86% (10517/12229)
+2026-11-11T10:47:24.0938216Z Updating files:  87% (10640/12229)
+2026-11-11T10:47:24.1003211Z Updating files:  88% (10762/12229)
+2026-11-11T10:47:24.1053046Z Updating files:  89% (10884/12229)
+2026-11-11T10:47:24.1096723Z Updating files:  90% (11007/12229)
+2026-11-11T10:47:24.1213636Z Updating files:  91% (11129/12229)
+2026-11-11T10:47:24.1941619Z Updating files:  92% (11251/12229)
+2026-11-11T10:47:24.2635297Z Updating files:  92% (11348/12229)
+2026-11-11T10:47:24.2681585Z Updating files:  93% (11373/12229)
+2026-11-11T10:47:24.2729212Z Updating files:  94% (11496/12229)
+2026-11-11T10:47:24.4206099Z Updating files:  95% (11618/12229)
+2026-11-11T10:47:25.1639693Z Updating files:  96% (11740/12229)
+2026-11-11T10:47:25.1849263Z Updating files:  96% (11854/12229)
+2026-11-11T10:47:25.2965894Z Updating files:  97% (11863/12229)
+2026-11-11T10:47:25.3205024Z Updating files:  98% (11985/12229)
+2026-11-11T10:47:25.3962129Z Updating files:  99% (12107/12229)
+2026-11-11T10:47:25.3962654Z Updating files: 100% (12229/12229)
+2026-11-11T10:47:25.3963075Z Updating files: 100% (12229/12229), done.
+2026-11-11T10:47:25.4133938Z Switched to a new branch 'main'
+2026-11-11T10:47:25.4138563Z branch 'main' set up to track 'origin/main'.
+2026-11-11T10:47:25.4314907Z ##[endgroup]
+2026-11-11T10:47:25.4384526Z [command]/usr/bin/git log -1 --format=%H
+2026-11-11T10:47:25.4432046Z 532125a281bee745efd86a4458852a1ef689d184
+2026-11-11T10:47:25.4679180Z ##[group]Run rustup toolchain install 1.99.1 --profile minimal
+2026-11-11T10:47:25.4679787Z [36;1mrustup toolchain install 1.99.1 --profile minimal[0m
+2026-11-11T10:47:25.4710270Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:47:25.4710583Z env:
+2026-11-11T10:47:25.4710803Z   CARGO_TERM_COLOR: always
+2026-11-11T10:47:25.4711060Z   RUST_BACKTRACE: 1
+2026-11-11T10:47:25.4711279Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:47:25.4711770Z   RUST_TEST_THREADS: 1
+2026-11-11T10:47:25.4711998Z   QWEN_MODEL: Qwen3-0.6B
+2026-11-11T10:47:25.4712231Z ##[endgroup]
+2026-11-11T10:47:26.6056007Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-11T10:47:27.4182184Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:47:27.4225354Z info: downloading 3 components
+2026-11-11T10:47:36.4166935Z 
+2026-11-11T10:47:36.4347794Z   1.99.1-x86_64-unknown-linux-gnu installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:47:36.4348485Z 
+2026-11-11T10:47:37.2177290Z ##[group]Run cargo fetch --locked
+2026-11-11T10:47:37.2177627Z [36;1mcargo fetch --locked[0m
+2026-11-11T10:47:37.2202396Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:47:37.2202695Z env:
+2026-11-11T10:47:37.2202909Z   CARGO_TERM_COLOR: always
+2026-11-11T10:47:37.2203164Z   RUST_BACKTRACE: 1
+2026-11-11T10:47:37.2203384Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:47:37.2203610Z   RUST_TEST_THREADS: 1
+2026-11-11T10:47:37.2203860Z   QWEN_MODEL: Qwen3-0.6B
+2026-11-11T10:47:37.2204135Z ##[endgroup]
+2026-11-11T10:47:37.4460608Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-11T10:47:37.6907983Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:47:37.7081370Z info: downloading 2 components
+2026-11-11T10:47:38.5411618Z [1m[92m    Updating[0m crates.io index
+2026-11-11T10:47:38.7378713Z [1m[92m Downloading[0m crates ...
+2026-11-11T10:47:38.8650424Z [1m[92m  Downloaded[0m arraydeque v0.5.1
+2026-11-11T10:47:38.8674889Z [1m[92m  Downloaded[0m hashlink v0.12.2
+2026-11-11T10:47:38.8700264Z [1m[92m  Downloaded[0m foldhash v0.2.0
+2026-11-11T10:47:38.8712858Z [1m[92m  Downloaded[0m yaml-rust2 v0.13.0
+2026-11-11T10:47:38.8808332Z [1m[92m  Downloaded[0m hashbrown v0.17.1
+2026-11-11T10:47:39.5670216Z ##[group]Run $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json
+2026-11-11T10:47:39.5671338Z [36;1m$manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json[0m
+2026-11-11T10:47:39.5672132Z [36;1m$selected = @($manifest.models | Where-Object { $_.name -eq $env:QWEN_MODEL })[0m
+2026-11-11T10:47:39.5672702Z [36;1mif ($selected.Count -ne 1) { throw "Expected one pinned model named $env:QWEN_MODEL" }[0m
+2026-11-11T10:47:39.5673171Z [36;1mforeach ($model in $manifest.models) {[0m
+2026-11-11T10:47:39.5673598Z [36;1m  # The complete-file test needs all eight inputs for this matrix model.[0m
+2026-11-11T10:47:39.5674106Z [36;1m  # Both small tokenizer JSONs also support the official tokenizer replay.[0m
+2026-11-11T10:47:39.5674547Z [36;1m  $files = if ($model.name -eq $env:QWEN_MODEL) {[0m
+2026-11-11T10:47:39.5674919Z [36;1m    @($model.inputs)[0m
+2026-11-11T10:47:39.5675167Z [36;1m  } else {[0m
+2026-11-11T10:47:39.5675498Z [36;1m    @($model.inputs | Where-Object { $_.path -eq 'tokenizer.json' })[0m
+2026-11-11T10:47:39.5675862Z [36;1m  }[0m
+2026-11-11T10:47:39.5676080Z [36;1m  foreach ($file in $files) {[0m
+2026-11-11T10:47:39.5676449Z [36;1m    $directory = Join-Path $env:LLAMA_TEST_QWEN_HF_ROOT $model.name[0m
+2026-11-11T10:47:39.5676876Z [36;1m    $destination = Join-Path $directory $file.path[0m
+2026-11-11T10:47:39.5677406Z [36;1m    $url = "https://huggingface.co/$($model.repository)/resolve/$($model.revision)/$($file.path)"[0m
+2026-11-11T10:47:39.5678173Z [36;1m    & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $file.bytes --create-dirs --output $destination $url[0m
+2026-11-11T10:47:39.5679102Z [36;1m    if ($LASTEXITCODE -ne 0) { throw "Download failed: $($model.name)/$($file.path)" }[0m
+2026-11-11T10:47:39.5679630Z [36;1m    if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {[0m
+2026-11-11T10:47:39.5680070Z [36;1m      throw "Length mismatch: $($model.name)/$($file.path)"[0m
+2026-11-11T10:47:39.5680397Z [36;1m    }[0m
+2026-11-11T10:47:39.5681109Z [36;1m    $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()[0m
+2026-11-11T10:47:39.5681706Z [36;1m    if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: $($model.name)/$($file.path)" }[0m
+2026-11-11T10:47:39.5682266Z [36;1m    Write-Host "Verified $($model.name)/$($file.path): $($file.bytes) bytes, SHA-256 $hash"[0m
+2026-11-11T10:47:39.5682671Z [36;1m  }[0m
+2026-11-11T10:47:39.5682867Z [36;1m}[0m
+2026-11-11T10:47:39.5708334Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:47:39.5708624Z env:
+2026-11-11T10:47:39.5708950Z   CARGO_TERM_COLOR: always
+2026-11-11T10:47:39.5709189Z   RUST_BACKTRACE: 1
+2026-11-11T10:47:39.5709397Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:47:39.5709613Z   RUST_TEST_THREADS: 1
+2026-11-11T10:47:39.5709835Z   QWEN_MODEL: Qwen3-0.6B
+2026-11-11T10:47:39.5710142Z   LLAMA_TEST_QWEN_HF_ROOT: /home/runner/work/_temp/qwen-hf
+2026-11-11T10:47:39.5710476Z ##[endgroup]
+2026-11-11T10:47:40.4546145Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:47:40.4547007Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:47:40.4547394Z 
+2026-11-11T10:47:40.5104936Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:40.6169514Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:40.6170273Z 100   298  100   298    0     0   1834      0 --:--:-- --:--:-- --:--:--  1828
+2026-11-11T10:47:40.7693119Z 
+2026-11-11T10:47:40.7694217Z 100 6866k  100 6866k    0     0  21.2M      0 --:--:-- --:--:-- --:--:-- 21.2M
+2026-11-11T10:47:40.8069832Z Verified Qwen2.5-0.5B-Instruct/tokenizer.json: 7031645 bytes, SHA-256 c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539
+2026-11-11T10:47:40.8241557Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:47:40.8242459Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:47:40.8242882Z 
+2026-11-11T10:47:40.9213539Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:40.9214076Z 100   266  100   266    0     0   2732      0 --:--:-- --:--:-- --:--:--  2742
+2026-11-11T10:47:40.9432452Z 
+2026-11-11T10:47:40.9433095Z 100 13965  100 13965    0     0   114k      0 --:--:-- --:--:-- --:--:--  114k
+2026-11-11T10:47:40.9473830Z Verified Qwen3-0.6B/README.md: 13965 bytes, SHA-256 1ab64a26fcb3b461423b89a433a8c858f1bf8d4086f979cbb3ff878d47cf20e9
+2026-11-11T10:47:40.9633546Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:47:40.9634447Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:47:40.9635274Z 
+2026-11-11T10:47:41.0650211Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:41.0650849Z 100   270  100   270    0     0   2653      0 --:--:-- --:--:-- --:--:--  2673
+2026-11-11T10:47:41.0854602Z 
+2026-11-11T10:47:41.0855708Z 100   726  100   726    0     0   5939      0 --:--:-- --:--:-- --:--:--  5939
+2026-11-11T10:47:41.0895972Z Verified Qwen3-0.6B/config.json: 726 bytes, SHA-256 660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd
+2026-11-11T10:47:41.1066288Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:47:41.1067033Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:47:41.1067422Z 
+2026-11-11T10:47:41.2020646Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:41.2021121Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:47:41.2021491Z curl: (63) Maximum file size exceeded
+2026-11-11T10:47:41.3573100Z [31;1mException: [0m/home/runner/work/_temp/7b616162-2ccc-4d59-9953-9e14e3f9a5d0.ps1:18[0m
+2026-11-11T10:47:41.3573663Z [31;1m[0m[36;1mLine |[0m
+2026-11-11T10:47:41.3574277Z [31;1m[0m[36;1m[36;1m  18 | [0m … CODE -ne 0) { [36;1mthrow "Download failed: $($model.name)/$($file.path)"[0m }[0m
+2026-11-11T10:47:41.3575769Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+2026-11-11T10:47:41.3576799Z [31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mDownload failed: Qwen3-0.6B/generation_config.json[0m
+2026-11-11T10:47:41.4078014Z ##[error]Process completed with exit code 1.
+2026-11-11T10:47:41.4225309Z Post job cleanup.
+2026-11-11T10:47:41.5227873Z [command]/usr/bin/git version
+2026-11-11T10:47:41.5312501Z git version 2.56.0
+2026-11-11T10:47:41.5352692Z Temporarily overriding HOME='/home/runner/work/_temp/5b4695d9-6d0d-4a1d-9db9-32013d13903f' before making global git config changes
+2026-11-11T10:47:41.5353931Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T10:47:41.5358518Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:47:41.5404998Z Removing SSH command configuration
+2026-11-11T10:47:41.5413145Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T10:47:41.5479995Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T10:47:41.5872563Z Removing HTTP extra header
+2026-11-11T10:47:41.5880308Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T10:47:41.5932405Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T10:47:41.6283338Z Removing includeIf entries pointing to credentials config files
+2026-11-11T10:47:41.6291546Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T10:47:41.6341337Z includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path
+2026-11-11T10:47:41.6342057Z includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-11T10:47:41.6342500Z includeif.gitdir:/github/workspace/.git.path
+2026-11-11T10:47:41.6342873Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-11T10:47:41.6352685Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path
+2026-11-11T10:47:41.6394210Z /home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:41.6405771Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-10dc30d7\-ba49\-4f89\-835d\-082cb8878673\.config
+2026-11-11T10:47:41.6461281Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-11T10:47:41.6506084Z /home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:41.6516719Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-10dc30d7\-ba49\-4f89\-835d\-082cb8878673\.config
+2026-11-11T10:47:41.6567970Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-11T10:47:41.6606960Z /github/runner_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:41.6616687Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-10dc30d7\-ba49\-4f89\-835d\-082cb8878673\.config
+2026-11-11T10:47:41.6669239Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-11T10:47:41.6710384Z /github/runner_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config
+2026-11-11T10:47:41.6719722Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-10dc30d7\-ba49\-4f89\-835d\-082cb8878673\.config
+2026-11-11T10:47:41.6771779Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T10:47:41.7074961Z Removing credentials config '/home/runner/work/_temp/git-credentials-10dc30d7-ba49-4f89-835d-082cb8878673.config'
+2026-11-11T10:47:41.7252891Z Cleaning up orphan processes

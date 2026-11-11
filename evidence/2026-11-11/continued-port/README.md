@@ -127,6 +127,15 @@ they are not whole-repository prose, license and release-policy guards.
 
 ## Publication and remaining work
 
+The next run started all six jobs, then its two GNU Qwen jobs exposed a
+transport limit issue: the 242/239-byte generation configurations have
+314/292-byte HTTP redirect bodies. A tiny GNU curl probe reproduces the old
+exit 63 and verifies exact final files with a bounded 1 MiB minimum transfer
+allowance. The workflow retains the exact final length and SHA-256 checks.
+[Download correction evidence](ci-download-envelope-fix/correction.json)
+preserves both failed job logs, redirect observations, probe outputs and the
+new workflow manifest. All 1,279 selected non-CI inputs remain unchanged.
+
 The first published workflow was rejected before any job started in
 [run 43005930716](https://github.com/adybag14-cyber/rust-llama/actions/runs/43005930716).
 Its Qwen paths used the runner context at job-level environment scope. The

@@ -133,7 +133,9 @@ jobs:
               $directory = Join-Path $env:LLAMA_TEST_QWEN_HF_ROOT $model.name
               $destination = Join-Path $directory $file.path
               $url = "https://huggingface.co/$($model.repository)/resolve/$($model.revision)/$($file.path)"
-              & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $file.bytes --create-dirs --output $destination $url
+              # Redirect bodies can exceed tiny targets; final length and SHA-256 stay exact.
+              $maximumTransferBytes = [Math]::Max([long]$file.bytes, [long]1048576)
+              & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $maximumTransferBytes --create-dirs --output $destination $url
               if ($LASTEXITCODE -ne 0) { throw "Download failed: $($model.name)/$($file.path)" }
               if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {
                 throw "Length mismatch: $($model.name)/$($file.path)"
