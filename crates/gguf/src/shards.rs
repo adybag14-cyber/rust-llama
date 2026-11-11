@@ -333,6 +333,15 @@ impl GgufSet {
         self.tensor_shard(name)
             .map(|index| self.shards[index].info.endian)
     }
+    /// Read a bounded byte range of one tensor without allocating the full payload.
+    /// The source shard is the same owned handle whose header was validated.
+    pub fn read_tensor_range(&mut self, name: &str, offset: u64, out: &mut [u8]) -> Result<()> {
+        let index = self
+            .tensor_index(name)
+            .ok_or_else(|| invalid(format!("missing tensor {name}")))?;
+        let shard = &mut self.shards[self.tensor_shards[index]].file;
+        shard.read_model_range(&self.tensors[index], offset, out)
+    }
     pub fn read_tensor(&mut self, name: &str) -> Result<Vec<u8>> {
         let index = self
             .tensor_index(name)

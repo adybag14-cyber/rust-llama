@@ -425,6 +425,40 @@ impl<R: Read + Seek> RawGguf<R> {
         Ok(result)
     }
 
+    /// Read a checked subrange through the retained model file handle.
+    pub(crate) fn read_model_range(
+        &mut self,
+        tensor: &TensorInfo,
+        offset: u64,
+        out: &mut [u8],
+    ) -> Result<()> {
+        if out.len() > self.limits.max_tensor_read_bytes {
+            return Err(Error::Limit(
+                "tensor range exceeds payload read budget".into(),
+            ));
+        }
+        let end = offset
+            .checked_add(out.len() as u64)
+            .ok_or_else(|| invalid("tensor range overflow"))?;
+        if end > tensor.byte_len {
+            return Err(invalid("tensor range exceeds descriptor"));
+        }
+        let position = self
+            .data_offset
+            .checked_add(tensor.offset)
+            .and_then(|v| v.checked_add(offset))
+            .ok_or_else(|| invalid("tensor range file offset overflow"))?;
+        if position
+            .checked_add(out.len() as u64)
+            .is_none_or(|v| v > self.file_len)
+        {
+            return Err(invalid("tensor range exceeds retained file length"));
+        }
+        self.reader.seek(SeekFrom::Start(position))?;
+        self.reader.read_exact(out)?;
+        Ok(())
+    }
+
     pub(crate) fn read_model_tensor(&mut self, info: &TensorInfo) -> Result<Vec<u8>> {
         read_tensor_payload_info(
             &mut self.reader,

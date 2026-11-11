@@ -1,6 +1,7 @@
 //! Bounded byte ECMAScript matching for the frozen C grammar trigger contract.
 //! Byte classes, capture order, lookahead and identity escapes follow the frozen
-//! MSVC C-locale target; complexity/allocation limits report checked errors.
+//! MSVC C-locale default and an explicit frozen libstdc++ C-locale profile;
+//! complexity/allocation limits report checked errors.
 use crate::{Error, Result};
 use std::ops::Range;
 use std::sync::Arc;
@@ -35,8 +36,14 @@ struct Node {
     kind: Kind,
     captures: Range<usize>,
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RegexProfile {
+    Msvc,
+    Gnu,
+}
 #[derive(Debug)]
 struct Program {
+    profile: RegexProfile,
     nodes: Vec<Node>,
     root: usize,
     groups: usize,
@@ -52,6 +59,7 @@ pub struct NativeMatch {
     pub captures: Vec<Option<Range<usize>>>,
 }
 struct Parser<'a> {
+    profile: RegexProfile,
     pattern: &'a [u8],
     pos: usize,
     nodes: Vec<Node>,
@@ -69,7 +77,7 @@ fn one(byte: u8) -> Box<[bool; 256]> {
     c[byte as usize] = true;
     c
 }
-fn named(name: &[u8]) -> Result<Box<[bool; 256]>> {
+fn named(name: &[u8], profile: RegexProfile) -> Result<Box<[bool; 256]>> {
     let mut c = Box::new([false; 256]);
     for n in 0u16..256 {
         let b = n as u8;
@@ -79,7 +87,13 @@ fn named(name: &[u8]) -> Result<Box<[bool; 256]>> {
             b"w" => b.is_ascii_alphanumeric() || b == b'_',
             b"alnum" => b.is_ascii_alphanumeric(),
             b"alpha" => b.is_ascii_alphabetic(),
-            b"blank" => matches!(b, b' ' | b'\t' | b'\n' | b'\r' | 0x0b | 0x0c),
+            b"blank" => {
+                if profile == RegexProfile::Gnu {
+                    matches!(b, b' ' | b'\t')
+                } else {
+                    matches!(b, b' ' | b'\t' | b'\n' | b'\r' | 0x0b | 0x0c)
+                }
+            }
             b"cntrl" => b < 32 || b == 127,
             b"graph" => b.is_ascii_graphic(),
             b"lower" => b.is_ascii_lowercase(),
@@ -92,8 +106,10 @@ fn named(name: &[u8]) -> Result<Box<[bool; 256]>> {
     }
     Ok(c)
 }
-fn collating(name: &[u8]) -> Result<u8> {
-    if name.len() == 1 {
+fn collating(name: &[u8], profile: RegexProfile) -> Result<u8> {
+    if profile == RegexProfile::Gnu && name == b"space" {
+        Ok(b' ')
+    } else if name.len() == 1 {
         Ok(name[0])
     } else {
         Err(error("unknown C-locale collating element"))
@@ -173,7 +189,11 @@ impl Parser<'_> {
             };
             value = (value << 4) + u32::from(x);
         }
-        u8::try_from(value).map_err(|_| error("escape exceeds byte character range"))
+        if self.profile == RegexProfile::Gnu {
+            Ok(value as u8)
+        } else {
+            u8::try_from(value).map_err(|_| error("escape exceeds byte character range"))
+        }
     }
     fn escaped_atom(&mut self, in_class: bool) -> Result<Atom> {
         let b = self.take()?;
@@ -185,7 +205,9 @@ impl Parser<'_> {
             b'v' => 11,
             b'b' if in_class => 8,
             b'0' => {
-                if self.peek().is_some_and(|v| v.is_ascii_digit()) {
+                if self.profile == RegexProfile::Msvc
+                    && self.peek().is_some_and(|v| v.is_ascii_digit())
+                {
                     return Err(error("octal escape is not ECMAScript"));
                 }
                 0
@@ -195,13 +217,17 @@ impl Parser<'_> {
             b'u' => self.hex(4)?,
             b'c' => {
                 let x = self.take()?;
-                if !x.is_ascii_alphabetic() {
-                    return Err(error("invalid control escape"));
+                if self.profile == RegexProfile::Gnu {
+                    x
+                } else {
+                    if !x.is_ascii_alphabetic() {
+                        return Err(error("invalid control escape"));
+                    }
+                    x % 32
                 }
-                x % 32
             }
             b'd' | b'D' | b's' | b'S' | b'w' | b'W' => {
-                let mut set = named(&[b.to_ascii_lowercase()])?;
+                let mut set = named(&[b.to_ascii_lowercase()], self.profile)?;
                 if b.is_ascii_uppercase() {
                     for value in set.iter_mut() {
                         *value = !*value;
@@ -237,9 +263,17 @@ impl Parser<'_> {
                 return Err(error("invalid delimited character class"));
             }
             return if marker == b':' {
-                Ok(Atom::Set(named(&name)?))
+                Ok(Atom::Set(named(&name, self.profile)?))
             } else {
-                Ok(Atom::Byte(collating(&name)?))
+                let byte = collating(&name, self.profile)?;
+                if marker == b'=' && self.profile == RegexProfile::Gnu && byte.is_ascii_alphabetic()
+                {
+                    let mut set = one(byte.to_ascii_lowercase());
+                    set[byte.to_ascii_uppercase() as usize] = true;
+                    Ok(Atom::Set(set))
+                } else {
+                    Ok(Atom::Byte(byte))
+                }
             };
         }
         Ok(Atom::Byte(self.take()?))
@@ -363,50 +397,57 @@ impl Parser<'_> {
                 other => self.push(Kind::Class(one(other)), 0..0)?,
             };
             if quantifiable {
-                let repeat = match self.peek() {
-                    Some(b'*') => {
-                        self.pos += 1;
-                        Some((0, None))
-                    }
-                    Some(b'+') => {
-                        self.pos += 1;
-                        Some((1, None))
-                    }
-                    Some(b'?') => {
-                        self.pos += 1;
-                        Some((0, Some(1)))
-                    }
-                    Some(b'{') => {
-                        self.pos += 1;
-                        let min = self.number()?;
-                        let max = if self.eat(b',') {
-                            if self.peek() == Some(b'}') {
-                                None
-                            } else {
-                                Some(self.number()?)
-                            }
-                        } else {
-                            Some(min)
-                        };
-                        if !self.eat(b'}') || max.is_some_and(|n| n < min) {
-                            return Err(error("invalid repetition bounds"));
+                loop {
+                    let repeat = match self.peek() {
+                        Some(b'*') => {
+                            self.pos += 1;
+                            Some((0, None))
                         }
-                        Some((min, max))
+                        Some(b'+') => {
+                            self.pos += 1;
+                            Some((1, None))
+                        }
+                        Some(b'?') => {
+                            self.pos += 1;
+                            Some((0, Some(1)))
+                        }
+                        Some(b'{') => {
+                            self.pos += 1;
+                            let min = self.number()?;
+                            let max = if self.eat(b',') {
+                                if self.peek() == Some(b'}') {
+                                    None
+                                } else {
+                                    Some(self.number()?)
+                                }
+                            } else {
+                                Some(min)
+                            };
+                            if !self.eat(b'}') || max.is_some_and(|n| n < min) {
+                                return Err(error("invalid repetition bounds"));
+                            }
+                            Some((min, max))
+                        }
+                        _ => None,
+                    };
+                    if let Some((min, max)) = repeat {
+                        let greedy = !self.eat(b'?');
+                        let captures = self.nodes[node].captures.clone();
+                        node = self.push(
+                            Kind::Repeat {
+                                child: node,
+                                min,
+                                max,
+                                greedy,
+                            },
+                            captures,
+                        )?;
+                    } else {
+                        break;
                     }
-                    _ => None,
-                };
-                if let Some((min, max)) = repeat {
-                    let greedy = !self.eat(b'?');
-                    let captures = self.nodes[node].captures.clone();
-                    node = self.push(
-                        Kind::Repeat {
-                            child: node,
-                            min,
-                            max,
-                            greedy,
-                        },
-                        captures,
-                    )?;
+                    if self.profile != RegexProfile::Gnu {
+                        break;
+                    }
                 }
             }
             items.push(node);
@@ -516,10 +557,15 @@ impl Budget {
 }
 impl NativeRegex {
     pub fn parse(pattern: &[u8]) -> Result<Self> {
+        Self::parse_with_profile(pattern, RegexProfile::Msvc)
+    }
+    /// Explicit native library policy; existing grammar callers keep MSVC semantics.
+    pub fn parse_with_profile(pattern: &[u8], profile: RegexProfile) -> Result<Self> {
         if pattern.len() > MAX_PATTERN {
             return Err(error("pattern size exceeds limit"));
         }
         let mut parser = Parser {
+            profile,
             pattern,
             pos: 0,
             nodes: Vec::new(),
@@ -531,6 +577,7 @@ impl NativeRegex {
         }
         Ok(Self {
             program: Arc::new(Program {
+                profile,
                 nodes: parser.nodes,
                 root,
                 groups: parser.finished.len(),
@@ -663,6 +710,8 @@ impl NativeRegex {
                             } else {
                                 failed = true;
                             }
+                        } else if self.program.profile == RegexProfile::Gnu {
+                            failed = true;
                         }
                     }
                     Kind::Look(child, positive) => {

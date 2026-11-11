@@ -11,7 +11,7 @@ mod writer;
 pub use shards::{GgufSet, ShardInfo, ShardLimits};
 pub use writer::{
     RawTensorDescriptor, TensorDescriptor, WriteLayout, write_header, write_ordered,
-    write_raw_header,
+    write_raw_header, write_tool_header,
 };
 
 use llama_quant::DType;

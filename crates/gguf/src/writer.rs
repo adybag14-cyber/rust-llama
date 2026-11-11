@@ -468,6 +468,19 @@ pub fn write_raw_header<W: Write>(
 ) -> Result<WriteLayout> {
     raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::RAW)
 }
+/// Write the frozen copying tools' GGUF v3 header: native C-string projection,
+/// trailing singleton rank collapse, and physical 32-byte alignment. Metadata
+/// alignment is copied as data, as in the original tool. The caller is responsible
+/// for setter ordering and duplicate C-prefix normalization before this call.
+pub fn write_tool_header<W: Write>(
+    out: &mut W,
+    metadata: &[(&[u8], &RawValue)],
+    tensors: &[RawTensorDescriptor<'_>],
+    limits: &Limits,
+) -> Result<WriteLayout> {
+    raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::FROZEN_TOOL)
+}
+
 pub(crate) fn native_raw_header<W: Write>(
     out: &mut W,
     metadata: &[(&[u8], &RawValue)],

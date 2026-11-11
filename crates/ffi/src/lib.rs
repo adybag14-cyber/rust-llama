@@ -25,6 +25,11 @@ mod enum_names;
 mod logging;
 mod memory;
 mod model;
+mod quantization;
+pub use quantization::{
+    LlamaModelImatrixData, LlamaModelKvOverride, LlamaModelKvOverrideValue,
+    LlamaModelQuantizeParams, LlamaModelTensorOverride,
+};
 mod model_metadata;
 mod native_metadata_policy;
 mod sampler;
