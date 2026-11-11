@@ -1,0 +1,33 @@
+   Compiling foldhash v0.2.0
+   Compiling llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\quant)
+   Compiling hashbrown v0.17.1
+   Compiling hashlink v0.12.2
+   Compiling llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\gguf)
+   Compiling arraydeque v0.5.1
+   Compiling yaml-rust2 v0.13.0
+   Compiling llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\tokenizer)
+   Compiling llama-conformance v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\llama-conformance)
+   Compiling llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\llama-behavior)
+   Compiling llama-checkpoint v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\checkpoint)
+   Compiling llama-convert v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\convert\crates\convert)
+error[E0061]: this method takes 3 arguments but 2 arguments were supplied
+   --> crates\convert\src\hf_qwen_reference.rs:338:17
+    |
+338 |         backend.override_direct_prefix(Some(config), false).unwrap();
+    |                 ^^^^^^^^^^^^^^^^^^^^^^--------------------- argument #3 of type `bool` is missing
+    |
+note: method defined here
+   --> crates\convert\src\hf_backend.rs:451:12
+    |
+451 |     pub fn override_direct_prefix(
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+455 |         is_bloom: bool,
+    |         --------------
+help: provide the argument
+    |
+338 |         backend.override_direct_prefix(Some(config), false, /* bool */).unwrap();
+    |                                                           ++++++++++++
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `llama-convert` (lib test) due to 1 previous error

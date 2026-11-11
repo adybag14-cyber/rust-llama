@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "status": "reviewed_no_blocking_findings",
+  "reviewer": "port_gap_audit",
+  "scope": "Read-only focused review of the shared boundaries added during the BLOOM converter package; not an execution or full converter re-certification.",
+  "reviewed_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\gguf\\src\\writer.rs",
+      "bytes": 24102,
+      "sha256": "6b0f89518eafb53e82124bd2c914afbbf9107f9867b36451354481de1acde20e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\gguf\\tests\\source_conversion.rs",
+      "bytes": 3925,
+      "sha256": "259f02c87a175494d29cb8369580906898a7eaedd6d0ef60ed0435a662bd98d4"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\hf_backend.rs",
+      "bytes": 48063,
+      "sha256": "f6905799556ae593444d08121eaecb67c521644ad349c35cf12d0a22b3858ad1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\hf_schema.rs",
+      "bytes": 28240,
+      "sha256": "360ec821dd7d744914e9e8c50f9ece2452ef5412961bf55ef8c6ebf454af72d1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\tensors.rs",
+      "bytes": 29165,
+      "sha256": "299f540c18c9c8d4872e386f386cb229f19563d5cea06544999b257c274ab9b0"
+    }
+  ],
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_paths": [
+    "conversion/base.py::ModelBase.filter_tensors",
+    "conversion/base.py::TextModel.filter_tensors",
+    "conversion/llama.py::LlamaModel.filter_tensors",
+    "conversion/bloom.py",
+    "pinned tokenizer JSON BLOOM_PATTERN"
+  ],
+  "findings": [],
+  "notes": [
+    "SOURCE_CONVERSION is an explicit raw-header policy; strict raw/text writer policies continue to reject nested arrays. Validation of element types, 64 array levels, cumulative values, bytes, strings and layout precedes output writes.",
+    "The nested writer encoder uses the exact typed recursive representation after validation. Unit tests include no-write failure guards and verify strict readers still reject the extension.",
+    "The one-child ByteLevel decoder Sequence recurses through the existing schema depth check and does not mark unrelated decoder pipelines executable.",
+    "BloomSplit advances at UTF-8 scalar boundaries, retains unmatched runs for Isolated semantics, consumes each successful matched span once, and charges input length against work limits.",
+    "Only the Llama subclass removes every text_model. wrapper before multimodal filtering. TextModel strips one leading model. only for its skip predicate while retaining the original name. ModelBase tests the e_score_correction_bias suffix before replacing language_model. wrappers; current Rust order matches those source methods.",
+    "The filter test pins six family decisions from the newly captured original data; full pipeline/native test completion remains the owner's execution gate."
+  ],
+  "qualification": "No builds, product edits, or native executions performed for this review. Broader source acceptance and all official model byte comparisons are established separately by package-owner receipts."
+}

@@ -66,6 +66,7 @@ pub(crate) struct HeaderPolicy {
     frozen_tool: bool,
     native_header: bool,
     raw_strings: bool,
+    converter_arrays: bool,
     version: u32,
     physical_alignment: Option<u32>,
 }
@@ -74,12 +75,17 @@ impl HeaderPolicy {
         frozen_tool: false,
         native_header: false,
         raw_strings: false,
+        converter_arrays: false,
         version: 3,
         physical_alignment: None,
     };
     const RAW: Self = Self {
         raw_strings: true,
         ..Self::STANDARD
+    };
+    const SOURCE_CONVERSION: Self = Self {
+        converter_arrays: true,
+        ..Self::RAW
     };
     pub(crate) const FROZEN_TOOL: Self = Self {
         frozen_tool: true,
@@ -151,6 +157,7 @@ fn value_size<S: WireBytes>(
     limits: &Limits,
     policy: HeaderPolicy,
     total_values: &mut usize,
+    array_depth: usize,
 ) -> Result<u64> {
     *total_values = total_values
         .checked_add(1)
@@ -167,8 +174,14 @@ fn value_size<S: WireBytes>(
             element_type,
             values,
         } => {
-            if *element_type > 12 || *element_type == 9 {
+            if *element_type > 12 || (*element_type == 9 && !policy.converter_arrays) {
                 return Err(invalid("heterogeneous or nested array"));
+            }
+            if array_depth >= 64 {
+                return Err(Error::Limit("source conversion array depth".into()));
+            }
+            if policy.converter_arrays && array_depth != 0 && values.is_empty() {
+                return Err(invalid("empty nested source conversion array"));
             }
             if values.len() > limits.max_array_values
                 || values.len() > limits.max_total_values.saturating_sub(*total_values)
@@ -182,7 +195,7 @@ fn value_size<S: WireBytes>(
                 }
                 add(
                     &mut bytes,
-                    value_size(item, limits, policy, total_values)?,
+                    value_size(item, limits, policy, total_values, array_depth + 1)?,
                     limits.max_metadata_bytes,
                 )?;
             }
@@ -262,7 +275,7 @@ fn layout_inner<N: WireBytes + ?Sized, S: WireBytes>(
         add(&mut header, 4, limits.max_metadata_bytes)?;
         add(
             &mut header,
-            value_size(value, limits, policy, &mut values)?,
+            value_size(value, limits, policy, &mut values, 0)?,
             limits.max_metadata_bytes,
         )?;
     }
@@ -479,6 +492,28 @@ pub fn write_tool_header<W: Write>(
     limits: &Limits,
 ) -> Result<WriteLayout> {
     raw_header_with_policy(out, metadata, tensors, limits, HeaderPolicy::FROZEN_TOOL)
+}
+
+/// Write the frozen Python converter's ordered metadata representation.
+///
+/// This explicitly separate compatibility path permits homogeneous nested
+/// arrays emitted by the original converter, with a fixed 64-array-level bound.
+/// Such output is outside strict GGUF reader admission. The normal writers and
+/// readers continue to reject nested arrays. All ordinary value, string, count,
+/// layout and total-byte limits are checked before the first output write.
+pub fn write_source_conversion_header<W: Write>(
+    out: &mut W,
+    metadata: &[(&[u8], &RawValue)],
+    tensors: &[RawTensorDescriptor<'_>],
+    limits: &Limits,
+) -> Result<WriteLayout> {
+    raw_header_with_policy(
+        out,
+        metadata,
+        tensors,
+        limits,
+        HeaderPolicy::SOURCE_CONVERSION,
+    )
 }
 
 pub(crate) fn native_raw_header<W: Write>(

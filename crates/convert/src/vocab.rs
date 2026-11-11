@@ -261,7 +261,10 @@ pub(crate) fn write(
     {
         out.boolean("tokenizer.ggml.add_space_prefix", truth(value))?;
     }
-    let spm = if matches!(config.family, Architecture::Gpt2 | Architecture::GptNeoX) {
+    let spm = if matches!(
+        config.family,
+        Architecture::Gpt2 | Architecture::GptNeoX | Architecture::Bloom
+    ) {
         None
     } else {
         source.read_optional("tokenizer.model")?

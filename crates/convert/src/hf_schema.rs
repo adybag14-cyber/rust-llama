@@ -7,6 +7,8 @@ use crate::util::{object, optional_text, text};
 use crate::{Error, Result, reserve};
 use llama_checkpoint::{Number, Object, Value as Json};
 
+pub(crate) const BLOOM_PATTERN: &str = r" ?[^(\s|[.,!?…。，、।۔،])]+";
+
 pub(crate) const QWEN_PATTERN: &str = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -106,7 +108,11 @@ fn nested(depth: usize) -> Result<()> {
 /// A finite, explicitly reviewed regex domain. Unknown valid Oniguruma syntax
 /// is rejected as unsupported, never executed as a literal or another regex.
 fn regex(pattern: &str) -> Result<()> {
-    if pattern == LLAMA3_PATTERN || pattern == QWEN_PATTERN || pattern == "x+" {
+    if pattern == LLAMA3_PATTERN
+        || pattern == QWEN_PATTERN
+        || pattern == BLOOM_PATTERN
+        || pattern == "x+"
+    {
         return Ok(());
     }
     if pattern.chars().all(|ch| {

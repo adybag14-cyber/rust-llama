@@ -192,7 +192,14 @@ pub(crate) fn prepare<'a>(
     let is_gpt2 = matches!(class, "GPT2Tokenizer" | "GPT2TokenizerFast");
     let is_qwen2 = matches!(class, "Qwen2Tokenizer" | "Qwen2TokenizerFast");
     let is_neox = matches!(class, "GPTNeoXTokenizer" | "GPTNeoXTokenizerFast");
-    if !is_llama && !is_gpt2 && !is_qwen2 && !is_neox && class != "PreTrainedTokenizerFast" {
+    let is_bloom = matches!(class, "BloomTokenizer" | "BloomTokenizerFast");
+    if !is_llama
+        && !is_gpt2
+        && !is_qwen2
+        && !is_neox
+        && !is_bloom
+        && class != "PreTrainedTokenizerFast"
+    {
         return Err(Error::Unsupported(
             "AutoTokenizer class outside reviewed dense converter ingestion",
         ));
@@ -223,7 +230,7 @@ pub(crate) fn prepare<'a>(
         }
     }
     let mut backend = Backend::from_json(raw, limits)?;
-    backend.override_direct_prefix(config, is_llama)?;
+    backend.override_direct_prefix(config, is_llama, is_bloom)?;
     // Python class defaults are applied before legacy map overrides.
     let mut attributes: Vec<Vec<Added<'a>>> = Vec::new();
     reserve(&mut attributes, SPECIAL.len(), "special token attributes")?;
@@ -232,11 +239,12 @@ pub(crate) fn prepare<'a>(
         let default =
             if (is_qwen2 && matches!(index, 1 | 2 | 4)) || ((is_gpt2 || is_neox) && index < 3) {
                 Some("<|endoftext|>")
-            } else if is_llama {
+            } else if is_llama || is_bloom {
                 match index {
                     0 => Some("<s>"),
                     1 => Some("</s>"),
                     2 => Some("<unk>"),
+                    4 if is_bloom => Some("<pad>"),
                     _ => None,
                 }
             } else {
@@ -447,7 +455,9 @@ pub(crate) fn write(
     )?;
     let gpt_family = matches!(
         config.family,
-        crate::config::Architecture::Gpt2 | crate::config::Architecture::GptNeoX
+        crate::config::Architecture::Gpt2
+            | crate::config::Architecture::GptNeoX
+            | crate::config::Architecture::Bloom
     );
     // These source subclasses directly use the GPT2 vocabulary routine,
     // whose native Tokenizers deserializer admits legacy untagged BPE.

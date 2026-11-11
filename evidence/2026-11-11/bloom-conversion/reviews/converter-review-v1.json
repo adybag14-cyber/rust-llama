@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "reviewer": "port_gap_audit",
+  "reviewed_utc": "2026-11-11 18:40:35 UTC",
+  "status": "no_blocking_findings",
+  "scope": "Read-only source review of BLOOM conversion metadata, alias/QKV transformation ordering, tokenizer class branches and complete-file/regression tests. No tests or conversions were executed by this reviewer.",
+  "reviewed_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\bloom.rs",
+      "bytes": 4417,
+      "sha256": "b162d63bb8feba45c061e3059fad46b7fc48140e327c5b67636fc92af33cf65e"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\config.rs",
+      "bytes": 30122,
+      "sha256": "efbd9a5dd856bf79b531fc89d1407d0785d1b136ae6fda454dce9b1bb46a1ce9"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\gpt.rs",
+      "bytes": 10892,
+      "sha256": "3441a5bbde671108d50dee19605135f955ce15f0d433817e605256f046f8891a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\tensors.rs",
+      "bytes": 26057,
+      "sha256": "0589c19b77fb3ee4462f9411f8ceeca4b3318ecf9d8389699d1ec4807b26d7c1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\hf_backend.rs",
+      "bytes": 45046,
+      "sha256": "5ddf7aebbd1a60f4a820b3756b28a0c4738c4ad28e04c0712f0ab37538aeb6e1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\hf_bpe.rs",
+      "bytes": 24351,
+      "sha256": "7c9f496c6da54f98af47b0509633f4bfcf1d4683055a0045323a27efad763405"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\vocab.rs",
+      "bytes": 11171,
+      "sha256": "d7e06aa258c824d670186f96894e3d32ef215067f137c26ebc48244ba0a26b85"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\tests\\bloom_conversion.rs",
+      "bytes": 6035,
+      "sha256": "a8cf3391aa1a9e09934c94275f7e808d5ebc6469995fe6c2eb74f499cf1c25ca"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\tests\\bloom_pretrained.rs",
+      "bytes": 4407,
+      "sha256": "2bcee393fc11a8f28cbf4b384a5b1b98b53cc0fd9f36db33d064e85c3f1669fc"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\hf_bloom_reference.rs",
+      "bytes": 5305,
+      "sha256": "31e96170c0ef0aeef3be44e203fb950ee94c17ebe78fa01c3c6434b574ffdc5f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\convert\\crates\\convert\\src\\bloom_tables.rs",
+      "bytes": 46559,
+      "sha256": "0508cf73a6347a5312d0268c64c0efd92298f4dbc7fe0329b4a7d9578928df4a"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\conversion\\bloom.py",
+      "bytes": 2983,
+      "sha256": "cf17a9c8717c45121c843112dfce7a2fd2aeab060158fb6349f50397f4963c1d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\bloom\\tokenization_bloom_fast.py",
+      "bytes": 6277,
+      "sha256": "56242c361b2c2bfd2016d107ada2572d12721d582301b069d2d9916c8b2f8958"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\bloom\\configuration_bloom.py",
+      "bytes": 10216,
+      "sha256": "3bd5ff8eebcd3ea12ec65c0940dfa33c9aa3f1dd1244e4c711162548211ffc2e"
+    }
+  ],
+  "checks": [
+    "Frozen BloomModel metadata override preserves hidden_size/n_embed and n_head/num_attention_heads precedence, emits fixed four-times-hidden FFN width, required epsilon and original file type.",
+    "Resolved BloomConfig consumes non-null n_embed, hides consumed/aliased keys in normalized root serialization, and permits inherited aliases to overwrite initialized n_head/n_layer; this matches inspected Transformers4.57.6 source.",
+    "All literal transformer. segments are removed after contribution dictionary semantics, preserving collisions for canonical publication checks.",
+    "Fused QKV transform acts on source head-major blocks and checked original element counts; weight and bias zero/nondivisible cases preserve their distinct source behavior. Empty permutation buffers terminate before iterating large head counts.",
+    "New head-count sequence serialization uses original GGUF element wire kinds and a declared recursion bound; malformed and heterogeneous cases fail explicitly.",
+    "BloomTokenizerFast default specials and truthy recursive ByteLevel prefix update match inspected installed source and retained native class corpus. Existing other tokenizer family guard remains separate.",
+    "Complete-file test pins input blob data, independent original output hashes and retained failure statuses; budget test requires failure before publishing over an existing destination and checks temporary-file cleanup.",
+    "Pretrained test verifies unchanged official input hashes before/after conversion, uses a fresh output root, and compares all three complete original output hashes and byte counts."
+  ],
+  "limitations": [
+    "Review is limited to the sampled identities; later implementation changes require refresh.",
+    "No blanket assurance for untested architectures or tokenizer backends; no repository-wide release gate is closed.",
+    "The reviewer has inspected source and test contracts, while actual test execution remains the owning agent's validation."
+  ]
+}

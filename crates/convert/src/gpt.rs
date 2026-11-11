@@ -127,7 +127,7 @@ impl Transform {
                 tail,
             });
         }
-        if config.family == Architecture::GptNeoX {
+        if matches!(config.family, Architecture::GptNeoX | Architecture::Bloom) {
             // The subclass asserts these before its name dispatch, including
             // for non-QKV tensors. An explicit n_head:null masks the fallback.
             let heads_value = config.required(&["n_head", "num_attention_heads"])?;
@@ -135,26 +135,32 @@ impl Transform {
             if matches!(heads_value, llama_checkpoint::Value::Null)
                 || matches!(hidden_value, llama_checkpoint::Value::Null)
             {
-                return Err(Error::Invalid("null GPT-NeoX tensor dimensions"));
+                return Err(Error::Invalid("null QKV tensor dimensions"));
             }
             // The original re.match is rooted in this exact checkpoint prefix.
             // Canonical/other aliases must not accidentally trigger a reshape.
+            let bloom = config.family == Architecture::Bloom;
             let suffix = name
-                .strip_prefix("gpt_neox.layers.")
+                .strip_prefix(if bloom { "h." } else { "gpt_neox.layers." })
                 .and_then(|s| s.split_once('.'))
                 .filter(|(layer, _)| !layer.is_empty() && layer.bytes().all(|c| c.is_ascii_digit()))
                 .map(|(_, rest)| rest);
-            let row_width = match suffix {
-                Some("attention.query_key_value.weight") => None,
-                Some("attention.query_key_value.bias") => Some(1usize),
+            let row_width = match (bloom, suffix) {
+                (false, Some("attention.query_key_value.weight"))
+                | (true, Some("self_attention.query_key_value.weight")) => None,
+                (false, Some("attention.query_key_value.bias"))
+                | (true, Some("self_attention.query_key_value.bias")) => Some(1usize),
                 _ => return Ok(Self::Identity),
             };
             let heads = usize::try_from(integer(heads_value)?)
-                .map_err(|_| Error::Invalid("negative GPT-NeoX QKV heads"))?;
+                .map_err(|_| Error::Invalid("negative QKV heads"))?;
             let hidden = usize::try_from(integer(hidden_value)?)
-                .map_err(|_| Error::Invalid("negative GPT-NeoX QKV embedding"))?;
-            if heads == 0 || hidden == 0 {
-                return Err(Error::Invalid("zero GPT-NeoX QKV dimension"));
+                .map_err(|_| Error::Invalid("negative QKV embedding"))?;
+            // BLOOM admits an empty bias with hidden=0; the weight path
+            // still fails its source reshape(-1, 0), and NeoX retains its
+            // independently captured zero-width rejection.
+            if heads == 0 || (hidden == 0 && !(bloom && row_width.is_some())) {
+                return Err(Error::Invalid("zero QKV dimension"));
             }
             let head_width = hidden / heads;
             let rows = heads

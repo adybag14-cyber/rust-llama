@@ -335,7 +335,9 @@ fn native_qwen_fast_generic_flags() {
     for case in array(field(&root, "cases")) {
         let config = object(field(case, "kwargs")).unwrap();
         let mut backend = Backend::from_json(&tokenizer, &Limits::default()).unwrap();
-        backend.override_direct_prefix(Some(config), false).unwrap();
+        backend
+            .override_direct_prefix(Some(config), false, false)
+            .unwrap();
         backend
             .add_tokens(&[Added::plain("<|endoftext|>", true)])
             .unwrap();

@@ -6,6 +6,7 @@ use crate::frozen::TensorName;
 use crate::{Error, Limits, Options, OutputType, Result, reserve, string};
 use llama_checkpoint::{Checkpoint, DType as SourceType, TypedLayout};
 use llama_quant::DType;
+use std::borrow::Cow;
 use std::io::Read;
 
 #[derive(Debug)]
@@ -47,7 +48,7 @@ impl Plan {
         options: &Options,
         limits: &Limits,
     ) -> Result<Self> {
-        let mut values = contributions(checkpoint, limits)?;
+        let mut values = contributions(checkpoint, config.family, limits)?;
         let output_type = if options.output_type == OutputType::Auto {
             let mut guessed = OutputType::F16;
             for value in &values {
@@ -127,6 +128,12 @@ impl Plan {
                     .map_err(|_| Error::Limit("tensor name"))?;
                 name.push_str(&value.name);
                 name
+            } else if config.family == Architecture::Bloom {
+                // BloomModel removes every literal transformer. occurrence
+                // only after the base contribution dictionary is built.
+                // Normalizing earlier would hide canonical-name collisions.
+                String::from_utf8(replace_bytes(value.name.as_bytes(), b"transformer.", b"")?)
+                    .map_err(|_| Error::Invalid("BLOOM tensor name is not Unicode"))?
             } else {
                 string(&value.name)?
             };
@@ -265,7 +272,11 @@ fn layout(checkpoint: &Checkpoint, value: &Contribution) -> Result<TypedLayout> 
         .ok_or(Error::Invalid("source tensor index"))?
         .typed_layout()?)
 }
-fn contributions(checkpoint: &Checkpoint, limits: &Limits) -> Result<Vec<Contribution>> {
+fn contributions(
+    checkpoint: &Checkpoint,
+    family: Architecture,
+    limits: &Limits,
+) -> Result<Vec<Contribution>> {
     let mut all = Vec::new();
     let mut order = 0usize;
     let mut text_bytes = 0usize;
@@ -274,7 +285,11 @@ fn contributions(checkpoint: &Checkpoint, limits: &Limits) -> Result<Vec<Contrib
             .file(file_index)
             .ok_or(Error::Invalid("checkpoint owner index"))?;
         for (tensor_index, tensor) in file.tensors().iter().enumerate() {
-            let Some(name) = filter_name(tensor.name().as_wtf8(), limits.max_tensor_name_bytes)?
+            let Some(name) = filter_name(
+                tensor.name().as_wtf8(),
+                family,
+                limits.max_tensor_name_bytes,
+            )?
             else {
                 continue;
             };
@@ -336,11 +351,17 @@ fn replace_bytes(input: &[u8], from: &[u8], to: &[u8]) -> Result<Vec<u8>> {
 fn contains(haystack: &[u8], needle: &[u8]) -> bool {
     haystack.windows(needle.len()).any(|v| v == needle)
 }
-fn filter_name(raw: &[u8], max: usize) -> Result<Option<String>> {
+fn filter_name(raw: &[u8], family: Architecture, max: usize) -> Result<Option<String>> {
     if raw.len() > max {
         return Err(Error::Limit("source tensor name"));
     }
-    let first = replace_bytes(raw, b"text_model.", b"")?;
+    // Only the frozen Llama subclass strips this wrapper, before TextModel's
+    // multimodal filter. Qwen, GPT and BLOOM inherit the base name unchanged.
+    let first: Cow<'_, [u8]> = if family == Architecture::Llama {
+        Cow::Owned(replace_bytes(raw, b"text_model.", b"")?)
+    } else {
+        Cow::Borrowed(raw)
+    };
     let check = first.strip_prefix(b"model.").unwrap_or(&first);
     if [
         b"mlp".as_slice(),
@@ -380,12 +401,17 @@ fn filter_name(raw: &[u8], max: usize) -> Result<Option<String>> {
     {
         return Ok(None);
     }
-    let second = replace_bytes(&first, b"language_model.", b"")?;
-    let third = replace_bytes(
-        &second,
-        b"e_score_correction_bias",
-        b"e_score_correction.bias",
-    )?;
+    // ModelBase tests this suffix before it removes the language_model wrapper.
+    let second = if first.ends_with(b"e_score_correction_bias") {
+        Cow::Owned(replace_bytes(
+            &first,
+            b"e_score_correction_bias",
+            b"e_score_correction.bias",
+        )?)
+    } else {
+        first
+    };
+    let third = replace_bytes(&second, b"language_model.", b"")?;
     Ok(Some(String::from_utf8(third).map_err(|_| {
         Error::Invalid("admitted tensor name is not Unicode scalar text")
     })?))
@@ -679,5 +705,103 @@ impl Tensor {
             &mut encoded,
         )?;
         Ok(encoded)
+    }
+}
+
+#[cfg(test)]
+mod bloom_alias_reference {
+    use super::*;
+    #[test]
+    fn frozen_bloom_alias_lookup() {
+        let raw = llama_checkpoint::json::parse(
+            include_bytes!("../tests/fixtures/bloom-conversion/aliases.json"),
+            llama_checkpoint::Limits::default(),
+        )
+        .unwrap();
+        let object = raw.as_object().unwrap();
+        let cases = object.get("cases").unwrap().as_array().unwrap();
+        assert_eq!(cases.len(), 576);
+        for case in cases {
+            let row = case.as_object().unwrap();
+            let name = row
+                .get("name")
+                .unwrap()
+                .as_text()
+                .unwrap()
+                .as_str()
+                .unwrap();
+            let expected = row.get("result").unwrap();
+            let result = map_name(name, 2, crate::bloom_tables::BLOOM_TENSOR_NAMES).unwrap();
+            let expected = if matches!(expected, llama_checkpoint::Value::Null) {
+                None
+            } else {
+                Some(expected.as_text().unwrap().as_str().unwrap())
+            };
+            assert_eq!(result.as_ref().map(|v| v.name.as_str()), expected, "{name}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod family_filter_reference {
+    use super::*;
+    use crate::util::{integer, object, text};
+    use llama_checkpoint::Value as Json;
+
+    #[test]
+    fn native_bloom_related_family_filters() {
+        let root = llama_checkpoint::json::parse(
+            include_bytes!("../tests/fixtures/bloom-conversion/filter-reference.json"),
+            llama_checkpoint::Limits::default(),
+        )
+        .unwrap();
+        let root = object(&root).unwrap();
+        let host = if cfg!(windows) { "windows" } else { "linux" };
+        let profile = object(root.get("profiles").unwrap())
+            .unwrap()
+            .get(host)
+            .unwrap();
+        let families = profile.as_array().unwrap();
+        assert_eq!(families.len(), 6);
+        let mut decisions = 0;
+        for family in families {
+            let family = object(family).unwrap();
+            let name = text(family.get("family").unwrap()).unwrap();
+            let kind = match name {
+                "llama" => Architecture::Llama,
+                "qwen2" => Architecture::Qwen2,
+                "qwen3" => Architecture::Qwen3,
+                "gpt2" => Architecture::Gpt2,
+                "gptneox" => Architecture::GptNeoX,
+                "bloom" => Architecture::Bloom,
+                _ => panic!("unrecognized native family {name}"),
+            };
+            for case in family.get("cases").unwrap().as_array().unwrap() {
+                let case = object(case).unwrap();
+                let input = text(case.get("name").unwrap()).unwrap();
+                let expected = case.get("result").unwrap();
+                let expected = match expected {
+                    Json::Null => None,
+                    value => Some(text(value).unwrap()),
+                };
+                assert_eq!(
+                    filter_name(
+                        input.as_bytes(),
+                        kind,
+                        Limits::default().max_tensor_name_bytes
+                    )
+                    .unwrap()
+                    .as_deref(),
+                    expected,
+                    "{name}: {input:?}"
+                );
+                decisions += 1;
+            }
+        }
+        assert_eq!(
+            decisions,
+            integer(root.get("decisions_per_host").unwrap()).unwrap()
+        );
+        assert!(decisions > 1000);
     }
 }

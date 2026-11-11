@@ -137,7 +137,7 @@ impl Conversion {
         let metadata_refs = metadata_refs(&metadata)?;
         // The same checked shared writer calculates encoded_header_bytes and
         // aligned layout. No duplicated wire-size calculation or byte patching.
-        let layout = llama_gguf::write_raw_header(
+        let layout = llama_gguf::write_source_conversion_header(
             &mut io::sink(),
             &metadata_refs,
             &descriptors,
@@ -200,14 +200,23 @@ impl Conversion {
                 output,
                 remaining: self.layout.encoded_header_bytes,
             };
-            let layout =
-                llama_gguf::write_raw_header(&mut bounded, &metadata, &tensors, &self.limits.gguf)?;
+            let layout = llama_gguf::write_source_conversion_header(
+                &mut bounded,
+                &metadata,
+                &tensors,
+                &self.limits.gguf,
+            )?;
             if bounded.remaining != 0 || layout != self.layout {
                 return Err(Error::Invalid("vocabulary header plan changed"));
             }
             return Ok(());
         }
-        let layout = llama_gguf::write_raw_header(output, &metadata, &tensors, &self.limits.gguf)?;
+        let layout = llama_gguf::write_source_conversion_header(
+            output,
+            &metadata,
+            &tensors,
+            &self.limits.gguf,
+        )?;
         if layout != self.layout {
             return Err(Error::Invalid("prepared header plan changed"));
         }

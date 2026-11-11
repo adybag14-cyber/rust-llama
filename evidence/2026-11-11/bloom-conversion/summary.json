@@ -1,0 +1,370 @@
+{
+  "schema": 1,
+  "packaged_utc": "2026-11-11T19:34:46.294852+00:00",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "base_commit": "37ba10da13aff8bc10bfe1ecb7b650b1c68029a7",
+  "scope": [
+    "BloomForCausalLM",
+    "BloomModel"
+  ],
+  "input_guard": {
+    "files": 205,
+    "sha256": "ca739cdec9fb34f5982db98323a1ba828dbb4c65b6b61530fb0d91babfcf8562"
+  },
+  "per_native_profile": {
+    "complete_cases": 113,
+    "accepted_complete_files": 84,
+    "source_rejections": 29,
+    "exact_complete_file_bytes": 1066141612,
+    "tokenizer_class_cases": 87,
+    "class_encoding_decoding_pairs": 2296,
+    "metadata_cases": 41,
+    "metadata_accepted": 20,
+    "metadata_rejected": 21,
+    "alias_lookups": 576,
+    "filter_decisions": 1308,
+    "unicode_scalars": 1112064,
+    "split_encoding_decoding_requests": 1922,
+    "genuine_pretrained_files": 3,
+    "genuine_pretrained_output_bytes": 2871136896
+  },
+  "official_model": {
+    "repository": "bigscience/bloom-560m",
+    "revision": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+    "license": "BigScience BLOOM RAIL 1.0",
+    "input_unchanged": true,
+    "required_pretrained_test_directory_basename": "official-hf",
+    "frozen_general_name": "Official Hf"
+  },
+  "profiles": {
+    "windows": {
+      "inputs_before": {
+        "files": 205,
+        "sha256": "ca739cdec9fb34f5982db98323a1ba828dbb4c65b6b61530fb0d91babfcf8562",
+        "unchanged": true
+      },
+      "inputs_after": {
+        "files": 205,
+        "sha256": "ca739cdec9fb34f5982db98323a1ba828dbb4c65b6b61530fb0d91babfcf8562",
+        "unchanged": true
+      },
+      "stages": [
+        {
+          "index": 0,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "fmt",
+            "-p",
+            "llama-convert",
+            "-p",
+            "llama-gguf",
+            "--",
+            "--check"
+          ],
+          "seconds": 1.0085884999934933,
+          "test_suites": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 1,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert",
+            "--lib",
+            "native_bloom_related_family_filters",
+            "--",
+            "--nocapture"
+          ],
+          "seconds": 5.87223780000204,
+          "test_suites": 1,
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 2,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-gguf"
+          ],
+          "seconds": 9.384189500000502,
+          "test_suites": 6,
+          "passed": 27,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 3,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-gguf"
+          ],
+          "seconds": 33.75393919999624,
+          "test_suites": 6,
+          "passed": 27,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 4,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "clippy",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert",
+            "-p",
+            "llama-gguf",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "seconds": 5.650047899995116,
+          "test_suites": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 5,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert"
+          ],
+          "seconds": 386.2901574999996,
+          "test_suites": 11,
+          "passed": 55,
+          "failed": 0,
+          "ignored": 9
+        },
+        {
+          "index": 6,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-convert"
+          ],
+          "seconds": 163.76122239999677,
+          "test_suites": 11,
+          "passed": 55,
+          "failed": 0,
+          "ignored": 9
+        },
+        {
+          "index": 7,
+          "argv": [
+            "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-convert",
+            "--test",
+            "bloom_pretrained",
+            "--",
+            "--ignored",
+            "--nocapture"
+          ],
+          "seconds": 31.493070700002136,
+          "test_suites": 1,
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "retained_pretrained_root": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-converter\\rust-validation\\final-v2\\windows\\pretrained\\bloom-560m"
+    },
+    "linux": {
+      "inputs_before": {
+        "files": 205,
+        "sha256": "ca739cdec9fb34f5982db98323a1ba828dbb4c65b6b61530fb0d91babfcf8562",
+        "unchanged": true
+      },
+      "inputs_after": {
+        "files": 205,
+        "sha256": "ca739cdec9fb34f5982db98323a1ba828dbb4c65b6b61530fb0d91babfcf8562",
+        "unchanged": true
+      },
+      "stages": [
+        {
+          "index": 0,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "fmt",
+            "-p",
+            "llama-convert",
+            "-p",
+            "llama-gguf",
+            "--",
+            "--check"
+          ],
+          "seconds": 2.0250725210000837,
+          "test_suites": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 1,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert",
+            "--lib",
+            "native_bloom_related_family_filters",
+            "--",
+            "--nocapture"
+          ],
+          "seconds": 7.08786483200015,
+          "test_suites": 1,
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 2,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-gguf"
+          ],
+          "seconds": 3.6287503460000607,
+          "test_suites": 6,
+          "passed": 28,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 3,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-gguf"
+          ],
+          "seconds": 2.725875194000082,
+          "test_suites": 6,
+          "passed": 28,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 4,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "clippy",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert",
+            "-p",
+            "llama-gguf",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "seconds": 4.734191864999957,
+          "test_suites": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "index": 5,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "-p",
+            "llama-convert"
+          ],
+          "seconds": 350.7528885480001,
+          "test_suites": 11,
+          "passed": 55,
+          "failed": 0,
+          "ignored": 9
+        },
+        {
+          "index": 6,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-convert"
+          ],
+          "seconds": 180.5291958009998,
+          "test_suites": 11,
+          "passed": 55,
+          "failed": 0,
+          "ignored": 9
+        },
+        {
+          "index": 7,
+          "argv": [
+            "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--offline",
+            "--locked",
+            "--release",
+            "-p",
+            "llama-convert",
+            "--test",
+            "bloom_pretrained",
+            "--",
+            "--ignored",
+            "--nocapture"
+          ],
+          "seconds": 95.76693697900009,
+          "test_suites": 1,
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "retained_pretrained_root": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-converter\\rust-validation\\final-v2\\linux\\pretrained\\bloom-560m"
+    }
+  },
+  "native_sources_before_implementation": true,
+  "reference_programs_and_pretrained_weights_external": true,
+  "full_release_gates_closed": false
+}

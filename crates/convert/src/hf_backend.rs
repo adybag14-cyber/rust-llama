@@ -81,6 +81,7 @@ enum Stage {
     Byte { prefix: bool, regex: bool },
     Digits { individual: bool },
     QwenSplit,
+    BloomSplit,
 }
 #[derive(Clone, Copy)]
 struct Merge {
@@ -287,7 +288,7 @@ impl<'a> Backend<'a> {
             .transpose()?
             == Some("ByteLevel");
         let executable = normalization != Normalization::Unsupported && stage_execution;
-        let byte_decoder = crate::hf_schema::decoder(root.get("decoder"), 0)? == "ByteLevel";
+        let byte_decoder = executable_byte_decoder(root.get("decoder"), 0)?;
         let post = crate::hf_schema::Post::parse(root.get("post_processor"), 0)?;
         crate::hf_schema::settings(root)?;
         let mut result = Self {
@@ -452,6 +453,7 @@ impl<'a> Backend<'a> {
         &mut self,
         config: Option<&Object>,
         is_llama: bool,
+        is_bloom: bool,
     ) -> Result<()> {
         let get = |key| config.and_then(|c| c.get(key));
         if is_llama && get("add_prefix_space").is_some_and(|v| !matches!(v, Json::Null)) {
@@ -473,6 +475,16 @@ impl<'a> Backend<'a> {
                 _ => {}
             }
         }
+        if is_bloom && get("add_prefix_space").is_some_and(crate::util::truth) {
+            // BloomTokenizerFast recursively rebuilds every ByteLevel stage
+            // for a truthy prefix option. Sequence stages are already
+            // flattened by the bounded backend parser.
+            for stage in &mut self.stages {
+                if let Stage::Byte { prefix, .. } = stage {
+                    *prefix = true;
+                }
+            }
+        }
         self.split_special_tokens = match get("split_special_tokens") {
             None => false,
             Some(Json::Bool(v)) => *v,
@@ -481,6 +493,7 @@ impl<'a> Backend<'a> {
         self.clean_up_spaces = match get("clean_up_tokenization_spaces") {
             None => false,
             Some(Json::Bool(v)) => *v,
+            Some(value) if is_bloom => crate::util::truth(value),
             _ => return Err(Error::Invalid("HF cleanup flag type")),
         };
         Ok(())
@@ -662,6 +675,29 @@ impl<'a> Backend<'a> {
                             let end = qwen_regex_end(&piece, start);
                             self.push_piece(&mut next, &piece[start..end])?;
                             start = end;
+                        }
+                    }
+                    Stage::BloomSplit => {
+                        self.charge(piece.len())?;
+                        let (mut retained, mut search) = (0, 0);
+                        while search < piece.len() {
+                            if let Some(end) = bloom_regex_end(&piece, search) {
+                                if retained < search {
+                                    self.push_piece(&mut next, &piece[retained..search])?;
+                                }
+                                self.push_piece(&mut next, &piece[search..end])?;
+                                retained = end;
+                                search = end;
+                            } else {
+                                search += piece[search..]
+                                    .chars()
+                                    .next()
+                                    .expect("nonempty BLOOM regex remainder")
+                                    .len_utf8();
+                            }
+                        }
+                        if retained < piece.len() {
+                            self.push_piece(&mut next, &piece[retained..])?;
                         }
                     }
                     Stage::Digits { individual } => {
@@ -1029,16 +1065,17 @@ fn parse_stages(value: Option<&Json>, stages: &mut Vec<Stage>, depth: usize) -> 
                 .transpose()?;
             let behavior = value.get("behavior").map(text).transpose()?;
             let invert = flag(value, "invert", false, true)?;
-            if expression == Some(crate::hf_schema::QWEN_PATTERN)
-                && behavior == Some("Isolated")
-                && !invert
-            {
-                reserve(stages, 1, "HF pretokenizer stages")?;
-                stages.push(Stage::QwenSplit);
-                Ok(true)
-            } else {
-                Ok(false)
+            if behavior != Some("Isolated") || invert {
+                return Ok(false);
             }
+            let stage = match expression {
+                Some(crate::hf_schema::QWEN_PATTERN) => Stage::QwenSplit,
+                Some(crate::hf_schema::BLOOM_PATTERN) => Stage::BloomSplit,
+                _ => return Ok(false),
+            };
+            reserve(stages, 1, "HF pretokenizer stages")?;
+            stages.push(stage);
+            Ok(true)
         }
         "Metaspace" | "Whitespace" | "WhitespaceSplit" | "BertPreTokenizer" | "Punctuation"
         | "CharDelimiterSplit" | "UnicodeScripts" | "FixedLength" => Ok(false),
@@ -1203,4 +1240,48 @@ pub(crate) fn qwen_regex_end(text: &str, start: usize) -> usize {
     }
     // Every scalar is Letter, Number, Space or Other.
     start + first.len_utf8()
+}
+
+// A Sequence with exactly one recursively selected ByteLevel decoder performs
+// the same operation as that child. Keep all other decoder execution explicit;
+// schema validation alone does not make a decoder executable.
+fn executable_byte_decoder(value: Option<&Json>, depth: usize) -> Result<bool> {
+    match crate::hf_schema::decoder(value, depth)? {
+        "ByteLevel" => Ok(true),
+        "Sequence" => {
+            let sequence = object(value.ok_or(Error::Invalid("missing decoder sequence"))?)?;
+            let children = sequence
+                .get("decoders")
+                .and_then(Json::as_array)
+                .ok_or(Error::Invalid("decoder sequence children"))?;
+            if children.len() == 1 {
+                executable_byte_decoder(Some(&children[0]), depth + 1)
+            } else {
+                Ok(false)
+            }
+        }
+        _ => Ok(false),
+    }
+}
+
+// Exact character class from the pinned BLOOM Oniguruma expression.
+// Its nested character class excludes literal parentheses and vertical bar,
+// but not square brackets. Every Unicode scalar was checked independently.
+pub(crate) fn bloom_regex_member(ch: char) -> bool {
+    unicode::flags(ch as u32) & unicode::SPACE == 0
+        && !matches!(
+            ch,
+            '(' | ')' | '|' | '.' | ',' | '!' | '?' | '…' | '。' | '，' | '、' | '।' | '۔' | '،'
+        )
+}
+fn bloom_regex_end(text: &str, start: usize) -> Option<usize> {
+    let mut end = start + usize::from(text[start..].starts_with(' '));
+    let begin = end;
+    for ch in text[end..].chars() {
+        if !bloom_regex_member(ch) {
+            break;
+        }
+        end += ch.len_utf8();
+    }
+    (end > begin).then_some(end)
 }

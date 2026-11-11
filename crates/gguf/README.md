@@ -361,3 +361,21 @@ vocabulary metadata and the deterministic synthetic weight generators.
 ## Unpadded converter headers
 
 WriteLayout::encoded_header_bytes exposes the checked header size before alignment padding. The HF vocabulary-only converter uses that boundary to match the frozen original metadata-only output. data_offset, tensor offsets and normal aligned writer behavior are unchanged.
+
+## Python source-conversion header extension
+
+`write_source_conversion_header` is an explicitly separate compatibility entry
+point for the frozen Python HF converter. It uses borrowed byte strings and the
+normal checked layout, but also permits homogeneous nested metadata arrays
+because that original converter emits them for some BLOOM head-count inputs.
+Those source-compatible outputs are rejected by strict GGUF readers, including
+this crate's readers and the frozen native GGUF reader.
+
+The existing `write_header`, `write_raw_header`, native header, split/merge
+policies and readers keep their strict nested-array rejection. The conversion
+extension checks a fixed 64-array-level bound, rejects empty nested arrays,
+retains cumulative value, array, string and metadata-byte budgets, and validates
+the entire layout before writing the first byte. Exact nested output bytes are
+compared to the original Python captures in the
+[BLOOM conversion corpus](../../docs/BLOOM_HF_CONVERSION.md); separate GGUF tests
+retain strict-writer/reader behavior and pre-write failure guarantees.

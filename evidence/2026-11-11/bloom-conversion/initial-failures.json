@@ -1,0 +1,102 @@
+{
+  "attempts": [
+    {
+      "tag": "focus-v1",
+      "host": "windows",
+      "status": "failed",
+      "failed_commands": [
+        [
+          "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "llama-convert",
+          "--lib",
+          "bloom",
+          "--",
+          "--nocapture"
+        ]
+      ]
+    },
+    {
+      "tag": "focus-v2",
+      "host": "windows",
+      "status": "failed",
+      "failed_commands": [
+        [
+          "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "llama-convert",
+          "--lib",
+          "bloom",
+          "--",
+          "--nocapture"
+        ]
+      ]
+    },
+    {
+      "tag": "focus-v3",
+      "host": "windows",
+      "status": "failed",
+      "failed_commands": [
+        [
+          "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "llama-convert",
+          "--test",
+          "bloom_conversion",
+          "--",
+          "--nocapture"
+        ]
+      ]
+    },
+    {
+      "tag": "focus-v4",
+      "host": "windows",
+      "status": "failed",
+      "failed_commands": [
+        [
+          "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "llama-convert",
+          "--test",
+          "bloom_conversion",
+          "--",
+          "--nocapture"
+        ]
+      ]
+    },
+    {
+      "tag": "full-v1",
+      "host": "linux",
+      "status": "failed",
+      "failed_commands": [
+        [
+          "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--offline",
+          "--locked",
+          "-p",
+          "llama-convert"
+        ]
+      ]
+    }
+  ],
+  "explanations": [
+    "The first Rust compile exposed a shared tokenizer prefix helper call missing its new family flag; the old Qwen caller was corrected.",
+    "Native metadata and class cases required an explicitly separate nested-array source writer and single-child ByteLevel decoder Sequence. Strict GGUF writer/reader admission remains unchanged.",
+    "The first complete pipeline encountered the previously unsupported official BLOOM Split expression. Additional independent all-scalar and complete encoding captures preceded the finite matcher implementation.",
+    "The fourth Windows and first GNU full pipeline matched 94 native cases before exposing text_model wrapper stripping outside the Llama subclass. Both-host captures of 1308 filter decisions preceded the family-specific correction and suffix rename-order repair.",
+    "An initial structured GNU filter launcher was rejected by the Devbox program allowlist before execution. The supported shell-command invocation completed the original capture. No expectation or original source was changed."
+  ]
+}

@@ -1,6 +1,6 @@
 # Native dense HF to GGUF conversion
 
-`llama-convert` converts local Hugging Face dense Llama, Qwen2, Qwen3, GPT-2 and GPT-NeoX Safetensors checkpoints into the frozen converter's GGUF bytes. The library owns and bounds its inputs, plans the output before publication, and streams one output tensor at a time. The `convert-hf-to-gguf` binary exposes this implemented path.
+`llama-convert` converts local Hugging Face dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX and BLOOM Safetensors checkpoints into the frozen converter's GGUF bytes. The library owns and bounds its inputs, plans the output before publication, and streams one output tensor at a time. The `convert-hf-to-gguf` binary exposes this implemented path.
 
 The authority is the user-provided llama.cpp archive with SHA-256
 `2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122`.
@@ -31,10 +31,10 @@ convert-hf-to-gguf /path/to/model --outtype f16 --dry-run
 
 | Area | Implemented behavior |
 | --- | --- |
-| Architecture | `LlamaForCausalLM`, `LLaMAForCausalLM`, `LlamaModel`, `Qwen2ForCausalLM`, `Qwen2Model`, `Qwen3ForCausalLM`, `Qwen3Model`, `GPT2LMHeadModel` and `GPTNeoXForCausalLM`; dense text checkpoints |
+| Architecture | `LlamaForCausalLM`, `LLaMAForCausalLM`, `LlamaModel`, `Qwen2ForCausalLM`, `Qwen2Model`, `Qwen3ForCausalLM`, `Qwen3Model`, `GPT2LMHeadModel`, `GPTNeoXForCausalLM`, `BloomForCausalLM` and `BloomModel`; dense text checkpoints |
 | Inputs | Local Safetensors files and indexed shards selected by the frozen prefix/index/global-name rules, with retained file owners and bounded JSON parsing |
 | Output | Little-endian GGUF; `auto`, F32, F16, BF16, Q8_0, TQ1_0 and TQ2_0; source shape-dependent F16 fallback |
-| Tensor mapping | Frozen architecture-specific aliases, filtering and insertion order; Llama Q/K row permutation, Qwen unpermuted rows, Qwen3 Q/K norm tensors, GPT-2 Conv1D transposes, NeoX fused-QKV reordering, and compatible QKV fusion including biases |
+| Tensor mapping | Frozen architecture-specific aliases, filtering and insertion order; Llama Q/K row permutation, Qwen unpermuted rows, Qwen3 Q/K norm tensors, GPT-2 Conv1D transposes, NeoX/BLOOM fused-QKV reordering, BLOOM name normalization, and compatible QKV fusion including biases |
 | Metadata | Family-specific config defaults and supported nested text config; original metadata order and types; model-card YAML, generation configuration, special tokens, chat templates, naming and Qwen pooling sidecars |
 | Vocabulary | SentencePiece model vocabulary; reviewed Hugging Face BPE ingestion from local tokenizer JSON |
 | RoPE conversion | Metadata for source-supported configurations; generated Llama 3 F32 `rope_freqs.weight` on the measured native source profiles |
@@ -43,23 +43,27 @@ convert-hf-to-gguf /path/to/model --outtype f16 --dry-run
 
 The dtype codec accepts the frozen numeric input domain, including F16/F32/F64/BF16, signed integer types, U8, Boolean, and the measured FP8 scalar formats. These are casts into the dense conversion working representation; preserved prequantized FP8/ModelOpt layouts are a different contract. U16/U32/U64 and unsupported packed formats return errors. Exact cast and packing qualifications are in [CODEC.md](CODEC.md).
 
-The HF JSON path admits LlamaTokenizer/LlamaTokenizerFast, GPT2Tokenizer/GPT2TokenizerFast, Qwen2Tokenizer/Qwen2TokenizerFast, GPTNeoXTokenizer/GPTNeoXTokenizerFast and PreTrainedTokenizerFast with a locally executable reviewed BPE pipeline. It preserves added-token precedence, relevant decoder/schema admission, frozen pretokenizer probes and class-specific postprocessing. An accepted JSON schema is separate from executable conversion support: an unimplemented normalizer, pretokenizer or regex pipeline returns an explicit unsupported error when its behavior is required. It does not substitute a similarly named tokenizer family.
+The HF JSON path admits LlamaTokenizer/LlamaTokenizerFast, GPT2Tokenizer/GPT2TokenizerFast, Qwen2Tokenizer/Qwen2TokenizerFast, GPTNeoXTokenizer/GPTNeoXTokenizerFast, BloomTokenizer/BloomTokenizerFast and PreTrainedTokenizerFast with a locally executable reviewed BPE pipeline. It preserves added-token precedence, relevant decoder/schema admission, frozen pretokenizer probes and class-specific postprocessing. An accepted JSON schema is separate from executable conversion support: an unimplemented normalizer, pretokenizer or regex pipeline returns an explicit unsupported error when its behavior is required. It does not substitute a similarly named tokenizer family.
 
-The HF boundary includes the Transformers Llama fast class's recreation of BOS/EOS templates, including Python truth-value semantics, unknown-token fallback and source template-name interpretation. NeoX recreates the same template form with BOS/EOS insertion disabled by default. Generic, GPT2 and Qwen2 fast classes retain their distinct behavior. Qwen2 uses its own default special tokens. All admitted fast classes apply generic split-special and cleanup controls. For a direct ByteLevel root, Qwen2/GPT2/NeoX/generic Fast default an absent prefix setting to false, apply explicit booleans, and preserve saved settings for null/non-boolean inputs. This also applies when the whole sidecar is absent. Llama preserves its saved prefix for absent/null settings; explicit non-null prefix reconstruction requires its unsupported slow path. Qwen2 does not recreate Llama's BOS/EOS templates. Sequence roots retain their nested ByteLevel settings, including a single or nested single child. A native tokenizer panic or invalid template is a checked Rust error.
+The HF boundary includes the Transformers Llama fast class's recreation of BOS/EOS templates, including Python truth-value semantics, unknown-token fallback and source template-name interpretation. NeoX recreates the same template form with BOS/EOS insertion disabled by default. Generic, GPT2 and Qwen2 fast classes retain their distinct behavior. Qwen2 uses its own default special tokens. All admitted fast classes apply generic split-special and cleanup controls. For a direct ByteLevel root, Qwen2/GPT2/NeoX/BLOOM/generic Fast default an absent prefix setting to false, apply explicit booleans, and preserve saved settings for null/non-boolean inputs. This also applies when the whole sidecar is absent. Llama preserves its saved prefix for absent/null settings; explicit non-null prefix reconstruction requires its unsupported slow path. Qwen2 does not recreate Llama's BOS/EOS templates. BLOOM then applies its own truthy-prefix override to every ByteLevel stage, including nested Sequences, and preserves its saved postprocessor. Its cleanup option uses Python truth values. Other Sequence roots retain their nested ByteLevel settings, including a single or nested single child. A native tokenizer panic or invalid template is a checked Rust error.
 
 A non-null sidecar tokenizer class takes precedence. An absent/null class uses the successfully resolved root model configuration, its root tokenizer class and the captured class mapping; nested text configuration does not override root tokenizer selection. Null and absent `model_type` values remain distinct. When class inference needs root `auto_map` or `configuration_files` indirection, it returns an explicit unsupported error. The native class, prefix and full-file evidence is documented in [QWEN_HF_CONVERSION.md](../../docs/QWEN_HF_CONVERSION.md).
 
 ## Deliberate boundaries
 
-These are five dense architecture conversion paths in the larger port. Other architecture families, mixture-of-experts conversion, multimodal projectors, adapters, PyTorch pickle input, remote model acquisition, source prequantization layouts, big-endian output, output sharding, executable remote tokenizer code, and general upstream CLI option compatibility remain outside this crate's admitted path. The converter rejects these when selected; completion of this crate does not close the project's full conversion or release gates.
+These are six dense architecture conversion paths in the larger port. Other architecture families, mixture-of-experts conversion, multimodal projectors, adapters, PyTorch pickle input, remote model acquisition, source prequantization layouts, big-endian output, output sharding, executable remote tokenizer code, and general upstream CLI option compatibility remain outside this crate's admitted path. The converter rejects these when selected; completion of this crate does not close the project's full conversion or release gates.
 
 Qwen HybridDNA tokenizers, InternS1 specialized vocabulary, reranker head extraction, the `linear.weight` embedding projection rewrite, Qwen mixture-of-experts and recurrent/Next/MTP variants remain outside the admitted dense path. Nested wrapper architectures retain their origin when checking these boundaries; a Qwen3 text config does not silently erase a reranker or InternS1 origin. Supported sentence-transformer sidecars select mean, CLS or last-token pooling with the frozen precedence. Conversion support for this metadata does not establish an embedding or reranking inference implementation.
+
+The named source-conversion writer can reproduce original Python nested-array metadata. Strict GGUF writers and readers still reject nested arrays; those original-compatible outputs are not thereby valid inputs to the native GGUF reader.
 
 The result reproduces conversion behavior. A model or metadata feature accepted for conversion is not thereby supported by the current Rust inference runtime. In particular, writing scaled-RoPE metadata or a Llama 3 factor tensor does not establish runtime scaled-RoPE inference parity.
 
 The API rejects symlinks/reparse points, parent traversal, absolute relative-sidecar paths and Windows alternate streams beneath an untrusted input directory. Callers with trusted model-cache symlink layouts should materialize ordinary input files or use the checkpoint capability APIs as appropriate. Input configuration strings used as filenames must satisfy the retained-root policy.
 
 GPT-2 and GPT-NeoX preserve their distinct metadata overrides, tokenizer class defaults and tensor permutations. The original official GPT-2 checkpoint fails on static causal-mask buffers; the converter preserves that source rejection. The disclosed external validation derivative, Rust-only ignored-test preparation, complete-file captures and exact boundaries are described in [GPT_HF_CONVERSION.md](../../docs/GPT_HF_CONVERSION.md).
+
+BLOOM reproduces its separate metadata override, normalized configuration aliases, global `transformer.` removal, and head-major fused-QKV transform. The unchanged official BLOOM checkpoint is accepted by the frozen converter. Its independently captured malformed layouts, tokenizer classes, metadata sequences and complete pretrained files are described in [BLOOM_HF_CONVERSION.md](../../docs/BLOOM_HF_CONVERSION.md).
 
 ## Source-build profiles
 
@@ -91,6 +95,7 @@ Defaults are explicit and configurable through `Limits`:
 | Parsed protobuf fields | 4,000,000 |
 | Tokenizer work operations | 64,000,000 |
 | Transformer layers | 512 |
+| Nested BLOOM head-metadata arrays | 64 levels (fixed ingestion bound) |
 
 Checkpoint headers, cumulative JSON nodes/text, path work, YAML events/depth/aliases, and GGUF metadata have additional independently configured limits. Size arithmetic is checked and heap reservation is fallible. Input tensors, prepared components, permutations and joined QKV buffers are charged before allocation. The working budget is conservative and cumulative for one output tensor; freeing an intermediate buffer does not refund its charge. It is not a process RSS, allocator, OS cache, wall-clock or total-file-system budget.
 
@@ -126,7 +131,10 @@ Ordinary `cargo test -p llama-convert --offline --locked` exercises the bundled 
 | --- | --- |
 | Complete Llama converter | 64 cases per native host: 57 accepted files totaling 8,091,032 exact bytes, and 7 original rejections |
 | Complete GPT-2/GPT-NeoX converter | 101 cases per native host: 77 accepted files totaling 143,810,730 exact bytes and 24 source rejections |
+| Complete BLOOM converter | 113 cases per native host: 84 accepted files totaling 1,066,141,612 exact bytes, and 29 source rejections |
+| BLOOM class / metadata / aliases | 87 tokenizer configurations (82 accepted/five rejected), 2,296 exact encoding/decoder requests, 41 metadata calls (20 accepted/21 rejected), and 576 native alias lookups per host |
 | HF NeoX class behavior | 46 class configurations, 40 accepted/six rejected and 960 exact encoding/decoder requests per native host |
+| BLOOM official tokenizer pattern | All 1,112,064 Unicode scalars and 1,922 exact split/encoding/decoding requests across both prefix settings |
 | Complete Qwen2/Qwen3 converter | 112 cases per native host: 104 accepted files totaling 25,723,552 exact bytes, and eight original rejections |
 | Qwen configuration fallback | 32 additional complete files per native host; 5,318,912 exact bytes, including default sliding windows, invalid thresholds and iterable layer types |
 | Qwen root model-type presence | Eight additional complete files per native host; 1,329,824 exact bytes for explicit, absent, null and unknown types |
@@ -148,8 +156,10 @@ The Qwen ordinary corpus contains synthetic weights only. Separate ignored tests
 
 The separate GPT ignored tests use the pinned official GPT-2 and Pythia-14M checkpoints. They reproduce three original GPT-2 failures, then compare six complete F16/Q8_0/auto files totaling 718,209,760 bytes per native profile. When an external filtered GPT-2 fixture is not supplied, the Rust test removes the twelve source-rejected mask buffers and verifies the entire derived input against the independently captured checksum. The product converter never performs that fixture adaptation. See the GPT conversion document for input variables and the two tests.
 
+The separate BLOOM ignored test uses the unchanged official `bigscience/bloom-560m` checkpoint at revision `ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971`. Set `LLAMA_TEST_BLOOM_HF` to the directory holding all seven files in its [pretrained manifest](tests/fixtures/bloom-conversion/pretrained-reference.json) and `LLAMA_TEST_BLOOM_OUTPUT_ROOT` to a fresh output directory. `cargo test -p llama-convert --release --test bloom_pretrained --offline --locked -- --ignored --nocapture` compares three complete F16/Q8_0/auto files, totaling 2,871,136,896 bytes per profile, and verifies input hashes before and after. It makes no input adaptations. The bundled BLOOM tokenizer data retains its BigScience BLOOM RAIL 1.0 license.
+
 Numerical checks compare exact bytes and F32 words, including signs and payloads of NaNs where the captured profile defines them. No approximate self-generated expected outputs replace the original references.
 
 ## Attribution
 
-Retain [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [METADATA_NOTICES.md](METADATA_NOTICES.md) and [ROPE_NOTICES.md](ROPE_NOTICES.md). The reviewed YAML dependency cohort, archive/source hashes, resolved features and complete license texts live under `docs/dependencies` and `release/reviewed-dependencies.json`. The dependency audit rejects unreviewed identities, source replacement, feature drift, source-cache changes, native links and build scripts.
+Retain [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [METADATA_NOTICES.md](METADATA_NOTICES.md) [ROPE_NOTICES.md](ROPE_NOTICES.md) and [BLOOM_NOTICES.md](BLOOM_NOTICES.md). The reviewed YAML dependency cohort, archive/source hashes, resolved features and complete license texts live under `docs/dependencies` and `release/reviewed-dependencies.json`. The dependency audit rejects unreviewed identities, source replacement, feature drift, source-cache changes, native links and build scripts.
