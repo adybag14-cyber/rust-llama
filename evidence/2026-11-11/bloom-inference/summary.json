@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "scope": "BLOOM strict causal Rust CPU F32-cache execution; no native C decoder claim",
+  "prepared_utc": "2026-11-11T18:41:33.697883+00:00",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "base_git_commit": "37ba10da13aff8bc10bfe1ecb7b650b1c68029a7",
+  "final_attempt": "full-v3",
+  "final_input_count": 558,
+  "final_input_manifest_sha256": "f80fb153b46fc7cfeba4407a717303c34dd971e7aa6b594d2740f30cc539d656",
+  "input_scope": "All files under model-runtime, inference, quant, tokenizer, llama-behavior, gguf, platform-loader, llama-conformance, fixtures/inference plus root Cargo manifests/toolchain. Documentation and evidence added after validation are outside this guard.",
+  "profiles": {
+    "linux-gnu": {
+      "status": "succeeded",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v3/linux-gnu/report.json",
+        "bytes": 99459,
+        "sha256": "9a5bbcbae8859db5a533c0256b76ad050292503ef54d4995ea8e45caa690f2c0"
+      },
+      "ordinary": {
+        "debug": {
+          "passed": 126,
+          "ignored": 12,
+          "suites": 24
+        },
+        "release": {
+          "passed": 126,
+          "ignored": 12,
+          "suites": 24
+        }
+      },
+      "pretrained": {
+        "passed": 2,
+        "ignored": 0,
+        "suites": 1
+      },
+      "metrics": {
+        "debug-affected": [
+          {
+            "label": "18 executable tiny variants / 13 checked boundaries",
+            "profile": "gnu",
+            "rows": 1062,
+            "floats": 346644,
+            "bitwise_equal": 346644,
+            "greedy_ids": 216,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ],
+        "release-affected": [
+          {
+            "label": "18 executable tiny variants / 13 checked boundaries",
+            "profile": "gnu",
+            "rows": 1062,
+            "floats": 346644,
+            "bitwise_equal": 346644,
+            "greedy_ids": 216,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ],
+        "release-pretrained": [
+          {
+            "label": "official-bloom-560m-f16",
+            "profile": "gnu",
+            "rows": 40,
+            "floats": 6537216,
+            "bitwise_equal": 6537216,
+            "greedy_ids": 12,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          },
+          {
+            "label": "official-bloom-560m-q8_0",
+            "profile": "gnu",
+            "rows": 40,
+            "floats": 6537216,
+            "bitwise_equal": 6537216,
+            "greedy_ids": 12,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ]
+      }
+    },
+    "windows-msvc": {
+      "status": "succeeded",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v3/windows-msvc/report.json",
+        "bytes": 99218,
+        "sha256": "28efd61fc1013c3481ed24990d32db343275069a8dd89d41d105e93126c5d1af"
+      },
+      "ordinary": {
+        "debug": {
+          "passed": 124,
+          "ignored": 12,
+          "suites": 24
+        },
+        "release": {
+          "passed": 124,
+          "ignored": 12,
+          "suites": 24
+        }
+      },
+      "pretrained": {
+        "passed": 2,
+        "ignored": 0,
+        "suites": 1
+      },
+      "metrics": {
+        "debug-affected": [
+          {
+            "label": "18 executable tiny variants / 13 checked boundaries",
+            "profile": "msvc",
+            "rows": 1062,
+            "floats": 346644,
+            "bitwise_equal": 346644,
+            "greedy_ids": 216,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ],
+        "release-affected": [
+          {
+            "label": "18 executable tiny variants / 13 checked boundaries",
+            "profile": "msvc",
+            "rows": 1062,
+            "floats": 346644,
+            "bitwise_equal": 346644,
+            "greedy_ids": 216,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ],
+        "release-pretrained": [
+          {
+            "label": "official-bloom-560m-f16",
+            "profile": "msvc",
+            "rows": 40,
+            "floats": 6537216,
+            "bitwise_equal": 6537216,
+            "greedy_ids": 12,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          },
+          {
+            "label": "official-bloom-560m-q8_0",
+            "profile": "msvc",
+            "rows": 40,
+            "floats": 6537216,
+            "bitwise_equal": 6537216,
+            "greedy_ids": 12,
+            "maximum_absolute": 0.0,
+            "maximum_budget_fraction": 0.0
+          }
+        ]
+      }
+    }
+  },
+  "attempts": [
+    {
+      "attempt": "full-v1",
+      "profile": "linux-gnu",
+      "status": "failed",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v1/linux-gnu/report.json",
+        "bytes": 45718,
+        "sha256": "3455279788f21b7abd1609bb3d02c7bdc492e0ba450a08351b0e2efe8d3464bd"
+      }
+    },
+    {
+      "attempt": "full-v1",
+      "profile": "windows-msvc",
+      "status": "failed",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v1/windows-msvc/report.json",
+        "bytes": 45626,
+        "sha256": "9255ec7c90c77936a99ebdf74d3be83d1f523480a3d34638748b24ae22b53cf9"
+      }
+    },
+    {
+      "attempt": "full-v2",
+      "profile": "linux-gnu",
+      "status": "failed",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v2/linux-gnu/report.json",
+        "bytes": 45740,
+        "sha256": "125d8e3e7ed3c65745af76d8add2660b4d5169c38a10da9c76ed40565587ebe0"
+      }
+    },
+    {
+      "attempt": "full-v2",
+      "profile": "windows-msvc",
+      "status": "failed",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v2/windows-msvc/report.json",
+        "bytes": 45647,
+        "sha256": "0a0858f0e9a469bd5b77a4c7cb75ea8e925416d432aca58ea508bd2988ff5390"
+      }
+    },
+    {
+      "attempt": "full-v3",
+      "profile": "linux-gnu",
+      "status": "succeeded",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v3/linux-gnu/report.json",
+        "bytes": 99459,
+        "sha256": "9a5bbcbae8859db5a533c0256b76ad050292503ef54d4995ea8e45caa690f2c0"
+      }
+    },
+    {
+      "attempt": "full-v3",
+      "profile": "windows-msvc",
+      "status": "succeeded",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/full-v3/windows-msvc/report.json",
+        "bytes": 99218,
+        "sha256": "28efd61fc1013c3481ed24990d32db343275069a8dd89d41d105e93126c5d1af"
+      }
+    },
+    {
+      "attempt": "quick-v1",
+      "profile": "windows-msvc",
+      "status": "failed",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/quick-v1/windows-msvc/report.json",
+        "bytes": 42909,
+        "sha256": "95aa8356ca0deec2f0f67dbf7e9999b73f407b7e1ceae3611af736882a72b7ce"
+      }
+    },
+    {
+      "attempt": "quick-v2",
+      "profile": "windows-msvc",
+      "status": "succeeded",
+      "report": {
+        "path": "evidence/2026-11-11/bloom-inference/validation/quick-v2/windows-msvc/report.json",
+        "bytes": 45742,
+        "sha256": "ae3cfcffdf4b6ccf5a14061bba9f830988e600e304d9b5b7b50c89e8d9f4aec6"
+      }
+    }
+  ],
+  "fixture_manifest": {
+    "bytes": 4848,
+    "sha256": "fc336a92d5227fea00ae92d9f3c821eb665a6fdb2c011d715e6410141fdd62b2"
+  },
+  "fixture_files": 17,
+  "original_case_counts": {
+    "per_profile": {
+      "tiny_supported": 18,
+      "tiny_invalid": 8,
+      "tiny_unsupported": 5,
+      "official_trained_models": 2
+    }
+  },
+  "qualifications": [
+    "Original captures and immutable fixture packing completed before Rust implementation; separate MSVC/GNU references.",
+    "Initial original GNU linker attempts failed due to -llama rather than -lllama; the initial symlink diagnosis was explicitly corrected. Original baseline/build files were unchanged.",
+    "quick-v1 MSVC failed compilation because the test assumed a Default implementation for NativeContextOptions; explicit limits fixed that test.",
+    "full-v1 on both hosts failed only the stale seven-slice smoke assertion after BLOOM became the eighth slice; original BLOOM comparisons were exact.",
+    "full-v2 on both hosts failed strict Clippy for two range loops; iterator traversal preserved numeric operation order.",
+    "Only the final complete unchanged-input full runs establish the domain pass; every earlier attempt retains its actual status and scope.",
+    "Official checkpoint payloads, native builds, raw large native result JSON and non-Rust generators remain external."
+  ],
+  "postflight": {
+    "status": "succeeded",
+    "report": {
+      "path": "evidence/2026-11-11/bloom-inference/postflight/v1/report.json",
+      "bytes": 1585,
+      "sha256": "a07315ff29e5f0856d17b24b273129857a9eb21bedcc42128924eae08f6f4b9e"
+    },
+    "scope": "BLOOM domain package audit and complete fixture integrity on Windows/MSVC"
+  },
+  "independent_review": {
+    "result": "no blocking finding",
+    "report": {
+      "path": "evidence/2026-11-11/bloom-inference/review/runtime-review-v1.json",
+      "bytes": 3687,
+      "sha256": "c79258219dfcb8d5210214fdfb436cddd085123ced5d7be706ac08f6257ac857"
+    }
+  },
+  "final_publication_guard": {
+    "checked_utc": "2026-11-11T18:44:39.255937+00:00",
+    "selected_inputs_unchanged": 558,
+    "reviewed_product_and_reference_files_unchanged": true,
+    "driver": {
+      "bytes": 3750,
+      "sha256": "3c70a30a83e43cf7a3dfcafe97c8cbe09511535438a44af43a189b4f6f6b2ade"
+    }
+  }
+}

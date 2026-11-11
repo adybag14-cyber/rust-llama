@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "attempt": "v1",
+  "scope": "BLOOM domain package audit and complete fixture integrity on Windows/MSVC",
+  "driver": {
+    "bytes": 1754,
+    "sha256": "ac14b1ca2d097fb90b0eb05fd422158b708b61b8eee46e9d2efe55e7025639a2"
+  },
+  "stages": [
+    {
+      "name": "package-audit",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 73.45154094696045,
+      "log": {
+        "path": "package-audit.log",
+        "bytes": 57355,
+        "sha256": "0b096c49ff0cf73cee2e8744db377b37cdba1acce3fe0a025d0b3432dc9fb247"
+      }
+    },
+    {
+      "name": "fixture-integrity",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 71.58096957206726,
+      "log": {
+        "path": "fixture-integrity.log",
+        "bytes": 397,
+        "sha256": "ce9bf8928f15edaa5a6fba7a8f43aebc02eb16e2dc786e32fcff2f09d74f3674"
+      }
+    },
+    {
+      "name": "diff-check",
+      "args": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08205032348632812,
+      "log": {
+        "path": "diff-check.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "finished_utc": "2026-11-11T18:44:23.018748+00:00"
+}

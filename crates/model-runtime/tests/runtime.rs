@@ -669,5 +669,5 @@ fn smoke_demo_is_real_execution_with_reproducible_state() {
     assert_eq!(report.llama_logits.len(), 7);
     assert_eq!(report.mamba_logits.len(), 7);
     assert_eq!(report.bert_mean_embedding.len(), 4);
-    assert_eq!(report.executable_f32_slices, 7);
+    assert_eq!(report.executable_f32_slices, 8);
 }

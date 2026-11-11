@@ -10,6 +10,7 @@
 
 pub mod adapters;
 pub mod bert;
+pub mod bloom;
 pub mod context;
 pub mod fixtures;
 pub mod gpt2;
@@ -24,6 +25,7 @@ mod state;
 
 pub use adapters::{AdapterSet, Lora};
 pub use bert::{BertConfig, BertLayer, BertModel, BertWeights, Encoded, Pooling};
+pub use bloom::{BloomConfig, BloomLayer, BloomModel, BloomWeights};
 pub use context::{
     BatchToken, Context, ContextCheckpoint, ContextOptions, Input, NativeBatchToken, NativeContext,
     NativeContextOptions, NativeExecutionOptions, NativeExecutionStats, NativeKvType, NativeState,
@@ -98,6 +100,7 @@ pub enum Model {
     Qwen2(Qwen2Model),
     Qwen3(Qwen3Model),
     Gpt2(Gpt2Model),
+    Bloom(BloomModel),
     GptNeoX(GptNeoXModel),
 }
 impl Model {
@@ -108,6 +111,7 @@ impl Model {
             Self::Qwen2(_) => &registry::ARCHITECTURES[24],
             Self::Qwen3(_) => &registry::ARCHITECTURES[28],
             Self::Gpt2(_) => &registry::ARCHITECTURES[7],
+            Self::Bloom(_) => &registry::ARCHITECTURES[21],
             Self::GptNeoX(_) => &registry::ARCHITECTURES[9],
         }
     }
@@ -118,6 +122,7 @@ impl Model {
             Self::Qwen2(m) => m.config().width,
             Self::Qwen3(m) => m.config().width,
             Self::Gpt2(m) => m.config().width,
+            Self::Bloom(m) => m.config().width,
             Self::GptNeoX(m) => m.config().width,
         }
     }
@@ -128,6 +133,7 @@ impl Model {
             Self::Qwen2(m) => m.config().vocabulary,
             Self::Qwen3(m) => m.config().vocabulary,
             Self::Gpt2(m) => m.config().vocabulary,
+            Self::Bloom(m) => m.config().vocabulary,
             Self::GptNeoX(m) => m.config().vocabulary,
         }
     }
@@ -138,6 +144,7 @@ impl Model {
             Self::Qwen2(m) => m.config().max_context,
             Self::Qwen3(m) => m.config().max_context,
             Self::Gpt2(m) => m.config().max_context,
+            Self::Bloom(m) => m.config().max_context,
             Self::GptNeoX(m) => m.config().max_context,
         }
     }
@@ -148,6 +155,7 @@ impl Model {
             Self::Qwen2(m) => m.layer_count(),
             Self::Qwen3(m) => m.layer_count(),
             Self::Gpt2(m) => m.layer_count(),
+            Self::Bloom(m) => m.layer_count(),
             Self::GptNeoX(m) => m.layer_count(),
         }
     }
@@ -158,6 +166,7 @@ impl Model {
             Self::Qwen2(m) => m.fingerprint(),
             Self::Qwen3(m) => m.fingerprint(),
             Self::Gpt2(m) => m.fingerprint(),
+            Self::Bloom(m) => m.fingerprint(),
             Self::GptNeoX(m) => m.fingerprint(),
         }
     }
@@ -168,6 +177,7 @@ impl Model {
             Self::Qwen2(m) => m.weight(name),
             Self::Qwen3(m) => m.weight(name),
             Self::Gpt2(m) => m.weight(name),
+            Self::Bloom(m) => m.weight(name),
             Self::GptNeoX(m) => m.weight(name),
         }
     }
@@ -178,6 +188,7 @@ impl Model {
             Self::Qwen2(m) => m.embedding(token),
             Self::Qwen3(m) => m.embedding(token),
             Self::Gpt2(m) => m.embedding(token),
+            Self::Bloom(m) => m.embedding(token),
             Self::GptNeoX(m) => m.embedding(token),
         }
     }

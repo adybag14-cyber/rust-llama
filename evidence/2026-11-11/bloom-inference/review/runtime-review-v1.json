@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "reviewer": "gpt_converters",
+  "mode": "read-only source review",
+  "result": "no blocking finding",
+  "product_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\models\\crates\\model-runtime\\src\\bloom.rs",
+      "bytes": 15217,
+      "sha256": "0cb0a62db1dd6646d591bf3bc1f79b68b4f66e90a10c90901636fcf1622eda8f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\models\\crates\\inference\\src\\bloom_loader.rs",
+      "bytes": 6825,
+      "sha256": "70d2753066e8a354475b9ac4635518c090a36b9bf9fe153cf6b879d2788f9300"
+    }
+  ],
+  "reference_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\models\\bloom.cpp",
+      "bytes": 5433,
+      "sha256": "4323ced163de10039f8dbe35402e2cfb3e4b70e8489a3db886e6588a2928558f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp",
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\llama-kv-cache.cpp",
+      "bytes": 104089,
+      "sha256": "7f7bdb698d6db40b9a57cfa6be7f40396efdd8ea76e2fbce8b1f54d5f9142f6b"
+    }
+  ],
+  "supporting_product_files": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\models\\crates\\inference\\src\\loader.rs",
+      "bytes": 15880,
+      "sha256": "c14126a0f6c546ffdda4ffec12d04bb34eb55acd2912adf809e57072e0db21ad"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\models\\crates\\model-runtime\\src\\lib.rs",
+      "bytes": 10654,
+      "sha256": "0aa65fa44f17ae821af2096a0114e367cca4d9963dbceec18f78f9baf5cacb71"
+    }
+  ],
+  "verified": [
+    "Affine input LayerNorm is applied after both token lookup and direct embeddings, before the first attention normalization, matching bloom.cpp.",
+    "QKV slices use query width and two KV widths, with checked head dimension and GQA divisibility; projection, residual, normalized GELU feed-forward and final affine norm follow source graph order.",
+    "Optional output matrix falls back to input embeddings exactly; bias and norm vector widths, QKV/FFN matrix shapes and required tensors are checked before model construction.",
+    "ALiBi fixes max bias to 8, uses floor(log2(heads)) for the head-power partition, source m0/m1 and odd-tail exponent ordering, and native powf-compatible f32 arithmetic.",
+    "The integer relative causal mask is negated before conversion to f32, preserving positive-zero diagonal; dot products scale before slope*mask addition and softmax operates on a 256-padded row.",
+    "Loader bounds layer count, validates context/epsilon/head fields, enforces scalar head/FFN metadata boundary and F32 active vectors, rejects unconsumed tensors, and applies the shared checked decoded-weight-byte budget before materializing weights.",
+    "Cache layer count and position lengths are checked; max context and KV width multiplication are checked. Attention buffer reservations are fallible."
+  ],
+  "limitations": [
+    "Review did not execute tests or regenerate the native corpus. Independent numerical execution remains the implementation worker's evidence.",
+    "Review covers the declared contiguous single-sequence CPU graph and loader contract; it does not establish flash attention, per-layer heterogeneous metadata, general original scheduling or complete model-family portability.",
+    "Global source/model identity and fixture coverage beyond the inspected files were not re-audited."
+  ]
+}

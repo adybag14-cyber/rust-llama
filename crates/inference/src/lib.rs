@@ -4,6 +4,7 @@
 #![forbid(unsafe_code)]
 
 mod bert_loader;
+mod bloom_loader;
 mod gpt2_loader;
 mod gptneox_loader;
 mod loader;

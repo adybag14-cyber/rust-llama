@@ -1,0 +1,36 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\quant)
+    Checking llama-platform-loader v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\platform-loader)
+    Checking llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\llama-behavior)
+    Checking llama-model-runtime v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\model-runtime)
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\gguf)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111-late\models\crates\tokenizer)
+error: the loop variable `token` is used to index `scores`
+   --> crates\model-runtime\src\bloom.rs:383:22
+    |
+383 |         for token in 0..count {
+    |                      ^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and enumerate()
+    |
+383 -         for token in 0..count {
+383 +         for (token, <item>) in scores.iter_mut().enumerate().take(count) {
+    |
+
+error: the loop variable `token` is used to index `scores`
+   --> crates\model-runtime\src\bloom.rs:401:22
+    |
+401 |         for token in 0..count {
+    |                      ^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+401 -         for token in 0..count {
+401 +         for (token, <item>) in scores.iter().enumerate().take(count) {
+    |
+
+error: could not compile `llama-model-runtime` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

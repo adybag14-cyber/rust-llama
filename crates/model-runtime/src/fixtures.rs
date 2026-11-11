@@ -302,3 +302,47 @@ pub fn smoke_demo() -> Result<SmokeReport> {
         state_roundtrips_match: llama_match && mamba_match,
     })
 }
+
+/// Structural BLOOM weights only; original numerical/pretrained proof is in
+/// llama-inference/tests/bloom.rs and fixtures/inference/bloom.
+pub fn tiny_bloom() -> Result<BloomModel> {
+    let config = BloomConfig {
+        vocabulary: 7,
+        width: 4,
+        feed_forward: 6,
+        heads: 2,
+        kv_heads: 1,
+        max_context: 32,
+        norm_epsilon: 1e-5,
+    };
+    let mut layers = Vec::new();
+    for index in 0..2 {
+        let seed = index * 20;
+        layers.push(BloomLayer {
+            attention_norm: norms(4, seed + 2),
+            attention_norm_bias: values(4, seed + 3),
+            qkv: matrix(8, 4, seed + 4)?,
+            qkv_bias: values(8, seed + 5),
+            attention_output: matrix(4, 4, seed + 6)?,
+            attention_output_bias: values(4, seed + 7),
+            feed_forward_norm: norms(4, seed + 8),
+            feed_forward_norm_bias: values(4, seed + 9),
+            up: matrix(6, 4, seed + 10)?,
+            up_bias: values(6, seed + 11),
+            down: matrix(4, 6, seed + 12)?,
+            down_bias: values(4, seed + 13),
+        });
+    }
+    BloomModel::new(
+        config,
+        BloomWeights {
+            token_embedding: matrix(7, 4, 1)?,
+            embedding_norm: norms(4, 61),
+            embedding_norm_bias: values(4, 62),
+            layers,
+            output_norm: norms(4, 50),
+            output_norm_bias: values(4, 51),
+            output: Some(matrix(7, 4, 52)?),
+        },
+    )
+}

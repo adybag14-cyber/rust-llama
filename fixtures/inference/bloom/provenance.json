@@ -1,0 +1,2392 @@
+{
+  "schema": 1,
+  "origin": "Independent frozen original C API runs and original GGUF writer/scalar quantizers; no Rust expected values.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "captured_and_packed_before_rust_implementation": true,
+  "packed_utc": "2026-11-11T18:24:20.261347+00:00",
+  "contracts": {
+    "tiny-inputs/contract-before-rust.json": {
+      "schema": 1,
+      "captured_before_rust_implementation": true,
+      "utc": "2026-11-11T18:15:54.569087+00:00",
+      "absolute_budget": 0.0002,
+      "relative_budget": 2e-05,
+      "token_ids": "exact",
+      "token_piece_bytes": "exact",
+      "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "graph": "BLOOM fixed max ALiBi bias8, contiguous F32 cache, one thread, nonflash, F32 activation/vector operations. Any failing comparison must be diagnosed before changing the contract."
+    },
+    "pretrained-contract-before-rust.json": {
+      "schema": 1,
+      "rust_implementation_started": false,
+      "model": "bigscience/bloom-560m",
+      "revision": "ac2ae5fab2ce3f9f40dc79b5ca9f637430d24971",
+      "matrix_profiles": [
+        "F16",
+        "Q8_0"
+      ],
+      "native_profiles": [
+        "MSVC",
+        "GNU"
+      ],
+      "absolute_budget": 0.0002,
+      "relative_budget": 2e-05,
+      "token_ids": "exact",
+      "piece_bytes": "exact",
+      "source_semantics": "F32 causal contiguous KV; native CPU one thread, nonflash, embedding and affine norms, fixed ALiBi max bias 8. Native captured values only; investigate source arithmetic differences before any contract change.",
+      "decoded_weight_budget": 4294967296
+    }
+  },
+  "source_files": {
+    "src/models/bloom.cpp": {
+      "bytes": 5433,
+      "sha256": "4323ced163de10039f8dbe35402e2cfb3e4b70e8489a3db886e6588a2928558f"
+    },
+    "src/llama-graph.cpp": {
+      "bytes": 167817,
+      "sha256": "62418701824f9fc78bbd47b5f8b3fd142c6aa9e243273ff9ef3878761b98048f"
+    },
+    "src/llama-kv-cache.cpp": {
+      "bytes": 104089,
+      "sha256": "7f7bdb698d6db40b9a57cfa6be7f40396efdd8ea76e2fbce8b1f54d5f9142f6b"
+    },
+    "ggml/src/ggml-cpu/ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    "conversion/bloom.py": {
+      "bytes": 2983,
+      "sha256": "cf17a9c8717c45121c843112dfce7a2fd2aeab060158fb6349f50397f4963c1d"
+    }
+  },
+  "external_tools": {
+    "tiny-bloom.cpp": {
+      "bytes": 5700,
+      "sha256": "62b621a9332c25963f6f3a4ebee72979e952fc2cc77ca47961fbeacca380cea6"
+    },
+    "bloom-inference-oracle.cpp": {
+      "bytes": 13526,
+      "sha256": "fe1f7b518c75f0921ca396282b72bbe7082623b3d6231d9cb4e494295d3dc353"
+    },
+    "prepare.py": {
+      "bytes": 8963,
+      "sha256": "4121d8ca5ffbd1aad1f9eebf14420acccca37f556456dcbeac69a56b8a694444"
+    },
+    "capture.py": {
+      "bytes": 5078,
+      "sha256": "345ece9f557f8c012fb2a0c2b046588aed40ca490fc1f928d1f37f53319196f1"
+    },
+    "capture-v1.py": {
+      "bytes": 4591,
+      "sha256": "fcc531e14416e5114838ab470f8c78d5885fe3381b1c20630768c61d144a26b6"
+    },
+    "capture-v2.py": {
+      "bytes": 5077,
+      "sha256": "54f7ce9a49d53c707c1c8cdd1fb7757aa2d2b7e95ace8d79fccdd2d1e39d2cb1"
+    },
+    "pack.py": {
+      "bytes": 8476,
+      "sha256": "c34e02111130b1b185487704c4430e2f6769e66dc370e5df8d6d31d3f3f4069f"
+    }
+  },
+  "profiles": {
+    "tiny-msvc": {
+      "schema": 1,
+      "profile": "msvc",
+      "status": "succeeded",
+      "started_utc": "2026-11-11T18:16:36.637220+00:00",
+      "kind": "tiny",
+      "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "harness": {
+        "bytes": 13526,
+        "sha256": "fe1f7b518c75f0921ca396282b72bbe7082623b3d6231d9cb4e494295d3dc353"
+      },
+      "executable": {
+        "bytes": 178176,
+        "sha256": "fba3781d9f7d482560d60457d9273c5a7040fc4abb72f4450242ebf29b251513"
+      },
+      "driver": {
+        "bytes": 4591,
+        "sha256": "fcc531e14416e5114838ab470f8c78d5885fe3381b1c20630768c61d144a26b6"
+      },
+      "cases": [
+        {
+          "name": "f32-tied",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "b968a63611975fd78d63357f6204f8218ea795c4678b05080ca611d70971a2ca"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\f32-tied.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f32-tied.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f32-tied.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.660799+00:00",
+          "finished_utc": "2026-11-11T18:16:36.873698+00:00",
+          "stdout": {
+            "bytes": 140,
+            "sha256": "60dc6ccb3feaab541433772415f0c5f82de76f36ddd960af2d75d2d79d593857"
+          },
+          "stderr": {
+            "bytes": 22301,
+            "sha256": "cdea1c8a18e6f5bacbf9cb9f7623594ec83a7ed02b4f97f4fccc424c6c14d3e1"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "7f8241eb87465023b9ba7f3074bb26f92528a0d5571ac0732072de67cefed298"
+          }
+        },
+        {
+          "name": "f32-untied",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 543968,
+            "sha256": "b6de0813a170dd5b4a441baec9cf54e7fc1042436c451f32e58607b891358ec6"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\f32-untied.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f32-untied.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f32-untied.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.875715+00:00",
+          "finished_utc": "2026-11-11T18:16:36.901489+00:00",
+          "stdout": {
+            "bytes": 142,
+            "sha256": "0f7b5c92dbaa13c631b1ca0818f8019797fefcbdc6e3d70e12ffd6ae4f9eacca"
+          },
+          "stderr": {
+            "bytes": 22258,
+            "sha256": "f371450100b9bee68b4da9ab91700e7e215843f80e793b1b75ed9c402c1df2ed"
+          },
+          "reference": {
+            "bytes": 402914,
+            "sha256": "976cc7c023b90ab6a1700061efb26aa11677cde1fd24dd315906be9f889a34d5"
+          }
+        },
+        {
+          "name": "f16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 216224,
+            "sha256": "7556ab63d1c9ffd486db5f09b08b5c9afdf2e6ae800c797c723d3115da36dc5c"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\f16.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f16.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\f16.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.903571+00:00",
+          "finished_utc": "2026-11-11T18:16:36.928330+00:00",
+          "stdout": {
+            "bytes": 135,
+            "sha256": "7a616db19b1074c56734a1c73037c4291901c8b380935f7887f4e19cfac779ce"
+          },
+          "stderr": {
+            "bytes": 22328,
+            "sha256": "6f87df498ab1f7885ddcfc8f273c7ad47650da3f028c5e35d8ffbb14dead5a48"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "b5a78dd505870aee11f13b866577044695ea8504b2064c5c1cd08a6d7df51bf7"
+          }
+        },
+        {
+          "name": "bf16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 216224,
+            "sha256": "329fcc7508211cb62290f41930c6ffc11990a00e349805fdf6823037caee3e08"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\bf16.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bf16.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bf16.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.930327+00:00",
+          "finished_utc": "2026-11-11T18:16:36.955774+00:00",
+          "stdout": {
+            "bytes": 136,
+            "sha256": "b235f651d214b42eec0f72cbda85bdd89fd6aa225a0adcc3e7a3c9052a27dad1"
+          },
+          "stderr": {
+            "bytes": 22335,
+            "sha256": "71bfcc9dd0ad23a1cefdacd5796547bd7ba0671a049dcd9cad2de7ff1f893430"
+          },
+          "reference": {
+            "bytes": 402503,
+            "sha256": "e35215f52a7c90eeba576acae45e48a7acded583e44f800201f7a240561c5e3e"
+          }
+        },
+        {
+          "name": "q4-0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 74912,
+            "sha256": "12459167ac5bd91f65934a706dc061efc1d96de1b0b4fcb3000462b717db97eb"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\q4-0.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q4-0.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q4-0.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.958011+00:00",
+          "finished_utc": "2026-11-11T18:16:36.982998+00:00",
+          "stdout": {
+            "bytes": 136,
+            "sha256": "41a63c31926290cfb99483cd70a8bb2c035a108c095eb017ff034002e2da999f"
+          },
+          "stderr": {
+            "bytes": 22338,
+            "sha256": "087b7d7ffec7518094914492b26af88859400d5e2c4be1fb4ff259a8fa66c5be"
+          },
+          "reference": {
+            "bytes": 402007,
+            "sha256": "81786a6eb282adb953641829113affb930f9efa5de9fdbb7c9d06cad6f57a0f7"
+          }
+        },
+        {
+          "name": "q8-0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 124064,
+            "sha256": "285a32fbd94de2acf24bae79e1eeb39ccf73909344f6ec02a58e5a6830fe021a"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\q8-0.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q8-0.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q8-0.json"
+          ],
+          "started_utc": "2026-11-11T18:16:36.984922+00:00",
+          "finished_utc": "2026-11-11T18:16:37.010107+00:00",
+          "stdout": {
+            "bytes": 136,
+            "sha256": "4d692bece6c8b1f6576ecd3f5a3b96ffe56948ae1b8aab82a1fb116867516f94"
+          },
+          "stderr": {
+            "bytes": 22337,
+            "sha256": "d68b158930de9acdeb3193c23c297f5181d2483c514ed9a80fe6f998a62bf7d6"
+          },
+          "reference": {
+            "bytes": 402622,
+            "sha256": "a8ecef74437e41e82f6044a162659faf12a4b3fde7bc6fc01b9d4b044368d6c8"
+          }
+        },
+        {
+          "name": "q4-k",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 703136,
+            "sha256": "3e439a94aa3ce456e6842f83e70a0c55c03f9c9c5587a4c28b66b9b93ee61740"
+          },
+          "request": {
+            "bytes": 14341,
+            "sha256": "f31b1fc08e15a62d1260ded64fa3bed27d575a98bcabbd2df8b95b5522d1dd70"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\q4-k.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q4-k.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\q4-k.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.012315+00:00",
+          "finished_utc": "2026-11-11T18:16:37.059886+00:00",
+          "stdout": {
+            "bytes": 136,
+            "sha256": "57f96909dca13183775d64e8c03ad3df4c81a20832a1566e9e1d07709367b90f"
+          },
+          "stderr": {
+            "bytes": 22349,
+            "sha256": "eec52df0d1ff317417da4dfac520a99ec91f2d04ab279402f5942fbe0642f35b"
+          },
+          "reference": {
+            "bytes": 503814,
+            "sha256": "76b61c8663d9e90c8b46c5b453708fff2454191800be63cf045db16ebbd570ae"
+          }
+        },
+        {
+          "name": "grouped-query",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 379552,
+            "sha256": "eeefb2b90fc925129c1f4e0fc6e748297f3006bbe0602cad27576fb6768f33ec"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\grouped-query.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\grouped-query.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\grouped-query.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.062030+00:00",
+          "finished_utc": "2026-11-11T18:16:37.088846+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "74763a40c10a595d507e0bf95873fea5e398e84792e70dfa769210a52dcfed7c"
+          },
+          "stderr": {
+            "bytes": 22315,
+            "sha256": "8f85ab3ea135ffd0c92f1ca15fcad808198e14be2227603dac3bbc50e78b2265"
+          },
+          "reference": {
+            "bytes": 403740,
+            "sha256": "e0bf47a6435ee91b130c9496f0dde2dda677392cdcd9ec18433bfb1faa7306cc"
+          }
+        },
+        {
+          "name": "multi-query",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 362912,
+            "sha256": "2cb387241823fe082945b9467a69da1ff646a17bb250430bc88eaa0a59c735ad"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\multi-query.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\multi-query.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\multi-query.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.090845+00:00",
+          "finished_utc": "2026-11-11T18:16:37.118193+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "f3873caf167783ad14bb836d4ec608a58529b974505b24bb82083592ca774208"
+          },
+          "stderr": {
+            "bytes": 22310,
+            "sha256": "991a514869cf8f3378b9a138cb476fabbc9367229c97cbe0db1875aba5606a86"
+          },
+          "reference": {
+            "bytes": 403950,
+            "sha256": "37c55a0956982ef8052cf7706d3af9d1a9a784d87b9293a78e5bf905a1653655"
+          }
+        },
+        {
+          "name": "heads-three",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "9b4e0099d5481be4d617bdf82b6e7269b4bd8331c05f485b1d5d8f1a70ce74de"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\heads-three.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\heads-three.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\heads-three.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.120883+00:00",
+          "finished_utc": "2026-11-11T18:16:37.147037+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "e15df33342376edffce42f125f5256324e3c9869336d8ca0cf46e0d8a109427b"
+          },
+          "stderr": {
+            "bytes": 22308,
+            "sha256": "93da9f488d8734facdd211c14233ee662889447f2c7a6f28422eff9a9f4577b4"
+          },
+          "reference": {
+            "bytes": 403246,
+            "sha256": "2d6821956149ab5bfaaf813e967b98cad83e56d50dbd6ecabdb8b5d877b6c8af"
+          }
+        },
+        {
+          "name": "heads-five",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "a949bca40eb230b09ff64f89f0c7ed182efd6c8032f92ec8fd7534fc3a6d7f99"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\heads-five.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\heads-five.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\heads-five.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.149067+00:00",
+          "finished_utc": "2026-11-11T18:16:37.175223+00:00",
+          "stdout": {
+            "bytes": 142,
+            "sha256": "2faf7514e229b9bd3ae1fe2674c694981c4c60f0f8afcb5bbe2483c77bb6c5ac"
+          },
+          "stderr": {
+            "bytes": 22305,
+            "sha256": "c66145057dda231ead169b0d94d9b1c48af3cb458048304d6e2ece3201b3b994"
+          },
+          "reference": {
+            "bytes": 403216,
+            "sha256": "cad386dfa6963fe72a41971996dd12b0dd31ca31db551ec5a0bdf7f37faab934"
+          }
+        },
+        {
+          "name": "odd-head-width",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "68c19f0cb0465534c870b833490ed8d76fa7e3733570d2c08f4f4d397086d530"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\odd-head-width.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\odd-head-width.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\odd-head-width.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.177215+00:00",
+          "finished_utc": "2026-11-11T18:16:37.204317+00:00",
+          "stdout": {
+            "bytes": 146,
+            "sha256": "7743cc12d001818685b23c93108dd15f191ae47b2bd43dc498c966f9d098cf8c"
+          },
+          "stderr": {
+            "bytes": 22317,
+            "sha256": "e7f3d09de2e43903ffc64bef6ac7cd2f884d4551f492fa86b9d8a88943473fa6"
+          },
+          "reference": {
+            "bytes": 403207,
+            "sha256": "e901970c11d5c7376da65a340596fd09e896740083b40be6ff5cd72be050d343"
+          }
+        },
+        {
+          "name": "single-head",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "64a734321cb820009c3ca409dcc17893fcfecf1bc93fae5d0c40785c4293b076"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\single-head.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\single-head.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\single-head.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.206470+00:00",
+          "finished_utc": "2026-11-11T18:16:37.231826+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "694ee85767ad05d3fbf4a107fe101854bb2d1df6b3143cfb6c1f3f5063d69e52"
+          },
+          "stderr": {
+            "bytes": 22309,
+            "sha256": "5e0d88d90f23cb1cb9af5ab08e5f812bf4ee363a3790fd9e06760fb70f4790c3"
+          },
+          "reference": {
+            "bytes": 402619,
+            "sha256": "108f1487eae478fcbd8571aa95f434aa3d09aafb904de88ba40730f8a08a1f4d"
+          }
+        },
+        {
+          "name": "single-layer",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 278304,
+            "sha256": "1cc5c1e7018d9f6ea823ec5c8adc78805d027a331a9177b1b31f6418fd5d4f63"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\single-layer.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\single-layer.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\single-layer.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.233843+00:00",
+          "finished_utc": "2026-11-11T18:16:37.256885+00:00",
+          "stdout": {
+            "bytes": 144,
+            "sha256": "519296b123c865af407180751bb7e71cbcfa400f33fae49dd23c2aa703d3fe24"
+          },
+          "stderr": {
+            "bytes": 18073,
+            "sha256": "b8e23cf0e3b67d995422ab52f92d29409c771c495d261788fd5368abcca64c72"
+          },
+          "reference": {
+            "bytes": 402911,
+            "sha256": "7aa3419ac486b5e76f48490fee9fb9a7539a4a8fd251baae3126495f405827cd"
+          }
+        },
+        {
+          "name": "three-layers",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 547392,
+            "sha256": "a183818461244d7fbb364f298f9002d5075b967cd0a04d38038f3d5fc46f5129"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\three-layers.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\three-layers.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\three-layers.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.258923+00:00",
+          "finished_utc": "2026-11-11T18:16:37.286606+00:00",
+          "stdout": {
+            "bytes": 144,
+            "sha256": "84ddc216785063707867cfff9e5a18ce80793484e9dbeca067392e542b73098b"
+          },
+          "stderr": {
+            "bytes": 26563,
+            "sha256": "e60f1847659c171601e06726f9e142059f203c435cf703cf773106b39193f09a"
+          },
+          "reference": {
+            "bytes": 403082,
+            "sha256": "a03a8a409ae3a72781b35eecbe56c0fe836ebb54cc8468193f93fb61b2bb9468"
+          }
+        },
+        {
+          "name": "epsilon-1e3",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "24cdb57e4acf431a84933be9df889928fd515cb61ac6f48efbdcd47b6b49936f"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\epsilon-1e3.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\epsilon-1e3.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\epsilon-1e3.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.288734+00:00",
+          "finished_utc": "2026-11-11T18:16:37.327202+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "c67900ed2e5c723dd73242647a9ee1c3100261fc1a08650110116a22ae64a8c3"
+          },
+          "stderr": {
+            "bytes": 22309,
+            "sha256": "44594dcae1b59f8876923b62804015689b5cab3faeb7119f20dea8dd8b03d2c0"
+          },
+          "reference": {
+            "bytes": 402781,
+            "sha256": "30d7e7adef7cc6e0b717b5ee999ae7cf3a5d785e16eae105f7924d0dc27357da"
+          }
+        },
+        {
+          "name": "implicit-kv",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412800,
+            "sha256": "2b1d4d707db24fb2dd02c9a92d3192e9a46000488c1da24dbcd6e68f3e76beec"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\implicit-kv.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\implicit-kv.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\implicit-kv.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.329280+00:00",
+          "finished_utc": "2026-11-11T18:16:37.355106+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "a4e671c31df606c1d9c61dafc461054beaf1fdb63d4ec626301553693d3d3f94"
+          },
+          "stderr": {
+            "bytes": 22214,
+            "sha256": "fffc1acfd34a258baa71d20c29ec6854c2fbed7487fa3fa5fe5f0ea4b7c6e9c3"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "7f8241eb87465023b9ba7f3074bb26f92528a0d5571ac0732072de67cefed298"
+          }
+        },
+        {
+          "name": "ignored-alibi-metadata",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412896,
+            "sha256": "05b36026679adfef136a8712d8bf699bf35fba86873bb6bacad282283e50166d"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\ignored-alibi-metadata.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\ignored-alibi-metadata.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\ignored-alibi-metadata.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.357218+00:00",
+          "finished_utc": "2026-11-11T18:16:37.408008+00:00",
+          "stdout": {
+            "bytes": 154,
+            "sha256": "4330a025f8abbb39d700129989c5ea7c7fb96a3876e40ef8d12361c611a63df4"
+          },
+          "stderr": {
+            "bytes": 22444,
+            "sha256": "47dbbf426d23bf5aa026142199821b4e44678190db9d552fbdd44c30ce836887"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "7f8241eb87465023b9ba7f3074bb26f92528a0d5571ac0732072de67cefed298"
+          }
+        },
+        {
+          "name": "missing-input-norm",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "38ac512dda9016bc87515e3d04b6741837aa1611aa72aa0097bfb9ac197425d1"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\missing-input-norm.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-input-norm.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-input-norm.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.410100+00:00",
+          "finished_utc": "2026-11-11T18:16:37.426143+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 5796,
+            "sha256": "90370412648841d7d30d788440f164b65b6793a88a631dd247e8663a8b9df327"
+          }
+        },
+        {
+          "name": "missing-input-norm-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "950e64afc69da857a962a3452ce695008a8f738602d1bed1f6378625e79fc929"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\missing-input-norm-bias.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-input-norm-bias.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-input-norm-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.427462+00:00",
+          "finished_utc": "2026-11-11T18:16:37.443694+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 5861,
+            "sha256": "b2fa6ab45c29cbda624e348dcc41a13d264ff982680310f34c82058f21166179"
+          }
+        },
+        {
+          "name": "missing-final-norm-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "dc563059ae58f3e52521b90af3c74cb4b85d102591b3f447a12c7559f39d89c2"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\missing-final-norm-bias.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-final-norm-bias.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-final-norm-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.445107+00:00",
+          "finished_utc": "2026-11-11T18:16:37.460835+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 5955,
+            "sha256": "b1f0e7874d5da2fb9bf346532ede6f64347564b7eb60b3d27c10c39d52f3e960"
+          }
+        },
+        {
+          "name": "missing-qkv-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412032,
+            "sha256": "e9db61c69592bc45b38d4387cf905d82e69ee91c9997465e6e724db012013140"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\missing-qkv-bias.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-qkv-bias.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\missing-qkv-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.462182+00:00",
+          "finished_utc": "2026-11-11T18:16:37.477630+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 6241,
+            "sha256": "ff7f20af2aeb247a6622dfe41c08b666dc880c4caae46d6a454dab03228990bd"
+          }
+        },
+        {
+          "name": "bad-input-norm-shape",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412896,
+            "sha256": "ad132e54c5b9f11b82212919a05eeca978045c057fec82f1580a488701e5f281"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\bad-input-norm-shape.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-input-norm-shape.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-input-norm-shape.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.478930+00:00",
+          "finished_utc": "2026-11-11T18:16:37.493497+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 5861,
+            "sha256": "dac7cc96f03e252e5c04e97b19680336153314bb290607d4b1670006ce83d023"
+          }
+        },
+        {
+          "name": "bad-heads",
+          "rust_scope": "invalid",
+          "exit_code": 3221226505,
+          "model": {
+            "bytes": 411808,
+            "sha256": "c7bdc0a1c1b3c470824c4eff3a7ff5cebd0878c5fc7ea22e7f85d1607a2df683"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\bad-heads.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-heads.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-heads.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.494914+00:00",
+          "finished_utc": "2026-11-11T18:16:37.588427+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 9714,
+            "sha256": "27272603a67aea0234e17a3d6f19b03c94965ebd035516a8e2e2b7c405c491a6"
+          }
+        },
+        {
+          "name": "bad-kv-heads",
+          "rust_scope": "invalid",
+          "exit_code": 3221226505,
+          "model": {
+            "bytes": 396192,
+            "sha256": "0f9b9f02f9cac28ff058d485a183b83a07dc65cd1d16a41da8d52dac40ac562e"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\bad-kv-heads.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-kv-heads.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\bad-kv-heads.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.589887+00:00",
+          "finished_utc": "2026-11-11T18:16:37.649195+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 9721,
+            "sha256": "714fb90d91ea76eed468399791231712546c17e185c3804006b5dd4d8057cd76"
+          }
+        },
+        {
+          "name": "negative-epsilon",
+          "rust_scope": "invalid",
+          "exit_code": 3221226505,
+          "model": {
+            "bytes": 412864,
+            "sha256": "607e21a9718687b2b043932d376a6038cc1994c8ffc9fda0e52d94f7a3f86559"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\negative-epsilon.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\negative-epsilon.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\negative-epsilon.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.650601+00:00",
+          "finished_utc": "2026-11-11T18:16:37.710334+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 22343,
+            "sha256": "0e57c72dcf5f58cb188bffd66609fa5a24a5a9cbd55e7b34f85c2994097596dd"
+          }
+        },
+        {
+          "name": "input-norm-f16",
+          "rust_scope": "unsupported",
+          "exit_code": 3221226505,
+          "model": {
+            "bytes": 412704,
+            "sha256": "d3edef48c3e78568a896c90396bdc2236e0ba3a0eaffe31046d4b52601bc93c3"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\input-norm-f16.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\input-norm-f16.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\input-norm-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.711768+00:00",
+          "finished_utc": "2026-11-11T18:16:37.799905+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 22419,
+            "sha256": "e2c9a9a4c6f33b3a58f5e6989c8aab9873baaa2ddb55d8eec5bb22df77459bb9"
+          }
+        },
+        {
+          "name": "qkv-bias-f16",
+          "rust_scope": "unsupported",
+          "exit_code": 3221226505,
+          "model": {
+            "bytes": 412448,
+            "sha256": "b5387ba1b21942c5af0276e85e6ea4da5ef58969b2521d69c8598911ac8c7758"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\qkv-bias-f16.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\qkv-bias-f16.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\qkv-bias-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.801414+00:00",
+          "finished_utc": "2026-11-11T18:16:37.860171+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 22413,
+            "sha256": "5932ca7b0a62953e9c51dc5f0b5848a772f7186905e5ec08abc55a60d9424aff"
+          }
+        },
+        {
+          "name": "noncausal",
+          "rust_scope": "unsupported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "88eed62e2aca89da3d4c4f9793baf258f935e7f9f7c6f215afbdcb4523ad3dae"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\noncausal.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\noncausal.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\noncausal.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.861671+00:00",
+          "finished_utc": "2026-11-11T18:16:37.885848+00:00",
+          "stdout": {
+            "bytes": 141,
+            "sha256": "e73557e7a7edc846fee9e059d43e121ceecbcdad3c98dffcdccf3e509ccf86f3"
+          },
+          "stderr": {
+            "bytes": 22304,
+            "sha256": "3a9f5e5b719ef171d457f8042f37f3303b282ceace2bd0d3c033cba0c376ecf3"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "7f8241eb87465023b9ba7f3074bb26f92528a0d5571ac0732072de67cefed298"
+          }
+        },
+        {
+          "name": "head-array",
+          "rust_scope": "unsupported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412864,
+            "sha256": "81172119018f6cc7bb614e9ccf1819c3ca75937afbb1325abc83e3baa7d30117"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\head-array.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\head-array.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\head-array.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.887980+00:00",
+          "finished_utc": "2026-11-11T18:16:37.912635+00:00",
+          "stdout": {
+            "bytes": 142,
+            "sha256": "86201bf3e4603009ea9846685c348e4ad9b7503274af62c36bfec7d3200c2de4"
+          },
+          "stderr": {
+            "bytes": 22311,
+            "sha256": "754043c28577b831a0513aef9f7912739967b59ce5843ed63650c4fadde8bd80"
+          },
+          "reference": {
+            "bytes": 402649,
+            "sha256": "7f8241eb87465023b9ba7f3074bb26f92528a0d5571ac0732072de67cefed298"
+          }
+        },
+        {
+          "name": "unconsumed-output-bias",
+          "rust_scope": "unsupported",
+          "exit_code": 1,
+          "model": {
+            "bytes": 414944,
+            "sha256": "67cd3700eef10d703dfd9edf3adba2b77d0ce25ab5f095a5c8e22f63b9101367"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-inputs\\unconsumed-output-bias.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\unconsumed-output-bias.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\tiny-native-msvc\\unconsumed-output-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:16:37.914799+00:00",
+          "finished_utc": "2026-11-11T18:16:37.930442+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 8199,
+            "sha256": "8bfb4a911244fae86a3e936111e20c628c2fe252d2bbce8e3e72638fc9cb8c88"
+          }
+        }
+      ],
+      "libraries": {
+        "llama.dll": {
+          "bytes": 3211264,
+          "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+        },
+        "ggml-base.dll": {
+          "bytes": 718336,
+          "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+        },
+        "ggml-cpu.dll": {
+          "bytes": 878592,
+          "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+        },
+        "ggml.dll": {
+          "bytes": 62464,
+          "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+        }
+      },
+      "finished_utc": "2026-11-11T18:16:37.937053+00:00"
+    },
+    "pretrained-msvc": {
+      "schema": 1,
+      "profile": "msvc",
+      "status": "succeeded",
+      "started_utc": "2026-11-11T18:19:03.187756+00:00",
+      "kind": "pretrained",
+      "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "harness": {
+        "bytes": 13526,
+        "sha256": "fe1f7b518c75f0921ca396282b72bbe7082623b3d6231d9cb4e494295d3dc353"
+      },
+      "executable": {
+        "bytes": 178176,
+        "sha256": "fba3781d9f7d482560d60457d9273c5a7040fc4abb72f4450242ebf29b251513"
+      },
+      "driver": {
+        "bytes": 5077,
+        "sha256": "54f7ce9a49d53c707c1c8cdd1fb7757aa2d2b7e95ace8d79fccdd2d1e39d2cb1"
+      },
+      "cases": [
+        {
+          "name": "official-bloom-560m-f16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 1131699072,
+            "sha256": "ac136500f37dbada4866b390123f14c9fbe14d215aabf8d93e96fc58772780bf"
+          },
+          "request": {
+            "bytes": 422,
+            "sha256": "faf7c19f6d5fd8b04a75fd0c24413bca936709550e1f91fee09d3694225925a7"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-converter\\pretrained-native-v1\\windows\\bloom-f16.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\pretrained-native-msvc\\official-bloom-560m-f16.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\pretrained-native-msvc\\official-bloom-560m-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:19:03.189793+00:00",
+          "finished_utc": "2026-11-11T18:19:13.491354+00:00",
+          "stdout": {
+            "bytes": 164,
+            "sha256": "0bcc6a72e2b1c9c9bb368a4f2a6e3aa1f4ad59be17421b0550fe31b9020ab037"
+          },
+          "stderr": {
+            "bytes": 116926,
+            "sha256": "61dd1097c608f175a3b550bfa77c8d4636359fde78b723fb35ba006a173173df"
+          },
+          "reference": {
+            "bytes": 114184570,
+            "sha256": "e1c6947d9ada847db54c7ffd3814a32eb493e8fe14bfa145e7550fa4c13ff2ba"
+          }
+        },
+        {
+          "name": "official-bloom-560m-q8_0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 607738752,
+            "sha256": "97eec92fef8daac7afff0e0a0e71bb822e346ac267d84e05290e2b01f8821fdc"
+          },
+          "request": {
+            "bytes": 422,
+            "sha256": "faf7c19f6d5fd8b04a75fd0c24413bca936709550e1f91fee09d3694225925a7"
+          },
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\native-build\\Release\\bloom-inference-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-converter\\pretrained-native-v1\\windows\\bloom-q8_0.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\pretrained-native-msvc\\official-bloom-560m-q8_0.request.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\bloom-oracle\\pretrained-native-msvc\\official-bloom-560m-q8_0.json"
+          ],
+          "started_utc": "2026-11-11T18:19:13.580232+00:00",
+          "finished_utc": "2026-11-11T18:19:18.437807+00:00",
+          "stdout": {
+            "bytes": 165,
+            "sha256": "72aee140c3599470eeca5e3456c16babf942135ec97b8b38fd359c705eb91073"
+          },
+          "stderr": {
+            "bytes": 116929,
+            "sha256": "450a43afc905f623b737e79f17a8881fd3e363d560f00564dec962f7fe13611a"
+          },
+          "reference": {
+            "bytes": 114281372,
+            "sha256": "8525d27a2914f19401aa302fb83b24263656da6dfae944c1be8b018df0a16d2b"
+          }
+        }
+      ],
+      "libraries": {
+        "llama.dll": {
+          "bytes": 3211264,
+          "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+        },
+        "ggml-base.dll": {
+          "bytes": 718336,
+          "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+        },
+        "ggml-cpu.dll": {
+          "bytes": 878592,
+          "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+        },
+        "ggml.dll": {
+          "bytes": 62464,
+          "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+        }
+      },
+      "finished_utc": "2026-11-11T18:19:18.515153+00:00"
+    },
+    "tiny-gnu": {
+      "schema": 1,
+      "profile": "gnu",
+      "status": "succeeded",
+      "started_utc": "2026-11-11T18:19:49.679322+00:00",
+      "kind": "tiny",
+      "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "harness": {
+        "bytes": 13526,
+        "sha256": "fe1f7b518c75f0921ca396282b72bbe7082623b3d6231d9cb4e494295d3dc353"
+      },
+      "executable": {
+        "bytes": 270720,
+        "sha256": "9d3260951dc98dbdfca958f6de2ee9153ff289c98d6e374b339fc750a73203c9"
+      },
+      "driver": {
+        "bytes": 5078,
+        "sha256": "345ece9f557f8c012fb2a0c2b046588aed40ca490fc1f928d1f37f53319196f1"
+      },
+      "cases": [
+        {
+          "name": "f32-tied",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "b968a63611975fd78d63357f6204f8218ea795c4678b05080ca611d70971a2ca"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/f32-tied.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f32-tied.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f32-tied.json"
+          ],
+          "started_utc": "2026-11-11T18:19:49.689906+00:00",
+          "finished_utc": "2026-11-11T18:19:49.915119+00:00",
+          "stdout": {
+            "bytes": 142,
+            "sha256": "9fa611e6ec229e3290f4a46ed0e74b285786a437a530fa14ff6b31ff521af9a7"
+          },
+          "stderr": {
+            "bytes": 22302,
+            "sha256": "91c6ddd4c9316183dfa0be5226664072ef3983af130aeeadb0a93d94d120fe4a"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "68a9e83b701d849a3fc4fb29b74a6cebe1bb8a146ad5779eb2029109c0b7788b"
+          }
+        },
+        {
+          "name": "f32-untied",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 543968,
+            "sha256": "b6de0813a170dd5b4a441baec9cf54e7fc1042436c451f32e58607b891358ec6"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/f32-untied.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f32-untied.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f32-untied.json"
+          ],
+          "started_utc": "2026-11-11T18:19:49.929298+00:00",
+          "finished_utc": "2026-11-11T18:19:50.155872+00:00",
+          "stdout": {
+            "bytes": 144,
+            "sha256": "51a1bf44d4303612062c33e0580822f69a15c4634460cdc7c3d573ff8269c267"
+          },
+          "stderr": {
+            "bytes": 22261,
+            "sha256": "254a7ff40f30f5be7f50ea8cdce08a7adceec74ccf75484311a0463c75bc6f50"
+          },
+          "reference": {
+            "bytes": 402765,
+            "sha256": "1656b3612787ae63e151521f057ace2cdd7b8fc38df44b8c0565f257d04ca494"
+          }
+        },
+        {
+          "name": "f16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 216224,
+            "sha256": "7556ab63d1c9ffd486db5f09b08b5c9afdf2e6ae800c797c723d3115da36dc5c"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/f16.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f16.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/f16.json"
+          ],
+          "started_utc": "2026-11-11T18:19:50.172795+00:00",
+          "finished_utc": "2026-11-11T18:19:50.397759+00:00",
+          "stdout": {
+            "bytes": 137,
+            "sha256": "9e69ef0abc586a66997a73ef87b69b5ce8081cc7c23a52f7d3d93304a7226822"
+          },
+          "stderr": {
+            "bytes": 22329,
+            "sha256": "247e0c7c9a2aecf2273bbd6e0bfe5cd4ed11735b12379cfea74ddf2aabc23b0c"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "9c8de2591efb2a78e5f5a7478c7775d1680cbaff48bb52f39d6032d7b3aa7c18"
+          }
+        },
+        {
+          "name": "bf16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 216224,
+            "sha256": "329fcc7508211cb62290f41930c6ffc11990a00e349805fdf6823037caee3e08"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/bf16.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bf16.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bf16.json"
+          ],
+          "started_utc": "2026-11-11T18:19:50.410745+00:00",
+          "finished_utc": "2026-11-11T18:19:50.584506+00:00",
+          "stdout": {
+            "bytes": 138,
+            "sha256": "6ae255cf4c4e54e637e2fe5ea0b78dbed81e8ad25851d4e50b402115773e6f1f"
+          },
+          "stderr": {
+            "bytes": 22336,
+            "sha256": "70784d2013e50f436be45df8cd11adac513a2a35bcb37018710dabf3a012d5a3"
+          },
+          "reference": {
+            "bytes": 402514,
+            "sha256": "7addee5c05e8c8fe3b46a90eb5999c155cba5d918f7b626eb445818ad53e7b27"
+          }
+        },
+        {
+          "name": "q4-0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 74912,
+            "sha256": "12459167ac5bd91f65934a706dc061efc1d96de1b0b4fcb3000462b717db97eb"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/q4-0.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q4-0.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q4-0.json"
+          ],
+          "started_utc": "2026-11-11T18:19:50.597632+00:00",
+          "finished_utc": "2026-11-11T18:19:50.770796+00:00",
+          "stdout": {
+            "bytes": 138,
+            "sha256": "9cf05ab5e12ca2aaae7aefcd6a9035f13c15efb1aa0e59d099fc9a2f72c0a881"
+          },
+          "stderr": {
+            "bytes": 22339,
+            "sha256": "2a3140291f0c1a606fb74037a0c78f68fe1bac51abbd0568846c92605667964d"
+          },
+          "reference": {
+            "bytes": 402008,
+            "sha256": "d493ee0dc6fe748ad01407f229461b1c53ba8c32ba2dc97550ba6d85cd4116bd"
+          }
+        },
+        {
+          "name": "q8-0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 124064,
+            "sha256": "285a32fbd94de2acf24bae79e1eeb39ccf73909344f6ec02a58e5a6830fe021a"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/q8-0.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q8-0.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q8-0.json"
+          ],
+          "started_utc": "2026-11-11T18:19:50.783615+00:00",
+          "finished_utc": "2026-11-11T18:19:51.056983+00:00",
+          "stdout": {
+            "bytes": 138,
+            "sha256": "61f00cef8a2fe7ce3847eb1e1b5f8373934bedb96d8c5ba8cd2a4e3b91248dbd"
+          },
+          "stderr": {
+            "bytes": 22338,
+            "sha256": "dec3f6058106af478153f66e4004bce01c3e729beb178693bbf41f5f0341edb1"
+          },
+          "reference": {
+            "bytes": 402626,
+            "sha256": "00b2b9b5fe76ca1bf5b096b992d05292b9121cfd0d8f8576cc0b82a3e3ad1796"
+          }
+        },
+        {
+          "name": "q4-k",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 703136,
+            "sha256": "3e439a94aa3ce456e6842f83e70a0c55c03f9c9c5587a4c28b66b9b93ee61740"
+          },
+          "request": {
+            "bytes": 14341,
+            "sha256": "f31b1fc08e15a62d1260ded64fa3bed27d575a98bcabbd2df8b95b5522d1dd70"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/q4-k.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q4-k.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/q4-k.json"
+          ],
+          "started_utc": "2026-11-11T18:19:51.070264+00:00",
+          "finished_utc": "2026-11-11T18:19:51.296214+00:00",
+          "stdout": {
+            "bytes": 138,
+            "sha256": "cb7c4e76e8ab18114db8713d825e5813322a90f60eb6df3ed5fbb50aece09d9c"
+          },
+          "stderr": {
+            "bytes": 22350,
+            "sha256": "0005136f67a84ac8488daf04b3fc95d4452c2a235ee0184e279e31e23df690eb"
+          },
+          "reference": {
+            "bytes": 503788,
+            "sha256": "aa6bd05f6d8047696b1d2478233669148554b7531e2484b1af3db90399b377de"
+          }
+        },
+        {
+          "name": "grouped-query",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 379552,
+            "sha256": "eeefb2b90fc925129c1f4e0fc6e748297f3006bbe0602cad27576fb6768f33ec"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/grouped-query.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/grouped-query.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/grouped-query.json"
+          ],
+          "started_utc": "2026-11-11T18:19:51.309597+00:00",
+          "finished_utc": "2026-11-11T18:19:51.483703+00:00",
+          "stdout": {
+            "bytes": 147,
+            "sha256": "e9e2d53b7c6a53758cfe4bb686fcfa1411900b5da6db0e7698ac6f2da962b764"
+          },
+          "stderr": {
+            "bytes": 22317,
+            "sha256": "f406ee1f03479bedc20b011845e0a0d155152d2b7235391370fa19a96c39a4b9"
+          },
+          "reference": {
+            "bytes": 403650,
+            "sha256": "83bbc4060ee6a037a09a8f9daa13e91b9d435f8868df818378f01557384a9c05"
+          }
+        },
+        {
+          "name": "multi-query",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 362912,
+            "sha256": "2cb387241823fe082945b9467a69da1ff646a17bb250430bc88eaa0a59c735ad"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/multi-query.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/multi-query.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/multi-query.json"
+          ],
+          "started_utc": "2026-11-11T18:19:51.497146+00:00",
+          "finished_utc": "2026-11-11T18:19:51.721573+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "158e95e4b17cbe6d317ec735b8ec9df45440f377eb3b6bcdb42d8b9d4d0f42d7"
+          },
+          "stderr": {
+            "bytes": 22312,
+            "sha256": "717e9a1672dbf62ffc1be85f81a2c1506b505662d3eaaba80b359405d6ae0331"
+          },
+          "reference": {
+            "bytes": 403923,
+            "sha256": "db642203e6abfb15765266ca22305a1b89369088b40dc758e747f8f0485917aa"
+          }
+        },
+        {
+          "name": "heads-three",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "9b4e0099d5481be4d617bdf82b6e7269b4bd8331c05f485b1d5d8f1a70ce74de"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/heads-three.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/heads-three.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/heads-three.json"
+          ],
+          "started_utc": "2026-11-11T18:19:51.735009+00:00",
+          "finished_utc": "2026-11-11T18:19:51.909511+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "a70004fbb6aeacbd101e96d34abb422a8f7ddd80da8de8a0c27af1b2e7c6b19a"
+          },
+          "stderr": {
+            "bytes": 22310,
+            "sha256": "3e4bc9f5de297c2a044c16e3faf08886332697b34259b932bd288a77a33d83b4"
+          },
+          "reference": {
+            "bytes": 403331,
+            "sha256": "2061373a81306ec625c5ef379ea78ef8df2c767b417ceddc5feb76fe14bb5749"
+          }
+        },
+        {
+          "name": "heads-five",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "a949bca40eb230b09ff64f89f0c7ed182efd6c8032f92ec8fd7534fc3a6d7f99"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/heads-five.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/heads-five.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/heads-five.json"
+          ],
+          "started_utc": "2026-11-11T18:19:51.922750+00:00",
+          "finished_utc": "2026-11-11T18:19:52.097379+00:00",
+          "stdout": {
+            "bytes": 144,
+            "sha256": "795a54c021cfc489bd04b9d2be08ede11856336a0e3164c835b321962dc88d69"
+          },
+          "stderr": {
+            "bytes": 22307,
+            "sha256": "f1ce1372a9c12491d57d0faf69ee68c0b2383335b9ce00191771e60f7ad49ab8"
+          },
+          "reference": {
+            "bytes": 403022,
+            "sha256": "0ed51af9a05a482b6f6f7a442062641ccff246dd0fa7a0aa22d8298d3b317bd5"
+          }
+        },
+        {
+          "name": "odd-head-width",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 380512,
+            "sha256": "68c19f0cb0465534c870b833490ed8d76fa7e3733570d2c08f4f4d397086d530"
+          },
+          "request": {
+            "bytes": 3810,
+            "sha256": "7cf382934cc3ca3cf40e1ca957932704c9cf182c10c06ae8a4a607ce137c2085"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/odd-head-width.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/odd-head-width.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/odd-head-width.json"
+          ],
+          "started_utc": "2026-11-11T18:19:52.111995+00:00",
+          "finished_utc": "2026-11-11T18:19:52.337464+00:00",
+          "stdout": {
+            "bytes": 148,
+            "sha256": "5bfb928dfc15c2ea8df5b44666492699ee39f74e8773b794540051caf6bc5bbb"
+          },
+          "stderr": {
+            "bytes": 22319,
+            "sha256": "a445c9febe2841e50e4847cde2c28bf301c88e7a29faeb090a3911b64557f9ba"
+          },
+          "reference": {
+            "bytes": 403143,
+            "sha256": "1124b5a152e3a3c16d8f223b529ff397776dd784c8c30865a47b9ca78e969bd6"
+          }
+        },
+        {
+          "name": "single-head",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "64a734321cb820009c3ca409dcc17893fcfecf1bc93fae5d0c40785c4293b076"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/single-head.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/single-head.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/single-head.json"
+          ],
+          "started_utc": "2026-11-11T18:19:52.351064+00:00",
+          "finished_utc": "2026-11-11T18:19:52.576081+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "8b5980185585f6106dad20b4dba2784a528168ef125ea922f040f1c59cdf2bf9"
+          },
+          "stderr": {
+            "bytes": 22311,
+            "sha256": "97bd1fd0cff317543047af2fe8f65c59462e69ab6887913cc394248f352ebbc3"
+          },
+          "reference": {
+            "bytes": 402726,
+            "sha256": "68deb91ed1ac193a511e0e91eb1bfc47915544bbeecdf4e2de70fe556733af75"
+          }
+        },
+        {
+          "name": "single-layer",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 278304,
+            "sha256": "1cc5c1e7018d9f6ea823ec5c8adc78805d027a331a9177b1b31f6418fd5d4f63"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/single-layer.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/single-layer.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/single-layer.json"
+          ],
+          "started_utc": "2026-11-11T18:19:52.589143+00:00",
+          "finished_utc": "2026-11-11T18:19:52.764045+00:00",
+          "stdout": {
+            "bytes": 146,
+            "sha256": "289d2385ac31790d620432beb212ead17ade9e0eeb4a1067d3d1fa330f3edf1f"
+          },
+          "stderr": {
+            "bytes": 18114,
+            "sha256": "78997b435385ba0bba3a8370660067b5434dea9a97cc4020d24a908e6ff74199"
+          },
+          "reference": {
+            "bytes": 403055,
+            "sha256": "bfa1982c243217f49845304c50a2d2c76fc41e17b1fc9f5a2c6b2bcc93589018"
+          }
+        },
+        {
+          "name": "three-layers",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 547392,
+            "sha256": "a183818461244d7fbb364f298f9002d5075b967cd0a04d38038f3d5fc46f5129"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/three-layers.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/three-layers.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/three-layers.json"
+          ],
+          "started_utc": "2026-11-11T18:19:52.777014+00:00",
+          "finished_utc": "2026-11-11T18:19:53.001951+00:00",
+          "stdout": {
+            "bytes": 146,
+            "sha256": "9ea5bd557edb3d7bafe67f6fa1cba5b47ae69c5f6bc6a3dcf9b7e435f3eccf69"
+          },
+          "stderr": {
+            "bytes": 26525,
+            "sha256": "5f00274f0cd6bb51ca4d9c5427036779f0149932376861352fe7008842ea880a"
+          },
+          "reference": {
+            "bytes": 402392,
+            "sha256": "eddad6c7b0c11505e94b8e8d875fc5630501ce771cb6ba4fc39eed6f76f197d7"
+          }
+        },
+        {
+          "name": "epsilon-1e3",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "24cdb57e4acf431a84933be9df889928fd515cb61ac6f48efbdcd47b6b49936f"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/epsilon-1e3.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/epsilon-1e3.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/epsilon-1e3.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.015589+00:00",
+          "finished_utc": "2026-11-11T18:19:53.191501+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "7bd370b24937e742fad61401e851509667f943db5d59c88bc0111b0ed8405f4b"
+          },
+          "stderr": {
+            "bytes": 22311,
+            "sha256": "221fc1e9b38c3ae2e8001a229f24e8a8d505c200761de241e92ec99f87b19458"
+          },
+          "reference": {
+            "bytes": 402829,
+            "sha256": "cebe34502b4be6999e1ae15fc9e230a22cb9558f64362f959f83862b79a62111"
+          }
+        },
+        {
+          "name": "implicit-kv",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412800,
+            "sha256": "2b1d4d707db24fb2dd02c9a92d3192e9a46000488c1da24dbcd6e68f3e76beec"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/implicit-kv.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/implicit-kv.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/implicit-kv.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.204722+00:00",
+          "finished_utc": "2026-11-11T18:19:53.378617+00:00",
+          "stdout": {
+            "bytes": 145,
+            "sha256": "399cc205766288d370d8aa199544ffcf320d52420a1ff6f0fb37ad0e8912f929"
+          },
+          "stderr": {
+            "bytes": 22217,
+            "sha256": "d0267e2f87432b13f85e25c09f77259238a87388792292c56e38236beec6c723"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "68a9e83b701d849a3fc4fb29b74a6cebe1bb8a146ad5779eb2029109c0b7788b"
+          }
+        },
+        {
+          "name": "ignored-alibi-metadata",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412896,
+            "sha256": "05b36026679adfef136a8712d8bf699bf35fba86873bb6bacad282283e50166d"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/ignored-alibi-metadata.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/ignored-alibi-metadata.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/ignored-alibi-metadata.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.391749+00:00",
+          "finished_utc": "2026-11-11T18:19:53.566582+00:00",
+          "stdout": {
+            "bytes": 156,
+            "sha256": "c28cb982e8d61f29ea3bf031a08bdbb6efc61899bbcdf663ae57964005e1b467"
+          },
+          "stderr": {
+            "bytes": 22445,
+            "sha256": "bfde44d4023769068378a7032ce60f6c66f07902e756ed940da9e377471ec00b"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "68a9e83b701d849a3fc4fb29b74a6cebe1bb8a146ad5779eb2029109c0b7788b"
+          }
+        },
+        {
+          "name": "missing-input-norm",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "38ac512dda9016bc87515e3d04b6741837aa1611aa72aa0097bfb9ac197425d1"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/missing-input-norm.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-input-norm.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-input-norm.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.579374+00:00",
+          "finished_utc": "2026-11-11T18:19:53.755053+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 5956,
+            "sha256": "2b56531208593be68104aee543da04283140d07368c181b1f7b83aebf659633d"
+          }
+        },
+        {
+          "name": "missing-input-norm-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "950e64afc69da857a962a3452ce695008a8f738602d1bed1f6378625e79fc929"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/missing-input-norm-bias.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-input-norm-bias.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-input-norm-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.764781+00:00",
+          "finished_utc": "2026-11-11T18:19:53.940780+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 6020,
+            "sha256": "cefcb64c060c97971f4f31c6830ecd1b8fdec6ebed7f294974003cc72d7cb13d"
+          }
+        },
+        {
+          "name": "missing-final-norm-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412544,
+            "sha256": "dc563059ae58f3e52521b90af3c74cb4b85d102591b3f447a12c7559f39d89c2"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/missing-final-norm-bias.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-final-norm-bias.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-final-norm-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:19:53.949582+00:00",
+          "finished_utc": "2026-11-11T18:19:54.124717+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 6112,
+            "sha256": "c2c96dd13740a479756e6b2a11de00b587b9c607eabb21f01a96e5cb9b986699"
+          }
+        },
+        {
+          "name": "missing-qkv-bias",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412032,
+            "sha256": "e9db61c69592bc45b38d4387cf905d82e69ee91c9997465e6e724db012013140"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/missing-qkv-bias.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-qkv-bias.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/missing-qkv-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:19:54.133646+00:00",
+          "finished_utc": "2026-11-11T18:19:54.309414+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 6392,
+            "sha256": "228f52cb177b84399b28678169eb05ac5903840bb41db579a9b638762e57dd3b"
+          }
+        },
+        {
+          "name": "bad-input-norm-shape",
+          "rust_scope": "invalid",
+          "exit_code": 1,
+          "model": {
+            "bytes": 412896,
+            "sha256": "ad132e54c5b9f11b82212919a05eeca978045c057fec82f1580a488701e5f281"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/bad-input-norm-shape.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-input-norm-shape.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-input-norm-shape.json"
+          ],
+          "started_utc": "2026-11-11T18:19:54.318523+00:00",
+          "finished_utc": "2026-11-11T18:19:54.494326+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 6021,
+            "sha256": "8998bf445711c7a360bb58a8931fe0e388e8778ae0f042d1d59761e2819d932a"
+          }
+        },
+        {
+          "name": "bad-heads",
+          "rust_scope": "invalid",
+          "exit_code": -6,
+          "model": {
+            "bytes": 411808,
+            "sha256": "c7bdc0a1c1b3c470824c4eff3a7ff5cebd0878c5fc7ea22e7f85d1607a2df683"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/bad-heads.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-heads.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-heads.json"
+          ],
+          "started_utc": "2026-11-11T18:19:54.504748+00:00",
+          "finished_utc": "2026-11-11T18:19:55.332685+00:00",
+          "stdout": {
+            "bytes": 2996,
+            "sha256": "0cf38bb79886d9d571d871fcb8c5cb13275c238a987ba9a2ba80071e6167fcf4"
+          },
+          "stderr": {
+            "bytes": 9802,
+            "sha256": "d8e1c6de506be6da8127f192b536df6ae82a681271f94d014b747bd36e78fde0"
+          }
+        },
+        {
+          "name": "bad-kv-heads",
+          "rust_scope": "invalid",
+          "exit_code": -6,
+          "model": {
+            "bytes": 396192,
+            "sha256": "0f9b9f02f9cac28ff058d485a183b83a07dc65cd1d16a41da8d52dac40ac562e"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/bad-kv-heads.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-kv-heads.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/bad-kv-heads.json"
+          ],
+          "started_utc": "2026-11-11T18:19:55.342595+00:00",
+          "finished_utc": "2026-11-11T18:19:56.018777+00:00",
+          "stdout": {
+            "bytes": 3085,
+            "sha256": "46dc1743b47e1c9a90d5a73f47fbf940d62530f0b1454b3ce220f61a5a488306"
+          },
+          "stderr": {
+            "bytes": 9809,
+            "sha256": "3e3d102b1ccdc6ae52a86dcbf72078ff815ef7d2d43b6f25521a83a6f3a11ad2"
+          }
+        },
+        {
+          "name": "negative-epsilon",
+          "rust_scope": "invalid",
+          "exit_code": -6,
+          "model": {
+            "bytes": 412864,
+            "sha256": "607e21a9718687b2b043932d376a6038cc1994c8ffc9fda0e52d94f7a3f86559"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/negative-epsilon.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/negative-epsilon.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/negative-epsilon.json"
+          ],
+          "started_utc": "2026-11-11T18:19:56.029107+00:00",
+          "finished_utc": "2026-11-11T18:19:56.805543+00:00",
+          "stdout": {
+            "bytes": 2574,
+            "sha256": "5f9b4026c2000bbce97fc965ec03ff729519d9bb7432afbb5650a21934b2d9c3"
+          },
+          "stderr": {
+            "bytes": 22349,
+            "sha256": "6e9cf08dcef1d32ca0ef1c9a82b88c017f7ccac4d0096b9b937c883e1be30558"
+          }
+        },
+        {
+          "name": "input-norm-f16",
+          "rust_scope": "unsupported",
+          "exit_code": -6,
+          "model": {
+            "bytes": 412704,
+            "sha256": "d3edef48c3e78568a896c90396bdc2236e0ba3a0eaffe31046d4b52601bc93c3"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/input-norm-f16.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/input-norm-f16.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/input-norm-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:19:56.816377+00:00",
+          "finished_utc": "2026-11-11T18:19:57.707903+00:00",
+          "stdout": {
+            "bytes": 2573,
+            "sha256": "16578d5f1887e949b792e3afdd1d51ac4fdfdd167fb25a132648049ccd7b41df"
+          },
+          "stderr": {
+            "bytes": 22423,
+            "sha256": "97f7eecfb7cf7b405e04da3774bab7af0bf9436bc5a4b62e03240a737dc56559"
+          }
+        },
+        {
+          "name": "qkv-bias-f16",
+          "rust_scope": "unsupported",
+          "exit_code": -6,
+          "model": {
+            "bytes": 412448,
+            "sha256": "b5387ba1b21942c5af0276e85e6ea4da5ef58969b2521d69c8598911ac8c7758"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/qkv-bias-f16.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/qkv-bias-f16.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/qkv-bias-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:19:57.716899+00:00",
+          "finished_utc": "2026-11-11T18:19:58.442006+00:00",
+          "stdout": {
+            "bytes": 2587,
+            "sha256": "4d72afcacda3692a6f720cfa5194e3cacbefad55c1244804d4c7ae58d026c92b"
+          },
+          "stderr": {
+            "bytes": 22417,
+            "sha256": "f7b3942041ff1f5d6ca0044db0dfc6678f5ad8c5c6b9cc2b87d380ea2c1b655c"
+          }
+        },
+        {
+          "name": "noncausal",
+          "rust_scope": "unsupported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412832,
+            "sha256": "88eed62e2aca89da3d4c4f9793baf258f935e7f9f7c6f215afbdcb4523ad3dae"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/noncausal.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/noncausal.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/noncausal.json"
+          ],
+          "started_utc": "2026-11-11T18:19:58.451243+00:00",
+          "finished_utc": "2026-11-11T18:19:58.676361+00:00",
+          "stdout": {
+            "bytes": 143,
+            "sha256": "6971f137b5a05f5760f15c00490736ae38bca7d99c3474374194541226d6780c"
+          },
+          "stderr": {
+            "bytes": 22306,
+            "sha256": "8f8d94d4a98d973768c59486a0ffc86baf34f6c86020c0e4efd1710fcc20746c"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "68a9e83b701d849a3fc4fb29b74a6cebe1bb8a146ad5779eb2029109c0b7788b"
+          }
+        },
+        {
+          "name": "head-array",
+          "rust_scope": "unsupported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 412864,
+            "sha256": "81172119018f6cc7bb614e9ccf1819c3ca75937afbb1325abc83e3baa7d30117"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/head-array.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/head-array.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/head-array.json"
+          ],
+          "started_utc": "2026-11-11T18:19:58.690741+00:00",
+          "finished_utc": "2026-11-11T18:19:58.866250+00:00",
+          "stdout": {
+            "bytes": 144,
+            "sha256": "dfec8d8068f221c72707d5d31b27b6b2394152666d8f2841df8646f4d851f5c6"
+          },
+          "stderr": {
+            "bytes": 22313,
+            "sha256": "c51574efeab67912803de25192a293c7f1d56946558802323e795f1c5a1b142b"
+          },
+          "reference": {
+            "bytes": 402559,
+            "sha256": "68a9e83b701d849a3fc4fb29b74a6cebe1bb8a146ad5779eb2029109c0b7788b"
+          }
+        },
+        {
+          "name": "unconsumed-output-bias",
+          "rust_scope": "unsupported",
+          "exit_code": 1,
+          "model": {
+            "bytes": 414944,
+            "sha256": "67cd3700eef10d703dfd9edf3adba2b77d0ce25ab5f095a5c8e22f63b9101367"
+          },
+          "request": {
+            "bytes": 4023,
+            "sha256": "5b251bb4ea1caf76c13c079bb07a2a8f17fc0a72ec4561c3fd502d6d182c5b5b"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-inputs/unconsumed-output-bias.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/unconsumed-output-bias.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/tiny-native-gnu/unconsumed-output-bias.json"
+          ],
+          "started_utc": "2026-11-11T18:19:58.882521+00:00",
+          "finished_utc": "2026-11-11T18:19:59.060645+00:00",
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 8314,
+            "sha256": "7535afb53753140bff00fe70595077688fd81ba2c21a7ce60226e1cafc352d2f"
+          }
+        }
+      ],
+      "libraries": {
+        "libllama.so.0.9.0": {
+          "bytes": 5499792,
+          "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+        },
+        "libggml-base.so.0.29.0": {
+          "bytes": 937384,
+          "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+        },
+        "libggml-cpu.so.0.29.0": {
+          "bytes": 976464,
+          "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+        },
+        "libggml.so.0.29.0": {
+          "bytes": 55584,
+          "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+        }
+      },
+      "finished_utc": "2026-11-11T18:19:59.110426+00:00"
+    },
+    "pretrained-gnu": {
+      "schema": 1,
+      "profile": "gnu",
+      "status": "succeeded",
+      "started_utc": "2026-11-11T18:20:27.458943+00:00",
+      "kind": "pretrained",
+      "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "harness": {
+        "bytes": 13526,
+        "sha256": "fe1f7b518c75f0921ca396282b72bbe7082623b3d6231d9cb4e494295d3dc353"
+      },
+      "executable": {
+        "bytes": 270720,
+        "sha256": "9d3260951dc98dbdfca958f6de2ee9153ff289c98d6e374b339fc750a73203c9"
+      },
+      "driver": {
+        "bytes": 5078,
+        "sha256": "345ece9f557f8c012fb2a0c2b046588aed40ca490fc1f928d1f37f53319196f1"
+      },
+      "cases": [
+        {
+          "name": "official-bloom-560m-f16",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 1131699072,
+            "sha256": "ac136500f37dbada4866b390123f14c9fbe14d215aabf8d93e96fc58772780bf"
+          },
+          "request": {
+            "bytes": 422,
+            "sha256": "faf7c19f6d5fd8b04a75fd0c24413bca936709550e1f91fee09d3694225925a7"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-converter/pretrained-native-v1/windows/bloom-f16.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/pretrained-native-gnu/official-bloom-560m-f16.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/pretrained-native-gnu/official-bloom-560m-f16.json"
+          ],
+          "started_utc": "2026-11-11T18:20:27.469093+00:00",
+          "finished_utc": "2026-11-11T18:20:48.935142+00:00",
+          "stdout": {
+            "bytes": 166,
+            "sha256": "449b967881a3cec33b04f401e2ec51b5f03071f92a80b8fddbf171624cae58dd"
+          },
+          "stderr": {
+            "bytes": 116039,
+            "sha256": "4a2dddf4704a527677cd9ab31c8ed1f4160c2db5aaee2ca4da412d5190a142dc"
+          },
+          "reference": {
+            "bytes": 114181260,
+            "sha256": "e8c577d7456ae27b8b2c1dc2d942e0d6fea1877e4ff84403f24334625ab1276a"
+          }
+        },
+        {
+          "name": "official-bloom-560m-q8_0",
+          "rust_scope": "supported",
+          "exit_code": 0,
+          "model": {
+            "bytes": 607738752,
+            "sha256": "97eec92fef8daac7afff0e0a0e71bb822e346ac267d84e05290e2b01f8821fdc"
+          },
+          "request": {
+            "bytes": 422,
+            "sha256": "faf7c19f6d5fd8b04a75fd0c24413bca936709550e1f91fee09d3694225925a7"
+          },
+          "argv": [
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-build-gnu/bloom-inference-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-converter/pretrained-native-v1/windows/bloom-q8_0.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/pretrained-native-gnu/official-bloom-560m-q8_0.request.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/pretrained-native-gnu/official-bloom-560m-q8_0.json"
+          ],
+          "started_utc": "2026-11-11T18:20:49.454639+00:00",
+          "finished_utc": "2026-11-11T18:20:59.360123+00:00",
+          "stdout": {
+            "bytes": 167,
+            "sha256": "8888681cf11ebd8d92ae270016a6529c9a7f6c2eb1d7e0fd226d11091dc59ce5"
+          },
+          "stderr": {
+            "bytes": 116042,
+            "sha256": "4cbc6e3a52e181d23be3bc82da60e8378b4e8b4360b122b6c6d814f81debf367"
+          },
+          "reference": {
+            "bytes": 114281401,
+            "sha256": "92579aef62182d7950b38c2130466ab1899679b3e1f256193f54d8055374d536"
+          }
+        }
+      ],
+      "libraries": {
+        "libllama.so.0.9.0": {
+          "bytes": 5499792,
+          "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+        },
+        "libggml-base.so.0.29.0": {
+          "bytes": 937384,
+          "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+        },
+        "libggml-cpu.so.0.29.0": {
+          "bytes": 976464,
+          "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+        },
+        "libggml.so.0.29.0": {
+          "bytes": 55584,
+          "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+        }
+      },
+      "finished_utc": "2026-11-11T18:20:59.922452+00:00"
+    }
+  },
+  "packing_statistics": {
+    "tiny-msvc": {
+      "rows": 1240,
+      "floats": 415380,
+      "unique_rows": 722,
+      "unique_bytes": 955888
+    },
+    "pretrained-msvc": {
+      "rows": 76,
+      "floats": 12570624,
+      "unique_rows": 70,
+      "unique_bytes": 44261376
+    },
+    "tiny-gnu": {
+      "rows": 1240,
+      "floats": 415380,
+      "unique_rows": 722,
+      "unique_bytes": 955888
+    },
+    "pretrained-gnu": {
+      "rows": 76,
+      "floats": 12570624,
+      "unique_rows": 70,
+      "unique_bytes": 44261376
+    }
+  },
+  "original_conversions": {
+    "windows": {
+      "bytes": 184173,
+      "sha256": "a958a63d101d5d0db825f06d0076fbb0ded94c1cbfe6e0d13225e2b7b3ad8067"
+    },
+    "linux": {
+      "bytes": 176267,
+      "sha256": "0f6c001eb9a5f5f4b6238450fa40d2c94f3825af22f4f0f0632fd49815e5150d"
+    }
+  },
+  "packing": "Finite JSON numbers round-trip to the same F32 words, little endian; deduplicate only full byte-identical rows using SHA-256 plus byte equality.",
+  "scope": "Strict causal contiguous F32-cache BLOOM decoder; F32/F16/BF16/Q4_0/Q8_0/Q4_K tiny variants and untouched official BLOOM560m F16/Q8_0 trained checkpoints. No native compatibility C context, flash, other cache types, per-layer arrays or noncausal execution claim.",
+  "license": "Original llama.cpp MIT; independently authored synthetic inputs; official BLOOM data and derived numerical fixtures retain BigScience BLOOM RAIL1.0 notice and model card. No checkpoint payload is in product.",
+  "failures": "GNU compiler driver initially passed -llama instead of -lllama; historical logs and corrected diagnosis retained externally and in evidence. No original source/build file modified."
+}

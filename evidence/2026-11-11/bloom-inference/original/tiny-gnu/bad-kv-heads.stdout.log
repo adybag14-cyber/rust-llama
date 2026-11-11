@@ -1,0 +1,19 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x0000756732aea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x0000756732aea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007567330c06cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libggml-base.so.0
+#2  0x00007567330c0862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libggml-base.so.0
+#3  0x00007567330c6e89 in ggml_mul_mat () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libggml-base.so.0
+#4  0x0000756733466831 in llm_graph_context::build_attn_mha(ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, long, float, int) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#5  0x000075673346a7a7 in llm_graph_context::build_attn(llm_graph_input_attn_kv*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, float, int) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#6  0x00007567333ef0ad in llama_model_bloom::graph::graph(llm_graph_params const&) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#7  0x00007567333ef227 in llama_model_bloom::build_arch_graph(llm_graph_params const&) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#8  0x000075673350a251 in llama_model::build_graph(llm_graph_params const&) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#9  0x0000756733423aff in llama_context::graph_reserve(unsigned int, unsigned int, unsigned int, llama_memory_context_i const*, bool, unsigned long*) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#10 0x0000756733425958 in llama_context::resolve_fused_ops(llama_memory_context_i const*, unsigned int) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#11 0x0000756733426ae9 in llama_context::sched_reserve() () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#12 0x000075673342838a in llama_context::llama_context(llama_model const&, llama_context_params) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#13 0x00007567334293f7 in llama_init_from_model () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/bloom-oracle/native-libs-gnu/libllama.so.0
+#14 0x000056a55d103be3 in main ()
+[Inferior 1 (process 1544) detached]
