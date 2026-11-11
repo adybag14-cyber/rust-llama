@@ -10,6 +10,28 @@ The product's maintained implementation is Rust. Frozen C/C++ reference builds, 
 
 The merged workspace has local path dependencies plus five exactly reviewed Rust registry packages for converter YAML parsing. Locked dependency acquisition precedes offline gates; the audit verifies the actual archives, extracted source, versions, features and licenses. Optional OS/driver/vendor interfaces remain named external boundaries. They do not import the original llama.cpp implementation. See `release/dependency-inventory.tsv`.
 
+## Integrated verification — 11 November
+
+Both native hosts passed the complete ordinary debug and release suites:
+662 tests per Windows MSVC build and 667 per GNU build, with zero failures,
+27 explicit prerequisite tests ignored, and 117 test-result suites per run.
+Separate release checks passed eleven pretrained inference/server tests,
+three complete-file converter tests and one official Qwen tokenizer replay.
+Both debug and release C libraries passed the retained native clients and exact
+216-frozen-plus-four-extension export checks; 39 frozen symbols remain absent.
+
+Rust 1.99.1 / LLVM 23.1.1 builds, strict Clippy, formatting and the reviewed
+dependency audit passed. Both hosts verified all 4,082 source files in each
+frozen tree and 858 fixture files / declarations across ten manifests.
+
+The original full runs retain their failed execution-input guards: only the
+CI workflow changed after launch. The separate review proves all 1,279 other
+recorded inputs unchanged; four postflight stages passed with the final
+1,280 selected execution inputs unchanged. This is a qualified selected-input
+verification, not a whole-repository immutable guard or a published CI result.
+All twenty mandatory full-port gates remain open. See
+[the complete receipt](../evidence/2026-11-11/continued-port/README.md).
+
 ## Historical integrated verification — 10 November
 
 The final integrated input manifest covers 1,047 code, fixture and execution
@@ -140,7 +162,7 @@ retained in the evidence.
 Shape, stride and parameter/error behavior are tested separately. Tensor
 coverage before the flash adapter was 75 executable IDs plus NONE. The adapter
 checkpoint raised this to 76 executable IDs plus NONE, with 25 then pending.
-The later recurrent extension reaches 81 executable IDs plus NONE, with 20 pending.
+That recurrent checkpoint reached 81 executable IDs plus NONE, with 20 then pending.
 The earlier tensor corpus retains 3,240 distinct graph inputs and
 6,118 native captures; repeated platform executions are not counted as new
 graph cases. Shared scalar/SSE2 row math now serves model-runtime and tensor;
@@ -192,8 +214,8 @@ corpus and its output/deletion/undefined-behavior qualifications remain intact.
 The strict Gguf entry point retains its text contract. GgufSet now retains raw
 primary metadata and a first-C-prefix model projection, including ByteString
 values for non-UTF-8 payloads. Consumed settings and tensor names retain checked
-boundaries. Dense Llama checkpoint conversion is now implemented; other
-converters, remaining raw-byte semantics and the rest of T04 stay open. All
+boundaries. Dense Llama, Qwen2 and Qwen3 checkpoint conversion is implemented;
+other converters, remaining raw-byte semantics and the rest of T04 stay open. All
 twenty mandatory release gates remain open.
 
 ## Native CPU flash and checkpoint foundation
@@ -221,11 +243,11 @@ memory API retains its separate 256-ID domain.
 The checkpoint crate provides raw Safetensors parsing, bounded positioned
 reads and indexed composition over retained file capabilities. Original file
 and index corpora retain platform behavior and safe checked path-policy
-differences. Architecture conversion and the remainder of T04 stay open.
+differences. Other architecture converters and the remainder of T04 stay open.
 
-The combined guard includes every file outside historical evidence and
-recognized Git/build caches, including prose, licenses, release policy, source
-ledgers, declarations and all fixture types. Earlier 648/744/823/849-file subsets
+At that checkpoint, the combined guard covered every file outside historical
+evidence and recognized Git/build caches, including prose, licenses, release
+policy, source ledgers, declarations and all fixture types. Earlier 648/744/823/849-file subsets
 retain their original meaning and are not described as complete guards. The
 actual release list has twenty open rows across twelve ownership tracks.
 Historical statements that called the track count a gate count are preserved
@@ -233,9 +255,9 @@ with a recorded erratum; no gate status changes with this wording correction.
 
 ## Memory and execution qualifications
 
-The high-level model facade loads a dense Llama, Qwen2, Qwen3, Mamba-1 or BERT GGUF file set into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
+The high-level model facade loads a dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, Mamba-1 or BERT GGUF file set into host memory. Non-matrix vectors are decoded F32. Matrices retain a decoded F32 row-access cache and, for supported non-F32 types, the original packed bytes needed for native dot arithmetic. The decoded-weight limit is not a total process memory limit. Loader hparams use the source UINT32/FLOAT32 types and 512-layer maximum; split.count uses UINT16 and accepts omitted, zero or one for a single file. Unsupported NextN/MTP, PRISM transforms, scaled RoPE and noncausal decoder modes return explicit errors. There is no mmap, tensor streaming, GPU model placement or full asynchronous scheduler claim.
 
-The strict Llama, Qwen2 and Qwen3 decoder Context uses F32 KV. The separate Llama NativeContext admits independent F32/F16 key/value storage, native flash/AUTO resolution and actual configured workers for admitted dense-Llama CPU graphs; explicit nonflash execution remains single-worker. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
+The strict Llama, Qwen2, Qwen3, GPT-2 and GPT-NeoX decoder Context uses F32 KV. The separate Llama NativeContext admits independent F32/F16 key/value storage, native flash/AUTO resolution and actual configured workers for admitted dense-Llama CPU graphs; explicit nonflash execution remains single-worker. Mamba-1 owns F32 causal-convolution and selective-SSM state; cancellation and state restoration are transactional through the strict Rust Context API. Native C recurrent-memory compatibility remains separately open. BERT uses complete bidirectional sequences and its trained position table; it has no decoder KV context through this facade. Model instances are immutable and shared; each generation request owns independent context and sampler state. Stop strings and incomplete UTF-8 suffixes are withheld across token boundaries. Errors and cancellation do not commit partial model state. The C ABI documentation separately states accepted/rejected native parameter configurations.
 
 The strict Rust Context defaults to a 1 GiB max_state_bytes budget. It reserves
 owned sequence/layer records, KV and recurrent capacities, planning records,
@@ -264,7 +286,7 @@ Generation currently supports greedy or temperature/distribution sampling with a
 
 ## Validation and honest failure reporting
 
-Current continuation logs are under `evidence/2026-11-10/` and `evidence/hf-converter-20261110/`. The preceding checkpoint logs remain under `evidence/2026-11-09/`, with earlier imported archive logs under `docs/imports/`. Test outputs are associated with their command, platform and inputs. A test marked ignored requires an explicit external model, native reference library, installed compiler or vendor service. Ordinary workspace tests do not substitute for those explicit runs.
+Current continuation logs are under `evidence/2026-11-11/`. The preceding continuation is under `evidence/2026-11-10/` and `evidence/hf-converter-20261110/`; earlier checkpoint logs remain under `evidence/2026-11-09/`, with imported archive logs under `docs/imports/`. Test outputs are associated with their command, platform and inputs. A test marked ignored requires an explicit external model, native reference library, installed compiler or vendor service. Ordinary workspace tests do not substitute for those explicit runs.
 
 The earlier expanded checkpoint passed 384 ordinary tests on Windows and 385 on Linux in both debug and release, with 17 explicitly gated tests left out of ordinary execution. Seven pretrained tests run separately and pass on both platforms. The 195 fixture declarations, source tree, strict Clippy, offline release builds, 37 generation HTTP checks, embedding CLI lifecycle and SmolLM2/Mamba generation CLI checks also pass. The same 396 execution inputs have SHA-256 050cbc4b0c607a4be1bd7ade8d590f0b49b52b3cbbc284b12c8cfa5ed88413a9. The preserved audit/driver failures and same-fingerprint continuation are explained in evidence/2026-11-09/expanded-runtime/README.md.
 

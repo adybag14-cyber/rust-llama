@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "profile": "linux-gnu",
+  "tag": "final-postflight-f9d914",
+  "started_utc": "2026-11-11T10:34:36.978624+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 5.937,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 91.224,
+      "stdout": {
+        "bytes": 51733,
+        "sha256": "f5d28c8f9ac6d747310507a141ddb56a7e1c591ec4b2fbced129e10747b2c611"
+      },
+      "stderr": {
+        "bytes": 137,
+        "sha256": "215a38b72b929c088013842927841c8d82ce6cfec5f5cccc1ad3804b97daec13"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 89.733,
+      "stdout": {
+        "bytes": 198,
+        "sha256": "6f4baea65135b2b5668a1fb0563e7b074a44495e871061eb0e4daa65c69bfc51"
+      },
+      "stderr": {
+        "bytes": 140,
+        "sha256": "0c6602dd192711dbb1f723f361b6954c3742381f07a19c6db6f1ac2f33a1cc4c"
+      }
+    },
+    {
+      "name": "release-gates",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 0.474,
+      "stdout": {
+        "bytes": 3507,
+        "sha256": "4d0a5f90b860dd04cd47929a5567d95120442256152bf759fc7fdcf1963e9eca"
+      },
+      "stderr": {
+        "bytes": 216,
+        "sha256": "2c7babe7a51d15f94e4a8ece718085efa3ffb7fce29c4a27fd734104de1d7bb9"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1280,
+    "bytes": 191823,
+    "sha256": "9da6d0bca8779e1691fbae7eca826155ef5d4ed23065bdbec0167ee9b5c37688"
+  },
+  "requested_stages": [
+    "audit",
+    "fixtures",
+    "fmt",
+    "release-gates"
+  ],
+  "driver": {
+    "bytes": 14208,
+    "sha256": "be740768b4e5c19bfd38aa080e5f4ce1e4b8b9479f7e42954cd690391d259018"
+  },
+  "git_head": "f9d914aa497134c675e7cdb61b1e9b65c07f9802",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 22.4.0 (jammy) [64-bit]\n",
+  "unchanged_execution_inputs": true,
+  "finished_utc": "2026-11-11T10:38:14.644385+00:00"
+}
