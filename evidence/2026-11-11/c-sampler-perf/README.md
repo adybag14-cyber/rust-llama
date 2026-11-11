@@ -14,7 +14,7 @@ MSVC passes all 51. Formatting and Clippy with warnings denied pass on both.
 Export tables contain exactly 216 frozen C names plus the four existing Rust
 extensions, with 39 public functions still absent.
 
-Fixture-registration.json lists the five new inputs/reference/provenance/stream
+fixture-registration.json lists the five new inputs/reference/provenance/stream
 files. Their expectations are authored or derived only from the original library.
 Source, compiler, library and model hashes are retained with their captures.
 The harness and build scripts remain external at the path in receipt.json.

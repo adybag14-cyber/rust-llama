@@ -15,7 +15,7 @@ pass; format and Clippy checks pass on both platforms.
 The external header harness and reference libraries are under the path recorded
 in receipt.json. Original captures predate the Rust implementation. The current
 GNU harness source was also rebuilt: its executable and original replay are
-byte-identical to the initially captured versions. Fixture-registration.json
+byte-identical to the initially captured versions. fixture-registration.json
 lists the six authored/native fixture files for integration into global manifests.
 
 Earlier GNU validation v1 passed debug/release tests but found the Rust 1.99
