@@ -82,7 +82,12 @@ jobs:
           LLAMA_TEST_QWEN3_MODEL: ${{ runner.temp }}/qwen3-0.6b-q8_0.gguf
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
-        run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture
+        run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture --skip official_bloom_560m
+
+      - name: Pretrained native C encoder comparisons
+        env:
+          LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
+        run: cargo test --release --offline --locked -p llama-ffi context::encoder::tests::independent_pretrained_native_bert_encoder_corpus -- --ignored --exact --nocapture
 
   # Each model gets a fresh runner: its checkpoint and three complete outputs
   # remain separate from the inference cache and the other converter model.
@@ -205,3 +210,55 @@ jobs:
           LLAMA_TEST_GPTNEOX_HF: ${{ runner.temp }}/gpt-converter-inputs/gptneox/official-hf
           LLAMA_TEST_GPT_OUTPUT_ROOT: ${{ runner.temp }}/gpt-converter-output
         run: cargo test -p llama-convert --release --offline --locked --test gpt_pretrained -- --ignored --nocapture --test-threads=1
+
+  # BLOOM conversion retains its exact F16/Q8_0 outputs for the inference replay.
+  # The CPU job's explicit skip is covered here on each corresponding host.
+  bloom-conversion-inference:
+    name: BLOOM conversion and inference / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned compiler
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Fetch checksum-pinned reviewed dependencies
+        run: cargo fetch --locked
+      - name: Fetch and verify unchanged official BLOOM inputs
+        env:
+          BLOOM_CHECKPOINT: ${{ runner.temp }}/bloom-hf/official-hf
+        run: |
+          $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/bloom-conversion/pretrained-reference.json' | ConvertFrom-Json
+          foreach ($file in $manifest.model_origin.files) {
+            $destination = Join-Path $env:BLOOM_CHECKPOINT $file.path
+            $maximumTransferBytes = [Math]::Max([long]$file.bytes, [long]1048576)
+            & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $maximumTransferBytes --create-dirs --output $destination $file.url
+            if ($LASTEXITCODE -ne 0) { throw "Download failed: BLOOM/$($file.path)" }
+            if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {
+              throw "Length mismatch: BLOOM/$($file.path)"
+            }
+            $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: BLOOM/$($file.path)" }
+            Write-Host "Verified BLOOM/$($file.path): $($file.bytes) bytes, SHA-256 $hash"
+          }
+      - name: Compare all three complete BLOOM conversions with the frozen converter
+        env:
+          LLAMA_TEST_BLOOM_HF: ${{ runner.temp }}/bloom-hf/official-hf
+          LLAMA_TEST_BLOOM_OUTPUT_ROOT: ${{ runner.temp }}/bloom-converter-output
+        run: cargo test --release --offline --locked -p llama-convert --test bloom_pretrained -- --ignored --nocapture --test-threads=1
+      - name: Replay F16 and Q8_0 BLOOM inference against frozen native outputs
+        env:
+          LLAMA_TEST_BLOOM_F16_MODEL: ${{ runner.temp }}/bloom-converter-output/bloom-560m/f16.gguf
+          LLAMA_TEST_BLOOM_Q8_0_MODEL: ${{ runner.temp }}/bloom-converter-output/bloom-560m/q8_0.gguf
+        run: cargo test --release --offline --locked -p llama-inference --test bloom official_bloom_560m -- --ignored --nocapture --test-threads=1

@@ -2,10 +2,20 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **230**, leaves
-**25 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **232**, leaves
+**23 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
 SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, ADAPTERS.md and ENCODER.md.
+
+The quantization checkpoint adds `llama_model_quantize_default_params` and
+`llama_model_quantize` with native Rust model-file conversion. The original
+64-byte parameter layout and typed override/importance arrays are independently
+checked through frozen-header C callers on Windows and GNU debug/release
+libraries. Each profile replays 88 requests and 76 exact complete output files.
+The [model quantization contract](../model-quant/README.md) records its eight
+admitted file families, bounded resource policy, independent metadata corpus
+and explicit unsupported domains. Full quantizer/architecture coverage remains
+a separate release requirement.
 
 The encoder checkpoint adds `llama_encode`, `llama_get_embeddings_seq`,
 `llama_model_n_cls_out` and `llama_model_cls_label` with real complete-batch
@@ -169,6 +179,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_model_n_layer_nextn` |
 | `llama_model_n_params` |
 | `llama_model_n_swa` |
+| `llama_model_quantize` |
+| `llama_model_quantize_default_params` |
 | `llama_model_rope_freq_scale_train` |
 | `llama_model_rope_type` |
 | `llama_model_size` |
@@ -328,8 +340,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_sampled_token_ith` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
-| `llama_model_quantize` |
-| `llama_model_quantize_default_params` |
 | `llama_model_save_to_file` |
 | `llama_numa_init` |
 | `llama_opt_epoch` |
