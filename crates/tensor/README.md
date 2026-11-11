@@ -1,6 +1,6 @@
 # Rust tensor layouts and scalar CPU graphs
 
-This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **88 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
+This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **92 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
 
 ## Flash attention through the CPU DAG
 
@@ -278,8 +278,18 @@ selection and source reduction order. Four independent cohorts contain
 See [VISION_LOSS.md](VISION_LOSS.md) for shape/layout contracts and numerical
 boundaries; every native expected byte remains unchanged.
 
+## Gated delta and DeepSeek V4 hyper-connections
+
+Four additional IDs execute through `GatedDeltaNet { snapshots }`,
+`Dsv4HcComb`, `Dsv4HcPre` / `Dsv4HcPreGated` and `Dsv4HcPost`.
+The independently captured native graphs cover scalar/vector decay, cyclic
+query/key heads, grouped sequences, reverse state snapshots, arbitrary aligned
+byte strides, four-stream normalization, sigmoid gates and residual mixing.
+See [ATTENTION_STATE.md](ATTENTION_STATE.md) for the exact supported domain,
+retained successful native nonfinite outputs and explicit resource boundaries.
+
 ## Open T02 gates
 
-The remaining 13 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+The remaining 9 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
 
 Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.

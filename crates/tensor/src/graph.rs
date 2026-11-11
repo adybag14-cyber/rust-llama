@@ -69,6 +69,26 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Inputs: Q, K, V, scalar/vector gate, beta and initial state.
+    /// Returns attention scores followed by reverse-time state snapshots.
+    GatedDeltaNet {
+        snapshots: usize,
+    },
+    /// Inputs: 24 mix channels, scales and base. Four-stream normalization.
+    Dsv4HcComb {
+        epsilon: f32,
+        iterations: usize,
+    },
+    /// Reduce hyper-connection streams with per-stream weights.
+    Dsv4HcPre,
+    /// Reduce hyper-connection streams with per-channel sigmoid gates.
+    Dsv4HcPreGated {
+        scale: f32,
+    },
+    /// Inputs: X, residual streams, post weights and optional mixing matrix.
+    Dsv4HcPost {
+        with_comb: bool,
+    },
     /// Source flat-layout partition into padded square windows, F32.
     WindowPartition {
         window: usize,
@@ -382,6 +402,10 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            GatedDeltaNet { .. } => OpCode::GATED_DELTA_NET,
+            Dsv4HcComb { .. } => OpCode::DSV4_HC_COMB,
+            Dsv4HcPre | Dsv4HcPreGated { .. } => OpCode::DSV4_HC_PRE,
+            Dsv4HcPost { .. } => OpCode::DSV4_HC_POST,
             WindowPartition { .. } => OpCode::WIN_PART,
             WindowUnpartition { .. } => OpCode::WIN_UNPART,
             GetRelativePosition { .. } => OpCode::GET_REL_POS,
@@ -481,6 +505,10 @@ impl Op {
     }
     fn arity(&self) -> usize {
         match self {
+            Self::GatedDeltaNet { .. } => 6,
+            Self::Dsv4HcComb { .. } => 3,
+            Self::Dsv4HcPre | Self::Dsv4HcPreGated { .. } => 2,
+            Self::Dsv4HcPost { with_comb } => 3 + usize::from(*with_comb),
             Self::Arange { .. } => 0,
             Self::AddRelativePosition | Self::CrossEntropyLossBack => 3,
             Self::SolveTriangular | Self::CrossEntropyLoss => 2,

@@ -2,6 +2,7 @@
 //! Maintained implementation is Rust. The full operation registry is not a support claim.
 #![forbid(unsafe_code)]
 mod cpu;
+mod cpu_attention;
 mod cpu_conv;
 mod cpu_extra;
 mod cpu_flash;

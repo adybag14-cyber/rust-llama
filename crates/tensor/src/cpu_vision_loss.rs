@@ -132,6 +132,11 @@ fn float_at(bytes: &[u8], index: usize) -> Result<f32> {
 fn output_bytes(dtype: DType, shape: [usize; 4]) -> Result<(TensorDesc, Vec<u8>)> {
     let desc = TensorDesc::contiguous(dtype, shape)?;
     let len = desc.byte_span()?;
+    if len > 256 * 1024 * 1024 {
+        return Err(TensorError::Unsupported(
+            "window/relative output exceeds the 256 MiB allocation limit",
+        ));
+    }
     let mut bytes = reserved(len)?;
     bytes.resize(len, 0);
     Ok((desc, bytes))
@@ -148,8 +153,11 @@ fn partition(a: &Tensor, window: usize, cancel: &AtomicBool) -> Result<Tensor> {
     let ny = height.div_ceil(window);
     let patches = mul(nx, ny)?;
     positive_i32(patches)?;
-    let (desc, mut out) = output_bytes(DType::F32, [channels, window, window, patches])?;
     let input = raw(a)?;
+    if mul(mul(mul(channels, width)?, height)?, 4)? > input.len() {
+        return Err(TensorError::Bounds);
+    }
+    let (desc, mut out) = output_bytes(DType::F32, [channels, window, window, patches])?;
     let mut at = 0;
     for py in 0..ny {
         for px in 0..nx {
@@ -175,6 +183,30 @@ fn partition(a: &Tensor, window: usize, cancel: &AtomicBool) -> Result<Tensor> {
     Tensor::from_bytes(desc, out)
 }
 
+// Maximum source coordinate over complete blocks and the last partial block.
+// The last output pixel need not address the greatest source offset when the
+// source's stored window is smaller than the requested window size.
+fn maximum_window_axis(
+    length: usize,
+    window: usize,
+    block_stride: usize,
+    inner_stride: usize,
+) -> Result<usize> {
+    let block = (length - 1) / window;
+    let last = add(
+        mul(block, block_stride)?,
+        mul((length - 1) % window, inner_stride)?,
+    )?;
+    if block == 0 {
+        return Ok(last);
+    }
+    let previous = add(
+        mul(block - 1, block_stride)?,
+        mul(window - 1, inner_stride)?,
+    )?;
+    Ok(last.max(previous))
+}
+
 fn unpartition(
     a: &Tensor,
     width: usize,
@@ -188,8 +220,15 @@ fn unpartition(
     }
     let [channels, ax, ay, _] = a.shape();
     let nx = width.div_ceil(window);
-    let (desc, mut out) = output_bytes(DType::F32, [channels, width, height, 1])?;
     let input = raw(a)?;
+    let window_area = mul(ax, ay)?;
+    let last_x = maximum_window_axis(width, window, window_area, 1)?;
+    let last_y = maximum_window_axis(height, window, mul(nx, window_area)?, ax)?;
+    let required = mul(mul(add(add(last_x, last_y)?, 1)?, channels)?, 4)?;
+    if required > input.len() {
+        return Err(TensorError::Bounds);
+    }
+    let (desc, mut out) = output_bytes(DType::F32, [channels, width, height, 1])?;
     let row_bytes = mul(channels, 4)?;
     let mut at = 0;
     for y in 0..height {
@@ -228,8 +267,11 @@ fn relative(a: &Tensor, query: usize, key: usize, cancel: &AtomicBool) -> Result
     let channels = a.shape()[0];
     // The original constructor always produces F16, even for BF16 input.
     // Its kernel copies u16 payloads without any numerical conversion.
-    let (desc, mut out) = output_bytes(DType::F16, [channels, key, query, 1])?;
     let input = raw(a)?;
+    if mul(mul(channels, mul(key, 2)? - 1)?, 2)? > input.len() {
+        return Err(TensorError::Bounds);
+    }
+    let (desc, mut out) = output_bytes(DType::F16, [channels, key, query, 1])?;
     let row_bytes = mul(channels, 2)?;
     let mut at = 0;
     for q in 0..query {
@@ -361,7 +403,19 @@ fn loss_inputs(a: &Tensor, b: &Tensor) -> Result<(usize, usize)> {
         ));
     }
     let n = a.shape();
-    Ok((n[0], mul(mul(n[1], n[2])?, n[3])?))
+    let rows = mul(mul(n[1], n[2])?, n[3])?;
+    if mul(n[0], rows)? > 64 * 1024 * 1024 {
+        return Err(TensorError::Unsupported(
+            "scalar cross-entropy work exceeds 64 million logical cells",
+        ));
+    }
+    for tensor in [a, b] {
+        let end = add(mul(rows - 1, tensor.desc().nb[1])?, mul(n[0], 4)?)?;
+        if end > tensor.desc().byte_span()? {
+            return Err(TensorError::Bounds);
+        }
+    }
+    Ok((n[0], rows))
 }
 
 fn loss(a: &Tensor, b: &Tensor, cancel: &AtomicBool) -> Result<Tensor> {

@@ -53,6 +53,10 @@ dtypes, zero triangular diagonals, malformed shape relationships and addresses
 outside the declared view return errors. Geometry fits positive signed I32,
 matching the original CPU loop and parameter domain. Fallible output/scratch
 allocations and checked size/address arithmetic precede unsafe-sized work.
+Flat source spans are preflighted before output allocation, including nonmonotonic
+WIN_UNPART addressing with stored windows smaller than the requested window.
+Window/relative outputs are limited to 256 MiB and scalar loss work to 64 million
+logical cells; requests beyond this adapter budget return Unsupported.
 
 The original MSVC and GNU kernels can select different NaN payload operands.
 The Rust implementation explicitly quiets input NaNs and preserves the measured

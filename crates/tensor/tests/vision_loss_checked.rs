@@ -208,3 +208,78 @@ fn cancellation_and_empty_domains_do_not_publish_outputs() {
         assert!(run(op, &[zeros([3, 0, 2, 1])]).is_err());
     }
 }
+
+#[test]
+fn flat_spans_and_large_padding_are_checked_before_allocating() {
+    let huge = i32::MAX as usize;
+    let overlap = Tensor::from_bytes(
+        TensorDesc::with_strides(DType::F32, [1, huge, 1, 1], [4, 0, 0, 0]).unwrap(),
+        vec![0; 4],
+    )
+    .unwrap();
+    assert!(matches!(
+        run(
+            Op::WindowPartition { window: 1 },
+            std::slice::from_ref(&overlap)
+        ),
+        Err(TensorError::Bounds)
+    ));
+    assert!(matches!(
+        run(
+            Op::WindowUnpartition {
+                width: huge,
+                height: 1,
+                window: 1
+            },
+            &[zeros([1; 4])]
+        ),
+        Err(TensorError::Bounds)
+    ));
+    let half = Tensor::from_bytes(
+        TensorDesc::with_strides(DType::F16, [1, huge, 1, 1], [2, 0, 0, 0]).unwrap(),
+        vec![0; 2],
+    )
+    .unwrap();
+    assert!(matches!(
+        run(
+            Op::GetRelativePosition {
+                query: huge.div_ceil(2),
+                key: huge.div_ceil(2)
+            },
+            &[half]
+        ),
+        Err(TensorError::Bounds)
+    ));
+    assert!(matches!(
+        run(Op::WindowPartition { window: 1_000_000 }, &[zeros([1; 4])]),
+        Err(TensorError::Unsupported(_))
+    ));
+    assert!(matches!(
+        run(Op::CrossEntropyLoss, &[overlap.clone(), overlap]),
+        Err(TensorError::Unsupported(_))
+    ));
+    // When stored windows are smaller, the greatest physical read may belong
+    // to a complete earlier block rather than the final output coordinate.
+    assert!(
+        run(
+            Op::WindowUnpartition {
+                width: 4,
+                height: 4,
+                window: 3
+            },
+            &[zeros([1, 1, 1, 5])]
+        )
+        .is_ok()
+    );
+    assert!(matches!(
+        run(
+            Op::WindowUnpartition {
+                width: 4,
+                height: 4,
+                window: 3
+            },
+            &[zeros([1, 1, 1, 4])]
+        ),
+        Err(TensorError::Bounds)
+    ));
+}
