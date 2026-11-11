@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **92 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **9 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **93 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **8 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -93,7 +93,7 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 84 | `RWKV_WKV7` | Implemented slice | F32 | Contiguous R/W/K/V/A/B/state; source two-pass state update and complete final state. Checked arithmetic with competing NaN payloads. See RECURRENT.md. |
 | 85 | `SOLVE_TRI` | Implemented slice | F32 | Contiguous left/lower/non-unit solve with matching batch axes; checked zero diagonals and source scalar arithmetic. See VISION_LOSS.md. |
 | 86 | `GATED_DELTA_NET` | Implemented slice | F32 | Scalar/vector gates, cyclic heads, grouped sequences, reverse state snapshots; finite read values/output and bounded allocations. |
-| 87 | `LIGHTNING_INDEXER` | Pending | — | No executable Op constructor; no fallback result. |
+| 87 | `LIGHTNING_INDEXER` | Implemented slice | F32 Q/weights, 29 original key storage types, F16 mask → F32 | Decoded rows, source scalar weighted ReLU dots, modulo stream masks, empty dispatch; finite pre-mask scores and bounded allocation/work. See LIGHTNING_INDEXER.md. |
 | 88 | `DSV4_HC_COMB` | Implemented slice | F32 | Strided 24-channel mixes, four-stream normalization; finite read values/output, positive signed-I32 iterations. |
 | 89 | `DSV4_HC_PRE` | Implemented slice | F32 | Strided weighted or sigmoid-gated stream reduction; finite read values/output. |
 | 90 | `DSV4_HC_POST` | Implemented slice | F32 | Strided residual stream update, optional mixing matrix; finite read values/output. |

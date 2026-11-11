@@ -7,6 +7,7 @@ mod cpu_conv;
 mod cpu_extra;
 mod cpu_flash;
 mod cpu_index;
+mod cpu_lightning;
 mod cpu_recurrent;
 mod cpu_vision_loss;
 mod graph;

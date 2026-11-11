@@ -69,6 +69,9 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Inputs: F32 query, native-decoder keys, F32 weights and F16 mask.
+    /// Scalar original Lightning Indexer; returns [keys,tokens,1,streams].
+    LightningIndexer,
     /// Inputs: Q, K, V, scalar/vector gate, beta and initial state.
     /// Returns attention scores followed by reverse-time state snapshots.
     GatedDeltaNet {
@@ -402,6 +405,7 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            LightningIndexer => OpCode::LIGHTNING_INDEXER,
             GatedDeltaNet { .. } => OpCode::GATED_DELTA_NET,
             Dsv4HcComb { .. } => OpCode::DSV4_HC_COMB,
             Dsv4HcPre | Dsv4HcPreGated { .. } => OpCode::DSV4_HC_PRE,
@@ -505,6 +509,7 @@ impl Op {
     }
     fn arity(&self) -> usize {
         match self {
+            Self::LightningIndexer => 4,
             Self::GatedDeltaNet { .. } => 6,
             Self::Dsv4HcComb { .. } => 3,
             Self::Dsv4HcPre | Self::Dsv4HcPreGated { .. } => 2,
