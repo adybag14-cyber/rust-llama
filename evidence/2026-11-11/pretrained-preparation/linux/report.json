@@ -1,0 +1,176 @@
+{
+  "host": "linux",
+  "attempt": "v1",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "xtask",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5186127880000413,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lock-check",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3211515140000074,
+      "log_sha256": "649527254e88200c7f0175f23b6f334ab42d28ac5aa77aa6d30073d6ef96e1c4"
+    },
+    {
+      "name": "debug",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3704597189999959,
+      "log_sha256": "6b5efbe726441e8de340f950f8a232755952c1213cb19a5f20f9aaee702aa5c6"
+    },
+    {
+      "name": "release",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 4.7277029570000195,
+      "log_sha256": "403193da1e6d7f6bdead30337a6ee4a53d6382acdd31e28c5eb8eee272383c1b"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9691611580000199,
+      "log_sha256": "5d87f47b35e863ff1b036c11dbfee5496a5a46a2de1c99beeb003d1ea5ab6c2f"
+    },
+    {
+      "name": "prepare-gpt2",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "gpt2-124m-f16",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/official-hf/model.safetensors",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/gpt2-124m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 24.123155337999947,
+      "log_sha256": "9c3e4b8c10ccf308c4a50ba31f39912900ca1cb46fc27eededdd7cad0dcfcacd"
+    },
+    {
+      "name": "prepare-pythia",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "pythia-14m-f16",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/official-hf/model.safetensors",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/pythia-14m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 2.0222256189999825,
+      "log_sha256": "2e48648bde1c73671f675f50cb4a459bf521ae7b275855f848a9fcba6652e291"
+    },
+    {
+      "name": "pretrained-gpt2",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 34.20046332100003,
+      "log_sha256": "22e07a39bb411c2fdc98dca54a51ba930f1c0853f20a32533d8fdb131b50fb03"
+    },
+    {
+      "name": "pretrained-pythia",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "official_pythia",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 3.1748265999999603,
+      "log_sha256": "2d09492c5d08a271b36e59e1cd1a4724c52e496bf8e5893c340d3b8faa6c1bd7"
+    }
+  ],
+  "prepared": [
+    {
+      "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/gpt2-124m-f16.gguf",
+      "bytes": 252470528,
+      "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+    },
+    {
+      "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/pythia-14m-f16.gguf",
+      "bytes": 29929440,
+      "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+    }
+  ]
+}

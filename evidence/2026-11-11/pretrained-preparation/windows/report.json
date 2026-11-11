@@ -1,0 +1,182 @@
+{
+  "host": "windows",
+  "attempt": "v1",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3900606000006519,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lock-check",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "check",
+        "--offline",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0280597000000853,
+      "log_sha256": "e9595b6677d40dbedb5ee91e69fe356468b4bc66f11d1541c08c9fba1f95558c"
+    },
+    {
+      "name": "debug",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 1.5415919000006397,
+      "log_sha256": "4ea167ecc9f46c1c4edd656b21c9dd3f71cb9c0b32ef0fd5c67509592eb5cb20"
+    },
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask"
+      ],
+      "exit_code": 0,
+      "seconds": 7.203031400000327,
+      "log_sha256": "e926763a23d0c72619c131511842792f3a93ce834e0dbe7e826fb1ef7ee99b6b"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.47395610000057786,
+      "log_sha256": "15389460fef5e130c5d941c8892625b507098d0a68d226d0a5fbed2f4be4c1a0"
+    },
+    {
+      "name": "prepare-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "gpt2-124m-f16",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\official-hf\\model.safetensors",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\gpt2-124m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 16.61629130000074,
+      "log_sha256": "7e613326b28dcfc67d4844f9bd4cc142c6ac05bfb55d9cf46661b6ebbc24ab02"
+    },
+    {
+      "name": "prepare-pythia",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "pythia-14m-f16",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\official-hf\\model.safetensors",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\pythia-14m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6028465999997934,
+      "log_sha256": "df1acfa6c046f1add7b562b589572058a5d2869e09bdf40f7fc0323ee7af1148"
+    },
+    {
+      "name": "pretrained-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 49.90000349999991,
+      "log_sha256": "085dae917cc645ab97d9f8401c9e80fd94dd5d53d1fa51bdc91dd87d66cdf7a4"
+    },
+    {
+      "name": "pretrained-pythia",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gptneox",
+        "official_pythia",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.9145850999993854,
+      "log_sha256": "f123d022e45ce776b6c578c9e5ea9575ed68370b93e09c3736a80d4fad137eff"
+    }
+  ],
+  "prepared": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\gpt2-124m-f16.gguf",
+      "bytes": 252470528,
+      "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\pythia-14m-f16.gguf",
+      "bytes": 29929440,
+      "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+    }
+  ]
+}

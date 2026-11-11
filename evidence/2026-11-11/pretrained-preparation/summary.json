@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "date": "2026-11-11",
+  "scope": "Pinned test-data preparation only. No general GPT2/GPT-NeoX converter parity claim.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "source_review": "Independent peer review found no blocking arithmetic, payload, retained-handle, or destination-race issue. Caller-owned temporary directory assumption retained explicitly.",
+  "validation": {
+    "windows": {
+      "status": "passed",
+      "report": {
+        "path": "evidence/2026-11-11/pretrained-preparation/windows/report.json",
+        "bytes": 4902,
+        "sha256": "e6887e1d9eaec8305047395c8b8f6acb8a2367f5f58ec407f4613c608534ca53"
+      },
+      "metrics": {
+        "gpt2": {
+          "rows": 33,
+          "floats": 1658481,
+          "bitwise_equal": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        "pythia": {
+          "rows": 33,
+          "floats": 1660032,
+          "bitwise_equal": 1660032,
+          "greedy_ids": 24,
+          "maximum_absolute": 0.0
+        }
+      },
+      "prepared": [
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\gpt2-124m-f16.gguf",
+          "bytes": 252470528,
+          "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+        },
+        {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validation-windows-v1\\prepared\\pythia-14m-f16.gguf",
+          "bytes": 29929440,
+          "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+        }
+      ],
+      "seconds": {
+        "format": 0.3900606000006519,
+        "lock-check": 1.0280597000000853,
+        "debug": 1.5415919000006397,
+        "release": 7.203031400000327,
+        "clippy": 0.47395610000057786,
+        "prepare-gpt2": 16.61629130000074,
+        "prepare-pythia": 0.6028465999997934,
+        "pretrained-gpt2": 49.90000349999991,
+        "pretrained-pythia": 2.9145850999993854
+      }
+    },
+    "linux": {
+      "status": "passed",
+      "report": {
+        "path": "evidence/2026-11-11/pretrained-preparation/linux/report.json",
+        "bytes": 5183,
+        "sha256": "a91c7b4fd604275c56c51a0b3b35aa22805e453502827da72e3abad16775db7a"
+      },
+      "metrics": {
+        "gpt2": {
+          "rows": 33,
+          "floats": 1658481,
+          "bitwise_equal": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        "pythia": {
+          "rows": 33,
+          "floats": 1660032,
+          "bitwise_equal": 1660032,
+          "greedy_ids": 24,
+          "maximum_absolute": 0.0
+        }
+      },
+      "prepared": [
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/gpt2-124m-f16.gguf",
+          "bytes": 252470528,
+          "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+        },
+        {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/pretrained-preparation/validation-linux-v1/prepared/pythia-14m-f16.gguf",
+          "bytes": 29929440,
+          "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+        }
+      ],
+      "seconds": {
+        "format": 0.5186127880000413,
+        "lock-check": 1.3211515140000074,
+        "debug": 1.3704597189999959,
+        "release": 4.7277029570000195,
+        "clippy": 0.9691611580000199,
+        "prepare-gpt2": 24.123155337999947,
+        "prepare-pythia": 2.0222256189999825,
+        "pretrained-gpt2": 34.20046332100003,
+        "pretrained-pythia": 3.1748265999999603
+      }
+    }
+  },
+  "exact_transformed_learned_tensors": 224,
+  "verified_omitted_gpt2_static_masks": 12,
+  "new_preparation_tests_per_profile": 4,
+  "total_xtask_tests_per_profile": 8,
+  "maintained_implementation": [
+    {
+      "path": "xtask/src/pretrained.rs",
+      "bytes": 31834,
+      "sha256": "8b226bed8d25c23800873168bf3a5285f51c33ff3c4d0b5325d6260ae811b399"
+    },
+    {
+      "path": "xtask/src/main.rs",
+      "bytes": 16555,
+      "sha256": "b82c1a2c658445d4e66bc1278584359bb579b3c05a90f461c5623989827ffcb2"
+    },
+    {
+      "path": "xtask/Cargo.toml",
+      "bytes": 303,
+      "sha256": "6912787d500a730c4c86ddc0f665644e18a796023b9b76831e92439dab8d323a"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 3594,
+      "sha256": "8fd520abc3e4489af0d662c43b62714d3334f2e39a5ca191d5d7c782490d7b6d"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 6009,
+      "sha256": "6b090a176d57052dcb205116118efa90966c5ade7c210b3699cd9aff6e06dccc"
+    }
+  ],
+  "external_harnesses": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-recipe-audit.py",
+      "bytes": 14103,
+      "sha256": "137a180821f4dd4a1556c20fc8ebd1e3e642bfaedacbc12a21ba7e6042da950c"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\extract.py",
+      "bytes": 2775,
+      "sha256": "fb18d2422576d9987dbe95dd279049455dddd5adbd542bfdbb72827301486b48"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validate.py",
+      "bytes": 3597,
+      "sha256": "82819f50098a0374bee762f35c418edc21b33b6f2c57ed6b6f7089a2541c21b8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\run-linux.py",
+      "bytes": 709,
+      "sha256": "a3ea091b5b7c450a3378b1f908d3b365f87552612dba39af0341a8414aa0fdb8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\pack.py",
+      "bytes": 6097,
+      "sha256": "23893ec1e167eb9d59c45d1480ed28dcca851b16caa1db837ae73c898527b65a"
+    }
+  ],
+  "fixture_provenance": {
+    "path": "fixtures/pretrained-preparation/provenance.json",
+    "bytes": 8313,
+    "sha256": "f3fbe12e363a0c24d5bd44669d4f0c3511e34442db024c81c236ed87de2e060c"
+  },
+  "bounds": {
+    "recipe_bytes": 262144,
+    "header_bytes": 2097152,
+    "source_bytes": 629145600,
+    "output_bytes": 314572800,
+    "source_tensors": 256,
+    "random_tensor_bytes": 16777216,
+    "stream_elements": 8192,
+    "fixed_stream_buffers_bytes": 65536
+  }
+}

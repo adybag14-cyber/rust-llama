@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "original_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reports": {
+    "gpt2": {
+      "tensors": 148,
+      "ignored": 12,
+      "exact_output_payload_bytes": 250695168,
+      "dtype_counts": {
+        "F32": 99,
+        "F16": 49
+      },
+      "transform_counts": {
+        "identity": 100,
+        "transpose_2d": 48
+      }
+    },
+    "gptneox": {
+      "tensors": 76,
+      "ignored": 0,
+      "exact_output_payload_bytes": 28155904,
+      "dtype_counts": {
+        "F16": 26,
+        "F32": 50
+      },
+      "transform_counts": {
+        "identity": 64,
+        "neox_qkv_head_major_to_qkv_major": 12
+      }
+    }
+  },
+  "source_identities": {
+    "conversion/gpt2.py": {
+      "bytes": 3319,
+      "sha256": "b6c57b549c5545fb228b28e863e29a8b449e59d8370f94f0c3c781d40806e03b"
+    },
+    "conversion/gptneox.py": {
+      "bytes": 2949,
+      "sha256": "63e06a691f471828e1cd2671b6dd0749953bb347aab525a260ad4c0b2b81e6c2"
+    },
+    "conversion/base.py": {
+      "bytes": 179995,
+      "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+    },
+    "gguf-py/gguf/quants.py": {
+      "bytes": 67627,
+      "sha256": "f896726209ba8c91afd083dd87031c2d39dc4ef6a78e8a6c12763eeb8ed6ff84"
+    }
+  }
+}

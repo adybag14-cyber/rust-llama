@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "captured_date": "2026-11-11",
+  "purpose": "Reproduce two exact independently captured pretrained inference GGUF inputs from pinned official SafeTensors; not a general model converter.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "original_models": [
+    {
+      "fixture": "gpt2-124m-f16",
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\models\\gpt2-124m-f16.gguf",
+      "upstream_provenance": "fixtures/inference/gpt2/provenance.json",
+      "qualification": "Original converter reference uses precisely twelve static causal-mask omissions; all learned source tensors unchanged."
+    },
+    {
+      "fixture": "pythia-14m-f16",
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\models\\pythia-14m-f16.gguf",
+      "upstream_provenance": "fixtures/inference/gptneox/provenance.json",
+      "qualification": "Unmodified official source checkpoint; head-major fused QKV rows reordered by the original converter."
+    }
+  ],
+  "records": [
+    {
+      "fixture": "gpt2-124m-f16",
+      "recipe_bytes": 99153,
+      "recipe_sha256": "0ef173d3ac511f2a105c189ba64097a7b752dc51801fcad6c23fcedcca6288fc",
+      "header": {
+        "bytes": 1775360,
+        "sha256": "8045304d11af244edb6cb476e54a36154039618fd055a885d95e1e9812afe5dd"
+      },
+      "source": {
+        "bytes": 548105171,
+        "sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707",
+        "data_start": 14291,
+        "tensor_count": 160,
+        "origin": {
+          "repository": "openai-community/gpt2",
+          "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+          "source": {
+            "path": "model.safetensors",
+            "url": "https://huggingface.co/openai-community/gpt2/resolve/607a30d783dfa663caf39e06633721c8d4cfcd7e/model.safetensors",
+            "bytes": 548105171,
+            "sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707"
+          }
+        }
+      },
+      "output": {
+        "bytes": 252470528,
+        "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7",
+        "alignment": 32,
+        "tensor_count": 148
+      }
+    },
+    {
+      "fixture": "pythia-14m-f16",
+      "recipe_bytes": 51535,
+      "recipe_sha256": "c26683ae1e5c0e73f4c043177a1820a232d28b1ac735ca5f62fae73432e609a1",
+      "header": {
+        "bytes": 1773536,
+        "sha256": "2ffbd1206d1a723efdc0aafece792dd375bdd6215a94a7008cadab82d5ae9826"
+      },
+      "source": {
+        "bytes": 28143920,
+        "sha256": "116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1",
+        "data_start": 8496,
+        "tensor_count": 76,
+        "origin": {
+          "repository": "EleutherAI/pythia-14m",
+          "revision": "cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+          "source": {
+            "path": "model.safetensors",
+            "url": "https://huggingface.co/EleutherAI/pythia-14m/resolve/cf967c0a9a04383db6f7b1108d86b2962634b4ac/model.safetensors",
+            "bytes": 28143920,
+            "sha256": "116a02532db461f91386a5b20f942ff2c8d4de7341e21b55caafc3d7b25f49a1"
+          }
+        }
+      },
+      "output": {
+        "bytes": 29929440,
+        "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8",
+        "alignment": 32,
+        "tensor_count": 76
+      }
+    }
+  ],
+  "independent_audit": {
+    "method": "Read-only source transformations compared every official learned payload with an already captured original converter GGUF before Rust preparation implementation. Full source and original GGUF identities bracketed through retained handles.",
+    "summary": {
+      "status": "passed",
+      "original_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+      "reports": {
+        "gpt2": {
+          "tensors": 148,
+          "ignored": 12,
+          "exact_output_payload_bytes": 250695168,
+          "dtype_counts": {
+            "F32": 99,
+            "F16": 49
+          },
+          "transform_counts": {
+            "identity": 100,
+            "transpose_2d": 48
+          }
+        },
+        "gptneox": {
+          "tensors": 76,
+          "ignored": 0,
+          "exact_output_payload_bytes": 28155904,
+          "dtype_counts": {
+            "F16": 26,
+            "F32": 50
+          },
+          "transform_counts": {
+            "identity": 64,
+            "neox_qkv_head_major_to_qkv_major": 12
+          }
+        }
+      },
+      "source_identities": {
+        "conversion/gpt2.py": {
+          "bytes": 3319,
+          "sha256": "b6c57b549c5545fb228b28e863e29a8b449e59d8370f94f0c3c781d40806e03b"
+        },
+        "conversion/gptneox.py": {
+          "bytes": 2949,
+          "sha256": "63e06a691f471828e1cd2671b6dd0749953bb347aab525a260ad4c0b2b81e6c2"
+        },
+        "conversion/base.py": {
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        "gguf-py/gguf/quants.py": {
+          "bytes": 67627,
+          "sha256": "f896726209ba8c91afd083dd87031c2d39dc4ef6a78e8a6c12763eeb8ed6ff84"
+        }
+      }
+    },
+    "records": [
+      {
+        "path": "evidence/2026-11-11/pretrained-preparation/audit/gpt2-tensor-correspondence.json",
+        "bytes": 151631,
+        "sha256": "279f8252a26d1213ca3b54a66c67c697bcf1fd75e05354676fd8b75140c0a855"
+      },
+      {
+        "path": "evidence/2026-11-11/pretrained-preparation/audit/gptneox-tensor-correspondence.json",
+        "bytes": 79045,
+        "sha256": "8839721546461eca80a77ac11217f5c721d4d04ea11360f39e48aed6298d1d3c"
+      },
+      {
+        "path": "evidence/2026-11-11/pretrained-preparation/audit/source-identities.json",
+        "bytes": 537,
+        "sha256": "4b9556c7393b10611c81c85fa5caf5eefee83cc050b57697b822a1dd114b68e1"
+      },
+      {
+        "path": "evidence/2026-11-11/pretrained-preparation/audit/summary.json",
+        "bytes": 1289,
+        "sha256": "0f2ffd22ff7bb544f8d4b0b6bb352ed4b3b220c7e6cc1a0ce763672df04dcf62"
+      }
+    ]
+  },
+  "external_harnesses": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-recipe-audit.py",
+      "bytes": 14103,
+      "sha256": "137a180821f4dd4a1556c20fc8ebd1e3e642bfaedacbc12a21ba7e6042da950c"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\extract.py",
+      "bytes": 2775,
+      "sha256": "fb18d2422576d9987dbe95dd279049455dddd5adbd542bfdbb72827301486b48"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\validate.py",
+      "bytes": 3597,
+      "sha256": "82819f50098a0374bee762f35c418edc21b33b6f2c57ed6b6f7089a2541c21b8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\run-linux.py",
+      "bytes": 709,
+      "sha256": "a3ea091b5b7c450a3378b1f908d3b365f87552612dba39af0341a8414aa0fdb8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\pretrained-preparation\\pack.py",
+      "bytes": 6097,
+      "sha256": "23893ec1e167eb9d59c45d1480ed28dcca851b16caa1db837ae73c898527b65a"
+    }
+  ],
+  "licenses": [
+    {
+      "path": "fixtures/pretrained-preparation/gpt2-124m-f16-LICENSE.GPT2.txt",
+      "bytes": 1403,
+      "sha256": "0dbeda4bc78823b1d67ec0ee414d8690ee4cad826bc9c147b215adc3af202436"
+    },
+    {
+      "path": "fixtures/pretrained-preparation/LICENSE.llama.cpp.txt",
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "path": "fixtures/pretrained-preparation/pythia-14m-f16-license-origin.json",
+      "bytes": 242,
+      "sha256": "781403fccdc6e3ca612c09ff6d295c820adbde07cfbc5b084a8bcfd86d524f32"
+    },
+    {
+      "path": "fixtures/pretrained-preparation/pythia-14m-f16-LICENSE.PYTHIA.txt",
+      "bytes": 11340,
+      "sha256": "bc4cdd164a78077e0a47964605fa0708084691121f73672afaa0c3b59c766f65"
+    }
+  ],
+  "publication_assumption": "Input and output paths are in a caller-owned directory. An existing destination is never overwritten; hostile replacement of temporary names inside that directory is outside the supported contract.",
+  "rust_reference_output_used_to_derive_expected_bytes": false
+}

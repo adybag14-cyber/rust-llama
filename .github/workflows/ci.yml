@@ -62,8 +62,18 @@ jobs:
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/qwen2.5-0.5b-instruct-q4_k_m.gguf" https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q4_k_m.gguf
       - name: Fetch pinned Qwen3 Q8 model data
         run: curl --fail --location --ipv4 --retry 3 --output "${{ runner.temp }}/qwen3-0.6b-q8_0.gguf" https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf
+      - name: Fetch exact official GPT2 checkpoint for Rust fixture preparation
+        run: curl --fail --location --ipv4 --retry 3 --max-time 600 --max-filesize 548105171 --output "${{ runner.temp }}/gpt2-original.safetensors" https://huggingface.co/openai-community/gpt2/resolve/607a30d783dfa663caf39e06633721c8d4cfcd7e/model.safetensors
+      - name: Fetch exact official Pythia checkpoint for Rust fixture preparation
+        run: curl --fail --location --ipv4 --retry 3 --max-time 600 --max-filesize 28143920 --output "${{ runner.temp }}/pythia-14m-original.safetensors" https://huggingface.co/EleutherAI/pythia-14m/resolve/cf967c0a9a04383db6f7b1108d86b2962634b4ac/model.safetensors
+      - name: Prepare exact GPT2 GGUF with native Rust and verified hashes
+        run: cargo run --release --offline --locked -p xtask -- prepare-pretrained-fixture gpt2-124m-f16 "${{ runner.temp }}/gpt2-original.safetensors" "${{ runner.temp }}/gpt2-124m-f16.gguf"
+      - name: Prepare exact Pythia GGUF with native Rust and verified hashes
+        run: cargo run --release --offline --locked -p xtask -- prepare-pretrained-fixture pythia-14m-f16 "${{ runner.temp }}/pythia-14m-original.safetensors" "${{ runner.temp }}/pythia-14m-f16.gguf"
       - name: Pretrained model comparisons with verified SHA-256 inputs
         env:
+          LLAMA_TEST_GPT2_MODEL: ${{ runner.temp }}/gpt2-124m-f16.gguf
+          LLAMA_TEST_GPTNEOX_MODEL: ${{ runner.temp }}/pythia-14m-f16.gguf
           LLAMA_TEST_MODEL: ${{ runner.temp }}/stories260K.gguf
           LLAMA_TEST_Q4_MODEL: ${{ runner.temp }}/stories15M-q4_0.gguf
           LLAMA_TEST_BPE_MODEL: ${{ runner.temp }}/SmolLM2-135M-Q4_K_M.gguf
