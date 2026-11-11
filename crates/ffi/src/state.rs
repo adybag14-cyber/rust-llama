@@ -12,7 +12,7 @@ const MAX_SNAPSHOT_BYTES: usize = 1024 * 1024 * 1024;
 
 fn prepared(context: &ContextHandle, sequence: Option<i32>, flags: u32) -> Result<NativeState> {
     let mut state = context
-        .runtime
+        .decoder()?
         .prepare_native_state(sequence, flags)
         .map_err(|e| e.to_string())?;
     if let Some(sequence) = sequence {
@@ -36,7 +36,7 @@ fn prepared(context: &ContextHandle, sequence: Option<i32>, flags: u32) -> Resul
 }
 fn state_size(context: &ContextHandle, sequence: Option<i32>, flags: u32) -> Result<usize> {
     context
-        .runtime
+        .decoder()?
         .native_state_size(sequence, flags)
         .map_err(|e| e.to_string())?
         .checked_add(if sequence.is_some() { 8 } else { 0 })
@@ -108,7 +108,7 @@ fn read_state(
 ) -> Result<usize> {
     if sequence.is_none() {
         return context
-            .runtime
+            .decoder_mut()?
             .restore_native_state(source, None, 0)
             .map_err(|e| e.to_string());
     }
@@ -122,12 +122,13 @@ fn read_state(
             .state_snapshots
             .get(&origin)
             .ok_or("device state belongs to a missing or different owning context")?;
-        context
-            .runtime
-            .restore_native_state_with_tensors(&source[8..], sequence, flags, snapshot)
+        let crate::context::ContextRuntime::Decoder(runtime) = &mut context.runtime else {
+            return Err("BERT has no decoder state snapshots".into());
+        };
+        runtime.restore_native_state_with_tensors(&source[8..], sequence, flags, snapshot)
     } else {
         context
-            .runtime
+            .decoder_mut()?
             .restore_native_state(&source[8..], sequence, flags)
     };
     consumed.map(|size| size + 8).map_err(|e| e.to_string())
@@ -265,28 +266,28 @@ unsafe fn legacy_size(context: &ContextHandle, source: *const u8) -> Result<usiz
     unsafe {
         reference(source)?;
     }
-    let RuntimeModel::Llama(model) = context.runtime.model().as_ref() else {
+    let RuntimeModel::Llama(model) = context.decoder()?.model().as_ref() else {
         return Err("unsupported native state model".into());
     };
     let width = model.config().kv_width().map_err(|e| e.to_string())?;
-    let (key_type, value_type) = context.runtime.cache_types();
+    let (key_type, value_type) = context.decoder()?.cache_types();
     let mut reader = LegacyReader { source, at: 0 };
     if unsafe { reader.u32()? } != 5 {
         return Err("legacy state architecture length mismatch".into());
     }
     reader.skip(5)?;
     let streams = unsafe { reader.u32()? } as usize;
-    let expected = if context.runtime.is_unified() {
+    let expected = if context.decoder()?.is_unified() {
         1
     } else {
-        context.runtime.sequence_id_limit()
+        context.decoder()?.sequence_id_limit()
     };
     if streams != expected {
         return Err("legacy native state stream mismatch".into());
     }
     for _ in 0..streams {
         let count = unsafe { reader.u32()? } as usize;
-        if count > context.runtime.context_tokens_per_sequence() {
+        if count > context.decoder()?.context_tokens_per_sequence() {
             return Err("legacy state cell count exceeds capacity".into());
         }
         if count == 0 {
@@ -295,12 +296,12 @@ unsafe fn legacy_size(context: &ContextHandle, source: *const u8) -> Result<usiz
         for _ in 0..count {
             reader.skip(4)?;
             let ids = unsafe { reader.u32()? } as usize;
-            if ids > context.runtime.sequence_id_limit() {
+            if ids > context.decoder()?.sequence_id_limit() {
                 return Err("legacy state sequence count exceeds limit".into());
             }
             reader.skip(ids * 4)?;
         }
-        if unsafe { reader.u32()? } != u32::from(context.runtime.values_are_transposed())
+        if unsafe { reader.u32()? } != u32::from(context.decoder()?.values_are_transposed())
             || unsafe { reader.u32()? } as usize != model.layer_count()
             || unsafe { reader.u32()? } != 0
             || unsafe { reader.u32()? } != 0
@@ -326,7 +327,7 @@ unsafe fn legacy_size(context: &ContextHandle, source: *const u8) -> Result<usiz
             if unsafe { reader.u32()? } != value_type as u32 {
                 return Err("legacy state value type mismatch".into());
             }
-            if context.runtime.values_are_transposed() {
+            if context.decoder()?.values_are_transposed() {
                 if unsafe { reader.u32()? } != value_type.size() as u32
                     || unsafe { reader.u32()? } as usize != width
                 {
@@ -409,7 +410,7 @@ unsafe fn save_file(
     let tokens = unsafe { input_slice(tokens, count)? };
     let context = unsafe { reference(context)? };
     let memory = context
-        .runtime
+        .decoder()?
         .save_native_state(sequence, 0)
         .map_err(|e| e.to_string())?;
     let length = tokens
@@ -505,7 +506,7 @@ unsafe fn load_file(
     }
     let context = unsafe { reference_mut(context)? };
     let consumed = context
-        .runtime
+        .decoder_mut()?
         .restore_native_state(&bytes[prompt_end..], sequence, 0)
         .map_err(|e| e.to_string())?;
     if sequence.is_none() && consumed != bytes.len() - prompt_end {

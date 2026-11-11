@@ -1,6 +1,8 @@
 //! Dense bidirectional BERT encoder from `src/models/bert.cpp`.
 use crate::{Error, Matrix, Result, check_epsilon, check_positive, math};
 
+pub mod native;
+
 #[derive(Debug, Clone)]
 pub struct BertConfig {
     pub vocabulary: usize,
@@ -105,6 +107,7 @@ pub struct BertWeights {
 pub struct BertModel {
     config: BertConfig,
     weights: BertWeights,
+    classifier: BertClassifier,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -113,7 +116,34 @@ pub enum Pooling {
     Mean,
     First,
     Last,
+    /// Source classifier/reranking head, including its optional dense tanh layer.
+    Rank,
 }
+/// Optional classifier tensors from the frozen BERT graph. Biases without their
+/// corresponding matrix are retained and validated, but do not execute.
+#[derive(Debug, Clone)]
+pub struct BertClassifier {
+    pub dense: Option<Matrix>,
+    pub dense_bias: Option<Vec<f32>>,
+    pub output: Option<Matrix>,
+    pub output_bias: Option<Vec<f32>>,
+    pub output_count: usize,
+    pub mean_pooling: bool,
+}
+
+impl Default for BertClassifier {
+    fn default() -> Self {
+        Self {
+            dense: None,
+            dense_bias: None,
+            output: None,
+            output_bias: None,
+            output_count: 1,
+            mean_pooling: false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Encoded {
     pub tokens: Vec<Vec<f32>>,
@@ -144,7 +174,61 @@ impl BertModel {
         for layer in &weights.layers {
             layer.validate(&config)?;
         }
-        Ok(Self { config, weights })
+        Ok(Self {
+            config,
+            weights,
+            classifier: BertClassifier {
+                output_count: 1,
+                ..BertClassifier::default()
+            },
+        })
+    }
+    pub fn with_classifier(mut self, classifier: BertClassifier) -> Result<Self> {
+        check_positive(&[("BERT classifier output count", classifier.output_count)])?;
+        if let Some(matrix) = &classifier.dense {
+            matrix.shape(
+                self.config.width,
+                self.config.width,
+                "BERT classifier dense",
+            )?;
+        }
+        if let Some(matrix) = &classifier.output {
+            matrix.shape(
+                classifier.output_count,
+                self.config.width,
+                "BERT classifier output",
+            )?;
+        }
+        math::optional_bias(
+            &classifier.dense_bias,
+            self.config.width,
+            "BERT classifier dense bias",
+        )?;
+        math::optional_bias(
+            &classifier.output_bias,
+            classifier.output_count,
+            "BERT classifier output bias",
+        )?;
+        self.classifier = classifier;
+        Ok(self)
+    }
+    pub fn classifier(&self) -> &BertClassifier {
+        &self.classifier
+    }
+    fn classify(&self, mut pooled: Vec<f32>) -> Result<Vec<f32>> {
+        if let Some(matrix) = &self.classifier.dense {
+            pooled = matrix.multiply(&pooled)?;
+            math::bias(&mut pooled, &self.classifier.dense_bias);
+            for value in &mut pooled {
+                *value = value.tanh();
+            }
+        }
+        if let Some(matrix) = &self.classifier.output {
+            pooled = matrix.multiply(&pooled)?;
+            math::bias(&mut pooled, &self.classifier.output_bias);
+        }
+        math::finite(&pooled, "BERT classifier output")?;
+        Ok(pooled)
     }
     pub fn config(&self) -> &BertConfig {
         &self.config
@@ -284,9 +368,18 @@ impl BertModel {
         if cancel() {
             return Err(Error::Cancelled);
         }
-        let pooled = match pooling {
+        let selected_pooling = if pooling == Pooling::Rank {
+            if self.classifier.mean_pooling {
+                Pooling::Mean
+            } else {
+                Pooling::First
+            }
+        } else {
+            pooling
+        };
+        let pooled = match selected_pooling {
             Pooling::None => None,
-            Pooling::First => Some(hidden[0].clone()),
+            Pooling::First | Pooling::Rank => Some(hidden[0].clone()),
             Pooling::Last => Some(hidden[hidden.len() - 1].clone()),
             Pooling::Mean => {
                 // The frozen pooling graph multiplies by a repeated F32
@@ -301,6 +394,22 @@ impl BertModel {
                 }
                 Some(sum.into_iter().map(|value| value as f32).collect())
             }
+        };
+        let pooled = if pooling == Pooling::Rank {
+            pooled
+                .map(|values| {
+                    let mut values = self.classify(values)?;
+                    if self.classifier.output_count > values.len() {
+                        return Err(Error::Unsupported(
+                            "BERT classifier extraction exceeds its graph width".into(),
+                        ));
+                    }
+                    values.truncate(self.classifier.output_count);
+                    Ok(values)
+                })
+                .transpose()?
+        } else {
+            pooled
         };
         if let Some(values) = &pooled {
             math::finite(values, "BERT pooled embedding")?;

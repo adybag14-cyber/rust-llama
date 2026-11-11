@@ -273,6 +273,50 @@ pub(crate) fn pointer_map_order(keys: &[usize], profile: Profile) -> Result<Vec<
     }
     map.order()
 }
+
+/// Frozen std::unordered_set<int32_t> as copied into a legacy batch token.
+/// MSVC hashes the four-byte object representation and its copy reinserts
+/// iteration order into the retained bucket count. GNU uses the integer hash
+/// and preserves list order during copy. The independent 569-case/profile
+/// corpus covers every size through 256, rehashes, collisions and duplicates.
+pub(crate) fn sequence_set_order(keys: &[i32], profile: Profile) -> Result<Vec<i32>> {
+    if keys.len() > 256 || keys.iter().any(|&key| !(0..256).contains(&key)) {
+        return Err("native encoder sequence set exceeds the measured I32 domain".into());
+    }
+    let words: Vec<_> = keys.iter().map(|key| key.to_le_bytes()).collect();
+    let refs: Vec<_> = words.iter().map(|word| word.as_slice()).collect();
+    let mut map = NativeMap::new(
+        &refs,
+        profile,
+        Limits {
+            max_bytes: 128 * 1024,
+            max_work: 1_000_000,
+        },
+    )?;
+    for (index, key) in keys.iter().enumerate() {
+        let hash = match profile {
+            Profile::Msvc => string_hash(&words[index], Profile::Msvc),
+            Profile::Gnu => *key as u64,
+        };
+        map.insert_hash(index, hash)?;
+    }
+    if profile == Profile::Msvc {
+        let mut nodes = allocated(map.nodes.len())?;
+        let mut node = map.head;
+        while node != NONE {
+            nodes.push(node);
+            node = map.nodes[node].next;
+        }
+        map.buckets.fill(NONE);
+        map.head = NONE;
+        map.tail = NONE;
+        for node in nodes {
+            map.link(node);
+        }
+    }
+    Ok(map.order()?.into_iter().map(|index| keys[index]).collect())
+}
+
 fn string_hash(bytes: &[u8], profile: Profile) -> u64 {
     match profile {
         Profile::Msvc => bytes

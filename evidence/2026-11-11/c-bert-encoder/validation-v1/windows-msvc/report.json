@@ -1,0 +1,361 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "started_utc": "2026-11-11T18:52:46.130663+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.743,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 57.178,
+      "stdout": {
+        "bytes": 19504,
+        "sha256": "5262bdcd5d6d9adcbe4eb1b530f0c5f4cab38a9863fe4436ae15978cda9ba2be"
+      },
+      "stderr": {
+        "bytes": 4682,
+        "sha256": "e7f1a46ab54d35d4379bfa493bcd9c8f0a6f650ba32897f57c01bd10f24986c2"
+      },
+      "tests": {
+        "passed": 179,
+        "failed": 0,
+        "ignored": 11,
+        "suites": 25
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 4.184,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1138,
+        "sha256": "a26c4e571f25111dca4e72f59e4a4e1e9e11d2016b2fb64b54db42bd55746101"
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 213.57,
+      "stdout": {
+        "bytes": 19502,
+        "sha256": "1246275618e1f93df90efd3c685fc84a941fc14db4a88aa6ebb3dcd14e13eed3"
+      },
+      "stderr": {
+        "bytes": 5307,
+        "sha256": "4858733b87ce0a046f65dd9b8668c4bbc70e3bb9a4097d1ea732521775037d7b"
+      },
+      "tests": {
+        "passed": 179,
+        "failed": 0,
+        "ignored": 11,
+        "suites": 25
+      }
+    },
+    {
+      "name": "debug-library",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 2.457,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 178,
+        "sha256": "6ace375b08b0f36d347e9be44c471d700be068a32d2c3877d19c1183913fec79"
+      }
+    },
+    {
+      "name": "release-library",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 21.083,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 871,
+        "sha256": "38c5a3b13b270be4e4e34dec18f2389fbda3cbf1116f9fc0612e889b225543d7"
+      }
+    },
+    {
+      "name": "pretrained-native-rust",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked",
+        "context::encoder::tests::independent_pretrained_native_bert_encoder_corpus",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 5.05,
+      "stdout": {
+        "bytes": 200,
+        "sha256": "2468a62bb2d3c5026a521f87e669869ad040b65320c20cfc170bf4e298b882fd"
+      },
+      "stderr": {
+        "bytes": 296,
+        "sha256": "b93895ef79bb1b126df52c22bbbc12b0dc44140e4b75a7ae2cae6503bcc973d7"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "pretrained-facade-regression",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-inference",
+        "--test",
+        "bert_reference",
+        "--release",
+        "--offline",
+        "--locked",
+        "trained_bert_full_sequence_and_all_pooling_modes",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 16.567,
+      "stdout": {
+        "bytes": 174,
+        "sha256": "56322bd9821319d2d75196d51e739d8d5fabc49a84309f84382558423517f94a"
+      },
+      "stderr": {
+        "bytes": 360,
+        "sha256": "7d8711c326f3da38453f700b53577afadd38866d717caea94a9a8b77ab1d7c50"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "native-c-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay.py",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\validation-v1\\windows-msvc\\debug-c",
+        "all"
+      ],
+      "exit_code": 0,
+      "seconds": 42.974,
+      "stdout": {
+        "bytes": 681,
+        "sha256": "ba7370c0a0af55bc6f3ad1a5b65a0a9b1b95356c445ad81743e868b83cfdc725"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "native-c-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay.py",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-target-windows\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\validation-v1\\windows-msvc\\release-c",
+        "all"
+      ],
+      "exit_code": 0,
+      "seconds": 6.213,
+      "stdout": {
+        "bytes": 681,
+        "sha256": "3799a5c6e7252dc90407514deb954444d0320903aa3c4fc60cbb35fd0f79820d"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "fixture-audit",
+      "argv": [
+        "cargo",
+        "run",
+        "-p",
+        "xtask",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 13.136,
+      "stdout": {
+        "bytes": 198,
+        "sha256": "2de9fb7129ca817dbaea6112573a39fb04e0d2f03664d19a6f052aa5ab71d926"
+      },
+      "stderr": {
+        "bytes": 403,
+        "sha256": "17bc00b394effe6b7c5cfae4f46251916cc5ee615cfb57186800f181796c7527"
+      }
+    }
+  ],
+  "native_clients": {
+    "debug": {
+      "library": {
+        "bytes": 5692928,
+        "sha256": "8a07cd28a730a192ca93069cbe46504010dd62ae91df201d979e5083a69b7756"
+      },
+      "exports": {
+        "implemented": 230,
+        "extensions": 4,
+        "missing": 25
+      },
+      "encoder": {
+        "cases": 192,
+        "float_values": 37384,
+        "max_abs": 0.0,
+        "bitwise_different": 0,
+        "report": {
+          "bytes": 98936,
+          "sha256": "fef809d3bf3fc79680cc42849f6d43eb6b45fa936b492f2de066f398fbe11958"
+        }
+      }
+    },
+    "release": {
+      "library": {
+        "bytes": 2476544,
+        "sha256": "ed6860e7b415e8bc6df4a7d7cb747456f94cb31375cc206b09004169cbe14716"
+      },
+      "exports": {
+        "implemented": 230,
+        "extensions": 4,
+        "missing": 25
+      },
+      "encoder": {
+        "cases": 192,
+        "float_values": 37384,
+        "max_abs": 0.0,
+        "bitwise_different": 0,
+        "report": {
+          "bytes": 98944,
+          "sha256": "e15a4b13b046789ab7c4c953a5ae8fdde24627996bcb3448995d4d516369b05d"
+        }
+      }
+    }
+  },
+  "execution_inputs": {
+    "files": 1560,
+    "bytes": 232488,
+    "sha256": "03ecf284be444fdaf17e79d78ccde27b79a9801c7a601b2940bfbefff3fddf57"
+  },
+  "driver": {
+    "bytes": 7310,
+    "sha256": "96039746835e3f9bf9f37f4265f5a2c7651ef3f433b08dc0b37ad0135b16981b"
+  },
+  "replay_driver": {
+    "bytes": 4177,
+    "sha256": "3f42a15cc17f514cbfc72dcfe541aaef3b694a8e53c6251989ebc43a70e38434"
+  },
+  "git_head": "37ba10da13aff8bc10bfe1ecb7b650b1c68029a7",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "error": "AssertionError('validation inputs changed')",
+  "finished_utc": "2026-11-11T18:59:14.515902+00:00"
+}

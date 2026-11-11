@@ -7,7 +7,12 @@ ffi!(
     ptr::null_mut(),
     {
         let context = unsafe { reference(context)? };
-        Ok(ptr::addr_of!(context.runtime).cast_mut())
+        Ok(match &context.runtime {
+            crate::context::ContextRuntime::Decoder(runtime) => {
+                ptr::from_ref(runtime.as_ref()).cast_mut()
+            }
+            crate::context::ContextRuntime::Encoder(_) => ptr::null_mut(),
+        })
     }
 );
 ffi!(

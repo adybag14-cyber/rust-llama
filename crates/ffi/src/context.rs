@@ -6,11 +6,18 @@ use llama_model_runtime::{
 use std::collections::BTreeMap;
 use std::ffi::c_void;
 
+pub(crate) mod encoder;
+
+pub(crate) enum ContextRuntime {
+    Decoder(Box<NativeContext>),
+    Encoder(Box<encoder::BertEncoderContext>),
+}
+
 pub struct ContextHandle {
     // A distinct borrowed handle preserves model access after its original owner is freed.
     pub(crate) model_handle: Box<ModelHandle>,
     pub(crate) adapters: crate::adapter::ContextAdapters,
-    pub(crate) runtime: NativeContext,
+    pub(crate) runtime: ContextRuntime,
     pub(crate) state_snapshots: BTreeMap<i32, Vec<u8>>,
     n_ctx: u32,
     n_ctx_seq: u32,
@@ -27,6 +34,7 @@ pub struct ContextHandle {
 }
 unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut ContextHandle> {
     let data = unsafe { reference(model)? }.data.clone();
+    let is_encoder = data.architecture == "bert";
     let loaded = data
         .model
         .as_ref()
@@ -50,8 +58,8 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     let value_type = cache_type(p.type_v)?;
     if p.ctx_type != 0
         || ![-1, 0].contains(&p.rope_scaling_type)
-        || ![-1, 0].contains(&p.pooling_type)
-        || ![-1, 0].contains(&p.attention_type)
+        || !(if is_encoder { -1..=4 } else { -1..=0 }).contains(&p.pooling_type)
+        || !(if is_encoder { -1..=1 } else { -1..=0 }).contains(&p.attention_type)
         || ![-1, 0, 1].contains(&p.flash_attn_type)
     {
         return Err("only default decoder, unscaled RoPE, no pooling, causal attention and defined AUTO/DISABLED/ENABLED flash modes are supported".into());
@@ -97,7 +105,20 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     } else {
         p.n_ctx
     };
-    let n_batch = p.n_batch.min(n_ctx);
+    if n_ctx == 0 || n_ctx > i32::MAX as u32 {
+        return Err("native context length must be in 1..=INT32_MAX".into());
+    }
+    let causal = !is_encoder
+        || match p.attention_type {
+            -1 => data.causal_attention,
+            0 => true,
+            _ => false,
+        };
+    let n_batch = if causal {
+        p.n_batch.min(n_ctx)
+    } else {
+        p.n_batch
+    };
     // The frozen output reserve asserts if n_seq_max exceeds its default
     // n_batch output-row ceiling. Reject that source-invalid configuration
     // before construction instead of exposing a process abort through C.
@@ -114,27 +135,85 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
     // to the same CPU as the model layer. Within this admitted Llama/F32-or-F16
     // domain AUTO therefore resolves to enabled; other architectures/devices
     // remain outside this constructor's compatibility scope.
-    let runtime = NativeContext::new_with_execution(
-        loaded.runtime_model().map_err(|e| e.to_string())?,
-        NativeContextOptions {
-            context_tokens: n_ctx as usize,
-            maximum_sequences: p.n_seq_max as usize,
-            microbatch_tokens: n_ubatch as usize,
-            maximum_batch_tokens: n_batch as usize,
-            unified: p.kv_unified != 0,
-        },
-        key_type,
-        value_type,
-        NativeExecutionOptions {
-            flash_attention: p.flash_attn_type != 0,
-            threads,
-            threads_batch,
-            embeddings: p.embeddings != 0,
-        },
-    )
-    .map_err(|e| e.to_string())?;
-    let n_ctx = runtime.context_tokens() as u32;
-    let n_ctx_seq = runtime.context_tokens_per_sequence() as u32;
+    let (runtime, n_ctx, n_ctx_seq) = if is_encoder {
+        let model = loaded.bert_model().map_err(|e| e.to_string())?;
+        let pooling = if p.pooling_type < 0 {
+            encoder::pooling_id(
+                loaded
+                    .default_embedding_pooling()
+                    .unwrap_or(llama_model_runtime::Pooling::None),
+            )
+        } else {
+            p.pooling_type
+        };
+        let encoder = encoder::BertEncoderContext::new(
+            model,
+            pooling,
+            causal,
+            n_batch as usize,
+            p.n_seq_max as usize,
+            NativeExecutionOptions {
+                flash_attention: p.flash_attn_type != 0,
+                threads,
+                threads_batch,
+                embeddings: p.embeddings != 0,
+            },
+        )?;
+        let rounded = n_ctx
+            .checked_add(255)
+            .ok_or("BERT context padding overflow")?
+            / 256
+            * 256;
+        let per_sequence = if p.kv_unified != 0 {
+            rounded
+        } else {
+            (rounded / p.n_seq_max)
+                .checked_add(255)
+                .ok_or("BERT sequence padding overflow")?
+                / 256
+                * 256
+        };
+        let total = if p.kv_unified != 0 {
+            rounded
+        } else {
+            per_sequence
+                .checked_mul(p.n_seq_max)
+                .ok_or("BERT context total overflow")?
+        };
+        (
+            ContextRuntime::Encoder(Box::new(encoder)),
+            total,
+            per_sequence,
+        )
+    } else {
+        let runtime = NativeContext::new_with_execution(
+            loaded.runtime_model().map_err(|e| e.to_string())?,
+            NativeContextOptions {
+                context_tokens: n_ctx as usize,
+                maximum_sequences: p.n_seq_max as usize,
+                microbatch_tokens: n_ubatch as usize,
+                maximum_batch_tokens: n_batch as usize,
+                unified: p.kv_unified != 0,
+            },
+            key_type,
+            value_type,
+            NativeExecutionOptions {
+                flash_attention: p.flash_attn_type != 0,
+                threads,
+                threads_batch,
+                embeddings: p.embeddings != 0,
+            },
+        )
+        .map_err(|e| e.to_string())?;
+
+        let total = runtime.context_tokens() as u32;
+        let per_sequence = runtime.context_tokens_per_sequence() as u32;
+        (
+            ContextRuntime::Decoder(Box::new(runtime)),
+            total,
+            per_sequence,
+        )
+    };
     Ok(Box::into_raw(Box::new(ContextHandle {
         model_handle: Box::new(ModelHandle { data, owned: false }),
         adapters: crate::adapter::ContextAdapters::default(),
@@ -150,7 +229,11 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         abort_data: p.abort_callback_data,
         logits: Vec::new(),
         embeddings: Vec::new(),
-        output_ids: Vec::new(),
+        output_ids: if is_encoder {
+            vec![None; n_batch as usize]
+        } else {
+            Vec::new()
+        },
         output_count: 0,
     })))
 }
@@ -206,24 +289,21 @@ ffi!(
     llama_pooling_type(context: *const ContextHandle) -> i32,
     -1,
     {
-        unsafe {
-            reference(context)?;
-        }
-        Ok(0)
+        let context = unsafe { reference(context)? };
+        Ok(match &context.runtime {
+            ContextRuntime::Decoder(_) => 0,
+            ContextRuntime::Encoder(encoder) => encoder.pooling_id,
+        })
     }
 );
 ffi!(llama_n_threads(context: *mut ContextHandle) -> i32, 0, {
-    Ok(unsafe { reference(context)? }
-        .runtime
-        .execution_options()
-        .threads as i32)
+    Ok(unsafe { reference(context)? }.execution_options().threads as i32)
 });
 ffi!(
     llama_n_threads_batch(context: *mut ContextHandle) -> i32,
     0,
     {
         Ok(unsafe { reference(context)? }
-            .runtime
             .execution_options()
             .threads_batch as i32)
     }
@@ -235,10 +315,13 @@ ffi!(
         let generation =
             usize::try_from(generation).map_err(|_| "negative generation worker count")?;
         let batch = usize::try_from(batch).map_err(|_| "negative batch worker count")?;
-        unsafe { reference_mut(context)? }
-            .runtime
-            .set_threads(generation, batch)
-            .map_err(|error| error.to_string())
+        let context = unsafe { reference_mut(context)? };
+        match &mut context.runtime {
+            ContextRuntime::Decoder(runtime) => runtime
+                .set_threads(generation, batch)
+                .map_err(|e| e.to_string()),
+            ContextRuntime::Encoder(runtime) => runtime.set_threads(generation, batch),
+        }
     }
 );
 ffi!(
@@ -247,7 +330,10 @@ ffi!(
     {
         let enabled = boolean(enabled)?;
         let context = unsafe { reference_mut(context)? };
-        context.runtime.set_embeddings(enabled);
+        match &mut context.runtime {
+            ContextRuntime::Decoder(runtime) => runtime.set_embeddings(enabled),
+            ContextRuntime::Encoder(runtime) => runtime.execution.embeddings = enabled,
+        }
         context.embeddings_enabled = enabled;
         Ok(())
     }
@@ -256,23 +342,29 @@ ffi!(
     llama_get_causal_attn(context: *const ContextHandle) -> bool,
     false,
     {
-        unsafe {
-            reference(context)?;
-        }
-        Ok(true)
+        let context = unsafe { reference(context)? };
+        Ok(match &context.runtime {
+            ContextRuntime::Decoder(_) => true,
+            ContextRuntime::Encoder(runtime) => runtime.causal,
+        })
     }
 );
 ffi!(
     llama_set_causal_attn(context: *mut ContextHandle, causal: u8) -> (),
     (),
     {
-        unsafe {
-            reference_mut(context)?;
+        let context = unsafe { reference_mut(context)? };
+        let causal = boolean(causal)?;
+        match &mut context.runtime {
+            ContextRuntime::Decoder(_) if !causal => {
+                Err("non-causal attention is not implemented for this decoder".into())
+            }
+            ContextRuntime::Decoder(_) => Ok(()),
+            ContextRuntime::Encoder(runtime) => {
+                runtime.causal = causal;
+                Ok(())
+            }
         }
-        if !boolean(causal)? {
-            return Err("non-causal attention is not implemented for this decoder".into());
-        }
-        Ok(())
     }
 );
 ffi!(
@@ -299,6 +391,9 @@ ffi!(llama_synchronize(context: *mut ContextHandle) -> (), (), {
 
 unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> {
     let c = unsafe { reference_mut(context)? };
+    if matches!(c.runtime, ContextRuntime::Encoder(_)) {
+        return unsafe { encoder::encode(c, batch) };
+    }
     let n = count(batch.n_tokens)?;
     if n == 0 || n > c.n_batch as usize {
         return Err("empty or oversized decode batch".into());
@@ -360,12 +455,12 @@ unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> 
         };
         let sequence = sequences[0];
         for &id in &sequences {
-            if id < 0 || id as usize >= c.runtime.sequence_id_limit() {
+            if id < 0 || id as usize >= c.decoder()?.sequence_id_limit() {
                 return Err("batch sequence ID exceeds the configured native memory limit".into());
             }
         }
         let expected = *next.entry(sequence).or_insert(
-            c.runtime
+            c.decoder()?
                 .next_position(sequence)
                 .map_err(|e| e.to_string())? as usize,
         );
@@ -407,9 +502,11 @@ pub(crate) fn execute_native_batch(
     let n = runtime_batch.len();
     let abort = c.abort;
     let abort_data = c.abort_data;
-    let outputs = c.runtime.decode_batch_with_cancel(runtime_batch, || {
-        abort.is_some_and(|callback| unsafe { callback(abort_data) })
-    });
+    let outputs = c
+        .decoder_mut()?
+        .decode_batch_with_cancel(runtime_batch, || {
+            abort.is_some_and(|callback| unsafe { callback(abort_data) })
+        });
     let outputs = match outputs {
         Ok(v) => v,
         Err(error) => {
@@ -466,6 +563,9 @@ ffi!(
     ptr::null_mut(),
     {
         let c = unsafe { reference_mut(context)? };
+        if let ContextRuntime::Encoder(encoder) = &mut c.runtime {
+            return Ok(encoder.logits_pointer());
+        }
         Ok(if c.logits.is_empty() {
             ptr::null_mut()
         } else {
@@ -479,6 +579,9 @@ ffi!(
     {
         let c = unsafe { reference_mut(context)? };
         let row = output_index(c, index)?;
+        if let ContextRuntime::Encoder(encoder) = &mut c.runtime {
+            return encoder.logits_row_pointer(row);
+        }
         let offset = row
             .checked_mul(c.model_handle.data.vocab.texts.len())
             .ok_or("logit offset overflow")?;
@@ -493,6 +596,9 @@ ffi!(
     ptr::null_mut(),
     {
         let c = unsafe { reference_mut(context)? };
+        if let ContextRuntime::Encoder(encoder) = &mut c.runtime {
+            return Ok(encoder.embeddings_pointer());
+        }
         Ok(if c.embeddings.is_empty() {
             ptr::null_mut()
         } else {
@@ -506,6 +612,9 @@ ffi!(
     {
         let c = unsafe { reference_mut(context)? };
         let row = output_index(c, index)?;
+        if let ContextRuntime::Encoder(encoder) = &mut c.runtime {
+            return encoder.embeddings_row_pointer(row);
+        }
         let offset = row
             .checked_mul(c.model_handle.data.width as usize)
             .ok_or("embedding offset overflow")?;
@@ -518,6 +627,7 @@ ffi!(
 
 pub(crate) unsafe fn sampling_values(context: *mut ContextHandle, index: i32) -> Result<Vec<f32>> {
     let c = unsafe { reference(context)? };
+    c.decoder()?;
     let row = output_index(c, index)?;
     let width = c.model_handle.data.vocab.texts.len();
     let offset = row
@@ -533,6 +643,28 @@ pub(crate) unsafe fn sampling_values(context: *mut ContextHandle, index: i32) ->
 }
 
 impl ContextHandle {
+    pub(crate) fn decoder(&self) -> Result<&NativeContext> {
+        match &self.runtime {
+            ContextRuntime::Decoder(runtime) => Ok(runtime),
+            ContextRuntime::Encoder(_) => {
+                Err("this operation requires decoder memory; BERT has no decoder KV state".into())
+            }
+        }
+    }
+    pub(crate) fn decoder_mut(&mut self) -> Result<&mut NativeContext> {
+        match &mut self.runtime {
+            ContextRuntime::Decoder(runtime) => Ok(runtime),
+            ContextRuntime::Encoder(_) => {
+                Err("this operation requires decoder memory; BERT has no decoder KV state".into())
+            }
+        }
+    }
+    fn execution_options(&self) -> NativeExecutionOptions {
+        match &self.runtime {
+            ContextRuntime::Decoder(runtime) => runtime.execution_options(),
+            ContextRuntime::Encoder(runtime) => runtime.execution,
+        }
+    }
     pub(crate) fn extended_batch_configuration(&self) -> (usize, usize, usize, usize, bool) {
         (
             self.n_batch as usize,

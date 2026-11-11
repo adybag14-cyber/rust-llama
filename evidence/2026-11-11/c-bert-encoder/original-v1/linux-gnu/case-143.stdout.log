@@ -1,0 +1,18 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x000071e8376ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x000071e8376ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x000071e8379456cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#2  0x000071e837945862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#3  0x000071e8370773ea in ggml_compute_forward_add_non_quantized () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-cpu.so.0
+#4  0x000071e837035319 in ggml_graph_compute_thread.isra () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-cpu.so.0
+#5  0x000071e837037110 in ggml_graph_compute () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-cpu.so.0
+#6  0x000071e8370375ef in ggml_backend_cpu_graph_compute(ggml_backend*, ggml_cgraph*) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-cpu.so.0
+#7  0x000071e8379657c6 in ggml_backend_sched_graph_compute_async () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so.0
+#8  0x000071e8373d4e1b in llama_context::graph_compute(ggml_cgraph*, bool) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#9  0x000071e8373d75e5 in llama_context::process_ubatch(llama_ubatch const&, llm_graph_type, llama_memory_context_i*, ggml_status&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#10 0x000071e8373e11a8 in llama_context::encode(llama_batch_ext const&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#11 0x000071e8373e1d5c in llama_context::encode(llama_batch const&) () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#12 0x000071e8373e1db0 in llama_encode () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0
+#13 0x00005b6ffe71c6c3 in main ()
+[Inferior 1 (process 4303) detached]

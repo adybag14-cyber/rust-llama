@@ -1,0 +1,316 @@
+
+running 64 tests
+test abi::tests::frozen_x64_layout ... ok
+test adapter::tests::failed_adapter_updates_preserve_active_weights_kv_and_outputs ... ok
+test adapter::tests::loaded_adapter_and_context_own_weights_and_model_lifetimes ... ok
+test adapter::tests::metadata_and_tied_embedding_checked_boundaries_are_explicit ... ok
+test adapter::tests::native_pointer_map_order_is_exact_for_both_compilers ... ok
+test adapter::tests::original_lora_load_metadata_buffers_and_invocation_tokens_are_exact ... ok
+test adapter::tests::reused_handle_slot_refreshes_owned_execution_weights ... ok
+test batch::tests::allocated_token_and_embedding_batches_have_native_shape_and_safe_free ... ok
+test batch::tests::unsafe_allocation_sizes_fail_without_allocating ... ok
+test batch_ext::tests::checked_descriptor_overflow_and_invalid_bool_preserve_owned_rows ... ok
+test batch_ext::tests::original_extended_batch_builders_and_decode_are_exact ... ok
+test adapter::tests::original_lora_control_vectors_and_retained_kv_execution_are_bit_exact ... ok
+test chat::tests::checked_foreign_boundaries_preserve_output ... ok
+test chat::tests::all_original_c_chat_bytes_buffers_and_builtin_layouts ... ok
+test chat::tests::source_undefined_signed_case_conversion_is_checked_and_safe_text_api_is_unchanged ... ok
+test context::encoder::tests::encoder_ownership_and_source_invalid_inputs_are_bounded ... ok
+test context::encoder::tests::encoder_shape_preflight_precedes_foreign_input_copy ... ok
+test chat::tests::cumulative_input_and_output_limits_are_checked_before_writes ... ok
+test context::encoder::tests::independent_pretrained_native_bert_encoder_corpus ... ignored, requires the pinned external BGE model; set LLAMA_TEST_BERT_MODEL
+test context::encoder::tests::native_i32_set_order_matches_both_independent_compiler_profiles ... ok
+test context::encoder::tests::rust_embedding_facade_executes_optional_classifier_heads ... ok
+test context_reference_tests::malformed_state_is_atomic_and_device_state_requires_its_owner ... ok
+test context_reference_tests::native_memory_and_sequence_state_match_original_bytes_and_continuations ... ok
+test context::encoder::tests::independent_native_bert_encoder_corpus ... ok
+test context_reference_tests::original_physical_attention_rows_match_boundary_holes_and_shared_masks_bitwise ... ok
+test enum_names::tests::original_abort_cases_and_null_string_are_checked ... ok
+test enum_names::tests::original_enum_names_and_byte_load_modes ... ok
+test context_reference_tests::native_session_files_aliases_short_buffers_and_failure_side_effects ... ok
+test enum_names::tests::original_guessed_names_share_the_static_suffix_pointer ... ok
+test f16_context_reference_tests::original_default_layout_and_remaining_explicit_rejections ... ok
+test enum_names::tests::original_file_type_names_include_guessed_bits_and_unknown_values ... ok
+test model_metadata::tests::aggregate_metadata_budget_and_index_work_are_enforced ... ok
+test model_metadata::tests::raw_optional_copy_preserves_guards_and_null_capacity_contract ... ok
+test model_metadata_reference_tests::original_metadata_bytes_order_buffers_tokenization_and_continuation_logits ... ok
+test f16_context_reference_tests::original_four_dtype_pairs_nonflash_and_flash_state_and_continuations ... ok
+test model_shard_tests::split_list_tests::explicit_split_list_argument_guards_are_checked ... ok
+test model_shard_tests::original_auto_shard_loading_getters_and_inference ... ok
+test model_shard_tests::split_list_tests::explicit_split_list_copies_every_shard_before_foreign_callbacks ... ok
+test model_shard_tests::split_list_tests::model_path_owners_survive_foreign_callback_input_changes ... ok
+test model_shard_tests::split_list_tests::original_explicit_split_lists_getters_paths_and_inference ... ok
+test native_metadata_policy::tests::original_float_strings_preserve_rounding_sign_payload_and_full_ieee_range ... ok
+test native_metadata_policy::tests::policy_limits_reject_before_unbounded_growth_or_collision_work ... ok
+test native_metadata_policy::tests::every_native_hash_growth_snapshot_and_iteration_index ... ok
+test sampler::tests::chain_owns_children_rejects_cycles_and_remove_transfers_ownership ... ok
+test sampler::tests::cloned_distribution_and_copy_preserve_rng_and_reset ... ok
+test sampler::tests::frozen_windows_tied_sort_regressions ... ok
+test sampler::tests::malformed_candidates_do_not_advance_builtin_rng ... ok
+test sampler::tests::native_filter_retains_selection_and_xtc_advances_pointer ... ok
+test sampler::tests::penalty_accept_rejects_out_of_vocabulary_before_history_mutation ... ok
+test sampler::tests::sampler_layout_matches_frozen_x64_contract ... ok
+test sampler_grammar::tests::source_word_escaping_and_capture_start ... ok
+test sampler_perf_reference_tests::original_sampler_performance_and_logger_observations ... ok
+test sampler_perf_reference_tests::performance_misuse_and_invalid_logger_outputs_are_checked ... ok
+test sampler_reference_tests::empty_grammar_ignores_unused_pointers_and_owned_vocabulary_survives_model_free ... ok
+test sampler_reference_tests::frozen_dll_adaptive_rng_and_infill_candidate_corpus ... ok
+test sampler_reference_tests::frozen_dll_grammar_lazy_and_dry_corpus ... ok
+test sampler_reference_tests::pending_adaptive_clone_and_copy_fail_atomically ... ok
+test split_path::tests::original_split_helpers_bytes_signed_bounds_and_partial_buffers ... ok
+test split_path::tests::source_undefined_arguments_produce_checked_errors_before_writes ... ok
+test state::tests::actual_read_limit_does_not_depend_on_reported_file_length ... ok
+test state::tests::legacy_reader_arithmetic_rejects_oversized_offsets_before_access ... ok
+test tests::count_only_and_truncated_buffers_follow_c_conventions ... ok
+test tests::panic_is_contained_and_diagnostic_is_thread_local ... ok
+test native_microbatch_reference_tests::original_native_microbatches_defaults_workers_masks_and_exact_state ... ok
+
+test result: ok. 63 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 3.40s
+
+
+running 5 tests
+test stream::tests::invalid_utf8_and_tail_are_replaced_once ... ok
+test stream::tests::sink_failure_propagates ... ok
+test stream::tests::stop_spans_tokens_without_leaking_prefix ... ok
+test stream::tests::unmatched_stop_prefix_is_flushed ... ok
+test stream::tests::utf8_is_preserved_across_every_byte_boundary ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test missing_pooling_metadata_keeps_original_unpooled_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test big_endian_bert_preserves_the_same_native_model_outputs ... ignored, requires hash-pinned big-endian BERT model; set LLAMA_TEST_BERT_BE_MODEL and run --release --ignored --nocapture
+test trained_bert_full_sequence_and_all_pooling_modes ... ignored, requires hash-pinned external BERT model; set LLAMA_TEST_BERT_MODEL and run --release --ignored --nocapture
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test gpt2_context_checkpoint_cancellation_and_embedding_input ... ok
+test gpt2_weight_budget_context_and_position_table_boundaries ... ok
+test official_gpt2_f16_matches_original_native_profile ... ignored, requires pinned official GPT2 F16 conversion via LLAMA_TEST_GPT2_MODEL
+test gpt2_typed_metadata_and_unsupported_domains_are_explicit ... ok
+test original_gpt2_learned_positions_biases_storage_and_gqa ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+
+running 5 tests
+test gptneox_context_checkpoint_cancellation_and_embedding_input ... ok
+test gptneox_weight_budget_and_context_boundaries ... ok
+test official_pythia_14m_f16_matches_original_native_profile ... ignored, requires pinned official Pythia-14M F16 conversion via LLAMA_TEST_GPTNEOX_MODEL
+test gptneox_typed_metadata_and_unsupported_domains_are_explicit ... ok
+test original_gptneox_rope_residual_biases_storage_and_gqa ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+
+running 3 tests
+test cancellation_and_restore_keep_recurrent_state_transactional ... ok
+test required_shapes_unused_tensors_and_weight_budget_are_enforced ... ok
+test missing_invalid_and_overflowing_recurrent_metadata_fails_before_weights ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+
+running 8 tests
+test tiny_mamba_native_default_rms_and_untied_output ... ok
+test original_spm_68_unicode_special_and_empty_cases ... ok
+test trained_mamba130m_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external mamba-130m-hf.f16.gguf; set LLAMA_TEST_MAMBA_MODEL and run --release --ignored --nocapture
+test trained_qwen2_05b_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external Qwen2.5-0.5B Q4_K_M; set LLAMA_TEST_QWEN2_MODEL and run --release --ignored --nocapture
+test trained_smollm2_bpe_q4_k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external SmolLM2-135M-Q4_K_M.gguf; set LLAMA_TEST_BPE_MODEL and run --release --ignored --nocapture
+test trained_stories15m_q4_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories15M-q4_0.gguf; set LLAMA_TEST_Q4_MODEL and run --release --ignored --nocapture
+test trained_stories260k_full_logits_greedy_ids_and_text ... ignored, requires hash-pinned external stories260K.gguf; set LLAMA_TEST_MODEL and run --ignored --nocapture
+test tiny_qwen2_separate_fused_partial_bias_and_output_graphs ... ok
+
+test result: ok. 3 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+
+running 4 tests
+test missing_mis_shaped_or_unimplemented_qwen2_tensors_fail_explicitly ... ok
+test qwen2_unimplemented_model_modes_are_explicit ... ok
+test qwen2_source_typed_dimensions_and_limits_reject_malformed_files ... ok
+test source_rope_defaults_factor_precedence_and_single_file_counts_are_preserved ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.12s
+
+
+running 5 tests
+test official_qwen3_q8_matches_original_native_profile ... ignored, requires pinned official Qwen3-0.6B Q8_0 model via LLAMA_TEST_QWEN3_MODEL and 3 GiB decoded weight budget
+test original_active_vector_storage_and_ignored_fused_bias_types ... ok
+test native_qwen3_weight_and_context_boundaries_are_checked_before_execution ... ok
+test original_dense_qwen3_heads_norms_biases_storage_and_shards ... ok
+test qwen3_typed_metadata_and_unsupported_arrays_are_explicit ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.86s
+
+
+running 7 tests
+test automatic_discovery_preserves_unicode_file_paths ... ok
+test all_four_architectures_execute_original_sharded_native_corpora ... ok
+test cumulative_limits_include_every_shard_and_reads_remain_lazy ... ok
+test model_weight_budget_counts_all_shards_before_decoding ... ok
+test original_model_shard_admission_primary_metadata_and_file_origins ... ok
+test original_reader_headers_shapes_offsets_and_payloads ... ok
+test reads_keep_the_validated_file_handles_after_path_replacement ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.11s
+
+
+running 33 tests
+test context::allocation_tests::checked_overflow_and_concurrent_reservations_never_exceed_the_ledger ... ok
+test context::allocation_tests::explicit_default_and_zero_state_budget ... ok
+test context::allocation_tests::fork_checkpoint_restore_and_serialized_restore_fail_atomically ... ok
+test context::allocation_tests::initial_state_capacity_has_an_exact_checked_threshold ... ok
+test context::allocation_tests::live_checkpoints_and_fallible_copies_share_the_originating_budget ... ok
+test context::allocation_tests::pending_kv_growth_and_sequence_multiplicity_cannot_bypass_budget ... ok
+test context::allocation_tests::reset_removal_and_truncation_preserve_truthful_capacity_accounting ... ok
+test context::allocation_tests::serialized_output_reserve_is_checked_and_then_returns_caller_owned_bytes ... ok
+test context::native::native_batch::tests::both_original_compilers_select_the_same_native_input_order ... ok
+test context::native::native_batch::tests::unified_order_is_contiguous_and_empty_invalid_domains_are_checked ... ok
+test context::allocation_tests::every_fallible_state_reservation_rolls_back_when_allocation_fails ... ok
+test context::native::native_decode::tests::configured_workers_execute_each_actual_microbatch ... ok
+test context::native::native_decode::tests::flash_state_uses_untransposed_raw_half_bytes_and_rejects_cross_layout ... ok
+test context::native::native_decode::tests::worker_stack_budget_and_cancelled_decode_do_not_commit ... ok
+test context::native::native_kv::tests::half_storage_preserves_every_payload_without_conversion ... ok
+test context::native::native_kv::tests::typed_copy_rejects_mismatch_without_writes ... ok
+test context::native::native_decode::tests::complete_logical_row_maps_are_charged_before_state_clone ... ok
+test context::native::native_row_map::tests::original_row_map_bytes_and_logical_query_geometry ... ok
+test context::native::native_row_map::tests::source_slice_conditions_and_full_batch_bound ... ok
+test context::native::tests::decode_ids_use_configured_limit_while_memory_keeps_256_ids ... ok
+test context::native::tests::later_microbatches_are_counted_before_any_state_is_committed ... ok
+test context::native::tests::metadata_membership_is_fixed_and_queued_copies_reuse_buffers_in_order ... ok
+test context::native::tests::full_microbatch_metadata_is_counted_separately_from_attention_rows ... ok
+test context::native::tests::native_resource_limits_fail_before_allocating_or_mutating ... ok
+test math::native_attention_tests::twelve_bert_layers_match_original_scalar_attention ... ok
+test math::packed_matrix_tests::every_source_cpu_weight_type_loads_and_executes_through_matrix ... ok
+test math::packed_matrix_tests::packed_matrix_preserves_storage_and_native_activation_quantization ... ok
+test math::packed_matrix_tests::unsupported_dot_types_are_rejected_at_load ... ok
+test math::tests::attention_masks_and_physical_layout_bounds_fail_safely ... ok
+test math::tests::half_rounding_handles_normal_and_subnormal_ties_even ... ok
+test math::tests::overflowing_normalization_cannot_silently_create_zero_embeddings ... ok
+test state::tests::known_crc32_vector ... ok
+test context::native::tests::native_half_state_preserves_raw_payloads_and_rejects_wrong_storage_type_atomically ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+
+running 3 tests
+test finite_affine_weights_that_overflow_rollback_the_entire_batch ... ok
+test learned_position_and_affine_bias_changes_invalidate_saved_state ... ok
+test learned_position_capacity_and_required_shapes_are_checked ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test finite_projection_overflow_rolls_back_all_sequences_in_both_residual_modes ... ok
+test residual_rope_and_affine_changes_invalidate_saved_state ... ok
+test rotary_and_affine_shape_boundaries_are_checked ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test actual_original_graphs_preserve_row_boundaries_scaling_and_platform_policy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 1 test
+test explicit_sse2_prefix_matches_original_bits_on_either_host ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+
+running 2 tests
+test original_scalar_and_sse2_centered_variance_match_all_primitive_bits ... ok
+test actual_original_norm_graphs_match_native_policy_and_rounding ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 3 tests
+test llama_outputs_match_frozen_ggml_graph ... ok
+test bert_outputs_match_frozen_ggml_including_half_precision_gelu_table ... ok
+test mamba_outputs_match_frozen_ggml_scan_and_convolution ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test qwen2_late_output_overflow_rolls_back_other_sequences ... ok
+test finite_qwen2_projection_and_bias_overflow_cannot_commit_state ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test actual_kv_head_width_controls_growth_and_copy_budgets ... ok
+test cancellation_at_every_boundary_rolls_back_all_sequences_and_reservations ... ok
+test explicit_head_width_and_checked_shape_products ... ok
+test finite_weights_with_nonfinite_execution_never_commit_partial_state ... ok
+test fork_truncate_serialization_and_model_identity_preserve_state ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 29 tests
+test bad_adapters_leave_configuration_and_state_unchanged ... ok
+test batching_and_microbatch_boundaries_preserve_decode ... ok
+test bert_is_bidirectional_and_pooling_preserves_token_results ... ok
+test bert_mean_pooling_preserves_large_finite_values_without_sum_overflow ... ok
+test cancellation_inside_layer_and_before_commit_is_atomic ... ok
+test checked_state_decoder_rejects_forged_shapes_counts_and_nonfinite ... ok
+test context_limit_failure_preserves_prior_state ... ok
+test copied_prefix_diverges_without_mutating_original_sequence ... ok
+test exact_registry_ids_names_and_explicit_unsupported_models ... ok
+test interleaved_sequences_remain_independent ... ok
+test invalid_positions_sequence_ids_and_capacity_do_not_commit ... ok
+test kv_suffix_truncation_matches_recomputed_prefix ... ok
+test late_failure_rolls_back_every_sequence_and_prior_microbatch ... ok
+test lora_rank_scaling_and_composition_have_independent_expected_delta ... ok
+test malformed_model_shapes_and_norms_fail_before_execution ... ok
+test mamba_dimensions_are_checked_before_state_arithmetic ... ok
+test mamba_optional_dt_b_c_norm_and_one_tap_convolution_execute ... ok
+test matrix_shape_nonfinite_and_overflow_are_rejected ... ok
+test noncanonical_adapter_layer_names_are_rejected_instead_of_silently_ignored ... ok
+test numeric_overflow_is_an_error_and_cannot_poison_cache ... ok
+test public_config_dimension_helpers_reject_zero_invalid_and_overflowing_shapes ... ok
+test recurrent_rejection_uses_checkpoint_and_rejects_fake_inverse ... ok
+test requested_outputs_are_selected_without_dropping_state_updates ... ok
+test smoke_demo_is_real_execution_with_reproducible_state ... ok
+test state_rejects_different_model_weights_or_adapters ... ok
+test supplied_embeddings_match_tokens_and_validate_shape ... ok
+test state_roundtrip_resumes_both_attention_and_recurrence ... ok
+test valid_control_vector_resets_cache_and_changes_model_output ... ok
+test truncated_or_corrupted_state_never_mutates_context ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

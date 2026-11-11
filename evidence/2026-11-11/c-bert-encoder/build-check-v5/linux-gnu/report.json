@@ -1,0 +1,52 @@
+{
+  "status": "failed",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 7.389856815338135
+    },
+    {
+      "name": "check",
+      "argv": [
+        "cargo",
+        "check",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 5.231917858123779
+    },
+    {
+      "name": "encoder-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-ffi",
+        "context::encoder",
+        "--locked",
+        "--offline",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 7.635736465454102
+    }
+  ],
+  "error": "encoder-tests failed"
+}

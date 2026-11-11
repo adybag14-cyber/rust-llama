@@ -2,10 +2,18 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **226**, leaves
-**29 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **230**, leaves
+**25 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md and ADAPTERS.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, ADAPTERS.md and ENCODER.md.
+
+The encoder checkpoint adds `llama_encode`, `llama_get_embeddings_seq`,
+`llama_model_n_cls_out` and `llama_model_cls_label` with real complete-batch
+BERT execution, native sequence grouping, pooling and optional classifier
+heads. It admits full BERT loading and context ownership. ENCODER.md records
+the independently captured MSVC/GNU ordering, numerical, output-lifetime and
+bounded-error contract. Decoder-only memory, state and adapter execution are
+not extended to BERT.
 
 The adapter checkpoint adds ten real LoRA/control-vector functions. Owned GGUF
 weights, scalar metadata, invocation-token storage, native ordered composition
@@ -24,8 +32,8 @@ client passes on all four Rust libraries; see `evidence/2026-11-11/c-batch-ext`.
 It adds twelve public builders and llama_process
 for the existing admitted dense Llama decode contexts. BATCH_EXT.md records
 source builder side effects, owned embedding storage, mixed input, output rules
-and the independently captured Windows/GNU corpus. Encode and other native
-context architectures remain open.
+and the independently captured Windows/GNU corpus. The subsequent encoder checkpoint is scoped separately in ENCODER.md;
+BERT extended-batch processing and other native context architectures remain open.
 
 The model-metadata/chat extension adds five scalar metadata exports and two
 byte-oriented chat exports. Their independent fixtures and native client checks
@@ -97,6 +105,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_copy_state_data` |
 | `llama_decode` |
 | `llama_detokenize` |
+| `llama_encode` |
 | `llama_flash_attn_type_name` |
 | `llama_free` |
 | `llama_free_model` |
@@ -104,6 +113,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_causal_attn` |
 | `llama_get_embeddings` |
 | `llama_get_embeddings_ith` |
+| `llama_get_embeddings_seq` |
 | `llama_get_logits` |
 | `llama_get_logits_ith` |
 | `llama_get_memory` |
@@ -129,6 +139,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_memory_seq_pos_min` |
 | `llama_memory_seq_rm` |
 | `llama_model_chat_template` |
+| `llama_model_cls_label` |
 | `llama_model_decoder_start_token` |
 | `llama_model_default_params` |
 | `llama_model_desc` |
@@ -147,6 +158,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_model_meta_key_str` |
 | `llama_model_meta_val_str` |
 | `llama_model_meta_val_str_by_index` |
+| `llama_model_n_cls_out` |
 | `llama_model_n_ctx_train` |
 | `llama_model_n_embd` |
 | `llama_model_n_embd_inp` |
@@ -307,8 +319,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_adapter_lora_init_from_file_ptr` |
 | `llama_attach_threadpool` |
 | `llama_detach_threadpool` |
-| `llama_encode` |
-| `llama_get_embeddings_seq` |
 | `llama_get_sampled_candidates_count_ith` |
 | `llama_get_sampled_candidates_ith` |
 | `llama_get_sampled_logits_count_ith` |
@@ -316,10 +326,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_sampled_probs_count_ith` |
 | `llama_get_sampled_probs_ith` |
 | `llama_get_sampled_token_ith` |
-| `llama_model_cls_label` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
-| `llama_model_n_cls_out` |
 | `llama_model_quantize` |
 | `llama_model_quantize_default_params` |
 | `llama_model_save_to_file` |

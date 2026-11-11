@@ -1,0 +1,891 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "models": [
+    "first.gguf",
+    "labels-only.gguf",
+    "last.gguf",
+    "mean.gguf",
+    "plain-bf16.gguf",
+    "plain-f16.gguf",
+    "plain.gguf",
+    "rank-dense-only.gguf",
+    "rank-full.gguf",
+    "rank-mean.gguf",
+    "rank-no-bias.gguf",
+    "rank-one.gguf",
+    "rank-mean-u32.gguf"
+  ],
+  "cases": [
+    {
+      "name": "rank-mean-u32.gguf:pool-1",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": -1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:pool0",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 0
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:pool1",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:pool2",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 2
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:pool3",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 3
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:pool4",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:auto",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            104,
+            102
+          ]
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "flags": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:positions",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            3,
+            0,
+            3,
+            1
+          ]
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            3,
+            4,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:interleaved",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            106,
+            107,
+            102
+          ],
+          "positions": [
+            0,
+            0,
+            1,
+            1,
+            2,
+            2
+          ],
+          "sequences": [
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:shared-first",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              0,
+              2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:shared-duplicate",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:sparse-ids",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "sequences": [
+            [
+              3
+            ],
+            [
+              1
+            ],
+            [
+              3
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rank-mean-u32.gguf:row-embedding",
+      "model": "rank-mean-u32.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "embedding": [
+            [
+              0.1,
+              -0.2,
+              0.3,
+              -0.4
+            ],
+            [
+              1.0,
+              0.0,
+              0.5,
+              -0.5
+            ],
+            [
+              0.2,
+              0.4,
+              0.6,
+              0.8
+            ]
+          ],
+          "positions": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash-1:pool0",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 0,
+        "sequences": 4,
+        "flash": -1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash-1:pool1",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 1,
+        "sequences": 4,
+        "flash": -1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash-1:pool4",
+      "model": "rank-full.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4,
+        "flash": -1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash1:pool0",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 0,
+        "sequences": 4,
+        "flash": 1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash1:pool1",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 1,
+        "sequences": 4,
+        "flash": 1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shared-native-order:flash1:pool4",
+      "model": "rank-full.gguf",
+      "params": {
+        "pooling": 4,
+        "sequences": 4,
+        "flash": 1
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            1,
+            2
+          ],
+          "sequences": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2,
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "interleaved:flash-workers4",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 0,
+        "sequences": 4,
+        "flash": 1,
+        "threads": 4,
+        "threads_batch": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            106,
+            107,
+            102
+          ],
+          "positions": [
+            0,
+            0,
+            1,
+            1,
+            2,
+            2
+          ],
+          "sequences": [
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ],
+            [
+              2
+            ],
+            [
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "noncausal:batch-larger-than-raw-context",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 1,
+        "sequences": 4,
+        "attention": 1,
+        "context": 8,
+        "batch": 32,
+        "ubatch": 32
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102,
+            101,
+            104,
+            105,
+            102,
+            101,
+            104,
+            105,
+            102,
+            101,
+            104,
+            105,
+            102
+          ],
+          "positions": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "sequences": [
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cancel-after-five:pool1",
+      "model": "plain.gguf",
+      "params": {
+        "pooling": 1,
+        "sequences": 4
+      },
+      "ops": [
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            104,
+            105,
+            102
+          ]
+        },
+        {
+          "op": "abort",
+          "after": 5
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            101,
+            107,
+            102
+          ]
+        },
+        {
+          "op": "abort",
+          "after": 0
+        },
+        {
+          "op": "encode",
+          "tokens": [
+            104,
+            102
+          ]
+        }
+      ]
+    }
+  ],
+  "source_assertion_cases": []
+}

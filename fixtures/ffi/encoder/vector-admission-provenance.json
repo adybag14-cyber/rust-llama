@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "license": "Synthetic tiny weights are project fixture data. Original source behavior is from the pinned MIT-licensed llama.cpp archive; no implementation is copied into this fixture.",
+  "pre_guard_seal": {
+    "bytes": 2280,
+    "sha256": "ccdac4597ff86fd9cbbf1a2997743b4ceb1bd97ec6e53ee1728e9f8edb859cbb"
+  },
+  "input_provenance": {
+    "schema": 1,
+    "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+    "generator": {
+      "bytes": 3118,
+      "sha256": "5820e1c5740831fd4d25e423e4d0d1fed0c19caabdb5eb770b66662e51d74f32"
+    },
+    "variants": [
+      {
+        "name": "active-norm-weight-f16.gguf",
+        "base": "plain.gguf",
+        "base_identity": {
+          "bytes": 6832,
+          "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+        },
+        "target_tensor": "token_embd_norm.weight",
+        "stored_dtype": 1,
+        "removed_tensors": [],
+        "result": {
+          "bytes": 6848,
+          "sha256": "fd29d2a92f797ea908664bcf5ded77e49853f035fc56110e84ff156aa868c711"
+        }
+      },
+      {
+        "name": "active-norm-bias-bf16.gguf",
+        "base": "plain.gguf",
+        "base_identity": {
+          "bytes": 6832,
+          "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+        },
+        "target_tensor": "token_embd_norm.bias",
+        "stored_dtype": 30,
+        "removed_tensors": [],
+        "result": {
+          "bytes": 6848,
+          "sha256": "f7e546a15658d1ded03ff792e9962d3357f3591ff44dd0111bbd7d67c73e5dea"
+        }
+      },
+      {
+        "name": "active-attention-bias-f16.gguf",
+        "base": "plain.gguf",
+        "base_identity": {
+          "bytes": 6832,
+          "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+        },
+        "target_tensor": "blk.0.attn_q.bias",
+        "stored_dtype": 1,
+        "removed_tensors": [],
+        "result": {
+          "bytes": 6848,
+          "sha256": "3e9d4918c5bc26405fe5f4f76b144ef964e1f8e2a2aec0311eb1e10c284e0fc2"
+        }
+      },
+      {
+        "name": "active-classifier-dense-bias-f16.gguf",
+        "base": "rank-full.gguf",
+        "base_identity": {
+          "bytes": 7328,
+          "sha256": "302589efa528d4766b7da029821137e681389a83513d7ccd328621c297b2020e"
+        },
+        "target_tensor": "cls.bias",
+        "stored_dtype": 1,
+        "removed_tensors": [],
+        "result": {
+          "bytes": 7328,
+          "sha256": "6564bade9dd3d3a2d3d9cf56962d576277d54a08fde73a1fa131c07ae5f0987c"
+        }
+      },
+      {
+        "name": "active-classifier-output-bias-bf16.gguf",
+        "base": "rank-full.gguf",
+        "base_identity": {
+          "bytes": 7328,
+          "sha256": "302589efa528d4766b7da029821137e681389a83513d7ccd328621c297b2020e"
+        },
+        "target_tensor": "cls.output.bias",
+        "stored_dtype": 30,
+        "removed_tensors": [],
+        "result": {
+          "bytes": 7328,
+          "sha256": "1302cb763ce64314d0e40080c0fb8d9fe4aec269feb3e167c8b95f3e273f869a"
+        }
+      },
+      {
+        "name": "ignored-classifier-dense-bias-f16.gguf",
+        "base": "rank-full.gguf",
+        "base_identity": {
+          "bytes": 7328,
+          "sha256": "302589efa528d4766b7da029821137e681389a83513d7ccd328621c297b2020e"
+        },
+        "target_tensor": "cls.bias",
+        "stored_dtype": 1,
+        "removed_tensors": [
+          "cls.weight"
+        ],
+        "result": {
+          "bytes": 7232,
+          "sha256": "33c47eda0be58fc3fa93284ac509cab7327040c44b5352c9f4c2fb807e5eb7e4"
+        }
+      },
+      {
+        "name": "ignored-classifier-output-bias-bf16.gguf",
+        "base": "rank-full.gguf",
+        "base_identity": {
+          "bytes": 7328,
+          "sha256": "302589efa528d4766b7da029821137e681389a83513d7ccd328621c297b2020e"
+        },
+        "target_tensor": "cls.output.bias",
+        "stored_dtype": 30,
+        "removed_tensors": [
+          "cls.output.weight"
+        ],
+        "result": {
+          "bytes": 7232,
+          "sha256": "f3a2cb750af3b53af4b5dcbfaf53eb0d09995002e65ce204d75fe60205401240"
+        }
+      }
+    ],
+    "sources": {
+      "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\models\\bert.cpp": {
+        "bytes": 9226,
+        "sha256": "9173dc75465a3a86f3ca5c5983d9496dcfd9512a3b913d7613581aa1c5b86300"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\src\\llama-graph.cpp": {
+        "bytes": 167817,
+        "sha256": "62418701824f9fc78bbd47b5f8b3fd142c6aa9e243273ff9ef3878761b98048f"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\binary-ops.cpp": {
+        "bytes": 6709,
+        "sha256": "2df261aadce36a20f5e3bf6961d4ca27b8c2d461afc41488361ee6ad09c1730d"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\include\\llama.h": {
+        "bytes": 91177,
+        "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+      }
+    },
+    "python_reference_imports_no_bytecode": true,
+    "matrix": {
+      "bytes": 3243,
+      "sha256": "c69603c74e3a0e89e73622e470adca4392750dbe8a6640f42b0f7b16297a423e"
+    }
+  },
+  "captures": {
+    "windows-msvc": {
+      "report": {
+        "bytes": 39011,
+        "sha256": "f433a14be8d241d490f9b09f35c5008c675ea3b00cde91635f0d1b158d53ba93"
+      },
+      "library": {
+        "bytes": 3211264,
+        "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+      },
+      "caller": {
+        "bytes": 195584,
+        "sha256": "02b1ed141f78e7ebdfd1c0265569b26378e21e2f40b4af6793c96b2aa80a8c67"
+      },
+      "finished_utc": "2026-11-11T19:24:34.626979+00:00"
+    },
+    "linux-gnu": {
+      "report": {
+        "bytes": 38443,
+        "sha256": "030e7d1bb7e3a4d74b1ac0ead2bfae42dd352642b6bb1c0774df1de539316a2d"
+      },
+      "library": {
+        "bytes": 5499792,
+        "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+      },
+      "caller": {
+        "bytes": 272824,
+        "sha256": "9ea1e75025c6127004ffd7b6b0b80a1c2654513d632a862d082e9b8772413fd5"
+      },
+      "finished_utc": "2026-11-11T19:24:35.975722+00:00"
+    }
+  },
+  "qualification": "Five active half-vector graphs abort in the originals and are bounded loader rejections in Rust. Four cases execute and retain exact original facts and numeric words. An unpaired classifier bias is ignored; paired biases require F32 at model admission even if a later context uses ordinary pooling."
+}

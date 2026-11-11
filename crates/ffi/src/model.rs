@@ -28,6 +28,8 @@ pub(crate) struct ModelData {
     pub heads: i32,
     pub kv_heads: i32,
     pub rope_base: f32,
+    pub causal_attention: bool,
+    pub classifier_labels: Vec<Vec<u8>>,
     pub bytes: u64,
     pub parameters: u64,
     pub ftype: i32,
@@ -288,9 +290,9 @@ unsafe fn load_set(
             "unsupported C ABI model architecture: {architecture}"
         ));
     }
-    if !vocab_only && architecture != "llama" {
+    if !vocab_only && !["llama", "bert"].contains(&architecture) {
         return Err(
-            "this C ABI currently executes Llama; this architecture supports vocabulary-only loading"
+            "this C ABI currently executes Llama and BERT; this architecture supports vocabulary-only loading"
                 .into(),
         );
     }
@@ -365,6 +367,55 @@ unsafe fn load_set(
     {
         return Err("negative model dimension metadata".into());
     }
+    let causal_attention = if vocab_only {
+        true
+    } else {
+        match m.get(&format!("{architecture}.attention.causal")) {
+            None => true,
+            Some(Value::Bool(value)) => *value,
+            Some(_) => return Err("attention.causal must be a boolean".into()),
+        }
+    };
+    let classifier_labels = if vocab_only {
+        Vec::new()
+    } else {
+        match m.get(&format!("{architecture}.classifier.output_labels")) {
+            None => Vec::new(),
+            Some(value) => {
+                let labels = value
+                    .as_array()
+                    .ok_or("classifier labels must be an array")?;
+                if labels.len() > 65_536 {
+                    return Err("classifier label count exceeds 65536".into());
+                }
+                let mut owned = Vec::new();
+                owned
+                    .try_reserve_exact(labels.len())
+                    .map_err(|_| "classifier labels allocation failed")?;
+                let mut bytes = 0usize;
+                for label in labels {
+                    let label = label
+                        .as_bytes()
+                        .ok_or("classifier labels must be byte strings")?;
+                    bytes = bytes
+                        .checked_add(label.len())
+                        .and_then(|n| n.checked_add(1))
+                        .ok_or("classifier labels size overflow")?;
+                    if bytes > 16 * 1024 * 1024 {
+                        return Err("classifier labels exceed 16 MiB".into());
+                    }
+                    let mut terminated = Vec::new();
+                    terminated
+                        .try_reserve_exact(label.len() + 1)
+                        .map_err(|_| "classifier label allocation failed")?;
+                    terminated.extend_from_slice(label);
+                    terminated.push(0);
+                    owned.push(terminated);
+                }
+                owned
+            }
+        }
+    };
     let bytes = files.tensor_bytes();
     let parameters = files.tensor_elements();
     let ftype = if vocab_only {
@@ -447,6 +498,8 @@ unsafe fn load_set(
         heads,
         kv_heads,
         rope_base,
+        causal_attention,
+        classifier_labels,
         bytes,
         parameters,
         ftype,
@@ -650,5 +703,25 @@ ffi!(
             reference(model)?;
         }
         Ok(-1)
+    }
+);
+
+ffi!(
+    llama_model_n_cls_out(model: *const ModelHandle) -> u32,
+    0,
+    {
+        let model = unsafe { reference(model)? };
+        Ok(model.data.classifier_labels.len().max(1) as u32)
+    }
+);
+ffi!(
+    llama_model_cls_label(model: *const ModelHandle, index: u32) -> *const c_char,
+    ptr::null(),
+    {
+        let model = unsafe { reference(model)? };
+        Ok(usize::try_from(index)
+            .ok()
+            .and_then(|index| model.data.classifier_labels.get(index))
+            .map_or(ptr::null(), |label| label.as_ptr().cast()))
     }
 );

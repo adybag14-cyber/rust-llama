@@ -2,6 +2,7 @@
 use crate::loader::{bias, details, float, matrix, uint, unsupported, vector};
 use crate::{Error, Executor, LoadOptions, Model, Result};
 use llama_gguf::{GgufSet, Value};
+use llama_model_runtime::bert::BertClassifier;
 use llama_model_runtime::{BertConfig, BertLayer, BertModel, BertWeights, Pooling};
 use llama_tokenizer::Tokenizer;
 use std::{collections::BTreeSet, path::Path, sync::Arc};
@@ -75,10 +76,43 @@ pub(crate) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result
         1 => Pooling::Mean,
         2 => Pooling::First,
         3 => Pooling::Last,
+        4 => Pooling::Rank,
         value => return Err(unsupported(format!("BERT pooling type {value}"))),
     };
+    let output_count = match m.get("bert.classifier.output_labels") {
+        None => 1,
+        Some(value) => {
+            let labels = value
+                .as_array()
+                .ok_or_else(|| Error::Invalid("BERT classifier labels must be an array".into()))?;
+            if labels.iter().any(|value| value.as_bytes().is_none()) {
+                return Err(Error::Invalid(
+                    "BERT classifier labels must be byte strings".into(),
+                ));
+            }
+            labels.len().max(1)
+        }
+    };
+    let classifier_mean_pooling = uint(m, "bert.classifier.pooling_type", Some(0))? == 1;
     let kv_width = config.kv_width()?;
     let (id, template, decoded_weight_bytes) = details(&g, path, options)?;
+    // The native CPU binary graph has no F32-left / half-right dispatch.
+    // Optional classifier biases are inactive when their paired matrix is absent.
+    let dense_head = g.tensor("cls.weight").is_some();
+    let output_head = g.tensor("cls.output.weight").is_some();
+    for tensor in g.tensors() {
+        let active_vector = match tensor.name.as_str() {
+            "cls.bias" => dense_head,
+            "cls.output.bias" => output_head,
+            name => name.ends_with(".bias") || name.ends_with("_norm.weight"),
+        };
+        if active_vector && tensor.dtype.id() != 0 {
+            return Err(unsupported(format!(
+                "BERT active norm/bias tensor {} requires F32 for the source binary graph",
+                tensor.name
+            )));
+        }
+    }
     let mut used = BTreeSet::new();
     let token_embedding = matrix(
         &mut g,
@@ -94,7 +128,12 @@ pub(crate) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result
         train_context,
         width,
     )?;
-    let token_type_embedding = if g.tensor("token_types.weight").is_some() {
+    let token_type_embedding = if let Some(tensor) = g.tensor("token_types.weight") {
+        if tensor.dtype.id() != 0 {
+            return Err(unsupported(
+                "BERT token_types.weight requires F32 for the source add graph",
+            ));
+        }
         Some(matrix(
             &mut g,
             &mut used,
@@ -141,6 +180,28 @@ pub(crate) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result
             output_norm_bias: vector(&mut g, &mut used, &key("layer_output_norm.bias"), width)?,
         });
     }
+    let classifier = BertClassifier {
+        dense: if g.tensor("cls.weight").is_some() {
+            Some(matrix(&mut g, &mut used, "cls.weight", width, width)?)
+        } else {
+            None
+        },
+        dense_bias: bias(&mut g, &mut used, "cls.bias", width)?,
+        output: if g.tensor("cls.output.weight").is_some() {
+            Some(matrix(
+                &mut g,
+                &mut used,
+                "cls.output.weight",
+                output_count,
+                width,
+            )?)
+        } else {
+            None
+        },
+        output_bias: bias(&mut g, &mut used, "cls.output.bias", output_count)?,
+        output_count,
+        mean_pooling: classifier_mean_pooling,
+    };
     let unused: Vec<_> = g
         .tensors()
         .iter()
@@ -163,7 +224,8 @@ pub(crate) fn load(mut g: GgufSet, path: &Path, options: &LoadOptions) -> Result
             embedding_norm_bias,
             layers: weights,
         },
-    )?;
+    )?
+    .with_classifier(classifier)?;
     Ok(Model {
         runtime: Executor::Bert(Arc::new(bert)),
         tokenizer,

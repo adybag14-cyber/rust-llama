@@ -474,9 +474,9 @@ unsafe fn set_lora(
         retained_control: context.adapters.clone_control()?,
         control_range: context.adapters.control_range,
     };
-    let composed = replacement.compose(&context.runtime)?;
+    let composed = replacement.compose(context.decoder()?)?;
     context
-        .runtime
+        .decoder_mut()?
         .set_adapters(composed)
         .map_err(|e| e.to_string())?;
     context.adapters = replacement;
@@ -497,9 +497,10 @@ unsafe fn set_control(
             retained_control: context.adapters.clone_control()?,
             control_range: None,
         };
+        let composed = replacement.compose(context.decoder()?)?;
         context
-            .runtime
-            .set_adapters(replacement.compose(&context.runtime)?)
+            .decoder_mut()?
+            .set_adapters(composed)
             .map_err(|e| e.to_string())?;
         context.adapters = replacement;
         return Ok(0);
@@ -535,9 +536,10 @@ unsafe fn set_control(
         retained_control: retained,
         control_range: Some((start, end)),
     };
+    let composed = replacement.compose(context.decoder()?)?;
     context
-        .runtime
-        .set_adapters(replacement.compose(&context.runtime)?)
+        .decoder_mut()?
+        .set_adapters(composed)
         .map_err(|e| e.to_string())?;
     context.adapters = replacement;
     Ok(0)

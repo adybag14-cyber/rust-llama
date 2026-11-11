@@ -1,0 +1,51 @@
+{
+  "status": "captured",
+  "profile": "windows-msvc",
+  "steps": [
+    {
+      "name": "configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\sequence-order",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\sequence-order\\build-windows",
+        "-DFROZEN_SOURCE=C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cmake",
+        "--build",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\sequence-order\\build-windows",
+        "--config",
+        "Release",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "capture",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\sequence-order\\build-windows\\Release\\sequence-order.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\sequence-order\\windows-msvc\\reference.json"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source": {
+    "bytes": 1824,
+    "sha256": "ec568937b9f376b8a4338c4541e5e6eb3cdcf5654dc969dc08c5dd1640133745"
+  },
+  "executable": {
+    "bytes": 98304,
+    "sha256": "330ec6debce1c142e87ef4b829eadca63b611a44cc1ee7f6829107a8e4175fbe"
+  },
+  "reference": {
+    "bytes": 737521,
+    "sha256": "2605a561060c2bcb67a2175a33c2319fc2e193b26fd72ba5e0eaec70ef2c31f8"
+  }
+}

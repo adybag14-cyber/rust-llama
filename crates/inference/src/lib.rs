@@ -251,6 +251,15 @@ impl Model {
             )),
         }
     }
+    /// Share immutable BERT weights with a separately owned complete-batch encoder.
+    pub fn bert_model(&self) -> Result<Arc<llama_model_runtime::BertModel>> {
+        match &self.runtime {
+            Executor::Bert(model) => Ok(model.clone()),
+            Executor::Decoder(_) => Err(Error::Unsupported(
+                "complete-batch BERT encoding requires a BERT model".into(),
+            )),
+        }
+    }
     /// Native server default: parse special strings, independent of BOS/EOS insertion.
     pub fn tokenize(&self, text: &str, add_special: bool) -> Result<Vec<i32>> {
         Ok(self.tokenizer.tokenize(text, add_special, true)?)

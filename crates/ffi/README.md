@@ -2,8 +2,8 @@
 
 This crate builds a cdylib, staticlib and rlib. The Windows DLL is
 `target/release/llama_ffi.dll`; the import library is `llama_ffi.dll.lib`.
-It executes the Rust GGUF loader, all nine frozen vocabulary family identifiers, CPU samplers and the dense CPU decoder from this
-workspace. No original llama/ggml library is linked or loaded by the product.
+It executes the Rust GGUF loader, all nine frozen vocabulary family identifiers, CPU samplers, dense CPU Llama decoding and complete-batch BERT encoding from
+this workspace. No original llama/ggml library is linked or loaded by the product.
 
 **This is an operational subset, not full llama.cpp ABI compatibility.**
 `COVERAGE.md` enumerates the exact frozen exports implemented and still absent.
@@ -33,20 +33,19 @@ slots as u8 internally, allowing validation before interpreting foreign values.
 calling-convention compatibility is claimed for an untested target. Parent
 workspace builds additionally check compilation on supported Rust targets.
 
-## Operational configuration
+## Model loading and execution
 
-The accepted execution path is dense Llama, using the validated GGUF loader and
-tokenizer from `llama-inference`. Vocabulary-only loading covers the frozen
+The accepted execution paths are dense Llama decoding and BERT encoding, using
+the validated GGUF loader and tokenizer from `llama-inference`. Vocabulary-only loading covers the frozen
 NONE, SPM, BPE, WordPiece, UGM, RWKV, PLaMo-2, test and PLaMo-3 identifiers.
 Admitted architecture metadata is llama, bert, gpt2, gptneox, mpt, falcon,
 command-r, refact, starcoder2, qwen2, gemma4, nomic-bert-moe, baichuan and phi3.
-Execution of non-Llama architectures is explicitly rejected in this C layer.
+Other architectures retain explicit vocabulary-only admission in this C layer.
 Vocabulary-only loading retains the source's unloaded model-info defaults:
 context/embedding/layer dimensions are zero, description is empty and file type
 is F32. Attention-head queries return a diagnostic because the native source
-aborts when no model layers were loaded. BERT's public architecture routing
-flags and RoPE enum follow the frozen header/source values even though C context
-execution is unavailable.
+aborts when no model layers were loaded. BERT's public architecture routing flags and RoPE enum retain the frozen
+header/source values. ENCODER.md records its native context and output contract.
 
 Weights use the same validated GGUF loader and its memory budget, numerical
 formats and explicit architecture restrictions. File loading automatically
@@ -63,6 +62,8 @@ Both that entry and automatic loading retain paths before foreign progress
 callbacks. `llama_split_path` and `llama_split_prefix` preserve the original
 byte-string, signed-format and partial-buffer behavior. See SPLITS.md for path
 encoding, truncation, ownership and independent regression scope.
+
+## Llama decoder configuration
 
 Start with the frozen parameter functions and select CPU model loading. On the
 qualified Windows x64/MSVC and Linux x64/GNU CPU profiles, an admitted dense
@@ -128,12 +129,12 @@ getters use original caller batch positions, even when native sequence splitting
 changes execution order; negative indices count backward through emitted rows.
 Invalid or unrequested rows return NULL. External embedding input and normalized
 hidden output are implemented. Pooling and noncausal decoding are outside this
-C executor. EXECUTION.md details row maps, workers and resource accounting;
+Llama decoder executor. EXECUTION.md details row maps, workers and resource accounting;
 STATE.md documents the raw cache and session contracts.
 
-## Unsupported options
+## Decoder options and remaining gaps
 
-Context creation rejects KV types other than F32/F16, nondefault context types,
+Llama decoder context creation rejects KV types other than F32/F16, nondefault context types,
 custom RoPE/YaRN, pooling, noncausal attention, nonflash multiple-worker execution, evaluator
 callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
 slots, nondefault output capacity fields and context performance counters. SWA preferences have no effect for the supported non-SWA model.
@@ -161,9 +162,34 @@ data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32/F16 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
-encoder entry points, model saving and context performance APIs remain absent.
+other encoder architectures, model saving and context performance APIs remain absent.
 ADAPTERS.md documents the owned LoRA loader and control-vector application.
 CHAT.md documents byte-oriented custom/built-in template application and its limits.
+
+## BERT encoder and classifier execution
+
+ENCODER.md defines the separate no-cache native BERT context. Full BERT GGUF
+loading now admits token/host-embedding batches, source sequence grouping and
+NONE/MEAN/CLS/LAST/RANK pooling. Optional dense/tanh and classifier output
+weights execute in Rust, with owned class labels and exact source extraction
+semantics. `llama_encode` runs the complete bidirectional batch;
+`llama_decode` takes the source no-memory encoding route.
+
+The context reports no memory handle and does not acquire decoder state,
+adapter or extended-batch execution through this addition. Source BERT model
+routing flags remain unchanged. Native Windows/GNU unordered sequence
+membership order is independently captured, including MSVC's copy behavior;
+both profiles' tiny C observation corpora and numerical data are persistent
+fixtures. The pinned pretrained BGE corpus provides separate trained-model
+evidence.
+
+Use the frozen model/context defaults and the CPU model settings above; enable
+`embeddings`, select the required pooling mode, keep `no_perf=true`, and set
+`n_ubatch` large enough for the complete input. A DISABLED flash context
+currently requires worker counts 1/1. AUTO/ENABLED uses the qualified native
+CPU flash path. Learned position-table bounds remain distinct from padded
+context-query capacities. ENCODER.md documents raw versus pooled pointers,
+cancellation, bounded errors, classifier metadata types and resource limits.
 
 ## Automatic shard regression
 

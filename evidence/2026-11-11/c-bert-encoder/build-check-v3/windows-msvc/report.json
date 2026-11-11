@@ -1,0 +1,60 @@
+{
+  "status": "failed",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6324660778045654
+    },
+    {
+      "name": "check",
+      "argv": [
+        "cargo",
+        "check",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0327608585357666
+    },
+    {
+      "name": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 6.323033332824707
+    },
+    {
+      "name": "tiny-c",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "-B",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay.py",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\build-check-v3\\windows-msvc\\c-tiny",
+        "tiny"
+      ],
+      "exit_code": 1,
+      "seconds": 2.3543081283569336
+    }
+  ],
+  "error": "tiny-c failed"
+}

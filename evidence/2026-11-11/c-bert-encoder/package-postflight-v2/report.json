@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "started_utc": "2026-11-11T19:37:39.841147+00:00",
+  "steps": [
+    {
+      "name": "source-audit",
+      "argv": [
+        "cargo",
+        "run",
+        "-p",
+        "xtask",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "seconds": 6.738686,
+      "stdout": {
+        "bytes": 59107,
+        "sha256": "47390da69c115ec3e8634c77d1aae5142911f00b7de5790403290d1d5e3f5e67"
+      },
+      "stderr": {
+        "bytes": 183,
+        "sha256": "94177e91d5b2103d8d4d74d45b938cdf36c9e54e68e8e4d8046d1c52d2ccb2da"
+      }
+    },
+    {
+      "name": "fixture-audit",
+      "argv": [
+        "cargo",
+        "run",
+        "-p",
+        "xtask",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "seconds": 4.894459,
+      "stdout": {
+        "bytes": 198,
+        "sha256": "8cd78a132633b352632bebf20e7fb3f63c488ea30ddf4751c0ade5c4cec3592e"
+      },
+      "stderr": {
+        "bytes": 186,
+        "sha256": "fefd2753c17267412d075b5e004af204c82089e24f788f419f9af1859a6d3bf5"
+      }
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.079694,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "execution_inputs": {
+    "bytes": 234044,
+    "sha256": "8bcf8270d5ded98a464fe63473f46f202373177813f33311640bb0b21abfbf86"
+  },
+  "package_summary": {
+    "bytes": 40546,
+    "sha256": "3d5f1faff850566d02a9d77fbc40fb80ba34190d4ec09d35f865be9ba4b2536f"
+  },
+  "selected_inputs_unchanged": true,
+  "finished_utc": "2026-11-11T19:37:54.828411+00:00"
+}
