@@ -2,19 +2,28 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **198**, leaves
-**57 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **211**, leaves
+**44 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md and CHAT.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md and BATCH_EXT.md.
+
+The extended batch checkpoint checks debug/release PE and ELF tables: exactly
+211 frozen exports, four extensions and 44 absent exports. The original-header
+client passes on all four Rust libraries; see `evidence/2026-11-11/c-batch-ext`.
+It adds twelve public builders and llama_process
+for the existing admitted dense Llama decode contexts. BATCH_EXT.md records
+source builder side effects, owned embedding storage, mixed input, output rules
+and the independently captured Windows/GNU corpus. Encode and other native
+context architectures remain open.
 
 The model-metadata/chat extension adds five scalar metadata exports and two
 byte-oriented chat exports. Their independent fixtures and native client checks
 are documented in METADATA.md and CHAT.md. Symbol presence does not remove their
 explicit platform, resource or semantic boundaries.
 
-The final integrated debug/release PE and ELF export tables were inspected on
-both hosts and contain exactly the 198 frozen exports and four extensions
-listed here. All 57 missing exports remain absent. The independent original
+At the 10 November checkpoint, integrated debug/release PE and ELF export tables were inspected on
+both hosts and contained exactly 198 frozen exports and four extensions.
+At that checkpoint, 57 exports remained absent. The independent original
 libraries still expose the complete 255-symbol set. Original-header chat,
 metadata and raw-name clients pass against all four integrated Rust builds;
 see `evidence/2026-11-10/continued-port`.
@@ -48,6 +57,18 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_add_eos_token` |
 | `llama_backend_free` |
 | `llama_backend_init` |
+| `llama_batch_ext_add` |
+| `llama_batch_ext_add_embd` |
+| `llama_batch_ext_add_seq` |
+| `llama_batch_ext_add_token` |
+| `llama_batch_ext_clear` |
+| `llama_batch_ext_free` |
+| `llama_batch_ext_init` |
+| `llama_batch_ext_set_embd_state` |
+| `llama_batch_ext_set_embd_token` |
+| `llama_batch_ext_set_output_embd` |
+| `llama_batch_ext_set_output_logits` |
+| `llama_batch_ext_set_pos` |
 | `llama_batch_free` |
 | `llama_batch_get_one` |
 | `llama_batch_init` |
@@ -133,6 +154,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_n_vocab` |
 | `llama_new_context_with_model` |
 | `llama_pooling_type` |
+| `llama_process` |
 | `llama_sampler_accept` |
 | `llama_sampler_apply` |
 | `llama_sampler_chain_add` |
@@ -266,18 +288,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_adapter_meta_val_str` |
 | `llama_adapter_meta_val_str_by_index` |
 | `llama_attach_threadpool` |
-| `llama_batch_ext_add` |
-| `llama_batch_ext_add_embd` |
-| `llama_batch_ext_add_seq` |
-| `llama_batch_ext_add_token` |
-| `llama_batch_ext_clear` |
-| `llama_batch_ext_free` |
-| `llama_batch_ext_init` |
-| `llama_batch_ext_set_embd_state` |
-| `llama_batch_ext_set_embd_token` |
-| `llama_batch_ext_set_output_embd` |
-| `llama_batch_ext_set_output_logits` |
-| `llama_batch_ext_set_pos` |
 | `llama_detach_threadpool` |
 | `llama_encode` |
 | `llama_get_embeddings_seq` |
@@ -308,7 +318,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_perf_sampler_print` |
 | `llama_perf_sampler_reset` |
 | `llama_print_system_info` |
-| `llama_process` |
 | `llama_set_adapter_cvec` |
 | `llama_set_adapters_lora` |
 | `llama_set_sampler` |

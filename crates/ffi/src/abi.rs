@@ -365,3 +365,12 @@ pub struct LlamaChatMessage {
     pub role: *const std::ffi::c_char,
     pub content: *const std::ffi::c_char,
 }
+
+/// Frozen public by-value embedding descriptor.
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+pub struct LlamaEmbd {
+    pub data: *const f32,
+    pub n_rows: usize,
+    pub n_embd: usize,
+}

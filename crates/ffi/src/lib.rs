@@ -17,6 +17,7 @@
 
 pub mod abi;
 mod batch;
+mod batch_ext;
 mod chat;
 mod context;
 mod enum_names;

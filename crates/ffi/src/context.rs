@@ -395,9 +395,17 @@ unsafe fn decode(context: *mut ContextHandle, batch: LlamaBatch) -> Result<i32> 
             output,
         });
     }
+    execute_native_batch(c, &runtime_batch)
+}
+
+pub(crate) fn execute_native_batch(
+    c: &mut ContextHandle,
+    runtime_batch: &[NativeBatchToken],
+) -> Result<i32> {
+    let n = runtime_batch.len();
     let abort = c.abort;
     let abort_data = c.abort_data;
-    let outputs = c.runtime.decode_batch_with_cancel(&runtime_batch, || {
+    let outputs = c.runtime.decode_batch_with_cancel(runtime_batch, || {
         abort.is_some_and(|callback| unsafe { callback(abort_data) })
     });
     let outputs = match outputs {
@@ -520,4 +528,16 @@ pub(crate) unsafe fn sampling_values(context: *mut ContextHandle, index: i32) ->
         .get(offset..end)
         .map(|v| v.to_vec())
         .ok_or_else(|| "requested logits are unavailable".into())
+}
+
+impl ContextHandle {
+    pub(crate) fn extended_batch_configuration(&self) -> (usize, usize, usize, usize, bool) {
+        (
+            self.n_batch as usize,
+            self.n_seq_max as usize,
+            self.model_handle.data.vocab.texts.len(),
+            self.model_handle.data.width as usize,
+            self.embeddings_enabled,
+        )
+    }
 }

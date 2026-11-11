@@ -1,0 +1,360 @@
+{
+  "profile": "windows",
+  "started_utc": "2026-11-11T08:57:17.882513+00:00",
+  "status": "passed",
+  "commands": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.215,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "tests-debug",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 20.823,
+      "stdout": {
+        "bytes": 4686,
+        "sha256": "e84b4399f2c0cebb87b271f1091d12193bc7446ea27ec7394db3fcb001756cc1"
+      },
+      "stderr": {
+        "bytes": 348,
+        "sha256": "e3592c76aefd98395dad23b420051bb53ef853f33869c46d31e0efc9d3c2890f"
+      },
+      "tests": [
+        {
+          "passed": 49,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "tests-release",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 28.691,
+      "stdout": {
+        "bytes": 4685,
+        "sha256": "d8414660ab542a01b549dc9cce23f034ed3fe56ff17bce309dc66c4eb5e8d29a"
+      },
+      "stderr": {
+        "bytes": 340,
+        "sha256": "d67353348ef66812d8eff29c3106fa439d50fd4e43fdd1d4ea0e98599462bd28"
+      },
+      "tests": [
+        {
+          "passed": 49,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.043,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 173,
+        "sha256": "c0cfb06865416574de33528e42368852d875524b18c23cb24a51175c0eed521c"
+      }
+    },
+    {
+      "name": "library-debug",
+      "argv": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.143,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 72,
+        "sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549"
+      }
+    },
+    {
+      "name": "native-debug",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\build-windows\\Release\\batch-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi-target-windows\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\inputs-v1.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\validation-windows-v3\\native-debug.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.286,
+      "stdout": {
+        "bytes": 31,
+        "sha256": "ba0c6a3e3caa31965aedeca7b9e763235998fd347e2e746d290918cae7e7beb7"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exact_native_capture_match": true,
+      "library_identity": {
+        "bytes": 4875776,
+        "sha256": "efc3fa516b360bfd918a68d61966c7e148bd6f426022e9055f77e6c1c481616c"
+      }
+    },
+    {
+      "name": "library-release",
+      "argv": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-ffi",
+        "--release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.094,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 62,
+        "sha256": "92434e198f27984c035c376ec77a7cf9e6ebdde782f8ccb1336ae3329b66ddb7"
+      }
+    },
+    {
+      "name": "native-release",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\build-windows\\Release\\batch-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi-target-windows\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\inputs-v1.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\validation-windows-v3\\native-release.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.107,
+      "stdout": {
+        "bytes": 31,
+        "sha256": "ba0c6a3e3caa31965aedeca7b9e763235998fd347e2e746d290918cae7e7beb7"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exact_native_capture_match": true,
+      "library_identity": {
+        "bytes": 2156032,
+        "sha256": "15a45513d3b7ee86c04abb0466b493f574bcc58545654b03d7bfe5ee683d9cab"
+      }
+    }
+  ],
+  "inputs": {
+    "Cargo.lock": {
+      "bytes": 3578,
+      "sha256": "36120e28e36fb291179428683a327c3268cfef1d2fce94e61ddddc5cd3dd014b"
+    },
+    "Cargo.toml": {
+      "bytes": 297,
+      "sha256": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c"
+    },
+    "crates\\ffi\\src\\abi.rs": {
+      "bytes": 11148,
+      "sha256": "db5325179cf37b15c9c6e2c46f7c771df79c9716f67e51365c472292877ab9bd"
+    },
+    "crates\\ffi\\src\\batch.rs": {
+      "bytes": 6439,
+      "sha256": "c77300e45bab5615ba2605142ba056a9dd7d09329cd630d6647aea6b0cd543f0"
+    },
+    "crates\\ffi\\src\\batch_ext.rs": {
+      "bytes": 12142,
+      "sha256": "47506e74e956d4106292de2d6de98237aeda35d2a6651ea656a0d9b9afc03f0b"
+    },
+    "crates\\ffi\\src\\batch_ext\\tests.rs": {
+      "bytes": 13957,
+      "sha256": "369200bdd200e6f4c063753db5b25a6266d8abe812a6dcbcc89807cfbe16cdf7"
+    },
+    "crates\\ffi\\src\\chat.rs": {
+      "bytes": 6034,
+      "sha256": "af9d197f785d53fa16e0fce26c5945fad04d48401e143a55a161893dcda7b4c3"
+    },
+    "crates\\ffi\\src\\chat\\tests.rs": {
+      "bytes": 11087,
+      "sha256": "7ff0778d83e9e698d7f559e9c73c416aa7e6d1c00934a9e2086208598489d733"
+    },
+    "crates\\ffi\\src\\context.rs": {
+      "bytes": 17287,
+      "sha256": "3d154c0337004d6408eae836f983e70b89bf5739095ff612cc54a959d65852ef"
+    },
+    "crates\\ffi\\src\\context_reference_tests.rs": {
+      "bytes": 36378,
+      "sha256": "d113732919d01a37321723de02a48681d34773f080e79e605eb0b9a44a1b5f54"
+    },
+    "crates\\ffi\\src\\enum_names.rs": {
+      "bytes": 9625,
+      "sha256": "befa6dc208f2572d57ec09edd63998f8797a5f0cf35595b7009e8551acb727d7"
+    },
+    "crates\\ffi\\src\\f16_context_reference_tests.rs": {
+      "bytes": 28332,
+      "sha256": "36ba8d15003df664759273e28f6f9586552531293b0099acf39fdcf415936b75"
+    },
+    "crates\\ffi\\src\\lib.rs": {
+      "bytes": 9157,
+      "sha256": "24174990e6be35ffe076d9579d9da8bdbb25f327b5f4a60bcd84cf8f7e639d61"
+    },
+    "crates\\ffi\\src\\memory.rs": {
+      "bytes": 2568,
+      "sha256": "34037f594e285ede4dc21f3e6f231870d6e7a5d58429c4311666410c125cc6f1"
+    },
+    "crates\\ffi\\src\\model.rs": {
+      "bytes": 19791,
+      "sha256": "a74ab2611e85f823f664dd95ab2f1c671ac71c6a4a35571c8be3f2424d85f8aa"
+    },
+    "crates\\ffi\\src\\model_metadata.rs": {
+      "bytes": 20956,
+      "sha256": "1d6e0b879bb8bd4e59640f3e4ed34399c0bf82f4403b52180e5e1cd0b91679e1"
+    },
+    "crates\\ffi\\src\\model_metadata_reference_tests.rs": {
+      "bytes": 15570,
+      "sha256": "746bc43e772113434e0c8dcbfad41f8f204c3df71ff9d1bd3b3b624773a73615"
+    },
+    "crates\\ffi\\src\\model_shard_tests.rs": {
+      "bytes": 17380,
+      "sha256": "14e705f05ac51eb670db176d98b5053f308f3fdc68861ce13f93e8f729ff47d8"
+    },
+    "crates\\ffi\\src\\model_split_list_tests.rs": {
+      "bytes": 9685,
+      "sha256": "dde4f8c41df868adb26693d894418d43407fe7c28f791dd24bc1e3aafeca1377"
+    },
+    "crates\\ffi\\src\\native_metadata_policy.rs": {
+      "bytes": 10762,
+      "sha256": "6075a4354cfb95d9f4a2b011cc7bd7255834b0a1de815260549e8bda86fcf7d6"
+    },
+    "crates\\ffi\\src\\native_metadata_policy_tests.rs": {
+      "bytes": 8350,
+      "sha256": "d06ade563034253541956cb69b09ce2b40622a46479d2e24c71bb90726bce788"
+    },
+    "crates\\ffi\\src\\native_microbatch_reference_tests.rs": {
+      "bytes": 19876,
+      "sha256": "75670f1c828b80a18359281e857fbc04a8ad4de597a906b54b5f172b54dee5bf"
+    },
+    "crates\\ffi\\src\\sampler.rs": {
+      "bytes": 50736,
+      "sha256": "2a67fefb55dddcd93e892a380c0594ab47735961c6000ba06192b4ac69b801eb"
+    },
+    "crates\\ffi\\src\\sampler_grammar.rs": {
+      "bytes": 9794,
+      "sha256": "d5bcac15f46998536cc3b67f206c6fc590bc67a19e3008dfd7c82e1df66ef7a7"
+    },
+    "crates\\ffi\\src\\sampler_reference_tests.rs": {
+      "bytes": 17817,
+      "sha256": "a81bc49f0649fc9f4d9bdfe5afff13894e6cb4caa1503fbedbb4760e6bde01e2"
+    },
+    "crates\\ffi\\src\\sampler_vocab.rs": {
+      "bytes": 5771,
+      "sha256": "7a9d1bad7bdc3d8973762aba199dc303f4dc09c4cbb914a4dbb264611581c5de"
+    },
+    "crates\\ffi\\src\\split_path.rs": {
+      "bytes": 9569,
+      "sha256": "e704365019ba14b420eef6beab610c5f04a7acfa1629b628634e07ca6ef940ab"
+    },
+    "crates\\ffi\\src\\state.rs": {
+      "bytes": 20284,
+      "sha256": "ba02b05f5de7fa5db5f261fecab4a1988d8cf990a4668da0a1cb501b9bbb8e3e"
+    },
+    "crates\\ffi\\src\\vocab.rs": {
+      "bytes": 12340,
+      "sha256": "162efe3c5489688a9d1448ab11de179c5303078582e0ed3515f835b3d8d8d588"
+    },
+    "fixtures\\ffi\\batch-ext\\inputs.json": {
+      "bytes": 146648,
+      "sha256": "b25b5736151200809014c45d7e52e7e56d29abc0b4efab37cb2431fedb3cb410"
+    },
+    "fixtures\\ffi\\batch-ext\\linux-data.bin": {
+      "bytes": 165302,
+      "sha256": "89530b7e213cd7c4544ef2e84885e7524dde94e63945e18a0fe1c59982338462"
+    },
+    "fixtures\\ffi\\batch-ext\\linux-reference.json": {
+      "bytes": 109012,
+      "sha256": "864c7301df9ab4325ac383b6c2964b6820e12ea9a351ae8b9fa23d0b36418651"
+    },
+    "fixtures\\ffi\\batch-ext\\provenance.json": {
+      "bytes": 5696,
+      "sha256": "2c1972c8545767f4b28659fb9115be53b3a30182fabab436be33e5cc8323cc12"
+    },
+    "fixtures\\ffi\\batch-ext\\windows-data.bin": {
+      "bytes": 167366,
+      "sha256": "cbf6662930dbc7467df7f0fb0eacc00507a4cb5fbd6a140004efc39fc8b4330e"
+    },
+    "fixtures\\ffi\\batch-ext\\windows-reference.json": {
+      "bytes": 109028,
+      "sha256": "4b08e8f508234b22a41acd5f527975fe1ccf0bbdfcc934fa45ffee7d680155cc"
+    },
+    "rust-toolchain.toml": {
+      "bytes": 90,
+      "sha256": "d8c420f9c9a2fc00c09cf07b7bb570c92a09137ef1559cb9ef5b12c76f7557cc"
+    }
+  },
+  "completed_utc": "2026-11-11T08:58:09.492556+00:00"
+}
