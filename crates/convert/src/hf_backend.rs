@@ -1,6 +1,9 @@
 //! Deterministic HF Tokenizers BPE preparation used by the frozen converter.
 //! Source: pinned Tokenizers 0.22.2 (Apache-2.0), with independently captured
 //! Unicode properties. This is separate from llama.cpp's runtime pretokenizers.
+#[path = "hf_nfc.rs"]
+pub(crate) mod nfc;
+use crate::hf_schema::Normalization;
 use crate::hf_unicode as unicode;
 use crate::util::{object, optional_text, text};
 use crate::{Error, Limits, Result, reserve, string};
@@ -77,6 +80,7 @@ pub(crate) fn id(value: &Json) -> Result<u32> {
 enum Stage {
     Byte { prefix: bool, regex: bool },
     Digits { individual: bool },
+    QwenSplit,
 }
 #[derive(Clone, Copy)]
 struct Merge {
@@ -85,9 +89,9 @@ struct Merge {
     rank: usize,
     result: u32,
 }
-#[derive(Clone, Copy)]
 struct Pattern<'a> {
     content: &'a str,
+    normalized_content: Option<String>,
     normalized: bool,
     special: bool,
     id: u32,
@@ -109,6 +113,7 @@ pub(crate) struct Backend<'a> {
     no_merges: bool,
     stages: Vec<Stage>,
     executable: bool,
+    normalization: Normalization,
     byte_decoder: bool,
     post: crate::hf_schema::Post<'a>,
     pub split_special_tokens: bool,
@@ -268,10 +273,10 @@ impl<'a> Backend<'a> {
             }
         }
         let mut stages = Vec::new();
-        let identity = crate::hf_schema::normalizer(root.get("normalizer"), 0)?;
+        let normalization = crate::hf_schema::normalizer(root.get("normalizer"), 0)?;
         crate::hf_schema::pretokenizer(root.get("pre_tokenizer"), 0)?;
         let stage_execution = parse_stages(root.get("pre_tokenizer"), &mut stages, 0)?;
-        let executable = identity && stage_execution;
+        let executable = normalization != Normalization::Unsupported && stage_execution;
         let byte_decoder = crate::hf_schema::decoder(root.get("decoder"), 0)? == "ByteLevel";
         let post = crate::hf_schema::Post::parse(root.get("post_processor"), 0)?;
         crate::hf_schema::settings(root)?;
@@ -291,6 +296,7 @@ impl<'a> Backend<'a> {
             no_merges,
             stages,
             executable,
+            normalization,
             byte_decoder,
             post,
             split_special_tokens: false,
@@ -347,6 +353,7 @@ impl<'a> Backend<'a> {
                 reserve(&mut self.patterns, 1, "special token patterns")?;
                 self.patterns.push(Pattern {
                     content: token.content,
+                    normalized_content: None,
                     normalized: token.normalized,
                     special: true,
                     id: 0,
@@ -406,6 +413,7 @@ impl<'a> Backend<'a> {
                 reserve(&mut self.patterns, 1, "ordinary token patterns")?;
                 self.patterns.push(Pattern {
                     content: token.content,
+                    normalized_content: None,
                     normalized: token.normalized,
                     special: false,
                     id,
@@ -418,6 +426,13 @@ impl<'a> Backend<'a> {
             self.patterns[index].id = self
                 .token_id(token)
                 .ok_or(Error::Invalid("pattern has no added token ID"))?;
+            if self.patterns[index].normalized && self.normalization == Normalization::Nfc {
+                self.patterns[index].normalized_content = Some(nfc::normalize(
+                    token,
+                    self.max_bytes,
+                    &mut self.operations_left,
+                )?);
+            }
         }
         self.added.sort_unstable_by_key(|p| p.0);
         Ok(())
@@ -623,6 +638,15 @@ impl<'a> Backend<'a> {
             let mut next = Vec::new();
             for piece in pieces {
                 match stage {
+                    Stage::QwenSplit => {
+                        self.charge(piece.len())?;
+                        let mut start = 0;
+                        while start < piece.len() {
+                            let end = qwen_regex_end(&piece, start);
+                            self.push_piece(&mut next, &piece[start..end])?;
+                            start = end;
+                        }
+                    }
                     Stage::Digits { individual } => {
                         let mut start = 0;
                         let mut prior = None;
@@ -715,9 +739,13 @@ impl<'a> Backend<'a> {
                     if pattern.special != special || pattern.normalized != normalized {
                         continue;
                     }
-                    if let Some(found) = input[search..].find(pattern.content) {
+                    let content = pattern
+                        .normalized_content
+                        .as_deref()
+                        .unwrap_or(pattern.content);
+                    if let Some(found) = input[search..].find(content) {
                         let start = search + found;
-                        let end = start + pattern.content.len();
+                        let end = start + content.len();
                         if best.is_none_or(|(a, b, _)| start < a || (start == a && end > b)) {
                             best = Some((start, end, index));
                         }
@@ -728,7 +756,7 @@ impl<'a> Backend<'a> {
                 break;
             };
             search = end;
-            let pattern = self.patterns[index];
+            let pattern = &self.patterns[index];
             let token = self
                 .added
                 .iter()
@@ -804,6 +832,16 @@ impl<'a> Backend<'a> {
                 continue;
             }
             let fragment = &input[start..end];
+            let normalized = if self.normalization == Normalization::Nfc {
+                Some(nfc::normalize(
+                    fragment,
+                    self.max_bytes,
+                    &mut self.operations_left,
+                )?)
+            } else {
+                None
+            };
+            let fragment = normalized.as_deref().unwrap_or(fragment);
             for (a, b, id) in self.split_added(fragment, true)? {
                 if let Some(id) = id {
                     reserve(&mut output, 1, "added output IDs")?;
@@ -965,8 +1003,28 @@ fn parse_stages(value: Option<&Json>, stages: &mut Vec<Stage>, depth: usize) -> 
             });
             Ok(true)
         }
-        "Metaspace" | "Split" | "Whitespace" | "WhitespaceSplit" | "BertPreTokenizer"
-        | "Punctuation" | "CharDelimiterSplit" | "UnicodeScripts" | "FixedLength" => Ok(false),
+        "Split" => {
+            let expression = value
+                .get("pattern")
+                .and_then(Json::as_object)
+                .and_then(|p| p.get("Regex"))
+                .map(text)
+                .transpose()?;
+            let behavior = value.get("behavior").map(text).transpose()?;
+            let invert = flag(value, "invert", false, true)?;
+            if expression == Some(crate::hf_schema::QWEN_PATTERN)
+                && behavior == Some("Isolated")
+                && !invert
+            {
+                reserve(stages, 1, "HF pretokenizer stages")?;
+                stages.push(Stage::QwenSplit);
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        }
+        "Metaspace" | "Whitespace" | "WhitespaceSplit" | "BertPreTokenizer" | "Punctuation"
+        | "CharDelimiterSplit" | "UnicodeScripts" | "FixedLength" => Ok(false),
         _ => Err(Error::Unsupported("HF pretokenizer schema")),
     }
 }
@@ -1041,4 +1099,91 @@ fn byte_regex_end(text: &str, start: usize) -> usize {
             .next()
             .expect("nonempty regex remainder")
             .len_utf8()
+}
+
+/// Exact reviewed Qwen Oniguruma alternative order. The native casefold
+/// capture over every Unicode scalar adds U+017F to ASCII S/s only.
+pub(crate) fn qwen_regex_end(text: &str, start: usize) -> usize {
+    let rest = &text[start..];
+    if let Some(tail) = rest.strip_prefix('\'') {
+        for suffix in ["s", "t", "re", "ve", "m", "ll", "d"] {
+            let mut chars = tail.chars();
+            let mut end = start + 1;
+            let matched = suffix.chars().all(|expected| {
+                let Some(ch) = chars.next() else { return false };
+                let folded = if ch == '\u{17f}' {
+                    's'
+                } else {
+                    ch.to_ascii_lowercase()
+                };
+                if folded != expected {
+                    return false;
+                }
+                end += ch.len_utf8();
+                true
+            });
+            if matched {
+                return end;
+            }
+        }
+    }
+    let first = rest.chars().next().expect("nonempty Qwen regex remainder");
+    let flags = unicode::flags(first as u32);
+    let prefix =
+        if flags & (unicode::LETTER | unicode::NUMBER) == 0 && first != '\r' && first != '\n' {
+            first.len_utf8()
+        } else {
+            0
+        };
+    let mut end = start + prefix;
+    let begin = end;
+    for ch in text[end..].chars() {
+        if unicode::flags(ch as u32) & unicode::LETTER == 0 {
+            break;
+        }
+        end += ch.len_utf8();
+    }
+    if end > begin {
+        return end;
+    }
+    if flags & unicode::NUMBER != 0 {
+        return start + first.len_utf8();
+    }
+    let mut end = start + usize::from(first == ' ');
+    let begin = end;
+    for ch in text[end..].chars() {
+        if unicode::flags(ch as u32) & (unicode::SPACE | unicode::LETTER | unicode::NUMBER) != 0 {
+            break;
+        }
+        end += ch.len_utf8();
+    }
+    if end > begin {
+        while matches!(text.as_bytes().get(end), Some(b'\r' | b'\n')) {
+            end += 1;
+        }
+        return end;
+    }
+    let (mut end, mut last, mut newline) = (start, start, start);
+    for ch in rest.chars() {
+        if unicode::flags(ch as u32) & unicode::SPACE == 0 {
+            break;
+        }
+        last = end;
+        end += ch.len_utf8();
+        if matches!(ch, '\r' | '\n') {
+            newline = end;
+        }
+    }
+    if newline > start {
+        return newline;
+    }
+    if end > start {
+        return if end < text.len() && last > start {
+            last
+        } else {
+            end
+        };
+    }
+    // Every scalar is Letter, Number, Space or Other.
+    start + first.len_utf8()
 }

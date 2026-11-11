@@ -1,0 +1,39 @@
+{
+  "host": "windows",
+  "attempt": "v1",
+  "status": "failed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7276413440704346,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-new",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 3.406043529510498,
+      "log_sha256": "66a42c860220a2d290889f6095a55d678606d4e92d71ba428ff8c3b24cfb8c39"
+    }
+  ]
+}

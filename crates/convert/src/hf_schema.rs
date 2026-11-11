@@ -7,6 +7,31 @@ use crate::util::{object, optional_text, text};
 use crate::{Error, Result, reserve};
 use llama_checkpoint::{Number, Object, Value as Json};
 
+pub(crate) const QWEN_PATTERN: &str = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+";
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Normalization {
+    Identity,
+    Nfc,
+    Unsupported,
+}
+impl Normalization {
+    fn identity(value: bool) -> Self {
+        if value {
+            Self::Identity
+        } else {
+            Self::Unsupported
+        }
+    }
+    fn then(self, next: Self) -> Self {
+        match (self, next) {
+            (Self::Unsupported, _) | (_, Self::Unsupported) => Self::Unsupported,
+            (Self::Nfc, _) | (_, Self::Nfc) => Self::Nfc,
+            _ => Self::Identity,
+        }
+    }
+}
+
 pub(crate) const LLAMA3_PATTERN: &str = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+";
 
 fn required<'a>(value: &'a Object, key: &str) -> Result<&'a Json> {
@@ -81,7 +106,7 @@ fn nested(depth: usize) -> Result<()> {
 /// A finite, explicitly reviewed regex domain. Unknown valid Oniguruma syntax
 /// is rejected as unsupported, never executed as a literal or another regex.
 fn regex(pattern: &str) -> Result<()> {
-    if pattern == LLAMA3_PATTERN || pattern == "x+" {
+    if pattern == LLAMA3_PATTERN || pattern == QWEN_PATTERN || pattern == "x+" {
         return Ok(());
     }
     if pattern.chars().all(|ch| {
@@ -158,10 +183,10 @@ fn alternate<T>(names: &[&str], mut parse: impl FnMut(&str) -> Result<T>) -> Res
     Err(unsupported.unwrap_or(Error::Invalid("no compatible tokenizer schema variant")))
 }
 
-pub(crate) fn normalizer(value: Option<&Json>, depth: usize) -> Result<bool> {
+pub(crate) fn normalizer(value: Option<&Json>, depth: usize) -> Result<Normalization> {
     nested(depth)?;
     let Some(value) = value.filter(|v| !matches!(v, Json::Null)) else {
-        return Ok(true);
+        return Ok(Normalization::Identity);
     };
     let value = object(value)?;
     const TAGS: &[&str] = &[
@@ -204,36 +229,40 @@ pub(crate) fn normalizer(value: Option<&Json>, depth: usize) -> Result<bool> {
         |kind| normalizer_variant(value, kind, depth),
     )
 }
-fn normalizer_variant(value: &Object, kind: &str, depth: usize) -> Result<bool> {
+fn normalizer_variant(value: &Object, kind: &str, depth: usize) -> Result<Normalization> {
     match kind {
         "Bert" => {
             let clean = boolean(value, "clean_text")?;
             let cjk = boolean(value, "handle_chinese_chars")?;
             let lower = boolean(value, "lowercase")?;
             let accents = optional_bool(value.get("strip_accents"))?.unwrap_or(lower);
-            Ok(!clean && !cjk && !lower && !accents)
+            Ok(Normalization::identity(
+                !clean && !cjk && !lower && !accents,
+            ))
         }
         "Strip" => {
             let left = boolean(value, "strip_left")?;
             let right = boolean(value, "strip_right")?;
-            Ok(!left && !right)
+            Ok(Normalization::identity(!left && !right))
         }
         "Sequence" => {
             let values = array(required(value, "normalizers")?)?;
-            let mut identity = true;
+            let mut execution = Normalization::Identity;
             for value in values {
                 if matches!(value, Json::Null) {
                     return Err(Error::Invalid("null nested normalizer"));
                 }
-                identity &= normalizer(Some(value), depth + 1)?;
+                execution = execution.then(normalizer(Some(value), depth + 1)?);
             }
-            Ok(identity)
+            Ok(execution)
         }
         "Replace" => {
             replacement(value)?;
-            Ok(false)
+            Ok(Normalization::Unsupported)
         }
-        "Prepend" => Ok(text(required(value, "prepend")?)?.is_empty()),
+        "Prepend" => Ok(Normalization::identity(
+            text(required(value, "prepend")?)?.is_empty(),
+        )),
         "Precompiled" => {
             marker(value, "Precompiled")?;
             let map = text(required(value, "precompiled_charsmap")?)?;
@@ -242,9 +271,13 @@ fn normalizer_variant(value: &Object, kind: &str, depth: usize) -> Result<bool> 
             }
             Err(Error::Unsupported("Tokenizers precompiled normalizer map"))
         }
-        "StripAccents" | "NFC" | "NFD" | "NFKC" | "NFKD" | "Lowercase" | "Nmt" | "ByteLevel" => {
+        "NFC" => {
             marker(value, kind)?;
-            Ok(false)
+            Ok(Normalization::Nfc)
+        }
+        "StripAccents" | "NFD" | "NFKC" | "NFKD" | "Lowercase" | "Nmt" | "ByteLevel" => {
+            marker(value, kind)?;
+            Ok(Normalization::Unsupported)
         }
         _ => Err(Error::Invalid("unknown normalizer variant")),
     }

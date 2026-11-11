@@ -1,0 +1,78 @@
+{
+  "host": "windows",
+  "attempt": "v3",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5501282215118408,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-new",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 10.001755237579346,
+      "log_sha256": "df15accf18b1177675c9f1f0d3dbbd3fa91145abf74e33b31652bdc5ef871e7d"
+    },
+    {
+      "name": "release-new",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 26.771739959716797,
+      "log_sha256": "331a1248734b01c8169827501c97f98a235accdefd1bc7911778cb784530efa0"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.361603260040283,
+      "log_sha256": "1e4126766d70eb9a371309bb1468dc6df444da150fe369da93fca4e2204a0395"
+    }
+  ]
+}

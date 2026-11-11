@@ -1,0 +1,26 @@
+   Compiling foldhash v0.2.0
+   Compiling arraydeque v0.5.1
+   Compiling hashbrown v0.17.1
+   Compiling llama-checkpoint v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\models\crates\checkpoint)
+   Compiling hashlink v0.12.2
+   Compiling yaml-rust2 v0.13.0
+   Compiling llama-convert v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\models\crates\convert)
+error[E0277]: can't compare `std::string::String` with `&mut str`
+  --> crates\convert\src\hf_qwen_reference.rs:95:13
+   |
+95 |             assert_eq!(actual, input, "NFC identity U+{cp:06X}");
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no implementation for `std::string::String == &mut str`
+   |
+   = help: the trait `PartialEq<&mut str>` is not implemented for `std::string::String`
+   = help: `std::string::String` implements trait `PartialEq<Rhs>`:
+             PartialEq<&str>
+             PartialEq<ByteStr>
+             PartialEq<Cow<'_, str>>
+             PartialEq<PathBuf>
+             PartialEq<std::bstr::ByteString>
+             PartialEq<std::path::Path>
+             PartialEq<str>
+             PartialEq
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `llama-convert` (lib test) due to 1 previous error

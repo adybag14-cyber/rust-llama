@@ -1,0 +1,110 @@
+{
+  "host": "linux",
+  "attempt": "v1",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-convert",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.272101879119873,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-new",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 6.783874750137329,
+      "log_sha256": "fa2eed0eb9c0742eac2baa6e321b7f9e49de0894ec4609334e9178346237ac93"
+    },
+    {
+      "name": "debug-all",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 8.992641687393188,
+      "log_sha256": "4234ec1e3409a05bc6da9aed12cb5c95cc6984c5187e22a43826d5362d3bac8c"
+    },
+    {
+      "name": "release-new",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 13.345925092697144,
+      "log_sha256": "56a451830057a3d654047e63fb0fabc0abdf98d2bd6032029307dad2349c2b3b"
+    },
+    {
+      "name": "release-official",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "pretrained_qwen_tokenizer_reference",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.020930290222168,
+      "log_sha256": "d19f12323bf98ea9cd3c7e9a8e5b4c3259c2266c8178072dbd4f9973318caddb"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 3.724207878112793,
+      "log_sha256": "288a46187e597452cc0cf778206844c9487a056b100b96e42adb5416040bcdbe"
+    }
+  ]
+}

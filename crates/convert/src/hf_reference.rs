@@ -236,3 +236,6 @@ fn pretrained_smollm2_hf_vocabulary_and_probe() {
         .collect();
     assert_eq!(ids, expected);
 }
+
+#[path = "hf_qwen_reference.rs"]
+mod qwen;

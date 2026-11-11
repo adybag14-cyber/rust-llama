@@ -1,0 +1,114 @@
+{
+  "host": "windows",
+  "attempt": "v2",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5517497062683105,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-new",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 5.244395732879639,
+      "log_sha256": "35221c882bee7652b6260e7922c74d8277e673488fd56859e945d6c636999590"
+    },
+    {
+      "name": "debug-all",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 10.74325966835022,
+      "log_sha256": "702f82f3bc2d95a1323950e8f5ac20e94c2fc4ea753cbb538a8d5cdf2739e59f"
+    },
+    {
+      "name": "release-new",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "hf_reference::qwen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 20.780282735824585,
+      "log_sha256": "8d71ceebdddbf221519278cf601b4ede6a18d5f15144dc138bb1fb599b46fd94"
+    },
+    {
+      "name": "release-official",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "pretrained_qwen_tokenizer_reference",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 1.3254544734954834,
+      "log_sha256": "a1625567f112c55ea3bb727afa1f4d9452601de6a7ccaabc125385477db6a8bb"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.818862199783325,
+      "log_sha256": "00dd40ef80e578fc88ed9bfe47051a3333d6c2a7793a26598b383aceb1d569de"
+    }
+  ]
+}
