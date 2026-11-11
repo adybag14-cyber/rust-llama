@@ -154,3 +154,54 @@ jobs:
           LLAMA_TEST_QWEN_HF_ROOT: ${{ runner.temp }}/qwen-hf
           LLAMA_TEST_QWEN_OUTPUT_ROOT: ${{ runner.temp }}/qwen-converter-output
         run: cargo test --release --offline --locked -p llama-convert --test qwen_pretrained ${{ matrix.model.test }} -- --ignored --exact --nocapture
+
+  gpt-conversion:
+    name: GPT conversion / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned compiler
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Fetch checksum-pinned reviewed dependencies
+        run: cargo fetch --locked
+      - name: Fetch and verify unchanged official GPT inputs
+        env:
+          GPT_CHECKPOINT_ROOT: ${{ runner.temp }}/gpt-converter-inputs
+        run: |
+          $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/gpt-conversion/pretrained-reference.json' | ConvertFrom-Json
+          foreach ($modelKey in @('gpt2', 'gptneox')) {
+            $origin = $manifest.model_origins.$modelKey
+            $directory = Join-Path (Join-Path $env:GPT_CHECKPOINT_ROOT $modelKey) 'official-hf'
+            foreach ($file in $origin.files) {
+              $destination = Join-Path $directory $file.path
+              # Redirect responses can be larger than the small final sidecar.
+              $maximumTransferBytes = [Math]::Max([long]$file.bytes, [long]1048576)
+              & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $maximumTransferBytes --create-dirs --output $destination $file.url
+              if ($LASTEXITCODE -ne 0) { throw "Download failed: $modelKey/$($file.path)" }
+              if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {
+                throw "Length mismatch: $modelKey/$($file.path)"
+              }
+              $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+              if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: $modelKey/$($file.path)" }
+              Write-Host "Verified $modelKey/$($file.path): $($file.bytes) bytes, SHA-256 $hash"
+            }
+          }
+      - name: Compare complete GPT conversions and the original GPT-2 rejection
+        env:
+          LLAMA_TEST_GPT2_HF: ${{ runner.temp }}/gpt-converter-inputs/gpt2/official-hf
+          LLAMA_TEST_GPTNEOX_HF: ${{ runner.temp }}/gpt-converter-inputs/gptneox/official-hf
+          LLAMA_TEST_GPT_OUTPUT_ROOT: ${{ runner.temp }}/gpt-converter-output
+        run: cargo test -p llama-convert --release --offline --locked --test gpt_pretrained -- --ignored --nocapture --test-threads=1

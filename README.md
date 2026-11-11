@@ -70,7 +70,7 @@ with checked boundaries for consumed settings and tensor names.
 
 ## Convert a Hugging Face checkpoint
 
-The native Rust converter accepts local dense Llama, Qwen2 and Qwen3 Safetensors checkpoints:
+The native Rust converter accepts local dense Llama, Qwen2, Qwen3, GPT-2 and GPT-NeoX Safetensors checkpoints:
 
 ~~~sh
 cargo run --release --offline --locked -p llama-convert --bin convert-hf-to-gguf -- \
@@ -127,11 +127,11 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | Area | Executable implementation |
 | --- | --- |
 | Quantization | All 36 active dtype decoders; all 29 source model quantizers including required/optional importance weights; 32 non-integer codecs including activation and F64 helpers; checked integer setters; all 29 scalar CPU weight dots. |
-| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 94 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, recurrent and gated-delta operators, hyper-connections, Lightning Indexer, backward RoPE, vision/loss kernels, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
+| Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 100 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, recurrent and gated-delta operators, hyper-connections, Lightning Indexer, extended forward/backward RoPE, masked/sink/ALiBi softmax, owned SGD/AdamW state, threaded custom callbacks, vision/loss kernels, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
 | Formats and vocabulary | Bounded shared raw/text GGUF v2/v3 reader and owned shard sets, byte-preserving ordered little-endian streaming writer, bounded split/merge executable, raw/indexed Safetensors reading with retained file capabilities, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
 | Model runtime | Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
-| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 216 implemented frozen C API exports. |
-| Checkpoint conversion | Native dense Llama/Qwen2/Qwen3 HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior including the Qwen Split expression, pinned NFC and class resolution, seven output type selections and complete-file publication. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 226 implemented frozen C API exports, including LoRA adapters and control vectors. |
+| Checkpoint conversion | Native dense Llama/Qwen2/Qwen3/GPT2/GPTNeoX HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior including the Qwen Split expression, pinned NFC and class resolution, seven output type selections and complete-file publication. |
 | Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
 | Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
@@ -139,14 +139,25 @@ Detailed support boundaries are in the crate READMEs and [PORT_STATUS.md](docs/P
 
 ## Independent comparisons
 
-The 11 November continuation passed **662 Windows / 667 GNU ordinary tests in
+The latest component continuation adds extended rotary/softmax behavior, six
+optimizer/custom operation IDs, ten native adapter C exports, and general GPT-2
+and GPT-NeoX checkpoint conversion. Independent MSVC/GNU captures compare
+11,181,540 admitted attention output bytes, 440,704 optimizer state bytes and
+30,064 custom-callback bytes per profile. Adapter fixtures cover 44 loads and
+107 execution scenarios, with 170,496 exact logit words. The GPT converter
+compares 77 successful ordinary files and six pretrained files totaling
+718,209,760 pretrained bytes per host. The original official GPT-2 rejection
+is preserved; the positive derivative removes only twelve static mask buffers.
+See the [current scope and qualifications](docs/PORT_STATUS.md).
+
+The earlier 11 November continuation passed **662 Windows / 667 GNU ordinary tests in
 each of debug and release**, with zero failures and 27 explicit external/device
 prerequisites ignored in each ordinary run. Both hosts verified all 4,082 supplied
 source files and all 858 fixture files across ten manifests. Separate release
 runs passed eleven pretrained inference/server tests, three complete-file
 converter tests, and the official Qwen tokenizer replay. Original-header clients
 and debug/release export inventories checked 216 frozen C exports plus four
-extensions; 39 frozen exports remain absent. The retained qualification explains
+extensions; 39 frozen exports were absent at that checkpoint. The retained qualification explains
 the CI-only change detected by the original execution-input guard, the unchanged
 1,279 other recorded inputs, and the successful four-stage postflight. Published-commit
 CI is reported separately by GitHub Actions. All twenty mandatory
@@ -195,7 +206,7 @@ The retained 9 November 2026 evidence includes:
 - **Shared flash and tensor adapter:** 3,746 original graphs check 7,060,000 raw default/forced output words per compiler profile, including source NaN operand selection. One-chunk, tiled and split-KV paths retain original geometry, physical masks, row maps and real worker partitions. The tensor adapter separately checks 114 new admitted graphs plus 896 reused sealed cases, with 3,032,980 exact output words per profile. Unsupported domains remain explicit; the tensor DAG has no aggregate retained-memory budget.
 - **Checkpoint foundation:** raw/indexed Safetensors reading, bounded positioned reads and a retained-directory capability boundary. Independent original file/index corpora and safe checked path-policy differences are recorded in [the checkpoint crate](crates/checkpoint/README.md). Other architecture converters and remaining format boundaries stay open.
 - **Actual devices:** 138 CUDA dispatches on RTX 4090 with zero recorded error; OpenCL kernel cases on RTX 4090 and AMD gfx1036 with recorded numerical bounds.
-- **C ABI:** At that checkpoint, 191 of 255 frozen exports, plus four diagnostic extensions, were exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The current [coverage inventory](crates/ffi/COVERAGE.md) retains all 39 absent exports and the remaining semantic restrictions.
+- **C ABI:** At that checkpoint, 191 of 255 frozen exports, plus four diagnostic extensions, were exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The current [coverage inventory](crates/ffi/COVERAGE.md) retains all 29 absent exports and the remaining semantic restrictions.
 - **Server:** 37 real-model generation requests plus 283 embedding HTTP transcripts per original build (256 tiny-model, 27 pretrained BGE). Both verified profiles require exact corresponding F32 bits and all seven base64 vectors. Direct normalization checks cover another 4,608 values. Real TCP lifecycle tests cover configured load bounds, limits, provider failures, disconnects, shutdown and complete deadline errors.
 
 The original MSVC and GNU builds do not use identical row arithmetic: the verified GNU build enables source SSE2 exponentiation, reductions and variance, while the verified MSVC build uses scalar rows. Separate expected captures preserve those differences. Test expectations select their profile independently of runtime dispatch. The model runtime also preserves 256-column attention padding and physical cache holes. None of these results establishes every CPU instruction-set path.
@@ -213,7 +224,9 @@ cargo xtask audit
 cargo xtask fixtures
 ```
 
-Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Qwen2, Qwen3, Mamba-1 and BERT model inputs for explicit numerical comparisons. CI also downloads exact official GPT-2 and Pythia Safetensors revisions and uses the Rust xtask preparer to reconstruct the pinned GGUF test inputs before inference comparisons. This preparer is a fixed test-data route; the general converter families are Llama, Qwen2 and Qwen3. Separate Windows and Linux CI jobs download the exact official Qwen checkpoint files, verify every input hash, and compare all three complete converter outputs for each model. Hardware/vendor tests retain their own explicit prerequisites. The corresponding verified original profiles produce exact results for the exercised model cases; unchanged portable error budgets remain available for unverified targets. See [fixtures/inference/README.md](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
+Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Qwen2, Qwen3, Mamba-1 and BERT model inputs for explicit numerical comparisons. CI also downloads exact official GPT-2 and Pythia Safetensors revisions and uses the Rust xtask preparer to reconstruct pinned GGUF inputs for inference tests.
+
+Separate conversion jobs verify every input hash and all three complete outputs per model for Qwen and GPT checkpoints. The general converter admits Llama, Qwen2, Qwen3, GPT-2 and GPT-NeoX. Its GPT test preserves the original official GPT-2 rejection and separately verifies the disclosed test derivative; [GPT_HF_CONVERSION.md](docs/GPT_HF_CONVERSION.md) records that boundary. Hardware/vendor tests retain their own explicit prerequisites. Exact numerical claims apply to the corresponding measured original profiles; portable error budgets remain available for unverified targets. See [inference fixtures](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
 
 With the frozen source extracted separately:
 

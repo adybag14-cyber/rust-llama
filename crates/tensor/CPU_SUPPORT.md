@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **94 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **7 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **100 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The remaining **one ID**, FLASH_ATTN_BACK, has no executable constructor; its public constructor aborts in the frozen source. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs`, `src/cpu_rope_back.rs`, `src/cpu_softmax.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs`, `src/cpu_rope_back.rs`, `src/cpu_softmax.rs`, `src/cpu_optimizer.rs`, `src/cpu_custom.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -99,14 +99,14 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 90 | `DSV4_HC_POST` | Implemented slice | F32 | Strided residual stream update, optional mixing matrix; finite read values/output. |
 | 91 | `TOP_K_MASK` | Implemented slice | F32/F16 mask + I32 indices | Optional score/block/extra inputs, source invalid-index skipping, batch repeats, raw retained payload bits. |
 | 92 | `UNARY` | Implemented slice | F32 / F16 / BF16 | All 22 scalar formulas; XIELU needs explicit parameters; OS ERF provider exact on verified dynamic-CRT profiles; mathematical fallback elsewhere. |
-| 93 | `MAP_CUSTOM1` | Pending | — | No executable Op constructor; no fallback result. |
-| 94 | `MAP_CUSTOM2` | Pending | — | No executable Op constructor; no fallback result. |
-| 95 | `MAP_CUSTOM3` | Pending | — | No executable Op constructor; no fallback result. |
-| 96 | `CUSTOM` | Pending | — | No executable Op constructor; no fallback result. |
+| 93 | `MAP_CUSTOM1` | Implemented slice | All active storage dtypes as checked bytes | Owned Rust callback; checked immutable input and physical-byte output access; actual scoped task threads. See CUSTOM.md. |
+| 94 | `MAP_CUSTOM2` | Implemented slice | All active storage dtypes as checked bytes | Two immutable inputs in source order; checked byte initialization and task dispatch. See CUSTOM.md. |
+| 95 | `MAP_CUSTOM3` | Implemented slice | All active storage dtypes as checked bytes | Three immutable inputs in source order; all callbacks join before result publication. See CUSTOM.md. |
+| 96 | `CUSTOM` | Implemented slice | All active storage dtypes as checked bytes | Explicit dtype/shape and zero through nine immutable inputs; owned callback userdata and bounded result storage. See CUSTOM.md. |
 | 97 | `CROSS_ENTROPY_LOSS` | Implemented slice | F32 | Finite equal-shape logits/labels, aligned rows, source flat row addressing and one-worker scalar log-softmax reduction. See VISION_LOSS.md. |
 | 98 | `CROSS_ENTROPY_LOSS_BACK` | Implemented slice | F32 | Finite scalar gradient and contiguous logits/labels; shared native-profile softmax and original rounding. See VISION_LOSS.md. |
-| 99 | `OPT_STEP_ADAMW` | Pending | — | No executable Op constructor; no fallback result. |
-| 100 | `OPT_STEP_SGD` | Pending | — | No executable Op constructor; no fallback result. |
+| 99 | `OPT_STEP_ADAMW` | Implemented slice | F32 | F32 parameter/gradient/moment steps with seven physical hyperparameters; all three owned state outputs publish atomically. See OPTIMIZERS.md. |
+| 100 | `OPT_STEP_SGD` | Implemented slice | F32 | F32 parameter/gradient step with two physical hyperparameters; preserved weight stride/padding and independent result storage. See OPTIMIZERS.md. |
 | 101 | `GLU` | Implemented slice | F32 / F16 / BF16, with limits below | All seven scalar variants; OAI/CLAMP support F32/F16 only; packed/split and gate swaps. |
 
 ## Unary variants
@@ -205,3 +205,15 @@ native-profile exact-byte gates. Both reuse the established source arithmetic
 policies and preserve their checked storage/finite-domain boundaries. Backward
 softmax nonzero bias remains an original assertion and is not advertised as
 supported. See [the complete contract](ATTENTION_EXT.md).
+
+## Optimizer and custom callback execution
+
+SGD and AdamW preserve the source F32 expression order and physical row addressing,
+including padding and separate moment output. The immutable Rust API publishes
+owned replacement state; it does not claim arbitrary in-place aliases or a
+complete training engine. MAP_CUSTOM1/2/3 and CUSTOM retain owned Rust callbacks,
+use actual scoped workers and verify full output-byte initialization before
+publication. Each original MSVC/GNU profile contributes 300 optimizer cases
+with 440,704 exact output bytes and 260 custom cases with 30,064 exact bytes.
+See [OPTIMIZERS.md](OPTIMIZERS.md), [CUSTOM.md](CUSTOM.md), and the component
+[evidence](../../evidence/2026-11-11/optimizer-custom).

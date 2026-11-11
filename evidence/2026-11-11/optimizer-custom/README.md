@@ -40,5 +40,5 @@ expected a spurious error; the test was corrected to genuinely incompatible
 shapes. The first Clippy run reported three style issues, fixed without warning
 allowances. Those failed logs remain distinct from subsequent passing evidence.
 
-See [the optimizer contract](../../../../crates/tensor/OPTIMIZERS.md),
-[the callback contract](../../../../crates/tensor/CUSTOM.md), and summary.json.
+See [the optimizer contract](../../../crates/tensor/OPTIMIZERS.md),
+[the callback contract](../../../crates/tensor/CUSTOM.md), and summary.json.

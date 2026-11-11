@@ -1,0 +1,53 @@
+{
+  "reviewed_utc": "2026-11-11T13:14:39.704Z",
+  "scope": "Read-only review of main .github/workflows/ci.yml GPT conversion job against convert worker's manifest and ignored tests; no builds or downloads",
+  "blocking_findings": [],
+  "verified_manifest_inputs": {
+    "checks": [
+      {
+        "model": "gpt2",
+        "input_count": 7,
+        "repository": "openai-community/gpt2",
+        "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+        "basename": "official-hf"
+      },
+      {
+        "model": "gptneox",
+        "input_count": 6,
+        "repository": "EleutherAI/pythia-14m",
+        "revision": "cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+        "basename": "official-hf"
+      }
+    ],
+    "download_files": 13,
+    "download_bytes": 581242324,
+    "all_downloads_match_test_inputs": true,
+    "derived_sidecars_match_original": true,
+    "hashes": [
+      {
+        "path": "C:\\Users\\adyba\\rust-llama\\.github\\workflows\\ci.yml",
+        "sha256": "50d87fc1f6140e43c39eece622c46a6b6f4aac1c3feabd7aa093c2b6e8f79efb"
+      },
+      {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\convert\\tests\\fixtures\\gpt-conversion\\pretrained-reference.json",
+        "sha256": "afec1ff9b0f030e1d41e1a329ec3b2b594323f5bf97c7487cdf0d85b41dea976"
+      },
+      {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\convert\\crates\\convert\\tests\\gpt_pretrained.rs",
+        "sha256": "95fbe29cd4664a5b9b3dc7c36419bca8544e9ea2772b67a2653c9e278e4c67a8"
+      }
+    ]
+  },
+  "conclusions": [
+    "PowerShell download loop selects the exact model_origins.gpt2 and model_origins.gptneox records. All 13 URL, path, size and SHA-256 entries match the input descriptors used by the ignored tests.",
+    "All URLs bind the expected repository and immutable 40-character revision. Each curl result is checked immediately; complete size and lowercase SHA-256 are verified after transfer. The one-MiB minimum transfer ceiling allows small-file redirect responses while exact final sizes remain enforced.",
+    "The downloader and test step use the same runner.temp/gpt-converter-inputs/{gpt2,gptneox}/official-hf paths. The directory basenames preserve the captured converter naming behavior.",
+    "runner.temp appears in step-level environment values, with the job configured for PowerShell on each independent Ubuntu/Windows runner. Shared compile policy and pinned toolchain installation match the surrounding workflow.",
+    "LLAMA_TEST_GPT2_FILTERED_HF is intentionally unset on the fresh hosted runner, so the ignored GPT-2 test builds the hash-pinned derivative through Rust under the unique output root. GPT-2 original rejection, its three accepted derivative files, and all three NeoX files are covered.",
+    "The final command names gpt_pretrained explicitly and runs release, offline, locked, ignored tests with test-threads=1. Both tests share only the fresh parent output root and use distinct output subdirectories; input hashes are checked again before and after conversion."
+  ],
+  "qualifications": [
+    "This review is structural/source validation, not a completed hosted Actions run. Parent's parser/static-checker and integrated executions remain separate evidence.",
+    "No workflow or product source was modified by this reviewer."
+  ]
+}
