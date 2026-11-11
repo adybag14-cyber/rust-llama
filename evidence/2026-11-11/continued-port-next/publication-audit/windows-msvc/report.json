@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "started_utc": "2026-11-11T13:57:06.710767+00:00",
+  "steps": [
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 56936,
+        "sha256": "12236c41cebe14cb5cf7a61199dd5414efc3bd30c44a53039d95d9ae48a7602b"
+      },
+      "stderr": {
+        "bytes": 108,
+        "sha256": "42ca35b44e416c05b07e33a76472813b1f86fac0bd059147572f02d1865d6a9a"
+      }
+    }
+  ],
+  "changed_paths_scope": "Only evidence/ and README.md or docs/PORT_STATUS.md",
+  "changed_path_count": 1010,
+  "git_head": "ebeb0637932774e6b07d989ab3f01259bc363715",
+  "staged_receipt": {
+    "bytes": 13546,
+    "sha256": "4f4329b914a873771250748a29e64ff53131492a7f66913e95ee5b07f45f83f1"
+  },
+  "execution_inputs": {
+    "files": 1536,
+    "bytes": 229192,
+    "sha256": "f4d5d64039bd7013fae32b5469799db984e6ef67e2aeae9c7fd91aff36d74ee2",
+    "unchanged": true
+  },
+  "finished_utc": "2026-11-11T13:57:17.197338+00:00",
+  "driver": {
+    "bytes": 3666,
+    "sha256": "6f67a5fa22f85632d60ff8b27f82f7a5ef8a9b2084247e906c00adfb666fa590"
+  }
+}

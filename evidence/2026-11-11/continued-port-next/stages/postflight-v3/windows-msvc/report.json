@@ -1,0 +1,3844 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "profile": "windows-msvc",
+  "tag": "postflight-v3",
+  "started_utc": "2026-11-11T13:46:10.372063+00:00",
+  "steps": [
+    {
+      "name": "verify-reference-copy",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.862,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+      },
+      "stderr": {
+        "bytes": 169,
+        "sha256": "d37a821eefb69ddd494aceef2a6fc5f4fad28268d4f7910c2b826bfc959a2bd6"
+      }
+    },
+    {
+      "name": "release-gates",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 0.092,
+      "stdout": {
+        "bytes": 3565,
+        "sha256": "444a896d212a753d3e7b0f38e74c95145f1cfbd83bb586d91c3e7d3ede940de6"
+      },
+      "stderr": {
+        "bytes": 284,
+        "sha256": "8b919ab796d6d2939f7e6babc7ff041e50522c6d1bc80c45873341b76440f9c1"
+      }
+    },
+    {
+      "name": "prepare-gpt2",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "gpt2-124m-f16",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\official-hf\\model.safetensors",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\prepared-pretrained\\gpt2-124m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 9.561,
+      "stdout": {
+        "bytes": 171,
+        "sha256": "7aa97b8e7484835068bdd0eeba879c0aaadfc37b396390d7e0cdfd46f7195c47"
+      },
+      "stderr": {
+        "bytes": 380,
+        "sha256": "c435351d432fd3a17e32db5e6200c0f845c0da62616de69a25bcdbfde1d9c3de"
+      }
+    },
+    {
+      "name": "prepare-gptneox",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "pythia-14m-f16",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\official-hf\\model.safetensors",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\prepared-pretrained\\pythia-14m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.553,
+      "stdout": {
+        "bytes": 169,
+        "sha256": "4fb8293b226740d3e2dd9c7ba45f4861d50d10b5067bab31314da5bcc23c286b"
+      },
+      "stderr": {
+        "bytes": 385,
+        "sha256": "68006afd254f75a6e4a2a132ab34f2d7a90c1ea6793b04ecb7257b4b9951b95e"
+      }
+    },
+    {
+      "name": "pretrained-inference",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-server",
+        "--tests",
+        "--",
+        "--ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 292.577,
+      "stdout": {
+        "bytes": 2420,
+        "sha256": "942456b510efe0ad72a2d9ea2d7021c1fd3e644e2cb0a919215291f3cdf0b6e1"
+      },
+      "stderr": {
+        "bytes": 3445,
+        "sha256": "2b9657d526d353582f6da9c55da0595ef5bc6f8b86b38813c0be4b405892b01e"
+      },
+      "tests": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 15
+      }
+    },
+    {
+      "name": "pretrained-converter",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--lib",
+        "pretrained_smollm2_complete_conversions",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.091,
+      "stdout": {
+        "bytes": 409,
+        "sha256": "c41addbb881936e9264e7fcbaa16764b78959d231c48305c141c8aac8681bc1d"
+      },
+      "stderr": {
+        "bytes": 153,
+        "sha256": "cdad4904b9a1cff91519f4b476cca941dcb3ba3b41d7ba9b5e7a9f350b123271"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "pretrained-qwen2-converter",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen2_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 31.882,
+      "stdout": {
+        "bytes": 631,
+        "sha256": "8e14a73fc0507bad8e6fa53c3f7e1165be3e62d8b3597da5b5d0d5b2dbf7be9a"
+      },
+      "stderr": {
+        "bytes": 236,
+        "sha256": "c296b1da2d6a0b24c357f6bbadb352ff614c6117c1f2026d776b8e11c690f547"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "pretrained-qwen3-converter",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen3_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 40.452,
+      "stdout": {
+        "bytes": 589,
+        "sha256": "5844009606fbf7b5cc655add67c80d23730da5b38d446399d62c79171a81eb9f"
+      },
+      "stderr": {
+        "bytes": 159,
+        "sha256": "702bc7a5ec117c8ff5a9b24a77aecd29cf38a91cd450d72a7eb7d13fbc41106f"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "pretrained-qwen-tokenizer",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "pretrained_qwen_tokenizer_reference",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.277,
+      "stdout": {
+        "bytes": 181,
+        "sha256": "3cb4120b95cdfdaa87125c2a9cfe48433d7e36b0d552d95ea2297bc6d3dca39b"
+      },
+      "stderr": {
+        "bytes": 232,
+        "sha256": "63a084025fd5858b55ac9880d8f9d1370244467d835659af8d597081a9a34c45"
+      },
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "pretrained-gpt-converter",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "gpt_pretrained",
+        "--",
+        "--ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 23.057,
+      "stdout": {
+        "bytes": 1387,
+        "sha256": "f85503d9945de2c8aabd1a28866cf4c0392bfa7fd1f773447f794f83859e0b5f"
+      },
+      "stderr": {
+        "bytes": 157,
+        "sha256": "135a60f53dd3f483ec2d84a633046945cd077196a6afe55dac43cfafc4ec7d7b"
+      },
+      "tests": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      }
+    },
+    {
+      "name": "chat-c-debug",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\build-windows\\Release\\chat-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\inputs-v1.bin",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\debug\\chat.bin"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.332,
+      "stdout": {
+        "bytes": 43,
+        "sha256": "25abcde4e68292f6dc0007c00aebcfe3e93981e6821009c578e6c05354ef3e36"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "raw-name-c-debug",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\tokenizer-raw-name-oracle\\replay-final.py",
+        "windows",
+        "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\debug\\raw-name"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.928,
+      "stdout": {
+        "bytes": 702,
+        "sha256": "83fefc5c177ff9f3592807f6a0957a32f306ec509f7e50485b69d4d82063dd6d"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "chat-c-release",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\build-windows\\Release\\chat-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\inputs-v1.bin",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\release\\chat.bin"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.093,
+      "stdout": {
+        "bytes": 43,
+        "sha256": "25abcde4e68292f6dc0007c00aebcfe3e93981e6821009c578e6c05354ef3e36"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "raw-name-c-release",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\tokenizer-raw-name-oracle\\replay-final.py",
+        "windows",
+        "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\release\\raw-name"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.659,
+      "stdout": {
+        "bytes": 704,
+        "sha256": "b72d3fc1735b46126d371ce56bba49b6611638a134da17a0291f9b8238f68f98"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "new-c-clients",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\replay-prior-c-clients.py",
+        "C:\\Users\\adyba\\rust-llama",
+        "C:\\Users\\adyba\\rust-llama\\target",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 3.8,
+      "stdout": {
+        "bytes": 1042,
+        "sha256": "79fa8d11049977af807e202a857d7e289e66c382291ad39b30772b5bc35b4fc0"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "adapter-c-clients",
+      "argv": [
+        "C:\\Python314\\python.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\replay.py",
+        "--repo",
+        "C:\\Users\\adyba\\rust-llama",
+        "--debug-library",
+        "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+        "--release-library",
+        "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+        "--output",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\adapter-c-clients"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.246,
+      "stdout": {
+        "bytes": 107,
+        "sha256": "63f3573d38121fd6b48726868742f5e7b5940bbf3c8d115c798bedb25199fb03"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "native_clients": {
+    "debug": {
+      "library": {
+        "bytes": 5321728,
+        "sha256": "89ec6baf8835d4532a7789dbf696b8408b19a2b1201eb8d38d391912330768a2"
+      },
+      "exports": {
+        "implemented": 226,
+        "extensions": 4,
+        "missing": 29
+      },
+      "chat": {
+        "cases": 35946,
+        "output": {
+          "bytes": 3937927,
+          "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+        },
+        "caller": {
+          "bytes": 53248,
+          "sha256": "04074bb44e168da6ce985c070142d8a8a37748fa95d9043c26561e45da0e5ec1"
+        }
+      },
+      "metadata": {
+        "cases": 171,
+        "records": [
+          {
+            "name": "baseline-vocab",
+            "output": {
+              "bytes": 158736,
+              "sha256": "24c6daba5c1c8f95e9b226a787777cbd699555bac039f59b0fbece6d08c66d18"
+            }
+          },
+          {
+            "name": "baseline-full",
+            "output": {
+              "bytes": 183587,
+              "sha256": "d14a2374edfc390541019533bab4e2978910f794f4f90a7fff942f78ba7a35fd"
+            }
+          },
+          {
+            "name": "scalar-types-and-bits-vocab",
+            "output": {
+              "bytes": 856887,
+              "sha256": "d26aca245e56dab50b490afa920d8f1c691dc9e2a26b6ed101f50d416c8eb687"
+            }
+          },
+          {
+            "name": "scalar-types-and-bits-full",
+            "output": {
+              "bytes": 881738,
+              "sha256": "0b02365beaabe832f00f26519e2b5e0264675c65883562abf047c9f56f0c96ca"
+            }
+          },
+          {
+            "name": "raw-string-values-vocab",
+            "output": {
+              "bytes": 421987,
+              "sha256": "8e364affbb171cf445c76f2c51dfd85e1496f38c19739e8ec3ebe410633f1149"
+            }
+          },
+          {
+            "name": "raw-string-values-full",
+            "output": {
+              "bytes": 446838,
+              "sha256": "645837ac57a249a570f46ad5386b1b3da887620b83628279f820682eccc05b79"
+            }
+          },
+          {
+            "name": "bool-byte-002-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "37586698bd674a1de9dc36c63918dd2ebaecdae107eb38be3766ba58f67eefd5"
+            }
+          },
+          {
+            "name": "bool-byte-002-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "4b18c0588b8efe60643a35c7f694fb6814944b672fb90cde5417af6e4c63d2f3"
+            }
+          },
+          {
+            "name": "bool-byte-127-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "4a99bf37fd73409b4ab6c502339efc3ec3a20febfc795abf0bf07ff7f17e10a6"
+            }
+          },
+          {
+            "name": "bool-byte-127-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "f180ab5e29bb0badcbf475f1cc16a8857fb81b2a8aa4869fe176f3b58389322b"
+            }
+          },
+          {
+            "name": "bool-byte-128-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "764174dcb74169a71e944e5f7f1fdafb7dc28c5d56c9a0350967bad09699e7d7"
+            }
+          },
+          {
+            "name": "bool-byte-128-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "1412e56743452b1394396eaee350abf68fcabd96fb79a3f0610ec03702a7ce98"
+            }
+          },
+          {
+            "name": "bool-byte-255-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "b56f27d31f1cab5b01d554ba8f5a3467cd40503ff3b5da9733ff9e4f1e00f82a"
+            }
+          },
+          {
+            "name": "bool-byte-255-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "340f898b3182892cbfe67543792fb9fac4d5077a25bb60f9a28aec04c96dfd3c"
+            }
+          },
+          {
+            "name": "unused-array-types-vocab",
+            "output": {
+              "bytes": 200378,
+              "sha256": "a248c88facfe9c2a196a7d89e36379c0fb2fcb50c94d4730789d4bc03424d124"
+            }
+          },
+          {
+            "name": "unused-array-types-full",
+            "output": {
+              "bytes": 225229,
+              "sha256": "c7bb0f42c83c8754e23b52f50596943f0a31f4ae6b5a7ce97f0717e125065a0e"
+            }
+          },
+          {
+            "name": "value-byte-grid-vocab",
+            "output": {
+              "bytes": 1672696,
+              "sha256": "8220ecbad353ccbe22c24bdf95cff31e7d40acf9f4963955fe4780accd373b4c"
+            }
+          },
+          {
+            "name": "value-byte-grid-full",
+            "output": {
+              "bytes": 1697547,
+              "sha256": "893509a04047b01a68b1f0e7087eb95dded3a5e72fc1237eb52518094e81b17f"
+            }
+          },
+          {
+            "name": "key-byte-grid-vocab",
+            "output": {
+              "bytes": 1651755,
+              "sha256": "5d2e427ecfe243a0da114fa885c8783844609caf1d7119a50c7f9213c1d656d5"
+            }
+          },
+          {
+            "name": "key-byte-grid-full",
+            "output": {
+              "bytes": 1676606,
+              "sha256": "904cca078d8cc31cd16cc89c8f0581368f0e6573dc37c3ec95a800d7a5de88ce"
+            }
+          },
+          {
+            "name": "raw-empty-and-long-keys-vocab",
+            "output": {
+              "bytes": 102,
+              "sha256": "cb70de969fb1012b3ebe7c221b939f995c4f25f091aac5e1cdcffce1dc2adc14"
+            }
+          },
+          {
+            "name": "raw-empty-and-long-keys-full",
+            "output": {
+              "bytes": 102,
+              "sha256": "c9bb4aed9f33ae8f7a0bf2ebd5a8d968a5b6a6ff743e3e157e8ebafe47f3c0ac"
+            }
+          },
+          {
+            "name": "two-nul-scalar-keys-vocab",
+            "output": {
+              "bytes": 180100,
+              "sha256": "c56921c500dd437adde15bcea40e7c8b2e17501698a8ab7c5d01cfe25cdfc9d1"
+            }
+          },
+          {
+            "name": "two-nul-scalar-keys-full",
+            "output": {
+              "bytes": 204951,
+              "sha256": "d14157ce8b9eccc61115b928d513880f648ffee4ced3252b1b8db93611e615db"
+            }
+          },
+          {
+            "name": "nul-before-plain-vocab",
+            "output": {
+              "bytes": 177185,
+              "sha256": "f330ed8743fa5779a96b0f45544bab1774aedcc15a1b36da702cb7c34e3bed49"
+            }
+          },
+          {
+            "name": "nul-before-plain-full",
+            "output": {
+              "bytes": 202036,
+              "sha256": "e8f4ed39ed62bba061117f196716ac8c86f9574183ca1dd67804015cbe5156d6"
+            }
+          },
+          {
+            "name": "plain-before-nul-vocab",
+            "output": {
+              "bytes": 177207,
+              "sha256": "e11907b1f1543678f9c5c4f5746f13dfa9dff2028e065d00fe016368318d2e91"
+            }
+          },
+          {
+            "name": "plain-before-nul-full",
+            "output": {
+              "bytes": 202058,
+              "sha256": "6daf8557d0b2975d64b4df358166d89b95245b32eafb6add350f8dab16a577ac"
+            }
+          },
+          {
+            "name": "array-nul-before-scalar-vocab",
+            "output": {
+              "bytes": 175912,
+              "sha256": "300f91fd674a53d75426021de3590213ecbc0bc1222dfee4bb1837ddb1a5294d"
+            }
+          },
+          {
+            "name": "array-nul-before-scalar-full",
+            "output": {
+              "bytes": 200763,
+              "sha256": "5fd76d85eb9bc8645988f2184a1dbdce26df0381614134c1fc72e3b474c855d1"
+            }
+          },
+          {
+            "name": "scalar-nul-before-array-vocab",
+            "output": {
+              "bytes": 175932,
+              "sha256": "0a27d94cebe3c668d4d123cc2644811b1f68bc27efba87d5a14f297f5aa33003"
+            }
+          },
+          {
+            "name": "scalar-nul-before-array-full",
+            "output": {
+              "bytes": 200783,
+              "sha256": "fe79cf66bac9178649b2de6b434b3224863c934f1cfb101a90f7e319db74a507"
+            }
+          },
+          {
+            "name": "array-plain-before-scalar-nul-vocab",
+            "output": {
+              "bytes": 175938,
+              "sha256": "9f7e553d5b5a41beac8dcad7086c778419f560dd2845ae73a4cdbe8e2fabff37"
+            }
+          },
+          {
+            "name": "array-plain-before-scalar-nul-full",
+            "output": {
+              "bytes": 200789,
+              "sha256": "798bd9bd33986d64e2a91ff6457751f2f5fd749f615fe88c6d650a7db331fa0f"
+            }
+          },
+          {
+            "name": "empty-prefix-aliases-vocab",
+            "output": {
+              "bytes": 99,
+              "sha256": "20cfb21675f512b2d1a5e0b669ad2b972082df27f4202e9801a3ff5deb9e6b66"
+            }
+          },
+          {
+            "name": "empty-prefix-aliases-full",
+            "output": {
+              "bytes": 99,
+              "sha256": "5b860f19803ad983f0ee5d8acffe6f2eccd42389a2464ee732133d1f8767d094"
+            }
+          },
+          {
+            "name": "exact-duplicate-key-vocab",
+            "output": {
+              "bytes": 98,
+              "sha256": "ceb649e620d805a041d69f7d42a29153a8f121bebe8e3afff4937ca6e071e199"
+            }
+          },
+          {
+            "name": "exact-duplicate-key-full",
+            "output": {
+              "bytes": 98,
+              "sha256": "8c8aa01a42c872a975410bc574c18c197652a3e44ac6613c533b237dfbdc0966"
+            }
+          },
+          {
+            "name": "general-name-raw-vocab",
+            "output": {
+              "bytes": 159382,
+              "sha256": "15a14e86f2a01dc55cd9013131ccbcf9f47db683ce72464f7a62cb3309f90f51"
+            }
+          },
+          {
+            "name": "general-name-raw-full",
+            "output": {
+              "bytes": 184233,
+              "sha256": "a58b4bac3d75b8f22eed4e6150c6de510fa4b72ac803bf04882d6d9fe50fc583"
+            }
+          },
+          {
+            "name": "general-name-nul-vocab",
+            "output": {
+              "bytes": 158412,
+              "sha256": "52403f8a00d7a417cfdc5d8b5e208276221db8ec95e868aee64b6108769de641"
+            }
+          },
+          {
+            "name": "general-name-nul-full",
+            "output": {
+              "bytes": 183263,
+              "sha256": "2c68da466e5d28009990c1be76ca365aabd8878ef97304adcd196c8ea261e6b6"
+            }
+          },
+          {
+            "name": "general-name-empty-vocab",
+            "output": {
+              "bytes": 156837,
+              "sha256": "4ac969880ade9e02b7ec90285331e1aa99242d876944e2c6f16b5af03061de08"
+            }
+          },
+          {
+            "name": "general-name-empty-full",
+            "output": {
+              "bytes": 181688,
+              "sha256": "a8b50d952fa423d4b635b86c1582884717f73fa9de54e9c4f072bbf44e988c57"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-raw-vocab",
+            "output": {
+              "bytes": 168782,
+              "sha256": "2d745341ea967f12c62445e2e602eead03d30d06758e1e671c0eb32a49dff34f"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-raw-full",
+            "output": {
+              "bytes": 193633,
+              "sha256": "106a1bace689dd9c1d80583028a8a6f452c1e911d673c68584067cb201102725"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-nul-vocab",
+            "output": {
+              "bytes": 167768,
+              "sha256": "0878b69f27d17dc0b1df6d3a75e653b1ddbc8f715e7ff30c51aec22b3dda3a8c"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-nul-full",
+            "output": {
+              "bytes": 192619,
+              "sha256": "8e582fa4a9d4fd68f577364e5feea9ec8531a167afe7aa805b4b92142df08015"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-empty-vocab",
+            "output": {
+              "bytes": 166105,
+              "sha256": "21259af56ae2a7eb4a5fb971f979dad7dab58683f224d3cf55f1a9eaad6ad0c8"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-empty-full",
+            "output": {
+              "bytes": 190956,
+              "sha256": "d0841bf2a38d0c34d879854d0ac83334a2fac3506222def27fe46f9759d960db"
+            }
+          },
+          {
+            "name": "general-architecture-nul-suffix-vocab",
+            "output": {
+              "bytes": 157209,
+              "sha256": "cbbec8e4a6d6919798561928cff13d8863b5ee76fc4ffa8ba1e70ce7ddbba990"
+            }
+          },
+          {
+            "name": "general-architecture-nul-suffix-full",
+            "output": {
+              "bytes": 182060,
+              "sha256": "72698eaf1d23be8233f81408f76f508c9da9b5f7bb9b52685c749480898bcb30"
+            }
+          },
+          {
+            "name": "general-architecture-raw-prefix-vocab",
+            "output": {
+              "bytes": 110,
+              "sha256": "dbea767908e0e830b802d498634e4c27d35aace6445486f65e94cf5424225061"
+            }
+          },
+          {
+            "name": "general-architecture-raw-prefix-full",
+            "output": {
+              "bytes": 110,
+              "sha256": "92d218c0b29734ba0dc196085a8ed849fb4a45949705b6a960bb1f0922087605"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-nul-suffix-vocab",
+            "output": {
+              "bytes": 160165,
+              "sha256": "9b5aaf83c6f3e8d93022eb44af4812613e985608a96918183638ea48dbb32848"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-nul-suffix-full",
+            "output": {
+              "bytes": 185016,
+              "sha256": "3fdecf9305534d5597a65e4c08f487e35311db10786aca1196cf46a6339d931f"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-raw-prefix-vocab",
+            "output": {
+              "bytes": 110,
+              "sha256": "838b1c5689c9c79c5b102dcc10dc186ba19536248fca58d251e8f3ecb78b0f95"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-raw-prefix-full",
+            "output": {
+              "bytes": 110,
+              "sha256": "61022177637d8cac8a806eb0dd01dc7f010183aa0d9697ca175a9629d72efe2d"
+            }
+          },
+          {
+            "name": "hparam-key-alias-before-vocab",
+            "output": {
+              "bytes": 158900,
+              "sha256": "5fdd71439e287309ab588d7e5c10670faa9d153ce8a7bc4e5c00db3cc57c5ec0"
+            }
+          },
+          {
+            "name": "hparam-key-alias-before-full",
+            "output": {
+              "bytes": 183751,
+              "sha256": "857682584c633d355df99024495e40eb738f9f145a2010058647b32bc2e62ec2"
+            }
+          },
+          {
+            "name": "hparam-key-alias-after-vocab",
+            "output": {
+              "bytes": 159704,
+              "sha256": "537a0b5bac58ffca406354d8e9c908d43c693283e4db42345bf2fd82e345874d"
+            }
+          },
+          {
+            "name": "hparam-key-alias-after-full",
+            "output": {
+              "bytes": 184555,
+              "sha256": "bd21156706cb4c7d4a6a576710739d8480663f69ff9db92e85e5d0f0e0207586"
+            }
+          },
+          {
+            "name": "architecture-key-alias-before-vocab",
+            "output": {
+              "bytes": 160295,
+              "sha256": "285d895d3bbb45730f1ec8a9ab87458d452366faa999a22804a2ca4617509fc7"
+            }
+          },
+          {
+            "name": "architecture-key-alias-before-full",
+            "output": {
+              "bytes": 185146,
+              "sha256": "3314fe3c7a19e187a0e74b305e67748652011b41f6b274d198cd9e619f93e657"
+            }
+          },
+          {
+            "name": "architecture-key-alias-after-vocab",
+            "output": {
+              "bytes": 160294,
+              "sha256": "ca188537917dbb5fb68f3849d476026ef9bc66a8ac63daedf027ca6c96b0e098"
+            }
+          },
+          {
+            "name": "architecture-key-alias-after-full",
+            "output": {
+              "bytes": 185145,
+              "sha256": "9cc39a1ec9dff08a50cfaae36b8fcd7b386112f710eea81cabf11fed37779583"
+            }
+          },
+          {
+            "name": "order-0001-forward-vocab",
+            "output": {
+              "bytes": 93530,
+              "sha256": "eb977c1f4c675b33df45fb76dbb836a2c4b9282cadb83b0422276953dcdd2b18"
+            }
+          },
+          {
+            "name": "order-0001-reverse-vocab",
+            "output": {
+              "bytes": 93530,
+              "sha256": "c8e48f26ee671e84f98cb69c7dc6a026a9a09b661aab523f01c5e0568f013044"
+            }
+          },
+          {
+            "name": "order-0001-shuffled-vocab",
+            "output": {
+              "bytes": 93531,
+              "sha256": "dc97869206357a2ff0df776a34c63539d170f3ff3ba755d537496b9a9da668f9"
+            }
+          },
+          {
+            "name": "order-0002-forward-vocab",
+            "output": {
+              "bytes": 99807,
+              "sha256": "d64dcfabed0991707a44d126a3cf759df84b8160bb36c637af21baa6762006a9"
+            }
+          },
+          {
+            "name": "order-0002-reverse-vocab",
+            "output": {
+              "bytes": 99807,
+              "sha256": "4cdc584a9405b929525b33bb628f9df47fe71d9ae164928ed9811e9870093576"
+            }
+          },
+          {
+            "name": "order-0002-shuffled-vocab",
+            "output": {
+              "bytes": 99808,
+              "sha256": "06ab481282e1193e56d6aaf64fb9baaf30f240f04fb0b1af415495dfaaa58780"
+            }
+          },
+          {
+            "name": "order-0007-forward-vocab",
+            "output": {
+              "bytes": 131192,
+              "sha256": "51518705ecb01338ed47fb897060dae097ee65de6e4b0c0cdc3f37f6769bd51a"
+            }
+          },
+          {
+            "name": "order-0007-reverse-vocab",
+            "output": {
+              "bytes": 131192,
+              "sha256": "69c4c8f13e0228c568bb348f7890f878b4efe3ce85d2284829f70f6371293248"
+            }
+          },
+          {
+            "name": "order-0007-shuffled-vocab",
+            "output": {
+              "bytes": 131193,
+              "sha256": "9378540ce60912ecb6b78bbf1f3305d29cd503925e22c968033a0bc0b12c8602"
+            }
+          },
+          {
+            "name": "order-0008-forward-vocab",
+            "output": {
+              "bytes": 137469,
+              "sha256": "8f83f1f5975a526bbed2807fca4983f0d495e3d225a133ed99807f85b0aa20ac"
+            }
+          },
+          {
+            "name": "order-0008-reverse-vocab",
+            "output": {
+              "bytes": 137469,
+              "sha256": "6f3f1395e085ef4279b95201bdadfc35ca00bd30dfa11939647058408ab2850b"
+            }
+          },
+          {
+            "name": "order-0008-shuffled-vocab",
+            "output": {
+              "bytes": 137470,
+              "sha256": "157168e8ef2e9a424021effd55ed148255a25f55199901be7361514b32f07cbc"
+            }
+          },
+          {
+            "name": "order-0012-forward-vocab",
+            "output": {
+              "bytes": 162613,
+              "sha256": "7c67bb52b676b31e20b42e42c9bdc9135de8d8b488e2073db9caafc7e9314c98"
+            }
+          },
+          {
+            "name": "order-0012-reverse-vocab",
+            "output": {
+              "bytes": 162613,
+              "sha256": "9544b66a7144c8f9305c5c9f186f4755c07ecfb0e39d1e73644b6a4a7fa3f26d"
+            }
+          },
+          {
+            "name": "order-0012-shuffled-vocab",
+            "output": {
+              "bytes": 162614,
+              "sha256": "afd1e90fc1af949cdf1a962bc1ec048705421e8607b52dc52b3a73092bf8837c"
+            }
+          },
+          {
+            "name": "order-0013-forward-vocab",
+            "output": {
+              "bytes": 168908,
+              "sha256": "14d8a12fc00deb52cd3a02e4893597075a8f1d18120ffb6a4bda56f882345f5f"
+            }
+          },
+          {
+            "name": "order-0013-reverse-vocab",
+            "output": {
+              "bytes": 168908,
+              "sha256": "c9f84cfe4d1d82a3d16fabbc65866e0427ad266ef009f7685a7f8b6c0b3db1c7"
+            }
+          },
+          {
+            "name": "order-0013-shuffled-vocab",
+            "output": {
+              "bytes": 168909,
+              "sha256": "fc1427ba28beef53122048941dc00387ac543d224ef996e4e8afd77b535f70ed"
+            }
+          },
+          {
+            "name": "order-0014-forward-vocab",
+            "output": {
+              "bytes": 175203,
+              "sha256": "f2cd01fcb7897a091b18cd4d5b839883cbc8d41b7beb61cd00f6199906a97d7b"
+            }
+          },
+          {
+            "name": "order-0014-reverse-vocab",
+            "output": {
+              "bytes": 175203,
+              "sha256": "f82ab548f3c9e439259d1d71d252c2504f2d05b7817b12f657c94a22fb190d70"
+            }
+          },
+          {
+            "name": "order-0014-shuffled-vocab",
+            "output": {
+              "bytes": 175204,
+              "sha256": "2e97bb2483e6f8776c518e4a808071bd3fc105e67070f0ad0e578b626994e2cc"
+            }
+          },
+          {
+            "name": "order-0028-forward-vocab",
+            "output": {
+              "bytes": 263331,
+              "sha256": "9a976088ef3c1cbff3fef15b6db2847b39174a0557b876678024184d69db7ab0"
+            }
+          },
+          {
+            "name": "order-0028-reverse-vocab",
+            "output": {
+              "bytes": 263331,
+              "sha256": "2b830f782a02ea15c5f416e7bd39b8e8b626f17e697be37cb7e40798718c9b7f"
+            }
+          },
+          {
+            "name": "order-0028-shuffled-vocab",
+            "output": {
+              "bytes": 263332,
+              "sha256": "b8df60c582a79dcacf12503c28ae1bcf6d62f85d77bc96e4fd4c56a53b6f1dd4"
+            }
+          },
+          {
+            "name": "order-0029-forward-vocab",
+            "output": {
+              "bytes": 269626,
+              "sha256": "a0c805e44b7f2edf928b07a8d0d1ccb8043349c77e1bd119edcadf0d947fd581"
+            }
+          },
+          {
+            "name": "order-0029-reverse-vocab",
+            "output": {
+              "bytes": 269626,
+              "sha256": "d86075e3a24bc2e85d88335de58d26cf3bbaed6a4c00f1bc61a2d0ea8f9e8f36"
+            }
+          },
+          {
+            "name": "order-0029-shuffled-vocab",
+            "output": {
+              "bytes": 269627,
+              "sha256": "c8d5a3f8b504f0333a9af2d9a4eec88c97f2342a5621f0d2db33aea1e2b46ce7"
+            }
+          },
+          {
+            "name": "order-0030-forward-vocab",
+            "output": {
+              "bytes": 275921,
+              "sha256": "284626df32cc260fcecedf0b9dc27b1112a2aa2125dbf761c568f4c1349be059"
+            }
+          },
+          {
+            "name": "order-0030-reverse-vocab",
+            "output": {
+              "bytes": 275921,
+              "sha256": "28db82bc95b8b8fc5348cb200a52c830626c8b490587d9e3ebb623498e8dce46"
+            }
+          },
+          {
+            "name": "order-0030-shuffled-vocab",
+            "output": {
+              "bytes": 275922,
+              "sha256": "1e7c082aea98e666c57c283e25e5e6defd8a40229acf9b9158501ab7a2fe55fe"
+            }
+          },
+          {
+            "name": "order-0058-forward-vocab",
+            "output": {
+              "bytes": 452181,
+              "sha256": "ba06f509b0d4569a0ae6e61e9d7c2d4c62a9872e801bff8ec3c5cedca3e3eb6c"
+            }
+          },
+          {
+            "name": "order-0058-reverse-vocab",
+            "output": {
+              "bytes": 452181,
+              "sha256": "3c0f973f79f36d2ee2ecee591a8055ba2f0bb42e2e49f6d4d66db36957e45e28"
+            }
+          },
+          {
+            "name": "order-0058-shuffled-vocab",
+            "output": {
+              "bytes": 452182,
+              "sha256": "3f06cd2f780e5ad6a03044b44ad02f3b37e7fc4c716ec233a60817710109edea"
+            }
+          },
+          {
+            "name": "order-0059-forward-vocab",
+            "output": {
+              "bytes": 458476,
+              "sha256": "49688aa7e8ba944ae52d7df90c0951e732a75695483ac877e80507289b0c9bda"
+            }
+          },
+          {
+            "name": "order-0059-reverse-vocab",
+            "output": {
+              "bytes": 458476,
+              "sha256": "b393b4119e68221f922edac027750bd355fc7852b1d7f6a5a50421b426a155c8"
+            }
+          },
+          {
+            "name": "order-0059-shuffled-vocab",
+            "output": {
+              "bytes": 458477,
+              "sha256": "4c2c4bde76be9caa817f9c26a68b9eace1e17ea2f48b0ac3db94c86c59010af8"
+            }
+          },
+          {
+            "name": "order-0060-forward-vocab",
+            "output": {
+              "bytes": 464771,
+              "sha256": "be0baa1303a015bee1fa8ede108886c74e28dad07023006e52d39703f284743e"
+            }
+          },
+          {
+            "name": "order-0060-reverse-vocab",
+            "output": {
+              "bytes": 464771,
+              "sha256": "167c56df7afe54f5ecf57be4371e778da4992d68b6a4c6d4dc3dbd93ff92b46c"
+            }
+          },
+          {
+            "name": "order-0060-shuffled-vocab",
+            "output": {
+              "bytes": 464772,
+              "sha256": "d2b282e50f5708af61bd9c180924498233c89daa16c1d3f93e7cad99b4be24f8"
+            }
+          },
+          {
+            "name": "order-0126-forward-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "ec526ee6828654b1079ca41b7d6c0574f1a0019acdb84213d10372ac6bde0516"
+            }
+          },
+          {
+            "name": "order-0126-reverse-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "27e397b8b8025c7273681676dedaecabed704a3c0f80cb4a42b9075fedadc290"
+            }
+          },
+          {
+            "name": "order-0126-shuffled-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "ada1b3c9fd5ea7762d1c06a318d33380c7484481ab57f28f31f82e1114372fd5"
+            }
+          },
+          {
+            "name": "order-0127-forward-vocab",
+            "output": {
+              "bytes": 895365,
+              "sha256": "fd740f3f33319bfdd1b95c31beda7171e4c208cdbe45f6da9db953ba844e7113"
+            }
+          },
+          {
+            "name": "order-0127-reverse-vocab",
+            "output": {
+              "bytes": 895365,
+              "sha256": "0a65f68a2e61c4df146b58a34df420c7c7cc70175027fa4461fe266762428916"
+            }
+          },
+          {
+            "name": "order-0127-shuffled-vocab",
+            "output": {
+              "bytes": 895364,
+              "sha256": "a01191aca306a02a105cd701010220b3c222d453da769065139d87eac9d10a42"
+            }
+          },
+          {
+            "name": "order-0128-forward-vocab",
+            "output": {
+              "bytes": 901979,
+              "sha256": "1f81257477750692fd30b98066d4a2a5193a0212fed6fb57e27d123e94101b89"
+            }
+          },
+          {
+            "name": "order-0128-reverse-vocab",
+            "output": {
+              "bytes": 901979,
+              "sha256": "a8d2f4690a54d5a78db7b86f122edbeae2578159d1621b10afa61d03f03e5cb8"
+            }
+          },
+          {
+            "name": "order-0128-shuffled-vocab",
+            "output": {
+              "bytes": 901980,
+              "sha256": "5fa6611c288ce9e3bf0b34779a1b30dd473344802d601a8fb5c6f0a966d2c52d"
+            }
+          },
+          {
+            "name": "order-0256-forward-vocab",
+            "output": {
+              "bytes": 1748570,
+              "sha256": "ff604e1bdf1fced55451d13f2359d83f9613b0763e48b76f993dad5ccd1cdb04"
+            }
+          },
+          {
+            "name": "order-0256-reverse-vocab",
+            "output": {
+              "bytes": 1748572,
+              "sha256": "3a8262c134667639233b02c932947c51c592e88e2cabc894323ff3903ae926bc"
+            }
+          },
+          {
+            "name": "order-0256-shuffled-vocab",
+            "output": {
+              "bytes": 1748573,
+              "sha256": "d8fa533a32ba036eafd615e408a89cc750f57db605beb95c0eecfb7dd2615b0f"
+            }
+          },
+          {
+            "name": "order-0512-forward-vocab",
+            "output": {
+              "bytes": 3441752,
+              "sha256": "b6fdeff60214638f6536c4724d09fcfc0ac59ee597052c2d6f1ae57d4b8465c1"
+            }
+          },
+          {
+            "name": "order-0512-reverse-vocab",
+            "output": {
+              "bytes": 3441753,
+              "sha256": "b3b89609ee856ad631d9d2796d59d38ad4ab871467edc8fc84bdbda8d72b0c68"
+            }
+          },
+          {
+            "name": "order-0512-shuffled-vocab",
+            "output": {
+              "bytes": 3441754,
+              "sha256": "39deabd3475e50d25ef357486b8010c751b96f1d6a53fb6884d5e12d38f97f41"
+            }
+          },
+          {
+            "name": "order-1024-forward-vocab",
+            "output": {
+              "bytes": 6829608,
+              "sha256": "216327bd529470e9048d378b25c345924dc854683b4431f480aa424471f30f40"
+            }
+          },
+          {
+            "name": "order-1024-reverse-vocab",
+            "output": {
+              "bytes": 6829608,
+              "sha256": "96cfff9a6eb7f8e8aa4efab8d7816b4a7811e89c68552d2a6eed091e75cf4b4c"
+            }
+          },
+          {
+            "name": "order-1024-shuffled-vocab",
+            "output": {
+              "bytes": 6829609,
+              "sha256": "dc938c70fd5294f2d0e0d8f8e8f2877ab8276d778058ec48a6d00ac0e38a5beb"
+            }
+          },
+          {
+            "name": "all-base-metadata-reversed-vocab",
+            "output": {
+              "bytes": 87262,
+              "sha256": "a841dde44f8bab2c0d29a4f19a83f5c5d6f3d0926290377f20d083e395afb19a"
+            }
+          },
+          {
+            "name": "all-base-metadata-reversed-full",
+            "output": {
+              "bytes": 112113,
+              "sha256": "b1bb0d2aea1e10a7e593f090bccc16e923d1f3b63f7c8fe2e8a801f4d057e482"
+            }
+          },
+          {
+            "name": "all-base-metadata-shuffled-vocab",
+            "output": {
+              "bytes": 87261,
+              "sha256": "9448397f0e8630b303df8a10ff22a7e5289c79e8bcf9327346df58ea480be9a1"
+            }
+          },
+          {
+            "name": "all-base-metadata-shuffled-full",
+            "output": {
+              "bytes": 112112,
+              "sha256": "ae6d7bc367a8432fa1aae71f406abeeebd88330a1f2668e0f19f1f1317dceea4"
+            }
+          },
+          {
+            "name": "unknown-scalar-type-vocab",
+            "output": {
+              "bytes": 98,
+              "sha256": "5ad30564312d5c1f34be32ddc9a0491fd07059b80368b15ab365e72041b0f869"
+            }
+          },
+          {
+            "name": "nested-array-type-vocab",
+            "output": {
+              "bytes": 96,
+              "sha256": "abbbe3491a9cb39104e665298e31146a0725b7c29976e4e29fac9f8a0f27a848"
+            }
+          },
+          {
+            "name": "baseline-addon-vocab",
+            "output": {
+              "bytes": 157192,
+              "sha256": "51d013d8febc8f1c1ec9875bdbe495eb67340e90d6adc9f0220a3166b1e86108"
+            }
+          },
+          {
+            "name": "baseline-addon-full",
+            "output": {
+              "bytes": 182043,
+              "sha256": "c825761e878394dfead2c7ba0d9b09e8e778803798de22bf079da9d9b0a855ff"
+            }
+          },
+          {
+            "name": "empty-key-vocab",
+            "output": {
+              "bytes": 88,
+              "sha256": "49c0b0ef9192238577bea254c097cd990cfc57378699d6f79f0b5a1ac349bb8c"
+            }
+          },
+          {
+            "name": "empty-key-full",
+            "output": {
+              "bytes": 88,
+              "sha256": "e5318b99b70520810d773c08740683801b1a9433beccd75142a8b5607890110e"
+            }
+          },
+          {
+            "name": "single-nul-key-vocab",
+            "output": {
+              "bytes": 170300,
+              "sha256": "a69a532ae1d3f36f83992152cc1c4b3e0532068a79765245906ab4013f901787"
+            }
+          },
+          {
+            "name": "single-nul-key-full",
+            "output": {
+              "bytes": 195151,
+              "sha256": "08be6f343d127474e7b504474730bcca1a7b18d3be16e5dd489acbf2c5daa589"
+            }
+          },
+          {
+            "name": "leading-nul-key-vocab",
+            "output": {
+              "bytes": 170565,
+              "sha256": "459df7bc34f98621c82befa49d99c6b77093d2e9f61556440f73f2d369101d72"
+            }
+          },
+          {
+            "name": "leading-nul-key-full",
+            "output": {
+              "bytes": 195416,
+              "sha256": "80d728547a8905ec4a940a38ea07c04c7ba6595c50cc8802223ddc1ec67a93ec"
+            }
+          },
+          {
+            "name": "invalid-utf8-key-vocab",
+            "output": {
+              "bytes": 169439,
+              "sha256": "0cd2a7426e0236535945c44e52d6c828aab0cee96485c7f43fb0577d1fdb2c3a"
+            }
+          },
+          {
+            "name": "invalid-utf8-key-full",
+            "output": {
+              "bytes": 194290,
+              "sha256": "2b788c28a432840acb80d6f8373aee986ad7ab61d3c49f4350a3f4ac64b643b1"
+            }
+          },
+          {
+            "name": "long-key-4097-vocab",
+            "output": {
+              "bytes": 481394,
+              "sha256": "bf9886667613b338fda39bc798e04f2c9fc408f8e87fd9cc0b7e2f1be5b23c84"
+            }
+          },
+          {
+            "name": "long-key-4097-full",
+            "output": {
+              "bytes": 506245,
+              "sha256": "9edf59aa972f7f576f434524c434112759f0f3653167236ffb165f8fad23366d"
+            }
+          },
+          {
+            "name": "leading-nul-aliases-vocab",
+            "output": {
+              "bytes": 173107,
+              "sha256": "eb0d4c6c601d15cb9b02576d0f766a994b9218f30a96a094077718e785a1be17"
+            }
+          },
+          {
+            "name": "leading-nul-aliases-full",
+            "output": {
+              "bytes": 197958,
+              "sha256": "6c380d544b877da1e95d3614716b66ee857dab9980e4a330203597a65ed7ab93"
+            }
+          },
+          {
+            "name": "leading-nul-array-then-scalar-vocab",
+            "output": {
+              "bytes": 171674,
+              "sha256": "e5ad64499f9fbc863d6861aec47f5ac139e8c2f7889c37968d5a7b7ce0131bc9"
+            }
+          },
+          {
+            "name": "leading-nul-array-then-scalar-full",
+            "output": {
+              "bytes": 196525,
+              "sha256": "f97e1d3bfefadc3d1568c3d85bbdc18f1b56dc6fbf6251ace92e00f0a201cd64"
+            }
+          },
+          {
+            "name": "leading-nul-scalar-then-array-vocab",
+            "output": {
+              "bytes": 171674,
+              "sha256": "0c7504e8fa41491563d78d1bf7559237aac4f69c6c723b8b3eea70a3befd6bc0"
+            }
+          },
+          {
+            "name": "leading-nul-scalar-then-array-full",
+            "output": {
+              "bytes": 196525,
+              "sha256": "bd9a489a10503345f5b749dc8c62e658497163eee3c60b1a5b9e79cf7041f154"
+            }
+          },
+          {
+            "name": "raw-name-array-vocab",
+            "output": {
+              "bytes": 160654,
+              "sha256": "52746e7b5851f64431e55ad8439dbacf933628b1abfd2420838282c2d678d67a"
+            }
+          },
+          {
+            "name": "raw-name-array-full",
+            "output": {
+              "bytes": 185505,
+              "sha256": "017b588b0d4d3981300be2f4cebe1bfa2154b8106ba09bf00c4b6aaae69576fe"
+            }
+          },
+          {
+            "name": "float-format-boundaries-vocab",
+            "output": {
+              "bytes": 4233939,
+              "sha256": "280cccfce124b70e378242441bac26fb583e4e68795864e376a5b481ac5328ca"
+            }
+          },
+          {
+            "name": "float-format-boundaries-full",
+            "output": {
+              "bytes": 4258790,
+              "sha256": "e6bc12a611ade5ea3a63bd62e6625f556d52aa8cd863979d774c09ecbd68852c"
+            }
+          },
+          {
+            "name": "raw-general-description-vocab",
+            "output": {
+              "bytes": 102,
+              "sha256": "62517c147fc39c9b6834d0b2197b740ca283bcf8a5490621e7be78734c72b813"
+            }
+          },
+          {
+            "name": "raw-general-description-full",
+            "output": {
+              "bytes": 102,
+              "sha256": "b804c6b295e9ceb364260da101aa6115652f99d7a1d162f27219df9d9844d362"
+            }
+          },
+          {
+            "name": "raw-array-key-vocab",
+            "output": {
+              "bytes": 92,
+              "sha256": "cd7f84c4f63b7613ce5906f6805eea2d20c92e24cb5107e8c1e2adb1f58cdc8e"
+            }
+          },
+          {
+            "name": "raw-array-key-full",
+            "output": {
+              "bytes": 92,
+              "sha256": "758012b22b1d31e6a887d187e6cc5f297da24977d62db6046525790bf2a5c369"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-vocab",
+            "output": {
+              "bytes": 104,
+              "sha256": "2df832705eaaac76d43c9130b28e2ec4fb68fb655fc00f1475c58ff1e4fc9b9c"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-full",
+            "output": {
+              "bytes": 104,
+              "sha256": "98dc24643498d66042da5489bc82196179f8b05be13e9c11048f4cb32da818fa"
+            }
+          },
+          {
+            "name": "raw-general-description-corrected-vocab",
+            "output": {
+              "bytes": 169962,
+              "sha256": "771e96466bdb03be1b2b8a9685f4e07bf4aa68961c01d27666f97b730dcac8f3"
+            }
+          },
+          {
+            "name": "raw-general-description-corrected-full",
+            "output": {
+              "bytes": 194813,
+              "sha256": "a080cf335bdb112da09b453d9b10e0d39e8e55a0d8d10e9ca98c6e6bc458a490"
+            }
+          },
+          {
+            "name": "raw-array-key-corrected-vocab",
+            "output": {
+              "bytes": 163033,
+              "sha256": "82ef778ff0eb2a33f734f5017fbc889d9f4d059cb95438da8c41938a619828c7"
+            }
+          },
+          {
+            "name": "raw-array-key-corrected-full",
+            "output": {
+              "bytes": 187884,
+              "sha256": "d8151ff42aadf6c49d9f572f3e45c0160ec0f721a1e485b1ed5160c0b9a71dc3"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-corrected-vocab",
+            "output": {
+              "bytes": 163045,
+              "sha256": "2fae8ce4442db31b22394f7b4fe865f5b73fe5076a8531469622d0eb5902f9a0"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-corrected-full",
+            "output": {
+              "bytes": 187896,
+              "sha256": "7ead3a6e5bf3f7674add235a92052c203f680094d9fe84ddf5539eca4ed8f163"
+            }
+          },
+          {
+            "name": "three-raw-subsidiary-vocab",
+            "output": {
+              "bytes": 186109,
+              "sha256": "5b5fe37f5b84be14e467127ea4d56d709f2fb2a93271be36784a148156869f84"
+            }
+          },
+          {
+            "name": "three-raw-subsidiary-full",
+            "output": {
+              "bytes": 210960,
+              "sha256": "17605feace9d8a7a285a43ca20f6e697d703b3c23c59b04608ad8c4b0bd892d5"
+            }
+          },
+          {
+            "name": "three-raw-primary-and-subsidiary-vocab",
+            "output": {
+              "bytes": 202665,
+              "sha256": "15ff14de81d98e5953d23e45ae7897119dd499a95d59fd05015ce692efc07779"
+            }
+          },
+          {
+            "name": "three-raw-primary-and-subsidiary-full",
+            "output": {
+              "bytes": 227516,
+              "sha256": "6d0ec9c789095e7d1310860aff8ff8ee0742974c914137797498fc9fb47166b6"
+            }
+          },
+          {
+            "name": "metadata-first-raw-primary-and-subsidiary-vocab",
+            "output": {
+              "bytes": 202674,
+              "sha256": "9b83c5533a27b0cae35e51016415789ca6ad27040acc3c3a089340d24209deee"
+            }
+          },
+          {
+            "name": "metadata-first-raw-primary-and-subsidiary-full",
+            "output": {
+              "bytes": 227525,
+              "sha256": "af53eeddbe8bbbb00ea4ff6f8468dc1a87dc48b4edc4675e6b002e150c743b12"
+            }
+          },
+          {
+            "name": "three-subsidiary-split-no-prefix-vocab",
+            "output": {
+              "bytes": 186121,
+              "sha256": "db41d64b541cf10515565f6ec2a3ea42a5056d7b92809b25bdcc4efc457446bc"
+            }
+          },
+          {
+            "name": "three-subsidiary-split-no-prefix-full",
+            "output": {
+              "bytes": 210972,
+              "sha256": "6e2af3f476512c8fef14018f7ac0734910463e63f784d1e86b556714453d876c"
+            }
+          }
+        ],
+        "caller": {
+          "bytes": 168448,
+          "sha256": "78b107b6c539cb5fd823d90254282424a1a816af96c2b180e3333b37790e2de6"
+        }
+      }
+    },
+    "release": {
+      "library": {
+        "bytes": 2349056,
+        "sha256": "619a9de5acb1b2d4812cd0ff7e4a3fd4e1cf23ed0640d2a4c5e7949e3f0468b8"
+      },
+      "exports": {
+        "implemented": 226,
+        "extensions": 4,
+        "missing": 29
+      },
+      "chat": {
+        "cases": 35946,
+        "output": {
+          "bytes": 3937927,
+          "sha256": "9bf7ccf214053f2e421e4f8e6e36da6a861f0c6cc3221bb1caa181f588bec40b"
+        },
+        "caller": {
+          "bytes": 53248,
+          "sha256": "04074bb44e168da6ce985c070142d8a8a37748fa95d9043c26561e45da0e5ec1"
+        }
+      },
+      "metadata": {
+        "cases": 171,
+        "records": [
+          {
+            "name": "baseline-vocab",
+            "output": {
+              "bytes": 158736,
+              "sha256": "24c6daba5c1c8f95e9b226a787777cbd699555bac039f59b0fbece6d08c66d18"
+            }
+          },
+          {
+            "name": "baseline-full",
+            "output": {
+              "bytes": 183587,
+              "sha256": "d14a2374edfc390541019533bab4e2978910f794f4f90a7fff942f78ba7a35fd"
+            }
+          },
+          {
+            "name": "scalar-types-and-bits-vocab",
+            "output": {
+              "bytes": 856887,
+              "sha256": "d26aca245e56dab50b490afa920d8f1c691dc9e2a26b6ed101f50d416c8eb687"
+            }
+          },
+          {
+            "name": "scalar-types-and-bits-full",
+            "output": {
+              "bytes": 881738,
+              "sha256": "0b02365beaabe832f00f26519e2b5e0264675c65883562abf047c9f56f0c96ca"
+            }
+          },
+          {
+            "name": "raw-string-values-vocab",
+            "output": {
+              "bytes": 421987,
+              "sha256": "8e364affbb171cf445c76f2c51dfd85e1496f38c19739e8ec3ebe410633f1149"
+            }
+          },
+          {
+            "name": "raw-string-values-full",
+            "output": {
+              "bytes": 446838,
+              "sha256": "645837ac57a249a570f46ad5386b1b3da887620b83628279f820682eccc05b79"
+            }
+          },
+          {
+            "name": "bool-byte-002-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "37586698bd674a1de9dc36c63918dd2ebaecdae107eb38be3766ba58f67eefd5"
+            }
+          },
+          {
+            "name": "bool-byte-002-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "4b18c0588b8efe60643a35c7f694fb6814944b672fb90cde5417af6e4c63d2f3"
+            }
+          },
+          {
+            "name": "bool-byte-127-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "4a99bf37fd73409b4ab6c502339efc3ec3a20febfc795abf0bf07ff7f17e10a6"
+            }
+          },
+          {
+            "name": "bool-byte-127-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "f180ab5e29bb0badcbf475f1cc16a8857fb81b2a8aa4869fe176f3b58389322b"
+            }
+          },
+          {
+            "name": "bool-byte-128-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "764174dcb74169a71e944e5f7f1fdafb7dc28c5d56c9a0350967bad09699e7d7"
+            }
+          },
+          {
+            "name": "bool-byte-128-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "1412e56743452b1394396eaee350abf68fcabd96fb79a3f0610ec03702a7ce98"
+            }
+          },
+          {
+            "name": "bool-byte-255-vocab",
+            "output": {
+              "bytes": 167276,
+              "sha256": "b56f27d31f1cab5b01d554ba8f5a3467cd40503ff3b5da9733ff9e4f1e00f82a"
+            }
+          },
+          {
+            "name": "bool-byte-255-full",
+            "output": {
+              "bytes": 192127,
+              "sha256": "340f898b3182892cbfe67543792fb9fac4d5077a25bb60f9a28aec04c96dfd3c"
+            }
+          },
+          {
+            "name": "unused-array-types-vocab",
+            "output": {
+              "bytes": 200378,
+              "sha256": "a248c88facfe9c2a196a7d89e36379c0fb2fcb50c94d4730789d4bc03424d124"
+            }
+          },
+          {
+            "name": "unused-array-types-full",
+            "output": {
+              "bytes": 225229,
+              "sha256": "c7bb0f42c83c8754e23b52f50596943f0a31f4ae6b5a7ce97f0717e125065a0e"
+            }
+          },
+          {
+            "name": "value-byte-grid-vocab",
+            "output": {
+              "bytes": 1672696,
+              "sha256": "8220ecbad353ccbe22c24bdf95cff31e7d40acf9f4963955fe4780accd373b4c"
+            }
+          },
+          {
+            "name": "value-byte-grid-full",
+            "output": {
+              "bytes": 1697547,
+              "sha256": "893509a04047b01a68b1f0e7087eb95dded3a5e72fc1237eb52518094e81b17f"
+            }
+          },
+          {
+            "name": "key-byte-grid-vocab",
+            "output": {
+              "bytes": 1651755,
+              "sha256": "5d2e427ecfe243a0da114fa885c8783844609caf1d7119a50c7f9213c1d656d5"
+            }
+          },
+          {
+            "name": "key-byte-grid-full",
+            "output": {
+              "bytes": 1676606,
+              "sha256": "904cca078d8cc31cd16cc89c8f0581368f0e6573dc37c3ec95a800d7a5de88ce"
+            }
+          },
+          {
+            "name": "raw-empty-and-long-keys-vocab",
+            "output": {
+              "bytes": 102,
+              "sha256": "cb70de969fb1012b3ebe7c221b939f995c4f25f091aac5e1cdcffce1dc2adc14"
+            }
+          },
+          {
+            "name": "raw-empty-and-long-keys-full",
+            "output": {
+              "bytes": 102,
+              "sha256": "c9bb4aed9f33ae8f7a0bf2ebd5a8d968a5b6a6ff743e3e157e8ebafe47f3c0ac"
+            }
+          },
+          {
+            "name": "two-nul-scalar-keys-vocab",
+            "output": {
+              "bytes": 180100,
+              "sha256": "c56921c500dd437adde15bcea40e7c8b2e17501698a8ab7c5d01cfe25cdfc9d1"
+            }
+          },
+          {
+            "name": "two-nul-scalar-keys-full",
+            "output": {
+              "bytes": 204951,
+              "sha256": "d14157ce8b9eccc61115b928d513880f648ffee4ced3252b1b8db93611e615db"
+            }
+          },
+          {
+            "name": "nul-before-plain-vocab",
+            "output": {
+              "bytes": 177185,
+              "sha256": "f330ed8743fa5779a96b0f45544bab1774aedcc15a1b36da702cb7c34e3bed49"
+            }
+          },
+          {
+            "name": "nul-before-plain-full",
+            "output": {
+              "bytes": 202036,
+              "sha256": "e8f4ed39ed62bba061117f196716ac8c86f9574183ca1dd67804015cbe5156d6"
+            }
+          },
+          {
+            "name": "plain-before-nul-vocab",
+            "output": {
+              "bytes": 177207,
+              "sha256": "e11907b1f1543678f9c5c4f5746f13dfa9dff2028e065d00fe016368318d2e91"
+            }
+          },
+          {
+            "name": "plain-before-nul-full",
+            "output": {
+              "bytes": 202058,
+              "sha256": "6daf8557d0b2975d64b4df358166d89b95245b32eafb6add350f8dab16a577ac"
+            }
+          },
+          {
+            "name": "array-nul-before-scalar-vocab",
+            "output": {
+              "bytes": 175912,
+              "sha256": "300f91fd674a53d75426021de3590213ecbc0bc1222dfee4bb1837ddb1a5294d"
+            }
+          },
+          {
+            "name": "array-nul-before-scalar-full",
+            "output": {
+              "bytes": 200763,
+              "sha256": "5fd76d85eb9bc8645988f2184a1dbdce26df0381614134c1fc72e3b474c855d1"
+            }
+          },
+          {
+            "name": "scalar-nul-before-array-vocab",
+            "output": {
+              "bytes": 175932,
+              "sha256": "0a27d94cebe3c668d4d123cc2644811b1f68bc27efba87d5a14f297f5aa33003"
+            }
+          },
+          {
+            "name": "scalar-nul-before-array-full",
+            "output": {
+              "bytes": 200783,
+              "sha256": "fe79cf66bac9178649b2de6b434b3224863c934f1cfb101a90f7e319db74a507"
+            }
+          },
+          {
+            "name": "array-plain-before-scalar-nul-vocab",
+            "output": {
+              "bytes": 175938,
+              "sha256": "9f7e553d5b5a41beac8dcad7086c778419f560dd2845ae73a4cdbe8e2fabff37"
+            }
+          },
+          {
+            "name": "array-plain-before-scalar-nul-full",
+            "output": {
+              "bytes": 200789,
+              "sha256": "798bd9bd33986d64e2a91ff6457751f2f5fd749f615fe88c6d650a7db331fa0f"
+            }
+          },
+          {
+            "name": "empty-prefix-aliases-vocab",
+            "output": {
+              "bytes": 99,
+              "sha256": "20cfb21675f512b2d1a5e0b669ad2b972082df27f4202e9801a3ff5deb9e6b66"
+            }
+          },
+          {
+            "name": "empty-prefix-aliases-full",
+            "output": {
+              "bytes": 99,
+              "sha256": "5b860f19803ad983f0ee5d8acffe6f2eccd42389a2464ee732133d1f8767d094"
+            }
+          },
+          {
+            "name": "exact-duplicate-key-vocab",
+            "output": {
+              "bytes": 98,
+              "sha256": "ceb649e620d805a041d69f7d42a29153a8f121bebe8e3afff4937ca6e071e199"
+            }
+          },
+          {
+            "name": "exact-duplicate-key-full",
+            "output": {
+              "bytes": 98,
+              "sha256": "8c8aa01a42c872a975410bc574c18c197652a3e44ac6613c533b237dfbdc0966"
+            }
+          },
+          {
+            "name": "general-name-raw-vocab",
+            "output": {
+              "bytes": 159382,
+              "sha256": "15a14e86f2a01dc55cd9013131ccbcf9f47db683ce72464f7a62cb3309f90f51"
+            }
+          },
+          {
+            "name": "general-name-raw-full",
+            "output": {
+              "bytes": 184233,
+              "sha256": "a58b4bac3d75b8f22eed4e6150c6de510fa4b72ac803bf04882d6d9fe50fc583"
+            }
+          },
+          {
+            "name": "general-name-nul-vocab",
+            "output": {
+              "bytes": 158412,
+              "sha256": "52403f8a00d7a417cfdc5d8b5e208276221db8ec95e868aee64b6108769de641"
+            }
+          },
+          {
+            "name": "general-name-nul-full",
+            "output": {
+              "bytes": 183263,
+              "sha256": "2c68da466e5d28009990c1be76ca365aabd8878ef97304adcd196c8ea261e6b6"
+            }
+          },
+          {
+            "name": "general-name-empty-vocab",
+            "output": {
+              "bytes": 156837,
+              "sha256": "4ac969880ade9e02b7ec90285331e1aa99242d876944e2c6f16b5af03061de08"
+            }
+          },
+          {
+            "name": "general-name-empty-full",
+            "output": {
+              "bytes": 181688,
+              "sha256": "a8b50d952fa423d4b635b86c1582884717f73fa9de54e9c4f072bbf44e988c57"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-raw-vocab",
+            "output": {
+              "bytes": 168782,
+              "sha256": "2d745341ea967f12c62445e2e602eead03d30d06758e1e671c0eb32a49dff34f"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-raw-full",
+            "output": {
+              "bytes": 193633,
+              "sha256": "106a1bace689dd9c1d80583028a8a6f452c1e911d673c68584067cb201102725"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-nul-vocab",
+            "output": {
+              "bytes": 167768,
+              "sha256": "0878b69f27d17dc0b1df6d3a75e653b1ddbc8f715e7ff30c51aec22b3dda3a8c"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-nul-full",
+            "output": {
+              "bytes": 192619,
+              "sha256": "8e582fa4a9d4fd68f577364e5feea9ec8531a167afe7aa805b4b92142df08015"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-empty-vocab",
+            "output": {
+              "bytes": 166105,
+              "sha256": "21259af56ae2a7eb4a5fb971f979dad7dab58683f224d3cf55f1a9eaad6ad0c8"
+            }
+          },
+          {
+            "name": "tokenizer-chat_template-empty-full",
+            "output": {
+              "bytes": 190956,
+              "sha256": "d0841bf2a38d0c34d879854d0ac83334a2fac3506222def27fe46f9759d960db"
+            }
+          },
+          {
+            "name": "general-architecture-nul-suffix-vocab",
+            "output": {
+              "bytes": 157209,
+              "sha256": "cbbec8e4a6d6919798561928cff13d8863b5ee76fc4ffa8ba1e70ce7ddbba990"
+            }
+          },
+          {
+            "name": "general-architecture-nul-suffix-full",
+            "output": {
+              "bytes": 182060,
+              "sha256": "72698eaf1d23be8233f81408f76f508c9da9b5f7bb9b52685c749480898bcb30"
+            }
+          },
+          {
+            "name": "general-architecture-raw-prefix-vocab",
+            "output": {
+              "bytes": 110,
+              "sha256": "dbea767908e0e830b802d498634e4c27d35aace6445486f65e94cf5424225061"
+            }
+          },
+          {
+            "name": "general-architecture-raw-prefix-full",
+            "output": {
+              "bytes": 110,
+              "sha256": "92d218c0b29734ba0dc196085a8ed849fb4a45949705b6a960bb1f0922087605"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-nul-suffix-vocab",
+            "output": {
+              "bytes": 160165,
+              "sha256": "9b5aaf83c6f3e8d93022eb44af4812613e985608a96918183638ea48dbb32848"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-nul-suffix-full",
+            "output": {
+              "bytes": 185016,
+              "sha256": "3fdecf9305534d5597a65e4c08f487e35311db10786aca1196cf46a6339d931f"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-raw-prefix-vocab",
+            "output": {
+              "bytes": 110,
+              "sha256": "838b1c5689c9c79c5b102dcc10dc186ba19536248fca58d251e8f3ecb78b0f95"
+            }
+          },
+          {
+            "name": "tokenizer-ggml-model-raw-prefix-full",
+            "output": {
+              "bytes": 110,
+              "sha256": "61022177637d8cac8a806eb0dd01dc7f010183aa0d9697ca175a9629d72efe2d"
+            }
+          },
+          {
+            "name": "hparam-key-alias-before-vocab",
+            "output": {
+              "bytes": 158900,
+              "sha256": "5fdd71439e287309ab588d7e5c10670faa9d153ce8a7bc4e5c00db3cc57c5ec0"
+            }
+          },
+          {
+            "name": "hparam-key-alias-before-full",
+            "output": {
+              "bytes": 183751,
+              "sha256": "857682584c633d355df99024495e40eb738f9f145a2010058647b32bc2e62ec2"
+            }
+          },
+          {
+            "name": "hparam-key-alias-after-vocab",
+            "output": {
+              "bytes": 159704,
+              "sha256": "537a0b5bac58ffca406354d8e9c908d43c693283e4db42345bf2fd82e345874d"
+            }
+          },
+          {
+            "name": "hparam-key-alias-after-full",
+            "output": {
+              "bytes": 184555,
+              "sha256": "bd21156706cb4c7d4a6a576710739d8480663f69ff9db92e85e5d0f0e0207586"
+            }
+          },
+          {
+            "name": "architecture-key-alias-before-vocab",
+            "output": {
+              "bytes": 160295,
+              "sha256": "285d895d3bbb45730f1ec8a9ab87458d452366faa999a22804a2ca4617509fc7"
+            }
+          },
+          {
+            "name": "architecture-key-alias-before-full",
+            "output": {
+              "bytes": 185146,
+              "sha256": "3314fe3c7a19e187a0e74b305e67748652011b41f6b274d198cd9e619f93e657"
+            }
+          },
+          {
+            "name": "architecture-key-alias-after-vocab",
+            "output": {
+              "bytes": 160294,
+              "sha256": "ca188537917dbb5fb68f3849d476026ef9bc66a8ac63daedf027ca6c96b0e098"
+            }
+          },
+          {
+            "name": "architecture-key-alias-after-full",
+            "output": {
+              "bytes": 185145,
+              "sha256": "9cc39a1ec9dff08a50cfaae36b8fcd7b386112f710eea81cabf11fed37779583"
+            }
+          },
+          {
+            "name": "order-0001-forward-vocab",
+            "output": {
+              "bytes": 93530,
+              "sha256": "eb977c1f4c675b33df45fb76dbb836a2c4b9282cadb83b0422276953dcdd2b18"
+            }
+          },
+          {
+            "name": "order-0001-reverse-vocab",
+            "output": {
+              "bytes": 93530,
+              "sha256": "c8e48f26ee671e84f98cb69c7dc6a026a9a09b661aab523f01c5e0568f013044"
+            }
+          },
+          {
+            "name": "order-0001-shuffled-vocab",
+            "output": {
+              "bytes": 93531,
+              "sha256": "dc97869206357a2ff0df776a34c63539d170f3ff3ba755d537496b9a9da668f9"
+            }
+          },
+          {
+            "name": "order-0002-forward-vocab",
+            "output": {
+              "bytes": 99807,
+              "sha256": "d64dcfabed0991707a44d126a3cf759df84b8160bb36c637af21baa6762006a9"
+            }
+          },
+          {
+            "name": "order-0002-reverse-vocab",
+            "output": {
+              "bytes": 99807,
+              "sha256": "4cdc584a9405b929525b33bb628f9df47fe71d9ae164928ed9811e9870093576"
+            }
+          },
+          {
+            "name": "order-0002-shuffled-vocab",
+            "output": {
+              "bytes": 99808,
+              "sha256": "06ab481282e1193e56d6aaf64fb9baaf30f240f04fb0b1af415495dfaaa58780"
+            }
+          },
+          {
+            "name": "order-0007-forward-vocab",
+            "output": {
+              "bytes": 131192,
+              "sha256": "51518705ecb01338ed47fb897060dae097ee65de6e4b0c0cdc3f37f6769bd51a"
+            }
+          },
+          {
+            "name": "order-0007-reverse-vocab",
+            "output": {
+              "bytes": 131192,
+              "sha256": "69c4c8f13e0228c568bb348f7890f878b4efe3ce85d2284829f70f6371293248"
+            }
+          },
+          {
+            "name": "order-0007-shuffled-vocab",
+            "output": {
+              "bytes": 131193,
+              "sha256": "9378540ce60912ecb6b78bbf1f3305d29cd503925e22c968033a0bc0b12c8602"
+            }
+          },
+          {
+            "name": "order-0008-forward-vocab",
+            "output": {
+              "bytes": 137469,
+              "sha256": "8f83f1f5975a526bbed2807fca4983f0d495e3d225a133ed99807f85b0aa20ac"
+            }
+          },
+          {
+            "name": "order-0008-reverse-vocab",
+            "output": {
+              "bytes": 137469,
+              "sha256": "6f3f1395e085ef4279b95201bdadfc35ca00bd30dfa11939647058408ab2850b"
+            }
+          },
+          {
+            "name": "order-0008-shuffled-vocab",
+            "output": {
+              "bytes": 137470,
+              "sha256": "157168e8ef2e9a424021effd55ed148255a25f55199901be7361514b32f07cbc"
+            }
+          },
+          {
+            "name": "order-0012-forward-vocab",
+            "output": {
+              "bytes": 162613,
+              "sha256": "7c67bb52b676b31e20b42e42c9bdc9135de8d8b488e2073db9caafc7e9314c98"
+            }
+          },
+          {
+            "name": "order-0012-reverse-vocab",
+            "output": {
+              "bytes": 162613,
+              "sha256": "9544b66a7144c8f9305c5c9f186f4755c07ecfb0e39d1e73644b6a4a7fa3f26d"
+            }
+          },
+          {
+            "name": "order-0012-shuffled-vocab",
+            "output": {
+              "bytes": 162614,
+              "sha256": "afd1e90fc1af949cdf1a962bc1ec048705421e8607b52dc52b3a73092bf8837c"
+            }
+          },
+          {
+            "name": "order-0013-forward-vocab",
+            "output": {
+              "bytes": 168908,
+              "sha256": "14d8a12fc00deb52cd3a02e4893597075a8f1d18120ffb6a4bda56f882345f5f"
+            }
+          },
+          {
+            "name": "order-0013-reverse-vocab",
+            "output": {
+              "bytes": 168908,
+              "sha256": "c9f84cfe4d1d82a3d16fabbc65866e0427ad266ef009f7685a7f8b6c0b3db1c7"
+            }
+          },
+          {
+            "name": "order-0013-shuffled-vocab",
+            "output": {
+              "bytes": 168909,
+              "sha256": "fc1427ba28beef53122048941dc00387ac543d224ef996e4e8afd77b535f70ed"
+            }
+          },
+          {
+            "name": "order-0014-forward-vocab",
+            "output": {
+              "bytes": 175203,
+              "sha256": "f2cd01fcb7897a091b18cd4d5b839883cbc8d41b7beb61cd00f6199906a97d7b"
+            }
+          },
+          {
+            "name": "order-0014-reverse-vocab",
+            "output": {
+              "bytes": 175203,
+              "sha256": "f82ab548f3c9e439259d1d71d252c2504f2d05b7817b12f657c94a22fb190d70"
+            }
+          },
+          {
+            "name": "order-0014-shuffled-vocab",
+            "output": {
+              "bytes": 175204,
+              "sha256": "2e97bb2483e6f8776c518e4a808071bd3fc105e67070f0ad0e578b626994e2cc"
+            }
+          },
+          {
+            "name": "order-0028-forward-vocab",
+            "output": {
+              "bytes": 263331,
+              "sha256": "9a976088ef3c1cbff3fef15b6db2847b39174a0557b876678024184d69db7ab0"
+            }
+          },
+          {
+            "name": "order-0028-reverse-vocab",
+            "output": {
+              "bytes": 263331,
+              "sha256": "2b830f782a02ea15c5f416e7bd39b8e8b626f17e697be37cb7e40798718c9b7f"
+            }
+          },
+          {
+            "name": "order-0028-shuffled-vocab",
+            "output": {
+              "bytes": 263332,
+              "sha256": "b8df60c582a79dcacf12503c28ae1bcf6d62f85d77bc96e4fd4c56a53b6f1dd4"
+            }
+          },
+          {
+            "name": "order-0029-forward-vocab",
+            "output": {
+              "bytes": 269626,
+              "sha256": "a0c805e44b7f2edf928b07a8d0d1ccb8043349c77e1bd119edcadf0d947fd581"
+            }
+          },
+          {
+            "name": "order-0029-reverse-vocab",
+            "output": {
+              "bytes": 269626,
+              "sha256": "d86075e3a24bc2e85d88335de58d26cf3bbaed6a4c00f1bc61a2d0ea8f9e8f36"
+            }
+          },
+          {
+            "name": "order-0029-shuffled-vocab",
+            "output": {
+              "bytes": 269627,
+              "sha256": "c8d5a3f8b504f0333a9af2d9a4eec88c97f2342a5621f0d2db33aea1e2b46ce7"
+            }
+          },
+          {
+            "name": "order-0030-forward-vocab",
+            "output": {
+              "bytes": 275921,
+              "sha256": "284626df32cc260fcecedf0b9dc27b1112a2aa2125dbf761c568f4c1349be059"
+            }
+          },
+          {
+            "name": "order-0030-reverse-vocab",
+            "output": {
+              "bytes": 275921,
+              "sha256": "28db82bc95b8b8fc5348cb200a52c830626c8b490587d9e3ebb623498e8dce46"
+            }
+          },
+          {
+            "name": "order-0030-shuffled-vocab",
+            "output": {
+              "bytes": 275922,
+              "sha256": "1e7c082aea98e666c57c283e25e5e6defd8a40229acf9b9158501ab7a2fe55fe"
+            }
+          },
+          {
+            "name": "order-0058-forward-vocab",
+            "output": {
+              "bytes": 452181,
+              "sha256": "ba06f509b0d4569a0ae6e61e9d7c2d4c62a9872e801bff8ec3c5cedca3e3eb6c"
+            }
+          },
+          {
+            "name": "order-0058-reverse-vocab",
+            "output": {
+              "bytes": 452181,
+              "sha256": "3c0f973f79f36d2ee2ecee591a8055ba2f0bb42e2e49f6d4d66db36957e45e28"
+            }
+          },
+          {
+            "name": "order-0058-shuffled-vocab",
+            "output": {
+              "bytes": 452182,
+              "sha256": "3f06cd2f780e5ad6a03044b44ad02f3b37e7fc4c716ec233a60817710109edea"
+            }
+          },
+          {
+            "name": "order-0059-forward-vocab",
+            "output": {
+              "bytes": 458476,
+              "sha256": "49688aa7e8ba944ae52d7df90c0951e732a75695483ac877e80507289b0c9bda"
+            }
+          },
+          {
+            "name": "order-0059-reverse-vocab",
+            "output": {
+              "bytes": 458476,
+              "sha256": "b393b4119e68221f922edac027750bd355fc7852b1d7f6a5a50421b426a155c8"
+            }
+          },
+          {
+            "name": "order-0059-shuffled-vocab",
+            "output": {
+              "bytes": 458477,
+              "sha256": "4c2c4bde76be9caa817f9c26a68b9eace1e17ea2f48b0ac3db94c86c59010af8"
+            }
+          },
+          {
+            "name": "order-0060-forward-vocab",
+            "output": {
+              "bytes": 464771,
+              "sha256": "be0baa1303a015bee1fa8ede108886c74e28dad07023006e52d39703f284743e"
+            }
+          },
+          {
+            "name": "order-0060-reverse-vocab",
+            "output": {
+              "bytes": 464771,
+              "sha256": "167c56df7afe54f5ecf57be4371e778da4992d68b6a4c6d4dc3dbd93ff92b46c"
+            }
+          },
+          {
+            "name": "order-0060-shuffled-vocab",
+            "output": {
+              "bytes": 464772,
+              "sha256": "d2b282e50f5708af61bd9c180924498233c89daa16c1d3f93e7cad99b4be24f8"
+            }
+          },
+          {
+            "name": "order-0126-forward-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "ec526ee6828654b1079ca41b7d6c0574f1a0019acdb84213d10372ac6bde0516"
+            }
+          },
+          {
+            "name": "order-0126-reverse-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "27e397b8b8025c7273681676dedaecabed704a3c0f80cb4a42b9075fedadc290"
+            }
+          },
+          {
+            "name": "order-0126-shuffled-vocab",
+            "output": {
+              "bytes": 888751,
+              "sha256": "ada1b3c9fd5ea7762d1c06a318d33380c7484481ab57f28f31f82e1114372fd5"
+            }
+          },
+          {
+            "name": "order-0127-forward-vocab",
+            "output": {
+              "bytes": 895365,
+              "sha256": "fd740f3f33319bfdd1b95c31beda7171e4c208cdbe45f6da9db953ba844e7113"
+            }
+          },
+          {
+            "name": "order-0127-reverse-vocab",
+            "output": {
+              "bytes": 895365,
+              "sha256": "0a65f68a2e61c4df146b58a34df420c7c7cc70175027fa4461fe266762428916"
+            }
+          },
+          {
+            "name": "order-0127-shuffled-vocab",
+            "output": {
+              "bytes": 895364,
+              "sha256": "a01191aca306a02a105cd701010220b3c222d453da769065139d87eac9d10a42"
+            }
+          },
+          {
+            "name": "order-0128-forward-vocab",
+            "output": {
+              "bytes": 901979,
+              "sha256": "1f81257477750692fd30b98066d4a2a5193a0212fed6fb57e27d123e94101b89"
+            }
+          },
+          {
+            "name": "order-0128-reverse-vocab",
+            "output": {
+              "bytes": 901979,
+              "sha256": "a8d2f4690a54d5a78db7b86f122edbeae2578159d1621b10afa61d03f03e5cb8"
+            }
+          },
+          {
+            "name": "order-0128-shuffled-vocab",
+            "output": {
+              "bytes": 901980,
+              "sha256": "5fa6611c288ce9e3bf0b34779a1b30dd473344802d601a8fb5c6f0a966d2c52d"
+            }
+          },
+          {
+            "name": "order-0256-forward-vocab",
+            "output": {
+              "bytes": 1748570,
+              "sha256": "ff604e1bdf1fced55451d13f2359d83f9613b0763e48b76f993dad5ccd1cdb04"
+            }
+          },
+          {
+            "name": "order-0256-reverse-vocab",
+            "output": {
+              "bytes": 1748572,
+              "sha256": "3a8262c134667639233b02c932947c51c592e88e2cabc894323ff3903ae926bc"
+            }
+          },
+          {
+            "name": "order-0256-shuffled-vocab",
+            "output": {
+              "bytes": 1748573,
+              "sha256": "d8fa533a32ba036eafd615e408a89cc750f57db605beb95c0eecfb7dd2615b0f"
+            }
+          },
+          {
+            "name": "order-0512-forward-vocab",
+            "output": {
+              "bytes": 3441752,
+              "sha256": "b6fdeff60214638f6536c4724d09fcfc0ac59ee597052c2d6f1ae57d4b8465c1"
+            }
+          },
+          {
+            "name": "order-0512-reverse-vocab",
+            "output": {
+              "bytes": 3441753,
+              "sha256": "b3b89609ee856ad631d9d2796d59d38ad4ab871467edc8fc84bdbda8d72b0c68"
+            }
+          },
+          {
+            "name": "order-0512-shuffled-vocab",
+            "output": {
+              "bytes": 3441754,
+              "sha256": "39deabd3475e50d25ef357486b8010c751b96f1d6a53fb6884d5e12d38f97f41"
+            }
+          },
+          {
+            "name": "order-1024-forward-vocab",
+            "output": {
+              "bytes": 6829608,
+              "sha256": "216327bd529470e9048d378b25c345924dc854683b4431f480aa424471f30f40"
+            }
+          },
+          {
+            "name": "order-1024-reverse-vocab",
+            "output": {
+              "bytes": 6829608,
+              "sha256": "96cfff9a6eb7f8e8aa4efab8d7816b4a7811e89c68552d2a6eed091e75cf4b4c"
+            }
+          },
+          {
+            "name": "order-1024-shuffled-vocab",
+            "output": {
+              "bytes": 6829609,
+              "sha256": "dc938c70fd5294f2d0e0d8f8e8f2877ab8276d778058ec48a6d00ac0e38a5beb"
+            }
+          },
+          {
+            "name": "all-base-metadata-reversed-vocab",
+            "output": {
+              "bytes": 87262,
+              "sha256": "a841dde44f8bab2c0d29a4f19a83f5c5d6f3d0926290377f20d083e395afb19a"
+            }
+          },
+          {
+            "name": "all-base-metadata-reversed-full",
+            "output": {
+              "bytes": 112113,
+              "sha256": "b1bb0d2aea1e10a7e593f090bccc16e923d1f3b63f7c8fe2e8a801f4d057e482"
+            }
+          },
+          {
+            "name": "all-base-metadata-shuffled-vocab",
+            "output": {
+              "bytes": 87261,
+              "sha256": "9448397f0e8630b303df8a10ff22a7e5289c79e8bcf9327346df58ea480be9a1"
+            }
+          },
+          {
+            "name": "all-base-metadata-shuffled-full",
+            "output": {
+              "bytes": 112112,
+              "sha256": "ae6d7bc367a8432fa1aae71f406abeeebd88330a1f2668e0f19f1f1317dceea4"
+            }
+          },
+          {
+            "name": "unknown-scalar-type-vocab",
+            "output": {
+              "bytes": 98,
+              "sha256": "5ad30564312d5c1f34be32ddc9a0491fd07059b80368b15ab365e72041b0f869"
+            }
+          },
+          {
+            "name": "nested-array-type-vocab",
+            "output": {
+              "bytes": 96,
+              "sha256": "abbbe3491a9cb39104e665298e31146a0725b7c29976e4e29fac9f8a0f27a848"
+            }
+          },
+          {
+            "name": "baseline-addon-vocab",
+            "output": {
+              "bytes": 157192,
+              "sha256": "51d013d8febc8f1c1ec9875bdbe495eb67340e90d6adc9f0220a3166b1e86108"
+            }
+          },
+          {
+            "name": "baseline-addon-full",
+            "output": {
+              "bytes": 182043,
+              "sha256": "c825761e878394dfead2c7ba0d9b09e8e778803798de22bf079da9d9b0a855ff"
+            }
+          },
+          {
+            "name": "empty-key-vocab",
+            "output": {
+              "bytes": 88,
+              "sha256": "49c0b0ef9192238577bea254c097cd990cfc57378699d6f79f0b5a1ac349bb8c"
+            }
+          },
+          {
+            "name": "empty-key-full",
+            "output": {
+              "bytes": 88,
+              "sha256": "e5318b99b70520810d773c08740683801b1a9433beccd75142a8b5607890110e"
+            }
+          },
+          {
+            "name": "single-nul-key-vocab",
+            "output": {
+              "bytes": 170300,
+              "sha256": "a69a532ae1d3f36f83992152cc1c4b3e0532068a79765245906ab4013f901787"
+            }
+          },
+          {
+            "name": "single-nul-key-full",
+            "output": {
+              "bytes": 195151,
+              "sha256": "08be6f343d127474e7b504474730bcca1a7b18d3be16e5dd489acbf2c5daa589"
+            }
+          },
+          {
+            "name": "leading-nul-key-vocab",
+            "output": {
+              "bytes": 170565,
+              "sha256": "459df7bc34f98621c82befa49d99c6b77093d2e9f61556440f73f2d369101d72"
+            }
+          },
+          {
+            "name": "leading-nul-key-full",
+            "output": {
+              "bytes": 195416,
+              "sha256": "80d728547a8905ec4a940a38ea07c04c7ba6595c50cc8802223ddc1ec67a93ec"
+            }
+          },
+          {
+            "name": "invalid-utf8-key-vocab",
+            "output": {
+              "bytes": 169439,
+              "sha256": "0cd2a7426e0236535945c44e52d6c828aab0cee96485c7f43fb0577d1fdb2c3a"
+            }
+          },
+          {
+            "name": "invalid-utf8-key-full",
+            "output": {
+              "bytes": 194290,
+              "sha256": "2b788c28a432840acb80d6f8373aee986ad7ab61d3c49f4350a3f4ac64b643b1"
+            }
+          },
+          {
+            "name": "long-key-4097-vocab",
+            "output": {
+              "bytes": 481394,
+              "sha256": "bf9886667613b338fda39bc798e04f2c9fc408f8e87fd9cc0b7e2f1be5b23c84"
+            }
+          },
+          {
+            "name": "long-key-4097-full",
+            "output": {
+              "bytes": 506245,
+              "sha256": "9edf59aa972f7f576f434524c434112759f0f3653167236ffb165f8fad23366d"
+            }
+          },
+          {
+            "name": "leading-nul-aliases-vocab",
+            "output": {
+              "bytes": 173107,
+              "sha256": "eb0d4c6c601d15cb9b02576d0f766a994b9218f30a96a094077718e785a1be17"
+            }
+          },
+          {
+            "name": "leading-nul-aliases-full",
+            "output": {
+              "bytes": 197958,
+              "sha256": "6c380d544b877da1e95d3614716b66ee857dab9980e4a330203597a65ed7ab93"
+            }
+          },
+          {
+            "name": "leading-nul-array-then-scalar-vocab",
+            "output": {
+              "bytes": 171674,
+              "sha256": "e5ad64499f9fbc863d6861aec47f5ac139e8c2f7889c37968d5a7b7ce0131bc9"
+            }
+          },
+          {
+            "name": "leading-nul-array-then-scalar-full",
+            "output": {
+              "bytes": 196525,
+              "sha256": "f97e1d3bfefadc3d1568c3d85bbdc18f1b56dc6fbf6251ace92e00f0a201cd64"
+            }
+          },
+          {
+            "name": "leading-nul-scalar-then-array-vocab",
+            "output": {
+              "bytes": 171674,
+              "sha256": "0c7504e8fa41491563d78d1bf7559237aac4f69c6c723b8b3eea70a3befd6bc0"
+            }
+          },
+          {
+            "name": "leading-nul-scalar-then-array-full",
+            "output": {
+              "bytes": 196525,
+              "sha256": "bd9a489a10503345f5b749dc8c62e658497163eee3c60b1a5b9e79cf7041f154"
+            }
+          },
+          {
+            "name": "raw-name-array-vocab",
+            "output": {
+              "bytes": 160654,
+              "sha256": "52746e7b5851f64431e55ad8439dbacf933628b1abfd2420838282c2d678d67a"
+            }
+          },
+          {
+            "name": "raw-name-array-full",
+            "output": {
+              "bytes": 185505,
+              "sha256": "017b588b0d4d3981300be2f4cebe1bfa2154b8106ba09bf00c4b6aaae69576fe"
+            }
+          },
+          {
+            "name": "float-format-boundaries-vocab",
+            "output": {
+              "bytes": 4233939,
+              "sha256": "280cccfce124b70e378242441bac26fb583e4e68795864e376a5b481ac5328ca"
+            }
+          },
+          {
+            "name": "float-format-boundaries-full",
+            "output": {
+              "bytes": 4258790,
+              "sha256": "e6bc12a611ade5ea3a63bd62e6625f556d52aa8cd863979d774c09ecbd68852c"
+            }
+          },
+          {
+            "name": "raw-general-description-vocab",
+            "output": {
+              "bytes": 102,
+              "sha256": "62517c147fc39c9b6834d0b2197b740ca283bcf8a5490621e7be78734c72b813"
+            }
+          },
+          {
+            "name": "raw-general-description-full",
+            "output": {
+              "bytes": 102,
+              "sha256": "b804c6b295e9ceb364260da101aa6115652f99d7a1d162f27219df9d9844d362"
+            }
+          },
+          {
+            "name": "raw-array-key-vocab",
+            "output": {
+              "bytes": 92,
+              "sha256": "cd7f84c4f63b7613ce5906f6805eea2d20c92e24cb5107e8c1e2adb1f58cdc8e"
+            }
+          },
+          {
+            "name": "raw-array-key-full",
+            "output": {
+              "bytes": 92,
+              "sha256": "758012b22b1d31e6a887d187e6cc5f297da24977d62db6046525790bf2a5c369"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-vocab",
+            "output": {
+              "bytes": 104,
+              "sha256": "2df832705eaaac76d43c9130b28e2ec4fb68fb655fc00f1475c58ff1e4fc9b9c"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-full",
+            "output": {
+              "bytes": 104,
+              "sha256": "98dc24643498d66042da5489bc82196179f8b05be13e9c11048f4cb32da818fa"
+            }
+          },
+          {
+            "name": "raw-general-description-corrected-vocab",
+            "output": {
+              "bytes": 169962,
+              "sha256": "771e96466bdb03be1b2b8a9685f4e07bf4aa68961c01d27666f97b730dcac8f3"
+            }
+          },
+          {
+            "name": "raw-general-description-corrected-full",
+            "output": {
+              "bytes": 194813,
+              "sha256": "a080cf335bdb112da09b453d9b10e0d39e8e55a0d8d10e9ca98c6e6bc458a490"
+            }
+          },
+          {
+            "name": "raw-array-key-corrected-vocab",
+            "output": {
+              "bytes": 163033,
+              "sha256": "82ef778ff0eb2a33f734f5017fbc889d9f4d059cb95438da8c41938a619828c7"
+            }
+          },
+          {
+            "name": "raw-array-key-corrected-full",
+            "output": {
+              "bytes": 187884,
+              "sha256": "d8151ff42aadf6c49d9f572f3e45c0160ec0f721a1e485b1ed5160c0b9a71dc3"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-corrected-vocab",
+            "output": {
+              "bytes": 163045,
+              "sha256": "2fae8ce4442db31b22394f7b4fe865f5b73fe5076a8531469622d0eb5902f9a0"
+            }
+          },
+          {
+            "name": "empty-unused-string-array-corrected-full",
+            "output": {
+              "bytes": 187896,
+              "sha256": "7ead3a6e5bf3f7674add235a92052c203f680094d9fe84ddf5539eca4ed8f163"
+            }
+          },
+          {
+            "name": "three-raw-subsidiary-vocab",
+            "output": {
+              "bytes": 186109,
+              "sha256": "5b5fe37f5b84be14e467127ea4d56d709f2fb2a93271be36784a148156869f84"
+            }
+          },
+          {
+            "name": "three-raw-subsidiary-full",
+            "output": {
+              "bytes": 210960,
+              "sha256": "17605feace9d8a7a285a43ca20f6e697d703b3c23c59b04608ad8c4b0bd892d5"
+            }
+          },
+          {
+            "name": "three-raw-primary-and-subsidiary-vocab",
+            "output": {
+              "bytes": 202665,
+              "sha256": "15ff14de81d98e5953d23e45ae7897119dd499a95d59fd05015ce692efc07779"
+            }
+          },
+          {
+            "name": "three-raw-primary-and-subsidiary-full",
+            "output": {
+              "bytes": 227516,
+              "sha256": "6d0ec9c789095e7d1310860aff8ff8ee0742974c914137797498fc9fb47166b6"
+            }
+          },
+          {
+            "name": "metadata-first-raw-primary-and-subsidiary-vocab",
+            "output": {
+              "bytes": 202674,
+              "sha256": "9b83c5533a27b0cae35e51016415789ca6ad27040acc3c3a089340d24209deee"
+            }
+          },
+          {
+            "name": "metadata-first-raw-primary-and-subsidiary-full",
+            "output": {
+              "bytes": 227525,
+              "sha256": "af53eeddbe8bbbb00ea4ff6f8468dc1a87dc48b4edc4675e6b002e150c743b12"
+            }
+          },
+          {
+            "name": "three-subsidiary-split-no-prefix-vocab",
+            "output": {
+              "bytes": 186121,
+              "sha256": "db41d64b541cf10515565f6ec2a3ea42a5056d7b92809b25bdcc4efc457446bc"
+            }
+          },
+          {
+            "name": "three-subsidiary-split-no-prefix-full",
+            "output": {
+              "bytes": 210972,
+              "sha256": "6e2af3f476512c8fef14018f7ac0734910463e63f784d1e86b556714453d876c"
+            }
+          }
+        ],
+        "caller": {
+          "bytes": 168448,
+          "sha256": "78b107b6c539cb5fd823d90254282424a1a816af96c2b180e3333b37790e2de6"
+        }
+      }
+    }
+  },
+  "execution_inputs": {
+    "files": 1536,
+    "bytes": 229192,
+    "sha256": "f4d5d64039bd7013fae32b5469799db984e6ef67e2aeae9c7fd91aff36d74ee2",
+    "scope": "All Git-listed tracked/unignored files except evidence/ and the two top-level progress documents README.md and docs/PORT_STATUS.md. Includes all release controls and attributes."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "c-clients",
+    "new-c-clients",
+    "pretrained-converter",
+    "pretrained-gpt-converter",
+    "pretrained-inference",
+    "pretrained-qwen-tokenizer",
+    "pretrained-qwen2-converter",
+    "pretrained-qwen3-converter",
+    "release-gates",
+    "verify-reference-copy"
+  ],
+  "driver": {
+    "bytes": 15097,
+    "sha256": "0183878f7d4fe0aefc58639704023ccf2c493e6dd6e9ed125090724e64b400be"
+  },
+  "git_head": "ebeb0637932774e6b07d989ab3f01259bc363715",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "prepared_models": {
+    "gpt2-124m-f16": {
+      "output_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\prepared-pretrained\\gpt2-124m-f16.gguf",
+      "bytes": 252470528,
+      "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+    },
+    "pythia-14m-f16": {
+      "output_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\prepared-pretrained\\pythia-14m-f16.gguf",
+      "bytes": 29929440,
+      "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+    }
+  },
+  "new_native_clients": {
+    "schema": 1,
+    "status": "passed",
+    "host": "windows",
+    "repo": "C:\\Users\\adyba\\rust-llama",
+    "target": "C:\\Users\\adyba\\rust-llama\\target",
+    "output": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients",
+    "started_utc": "2026-11-11T13:53:12.065721+00:00",
+    "driver": {
+      "bytes": 20834,
+      "sha256": "072aaf266d18ae585daa8bc4b2ec88897acef9436cbdc6bf29e1decbc51119d4"
+    },
+    "sealed_inputs": {
+      "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\replay-prior-c-clients.py": {
+        "bytes": 20834,
+        "sha256": "072aaf266d18ae585daa8bc4b2ec88897acef9436cbdc6bf29e1decbc51119d4"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\provenance.json": {
+        "bytes": 5696,
+        "sha256": "2c1972c8545767f4b28659fb9115be53b3a30182fabab436be33e5cc8323cc12"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\provenance.json": {
+        "bytes": 11302,
+        "sha256": "dd6ade5c580838ee82cd03771f4ed8a0fd10358f1fda4d5121278517832d2a1f"
+      },
+      "C:\\Users\\adyba\\rust-llama\\evidence\\2026-11-11\\c-sampler-perf\\windows\\exports.json": {
+        "bytes": 16843,
+        "sha256": "3c86fe2b66a1b01c37727aee159c1c922be38edd093e84eefbc0293c429d8da3"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\build-windows\\Release\\batch-oracle.exe": {
+        "bytes": 161280,
+        "sha256": "e1a76f8e8e62af032508a522302c49147da99bd314b4bf986e7396215976402b"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows\\Release\\perf-oracle.exe": {
+        "bytes": 167424,
+        "sha256": "ec5eba32893ccbcbb36b33862105555fc3a4ba46bf0e450d084de14e205d5b07"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\batch-oracle.cpp": {
+        "bytes": 7547,
+        "sha256": "35b9914584297f2580ce68d5a00e2f22dc8fb2849d8683b26c178e9474effe65"
+      },
+      "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\perf-oracle.cpp": {
+        "bytes": 10981,
+        "sha256": "83b84628b02e057b5b53d2df5586f523c21965f83610012e2cec38c48868ce33"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf": {
+        "bytes": 31328,
+        "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\inputs.json": {
+        "bytes": 146648,
+        "sha256": "b25b5736151200809014c45d7e52e7e56d29abc0b4efab37cb2431fedb3cb410"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\windows-reference.json": {
+        "bytes": 109028,
+        "sha256": "4b08e8f508234b22a41acd5f527975fe1ccf0bbdfcc934fa45ffee7d680155cc"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\windows-data.bin": {
+        "bytes": 167366,
+        "sha256": "cbf6662930dbc7467df7f0fb0eacc00507a4cb5fbd6a140004efc39fc8b4330e"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\default-linux-stderr.bin": {
+        "bytes": 99,
+        "sha256": "eb30fd7feca1d3bc8dac4bd07bf403bcc73cedc1456ddf004d217d382d36b77a"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\default-windows-stderr.bin": {
+        "bytes": 101,
+        "sha256": "fd02638d967084c45eb91619e09db7df2690e12677435a88da24c8da323aa93b"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\inputs.json": {
+        "bytes": 36042,
+        "sha256": "48d4f983475f9e4e646ebc27f80624c4adcb1c495d1c915a9e704e415cfef815"
+      },
+      "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\reference.json": {
+        "bytes": 39060,
+        "sha256": "a38134c26e7ba2aecf501d912a6958c04e7fab9e8f6b9db2d466412118c209c4"
+      },
+      "C:\\Users\\adyba\\rust-llama\\crates\\ffi\\COVERAGE.md": {
+        "bytes": 11304,
+        "sha256": "ea33a7ca22f05fedcca93e0c43ccee3efa32da231f23b9838f26a7e223cf4615"
+      },
+      "C:\\Users\\adyba\\rust-llama\\Cargo.toml": {
+        "bytes": 297,
+        "sha256": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c"
+      },
+      "C:\\Users\\adyba\\rust-llama\\Cargo.lock": {
+        "bytes": 3594,
+        "sha256": "8fd520abc3e4489af0d662c43b62714d3334f2e39a5ca191d5d7c782490d7b6d"
+      },
+      "C:\\Users\\adyba\\rust-llama\\rust-toolchain.toml": {
+        "bytes": 90,
+        "sha256": "d8c420f9c9a2fc00c09cf07b7bb570c92a09137ef1559cb9ef5b12c76f7557cc"
+      },
+      "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll": {
+        "bytes": 5321728,
+        "sha256": "89ec6baf8835d4532a7789dbf696b8408b19a2b1201eb8d38d391912330768a2"
+      },
+      "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll": {
+        "bytes": 2349056,
+        "sha256": "619a9de5acb1b2d4812cd0ff7e4a3fd4e1cf23ed0640d2a4c5e7949e3f0468b8"
+      }
+    },
+    "profiles": {
+      "debug": {
+        "library": {
+          "bytes": 5321728,
+          "sha256": "89ec6baf8835d4532a7789dbf696b8408b19a2b1201eb8d38d391912330768a2"
+        },
+        "status": "passed",
+        "exports": {
+          "implemented": 226,
+          "extensions": 4,
+          "absent": 29,
+          "result": {
+            "bytes": 7867,
+            "sha256": "a1020211282eb8aa8042e3e6ccd59f455abb127903db0924e7c845cfd56b6b59"
+          }
+        },
+        "batch": {
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\build-windows\\Release\\batch-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\inputs.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients\\debug\\batch.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.309,
+          "stdout": {
+            "bytes": 31,
+            "sha256": "ba0c6a3e3caa31965aedeca7b9e763235998fd347e2e746d290918cae7e7beb7"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "exact_original_capture": true,
+          "output": {
+            "bytes": 7381706,
+            "sha256": "19f746ab05abe7a29b448cb952635275438d21338ea551eab6507d79e12c4626"
+          },
+          "cases": 279,
+          "process_calls": 395,
+          "successful_process_calls": 386,
+          "exact_logit_words": 640000,
+          "exact_embedding_words": 2688,
+          "exact_state_bytes": 86694
+        },
+        "perf": {
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows\\Release\\perf-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\inputs.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients\\debug\\perf.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 1.272,
+          "stdout": {
+            "bytes": 14,
+            "sha256": "b83959731b7cbf793625613b507cd567349a2c8929ae44cb14d57f7aba9b5c98"
+          },
+          "stderr": {
+            "bytes": 101,
+            "sha256": "fd02638d967084c45eb91619e09db7df2690e12677435a88da24c8da323aa93b"
+          },
+          "exact_semantic_projection": true,
+          "exact_default_stderr": true,
+          "output": {
+            "bytes": 55784,
+            "sha256": "f3710824b2342c48f83ff0a6f73c29fc774d11d8b29e882057cbe56e4f3a2c80"
+          },
+          "cases": 8,
+          "operations": 324,
+          "timing_observations": 114,
+          "positive_timing_observations": 39
+        }
+      },
+      "release": {
+        "library": {
+          "bytes": 2349056,
+          "sha256": "619a9de5acb1b2d4812cd0ff7e4a3fd4e1cf23ed0640d2a4c5e7949e3f0468b8"
+        },
+        "status": "passed",
+        "exports": {
+          "implemented": 226,
+          "extensions": 4,
+          "absent": 29,
+          "result": {
+            "bytes": 7867,
+            "sha256": "78055e7e85cf53fd642419b50b6132018af1b6ade656e8e4d389fac141b9a100"
+          }
+        },
+        "batch": {
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\batch-oracle\\build-windows\\Release\\batch-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\batch-ext\\inputs.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients\\release\\batch.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.121,
+          "stdout": {
+            "bytes": 31,
+            "sha256": "ba0c6a3e3caa31965aedeca7b9e763235998fd347e2e746d290918cae7e7beb7"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "exact_original_capture": true,
+          "output": {
+            "bytes": 7381706,
+            "sha256": "19f746ab05abe7a29b448cb952635275438d21338ea551eab6507d79e12c4626"
+          },
+          "cases": 279,
+          "process_calls": 395,
+          "successful_process_calls": 386,
+          "exact_logit_words": 640000,
+          "exact_embedding_words": 2688,
+          "exact_state_bytes": 86694
+        },
+        "perf": {
+          "argv": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows\\Release\\perf-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\native-context-model.gguf",
+            "C:\\Users\\adyba\\rust-llama\\fixtures\\ffi\\sampler-perf\\inputs.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\new-c-clients\\release\\perf.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.872,
+          "stdout": {
+            "bytes": 14,
+            "sha256": "b83959731b7cbf793625613b507cd567349a2c8929ae44cb14d57f7aba9b5c98"
+          },
+          "stderr": {
+            "bytes": 101,
+            "sha256": "fd02638d967084c45eb91619e09db7df2690e12677435a88da24c8da323aa93b"
+          },
+          "exact_semantic_projection": true,
+          "exact_default_stderr": true,
+          "output": {
+            "bytes": 55810,
+            "sha256": "189512255b7b903445eae580e1b744beffaf06a1aacff7b3b66b305ab86e9889"
+          },
+          "cases": 8,
+          "operations": 324,
+          "timing_observations": 114,
+          "positive_timing_observations": 37
+        }
+      }
+    },
+    "historical_export_inventory": {
+      "implemented": [
+        "llama_add_bos_token",
+        "llama_add_eos_token",
+        "llama_backend_free",
+        "llama_backend_init",
+        "llama_batch_ext_add",
+        "llama_batch_ext_add_embd",
+        "llama_batch_ext_add_seq",
+        "llama_batch_ext_add_token",
+        "llama_batch_ext_clear",
+        "llama_batch_ext_free",
+        "llama_batch_ext_init",
+        "llama_batch_ext_set_embd_state",
+        "llama_batch_ext_set_embd_token",
+        "llama_batch_ext_set_output_embd",
+        "llama_batch_ext_set_output_logits",
+        "llama_batch_ext_set_pos",
+        "llama_batch_free",
+        "llama_batch_get_one",
+        "llama_batch_init",
+        "llama_chat_apply_template",
+        "llama_chat_builtin_templates",
+        "llama_context_default_params",
+        "llama_copy_state_data",
+        "llama_decode",
+        "llama_detokenize",
+        "llama_flash_attn_type_name",
+        "llama_free",
+        "llama_free_model",
+        "llama_ftype_name",
+        "llama_get_causal_attn",
+        "llama_get_embeddings",
+        "llama_get_embeddings_ith",
+        "llama_get_logits",
+        "llama_get_logits_ith",
+        "llama_get_memory",
+        "llama_get_model",
+        "llama_get_state_size",
+        "llama_init_from_model",
+        "llama_load_mode_from_str",
+        "llama_load_mode_name",
+        "llama_load_model_from_file",
+        "llama_load_session_file",
+        "llama_log_get",
+        "llama_log_set",
+        "llama_max_devices",
+        "llama_max_parallel_sequences",
+        "llama_max_tensor_buft_overrides",
+        "llama_memory_can_shift",
+        "llama_memory_clear",
+        "llama_memory_seq_add",
+        "llama_memory_seq_cp",
+        "llama_memory_seq_div",
+        "llama_memory_seq_keep",
+        "llama_memory_seq_pos_max",
+        "llama_memory_seq_pos_min",
+        "llama_memory_seq_rm",
+        "llama_model_chat_template",
+        "llama_model_decoder_start_token",
+        "llama_model_default_params",
+        "llama_model_desc",
+        "llama_model_free",
+        "llama_model_ftype",
+        "llama_model_get_vocab",
+        "llama_model_has_decoder",
+        "llama_model_has_encoder",
+        "llama_model_is_diffusion",
+        "llama_model_is_hybrid",
+        "llama_model_is_recurrent",
+        "llama_model_load_from_file",
+        "llama_model_load_from_splits",
+        "llama_model_meta_count",
+        "llama_model_meta_key_by_index",
+        "llama_model_meta_key_str",
+        "llama_model_meta_val_str",
+        "llama_model_meta_val_str_by_index",
+        "llama_model_n_ctx_train",
+        "llama_model_n_embd",
+        "llama_model_n_embd_inp",
+        "llama_model_n_embd_out",
+        "llama_model_n_head",
+        "llama_model_n_head_kv",
+        "llama_model_n_layer",
+        "llama_model_n_layer_nextn",
+        "llama_model_n_params",
+        "llama_model_n_swa",
+        "llama_model_rope_freq_scale_train",
+        "llama_model_rope_type",
+        "llama_model_size",
+        "llama_n_batch",
+        "llama_n_ctx",
+        "llama_n_ctx_seq",
+        "llama_n_ctx_train",
+        "llama_n_embd",
+        "llama_n_head",
+        "llama_n_layer",
+        "llama_n_rs_seq",
+        "llama_n_seq_max",
+        "llama_n_threads",
+        "llama_n_threads_batch",
+        "llama_n_ubatch",
+        "llama_n_vocab",
+        "llama_new_context_with_model",
+        "llama_perf_sampler",
+        "llama_perf_sampler_print",
+        "llama_perf_sampler_reset",
+        "llama_pooling_type",
+        "llama_process",
+        "llama_sampler_accept",
+        "llama_sampler_apply",
+        "llama_sampler_chain_add",
+        "llama_sampler_chain_default_params",
+        "llama_sampler_chain_get",
+        "llama_sampler_chain_init",
+        "llama_sampler_chain_n",
+        "llama_sampler_chain_remove",
+        "llama_sampler_clone",
+        "llama_sampler_copy",
+        "llama_sampler_free",
+        "llama_sampler_get_seed",
+        "llama_sampler_init",
+        "llama_sampler_init_adaptive_p",
+        "llama_sampler_init_dist",
+        "llama_sampler_init_dry",
+        "llama_sampler_init_grammar",
+        "llama_sampler_init_grammar_lazy",
+        "llama_sampler_init_grammar_lazy_patterns",
+        "llama_sampler_init_greedy",
+        "llama_sampler_init_infill",
+        "llama_sampler_init_logit_bias",
+        "llama_sampler_init_min_p",
+        "llama_sampler_init_mirostat",
+        "llama_sampler_init_mirostat_v2",
+        "llama_sampler_init_penalties",
+        "llama_sampler_init_temp",
+        "llama_sampler_init_temp_ext",
+        "llama_sampler_init_top_k",
+        "llama_sampler_init_top_n_sigma",
+        "llama_sampler_init_top_p",
+        "llama_sampler_init_typical",
+        "llama_sampler_init_xtc",
+        "llama_sampler_name",
+        "llama_sampler_reset",
+        "llama_sampler_sample",
+        "llama_save_session_file",
+        "llama_set_abort_callback",
+        "llama_set_causal_attn",
+        "llama_set_embeddings",
+        "llama_set_n_threads",
+        "llama_set_state_data",
+        "llama_split_path",
+        "llama_split_prefix",
+        "llama_state_get_data",
+        "llama_state_get_size",
+        "llama_state_load_file",
+        "llama_state_save_file",
+        "llama_state_seq_get_data",
+        "llama_state_seq_get_data_ext",
+        "llama_state_seq_get_size",
+        "llama_state_seq_get_size_ext",
+        "llama_state_seq_load_file",
+        "llama_state_seq_save_file",
+        "llama_state_seq_set_data",
+        "llama_state_seq_set_data_ext",
+        "llama_state_set_data",
+        "llama_supports_gpu_offload",
+        "llama_supports_mlock",
+        "llama_supports_mmap",
+        "llama_supports_rpc",
+        "llama_synchronize",
+        "llama_time_us",
+        "llama_token_bos",
+        "llama_token_cls",
+        "llama_token_eos",
+        "llama_token_eot",
+        "llama_token_fim_mid",
+        "llama_token_fim_pad",
+        "llama_token_fim_pre",
+        "llama_token_fim_rep",
+        "llama_token_fim_sep",
+        "llama_token_fim_suf",
+        "llama_token_get_attr",
+        "llama_token_get_score",
+        "llama_token_get_text",
+        "llama_token_is_control",
+        "llama_token_is_eog",
+        "llama_token_nl",
+        "llama_token_pad",
+        "llama_token_sep",
+        "llama_token_to_piece",
+        "llama_tokenize",
+        "llama_version",
+        "llama_vocab_bos",
+        "llama_vocab_cls",
+        "llama_vocab_eos",
+        "llama_vocab_eot",
+        "llama_vocab_fim_mid",
+        "llama_vocab_fim_pad",
+        "llama_vocab_fim_pre",
+        "llama_vocab_fim_rep",
+        "llama_vocab_fim_sep",
+        "llama_vocab_fim_suf",
+        "llama_vocab_get_add_bos",
+        "llama_vocab_get_add_eos",
+        "llama_vocab_get_add_sep",
+        "llama_vocab_get_attr",
+        "llama_vocab_get_score",
+        "llama_vocab_get_suppress_tokens",
+        "llama_vocab_get_text",
+        "llama_vocab_is_control",
+        "llama_vocab_is_eog",
+        "llama_vocab_mask",
+        "llama_vocab_n_tokens",
+        "llama_vocab_nl",
+        "llama_vocab_pad",
+        "llama_vocab_sep",
+        "llama_vocab_type"
+      ],
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "unexported": [
+        "llama_adapter_get_alora_invocation_tokens",
+        "llama_adapter_get_alora_n_invocation_tokens",
+        "llama_adapter_lora_free",
+        "llama_adapter_lora_init",
+        "llama_adapter_lora_init_from_file_ptr",
+        "llama_adapter_meta_count",
+        "llama_adapter_meta_key_by_index",
+        "llama_adapter_meta_val_str",
+        "llama_adapter_meta_val_str_by_index",
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_encode",
+        "llama_get_embeddings_seq",
+        "llama_get_sampled_candidates_count_ith",
+        "llama_get_sampled_candidates_ith",
+        "llama_get_sampled_logits_count_ith",
+        "llama_get_sampled_logits_ith",
+        "llama_get_sampled_probs_count_ith",
+        "llama_get_sampled_probs_ith",
+        "llama_get_sampled_token_ith",
+        "llama_model_cls_label",
+        "llama_model_init_from_user",
+        "llama_model_load_from_file_ptr",
+        "llama_model_n_cls_out",
+        "llama_model_quantize",
+        "llama_model_quantize_default_params",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all",
+        "llama_perf_context",
+        "llama_perf_context_print",
+        "llama_perf_context_reset",
+        "llama_print_system_info",
+        "llama_set_adapter_cvec",
+        "llama_set_adapters_lora",
+        "llama_set_sampler",
+        "llama_set_warmup"
+      ]
+    },
+    "repo_head": "ebeb0637932774e6b07d989ab3f01259bc363715",
+    "export_inventory": {
+      "implemented": [
+        "llama_adapter_get_alora_invocation_tokens",
+        "llama_adapter_get_alora_n_invocation_tokens",
+        "llama_adapter_lora_free",
+        "llama_adapter_lora_init",
+        "llama_adapter_meta_count",
+        "llama_adapter_meta_key_by_index",
+        "llama_adapter_meta_val_str",
+        "llama_adapter_meta_val_str_by_index",
+        "llama_add_bos_token",
+        "llama_add_eos_token",
+        "llama_backend_free",
+        "llama_backend_init",
+        "llama_batch_ext_add",
+        "llama_batch_ext_add_embd",
+        "llama_batch_ext_add_seq",
+        "llama_batch_ext_add_token",
+        "llama_batch_ext_clear",
+        "llama_batch_ext_free",
+        "llama_batch_ext_init",
+        "llama_batch_ext_set_embd_state",
+        "llama_batch_ext_set_embd_token",
+        "llama_batch_ext_set_output_embd",
+        "llama_batch_ext_set_output_logits",
+        "llama_batch_ext_set_pos",
+        "llama_batch_free",
+        "llama_batch_get_one",
+        "llama_batch_init",
+        "llama_chat_apply_template",
+        "llama_chat_builtin_templates",
+        "llama_context_default_params",
+        "llama_copy_state_data",
+        "llama_decode",
+        "llama_detokenize",
+        "llama_flash_attn_type_name",
+        "llama_free",
+        "llama_free_model",
+        "llama_ftype_name",
+        "llama_get_causal_attn",
+        "llama_get_embeddings",
+        "llama_get_embeddings_ith",
+        "llama_get_logits",
+        "llama_get_logits_ith",
+        "llama_get_memory",
+        "llama_get_model",
+        "llama_get_state_size",
+        "llama_init_from_model",
+        "llama_load_mode_from_str",
+        "llama_load_mode_name",
+        "llama_load_model_from_file",
+        "llama_load_session_file",
+        "llama_log_get",
+        "llama_log_set",
+        "llama_max_devices",
+        "llama_max_parallel_sequences",
+        "llama_max_tensor_buft_overrides",
+        "llama_memory_can_shift",
+        "llama_memory_clear",
+        "llama_memory_seq_add",
+        "llama_memory_seq_cp",
+        "llama_memory_seq_div",
+        "llama_memory_seq_keep",
+        "llama_memory_seq_pos_max",
+        "llama_memory_seq_pos_min",
+        "llama_memory_seq_rm",
+        "llama_model_chat_template",
+        "llama_model_decoder_start_token",
+        "llama_model_default_params",
+        "llama_model_desc",
+        "llama_model_free",
+        "llama_model_ftype",
+        "llama_model_get_vocab",
+        "llama_model_has_decoder",
+        "llama_model_has_encoder",
+        "llama_model_is_diffusion",
+        "llama_model_is_hybrid",
+        "llama_model_is_recurrent",
+        "llama_model_load_from_file",
+        "llama_model_load_from_splits",
+        "llama_model_meta_count",
+        "llama_model_meta_key_by_index",
+        "llama_model_meta_key_str",
+        "llama_model_meta_val_str",
+        "llama_model_meta_val_str_by_index",
+        "llama_model_n_ctx_train",
+        "llama_model_n_embd",
+        "llama_model_n_embd_inp",
+        "llama_model_n_embd_out",
+        "llama_model_n_head",
+        "llama_model_n_head_kv",
+        "llama_model_n_layer",
+        "llama_model_n_layer_nextn",
+        "llama_model_n_params",
+        "llama_model_n_swa",
+        "llama_model_rope_freq_scale_train",
+        "llama_model_rope_type",
+        "llama_model_size",
+        "llama_n_batch",
+        "llama_n_ctx",
+        "llama_n_ctx_seq",
+        "llama_n_ctx_train",
+        "llama_n_embd",
+        "llama_n_head",
+        "llama_n_layer",
+        "llama_n_rs_seq",
+        "llama_n_seq_max",
+        "llama_n_threads",
+        "llama_n_threads_batch",
+        "llama_n_ubatch",
+        "llama_n_vocab",
+        "llama_new_context_with_model",
+        "llama_perf_sampler",
+        "llama_perf_sampler_print",
+        "llama_perf_sampler_reset",
+        "llama_pooling_type",
+        "llama_process",
+        "llama_sampler_accept",
+        "llama_sampler_apply",
+        "llama_sampler_chain_add",
+        "llama_sampler_chain_default_params",
+        "llama_sampler_chain_get",
+        "llama_sampler_chain_init",
+        "llama_sampler_chain_n",
+        "llama_sampler_chain_remove",
+        "llama_sampler_clone",
+        "llama_sampler_copy",
+        "llama_sampler_free",
+        "llama_sampler_get_seed",
+        "llama_sampler_init",
+        "llama_sampler_init_adaptive_p",
+        "llama_sampler_init_dist",
+        "llama_sampler_init_dry",
+        "llama_sampler_init_grammar",
+        "llama_sampler_init_grammar_lazy",
+        "llama_sampler_init_grammar_lazy_patterns",
+        "llama_sampler_init_greedy",
+        "llama_sampler_init_infill",
+        "llama_sampler_init_logit_bias",
+        "llama_sampler_init_min_p",
+        "llama_sampler_init_mirostat",
+        "llama_sampler_init_mirostat_v2",
+        "llama_sampler_init_penalties",
+        "llama_sampler_init_temp",
+        "llama_sampler_init_temp_ext",
+        "llama_sampler_init_top_k",
+        "llama_sampler_init_top_n_sigma",
+        "llama_sampler_init_top_p",
+        "llama_sampler_init_typical",
+        "llama_sampler_init_xtc",
+        "llama_sampler_name",
+        "llama_sampler_reset",
+        "llama_sampler_sample",
+        "llama_save_session_file",
+        "llama_set_abort_callback",
+        "llama_set_adapter_cvec",
+        "llama_set_adapters_lora",
+        "llama_set_causal_attn",
+        "llama_set_embeddings",
+        "llama_set_n_threads",
+        "llama_set_state_data",
+        "llama_split_path",
+        "llama_split_prefix",
+        "llama_state_get_data",
+        "llama_state_get_size",
+        "llama_state_load_file",
+        "llama_state_save_file",
+        "llama_state_seq_get_data",
+        "llama_state_seq_get_data_ext",
+        "llama_state_seq_get_size",
+        "llama_state_seq_get_size_ext",
+        "llama_state_seq_load_file",
+        "llama_state_seq_save_file",
+        "llama_state_seq_set_data",
+        "llama_state_seq_set_data_ext",
+        "llama_state_set_data",
+        "llama_supports_gpu_offload",
+        "llama_supports_mlock",
+        "llama_supports_mmap",
+        "llama_supports_rpc",
+        "llama_synchronize",
+        "llama_time_us",
+        "llama_token_bos",
+        "llama_token_cls",
+        "llama_token_eos",
+        "llama_token_eot",
+        "llama_token_fim_mid",
+        "llama_token_fim_pad",
+        "llama_token_fim_pre",
+        "llama_token_fim_rep",
+        "llama_token_fim_sep",
+        "llama_token_fim_suf",
+        "llama_token_get_attr",
+        "llama_token_get_score",
+        "llama_token_get_text",
+        "llama_token_is_control",
+        "llama_token_is_eog",
+        "llama_token_nl",
+        "llama_token_pad",
+        "llama_token_sep",
+        "llama_token_to_piece",
+        "llama_tokenize",
+        "llama_version",
+        "llama_vocab_bos",
+        "llama_vocab_cls",
+        "llama_vocab_eos",
+        "llama_vocab_eot",
+        "llama_vocab_fim_mid",
+        "llama_vocab_fim_pad",
+        "llama_vocab_fim_pre",
+        "llama_vocab_fim_rep",
+        "llama_vocab_fim_sep",
+        "llama_vocab_fim_suf",
+        "llama_vocab_get_add_bos",
+        "llama_vocab_get_add_eos",
+        "llama_vocab_get_add_sep",
+        "llama_vocab_get_attr",
+        "llama_vocab_get_score",
+        "llama_vocab_get_suppress_tokens",
+        "llama_vocab_get_text",
+        "llama_vocab_is_control",
+        "llama_vocab_is_eog",
+        "llama_vocab_mask",
+        "llama_vocab_n_tokens",
+        "llama_vocab_nl",
+        "llama_vocab_pad",
+        "llama_vocab_sep",
+        "llama_vocab_type"
+      ],
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "unexported": [
+        "llama_adapter_lora_init_from_file_ptr",
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_encode",
+        "llama_get_embeddings_seq",
+        "llama_get_sampled_candidates_count_ith",
+        "llama_get_sampled_candidates_ith",
+        "llama_get_sampled_logits_count_ith",
+        "llama_get_sampled_logits_ith",
+        "llama_get_sampled_probs_count_ith",
+        "llama_get_sampled_probs_ith",
+        "llama_get_sampled_token_ith",
+        "llama_model_cls_label",
+        "llama_model_init_from_user",
+        "llama_model_load_from_file_ptr",
+        "llama_model_n_cls_out",
+        "llama_model_quantize",
+        "llama_model_quantize_default_params",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all",
+        "llama_perf_context",
+        "llama_perf_context_print",
+        "llama_perf_context_reset",
+        "llama_print_system_info",
+        "llama_set_sampler",
+        "llama_set_warmup"
+      ]
+    },
+    "batch_corpus": {
+      "cases": 279,
+      "process_calls": 395,
+      "successful_process_calls": 386,
+      "exact_logit_words": 640000,
+      "exact_embedding_words": 2688,
+      "exact_state_bytes": 86694
+    },
+    "perf_corpus": {
+      "cases": 8,
+      "operations": 324,
+      "timing_observations_per_profile": 114
+    },
+    "qualification": "Replays already-built libraries; build-to-source provenance belongs to the enclosing validation. Original numeric timings are nondeterministic; all captured clock/count/relation predicates, candidate words, callback bytes, and default stderr are exact.",
+    "completed_utc": "2026-11-11T13:53:15.732259+00:00"
+  },
+  "adapter_native_clients": {
+    "schema": 1,
+    "status": "passed",
+    "profile": "windows",
+    "repository": "C:\\Users\\adyba\\rust-llama",
+    "started": "2026-11-11T13:53:15.896604+00:00",
+    "original": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\original-v3\\windows\\results.json",
+      "bytes": 19290770,
+      "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+    },
+    "client": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\build-windows\\Release\\adapter-oracle.exe",
+      "bytes": 201728,
+      "sha256": "eaf1510570d786d8229201947d60ae33ea36823cf326a4b312462f30d2eefdcf"
+    },
+    "client_source": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\adapter-oracle.cpp",
+      "bytes": 9336,
+      "sha256": "d2f0f93abd2f76c9dfd8873b89e10f0a573caece023f7b881553036d0baad071"
+    },
+    "scenarios": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\matrix.json",
+      "bytes": 76646,
+      "sha256": "102999eaf4b84f6ba4726192f14f967e773f0f0b67b0981cd49e51f9fbd00a08"
+    },
+    "builds": {
+      "debug": {
+        "command": [
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\build-windows\\Release\\adapter-oracle.exe",
+          "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\inputs",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\matrix.json",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\adapter-c-clients\\debug-results.json"
+        ],
+        "exit_code": 0,
+        "seconds": 0.6871353999995335,
+        "library": {
+          "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+          "bytes": 5321728,
+          "sha256": "89ec6baf8835d4532a7789dbf696b8408b19a2b1201eb8d38d391912330768a2"
+        },
+        "result": {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\adapter-c-clients\\debug-results.json",
+          "bytes": 19290770,
+          "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+        },
+        "exact_original_match": true,
+        "loads": 44,
+        "accepted": 34,
+        "scenarios": 107,
+        "decodes": 333,
+        "f32_words": 170496
+      },
+      "release": {
+        "command": [
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\build-windows\\Release\\adapter-oracle.exe",
+          "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\inputs",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\matrix.json",
+          "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\adapter-c-clients\\release-results.json"
+        ],
+        "exit_code": 0,
+        "seconds": 0.2374214999981632,
+        "library": {
+          "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+          "bytes": 2349056,
+          "sha256": "619a9de5acb1b2d4812cd0ff7e4a3fd4e1cf23ed0640d2a4c5e7949e3f0468b8"
+        },
+        "result": {
+          "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\full-validation\\postflight-v3\\windows-msvc\\adapter-c-clients\\release-results.json",
+          "bytes": 19290770,
+          "sha256": "e981634efc952c9e03e6625bf94b1b3295207b7ccfbd9931fb527056228d4a35"
+        },
+        "exact_original_match": true,
+        "loads": 44,
+        "accepted": 34,
+        "scenarios": 107,
+        "decodes": 333,
+        "f32_words": 170496
+      }
+    },
+    "completed": "2026-11-11T13:53:16.974211+00:00"
+  },
+  "unchanged_execution_inputs": true,
+  "finished_utc": "2026-11-11T13:53:18.789875+00:00"
+}

@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "linux-gnu",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-11T13:22:20.322202+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.639,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 304.356,
+      "stdout": {
+        "bytes": 69764,
+        "sha256": "767594ca6af732474fe130a3f15f4d748ff210cda395fc6e6822984ffbc9a127"
+      },
+      "stderr": {
+        "bytes": 15854,
+        "sha256": "00d49a6927e88b3004099748fc1bf782baa1beb798fefe9cb52d088f09ba3e09"
+      },
+      "tests": {
+        "passed": 696,
+        "failed": 0,
+        "ignored": 29,
+        "suites": 124
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 336.581,
+      "stdout": {
+        "bytes": 69647,
+        "sha256": "22689887ed80d54ded02535a6c094c0f1edf25f2352e4c81ca21ba6b2830a7b1"
+      },
+      "stderr": {
+        "bytes": 16091,
+        "sha256": "39a5a286c4d792757466f30e566a7316ba43764a9988f03de6ef3fbd8348b1b8"
+      },
+      "tests": {
+        "passed": 696,
+        "failed": 0,
+        "ignored": 29,
+        "suites": 124
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 13.304,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 731,
+        "sha256": "479b1bd0a6d2e4bd4da28f80166fda829eeb31a8185043587831f3b48868d799"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 108.927,
+      "stdout": {
+        "bytes": 56786,
+        "sha256": "5d5bb2045e309d92b5ec54056530d390c1440162af927b513e50dbadef3b21cd"
+      },
+      "stderr": {
+        "bytes": 2852,
+        "sha256": "653cdca8fbabdef70511136697c71c38d93eebbdb6032d3040a0e954df71a5e5"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1537,
+    "bytes": 229350,
+    "sha256": "9cc92f74debdb3381b9998f2639b91f8efbbd4c81e4d62b934a62831cf2b6662",
+    "scope": "All Git-listed tracked/unignored files except evidence/ and the two top-level progress documents README.md and docs/PORT_STATUS.md. Includes all release controls and attributes."
+  },
+  "requested_stages": [
+    "all"
+  ],
+  "driver": {
+    "bytes": 15097,
+    "sha256": "0183878f7d4fe0aefc58639704023ccf2c493e6dd6e9ed125090724e64b400be"
+  },
+  "git_head": "979b1f1901637eaaaae7042aa2304eb95734fdc6",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 22.4.0 (jammy) [64-bit]\n",
+  "error": "RuntimeError('audit failed 1')",
+  "finished_utc": "2026-11-11T13:35:29.997922+00:00"
+}

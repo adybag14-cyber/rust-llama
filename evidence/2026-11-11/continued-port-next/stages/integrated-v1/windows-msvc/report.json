@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-11T13:22:15.730055+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 2.083,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 408.044,
+      "stdout": {
+        "bytes": 69422,
+        "sha256": "9a7a20b75593315be4cf071bbdb60da6f8ce970b54798638f4c34f4b5ebc6fda"
+      },
+      "stderr": {
+        "bytes": 12226,
+        "sha256": "0bb0067c89a0961a1602f72c4598fe0c8346c400646462b9fb134efefce15821"
+      },
+      "tests": {
+        "passed": 691,
+        "failed": 0,
+        "ignored": 29,
+        "suites": 124
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 560.52,
+      "stdout": {
+        "bytes": 69304,
+        "sha256": "ebfa14ebfb635968a2a2c64c2e15cf5485a4a2b718ad0ce7b628d1d09929829b"
+      },
+      "stderr": {
+        "bytes": 12548,
+        "sha256": "9bb14bff1428bdad7b0676ed1159e0ae428300d5147c089c8626fc568cc00144"
+      },
+      "tests": {
+        "passed": 691,
+        "failed": 0,
+        "ignored": 29,
+        "suites": 124
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.764,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 698,
+        "sha256": "7797d48134baa94599fd8d940614b81600f3dd545fb49ecc61e43b292342a2e6"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.141,
+      "stdout": {
+        "bytes": 56786,
+        "sha256": "5d5bb2045e309d92b5ec54056530d390c1440162af927b513e50dbadef3b21cd"
+      },
+      "stderr": {
+        "bytes": 2912,
+        "sha256": "f1641a9bd90f2870620353b4e8c521aa22fe4c206beba15a1f82aa8990a874f3"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1537,
+    "bytes": 229350,
+    "sha256": "9cc92f74debdb3381b9998f2639b91f8efbbd4c81e4d62b934a62831cf2b6662",
+    "scope": "All Git-listed tracked/unignored files except evidence/ and the two top-level progress documents README.md and docs/PORT_STATUS.md. Includes all release controls and attributes."
+  },
+  "requested_stages": [
+    "all"
+  ],
+  "driver": {
+    "bytes": 15097,
+    "sha256": "0183878f7d4fe0aefc58639704023ccf2c493e6dd6e9ed125090724e64b400be"
+  },
+  "git_head": "979b1f1901637eaaaae7042aa2304eb95734fdc6",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "error": "RuntimeError('audit failed 1')",
+  "finished_utc": "2026-11-11T13:38:45.403823+00:00"
+}

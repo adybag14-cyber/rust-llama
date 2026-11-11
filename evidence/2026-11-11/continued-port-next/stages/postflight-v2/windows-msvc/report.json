@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "tag": "postflight-v2",
+  "started_utc": "2026-11-11T13:42:48.750704+00:00",
+  "steps": [
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 5.435,
+      "stdout": {
+        "bytes": 56936,
+        "sha256": "04b4df11deff02af5d1d158c07a7d66048f2512b1c1063a894607078c4cbe541"
+      },
+      "stderr": {
+        "bytes": 108,
+        "sha256": "fcf0798e499344f47bd72cd191762ade0f1e20200fe4c2a527beca2a04eaea62"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 5.068,
+      "stdout": {
+        "bytes": 198,
+        "sha256": "52d868d0572c2b0a5076e5611858540c618385ffe7f06eb48030e05888276de3"
+      },
+      "stderr": {
+        "bytes": 111,
+        "sha256": "df44f15d8f7ce22bd6c43dd1f53515c1388937be89e4183d2e2f4fcfb9b8d617"
+      }
+    },
+    {
+      "name": "release-build",
+      "argv": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 51.05,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 834,
+        "sha256": "c0d9352b200ae3d6c3b952f09df3b18584bddcfd5398f36a9f5c9e17aeac3c16"
+      }
+    },
+    {
+      "name": "debug-library",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 2.219,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 141,
+        "sha256": "30944cbd539d5c3e18f708f0e46f33c6fae6f8660d95e3858d21bfa3067e39cf"
+      }
+    },
+    {
+      "name": "verify-source",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.962,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+      },
+      "stderr": {
+        "bytes": 241,
+        "sha256": "224eb5ff6e45ae460fbe03a72c663da3ff3022332ac62af91752f09a2ec20584"
+      }
+    },
+    {
+      "name": "verify-reference-copy",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.971,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 924,
+        "sha256": "83c62de2dc74883188a5e37e4d84ee1278e9878d4bcd2fa977dbfe2d354f0096"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1536,
+    "bytes": 229192,
+    "sha256": "f4d5d64039bd7013fae32b5469799db984e6ef67e2aeae9c7fd91aff36d74ee2",
+    "scope": "All Git-listed tracked/unignored files except evidence/ and the two top-level progress documents README.md and docs/PORT_STATUS.md. Includes all release controls and attributes."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "audit",
+    "c-clients",
+    "debug-library",
+    "fixtures",
+    "new-c-clients",
+    "pretrained-converter",
+    "pretrained-gpt-converter",
+    "pretrained-inference",
+    "pretrained-qwen-tokenizer",
+    "pretrained-qwen2-converter",
+    "pretrained-qwen3-converter",
+    "release-build",
+    "release-gates",
+    "verify-reference-copy",
+    "verify-source"
+  ],
+  "driver": {
+    "bytes": 15097,
+    "sha256": "0183878f7d4fe0aefc58639704023ccf2c493e6dd6e9ed125090724e64b400be"
+  },
+  "git_head": "ebeb0637932774e6b07d989ab3f01259bc363715",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "error": "RuntimeError('verify-reference-copy failed 1')",
+  "finished_utc": "2026-11-11T13:44:03.942574+00:00"
+}

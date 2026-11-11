@@ -10,6 +10,49 @@ The product's maintained implementation is Rust. Frozen C/C++ reference builds, 
 
 The merged workspace has local path dependencies plus five exactly reviewed Rust registry packages for converter YAML parsing. Locked dependency acquisition precedes offline gates; the audit verifies the actual archives, extracted source, versions, features and licenses. Optional OS/driver/vendor interfaces remain named external boundaries. They do not import the original llama.cpp implementation. See `release/dependency-inventory.tsv`.
 
+## Latest integrated verification — 11 November
+
+The integrated continuation passed **691 Windows MSVC / 696 Linux GNU ordinary
+tests in each of debug and release**, with zero failures, 29 explicit prerequisite
+tests ignored and 124 test-result suites per ordinary run. Separate release runs
+passed eleven pretrained inference/server tests, five complete-file converter
+tests and one official Qwen tokenizer replay on each host. The ordinary ignored
+entries remain explicit; these separate executions do not imply that every
+ignored device or external-data test ran.
+
+Formatting, strict Clippy, release builds and the actual-cache dependency/source
+audit passed using Rust 1.99.1 / LLVM 23.1.1. Both hosts verified all 959 fixture
+files and declarations across fourteen manifests, and all 4,082 files in each
+of the supplied and reference frozen trees. Original-header clients exercised
+both debug and release C libraries, including the adapter replay, with exact
+inventories of 226 frozen exports plus four diagnostic extensions. Twenty-nine
+frozen exports remain absent.
+
+Verification was staged, and the original reports retain their actual outcomes.
+Both first attempts passed the ordinary suites, formatting and strict Clippy,
+then failed the source-language package audit. The correction renamed evidence
+logs to admitted log suffixes, moved a binary-attribute rule to the root and
+removed the two nested attribute files. The numerical fixtures and runtime
+source were unchanged: a separate guard proves all 1,534 retained selected files
+identical, with only two changed package-control files and one removed
+package-control file in the selected input set.
+
+The first Windows continuation then failed reference-copy verification because
+an earlier oracle import had created ten Python bytecode cache files. Those
+generated files were moved outside the frozen tree; no baseline source file
+changed, and the supplied Downloads tree had already passed. The final GNU and
+Windows continuations passed their remaining requested checks with the same
+1,536 selected execution inputs unchanged. That selection includes release
+controls and attributes, and excludes evidence plus the two progress documents
+README.md and docs/PORT_STATUS.md. It is not a whole-repository immutable guard.
+
+The full-port release command still returns its expected failure with
+**twenty mandatory gates open**. Published-commit CI is reported separately
+by GitHub Actions. See
+[the staged receipt](../evidence/2026-11-11/continued-port-next/README.md)
+for all five attempt reports, log identities, corrections, native-client
+receipts and external driver identities.
+
 ## Earlier integrated verification — 11 November
 
 Both native hosts passed the complete ordinary debug and release suites:
