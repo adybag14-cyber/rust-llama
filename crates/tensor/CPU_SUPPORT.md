@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **81 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **20 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **88 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **13 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -84,14 +84,14 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 75 | `FLASH_ATTN_BACK` | Pending | — | No executable Op constructor; no fallback result. |
 | 76 | `SSM_CONV` | Implemented slice | F32 | Three-dimensional input and matching coefficient matrix; physical sequence strides, source one-worker flat coefficient rows, F32 accumulation, empty-output dispatch. See RECURRENT.md. |
 | 77 | `SSM_SCAN` | Implemented slice | F32 + I32 state IDs → F32 | Grouped Mamba1/Mamba2 scan, source state remapping and reverse snapshots; packed inner planes and physical outer strides; output plus owned state. Checked snapshot/ID and NaN boundaries. See RECURRENT.md. |
-| 78 | `WIN_PART` | Pending | — | No executable Op constructor; no fallback result. |
-| 79 | `WIN_UNPART` | Pending | — | No executable Op constructor; no fallback result. |
-| 80 | `GET_REL_POS` | Pending | — | No executable Op constructor; no fallback result. |
-| 81 | `ADD_REL_POS` | Pending | — | No executable Op constructor; no fallback result. |
+| 78 | `WIN_PART` | Implemented slice | F32 | Positive square windows, checked padding and source flattened physical reads; independent raw payload copies. See VISION_LOSS.md. |
+| 79 | `WIN_UNPART` | Implemented slice | F32 | Explicit output width/height and window; original flat assembly, checked view spans and cropping. See VISION_LOSS.md. |
+| 80 | `GET_REL_POS` | Implemented slice | F16/BF16 to F16 | Equal query/key widths; original raw 16-bit payload copy, including BF16 labeled as F16 without conversion. See VISION_LOSS.md. |
+| 81 | `ADD_REL_POS` | Implemented slice | F32 | Contiguous scores and width/height offsets; source addition order and profile NaN policy; fourth-axis remainder preserved. See VISION_LOSS.md. |
 | 82 | `RWKV_WKV6` | Implemented slice | F32 | Contiguous token tensors, time-first vector and per-sequence state; equal nonempty sequence runs, source output/final-state concatenation. See RECURRENT.md. |
 | 83 | `GATED_LINEAR_ATTN` | Implemented slice | F32 | Contiguous K/V/Q/gate/state with explicit F32 scale; equal nonempty sequence runs and owned final state. See RECURRENT.md. |
 | 84 | `RWKV_WKV7` | Implemented slice | F32 | Contiguous R/W/K/V/A/B/state; source two-pass state update and complete final state. Checked arithmetic with competing NaN payloads. See RECURRENT.md. |
-| 85 | `SOLVE_TRI` | Pending | — | No executable Op constructor; no fallback result. |
+| 85 | `SOLVE_TRI` | Implemented slice | F32 | Contiguous left/lower/non-unit solve with matching batch axes; checked zero diagonals and source scalar arithmetic. See VISION_LOSS.md. |
 | 86 | `GATED_DELTA_NET` | Pending | — | No executable Op constructor; no fallback result. |
 | 87 | `LIGHTNING_INDEXER` | Pending | — | No executable Op constructor; no fallback result. |
 | 88 | `DSV4_HC_COMB` | Pending | — | No executable Op constructor; no fallback result. |
@@ -103,8 +103,8 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 94 | `MAP_CUSTOM2` | Pending | — | No executable Op constructor; no fallback result. |
 | 95 | `MAP_CUSTOM3` | Pending | — | No executable Op constructor; no fallback result. |
 | 96 | `CUSTOM` | Pending | — | No executable Op constructor; no fallback result. |
-| 97 | `CROSS_ENTROPY_LOSS` | Pending | — | No executable Op constructor; no fallback result. |
-| 98 | `CROSS_ENTROPY_LOSS_BACK` | Pending | — | No executable Op constructor; no fallback result. |
+| 97 | `CROSS_ENTROPY_LOSS` | Implemented slice | F32 | Finite equal-shape logits/labels, aligned rows, source flat row addressing and one-worker scalar log-softmax reduction. See VISION_LOSS.md. |
+| 98 | `CROSS_ENTROPY_LOSS_BACK` | Implemented slice | F32 | Finite scalar gradient and contiguous logits/labels; shared native-profile softmax and original rounding. See VISION_LOSS.md. |
 | 99 | `OPT_STEP_ADAMW` | Pending | — | No executable Op constructor; no fallback result. |
 | 100 | `OPT_STEP_SGD` | Pending | — | No executable Op constructor; no fallback result. |
 | 101 | `GLU` | Implemented slice | F32 / F16 / BF16, with limits below | All seven scalar variants; OAI/CLAMP support F32/F16 only; packed/split and gate swaps. |

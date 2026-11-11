@@ -7,6 +7,7 @@ mod cpu_extra;
 mod cpu_flash;
 mod cpu_index;
 mod cpu_recurrent;
+mod cpu_vision_loss;
 mod graph;
 mod native_sort;
 mod registry;

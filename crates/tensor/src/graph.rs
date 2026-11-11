@@ -69,6 +69,29 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Source flat-layout partition into padded square windows, F32.
+    WindowPartition {
+        window: usize,
+    },
+    /// Source flat-layout assembly; crop to the explicit original image size.
+    WindowUnpartition {
+        width: usize,
+        height: usize,
+        window: usize,
+    },
+    /// Copy source F16/BF16 raw words into the original constructor's F16 output.
+    GetRelativePosition {
+        query: usize,
+        key: usize,
+    },
+    /// Inputs: attention scores, width and height relative positions, all F32.
+    AddRelativePosition,
+    /// Inputs: lower-triangular A, RHS B. Left solve with non-unit diagonal.
+    SolveTriangular,
+    /// F32 logits and labels; preserve one native worker's reduction order.
+    CrossEntropyLoss,
+    /// Inputs: scalar output gradient, F32 logits, F32 labels.
+    CrossEntropyLossBack,
     /// Inputs: sliding convolution window, per-channel weights. F32 output.
     /// Preserves the original one-worker flattened weight row addressing.
     SsmConv,
@@ -359,6 +382,13 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            WindowPartition { .. } => OpCode::WIN_PART,
+            WindowUnpartition { .. } => OpCode::WIN_UNPART,
+            GetRelativePosition { .. } => OpCode::GET_REL_POS,
+            AddRelativePosition => OpCode::ADD_REL_POS,
+            SolveTriangular => OpCode::SOLVE_TRI,
+            CrossEntropyLoss => OpCode::CROSS_ENTROPY_LOSS,
+            CrossEntropyLossBack => OpCode::CROSS_ENTROPY_LOSS_BACK,
             SsmConv => OpCode::SSM_CONV,
             SsmScan { .. } => OpCode::SSM_SCAN,
             RwkvWkv6 => OpCode::RWKV_WKV6,
@@ -452,6 +482,8 @@ impl Op {
     fn arity(&self) -> usize {
         match self {
             Self::Arange { .. } => 0,
+            Self::AddRelativePosition | Self::CrossEntropyLossBack => 3,
+            Self::SolveTriangular | Self::CrossEntropyLoss => 2,
             Self::SsmConv => 2,
             Self::SsmScan { .. } | Self::RwkvWkv7 => 7,
             Self::RwkvWkv6 => 6,

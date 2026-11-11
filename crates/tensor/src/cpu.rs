@@ -43,6 +43,9 @@ fn eps(v: f32) -> Result<()> {
 
 pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<Tensor> {
     use Op::*;
+    if let Some(result) = crate::cpu_vision_loss::evaluate(op, src, cancel) {
+        return result;
+    }
     if let Some(result) = crate::cpu_recurrent::evaluate(op, src, cancel) {
         return result;
     }
