@@ -1,0 +1,59 @@
+    Checking llama-tensor v0.1.0 (C:\Users\adyba\rust-llama\crates\tensor)
+error: this `if` statement can be collapsed
+   --> crates\tensor\src\cpu_custom.rs:293:13
+    |
+293 | /             if failure.is_none() {
+294 | |                 if let Err(e) = run_task(kernel, src, &output, cancel, 0, nth) {
+295 | |                     failure = Some(e);
+296 | |                 }
+297 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+293 ~             if failure.is_none()
+294 ~                 && let Err(e) = run_task(kernel, src, &output, cancel, 0, nth) {
+295 |                     failure = Some(e);
+296 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\tensor\src\cpu_custom.rs:302:17
+    |
+302 | /                 if let Err(e) = result {
+303 | |                     if failure.is_none() {
+304 | |                         failure = Some(e);
+305 | |                     }
+306 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+302 ~                 if let Err(e) = result
+303 ~                     && failure.is_none() {
+304 |                         failure = Some(e);
+305 ~                     }
+    |
+
+error: the loop variable `axis` is used to index `nb`
+   --> crates\tensor\src\cpu_optimizer.rs:193:17
+    |
+193 |     for axis in 1..4 {
+    |                 ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and enumerate()
+    |
+193 -     for axis in 1..4 {
+193 +     for (axis, <item>) in nb.iter().enumerate().skip(1) {
+    |
+
+error: could not compile `llama-tensor` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-tensor` (lib test) due to 3 previous errors

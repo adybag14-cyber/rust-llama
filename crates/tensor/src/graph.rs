@@ -69,6 +69,36 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Out-of-place Rust callback with the first input's type and shape.
+    MapCustom1 {
+        kernel: crate::CustomKernel,
+        options: crate::CustomOptions,
+    },
+    MapCustom2 {
+        kernel: crate::CustomKernel,
+        options: crate::CustomOptions,
+    },
+    MapCustom3 {
+        kernel: crate::CustomKernel,
+        options: crate::CustomOptions,
+    },
+    /// Explicit output and zero through nine immutable input tensors.
+    Custom {
+        kernel: crate::CustomKernel,
+        options: crate::CustomOptions,
+        dtype: DType,
+        shape: [usize; 4],
+        input_count: usize,
+    },
+    /// F32 source AdamW step. Primary output is weights; use Graph::adamw_step
+    /// to retain the two updated moment outputs from the same execution.
+    OptStepAdamW {
+        limits: crate::OptimizerLimits,
+    },
+    /// F32 source SGD step; returns a new owned parameter snapshot.
+    OptStepSgd {
+        limits: crate::OptimizerLimits,
+    },
     /// Original backward rotation: values, I32 positions, optional F32 factors.
     RopeBack {
         options: RopeBackOptions,
@@ -410,6 +440,12 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            MapCustom1 { .. } => OpCode::MAP_CUSTOM1,
+            MapCustom2 { .. } => OpCode::MAP_CUSTOM2,
+            MapCustom3 { .. } => OpCode::MAP_CUSTOM3,
+            Custom { .. } => OpCode::CUSTOM,
+            OptStepAdamW { .. } => OpCode::OPT_STEP_ADAMW,
+            OptStepSgd { .. } => OpCode::OPT_STEP_SGD,
             RopeBack { .. } => OpCode::ROPE_BACK,
             LightningIndexer => OpCode::LIGHTNING_INDEXER,
             GatedDeltaNet { .. } => OpCode::GATED_DELTA_NET,
@@ -515,6 +551,12 @@ impl Op {
     }
     fn arity(&self) -> usize {
         match self {
+            Self::MapCustom1 { .. } => 1,
+            Self::MapCustom2 { .. } => 2,
+            Self::MapCustom3 { .. } => 3,
+            Self::Custom { input_count, .. } => *input_count,
+            Self::OptStepAdamW { .. } => 5,
+            Self::OptStepSgd { .. } => 3,
             Self::RopeBack { with_factors, .. } => {
                 if *with_factors {
                     3
@@ -584,6 +626,24 @@ impl Op {
 enum Node {
     Input(Tensor),
     Compute { op: Op, inputs: Vec<NodeId> },
+    AdamWMoment { step: NodeId, second: bool },
+}
+/// Three values from a single AdamW operation. Projecting either moment keeps
+/// the step alive and does not recompute it during evaluate_many.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AdamWNodes {
+    pub weights: NodeId,
+    pub first_moment: NodeId,
+    pub second_moment: NodeId,
+}
+impl AdamWNodes {
+    pub fn as_array(self) -> [NodeId; 3] {
+        [self.weights, self.first_moment, self.second_moment]
+    }
+}
+struct NodeValue {
+    tensor: Tensor,
+    moments: Option<[Tensor; 2]>,
 }
 #[derive(Debug)]
 pub struct Graph {
@@ -637,6 +697,39 @@ impl Graph {
         });
         Ok(id)
     }
+    /// Construct one AdamW step with typed moment projections. All input edges
+    /// are immutable snapshots; returned values can feed a later optimizer step.
+    pub fn adamw_step(
+        &mut self,
+        inputs: [NodeId; 5],
+        limits: crate::OptimizerLimits,
+    ) -> Result<AdamWNodes> {
+        self.nodes
+            .try_reserve(3)
+            .map_err(|_| TensorError::AllocationFailed)?;
+        let weights = self.op(Op::OptStepAdamW { limits }, &inputs)?;
+        let first_moment = NodeId {
+            index: self.nodes.len(),
+            graph: self.id,
+        };
+        self.nodes.push(Node::AdamWMoment {
+            step: weights,
+            second: false,
+        });
+        let second_moment = NodeId {
+            index: self.nodes.len(),
+            graph: self.id,
+        };
+        self.nodes.push(Node::AdamWMoment {
+            step: weights,
+            second: true,
+        });
+        Ok(AdamWNodes {
+            weights,
+            first_moment,
+            second_moment,
+        })
+    }
     pub fn len(&self) -> usize {
         self.nodes.len()
     }
@@ -648,43 +741,116 @@ impl Graph {
     }
     /// Only target dependencies execute. Cancellation never modifies input storage.
     pub fn evaluate_with_cancel(&self, target: NodeId, cancel: &AtomicBool) -> Result<Tensor> {
-        if target.graph != self.id || target.index >= self.nodes.len() {
-            return Err(TensorError::InvalidNode(target.index));
+        Ok(self.evaluate_many_with_cancel(&[target], cancel)?.remove(0))
+    }
+    /// Evaluate the union of dependencies once, in insertion order. Output order
+    /// matches target order, including repeated targets.
+    pub fn evaluate_many(&self, targets: &[NodeId]) -> Result<Vec<Tensor>> {
+        self.evaluate_many_with_cancel(targets, &AtomicBool::new(false))
+    }
+    /// No output is published until every requested target succeeds. This also
+    /// makes the parameter and both optimizer moments a single transaction.
+    pub fn evaluate_many_with_cancel(
+        &self,
+        targets: &[NodeId],
+        cancel: &AtomicBool,
+    ) -> Result<Vec<Tensor>> {
+        check_cancel(cancel)?;
+        for target in targets {
+            if target.graph != self.id || target.index >= self.nodes.len() {
+                return Err(TensorError::InvalidNode(target.index));
+            }
         }
-        let mut needed = crate::reserved(target.index + 1)?;
-        needed.resize(target.index + 1, false);
-        let mut stack = vec![target];
+        let Some(last) = targets.iter().map(|id| id.index).max() else {
+            return Ok(Vec::new());
+        };
+        let mut needed = crate::reserved(last + 1)?;
+        needed.resize(last + 1, false);
+        let mut stack = crate::reserved(targets.len())?;
+        stack.extend_from_slice(targets);
         while let Some(id) = stack.pop() {
             check_cancel(cancel)?;
             if needed[id.index] {
                 continue;
             }
             needed[id.index] = true;
-            if let Node::Compute { inputs, .. } = &self.nodes[id.index] {
-                stack.extend(inputs);
+            match &self.nodes[id.index] {
+                Node::Compute { inputs, .. } => {
+                    stack
+                        .try_reserve(inputs.len())
+                        .map_err(|_| TensorError::AllocationFailed)?;
+                    stack.extend(inputs);
+                }
+                Node::AdamWMoment { step, .. } => {
+                    stack
+                        .try_reserve(1)
+                        .map_err(|_| TensorError::AllocationFailed)?;
+                    stack.push(*step);
+                }
+                Node::Input(_) => {}
             }
         }
-        let mut values = crate::reserved(target.index + 1)?;
-        values.resize_with(target.index + 1, || None);
-        for (index, node) in self.nodes.iter().enumerate().take(target.index + 1) {
+        let mut values: Vec<Option<NodeValue>> = crate::reserved(last + 1)?;
+        values.resize_with(last + 1, || None);
+        for (index, node) in self.nodes.iter().enumerate().take(last + 1) {
             if !needed[index] {
                 continue;
             }
             check_cancel(cancel)?;
             let value = match node {
-                Node::Input(t) => t.clone(),
+                Node::Input(t) => NodeValue {
+                    tensor: t.clone(),
+                    moments: None,
+                },
+                Node::AdamWMoment { step, second } => {
+                    let source = values[step.index]
+                        .as_ref()
+                        .expect("earlier optimizer dependency");
+                    let moments = source
+                        .moments
+                        .as_ref()
+                        .expect("optimizer projection source");
+                    NodeValue {
+                        tensor: moments[usize::from(*second)].clone(),
+                        moments: None,
+                    }
+                }
                 Node::Compute { op, inputs } => {
-                    let args = inputs
-                        .iter()
-                        .map(|id| values[id.index].as_ref().expect("earlier graph dependency"))
-                        .collect::<Vec<_>>();
-                    crate::cpu::evaluate(op, &args, cancel)?
+                    let mut args = crate::reserved(inputs.len())?;
+                    args.extend(inputs.iter().map(|id| {
+                        &values[id.index]
+                            .as_ref()
+                            .expect("earlier graph dependency")
+                            .tensor
+                    }));
+                    if let Op::OptStepAdamW { limits } = op {
+                        let state = crate::adamw_step(
+                            args[0], args[1], args[2], args[3], args[4], *limits, cancel,
+                        )?;
+                        NodeValue {
+                            tensor: state.weights,
+                            moments: Some([state.first_moment, state.second_moment]),
+                        }
+                    } else {
+                        NodeValue {
+                            tensor: crate::cpu::evaluate(op, &args, cancel)?,
+                            moments: None,
+                        }
+                    }
                 }
             };
             values[index] = Some(value);
         }
         check_cancel(cancel)?;
-        Ok(values[target.index].take().expect("evaluated target"))
+        let mut outputs = crate::reserved(targets.len())?;
+        outputs.extend(targets.iter().map(|id| {
+            values[id.index]
+                .as_ref()
+                .expect("evaluated target")
+                .tensor
+                .clone()
+        }));
+        Ok(outputs)
     }
 }
 pub(crate) fn check_cancel(cancel: &AtomicBool) -> Result<()> {

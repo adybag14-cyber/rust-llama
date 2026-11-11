@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "profile": "windows-msvc",
+  "started_utc": "2026-11-11T13:05:13.713585+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "debug",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--test",
+        "custom_reference",
+        "--test",
+        "optimizer_reference",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.452,
+      "stdout": {
+        "bytes": 823,
+        "sha256": "ac2d5d7e9af0b808fb25757f5fa4ad76f276bc912446e5ba05b5c7f9f9d1a683"
+      },
+      "stderr": {
+        "bytes": 348,
+        "sha256": "269ac29ff2754f1ddc931c18d973ef1d56cd52a335956e492e5016fc8064263e"
+      }
+    },
+    {
+      "name": "release",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--test",
+        "custom_reference",
+        "--test",
+        "optimizer_reference",
+        "--offline",
+        "--locked",
+        "--release"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 16.994,
+      "stdout": {
+        "bytes": 823,
+        "sha256": "df230525cb7795c49121159c36be0546b7414582d886ab81789f5593f96a75ff"
+      },
+      "stderr": {
+        "bytes": 342,
+        "sha256": "1b22f7e07f01936a03cf297382b732caa182f7ab1f43a51227e7f255649016d6"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "-p",
+        "llama-tensor",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.234,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 72,
+        "sha256": "22e0df986057b9ba5be07526ac5fb348862a3dedef42108383cc3e088acbb889"
+      }
+    },
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-tensor",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.309,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "scope": "Focused optimizer and custom callback validation; final whole-workspace integration is a separate gate.",
+  "input_guard": {
+    "scope": "Selected tensor/quant/platform-loader source, fixtures, Cargo/toolchain configuration",
+    "files": 282,
+    "sha256": "f067025783ab97a7b1fc91d13fac2bf63746c8dc96603f29dab5e31702733e92",
+    "unchanged": true
+  },
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+  "driver": {
+    "bytes": 4126,
+    "sha256": "ce113c3aa991bee880cb0e898009d52b4c90d95c0c83ebb628e693d4d48acabf"
+  },
+  "completed_utc": "2026-11-11T13:05:35.468934+00:00"
+}

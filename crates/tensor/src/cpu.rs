@@ -43,6 +43,16 @@ fn eps(v: f32) -> Result<()> {
 
 pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<Tensor> {
     use Op::*;
+    if let Some(result) = crate::cpu_custom::evaluate(op, src, cancel) {
+        return result;
+    }
+    if let OptStepSgd { limits } = op {
+        return crate::sgd_step(src[0], src[1], src[2], *limits, cancel);
+    }
+    if let OptStepAdamW { limits } = op {
+        return crate::adamw_step(src[0], src[1], src[2], src[3], src[4], *limits, cancel)
+            .map(|s| s.weights);
+    }
     if let RopeBack { options, .. } = op {
         return crate::cpu_rope_back::evaluate(options, src, cancel);
     }

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Actual frozen GGML public constructors and CPU graphs, captured before new Rust optimizer implementation. No Rust code is imported or executed.",
+  "profile": "windows-msvc",
+  "host": "Windows-11-10.0.26300-SP0",
+  "cases": 300,
+  "output_bytes": 440704,
+  "capture": {
+    "bytes": 1263122,
+    "sha256": "821cf17795ca6838cb937a69244fde4a0a013ef2ee004eed933eac01f9cfdce9"
+  },
+  "case_ledger": {
+    "bytes": 75816,
+    "sha256": "0817bd55448a1c7571be47397c1eb7e9cc510247003cf5c5fa4e85b10ca0cead"
+  },
+  "sources": {
+    "continue-20261111-next\\optimizer-oracle\\capture_optimizer_v2.py": {
+      "bytes": 8411,
+      "sha256": "7b746b6bf92c655328943333e6e88b202986a12fe272e3c15c779eb05a59df11"
+    },
+    "build\\bin\\Release\\ggml-base.dll": {
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    "build\\bin\\Release\\ggml-cpu.dll": {
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml.c": {
+      "bytes": 267312,
+      "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+    },
+    "llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master\\ggml\\include\\ggml.h": {
+      "bytes": 119446,
+      "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+    }
+  },
+  "qualifications": [
+    "Weights/gradients/moments are separate storage, so no cross-input data races or alias effects.",
+    "All state snapshots include preserved physical padding; source strides address every operand.",
+    "Native executions include one and three workers; element order within a parameter is independent for disjoint rows.",
+    "Finite parameter styles include values outside conventional training ranges; source accepts them.",
+    "Single exceptional operands are captured, not an assertion of arbitrary multi-NaN payload portability."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "reviewed_utc": "2026-11-11T13:06:06.188187+00:00",
+  "role": "Independent read-only review by attention worker; no main checkout edits or extra builds",
+  "reviewed_sha256": {
+    "crates/tensor/src/cpu_optimizer.rs": "785a6dbc361db63a8b3ed4dc5c0758028f54de35240e997fc7900b12057b041a",
+    "crates/tensor/src/cpu_custom.rs": "64e10a4e543db92017aca3f5164a79b0c3fca2f113e938f05e7c897fc1e90551",
+    "crates/tensor/src/graph.rs": "aac6c8d62f3668c0eced10ba8bd74fc68c48cd5ac7e764055046d97de4af117e",
+    "crates/tensor/tests/optimizer_reference.rs": "652c98eb7b305574302094066decf4f2add4d699b959e6ca905cb6ed73d27c76",
+    "crates/tensor/tests/custom_reference.rs": "8ff444608444922aefb2a4a7af85bccc2d0d783dac0a8478465f77e91013a85a",
+    "crates/tensor/OPTIMIZERS.md": "0793d9091c80dd3c7303a11e692034c27b2edac18163ee2cbc67e75b35c137fc",
+    "crates/tensor/CUSTOM.md": "fcb44ed1fd4202e2541107bc854e1c3148314adb20f1c8118ade93cf3383af7f"
+  },
+  "original_source_sha256": {
+    "ggml/src/ggml-cpu/ops.cpp": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6",
+    "ggml/src/ggml.c": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f",
+    "ggml/src/ggml-cpu/ggml-cpu.c": "aeae3376375667dd84fd35f5d4d413015b3f3c24985eef5399b94c337bdf84bd"
+  },
+  "blocking_findings": [],
+  "conclusions": [
+    "SGD and AdamW scalar expression order and the weight-derived physical addressing of all operands match original ops.cpp 12181-12305. Checked extent validation covers those accesses, while conservative alias rejection avoids mutable alias-dependent semantics.",
+    "State replacement occurs only after all three outputs are built successfully. Graph moment projections depend on one AdamW node, and evaluate_many marks the dependency union before a single insertion-order evaluation. Repeated targets share one result; an error drops all unreturned snapshots.",
+    "Owned Send+Sync callbacks and higher-ranked task lifetimes cannot retain borrowed output state. Output bytes and initialization bits share one mutex; bounds are checked before slicing. Callback errors and unwind panics discard partial output.",
+    "The scoped launch gate defers callbacks until all requested workers are created. On launch failure started threads receive disabled and join; on callback failure all workers join before discarding output. Source n_tasks/task capping and empty-output suppression match frozen constructors/planner.",
+    "The independent fixtures compare 300 optimizer cases / 440704 output bytes and 260 custom cases / 30064 output bytes per profile, with full binary cursor exhaustion and expected counts. Tests additionally exercise graph output sharing, physical bounds, alias rejection, budget errors, callback ownership and mid-callback cancellation.",
+    "The domain documents accurately qualify missing mutable aliases, in-place custom behavior, complete training/scheduler integration and aggregate retained-memory budgets."
+  ],
+  "qualifications": [
+    "Read-only source/provenance review, not an independent full test rerun. Parent owns integrated executions.",
+    "The supplied native optimizer captures cover single exceptional operands; arbitrary multi-NaN payload behavior is explicitly outside the equivalence guarantee.",
+    "The existing Tensor::from_bytes converts a Vec to Arc storage through the standard allocation path. Output byte limits do not bound that temporary peak, bitmap/thread-stack overhead, or every process allocation. The broad statement that all allocations are fallible should be read narrowly or qualified; this is a pre-existing tensor ownership boundary, not a newly introduced memory-safety defect.",
+    "The new optimizer failure test injects cancellation before a step, while code checks during loops and before publication. The custom test does inject cancellation after output writes. No concrete atomicity defect was found."
+  ]
+}

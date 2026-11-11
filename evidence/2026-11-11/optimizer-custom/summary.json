@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "scope": "Six executable scalar CPU operation IDs: SGD, AdamW, MAP_CUSTOM1/2/3 and CUSTOM; explicit immutable state snapshots and owned threaded Rust callbacks.",
+  "profiles": [
+    "windows-msvc",
+    "linux-gnu"
+  ],
+  "per_profile": {
+    "optimizer": {
+      "cases": 300,
+      "exact_output_bytes": 440704
+    },
+    "custom": {
+      "cases": 260,
+      "exact_output_bytes": 30064
+    },
+    "focused_debug_tests": 9,
+    "focused_release_tests": 9,
+    "strict_clippy": "passed",
+    "fmt": "passed"
+  },
+  "input_guards": {
+    "files": 282,
+    "sha256": "f067025783ab97a7b1fc91d13fac2bf63746c8dc96603f29dab5e31702733e92",
+    "unchanged": true,
+    "scope": "Selected tensor/quant/platform-loader sources, fixtures, Cargo/toolchain configuration during focused builds. Documentation wording qualified after review; full integration is recorded separately."
+  },
+  "review": "independent-review.json",
+  "review_resolution": "No blocking findings. Qualified output byte bounds and explicit vector reservation failure behavior; existing Vec-to-Arc allocation and thread-stack/bitmap overhead are not advertised as aggregate-memory bounds.",
+  "external_tools": {
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\optimizer-oracle\\capture_optimizer.py": {
+      "bytes": 8344,
+      "sha256": "38527a237597a851cba9598fd024d59dc12762b828579b055848680e18ae6410"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\optimizer-oracle\\capture_optimizer_v2.py": {
+      "bytes": 8411,
+      "sha256": "7b746b6bf92c655328943333e6e88b202986a12fe272e3c15c779eb05a59df11"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\custom-oracle\\capture_custom.py": {
+      "bytes": 7784,
+      "sha256": "82cf96a3d3a5b2598b9d29fb3490eff957551f57354d862ffeb8dcdd7f0da0a3"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\custom-oracle\\capture_custom_v2.py": {
+      "bytes": 7883,
+      "sha256": "c19acedb6686fb5270705cbc72ab5193d066a9e147751eab8096bff60faa7814"
+    },
+    "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\validate_own.py": {
+      "bytes": 4126,
+      "sha256": "ce113c3aa991bee880cb0e898009d52b4c90d95c0c83ebb628e693d4d48acabf"
+    }
+  },
+  "retained_failure_jobs": {
+    "optimizer-invalid-view-harness": "job-op-c0b559da1ad96d8fe3892de29ee11ea2f519caf4b64f44039ced371f680c69c7",
+    "custom-empty-windows-harness": "job-op-1a2f6103bc739667eb02e214987a9bef6639f36a775a69ec44baefea48e52561",
+    "custom-empty-linux-harness": "job-op-496fc2e35b070ce66155c9609f7b957ff1a0d086358c6ea1062e37fc990f4c1c",
+    "optimizer-first-test-mistake": "job-op-6145172c0c50e92b4bb43345a1d21d25e00b955769f9caabb89876e0dec4313b",
+    "first-clippy-style-errors": "job-op-3517844854b5c7172348f5768bab511909693b73e0913a7753ca17d5f132f762"
+  },
+  "remaining": [
+    "Complete autodiff/training loop",
+    "Mutable alias/in-place custom execution",
+    "General writable/device backend buffers and scheduler",
+    "Aggregate graph memory budget",
+    "Full dtype/shape/ISA/backend parity"
+  ],
+  "full_port_complete": false
+}

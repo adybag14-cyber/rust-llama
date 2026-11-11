@@ -1,0 +1,21 @@
+
+running 4 tests
+test optimizer_physical_bounds_aliases_and_empty_shapes ... ok
+test failed_optimizer_updates_are_transactional ... ok
+test multi_target_graph_checks_identity_order_and_liveness ... FAILED
+test independent_native_optimizer_state_and_graphs ... ok
+
+failures:
+
+---- multi_target_graph_checks_identity_order_and_liveness stdout ----
+
+thread 'multi_target_graph_checks_identity_order_and_liveness' (6052) panicked at crates\tensor\tests\optimizer_reference.rs:129:5:
+assertion failed: g.evaluate_many(&[a, bad]).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    multi_target_graph_checks_identity_order_and_liveness
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

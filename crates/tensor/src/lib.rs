@@ -4,21 +4,25 @@
 mod cpu;
 mod cpu_attention;
 mod cpu_conv;
+mod cpu_custom;
 mod cpu_extra;
 mod cpu_flash;
 mod cpu_index;
 mod cpu_lightning;
+mod cpu_optimizer;
 mod cpu_recurrent;
 mod cpu_rope_back;
 mod cpu_vision_loss;
 mod graph;
 mod native_sort;
 mod registry;
+pub use cpu_custom::{CustomKernel, CustomOptions, CustomTask};
 pub use cpu_flash::{FlashAttentionError, FlashAttentionOptions};
+pub use cpu_optimizer::{AdamWState, OptimizerLimits, adamw_step, sgd_step};
 pub use cpu_rope_back::{RopeBackMode, RopeBackOptions};
 pub use graph::{
-    Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode, SortOrder,
-    Triangle,
+    AdamWNodes, Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode,
+    SortOrder, Triangle,
 };
 pub use llama_quant::DType;
 pub use registry::{GluOp, OpCode, UnaryOp};
@@ -37,15 +41,18 @@ pub enum TensorError {
     Unsupported(&'static str),
     Parameters(&'static str),
     Cancelled,
+    Custom(&'static str),
     Quant(llama_quant::QuantError),
     FlashAttention(FlashAttentionError),
 }
 impl std::fmt::Display for TensorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Layout(m) | Self::Shape(m) | Self::Unsupported(m) | Self::Parameters(m) => {
-                f.write_str(m)
-            }
+            Self::Layout(m)
+            | Self::Shape(m)
+            | Self::Unsupported(m)
+            | Self::Parameters(m)
+            | Self::Custom(m) => f.write_str(m),
             Self::Overflow => f.write_str("tensor size or address overflow"),
             Self::Bounds => f.write_str("tensor view or index is outside its buffer"),
             Self::AllocationFailed => f.write_str("tensor allocation failed"),
