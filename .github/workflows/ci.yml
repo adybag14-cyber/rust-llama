@@ -83,3 +83,68 @@ jobs:
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
         run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture
+
+  # Each model gets a fresh runner: its checkpoint and three complete outputs
+  # remain separate from the inference cache and the other converter model.
+  qwen-conversion:
+    name: Qwen conversion / ${{ matrix.os }} / ${{ matrix.model.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        model:
+          - name: Qwen2.5-0.5B-Instruct
+            test: pretrained_qwen2_native_files
+          - name: Qwen3-0.6B
+            test: pretrained_qwen3_native_files
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '1'
+      QWEN_MODEL: ${{ matrix.model.name }}
+      LLAMA_TEST_QWEN_HF_ROOT: ${{ runner.temp }}/qwen-hf
+      LLAMA_TEST_QWEN_OUTPUT_ROOT: ${{ runner.temp }}/qwen-converter-output
+      LLAMA_TEST_QWEN_TOKENIZER_ROOT: ${{ runner.temp }}/qwen-hf
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned compiler
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Fetch checksum-pinned reviewed dependencies
+        run: cargo fetch --locked
+      - name: Fetch and verify unchanged official Qwen inputs
+        run: |
+          $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json
+          $selected = @($manifest.models | Where-Object { $_.name -eq $env:QWEN_MODEL })
+          if ($selected.Count -ne 1) { throw "Expected one pinned model named $env:QWEN_MODEL" }
+          foreach ($model in $manifest.models) {
+            # The complete-file test needs all eight inputs for this matrix model.
+            # Both small tokenizer JSONs also support the official tokenizer replay.
+            $files = if ($model.name -eq $env:QWEN_MODEL) {
+              @($model.inputs)
+            } else {
+              @($model.inputs | Where-Object { $_.path -eq 'tokenizer.json' })
+            }
+            foreach ($file in $files) {
+              $directory = Join-Path $env:LLAMA_TEST_QWEN_HF_ROOT $model.name
+              $destination = Join-Path $directory $file.path
+              $url = "https://huggingface.co/$($model.repository)/resolve/$($model.revision)/$($file.path)"
+              & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $file.bytes --create-dirs --output $destination $url
+              if ($LASTEXITCODE -ne 0) { throw "Download failed: $($model.name)/$($file.path)" }
+              if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {
+                throw "Length mismatch: $($model.name)/$($file.path)"
+              }
+              $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+              if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: $($model.name)/$($file.path)" }
+              Write-Host "Verified $($model.name)/$($file.path): $($file.bytes) bytes, SHA-256 $hash"
+            }
+          }
+      - name: Replay official Qwen tokenizer references
+        run: cargo test --release --offline --locked -p llama-convert --lib pretrained_qwen_tokenizer_reference -- --ignored --nocapture
+      - name: Compare all three complete GGUF files with the frozen converter
+        run: cargo test --release --offline --locked -p llama-convert --test qwen_pretrained ${{ matrix.model.test }} -- --ignored --exact --nocapture
