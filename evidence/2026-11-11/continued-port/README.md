@@ -127,7 +127,19 @@ they are not whole-repository prose, license and release-policy guards.
 
 ## Publication and remaining work
 
-The next run started all six jobs, then its two GNU Qwen jobs exposed a
+After the download correction, all four Qwen jobs and the GNU CPU job passed
+in [run 43007239292](https://github.com/adybag14-cyber/rust-llama/actions/runs/43007239292).
+Windows completed 662 debug and 662 release tests, then reached GitHub's
+30-minute job deadline during the final pretrained stage. Seven individual
+pretrained passes are observed; four of the eleven expected tests remain
+unconfirmed for that run. The one-line correction raises the CPU job budget
+to 45 minutes while preserving every command, pin, expected output and
+tolerance. [Timeout evidence](ci-time-budget-fix/correction.json) retains
+the actual GitHub annotation, all six raw job logs, the completed and partial
+audits, and the corrected input manifest. The prior run remains cancelled;
+no incomplete stage is relabeled as successful.
+
+The second published run started all six jobs, then its two GNU Qwen jobs exposed a
 transport limit issue: the 242/239-byte generation configurations have
 314/292-byte HTTP redirect bodies. A tiny GNU curl probe reproduces the old
 exit 63 and verifies exact final files with a bounded 1 MiB minimum transfer
@@ -147,8 +159,9 @@ not validate GitHub expression-context availability.
 
 The [CI review](qwen-ci-review.json) checks the four isolated Windows/GNU by
 Qwen-model jobs, pinned downloads, input hashes and explicit release commands.
-The original CPU job, GPT-2/Pythia preparation and complete ignored
-inference/server command remain unchanged. **Published-commit GitHub CI is recorded separately by GitHub Actions**;
+The CPU commands, GPT-2/Pythia preparation and complete ignored
+inference/server command remain unchanged; the CPU job now has a 45-minute
+budget. **Published-commit GitHub CI is recorded separately by GitHub Actions**;
 static workflow review and local execution do not substitute for that result. The [publication review](publication-review.json)
 records the read-only scope and object-size inspection.
 

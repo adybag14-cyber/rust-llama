@@ -1,0 +1,464 @@
+﻿2026-11-11T10:52:31.9254710Z Current runner version: '2.338.2'
+2026-11-11T10:52:31.9283983Z ##[group]Runner Image Provisioner
+2026-11-11T10:52:31.9284936Z Hosted Compute Agent
+2026-11-11T10:52:31.9285744Z Version: 20261028.624
+2026-11-11T10:52:31.9286724Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-11T10:52:31.9287737Z Build Date: 2026-10-28T21:51:42Z
+2026-11-11T10:52:31.9288674Z Worker ID: {dbbf5024-e625-4c45-8b18-e64400477978}
+2026-11-11T10:52:31.9289675Z Region: eastus2
+2026-11-11T10:52:31.9290419Z Cloud: Azure
+2026-11-11T10:52:31.9291079Z ##[endgroup]
+2026-11-11T10:52:31.9292710Z ##[group]Operating System
+2026-11-11T10:52:31.9293517Z Ubuntu
+2026-11-11T10:52:31.9294559Z 24.04.5
+2026-11-11T10:52:31.9295390Z LTS
+2026-11-11T10:52:31.9296056Z ##[endgroup]
+2026-11-11T10:52:31.9297064Z ##[group]Runner Image
+2026-11-11T10:52:31.9297847Z Image: ubuntu-24.04
+2026-11-11T10:52:31.9298538Z Version: 20261101.360.1
+2026-11-11T10:52:31.9300240Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-11T10:52:31.9302367Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-11T10:52:31.9303671Z ##[endgroup]
+2026-11-11T10:52:31.9305160Z ##[group]GITHUB_TOKEN Permissions
+2026-11-11T10:52:31.9307641Z Contents: read
+2026-11-11T10:52:31.9308302Z Metadata: read
+2026-11-11T10:52:31.9309005Z ##[endgroup]
+2026-11-11T10:52:31.9311245Z Secret source: Actions
+2026-11-11T10:52:31.9312443Z Cache mode: write
+2026-11-11T10:52:31.9313600Z Prepare workflow directory
+2026-11-11T10:52:31.9772621Z Prepare all required actions
+2026-11-11T10:52:31.9812596Z Getting action download info
+2026-11-11T10:52:32.1847804Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-11T10:52:32.3673169Z Complete job name: Qwen conversion / ubuntu-latest / Qwen2.5-0.5B-Instruct
+2026-11-11T10:52:32.4434361Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-11T10:52:32.4435199Z with:
+2026-11-11T10:52:32.4435577Z   repository: adybag14-cyber/rust-llama
+2026-11-11T10:52:32.4439130Z   token: ***
+2026-11-11T10:52:32.4439522Z   ssh-strict: true
+2026-11-11T10:52:32.4439893Z   ssh-user: git
+2026-11-11T10:52:32.4440262Z   persist-credentials: true
+2026-11-11T10:52:32.4440660Z   clean: true
+2026-11-11T10:52:32.4441028Z   sparse-checkout-cone-mode: true
+2026-11-11T10:52:32.4441446Z   fetch-depth: 1
+2026-11-11T10:52:32.4441796Z   fetch-tags: false
+2026-11-11T10:52:32.4442154Z   show-progress: true
+2026-11-11T10:52:32.4442512Z   lfs: false
+2026-11-11T10:52:32.4442854Z   submodules: false
+2026-11-11T10:52:32.4443217Z   set-safe-directory: true
+2026-11-11T10:52:32.4443626Z   allow-unsafe-pr-checkout: false
+2026-11-11T10:52:32.4444239Z env:
+2026-11-11T10:52:32.4444580Z   CARGO_TERM_COLOR: always
+2026-11-11T10:52:32.4444975Z   RUST_BACKTRACE: 1
+2026-11-11T10:52:32.4445373Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:52:32.4445738Z   RUST_TEST_THREADS: 1
+2026-11-11T10:52:32.4446284Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:52:32.4446707Z ##[endgroup]
+2026-11-11T10:52:32.8024747Z Syncing repository: adybag14-cyber/rust-llama
+2026-11-11T10:52:32.8027295Z ##[group]Getting Git version info
+2026-11-11T10:52:32.8028326Z Working directory is '/home/runner/work/rust-llama/rust-llama'
+2026-11-11T10:52:32.8030175Z [command]/usr/bin/git version
+2026-11-11T10:52:32.8103676Z git version 2.56.0
+2026-11-11T10:52:32.8125422Z ##[endgroup]
+2026-11-11T10:52:32.8138909Z Temporarily overriding HOME='/home/runner/work/_temp/952748b6-251b-42ca-848b-ba2e9fa4534f' before making global git config changes
+2026-11-11T10:52:32.8141881Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T10:52:32.8145069Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:52:32.8194095Z Deleting the contents of '/home/runner/work/rust-llama/rust-llama'
+2026-11-11T10:52:32.8197379Z ##[group]Determining repository object format
+2026-11-11T10:52:32.8199797Z ##[endgroup]
+2026-11-11T10:52:32.8201478Z ##[group]Initializing the repository
+2026-11-11T10:52:32.8214824Z [command]/usr/bin/git init /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:52:32.8317002Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-11T10:52:32.8319415Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-11T10:52:32.8321640Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-11T10:52:32.8323446Z hint: call:
+2026-11-11T10:52:32.8324423Z hint:
+2026-11-11T10:52:32.8325630Z hint: 	git config --global init.defaultBranch <name>
+2026-11-11T10:52:32.8327297Z hint:
+2026-11-11T10:52:32.8328750Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-11T10:52:32.8331230Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-11T10:52:32.8333185Z hint:
+2026-11-11T10:52:32.8334256Z hint: 	git branch -m <name>
+2026-11-11T10:52:32.8335499Z hint:
+2026-11-11T10:52:32.8338498Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-11T10:52:32.8354475Z Initialized empty Git repository in /home/runner/work/rust-llama/rust-llama/.git/
+2026-11-11T10:52:32.8366723Z [command]/usr/bin/git remote add origin https://github.com/adybag14-cyber/rust-llama
+2026-11-11T10:52:32.8420132Z ##[endgroup]
+2026-11-11T10:52:32.8421881Z ##[group]Disabling automatic garbage collection
+2026-11-11T10:52:32.8423262Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-11T10:52:32.8450256Z ##[endgroup]
+2026-11-11T10:52:32.8452293Z ##[group]Setting up auth
+2026-11-11T10:52:32.8453594Z Removing SSH command configuration
+2026-11-11T10:52:32.8463346Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T10:52:32.8494221Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T10:52:32.8841584Z Removing HTTP extra header
+2026-11-11T10:52:32.8846688Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T10:52:32.8886064Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T10:52:32.9107506Z Removing includeIf entries pointing to credentials config files
+2026-11-11T10:52:32.9111758Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T10:52:32.9149122Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T10:52:32.9367316Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-11T10:52:32.9410429Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path /home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:52:32.9452265Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:52:32.9494790Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:52:32.9538108Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:52:32.9577382Z ##[endgroup]
+2026-11-11T10:52:32.9578683Z ##[group]Fetching the repository
+2026-11-11T10:52:32.9585000Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ea53175b4f2e0eceed2c88010c5665402396b5a1:refs/remotes/origin/main
+2026-11-11T10:52:39.3081544Z From https://github.com/adybag14-cyber/rust-llama
+2026-11-11T10:52:39.3082948Z  * [new ref]         ea53175b4f2e0eceed2c88010c5665402396b5a1 -> origin/main
+2026-11-11T10:52:39.3089685Z [command]/usr/bin/git branch --list --remote origin/main
+2026-11-11T10:52:39.3123737Z   origin/main
+2026-11-11T10:52:39.3130070Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2026-11-11T10:52:39.3160862Z ea53175b4f2e0eceed2c88010c5665402396b5a1
+2026-11-11T10:52:39.3164499Z ##[endgroup]
+2026-11-11T10:52:39.3165128Z ##[group]Determining the checkout info
+2026-11-11T10:52:39.3165858Z ##[endgroup]
+2026-11-11T10:52:39.3169784Z [command]/usr/bin/git sparse-checkout disable
+2026-11-11T10:52:39.3224134Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-11T10:52:39.3260712Z ##[group]Checking out the ref
+2026-11-11T10:52:39.3264084Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-11T10:52:40.4184021Z Updating files:   5% (622/12253)
+2026-11-11T10:52:40.4258172Z Updating files:   6% (736/12253)
+2026-11-11T10:52:40.4342261Z Updating files:   7% (858/12253)
+2026-11-11T10:52:40.4420888Z Updating files:   8% (981/12253)
+2026-11-11T10:52:40.4470737Z Updating files:   9% (1103/12253)
+2026-11-11T10:52:40.4522575Z Updating files:  10% (1226/12253)
+2026-11-11T10:52:40.4570209Z Updating files:  11% (1348/12253)
+2026-11-11T10:52:40.4622598Z Updating files:  12% (1471/12253)
+2026-11-11T10:52:40.4668441Z Updating files:  13% (1593/12253)
+2026-11-11T10:52:40.4750229Z Updating files:  14% (1716/12253)
+2026-11-11T10:52:40.4835865Z Updating files:  15% (1838/12253)
+2026-11-11T10:52:40.4907559Z Updating files:  16% (1961/12253)
+2026-11-11T10:52:40.4988451Z Updating files:  17% (2084/12253)
+2026-11-11T10:52:40.5062289Z Updating files:  18% (2206/12253)
+2026-11-11T10:52:40.5128954Z Updating files:  19% (2329/12253)
+2026-11-11T10:52:40.5179326Z Updating files:  20% (2451/12253)
+2026-11-11T10:52:40.5240804Z Updating files:  21% (2574/12253)
+2026-11-11T10:52:40.5306641Z Updating files:  22% (2696/12253)
+2026-11-11T10:52:40.5345376Z Updating files:  23% (2819/12253)
+2026-11-11T10:52:40.5376913Z Updating files:  24% (2941/12253)
+2026-11-11T10:52:40.5406818Z Updating files:  25% (3064/12253)
+2026-11-11T10:52:40.5437691Z Updating files:  26% (3186/12253)
+2026-11-11T10:52:40.5474962Z Updating files:  27% (3309/12253)
+2026-11-11T10:52:40.5517428Z Updating files:  28% (3431/12253)
+2026-11-11T10:52:40.5553435Z Updating files:  29% (3554/12253)
+2026-11-11T10:52:40.5625552Z Updating files:  30% (3676/12253)
+2026-11-11T10:52:40.5655454Z Updating files:  31% (3799/12253)
+2026-11-11T10:52:40.5688702Z Updating files:  32% (3921/12253)
+2026-11-11T10:52:40.5726775Z Updating files:  33% (4044/12253)
+2026-11-11T10:52:40.5797635Z Updating files:  34% (4167/12253)
+2026-11-11T10:52:40.5817311Z Updating files:  35% (4289/12253)
+2026-11-11T10:52:40.5848320Z Updating files:  36% (4412/12253)
+2026-11-11T10:52:40.5875925Z Updating files:  37% (4534/12253)
+2026-11-11T10:52:40.5906830Z Updating files:  38% (4657/12253)
+2026-11-11T10:52:40.5938746Z Updating files:  39% (4779/12253)
+2026-11-11T10:52:40.5997927Z Updating files:  40% (4902/12253)
+2026-11-11T10:52:40.6025852Z Updating files:  41% (5024/12253)
+2026-11-11T10:52:40.6079449Z Updating files:  42% (5147/12253)
+2026-11-11T10:52:40.6129221Z Updating files:  43% (5269/12253)
+2026-11-11T10:52:40.6208331Z Updating files:  44% (5392/12253)
+2026-11-11T10:52:40.6236514Z Updating files:  45% (5514/12253)
+2026-11-11T10:52:40.6286947Z Updating files:  46% (5637/12253)
+2026-11-11T10:52:40.6455504Z Updating files:  47% (5759/12253)
+2026-11-11T10:52:40.6484430Z Updating files:  48% (5882/12253)
+2026-11-11T10:52:40.6531052Z Updating files:  49% (6004/12253)
+2026-11-11T10:52:40.6560226Z Updating files:  50% (6127/12253)
+2026-11-11T10:52:40.6594688Z Updating files:  51% (6250/12253)
+2026-11-11T10:52:40.6623791Z Updating files:  52% (6372/12253)
+2026-11-11T10:52:40.6658596Z Updating files:  53% (6495/12253)
+2026-11-11T10:52:40.6687120Z Updating files:  54% (6617/12253)
+2026-11-11T10:52:40.6741347Z Updating files:  55% (6740/12253)
+2026-11-11T10:52:40.6796297Z Updating files:  56% (6862/12253)
+2026-11-11T10:52:40.6846782Z Updating files:  57% (6985/12253)
+2026-11-11T10:52:40.6884790Z Updating files:  58% (7107/12253)
+2026-11-11T10:52:40.6919529Z Updating files:  59% (7230/12253)
+2026-11-11T10:52:40.6973880Z Updating files:  60% (7352/12253)
+2026-11-11T10:52:40.7022355Z Updating files:  61% (7475/12253)
+2026-11-11T10:52:40.7065156Z Updating files:  62% (7597/12253)
+2026-11-11T10:52:40.7108807Z Updating files:  63% (7720/12253)
+2026-11-11T10:52:40.7183383Z Updating files:  64% (7842/12253)
+2026-11-11T10:52:40.7236957Z Updating files:  65% (7965/12253)
+2026-11-11T10:52:40.7286045Z Updating files:  66% (8087/12253)
+2026-11-11T10:52:40.7323094Z Updating files:  67% (8210/12253)
+2026-11-11T10:52:40.7394828Z Updating files:  68% (8333/12253)
+2026-11-11T10:52:40.7454375Z Updating files:  69% (8455/12253)
+2026-11-11T10:52:40.7519467Z Updating files:  70% (8578/12253)
+2026-11-11T10:52:40.7584620Z Updating files:  71% (8700/12253)
+2026-11-11T10:52:40.7649890Z Updating files:  72% (8823/12253)
+2026-11-11T10:52:40.7729096Z Updating files:  73% (8945/12253)
+2026-11-11T10:52:40.7794282Z Updating files:  74% (9068/12253)
+2026-11-11T10:52:40.7847005Z Updating files:  75% (9190/12253)
+2026-11-11T10:52:40.7878466Z Updating files:  76% (9313/12253)
+2026-11-11T10:52:40.7917246Z Updating files:  77% (9435/12253)
+2026-11-11T10:52:40.7972214Z Updating files:  78% (9558/12253)
+2026-11-11T10:52:40.8013016Z Updating files:  79% (9680/12253)
+2026-11-11T10:52:40.8052533Z Updating files:  80% (9803/12253)
+2026-11-11T10:52:40.8077533Z Updating files:  81% (9925/12253)
+2026-11-11T10:52:40.8107528Z Updating files:  82% (10048/12253)
+2026-11-11T10:52:40.8132512Z Updating files:  83% (10170/12253)
+2026-11-11T10:52:40.8159077Z Updating files:  84% (10293/12253)
+2026-11-11T10:52:40.8184470Z Updating files:  85% (10416/12253)
+2026-11-11T10:52:40.8213548Z Updating files:  86% (10538/12253)
+2026-11-11T10:52:40.8238316Z Updating files:  87% (10661/12253)
+2026-11-11T10:52:40.8288011Z Updating files:  88% (10783/12253)
+2026-11-11T10:52:40.8326756Z Updating files:  89% (10906/12253)
+2026-11-11T10:52:40.8361476Z Updating files:  90% (11028/12253)
+2026-11-11T10:52:40.8451239Z Updating files:  91% (11151/12253)
+2026-11-11T10:52:40.9548142Z Updating files:  92% (11273/12253)
+2026-11-11T10:52:40.9583619Z Updating files:  93% (11396/12253)
+2026-11-11T10:52:40.9620477Z Updating files:  94% (11518/12253)
+2026-11-11T10:52:41.0751395Z Updating files:  95% (11641/12253)
+2026-11-11T10:52:41.3914946Z Updating files:  96% (11763/12253)
+2026-11-11T10:52:41.6620927Z Updating files:  96% (11867/12253)
+2026-11-11T10:52:41.7505324Z Updating files:  97% (11886/12253)
+2026-11-11T10:52:41.7696323Z Updating files:  98% (12008/12253)
+2026-11-11T10:52:41.8277850Z Updating files:  99% (12131/12253)
+2026-11-11T10:52:41.8278301Z Updating files: 100% (12253/12253)
+2026-11-11T10:52:41.8278717Z Updating files: 100% (12253/12253), done.
+2026-11-11T10:52:41.8408762Z Switched to a new branch 'main'
+2026-11-11T10:52:41.8413058Z branch 'main' set up to track 'origin/main'.
+2026-11-11T10:52:41.8537743Z ##[endgroup]
+2026-11-11T10:52:41.8589163Z [command]/usr/bin/git log -1 --format=%H
+2026-11-11T10:52:41.8622223Z ea53175b4f2e0eceed2c88010c5665402396b5a1
+2026-11-11T10:52:41.8820121Z ##[group]Run rustup toolchain install 1.99.1 --profile minimal
+2026-11-11T10:52:41.8820564Z [36;1mrustup toolchain install 1.99.1 --profile minimal[0m
+2026-11-11T10:52:41.8843981Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:52:41.8844225Z env:
+2026-11-11T10:52:41.8844399Z   CARGO_TERM_COLOR: always
+2026-11-11T10:52:41.8844599Z   RUST_BACKTRACE: 1
+2026-11-11T10:52:41.8844782Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:52:41.8844957Z   RUST_TEST_THREADS: 1
+2026-11-11T10:52:41.8845145Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:52:41.8845540Z ##[endgroup]
+2026-11-11T10:52:46.6375432Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-11T10:52:46.7972469Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:52:46.7974179Z info: downloading 3 components
+2026-11-11T10:52:54.0780974Z 
+2026-11-11T10:52:54.0844642Z   1.99.1-x86_64-unknown-linux-gnu installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:52:54.0845186Z 
+2026-11-11T10:52:57.1514798Z ##[group]Run cargo fetch --locked
+2026-11-11T10:52:57.1515067Z [36;1mcargo fetch --locked[0m
+2026-11-11T10:52:57.1534586Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:52:57.1534815Z env:
+2026-11-11T10:52:57.1534983Z   CARGO_TERM_COLOR: always
+2026-11-11T10:52:57.1535181Z   RUST_BACKTRACE: 1
+2026-11-11T10:52:57.1535357Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:52:57.1535536Z   RUST_TEST_THREADS: 1
+2026-11-11T10:52:57.1535719Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:52:57.1535926Z ##[endgroup]
+2026-11-11T10:52:57.3292932Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-11T10:52:57.4450143Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-11T10:52:57.4626892Z info: downloading 2 components
+2026-11-11T10:52:58.6502874Z [1m[92m    Updating[0m crates.io index
+2026-11-11T10:52:58.8681725Z [1m[92m Downloading[0m crates ...
+2026-11-11T10:52:58.9800531Z [1m[92m  Downloaded[0m hashlink v0.12.2
+2026-11-11T10:52:58.9818843Z [1m[92m  Downloaded[0m foldhash v0.2.0
+2026-11-11T10:52:58.9831016Z [1m[92m  Downloaded[0m arraydeque v0.5.1
+2026-11-11T10:52:58.9881529Z [1m[92m  Downloaded[0m yaml-rust2 v0.13.0
+2026-11-11T10:52:58.9908857Z [1m[92m  Downloaded[0m hashbrown v0.17.1
+2026-11-11T10:52:59.6577929Z ##[group]Run $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json
+2026-11-11T10:52:59.6579321Z [36;1m$manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/qwen-conversion/pretrained-reference.json' | ConvertFrom-Json[0m
+2026-11-11T10:52:59.6580273Z [36;1m$selected = @($manifest.models | Where-Object { $_.name -eq $env:QWEN_MODEL })[0m
+2026-11-11T10:52:59.6580921Z [36;1mif ($selected.Count -ne 1) { throw "Expected one pinned model named $env:QWEN_MODEL" }[0m
+2026-11-11T10:52:59.6581510Z [36;1mforeach ($model in $manifest.models) {[0m
+2026-11-11T10:52:59.6582037Z [36;1m  # The complete-file test needs all eight inputs for this matrix model.[0m
+2026-11-11T10:52:59.6582658Z [36;1m  # Both small tokenizer JSONs also support the official tokenizer replay.[0m
+2026-11-11T10:52:59.6583225Z [36;1m  $files = if ($model.name -eq $env:QWEN_MODEL) {[0m
+2026-11-11T10:52:59.6583668Z [36;1m    @($model.inputs)[0m
+2026-11-11T10:52:59.6583965Z [36;1m  } else {[0m
+2026-11-11T10:52:59.6584327Z [36;1m    @($model.inputs | Where-Object { $_.path -eq 'tokenizer.json' })[0m
+2026-11-11T10:52:59.6584720Z [36;1m  }[0m
+2026-11-11T10:52:59.6584972Z [36;1m  foreach ($file in $files) {[0m
+2026-11-11T10:52:59.6585437Z [36;1m    $directory = Join-Path $env:LLAMA_TEST_QWEN_HF_ROOT $model.name[0m
+2026-11-11T10:52:59.6585970Z [36;1m    $destination = Join-Path $directory $file.path[0m
+2026-11-11T10:52:59.6586786Z [36;1m    $url = "https://huggingface.co/$($model.repository)/resolve/$($model.revision)/$($file.path)"[0m
+2026-11-11T10:52:59.6587465Z [36;1m    # Redirect bodies can exceed tiny targets; final length and SHA-256 stay exact.[0m
+2026-11-11T10:52:59.6588143Z [36;1m    $maximumTransferBytes = [Math]::Max([long]$file.bytes, [long]1048576)[0m
+2026-11-11T10:52:59.6589083Z [36;1m    & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $maximumTransferBytes --create-dirs --output $destination $url[0m
+2026-11-11T10:52:59.6590028Z [36;1m    if ($LASTEXITCODE -ne 0) { throw "Download failed: $($model.name)/$($file.path)" }[0m
+2026-11-11T10:52:59.6590620Z [36;1m    if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {[0m
+2026-11-11T10:52:59.6591317Z [36;1m      throw "Length mismatch: $($model.name)/$($file.path)"[0m
+2026-11-11T10:52:59.6591729Z [36;1m    }[0m
+2026-11-11T10:52:59.6592246Z [36;1m    $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()[0m
+2026-11-11T10:52:59.6593028Z [36;1m    if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: $($model.name)/$($file.path)" }[0m
+2026-11-11T10:52:59.6593755Z [36;1m    Write-Host "Verified $($model.name)/$($file.path): $($file.bytes) bytes, SHA-256 $hash"[0m
+2026-11-11T10:52:59.6594273Z [36;1m  }[0m
+2026-11-11T10:52:59.6594509Z [36;1m}[0m
+2026-11-11T10:52:59.6615276Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:52:59.6615516Z env:
+2026-11-11T10:52:59.6615695Z   CARGO_TERM_COLOR: always
+2026-11-11T10:52:59.6615894Z   RUST_BACKTRACE: 1
+2026-11-11T10:52:59.6616075Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:52:59.6616459Z   RUST_TEST_THREADS: 1
+2026-11-11T10:52:59.6616653Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:52:59.6616917Z   LLAMA_TEST_QWEN_HF_ROOT: /home/runner/work/_temp/qwen-hf
+2026-11-11T10:52:59.6617176Z ##[endgroup]
+2026-11-11T10:53:00.8810496Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:00.8811316Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:00.8811673Z 
+2026-11-11T10:53:00.9273972Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:00.9274528Z 100   288  100   288    0     0   6184      0 --:--:-- --:--:-- --:--:--  6260
+2026-11-11T10:53:00.9358763Z 
+2026-11-11T10:53:00.9359121Z 100  4917  100  4917    0     0  89215      0 --:--:-- --:--:-- --:--:-- 89215
+2026-11-11T10:53:01.1382657Z Verified Qwen2.5-0.5B-Instruct/README.md: 4917 bytes, SHA-256 b19c806a904db6dc878a0462e70b551f6b7ac78dfbb88c2eb966ca2b9109ae15
+2026-11-11T10:53:01.1504700Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:01.1505525Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:01.1506061Z 
+2026-11-11T10:53:01.1899113Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:01.1899506Z 100   292  100   292    0     0   7382      0 --:--:-- --:--:-- --:--:--  7487
+2026-11-11T10:53:01.1979343Z 
+2026-11-11T10:53:01.1979677Z 100   659  100   659    0     0  13833      0 --:--:-- --:--:-- --:--:-- 13833
+2026-11-11T10:53:01.2012209Z Verified Qwen2.5-0.5B-Instruct/config.json: 659 bytes, SHA-256 18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45
+2026-11-11T10:53:01.2133295Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:01.2133985Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:01.2134351Z 
+2026-11-11T10:53:01.2513809Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:01.2514362Z 100   314  100   314    0     0   8227      0 --:--:-- --:--:-- --:--:--  8263
+2026-11-11T10:53:01.2595131Z 
+2026-11-11T10:53:01.2595411Z 100   242  100   242    0     0   5220      0 --:--:-- --:--:-- --:--:--  5220
+2026-11-11T10:53:01.2626514Z Verified Qwen2.5-0.5B-Instruct/generation_config.json: 242 bytes, SHA-256 e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6
+2026-11-11T10:53:01.2746865Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:01.2747402Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:01.2747680Z 
+2026-11-11T10:53:01.3216691Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:01.3217290Z 100   290  100   290    0     0   6175      0 --:--:-- --:--:-- --:--:--  6304
+2026-11-11T10:53:01.3663622Z 
+2026-11-11T10:53:01.3664320Z 100 1632k  100 1632k    0     0  17.3M      0 --:--:-- --:--:-- --:--:-- 17.3M
+2026-11-11T10:53:01.3724775Z Verified Qwen2.5-0.5B-Instruct/merges.txt: 1671839 bytes, SHA-256 599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3
+2026-11-11T10:53:01.3892026Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:01.3892709Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:01.3893072Z 
+2026-11-11T10:53:01.4354038Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:01.4354548Z 100  1044  100  1044    0     0  22547      0 --:--:-- --:--:-- --:--:-- 22695
+2026-11-11T10:53:01.8237674Z 
+2026-11-11T10:53:02.8237194Z  10  942M   10 94.3M    0     0   217M      0  0:00:04 --:--:--  0:00:04  217M
+2026-11-11T10:53:03.8240666Z  24  942M   24  230M    0     0   160M      0  0:00:05  0:00:01  0:00:04  135M
+2026-11-11T10:53:04.8242802Z  47  942M   47  445M    0     0   182M      0  0:00:05  0:00:02  0:00:03  175M
+2026-11-11T10:53:05.8240304Z  60  942M   60  574M    0     0   167M      0  0:00:05  0:00:03  0:00:02  160M
+2026-11-11T10:53:06.8255643Z  67  942M   67  633M    0     0   142M      0  0:00:06  0:00:04  0:00:02  134M
+2026-11-11T10:53:07.8242684Z  78  942M   78  743M    0     0   136M      0  0:00:06  0:00:05  0:00:01  129M
+2026-11-11T10:53:08.5507434Z  90  942M   90  848M    0     0   131M      0  0:00:07  0:00:06  0:00:01  123M
+2026-11-11T10:53:08.5508225Z 100  942M  100  942M    0     0   131M      0  0:00:07  0:00:07 --:--:--  105M
+2026-11-11T10:53:09.3386523Z Verified Qwen2.5-0.5B-Instruct/model.safetensors: 988097824 bytes, SHA-256 fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe
+2026-11-11T10:53:09.3525752Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:09.3526991Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:09.3527764Z 
+2026-11-11T10:53:09.3917784Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:09.3918352Z 100   298  100   298    0     0   7581      0 --:--:-- --:--:-- --:--:--  7641
+2026-11-11T10:53:09.4447339Z 
+2026-11-11T10:53:09.4447957Z 100 6866k  100 6866k    0     0  72.6M      0 --:--:-- --:--:-- --:--:-- 72.6M
+2026-11-11T10:53:09.4534220Z Verified Qwen2.5-0.5B-Instruct/tokenizer.json: 7031645 bytes, SHA-256 c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539
+2026-11-11T10:53:09.4656975Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:09.4657852Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:09.4658307Z 
+2026-11-11T10:53:09.5037412Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:09.5037984Z 100   312  100   312    0     0   8178      0 --:--:-- --:--:-- --:--:--  8210
+2026-11-11T10:53:09.5116944Z 
+2026-11-11T10:53:09.5117392Z 100  7305  100  7305    0     0   154k      0 --:--:-- --:--:-- --:--:--  154k
+2026-11-11T10:53:09.5142340Z Verified Qwen2.5-0.5B-Instruct/tokenizer_config.json: 7305 bytes, SHA-256 5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583
+2026-11-11T10:53:09.5267938Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:09.5268582Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:09.5268888Z 
+2026-11-11T10:53:09.5700470Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:09.5701061Z 100   290  100   290    0     0   6692      0 --:--:-- --:--:-- --:--:--  6744
+2026-11-11T10:53:09.6147765Z 
+2026-11-11T10:53:09.6148442Z 100 2711k  100 2711k    0     0  30.0M      0 --:--:-- --:--:-- --:--:-- 30.0M
+2026-11-11T10:53:09.6200332Z Verified Qwen2.5-0.5B-Instruct/vocab.json: 2776833 bytes, SHA-256 ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910
+2026-11-11T10:53:09.6344615Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-11T10:53:09.6345115Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-11T10:53:09.6345811Z 
+2026-11-11T10:53:09.6757281Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-11T10:53:09.6757846Z 100  1166  100  1166    0     0  28181      0 --:--:-- --:--:-- --:--:-- 28439
+2026-11-11T10:53:09.7814990Z 
+2026-11-11T10:53:09.7815909Z 100 10.8M  100 10.8M    0     0  74.0M      0 --:--:-- --:--:-- --:--:-- 74.0M
+2026-11-11T10:53:09.7945699Z Verified Qwen3-0.6B/tokenizer.json: 11422654 bytes, SHA-256 aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4
+2026-11-11T10:53:09.8381948Z ##[group]Run cargo test --release --offline --locked -p llama-convert --lib pretrained_qwen_tokenizer_reference -- --ignored --nocapture
+2026-11-11T10:53:09.8382696Z [36;1mcargo test --release --offline --locked -p llama-convert --lib pretrained_qwen_tokenizer_reference -- --ignored --nocapture[0m
+2026-11-11T10:53:09.8402090Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:53:09.8402325Z env:
+2026-11-11T10:53:09.8402488Z   CARGO_TERM_COLOR: always
+2026-11-11T10:53:09.8402691Z   RUST_BACKTRACE: 1
+2026-11-11T10:53:09.8402861Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:53:09.8403042Z   RUST_TEST_THREADS: 1
+2026-11-11T10:53:09.8403234Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:53:09.8403506Z   LLAMA_TEST_QWEN_TOKENIZER_ROOT: /home/runner/work/_temp/qwen-hf
+2026-11-11T10:53:09.8403782Z ##[endgroup]
+2026-11-11T10:53:10.0203000Z [1m[92m   Compiling[0m foldhash v0.2.0
+2026-11-11T10:53:10.0203718Z [1m[92m   Compiling[0m llama-quant v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/quant)
+2026-11-11T10:53:10.0930612Z [1m[92m   Compiling[0m hashbrown v0.17.1
+2026-11-11T10:53:10.5028600Z [1m[92m   Compiling[0m hashlink v0.12.2
+2026-11-11T10:53:10.6893394Z [1m[92m   Compiling[0m llama-gguf v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/gguf)
+2026-11-11T10:53:11.7603576Z [1m[92m   Compiling[0m arraydeque v0.5.1
+2026-11-11T10:53:11.8436676Z [1m[92m   Compiling[0m yaml-rust2 v0.13.0
+2026-11-11T10:53:12.0547237Z [1m[92m   Compiling[0m llama-tokenizer v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/tokenizer)
+2026-11-11T10:53:13.1127076Z [1m[92m   Compiling[0m llama-behavior v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/llama-behavior)
+2026-11-11T10:53:14.3525071Z [1m[92m   Compiling[0m llama-conformance v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/llama-conformance)
+2026-11-11T10:53:15.5861286Z [1m[92m   Compiling[0m llama-checkpoint v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/checkpoint)
+2026-11-11T10:53:16.4906939Z [1m[92m   Compiling[0m llama-convert v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/convert)
+2026-11-11T10:53:30.7639759Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 20.77s
+2026-11-11T10:53:30.7645685Z [1m[92m     Running[0m unittests src/lib.rs (target/release/deps/llama_convert-98e7892b4de0c35f)
+2026-11-11T10:53:30.7660331Z 
+2026-11-11T10:53:30.7662003Z running 1 test
+2026-11-11T10:53:32.3789727Z Official unchanged Qwen2.5/Qwen3 tokenizers: 6232 captured ID/decoder requests
+2026-11-11T10:53:32.3853678Z test hf_reference::qwen::pretrained_qwen_tokenizer_reference ... ok
+2026-11-11T10:53:32.3854084Z 
+2026-11-11T10:53:32.3854403Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 1.62s
+2026-11-11T10:53:32.3854827Z 
+2026-11-11T10:53:32.9021868Z ##[group]Run cargo test --release --offline --locked -p llama-convert --test qwen_pretrained pretrained_qwen2_native_files -- --ignored --exact --nocapture
+2026-11-11T10:53:32.9022698Z [36;1mcargo test --release --offline --locked -p llama-convert --test qwen_pretrained pretrained_qwen2_native_files -- --ignored --exact --nocapture[0m
+2026-11-11T10:53:32.9041587Z shell: /usr/bin/pwsh -command ". '{0}'"
+2026-11-11T10:53:32.9041829Z env:
+2026-11-11T10:53:32.9041999Z   CARGO_TERM_COLOR: always
+2026-11-11T10:53:32.9042191Z   RUST_BACKTRACE: 1
+2026-11-11T10:53:32.9042369Z   CARGO_BUILD_JOBS: 2
+2026-11-11T10:53:32.9042551Z   RUST_TEST_THREADS: 1
+2026-11-11T10:53:32.9042896Z   QWEN_MODEL: Qwen2.5-0.5B-Instruct
+2026-11-11T10:53:32.9043153Z   LLAMA_TEST_QWEN_HF_ROOT: /home/runner/work/_temp/qwen-hf
+2026-11-11T10:53:32.9043497Z   LLAMA_TEST_QWEN_OUTPUT_ROOT: /home/runner/work/_temp/qwen-converter-output
+2026-11-11T10:53:32.9043797Z ##[endgroup]
+2026-11-11T10:53:33.0653716Z [1m[92m   Compiling[0m llama-convert v0.1.0 (/home/runner/work/rust-llama/rust-llama/crates/convert)
+2026-11-11T10:53:48.9079569Z [1m[92m    Finished[0m `release` profile [optimized] target(s) in 15.85s
+2026-11-11T10:53:48.9084625Z [1m[92m     Running[0m tests/qwen_pretrained.rs (target/release/deps/qwen_pretrained-eaf791a1013d1587)
+2026-11-11T10:53:48.9098912Z 
+2026-11-11T10:53:48.9099028Z running 1 test
+2026-11-11T10:54:07.0490447Z test pretrained_qwen2_native_files ... linux Qwen2.5-0.5B-Instruct f16: 994157120 exact bytes, SHA-256 f781a61a06b2dbafd1404187dc27a7981cb45a7bd66fa3268c3fa724b602f38e
+2026-11-11T10:54:16.1942225Z linux Qwen2.5-0.5B-Instruct q8_0: 531068480 exact bytes, SHA-256 6138491dbbde6c58c3380ac997ec64b4d2fd2e721b02a011a6463a545ab5bfe5
+2026-11-11T10:54:28.9932183Z linux Qwen2.5-0.5B-Instruct auto: 994157120 exact bytes, SHA-256 6f8d546c52d0da75cc7c8c8f12f97f1494cff84e5afc49e20309a2cb2bcb70ec
+2026-11-11T10:54:29.0012799Z linux Qwen2.5-0.5B-Instruct: 3 full pretrained outputs, 2519382720 exact bytes
+2026-11-11T10:54:29.0048794Z ok
+2026-11-11T10:54:29.0048925Z 
+2026-11-11T10:54:29.0049474Z test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 40.09s
+2026-11-11T10:54:29.0052040Z 
+2026-11-11T10:54:29.5469624Z Post job cleanup.
+2026-11-11T10:54:29.6193266Z [command]/usr/bin/git version
+2026-11-11T10:54:29.6236800Z git version 2.56.0
+2026-11-11T10:54:29.6277207Z Temporarily overriding HOME='/home/runner/work/_temp/b09e52ca-fe5c-40c0-9fa9-30aa3ff11ff4' before making global git config changes
+2026-11-11T10:54:29.6278382Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-11T10:54:29.6279018Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/rust-llama/rust-llama
+2026-11-11T10:54:29.6312395Z Removing SSH command configuration
+2026-11-11T10:54:29.6318695Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-11T10:54:29.6380189Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-11T10:54:29.6630088Z Removing HTTP extra header
+2026-11-11T10:54:29.6635915Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-11T10:54:29.6677389Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-11T10:54:29.6947562Z Removing includeIf entries pointing to credentials config files
+2026-11-11T10:54:29.6954488Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-11T10:54:29.6996300Z includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path
+2026-11-11T10:54:29.6997108Z includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-11T10:54:29.6997955Z includeif.gitdir:/github/workspace/.git.path
+2026-11-11T10:54:29.6998399Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-11T10:54:29.7005843Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path
+2026-11-11T10:54:29.7045686Z /home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:54:29.7058236Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-10c0e00a\-5832\-4e78\-9c48\-2bdec5561a9f\.config
+2026-11-11T10:54:29.7108881Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path
+2026-11-11T10:54:29.7142029Z /home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:54:29.7150124Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/rust-llama/rust-llama/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-10c0e00a\-5832\-4e78\-9c48\-2bdec5561a9f\.config
+2026-11-11T10:54:29.7190935Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-11T10:54:29.7222755Z /github/runner_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:54:29.7230131Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-10c0e00a\-5832\-4e78\-9c48\-2bdec5561a9f\.config
+2026-11-11T10:54:29.7270960Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-11T10:54:29.7301548Z /github/runner_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config
+2026-11-11T10:54:29.7308976Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-10c0e00a\-5832\-4e78\-9c48\-2bdec5561a9f\.config
+2026-11-11T10:54:29.7349614Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-11T10:54:29.7581084Z Removing credentials config '/home/runner/work/_temp/git-credentials-10c0e00a-5832-4e78-9c48-2bdec5561a9f.config'
+2026-11-11T10:54:29.7721912Z Cleaning up orphan processes
