@@ -155,6 +155,49 @@ pub fn tiny_bert() -> Result<BertModel> {
     )
 }
 
+pub fn tiny_gpt2() -> Result<Gpt2Model> {
+    let config = Gpt2Config {
+        vocabulary: 7,
+        width: 4,
+        feed_forward: 6,
+        heads: 2,
+        kv_heads: 1,
+        positions: 32,
+        max_context: 32,
+        norm_epsilon: 1e-5,
+    };
+    let mut layers = Vec::new();
+    for index in 0..2 {
+        let seed = index * 20;
+        layers.push(Gpt2Layer {
+            attention_norm: norms(4, seed + 2),
+            attention_norm_bias: values(4, seed + 3),
+            qkv: matrix(8, 4, seed + 4)?,
+            qkv_bias: values(8, seed + 5),
+            attention_output: matrix(4, 4, seed + 6)?,
+            attention_output_bias: values(4, seed + 7),
+            feed_forward_norm: norms(4, seed + 8),
+            feed_forward_norm_bias: values(4, seed + 9),
+            up: matrix(6, 4, seed + 10)?,
+            up_bias: values(6, seed + 11),
+            down: matrix(4, 6, seed + 12)?,
+            down_bias: values(4, seed + 13),
+        });
+    }
+    Gpt2Model::new(
+        config,
+        Gpt2Weights {
+            token_embedding: matrix(7, 4, 1)?,
+            position_embedding: matrix(32, 4, 61)?,
+            layers,
+            output_norm: norms(4, 50),
+            output_norm_bias: values(4, 51),
+            output: Some(matrix(7, 4, 52)?),
+            output_bias: None,
+        },
+    )
+}
+
 #[derive(Debug, Clone)]
 pub struct SmokeReport {
     pub architecture_slots: usize,

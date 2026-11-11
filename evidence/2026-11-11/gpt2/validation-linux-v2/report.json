@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "profile": "linux",
+  "cwd": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/models",
+  "attempt": "v2",
+  "stages": [
+    {
+      "name": "format",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 5.883036851882935,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-gpt2",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 8.738403558731079,
+      "log_sha256": "06c327ec69c52446cd973c2c95136e2c3f62cc5096f425bffae003b59b31cf8a"
+    },
+    {
+      "name": "debug-runtime",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 7.234923839569092,
+      "log_sha256": "c6e02e2685faced5631f6089283bae7fc5a0327cf3fb650588087c9fdcac107c"
+    },
+    {
+      "name": "release-gpt2",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 14.1024751663208,
+      "log_sha256": "cec7f6c9346fb1077340777b1d4bcb89fbda260970cc917edd5592c05ac97903"
+    },
+    {
+      "name": "release-pretrained",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 32.7473623752594,
+      "log_sha256": "60c2844c927bbdeddad74680532291d412a1db51db527d39b36c525927872afc"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 4.828625679016113,
+      "log_sha256": "fa99285a972eaac1136f1f210e3956f0abb87dd1f758830a4bbdf872fa035361"
+    }
+  ]
+}

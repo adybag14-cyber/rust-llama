@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "profile": "msvc",
+  "kind": "tiny",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "executable_sha256": "4ef70ca22dbf3dc6628391fd8b54fd3f8459f994be86eacdb7c68d5eef4af7b4",
+  "harness_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+  "libraries": [
+    {
+      "name": "llama.dll",
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    },
+    {
+      "name": "ggml-base.dll",
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    {
+      "name": "ggml-cpu.dll",
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    {
+      "name": "ggml.dll",
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    }
+  ],
+  "cases": [
+    {
+      "name": "f32-default",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "5eb648b5eea1cd377d0f21e0f65916d7b0bd8c404bfae4d3d4b4678df024d334",
+      "model_bytes": 445056,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\f32-default.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\f32-default.json"
+      ],
+      "reference_sha256": "c3893d6eae7ae99f6379a0ee60c1d9a78e002fdee50bafa9475077835f2ebb1e"
+    },
+    {
+      "name": "f32-untied",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "0f06f66526cfad38123330b8f3475b29cf381ca7d0cca8bd6ea11c1e6e456330",
+      "model_bytes": 576160,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\f32-untied.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\f32-untied.json"
+      ],
+      "reference_sha256": "637c78dd4fdcd95dcfa9c570ec93ded1c399e3d0f86c1733790d3b426fc0a6be"
+    },
+    {
+      "name": "f32-output-bias",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "63e8370525cc63ea133d0e5e4c8137007ad63f2ed863d88c1ef07953ecc44b0b",
+      "model_bytes": 447136,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\f32-output-bias.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\f32-output-bias.json"
+      ],
+      "reference_sha256": "831110ac9c100bd96673774eff5d0af74671ef4b1ad50d54422cd9803a5115c9"
+    },
+    {
+      "name": "f32-untied-output-bias",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "4ee3b510c17d961ebe81959f096c4689ed31d0777418f586f4f49cd72b8ad34c",
+      "model_bytes": 578272,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\f32-untied-output-bias.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\f32-untied-output-bias.json"
+      ],
+      "reference_sha256": "8a1e530b24f78acd272476f2c5eca0a4f27b29cd36cfc9f2b928f7a555d461ed"
+    },
+    {
+      "name": "f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "d745f367a71b54d103bfbe78df0935e4c17e01a5ce3e686e394e5f9ca1afe1dd",
+      "model_bytes": 232032,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\f16.json"
+      ],
+      "reference_sha256": "a35bf1a1413fabad5fbba17500cc4afddc83e9d8ac42774a3809985743323675"
+    },
+    {
+      "name": "q4-0",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "8959caf4c6755867500618d73991cd8eddeb1e23abbe49b26d443a7bab3c7327",
+      "model_bytes": 78944,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\q4-0.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\q4-0.json"
+      ],
+      "reference_sha256": "abbd185f0c94911082d1186556845f696204bf7917d5cfeec6fb4ae5cf236a17"
+    },
+    {
+      "name": "q4-k",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "60ac269335ec456b1be4786b4a189e7a141632697e08b1e2b353472225ba4721",
+      "model_bytes": 719456,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\q4-k.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\q4-k.json"
+      ],
+      "reference_sha256": "268f0ebf9bd54df8449265d620c018c346d430f257465b11ffa623ded95655dc"
+    },
+    {
+      "name": "grouped-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "519585964f3e6eb24406bae68f223c995663675a5d1fc2047b048eec5e13356c",
+      "model_bytes": 411776,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\grouped-query.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\grouped-query.json"
+      ],
+      "reference_sha256": "15716050f7ba8e224fd6fcf254db52c3a04537a6bcd6453725dd68e7536b23e0"
+    },
+    {
+      "name": "multi-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ed4c42980f3448a46d9c8884f4a1e8e903f2f3faedbe1390769cbdb1f4f995fc",
+      "model_bytes": 395136,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\multi-query.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\multi-query.json"
+      ],
+      "reference_sha256": "272d9e8840f0cbd1e3dd2e5a6e1eaf58b2bf8fb48118e5c28553bc5451d8d6ac"
+    },
+    {
+      "name": "single-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "54ac42620544ed1700a3a43111984e98ebf02874173c40eda0999abc8a0ad1b7",
+      "model_bytes": 310496,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\single-layer.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\single-layer.json"
+      ],
+      "reference_sha256": "5155f7478b42fc2431224ed558b96d69de16929aa9e9acb390fcd6ede5ed1e15"
+    },
+    {
+      "name": "three-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "26ba8441745b4be259ce47986ecf2eb35644060e03c17248cca7ab4ae5e62c1c",
+      "model_bytes": 579584,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\three-layer.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\three-layer.json"
+      ],
+      "reference_sha256": "9646a47661b86e02a391335bf6f76b1789e0c3475ca97f5f5c0e31b49199be89"
+    },
+    {
+      "name": "odd-head-width",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "f4b4e9f304e59bc8539483c37fc41d79f676748617d5cbb75f4226da10cb6230",
+      "model_bytes": 410688,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\odd-head-width.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\odd-head-width.json"
+      ],
+      "reference_sha256": "789089d12ef4b8c5ccd7a65f92b97912a93bde342a2f2b0f4379527664bad7d9"
+    },
+    {
+      "name": "different-epsilon",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "698674616a2f75d86d7540ceeaab7622cae76d0eafd8d7f3b1ba5b85ad2c7a2f",
+      "model_bytes": 445056,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\different-epsilon.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\different-epsilon.json"
+      ],
+      "reference_sha256": "f54448a42927e3749b2f607fe663c473d4a4dcf566401766e9bbedd852cacf9a"
+    },
+    {
+      "name": "implicit-kv",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "7869f1d0a8843d14da70e33bc4619b66716d5e45bef3bc0997260a96d44ab2ca",
+      "model_bytes": 444992,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\implicit-kv.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\implicit-kv.json"
+      ],
+      "reference_sha256": "c3893d6eae7ae99f6379a0ee60c1d9a78e002fdee50bafa9475077835f2ebb1e"
+    },
+    {
+      "name": "norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": 3221226505,
+      "model_sha256": "8a1477bec594c2a5e2a288de58f35713f19824270fe548477540de906ed4585e",
+      "model_bytes": 444928,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\norm-f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\norm-f16.json"
+      ]
+    },
+    {
+      "name": "bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": 3221226505,
+      "model_sha256": "7717d85c0df03eefda3d53a47876f359a37f29256f3e39e0c6b0e82ea56fd236",
+      "model_bytes": 444672,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\bias-f16.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\bias-f16.json"
+      ]
+    },
+    {
+      "name": "missing-position",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "53bfe370492f01a13e388b3b81ed94e78389f947bd5a9970ac2b8a905ab1ef20",
+      "model_bytes": 412224,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\missing-position.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\missing-position.json"
+      ]
+    },
+    {
+      "name": "missing-norm-bias",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "09d45988c33c9b6909749050fd9b730580a9e2ad0de79f303fa8defa7f47a624",
+      "model_bytes": 444736,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\missing-norm-bias.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\missing-norm-bias.json"
+      ]
+    },
+    {
+      "name": "noncausal",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "a745d82559b4c7e81c8ff748740d851946b29bc32f3fed6a4e2808e0cf30318c",
+      "model_bytes": 445056,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\noncausal.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\noncausal.json"
+      ],
+      "reference_sha256": "c3893d6eae7ae99f6379a0ee60c1d9a78e002fdee50bafa9475077835f2ebb1e"
+    },
+    {
+      "name": "head-array",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "5c7bd48a05794b703a422465d71ddf0b2acb1348de5a3a87c774b794fd7e5ae2",
+      "model_bytes": 445056,
+      "args": [
+        "C:\\Users\\adyba\\rust-llama-reference\\sharded-gguf-port\\native-build\\Release\\shard-inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-inputs\\head-array.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\request.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\tiny-native-msvc\\head-array.json"
+      ],
+      "reference_sha256": "c3893d6eae7ae99f6379a0ee60c1d9a78e002fdee50bafa9475077835f2ebb1e"
+    }
+  ],
+  "utc": "2026-11-11T08:34:28Z"
+}

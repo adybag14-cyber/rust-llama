@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "profile": "windows",
+  "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\models",
+  "attempt": "v2",
+  "stages": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4988446235656738,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 3.24211049079895,
+      "log_sha256": "af7fa4edf4cc52b63233310da0342b5915d29e478a113590d1003ceb1529cd57"
+    },
+    {
+      "name": "debug-runtime",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4051504135131836,
+      "log_sha256": "a6ab3716731413c235b4cfcd0d1bdcd85f49ca6da039da8acc6ec66b4bff0224"
+    },
+    {
+      "name": "release-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 22.809633255004883,
+      "log_sha256": "ed02154fa89af66722e779b77d50319a86db220be76f09682813ca8742e98acc"
+    },
+    {
+      "name": "release-pretrained",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "official_gpt2",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 53.28547811508179,
+      "log_sha256": "080381a76e519d76ce98de78260cbd364bab09f44a525f416b82411ca3676778"
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-model-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 3.229832887649536,
+      "log_sha256": "7762179f358dabea01361d57429fbcf96e6f7ade2bcef07da33e6e9b83466c1a"
+    }
+  ]
+}

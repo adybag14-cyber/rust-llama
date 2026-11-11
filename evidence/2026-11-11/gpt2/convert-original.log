@@ -1,0 +1,26 @@
+INFO:hf-to-gguf:Loading model: official-hf
+INFO:hf-to-gguf:Model architecture: GPT2LMHeadModel
+INFO:hf-to-gguf:gguf: indexing model part 'model.safetensors'
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+INFO:hf-to-gguf:Exporting model...
+Traceback (most recent call last):
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\convert_hf_to_gguf.py", line 325, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\convert_hf_to_gguf.py", line 319, in main
+    model_instance.write()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\conversion\base.py", line 1647, in write
+    self.prepare_tensors()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\conversion\base.py", line 1515, in prepare_tensors
+    for new_name, data_torch in (self.modify_tensors(data_torch, name, bid)):
+                                 ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\conversion\gpt2.py", line 30, in modify_tensors
+    yield from super().modify_tensors(data_torch, name, bid)
+               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\conversion\base.py", line 1057, in modify_tensors
+    new_name = self.map_tensor_name(name)
+  File "C:\Users\adyba\Downloads\llama.cpp-master (4)\llama.cpp-master\conversion\base.py", line 808, in map_tensor_name
+    raise ValueError(f"Can not map tensor {name!r}")
+ValueError: Can not map tensor 'h.0.attn.bias'

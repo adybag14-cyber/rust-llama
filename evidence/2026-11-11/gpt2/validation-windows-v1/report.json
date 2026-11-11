@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "profile": "windows",
+  "cwd": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\models",
+  "attempt": "v1",
+  "stages": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 1.8865816593170166,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "debug-gpt2",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "gpt2",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 9.330880880355835,
+      "log_sha256": "8c5769c03be64371e184eb070ac16ba571b351a044500f55d6944ef0309146c5"
+    },
+    {
+      "name": "debug-runtime",
+      "args": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-model-runtime"
+      ],
+      "exit_code": 101,
+      "seconds": 4.354758977890015,
+      "log_sha256": "4875ae104f7fcbbd276833528a560d26a61177e851ee2d8ab630cdd86139d4b7"
+    }
+  ]
+}

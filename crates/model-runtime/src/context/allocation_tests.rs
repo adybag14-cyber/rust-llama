@@ -94,6 +94,7 @@ fn models() -> Vec<Arc<Model>> {
         Arc::new(Model::Mamba(fixtures::tiny_mamba().unwrap())),
         Arc::new(Model::Qwen2(qwen)),
         Arc::new(Model::Qwen3(qwen3)),
+        Arc::new(Model::Gpt2(fixtures::tiny_gpt2().unwrap())),
     ]
 }
 fn context(model: Arc<Model>, limit: usize) -> Context {

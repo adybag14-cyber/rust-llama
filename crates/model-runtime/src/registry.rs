@@ -7,6 +7,7 @@ use crate::{Error, Result};
 pub enum ExecutionSlice {
     Qwen2DenseF32,
     Qwen3DenseF32,
+    Gpt2DenseF32,
     LlamaDenseF32,
     Mamba1F32,
     BertDenseF32,
@@ -85,7 +86,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "gpt2",
         source_factory: Some("llama_model_gpt2"),
         source_files: &["src/models/gpt2.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::Gpt2DenseF32),
     },
     Architecture {
         id: 8,

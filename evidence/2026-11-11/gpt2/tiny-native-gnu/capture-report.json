@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "profile": "gnu",
+  "kind": "tiny",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "executable_sha256": "5a2ba090dde949d560cdfe3d02cd23e1cd12980f06652195608b60e88539ce2a",
+  "harness_source_sha256": "01812ebcae17c46e79c67c0f3a19f01872d6c75e5f4c2ff54b4b1109f49c1555",
+  "libraries": [
+    {
+      "name": "libllama.so",
+      "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+    },
+    {
+      "name": "libggml-base.so",
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    {
+      "name": "libggml-cpu.so",
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    {
+      "name": "libggml.so",
+      "sha256": "e8ac2a97b67ad49f7bf22fdb572ac32bb40deab941ac0c09174f9b5f987321cd"
+    }
+  ],
+  "cases": [
+    {
+      "name": "f32-default",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "5eb648b5eea1cd377d0f21e0f65916d7b0bd8c404bfae4d3d4b4678df024d334",
+      "model_bytes": 445056,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/f32-default.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/f32-default.json"
+      ],
+      "reference_sha256": "fb940d7e1a6147bafe5257f6c900b9851e3e678338a7affda2ce1abaeb931e87"
+    },
+    {
+      "name": "f32-untied",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "0f06f66526cfad38123330b8f3475b29cf381ca7d0cca8bd6ea11c1e6e456330",
+      "model_bytes": 576160,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/f32-untied.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/f32-untied.json"
+      ],
+      "reference_sha256": "99a7882950564b2e74c094109d079bc0180272803c7388a270a3f9c0f88bbe57"
+    },
+    {
+      "name": "f32-output-bias",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "63e8370525cc63ea133d0e5e4c8137007ad63f2ed863d88c1ef07953ecc44b0b",
+      "model_bytes": 447136,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/f32-output-bias.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/f32-output-bias.json"
+      ],
+      "reference_sha256": "a36c89432d67a0fcd46837bd3eb8002e5273279cb841bcb5041695d2a20ae78a"
+    },
+    {
+      "name": "f32-untied-output-bias",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "4ee3b510c17d961ebe81959f096c4689ed31d0777418f586f4f49cd72b8ad34c",
+      "model_bytes": 578272,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/f32-untied-output-bias.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/f32-untied-output-bias.json"
+      ],
+      "reference_sha256": "520adf9cd0fa5e055c161994b0552874c3ad6e8ee18abfd46395cc5bc6303129"
+    },
+    {
+      "name": "f16",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "d745f367a71b54d103bfbe78df0935e4c17e01a5ce3e686e394e5f9ca1afe1dd",
+      "model_bytes": 232032,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/f16.json"
+      ],
+      "reference_sha256": "d1399e176564db02aab0ecb4dfc3214299da4b53086c63167644172f9e9176e7"
+    },
+    {
+      "name": "q4-0",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "8959caf4c6755867500618d73991cd8eddeb1e23abbe49b26d443a7bab3c7327",
+      "model_bytes": 78944,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/q4-0.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/q4-0.json"
+      ],
+      "reference_sha256": "abbd185f0c94911082d1186556845f696204bf7917d5cfeec6fb4ae5cf236a17"
+    },
+    {
+      "name": "q4-k",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "60ac269335ec456b1be4786b4a189e7a141632697e08b1e2b353472225ba4721",
+      "model_bytes": 719456,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/q4-k.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/q4-k.json"
+      ],
+      "reference_sha256": "cf9306bab8a0f68023f09cbad2e6b3e0b614b9517eea12a42d309e14c4295b06"
+    },
+    {
+      "name": "grouped-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "519585964f3e6eb24406bae68f223c995663675a5d1fc2047b048eec5e13356c",
+      "model_bytes": 411776,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/grouped-query.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/grouped-query.json"
+      ],
+      "reference_sha256": "d8b5cbd06105d90c075dbcaf0c0c65dbaa145b38d675d277ba57b8d6864220a7"
+    },
+    {
+      "name": "multi-query",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "ed4c42980f3448a46d9c8884f4a1e8e903f2f3faedbe1390769cbdb1f4f995fc",
+      "model_bytes": 395136,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/multi-query.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/multi-query.json"
+      ],
+      "reference_sha256": "c87d6977b55dc036b718366c93736b20ba6dcfeb56a14602ca1f987e998de9f9"
+    },
+    {
+      "name": "single-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "54ac42620544ed1700a3a43111984e98ebf02874173c40eda0999abc8a0ad1b7",
+      "model_bytes": 310496,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/single-layer.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/single-layer.json"
+      ],
+      "reference_sha256": "31b3ced1f3bef7915cfd1d3b3cfd33863b0ad75049810fa54b30cc30df88549c"
+    },
+    {
+      "name": "three-layer",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "26ba8441745b4be259ce47986ecf2eb35644060e03c17248cca7ab4ae5e62c1c",
+      "model_bytes": 579584,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/three-layer.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/three-layer.json"
+      ],
+      "reference_sha256": "8bae492c842dbd7e4cc29a43962790a53018097920d766123398552e3f419273"
+    },
+    {
+      "name": "odd-head-width",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "f4b4e9f304e59bc8539483c37fc41d79f676748617d5cbb75f4226da10cb6230",
+      "model_bytes": 410688,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/odd-head-width.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/odd-head-width.json"
+      ],
+      "reference_sha256": "f64b440837cf86eed8ba1dcd7630726a567c59e8c0d541a51510c5d92f3a3c56"
+    },
+    {
+      "name": "different-epsilon",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "698674616a2f75d86d7540ceeaab7622cae76d0eafd8d7f3b1ba5b85ad2c7a2f",
+      "model_bytes": 445056,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/different-epsilon.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/different-epsilon.json"
+      ],
+      "reference_sha256": "ee61ab2be357044dca2cda3dc4974ab7d8d78b298a11fbb949c334095aa09f50"
+    },
+    {
+      "name": "implicit-kv",
+      "rust_scope": "supported",
+      "exit_code": 0,
+      "model_sha256": "7869f1d0a8843d14da70e33bc4619b66716d5e45bef3bc0997260a96d44ab2ca",
+      "model_bytes": 444992,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/implicit-kv.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/implicit-kv.json"
+      ],
+      "reference_sha256": "fb940d7e1a6147bafe5257f6c900b9851e3e678338a7affda2ce1abaeb931e87"
+    },
+    {
+      "name": "norm-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "model_sha256": "8a1477bec594c2a5e2a288de58f35713f19824270fe548477540de906ed4585e",
+      "model_bytes": 444928,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/norm-f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/norm-f16.json"
+      ]
+    },
+    {
+      "name": "bias-f16",
+      "rust_scope": "unsupported",
+      "exit_code": -6,
+      "model_sha256": "7717d85c0df03eefda3d53a47876f359a37f29256f3e39e0c6b0e82ea56fd236",
+      "model_bytes": 444672,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/bias-f16.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/bias-f16.json"
+      ]
+    },
+    {
+      "name": "missing-position",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "53bfe370492f01a13e388b3b81ed94e78389f947bd5a9970ac2b8a905ab1ef20",
+      "model_bytes": 412224,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/missing-position.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/missing-position.json"
+      ]
+    },
+    {
+      "name": "missing-norm-bias",
+      "rust_scope": "invalid",
+      "exit_code": 1,
+      "model_sha256": "09d45988c33c9b6909749050fd9b730580a9e2ad0de79f303fa8defa7f47a624",
+      "model_bytes": 444736,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/missing-norm-bias.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/missing-norm-bias.json"
+      ]
+    },
+    {
+      "name": "noncausal",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "a745d82559b4c7e81c8ff748740d851946b29bc32f3fed6a4e2808e0cf30318c",
+      "model_bytes": 445056,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/noncausal.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/noncausal.json"
+      ],
+      "reference_sha256": "fb940d7e1a6147bafe5257f6c900b9851e3e678338a7affda2ce1abaeb931e87"
+    },
+    {
+      "name": "head-array",
+      "rust_scope": "unsupported",
+      "exit_code": 0,
+      "model_sha256": "5c7bd48a05794b703a422465d71ddf0b2acb1348de5a3a87c774b794fd7e5ae2",
+      "model_bytes": 445056,
+      "args": [
+        "/mnt/c/Users/adyba/rust-llama-reference/sharded-gguf-port/native-build-linux/shard-inference-oracle",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-inputs/head-array.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/request.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/tiny-native-gnu/head-array.json"
+      ],
+      "reference_sha256": "fb940d7e1a6147bafe5257f6c900b9851e3e678338a7affda2ce1abaeb931e87"
+    }
+  ],
+  "utc": "2026-11-11T08:34:34Z"
+}

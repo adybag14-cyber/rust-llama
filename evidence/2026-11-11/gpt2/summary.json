@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "architecture": "gpt2",
+  "scope": "Dense causal learned-position GPT2 in the Rust decoder Context/inference path; not a NativeContext/FFI GPT2 or GPU claim.",
+  "reports": {
+    "windows": {
+      "all_six_stages_passed": true,
+      "runtime_debug_tests": 79,
+      "metrics": {
+        "debug-gpt2": {
+          "native_profile": "msvc",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-gpt2": {
+          "native_profile": "msvc",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-pretrained": {
+          "native_profile": "msvc",
+          "rows": 33,
+          "logits": 1658481,
+          "exact_bits": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        }
+      }
+    },
+    "linux": {
+      "all_six_stages_passed": true,
+      "runtime_debug_tests": 80,
+      "metrics": {
+        "debug-gpt2": {
+          "native_profile": "gnu",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-gpt2": {
+          "native_profile": "gnu",
+          "rows": 434,
+          "logits": 222208,
+          "exact_bits": 222208,
+          "greedy_ids": 168,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        },
+        "release-pretrained": {
+          "native_profile": "gnu",
+          "rows": 33,
+          "logits": 1658481,
+          "exact_bits": 1658481,
+          "greedy_ids": 24,
+          "maximum_absolute_error": 0.0,
+          "maximum_budget_fraction": 0.0
+        }
+      }
+    }
+  },
+  "synthetic_input_cases": {
+    "supported": 14,
+    "unsupported": 4,
+    "invalid": 2
+  },
+  "model": {
+    "repository": "openai-community/gpt2",
+    "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+    "source_safetensors_sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707",
+    "gguf_bytes": 252470528,
+    "gguf_sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7",
+    "input_adaptation": "Exactly twelve nonlearned static causal masks removed from external derived input; all retained tensors individually hashed and unchanged."
+  },
+  "retained_failures": [
+    "Frozen converter fails on official h.0.attn.bias static mask (convert-original.log).",
+    "Windows v1 runtime test expected old registry executable count five; corrected to six. No numerical expectations changed.",
+    "Original MSVC/GNU aborts with F16 norm/bias inputs and rejects missing required tensors; stderr/exit reports retained."
+  ],
+  "independence": "Original source outputs captured before Rust numeric comparisons. Original raw JSONs remain outside product; repository stores losslessly packed original f32 bytes plus command/source/library hashes.",
+  "limitations": [
+    "Only Windows x86_64 MSVC and Linux x86_64 GNU native profile parity measured.",
+    "Pretrained evidence is one official GPT2 124M F16 model, three prompts and 24 greedy tokens.",
+    "Per-layer arrays, noncausal, PRISM/NextN and unknown tensor paths explicitly unsupported.",
+    "Full repository release gates remain open."
+  ]
+}

@@ -12,6 +12,7 @@ pub mod adapters;
 pub mod bert;
 pub mod context;
 pub mod fixtures;
+pub mod gpt2;
 pub mod llama;
 pub mod mamba;
 pub mod math;
@@ -28,6 +29,7 @@ pub use context::{
     OutputSelection, TokenOutput,
 };
 pub use fixtures::{SmokeReport, smoke_demo};
+pub use gpt2::{Gpt2Config, Gpt2Layer, Gpt2Model, Gpt2Weights};
 pub use llama::{LlamaConfig, LlamaLayer, LlamaModel, LlamaWeights};
 pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
 pub use math::Matrix;
@@ -93,6 +95,7 @@ pub enum Model {
     Mamba(MambaModel),
     Qwen2(Qwen2Model),
     Qwen3(Qwen3Model),
+    Gpt2(Gpt2Model),
 }
 impl Model {
     pub fn architecture(&self) -> &'static registry::Architecture {
@@ -101,6 +104,7 @@ impl Model {
             Self::Mamba(_) => &registry::ARCHITECTURES[60],
             Self::Qwen2(_) => &registry::ARCHITECTURES[24],
             Self::Qwen3(_) => &registry::ARCHITECTURES[28],
+            Self::Gpt2(_) => &registry::ARCHITECTURES[7],
         }
     }
     pub fn width(&self) -> usize {
@@ -109,6 +113,7 @@ impl Model {
             Self::Mamba(m) => m.config().width,
             Self::Qwen2(m) => m.config().width,
             Self::Qwen3(m) => m.config().width,
+            Self::Gpt2(m) => m.config().width,
         }
     }
     pub fn vocabulary(&self) -> usize {
@@ -117,6 +122,7 @@ impl Model {
             Self::Mamba(m) => m.config().vocabulary,
             Self::Qwen2(m) => m.config().vocabulary,
             Self::Qwen3(m) => m.config().vocabulary,
+            Self::Gpt2(m) => m.config().vocabulary,
         }
     }
     pub fn max_context(&self) -> usize {
@@ -125,6 +131,7 @@ impl Model {
             Self::Mamba(m) => m.config().max_context,
             Self::Qwen2(m) => m.config().max_context,
             Self::Qwen3(m) => m.config().max_context,
+            Self::Gpt2(m) => m.config().max_context,
         }
     }
     pub fn layer_count(&self) -> usize {
@@ -133,6 +140,7 @@ impl Model {
             Self::Mamba(m) => m.layer_count(),
             Self::Qwen2(m) => m.layer_count(),
             Self::Qwen3(m) => m.layer_count(),
+            Self::Gpt2(m) => m.layer_count(),
         }
     }
     pub fn fingerprint(&self) -> u64 {
@@ -141,6 +149,7 @@ impl Model {
             Self::Mamba(m) => m.fingerprint(),
             Self::Qwen2(m) => m.fingerprint(),
             Self::Qwen3(m) => m.fingerprint(),
+            Self::Gpt2(m) => m.fingerprint(),
         }
     }
     pub fn weight(&self, name: &str) -> Option<&Matrix> {
@@ -149,6 +158,7 @@ impl Model {
             Self::Mamba(m) => m.weight(name),
             Self::Qwen2(m) => m.weight(name),
             Self::Qwen3(m) => m.weight(name),
+            Self::Gpt2(m) => m.weight(name),
         }
     }
     pub(crate) fn embedding(&self, token: u32) -> Result<Vec<f32>> {
@@ -157,6 +167,7 @@ impl Model {
             Self::Mamba(m) => m.embedding(token),
             Self::Qwen2(m) => m.embedding(token),
             Self::Qwen3(m) => m.embedding(token),
+            Self::Gpt2(m) => m.embedding(token),
         }
     }
 }
