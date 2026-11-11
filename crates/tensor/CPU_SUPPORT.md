@@ -2,7 +2,7 @@
 
 This table inventories all **102** frozen operation IDs. **94 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **7 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs`, `src/cpu_rope_back.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs`, `src/cpu_rope_back.rs`, `src/cpu_softmax.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -52,9 +52,9 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 43 | `DIAG` | Implemented slice | F32 | ne1 == 1; supports batches. |
 | 44 | `DIAG_MASK_INF` | Implemented slice | F32 | Explicit causal past length. |
 | 45 | `DIAG_MASK_ZERO` | Implemented slice | F32 | Explicit causal past length. |
-| 46 | `SOFT_MAX` | Implemented slice | F32 | Scalar scale only; auxiliary masks, sinks and ALiBi remain pending. |
+| 46 | `SOFT_MAX` | Implemented slice | F32 logits, optional F32/F16 mask and F32 sinks → F32 | Extended scale, ALiBi, mask head/batch broadcasts and source physical sink-prefix reads; contiguous logits/masks and checked finite normalization. See ATTENTION_EXT.md. |
 | 47 | `SOFT_MAX_BACK` | Implemented slice | F32 | Explicit backward kernels; softmax scale supported, positive max-bias/ALiBi derivative remains absent. |
-| 48 | `ROPE` | Implemented slice | F32 | Basic normal and NeoX modes, positions/base/scale; extended/multimodal/YaRN modes remain pending. |
+| 48 | `ROPE` | Implemented slice | F32/F16 + I32 positions, optional F32 factors → original dtype | Extended five CPU modes, YaRN/truncate, attention scaling, offsets and source flat prefix reads through RopeExt; existing basic Rope API retained. See ATTENTION_EXT.md. |
 | 49 | `ROPE_BACK` | Implemented slice | F32/F16 + I32 positions, optional F32 factors → original dtype | All five CPU modes, YaRN/truncate, attention scaling, offsets and source flat prefix reads; finite rotated values/coefficients/products and explicit bounds. See ROPE_BACK.md. |
 | 50 | `CLAMP` | Implemented slice | F32 | Finite ordered limits. |
 | 51 | `CONV_TRANSPOSE_1D` | Implemented slice | F32/F16 kernel × F32 → F32 | Matrix input, no padding, unit dilation, positive stride; F32 products/F64 channel dots then F32 scatter-add. |
@@ -135,7 +135,7 @@ The README lists every native CPU conversion destination and CPY pair. Missing C
 
 ## Still open
 
-Operation IDs marked pending, unsupported dtype combinations within implemented IDs, advanced attention/RoPE modes, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The retained portable ERF is a mathematical fallback, not a foreign-libm emulator. Exact provider equivalence outside the exercised x86_64 dynamic-UCRT/glibc profiles remains open; the new same-profile byte gate is separate from historical numerical comparisons.
+Operation IDs marked pending, unsupported dtype combinations within implemented IDs, remaining attention/RoPE domains, allocation planning, automatic differentiation, optimizer integration, CPU parallel scheduling, SIMD optimization, imported/writable/device storage and asynchronous events remain open. The retained portable ERF is a mathematical fallback, not a foreign-libm emulator. Exact provider equivalence outside the exercised x86_64 dynamic-UCRT/glibc profiles remains open; the new same-profile byte gate is separate from historical numerical comparisons.
 
 ## Convolution, extraction, pooling and resize bounds
 
@@ -197,3 +197,11 @@ returns an explicit unsupported error; source compiler payload selection is not
 replaced with an invented portable policy. Input storage remains immutable and
 cancellation never publishes partial output. General CPU scheduling and other
 ISA profiles remain open.
+
+## Extended forward rotary and softmax
+
+Forward extended RoPE and masked/sink/ALiBi softmax now have independently captured
+native-profile exact-byte gates. Both reuse the established source arithmetic
+policies and preserve their checked storage/finite-domain boundaries. Backward
+softmax nonzero bias remains an original assertion and is not advertised as
+supported. See [the complete contract](ATTENTION_EXT.md).

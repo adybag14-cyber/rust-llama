@@ -1,0 +1,103 @@
+{
+  "profile": "msvc",
+  "finished_utc": "2026-11-11T13:00:34.266498+00:00",
+  "restored_original_bytes": true,
+  "mutations": [
+    {
+      "name": "forward-sign",
+      "file": "crates/tensor/src/cpu_rope_back.rs",
+      "original_sha256": "5b9214b75d757513ecac9236f88c30247175c3f95134018456b5bd0339681ba0",
+      "mutant_sha256": "9149c30a8fb17a98652068e45f1f38fead9f19c57a7b3d583eac8c61160a2823",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "rope_forward",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "forward-sign.stdout.txt",
+      "stderr": "forward-sign.stderr.txt",
+      "stdout_sha256": "7533eb1dd2c95e7a373e056733091c823fefc828cba24fc2f1743a9bd7927118",
+      "stderr_sha256": "bdc43d2f5fd529d9c8bf12be229ebf9d44248aedd08e0992b2e4020663f22cca"
+    },
+    {
+      "name": "alibi-disabled",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "9c324af8e613d2f0db2eead74c8f822f2b19576087354db0d04d61061c7e2b8c",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "alibi-disabled.stdout.txt",
+      "stderr": "alibi-disabled.stderr.txt",
+      "stdout_sha256": "cfdea47375817a502e4aa60e42aa8a9935cc7590a686474780b50ca5227c596b",
+      "stderr_sha256": "ccc8971bd6a158930a9c35121f7acd021a45ab9cb3224d74070905a310b87151"
+    },
+    {
+      "name": "sink-denominator-removed",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "6e9cfd8a56f8d93b6ac79ce5328ed7d90ce08bb6763fca3c4822b1155a00322f",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "sink-denominator-removed.stdout.txt",
+      "stderr": "sink-denominator-removed.stderr.txt",
+      "stdout_sha256": "6f720141a445570996263e282b92d9c8c133bcc38fa17fcaa612120e95a290d7",
+      "stderr_sha256": "2a468d5e5e127fe6109ab3800907fdc40be1af63d0a1bfffd9d7c6270e2ade54"
+    },
+    {
+      "name": "grouped-instead-of-periodic-mask",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "5da336291f9e6bae7e334be6264a0dce28417f6d6884224a6ef88e14b5db57cd",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "grouped-instead-of-periodic-mask.stdout.txt",
+      "stderr": "grouped-instead-of-periodic-mask.stderr.txt",
+      "stdout_sha256": "9fbab3b46c813b82007cab01c75f902b4c7093fa63cc564873dac6aa358e7a6d",
+      "stderr_sha256": "032d89ccb3a639e49b38dd9582f97fcea78f993d09781739541b49d4a68b51e7"
+    }
+  ]
+}

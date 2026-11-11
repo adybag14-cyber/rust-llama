@@ -12,6 +12,7 @@ mod cpu_lightning;
 mod cpu_optimizer;
 mod cpu_recurrent;
 mod cpu_rope_back;
+mod cpu_softmax;
 mod cpu_vision_loss;
 mod graph;
 mod native_sort;
@@ -20,6 +21,8 @@ pub use cpu_custom::{CustomKernel, CustomOptions, CustomTask};
 pub use cpu_flash::{FlashAttentionError, FlashAttentionOptions};
 pub use cpu_optimizer::{AdamWState, OptimizerLimits, adamw_step, sgd_step};
 pub use cpu_rope_back::{RopeBackMode, RopeBackOptions};
+/// Extended forward rotary modes share the frozen backward numeric IDs.
+pub use cpu_rope_back::{RopeBackMode as RopeExtMode, RopeBackOptions as RopeExtOptions};
 pub use graph::{
     AdamWNodes, Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode,
     SortOrder, Triangle,

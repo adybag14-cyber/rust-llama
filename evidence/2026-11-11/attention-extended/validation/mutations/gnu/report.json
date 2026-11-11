@@ -1,0 +1,103 @@
+{
+  "profile": "gnu",
+  "finished_utc": "2026-11-11T13:00:54.326480+00:00",
+  "restored_original_bytes": true,
+  "mutations": [
+    {
+      "name": "forward-sign",
+      "file": "crates/tensor/src/cpu_rope_back.rs",
+      "original_sha256": "5b9214b75d757513ecac9236f88c30247175c3f95134018456b5bd0339681ba0",
+      "mutant_sha256": "9149c30a8fb17a98652068e45f1f38fead9f19c57a7b3d583eac8c61160a2823",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "rope_forward",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "forward-sign.stdout.txt",
+      "stderr": "forward-sign.stderr.txt",
+      "stdout_sha256": "3a54f5f15636044f50967a883952027b0e5c8779ccd615f2598859a65a3076f1",
+      "stderr_sha256": "4d259527f5f1619e7a329da9f3fbf60eb7eb6028d15736612c5940f55c67179a"
+    },
+    {
+      "name": "alibi-disabled",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "9c324af8e613d2f0db2eead74c8f822f2b19576087354db0d04d61061c7e2b8c",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "alibi-disabled.stdout.txt",
+      "stderr": "alibi-disabled.stderr.txt",
+      "stdout_sha256": "4a0de22c12ea4a88fa61f92b7b4accbea349871b6ac101f4fb330ffe8b463135",
+      "stderr_sha256": "61a17f89425b86664ba7b86b0499eda9aaa9157ed46b4b84df131ad46a6d5bd4"
+    },
+    {
+      "name": "sink-denominator-removed",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "6e9cfd8a56f8d93b6ac79ce5328ed7d90ce08bb6763fca3c4822b1155a00322f",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "sink-denominator-removed.stdout.txt",
+      "stderr": "sink-denominator-removed.stderr.txt",
+      "stdout_sha256": "dfa1bedd73e2e810f6b681665ae8ce7b6c8ef42361fbac35028d825784d7682c",
+      "stderr_sha256": "f9bb432ef62e383685245cf71e7b5fc81c277d50cc3c580195078a93ccc7b615"
+    },
+    {
+      "name": "grouped-instead-of-periodic-mask",
+      "file": "crates/tensor/src/cpu_softmax.rs",
+      "original_sha256": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+      "mutant_sha256": "5da336291f9e6bae7e334be6264a0dce28417f6d6884224a6ef88e14b5db57cd",
+      "argv": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-tensor",
+        "--offline",
+        "--locked",
+        "--test",
+        "softmax_ext",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "detected_by_test_failure": true,
+      "stdout": "grouped-instead-of-periodic-mask.stdout.txt",
+      "stderr": "grouped-instead-of-periodic-mask.stderr.txt",
+      "stdout_sha256": "129e0fb5a891e40db851b006511b636d1dfb1ccd65ad2287bb1e04f070e0d5ce",
+      "stderr_sha256": "8b8da173d672a2b68d4c523149c5ff9f70d0fd4fe30a60699eeffb5dcbeac797"
+    }
+  ]
+}

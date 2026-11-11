@@ -99,6 +99,18 @@ pub enum Op {
     OptStepSgd {
         limits: crate::OptimizerLimits,
     },
+    /// Original extended forward rotation: values, I32 positions, optional F32 factors.
+    RopeExt {
+        options: crate::RopeExtOptions,
+        with_factors: bool,
+    },
+    /// F32 logits, optional F32/F16 mask, optional F32 sinks.
+    SoftmaxExt {
+        scale: f32,
+        max_bias: f32,
+        with_mask: bool,
+        with_sinks: bool,
+    },
     /// Original backward rotation: values, I32 positions, optional F32 factors.
     RopeBack {
         options: RopeBackOptions,
@@ -446,6 +458,8 @@ impl Op {
             Custom { .. } => OpCode::CUSTOM,
             OptStepAdamW { .. } => OpCode::OPT_STEP_ADAMW,
             OptStepSgd { .. } => OpCode::OPT_STEP_SGD,
+            RopeExt { .. } => OpCode::ROPE,
+            SoftmaxExt { .. } => OpCode::SOFT_MAX,
             RopeBack { .. } => OpCode::ROPE_BACK,
             LightningIndexer => OpCode::LIGHTNING_INDEXER,
             GatedDeltaNet { .. } => OpCode::GATED_DELTA_NET,
@@ -557,7 +571,12 @@ impl Op {
             Self::Custom { input_count, .. } => *input_count,
             Self::OptStepAdamW { .. } => 5,
             Self::OptStepSgd { .. } => 3,
-            Self::RopeBack { with_factors, .. } => {
+            Self::SoftmaxExt {
+                with_mask,
+                with_sinks,
+                ..
+            } => 1 + usize::from(*with_mask) + usize::from(*with_sinks),
+            Self::RopeExt { with_factors, .. } | Self::RopeBack { with_factors, .. } => {
                 if *with_factors {
                     3
                 } else {

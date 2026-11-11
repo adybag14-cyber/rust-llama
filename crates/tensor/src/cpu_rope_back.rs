@@ -1,4 +1,4 @@
-//! Original F32/F16 backward rotary kernels and checked extended parameters.
+//! Shared original F32/F16 forward/backward rotary kernels and checked parameters.
 //! GGML MIT, copyright (c) 2023-2026 The ggml authors.
 //! YaRN equations: MIT, copyright (c) 2023 Jeffrey Quesnelle and Bowen Peng.
 use crate::graph::check_cancel;
@@ -16,7 +16,7 @@ pub enum RopeBackMode {
     Interleaved = 40,
 }
 
-/// Parameters for the original backward rotation, independent of forward APIs.
+/// Shared original rotary parameters; the operation selects the direction.
 #[derive(Clone, Debug)]
 pub struct RopeBackOptions {
     pub dimensions: usize,
@@ -93,9 +93,7 @@ fn multi(mode: RopeBackMode) -> bool {
     !matches!(mode, RopeBackMode::Normal | RopeBackMode::NeoX)
 }
 fn numerical_boundary() -> TensorError {
-    TensorError::Unsupported(
-        "RoPE backward requires finite rotated values, coefficients and F32 products",
-    )
+    TensorError::Unsupported("RoPE requires finite rotated values, coefficients and F32 products")
 }
 fn validate_frequencies(p: &RopeBackOptions) -> Result<()> {
     if !p.frequency_base.is_finite()
@@ -105,7 +103,7 @@ fn validate_frequencies(p: &RopeBackOptions) -> Result<()> {
         || !p.attention_factor.is_finite()
     {
         return Err(TensorError::Unsupported(
-            "RoPE backward frequency parameters are outside the finite domain",
+            "RoPE frequency parameters are outside the finite domain",
         ));
     }
     // The source computes these fields even when ext=0, but only uses their
@@ -119,7 +117,7 @@ fn validate_frequencies(p: &RopeBackOptions) -> Result<()> {
             || p.beta_slow <= 0.0)
     {
         return Err(TensorError::Unsupported(
-            "active backward YaRN requires positive context, scale and finite betas",
+            "active YaRN requires positive context, scale and finite betas",
         ));
     }
     Ok(())
@@ -135,6 +133,7 @@ fn cache(
     positions: [f32; 4],
     factors: Option<&[u8]>,
     values: &mut [f32],
+    backward: bool,
 ) -> Result<()> {
     let theta_scale = p.frequency_base.powf(-2.0 / p.dimensions as f32);
     let mut theta = positions;
@@ -201,7 +200,7 @@ fn cache(
         };
         if pair < used_pairs && (!ff.is_finite() || ff == 0.0) {
             return Err(TensorError::Unsupported(
-                "used backward RoPE frequency factors must be finite and nonzero",
+                "used RoPE frequency factors must be finite and nonzero",
             ));
         }
         let extrapolated = angle_base / ff;
@@ -223,7 +222,8 @@ fn cache(
             magnitude *= 1.0 + 0.1 * (1.0 / p.frequency_scale).ln();
         }
         let cosine = angle.cos() * magnitude;
-        let sine = -(angle.sin() * magnitude);
+        let sine = angle.sin() * magnitude;
+        let sine = if backward { -sine } else { sine };
         if pair < used_pairs && (!cosine.is_finite() || !sine.is_finite()) {
             return Err(numerical_boundary());
         }
@@ -236,17 +236,18 @@ fn cache(
     Ok(())
 }
 
-pub(super) fn evaluate(
+fn evaluate_direction(
     p: &RopeBackOptions,
     src: &[&Tensor],
     cancel: &AtomicBool,
+    backward: bool,
 ) -> Result<Tensor> {
     let a = src[0];
     let positions = src[1];
     let factors = src.get(2).copied();
     if !matches!(a.dtype(), DType::F32 | DType::F16) {
         return Err(TensorError::Unsupported(
-            "original RoPE backward supports only F32 and F16",
+            "original RoPE supports only F32 and F16",
         ));
     }
     if positions.dtype() != DType::I32 {
@@ -258,7 +259,7 @@ pub(super) fn evaluate(
     for tensor in src {
         if tensor.shape().into_iter().any(|n| n > i32::MAX as usize) {
             return Err(TensorError::Parameters(
-                "RoPE backward dimensions must fit signed I32",
+                "RoPE dimensions must fit signed I32",
             ));
         }
     }
@@ -268,7 +269,7 @@ pub(super) fn evaluate(
         .any(|v| v > i32::MAX as usize)
     {
         return Err(TensorError::Parameters(
-            "RoPE backward integer parameters must fit signed I32",
+            "RoPE integer parameters must fit signed I32",
         ));
     }
     let [width, heads, tokens, batches] = a.shape();
@@ -279,24 +280,24 @@ pub(super) fn evaluate(
         || add(p.offset, p.dimensions)? > width
     {
         return Err(TensorError::Parameters(
-            "RoPE backward needs positive even dimensions, even width/offset and a contained rotation",
+            "RoPE needs positive even dimensions, even width/offset and a contained rotation",
         ));
     }
     if p.mode == RopeBackMode::Vision && (p.dimensions != width / 2 || p.offset != 0) {
         return Err(TensorError::Parameters(
-            "vision RoPE backward requires half-width dimensions and zero offset",
+            "vision RoPE requires half-width dimensions and zero offset",
         ));
     }
     let sections = p.sections.iter().try_fold(0usize, |n, &v| add(n, v))?;
     if multi(p.mode) && (p.sections[..3].iter().all(|&v| v == 0) || sections > width) {
         return Err(TensorError::Parameters(
-            "multi-axis backward RoPE requires nonzero T/H/W sections with a bounded total",
+            "multi-axis RoPE requires nonzero T/H/W sections with a bounded total",
         ));
     }
     let position_count = mul(tokens, if multi(p.mode) { 4 } else { 1 })?;
     if positions.shape() != [position_count, 1, 1, 1] {
         return Err(TensorError::Shape(
-            "RoPE backward position vector does not match tokens and mode",
+            "RoPE position vector does not match tokens and mode",
         ));
     }
     if let Some(factors) = factors {
@@ -308,7 +309,7 @@ pub(super) fn evaluate(
         }
         if factors.shape()[0] < p.dimensions / 2 {
             return Err(TensorError::Shape(
-                "RoPE backward frequency tensor has too few constructor entries",
+                "RoPE frequency tensor has too few constructor entries",
             ));
         }
     }
@@ -319,13 +320,13 @@ pub(super) fn evaluate(
     }
     if mul(mul(heads, tokens)?, batches)? > i32::MAX as usize {
         return Err(TensorError::Parameters(
-            "RoPE backward row count must fit signed I32",
+            "RoPE row count must fit signed I32",
         ));
     }
     let size = a.dtype().type_size();
     if a.desc().nb[0] != size || a.desc().nb.iter().any(|n| !n.is_multiple_of(size)) {
         return Err(TensorError::Layout(
-            "RoPE backward requires contiguous inner rows and aligned scalar strides",
+            "RoPE requires contiguous inner rows and aligned scalar strides",
         ));
     }
     let output_bytes = desc.byte_span()?;
@@ -336,7 +337,7 @@ pub(super) fn evaluate(
         || work > 256 * 1024 * 1024
     {
         return Err(TensorError::Unsupported(
-            "RoPE backward exceeds the local 256 MiB allocation or 256 Mi scalar-work limit",
+            "RoPE exceeds the local 256 MiB allocation or 256 Mi scalar-work limit",
         ));
     }
     validate_frequencies(p)?;
@@ -369,7 +370,7 @@ pub(super) fn evaluate(
                     bytes_at(pos, offset, 4)?.try_into().expect("position word"),
                 ) as f32;
             }
-            cache(p, width, coordinates, factors, &mut trig)?;
+            cache(p, width, coordinates, factors, &mut trig, backward)?;
             for head in 0..heads {
                 check_cancel(cancel)?;
                 let offset = add(
@@ -413,4 +414,19 @@ pub(super) fn evaluate(
         }
     }
     Tensor::from_bytes(desc, output)
+}
+
+pub(super) fn evaluate(
+    p: &RopeBackOptions,
+    src: &[&Tensor],
+    cancel: &AtomicBool,
+) -> Result<Tensor> {
+    evaluate_direction(p, src, cancel, true)
+}
+pub(super) fn evaluate_forward(
+    p: &RopeBackOptions,
+    src: &[&Tensor],
+    cancel: &AtomicBool,
+) -> Result<Tensor> {
+    evaluate_direction(p, src, cancel, false)
 }

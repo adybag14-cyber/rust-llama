@@ -1,0 +1,78 @@
+{
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "reference": "Unchanged original ggml_soft_max_ext/add_sinks/back constructors and CPU execution; captured before new Rust code. No Rust code is read or executed.",
+  "profile": "gnu",
+  "host": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "cohort": "main",
+  "cases": 2122,
+  "admitted_cases": 2122,
+  "output_bytes": 7279720,
+  "admitted_output_bytes": 7279720,
+  "by_operation": {
+    "softmax_ext": 2018,
+    "softmax_back": 104
+  },
+  "file": {
+    "name": "softmax-ext-reference.bin",
+    "bytes": 18076903,
+    "sha256": "ecfb9c50e9f9ef0ebc9d0c74fff397dbf665adb64a2e6137aeee9f280be461a9"
+  },
+  "case_ledger": {
+    "name": "cases.jsonl",
+    "bytes": 671069,
+    "sha256": "6eb87ae900c10f4a428cc1a809f52372c0913c52eaaf5204c94dcee8875f745d"
+  },
+  "sources": {
+    "continue-20261111-next/attention-oracle/capture_softmax.py": {
+      "bytes": 8724,
+      "sha256": "69ea3c2c14cf9c380c0a0d1cda38b717c1bd9c2420545f89e6d9fedd9cd82fef"
+    },
+    "continue-20261111-next/attention-oracle/capture.py": {
+      "bytes": 10245,
+      "sha256": "2986b4348b9ccaf053ffaf563b2a873a1a808d847ef6e5550d95be5eecd777c7"
+    },
+    "build-ggml-linux-llama/bin/libggml-base.so": {
+      "bytes": 937384,
+      "sha256": "868d7c7020ac5e26210d83c469c8daf195d9612d3f005cdf7ccdf8870648024c"
+    },
+    "build-ggml-linux-llama/bin/libggml-cpu.so": {
+      "bytes": 976464,
+      "sha256": "669c886fd7045bb8a4adcd7ff0c7e177f378e20db8b86edfefcfb9433697321b"
+    },
+    "llama.cpp-master/ggml/src/ggml.c": {
+      "bytes": 267312,
+      "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ggml-cpu.c": {
+      "bytes": 133995,
+      "sha256": "aeae3376375667dd84fd35f5d4d413015b3f3c24985eef5399b94c337bdf84bd"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/ops.cpp": {
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.cpp": {
+      "bytes": 32937,
+      "sha256": "2422d2ab0ce6f9c1b78f478656bc1a2864d1374f8a339de127584c7349a4a869"
+    },
+    "llama.cpp-master/ggml/src/ggml-cpu/vec.h": {
+      "bytes": 72838,
+      "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6"
+    },
+    "llama.cpp-master/ggml/src/ggml-impl.h": {
+      "bytes": 28187,
+      "sha256": "75465b01eba2b1ecae8634898508e71294fbff0f7f96ee9ad2caf5bae5b6c5fd"
+    },
+    "llama.cpp-master/ggml/include/ggml.h": {
+      "bytes": 119446,
+      "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+    }
+  },
+  "contracts": [
+    "F32 logits and F16/F32 masks; source mask broadcast and physical sink-prefix semantics.",
+    "One/three native workers have disjoint rows; Rust need not claim parallel execution.",
+    "Native release nonfinite outputs are retained as explicit checked-error boundaries.",
+    "Backward nonzero max_bias is independently probed and remains unsupported because original asserts.",
+    "Original GGML MIT; oracle scripts and reference libraries remain outside product."
+  ]
+}

@@ -1,0 +1,233 @@
+
+running 5 tests
+test cpu_flash::tests::short_flat_sink_backing_is_rejected_without_reading ... ok
+test cpu_flash::tests::graph_arity_and_row_map_failures_are_checked ... ok
+test cpu_flash::tests::empty_output_cannot_bypass_source_signed_dimension_bounds ... ok
+test cpu_flash::tests::actual_workers_and_atomic_local_budget_errors ... ok
+96910 independent 80-digit ERF checks including both signs; maximum binary32 absolute rounding error 0.00000002980146340814116
+test cpu_extra::accuracy_tests::erf_rounding_matches_independent_80_digit_references ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 6 tests
+test constructors_check_source_arity_and_keep_original_ids ... ok
+test hyperconnection_shapes_and_scalar_alignment_are_checked ... ok
+test invalid_parameters_and_unwritten_snapshot_slots_are_rejected ... ok
+test cancellation_and_checked_failures_preserve_aliased_inputs ... ok
+test delta_checks_group_shapes_physical_rows_and_state_layouts ... ok
+test snapshot_and_broadcast_output_amplification_is_bounded ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test amplified_forward_rotary_output_is_rejected_before_allocation ... ok
+test optional_input_arity_and_frozen_operation_ids_are_preserved ... ok
+test mask_types_noncontiguity_and_sink_backing_spans_are_checked ... ok
+test original_constructor_failures_are_checked_errors ... ok
+test cancellation_and_later_row_failure_leave_input_bytes_unchanged ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+20 source-native backward-pool NaN cases; output bytes 1200; differing cases 0; differing values 0; finite differing values 0
+test native_overlapping_pool_gradients_preserve_nan_payload_order ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+original graph cases=25, compared bytes=422, mismatches=0
+test native_signed_convolution_sizes_and_fractional_pool_padding_keep_original_geometry ... ok
+original graph cases=490, compared bytes=4104, mismatches=0
+test native_reduction_payloads_and_unit_axis_dispatch_preserve_source_bits ... ok
+original graph cases=446, compared bytes=524520, mismatches=0
+test convolution_extraction_pooling_resize_match_original_graph_bytes_and_strides ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 4 tests
+test cancellation_precedes_allocation_and_each_new_operation_keeps_input_storage ... ok
+test flat_native_addressing_cannot_escape_a_declared_view_or_mutate_aliases ... ok
+test image_kernels_reject_native_undefined_dimensions_and_parameters_before_work ... ok
+test packed_channel_contracts_and_actual_source_dtypes_are_enforced ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test views_zero_input_nodes_and_i64_storage_obey_graph_contract ... ok
+test empty_and_extreme_descriptors_do_not_bypass_checked_arithmetic ... ok
+test packed_rhs_matmul_is_not_requantized_and_scalar_nonfinite_is_preserved ... ok
+test checked_extension_parameters_and_native_undefined_addresses_are_errors ... ok
+297 native graph cases; 256233 bit-exact checked values; 170260 transcendental values; 0 transcendental bit differences; 0 require final 16-bit rounding envelope; max F32 error 0; max all-dtype error 0. Exact platform ERF parity remains open.
+test extended_cpu_graphs_match_independent_native_outputs ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 3 tests
+test empty_nodes_still_validate_source_constructor_fields ... ok
+test captured_original_constructor_and_cpu_rejections ... ok
+test original_graph_contracts_and_exact_raw_outputs ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+
+running 1 test
+test sealed_dense_and_mapped_nan_payloads_survive_the_dag_boundary ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+
+running 4 tests
+test indexed_operations_observe_graph_cancellation_before_any_write ... ok
+test row_writes_are_transactional_and_preserve_aliases_and_layout ... ok
+test undefined_cpu_inputs_and_missing_converters_are_explicit_errors ... ok
+native indexing cases=890, exact compared bytes=599152, failures=0
+test indexing_graphs_match_independent_platform_native_bytes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 5 tests
+test physical_inner_rows_and_scalar_alignment_are_required ... ok
+test original_id_arity_and_missing_native_decoders_are_explicit ... ok
+test finite_score_boundary_keeps_source_relu_and_mask_behavior ... ok
+test query_key_weight_and_mask_groups_are_checked ... ok
+test aliased_shapes_cannot_amplify_output_or_scalar_work_without_bound ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test native_empty_ieee_and_nonfinite_score_domains_are_preserved ... ok
+test every_native_key_decoder_and_all_half_mask_words_match ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+
+running 2 tests
+test native_geometry_and_nonfinite_domains_are_retained ... ok
+test gated_delta_and_hyperconnections_match_native_graph_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+
+running 1 test
+125 source-native F16 cache matmul cases; output bytes 980616; differing cases 0; differing values 0; finite differing values 0
+test native_cache_matmul_keeps_unrounded_f32_rhs_and_strided_f16_weights ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+running 2 tests
+original recurrent graphs=450, exact output/state bytes=132336, checked NaN boundaries=[], mismatches=0
+test recurrent_raw_ieee_and_signaling_nan_controls_match_native_exactly ... ok
+original recurrent graphs=944, exact output/state bytes=1145804, checked NaN boundaries=["nan_payloads_ssm_conv", "nan_payloads_ssm_scan", "nan_payloads_rwkv_wkv6", "nan_payloads_gated_linear_attn", "nan_payloads_rwkv_wkv7"], mismatches=0
+test recurrent_graphs_match_frozen_native_shapes_strides_and_all_output_state_words ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 7 tests
+test recurrent_registry_ids_and_arities_are_executable ... ok
+test rwkv_and_gla_reject_empty_or_unequal_sequence_runs_and_invalid_state_storage ... ok
+test scan_rejects_ambiguous_unit_axis_state_destination_strides ... ok
+test convolution_checks_source_shapes_and_physical_accesses ... ok
+test scan_rejects_unwritten_snapshots_bad_ids_and_mismatched_groups ... ok
+test cancellation_does_not_publish_output_or_mutate_recurrent_inputs ... ok
+test competing_nans_are_checked_at_arithmetic_and_quiet_single_nan_is_preserved ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 8 tests
+test full_registries_are_exact_but_pending_ops_are_not_execution_claims ... ok
+test checked_layouts_reject_overflow_invalid_blocks_and_bounds ... ok
+test node_ids_are_bound_to_their_graph ... ok
+test views_keep_storage_alive_and_do_not_alias_output_writes ... ok
+test quantized_views_use_block_strides_and_preserve_bytes ... ok
+test cancellation_and_unrelated_branches_do_not_change_inputs ... ok
+test invalid_shapes_types_indices_and_softmax_are_errors ... ok
+test cpu_dag_matches_65_frozen_ggml_graph_cases ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test native_empty_copied_ieee_and_explicit_finite_boundaries_are_retained ... ok
+test original_backward_normal_neox_yarn_and_multi_axis_words_match ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+
+running 5 tests
+test original_backward_id_modes_and_optional_factor_arity_are_preserved ... ok
+test aliased_output_amplification_cancellation_and_failures_do_not_mutate_inputs ... ok
+test rotation_offsets_sections_and_signed_parameter_bounds_are_checked ... ok
+test declared_flat_prefix_spans_and_physical_scalar_rows_are_enforced ... ok
+test input_types_and_flat_position_frequency_contracts_are_checked ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test native_empty_copied_ieee_and_explicit_finite_boundaries_are_retained ... ok
+test original_forward_normal_neox_yarn_and_multi_axis_words_match ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 4 tests
+test row_policy_errors_are_checked_and_input_storage_is_unchanged ... ok
+72 source-native tensor row cases; output bytes 14208; differing cases 0; differing values 0; finite differing values 0
+test odd_packed_glu_preserves_source_flooring_and_vector_row_boundaries ... ok
+Portable SSE2 quick GELU prefix: 47736 exact GNU source output words
+test explicit_sse2_quick_prefix_matches_native_gnu_on_both_hosts ... ok
+935 source-native tensor row cases; output bytes 2894848; differing cases 0; differing values 0; finite differing values 0
+test native_tensor_row_policies_and_system_erf_match_original_graph_bytes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+
+running 2 tests
+test empty_ieee_sink_dominance_and_checked_boundaries_match_source ... ok
+test masks_sinks_alibi_broadcast_and_zero_bias_backward_match_original_words ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+
+running 4 tests
+original graphs=111, exact output bytes=25992, mismatches=0
+test relative_addition_and_triangular_solve_preserve_native_raw_ieee_words ... ok
+original graphs=168, exact output bytes=26208, mismatches=0
+test one_key_query_width_specialization_preserves_native_nan_payloads ... ok
+original graphs=222, exact output bytes=83424, mismatches=0
+test competing_nan_operand_policies_cover_variable_geometry ... ok
+original graphs=920, exact output bytes=1135798, mismatches=0
+test windows_relative_positions_solve_and_losses_match_every_native_output_byte ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+
+running 8 tests
+test cancellation_and_empty_domains_do_not_publish_outputs ... ok
+test flat_window_reads_cannot_escape_the_declared_view ... ok
+test relative_positions_preserve_bfloat_payloads_as_half_output ... ok
+test flat_spans_and_large_padding_are_checked_before_allocating ... ok
+test cross_entropy_checks_native_row_addresses_and_nonfinite_domains ... ok
+test geometry_and_dtype_errors_do_not_mutate_shared_inputs ... ok
+test relative_addition_rejects_inconsistent_or_noncontiguous_shapes ... ok
+test triangular_solve_checks_singular_and_mismatched_systems ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

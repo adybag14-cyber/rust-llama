@@ -53,6 +53,25 @@ pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<
         return crate::adamw_step(src[0], src[1], src[2], src[3], src[4], *limits, cancel)
             .map(|s| s.weights);
     }
+    if let RopeExt { options, .. } = op {
+        return crate::cpu_rope_back::evaluate_forward(options, src, cancel);
+    }
+    if let SoftmaxExt {
+        scale,
+        max_bias,
+        with_mask,
+        with_sinks,
+    } = op
+    {
+        return crate::cpu_softmax::evaluate(
+            *scale,
+            *max_bias,
+            *with_mask,
+            *with_sinks,
+            src,
+            cancel,
+        );
+    }
     if let RopeBack { options, .. } = op {
         return crate::cpu_rope_back::evaluate(options, src, cancel);
     }

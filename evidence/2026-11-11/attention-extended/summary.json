@@ -1,0 +1,227 @@
+{
+  "package": "T02 extended forward rotary and softmax attention",
+  "base_commit": "91589e125d2232e9de7c4791fe88abd4ba184b1f",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "completed_utc": "2026-11-11T13:03:42.404155+00:00",
+  "implementation": "Native maintained Rust; no new dependency or unsafe boundary; no original runtime link",
+  "frozen_ids": "ROPE 48 and SOFT_MAX 46 extended; operation-count unchanged",
+  "reference_sources": [
+    "ggml/include/ggml.h",
+    "ggml/src/ggml.c",
+    "ggml/src/ggml-cpu/ops.cpp",
+    "ggml/src/ggml-cpu/vec.h",
+    "ggml/src/ggml-cpu/vec.cpp"
+  ],
+  "per_profile": {
+    "native_graphs": 3361,
+    "admitted_graphs": 3303,
+    "exact_output_bytes": 11181540,
+    "retained_native_success_exclusions": 58,
+    "retained_exclusion_bytes": 20336,
+    "original_assertion_probes": 4
+  },
+  "full_tensor_package": {
+    "msvc": {
+      "steps": [
+        {
+          "name": "clippy",
+          "exit_code": 0
+        },
+        {
+          "name": "fmt",
+          "exit_code": 0
+        },
+        {
+          "name": "test-debug",
+          "exit_code": 0
+        },
+        {
+          "name": "test-release",
+          "exit_code": 0
+        }
+      ],
+      "selected_input_guard": {
+        "unchanged": true,
+        "selected_files": 103
+      },
+      "tests": {
+        "test-debug": {
+          "passed": 91,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 25
+        },
+        "test-release": {
+          "passed": 91,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 25
+        }
+      }
+    },
+    "gnu": {
+      "steps": [
+        {
+          "name": "clippy",
+          "exit_code": 0
+        },
+        {
+          "name": "fmt",
+          "exit_code": 0
+        },
+        {
+          "name": "test-debug",
+          "exit_code": 0
+        },
+        {
+          "name": "test-release",
+          "exit_code": 0
+        }
+      ],
+      "selected_input_guard": {
+        "unchanged": true,
+        "selected_files": 103
+      },
+      "tests": {
+        "test-debug": {
+          "passed": 91,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 25
+        },
+        "test-release": {
+          "passed": 91,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 25
+        }
+      }
+    }
+  },
+  "final_postflight": {
+    "msvc": {
+      "steps": [
+        {
+          "name": "clippy",
+          "exit_code": 0
+        },
+        {
+          "name": "fmt",
+          "exit_code": 0
+        },
+        {
+          "name": "debug",
+          "exit_code": 0
+        },
+        {
+          "name": "release",
+          "exit_code": 0
+        }
+      ],
+      "selected_input_guard": {
+        "unchanged": true,
+        "selected_files": 109
+      },
+      "tests": {
+        "debug": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 3
+        },
+        "release": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 3
+        }
+      }
+    },
+    "gnu": {
+      "steps": [
+        {
+          "name": "clippy",
+          "exit_code": 0
+        },
+        {
+          "name": "fmt",
+          "exit_code": 0
+        },
+        {
+          "name": "debug",
+          "exit_code": 0
+        },
+        {
+          "name": "release",
+          "exit_code": 0
+        }
+      ],
+      "selected_input_guard": {
+        "unchanged": true,
+        "selected_files": 109
+      },
+      "tests": {
+        "debug": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 3
+        },
+        "release": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "result_suites": 3
+        }
+      }
+    }
+  },
+  "mutation_controls": {
+    "msvc": {
+      "controls": 4,
+      "all_detected_by_executed_tests": true,
+      "restored_original_bytes": true
+    },
+    "gnu": {
+      "controls": 4,
+      "all_detected_by_executed_tests": true,
+      "restored_original_bytes": true
+    }
+  },
+  "fixture_declarations": 30,
+  "fixture_bytes": 58909290,
+  "manifest_sha256": "f1b2ee2c71c6621c7b3c3d6e568ae17d95e51fa80791afdf2015d44c5f8a49d2",
+  "implementation_files": {
+    "crates/tensor/src/cpu.rs": "636a6c6c2d899b965ebf90aba2704f10e7479699d2a1df73f36b1a368e09b872",
+    "crates/tensor/src/cpu_rope_back.rs": "5b9214b75d757513ecac9236f88c30247175c3f95134018456b5bd0339681ba0",
+    "crates/tensor/src/cpu_softmax.rs": "0a4ca7d78038b9738c388ca864524882531aa5bd563ae2045db8b4dea0e387a8",
+    "crates/tensor/src/graph.rs": "42d4b9135ade6f92ef12f260a954679bf95b93af88cd73747b981cd1fd419f51",
+    "crates/tensor/src/lib.rs": "8f1f7cfcacc2d6c77bf0afad4fd9ed1a64686386ad0e33d0d86570f8cb125aba"
+  },
+  "oracle_harnesses": {
+    "add-broadcast-and-manifest.py": "d68041d03cd94fee1bf8da0866e5be990a3d5af09c42f4a2964466d3ab27045a",
+    "capture-both.py": "37ed568d1c8cc17b0b5e2ecd90e059e7298210ba4797188b236598a194685b81",
+    "capture-broadcast-both.py": "7799b12016365122acacb75f3daf6c906bd9b83af230b29e08e5888ccc427d43",
+    "capture-broadcast-v2-both.py": "56fdab84c4090f93bebb324b80b457816ce64dfaf35cbada9daa9292b0d5a90c",
+    "capture-rejections.py": "ca93beafdf93bfe497d9e0429f9bb9f526922c6a43e8454c32d67bf7805a862c",
+    "capture.py": "2986b4348b9ccaf053ffaf563b2a873a1a808d847ef6e5550d95be5eecd777c7",
+    "capture_rope_forward.py": "3dac384cbceaedba4229a2b560ee63aa35d554eecb5e18dbe0dbf20edb12883f",
+    "capture_softmax.py": "69ea3c2c14cf9c380c0a0d1cda38b717c1bd9c2420545f89e6d9fedd9cd82fef",
+    "capture_softmax_broadcast.py": "ed25d6219d3ec582fa93184c278e63286752187a4ac6e81a4e21c237418d98e2",
+    "capture_softmax_broadcast_v2.py": "2f37578e2015d3a8a68ddfa985f791b03cf87209b010f8bd474160d15c56625d",
+    "complete.py": "0db3dd3a7914c61bf132b9e5080c5d8e1e5388b8b7f517885f022bd99be11749",
+    "mutations.py": "8c08d34263162474093a14ecb1c92cb634c5e087b96adab7f22dc5cdf126df22",
+    "seal.py": "8f7e7999d340918be42a1e1285049b29e1fd57916d493c9d5b4811f517211415",
+    "validate-postflight.py": "848a99237b7d73b4e8ee77adcef19c522c141746e07240c641ab59e025e59497",
+    "validate.py": "dfa37dccf17c5639d8a744a5b04f31491a13a2f8b11bb3dcae08989956eab8cd"
+  },
+  "qualifications": [
+    "Main and edge native captures precede implementation. Supplemental intermediate-divisor controls follow initial implementation; no Rust oracle is used.",
+    "The supplemental first harness carried an inherited inaccurate before-implementation phrase. Corrected v2 provenance retains truthful timing and every original binary byte is unchanged.",
+    "Two initial validation attempts failed only in new test diagnostics: strict constant-chunk Clippy lint, then a temporary slice/array type mismatch while correcting that lint. Both logs remain retained. Full v3 and final postflight pass.",
+    "Full tensor suite and final postflight verify the listed selected inputs, not whole repository immutability. Only softmax_ext.rs changes between full and postflight, adding the supplemental replay; six fixtures are added.",
+    "Four deliberately broken implementations each fail executed numerical tests on both hosts; exact source bytes restored before postflight.",
+    "No model runtime scaled-RoPE integration, general CPU parallel scheduler, additional ISA/device equivalence or full-port completion claim. Zero mandatory full-port gates closed.",
+    "The global fixture verifier automatically discovers the committed attention-extended-fixture-manifest.tsv domain manifest."
+  ]
+}
