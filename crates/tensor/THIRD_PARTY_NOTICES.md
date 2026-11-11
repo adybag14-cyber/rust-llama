@@ -10,3 +10,11 @@ The complete upstream license and LLVM exception are in LICENSE-MICROSOFT-STL.tx
 The GNU/Linux sorting policy is independently expressed Rust, tested against the original GGML graphs compiled with GNU 11.4.0. No GNU library implementation is copied or linked. The product contains no original C/C++ object; native libraries are external verification oracles only.
 
 Microsoft license source: https://raw.githubusercontent.com/microsoft/STL/main/LICENSE.txt
+
+## Backward RoPE and YaRN
+
+The F32/F16 backward rotary kernels preserve the frozen GGML MIT attribution.
+Their YaRN equations also retain MIT, copyright (c) 2023 Jeffrey Quesnelle and
+Bowen Peng. See [ROPE_BACK_NOTICES.md](ROPE_BACK_NOTICES.md) for source
+identification and complete MIT terms. These attributions are in addition to
+the sorting component above; the package license expression is unchanged.

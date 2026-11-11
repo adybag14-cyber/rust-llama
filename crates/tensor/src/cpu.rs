@@ -43,6 +43,9 @@ fn eps(v: f32) -> Result<()> {
 
 pub(crate) fn evaluate(op: &Op, src: &[&Tensor], cancel: &AtomicBool) -> Result<Tensor> {
     use Op::*;
+    if let RopeBack { options, .. } = op {
+        return crate::cpu_rope_back::evaluate(options, src, cancel);
+    }
     if matches!(op, LightningIndexer) {
         return crate::cpu_lightning::evaluate(src, cancel);
     }

@@ -9,11 +9,13 @@ mod cpu_flash;
 mod cpu_index;
 mod cpu_lightning;
 mod cpu_recurrent;
+mod cpu_rope_back;
 mod cpu_vision_loss;
 mod graph;
 mod native_sort;
 mod registry;
 pub use cpu_flash::{FlashAttentionError, FlashAttentionOptions};
+pub use cpu_rope_back::{RopeBackMode, RopeBackOptions};
 pub use graph::{
     Conv2dParams, Conv3dParams, Graph, NodeId, Op, PoolMode, ResizeMode, RopeMode, SortOrder,
     Triangle,

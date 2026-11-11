@@ -1,0 +1,14 @@
+    Checking llama-tensor v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\tensor\crates\tensor)
+error: this multiplication by -1 can be written more succinctly
+   --> crates\tensor\src\cpu_rope_back.rs:226:20
+    |
+226 |         let sine = (angle.sin() * magnitude) * -1.0;
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider using: `-(angle.sin() * magnitude)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#neg_multiply
+    = note: `-D clippy::neg-multiply` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::neg_multiply)]`
+
+error: could not compile `llama-tensor` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-tensor` (lib test) due to 1 previous error

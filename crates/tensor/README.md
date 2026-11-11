@@ -1,6 +1,6 @@
 # Rust tensor layouts and scalar CPU graphs
 
-This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **93 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
+This crate is an executable, partial T02 port of the frozen GGML tensor and CPU graph contracts. It currently exposes **94 operation IDs**, plus input leaves, from the frozen 102-ID registry. The full per-ID inventory and dtype restrictions are in [CPU_SUPPORT.md](CPU_SUPPORT.md). Registration of all IDs is an ABI inventory, not a claim that all operators, parameter modes or schedulers execute.
 
 ## Flash attention through the CPU DAG
 
@@ -302,8 +302,23 @@ remain sealed for the explicit nonfinite-score boundary.
 See [LIGHTNING_INDEXER.md](LIGHTNING_INDEXER.md) for dtype, arithmetic, empty
 shape, allocation/work and exceptional-value contracts.
 
+## Backward rotary execution
+
+Operation 49 executes through `RopeBack { options, with_factors }` for F32
+and F16. Explicit options cover all five original CPU modes, YaRN correction
+and truncate behavior, attention magnitude, frequency factors and partial
+rotation offsets. Position/frequency inputs retain the original flat physical
+prefix addressing. Unrotated channels retain their raw bits.
+
+The matching-profile gate uses **892 actual original backward graphs per host**,
+with **849 admitted graphs / 1,164,740 exact output bytes**. The other
+**43 successful original graphs / 5,216 bytes** remain unchanged for explicit
+finite-domain exclusions. Expected outputs come directly from the original
+backward kernels. See [ROPE_BACK.md](ROPE_BACK.md) for the precise source
+contracts and [ROPE_BACK_NOTICES.md](ROPE_BACK_NOTICES.md) for YaRN attribution.
+
 ## Open T02 gates
 
-The remaining 8 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
+The remaining 7 operator IDs, missing dtype/parameter combinations within implemented IDs, advanced forward RoPE, mask/sink/ALiBi softmax, ERF provider parity on unverified targets/toolchains, optimized CPU scheduling/SIMD, writable/imported/device storage, asynchronous execution/events, allocation planning/reuse, graph automatic differentiation and optimizer integration remain open. Explicit backward kernels do not imply a training framework. Scalar graph fixtures alone do not establish general pretrained-model inference parity.
 
 Implementation follows the frozen GGML layout/operator semantics under the MIT license, copyright (c) 2023-2026 The ggml authors. The adapted Microsoft STL sorting helpers use Apache-2.0 WITH LLVM-exception. The combined crate license is MIT AND (Apache-2.0 WITH LLVM-exception); see THIRD_PARTY_NOTICES.md and the included license texts.

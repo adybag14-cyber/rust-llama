@@ -1,4 +1,4 @@
-use crate::{DType, GluOp, OpCode, Result, Tensor, TensorError, UnaryOp};
+use crate::{DType, GluOp, OpCode, Result, RopeBackOptions, Tensor, TensorError, UnaryOp};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 static NEXT_GRAPH: AtomicU64 = AtomicU64::new(1);
 
@@ -69,6 +69,11 @@ pub enum ResizeMode {
 /// Registry entries without a variant remain pending implementation.
 #[derive(Clone, Debug)]
 pub enum Op {
+    /// Original backward rotation: values, I32 positions, optional F32 factors.
+    RopeBack {
+        options: RopeBackOptions,
+        with_factors: bool,
+    },
     /// Inputs: F32 query, native-decoder keys, F32 weights and F16 mask.
     /// Scalar original Lightning Indexer; returns [keys,tokens,1,streams].
     LightningIndexer,
@@ -405,6 +410,7 @@ impl Op {
     pub fn code(&self) -> OpCode {
         use Op::*;
         match self {
+            RopeBack { .. } => OpCode::ROPE_BACK,
             LightningIndexer => OpCode::LIGHTNING_INDEXER,
             GatedDeltaNet { .. } => OpCode::GATED_DELTA_NET,
             Dsv4HcComb { .. } => OpCode::DSV4_HC_COMB,
@@ -509,6 +515,13 @@ impl Op {
     }
     fn arity(&self) -> usize {
         match self {
+            Self::RopeBack { with_factors, .. } => {
+                if *with_factors {
+                    3
+                } else {
+                    2
+                }
+            }
             Self::LightningIndexer => 4,
             Self::GatedDeltaNet { .. } => 6,
             Self::Dsv4HcComb { .. } => 3,

@@ -1,0 +1,27 @@
+Calling original ggml_flash_attn_back with valid F32 Q/K/V/d geometry
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x0000776d2f2ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x0000776d2f2ea3aa in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000776d2e5456cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so
+#2  0x0000776d2e545862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so
+#3  0x0000776d2e552e92 in ggml_flash_attn_back () from /mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libggml-base.so
+#4  0x0000776d2f627e2e in ?? () from /lib/x86_64-linux-gnu/libffi.so.8
+#5  0x0000776d2f624493 in ?? () from /lib/x86_64-linux-gnu/libffi.so.8
+#6  0x0000776d2f4465d7 in ?? () from /usr/lib/python3.10/lib-dynload/_ctypes.cpython-310-x86_64-linux-gnu.so
+#7  0x0000776d2f44f2e2 in ?? () from /usr/lib/python3.10/lib-dynload/_ctypes.cpython-310-x86_64-linux-gnu.so
+#8  0x000064086ce6fbab in _PyObject_MakeTpCall ()
+#9  0x000064086ce69067 in _PyEval_EvalFrameDefault ()
+#10 0x000064086cf49036 in ?? ()
+#11 0x000064086cf48f06 in PyEval_EvalCode ()
+#12 0x000064086cf6fa88 in ?? ()
+#13 0x000064086cf6a0df in ?? ()
+#14 0x000064086cf6f825 in ?? ()
+#15 0x000064086cf6ed68 in _PyRun_SimpleFileObject ()
+#16 0x000064086cf6ea47 in _PyRun_AnyFileObject ()
+#17 0x000064086cf62eae in Py_RunMain ()
+#18 0x000064086cf3cf4d in Py_BytesMain ()
+#19 0x0000776d2f229d90 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#20 0x0000776d2f229e40 in __libc_start_main () from /lib/x86_64-linux-gnu/libc.so.6
+#21 0x000064086cf3ce45 in _start ()
+[Inferior 1 (process 665) detached]

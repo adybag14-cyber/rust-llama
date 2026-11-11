@@ -1,8 +1,8 @@
 # Frozen CPU operation inventory
 
-This table inventories all **102** frozen operation IDs. **93 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **8 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
+This table inventories all **102** frozen operation IDs. **94 IDs** have explicit `Op` constructors backed by Rust execution, and `NONE` is represented by an input leaf. The other **7 IDs** do not have executable constructors. An exposed constructor does not imply that every source dtype, shape, stride or parameter mode has been ported: evaluation checks the restrictions below and returns an error for unsupported inputs.
 
-Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
+Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/include/ggml.h`. Actual execution is in `src/cpu.rs`, `src/cpu_extra.rs`, `src/cpu_index.rs`, `src/cpu_conv.rs`, `src/cpu_flash.rs`, `src/cpu_recurrent.rs`, `src/cpu_vision_loss.rs`, `src/cpu_attention.rs`, `src/cpu_lightning.rs`, `src/cpu_rope_back.rs` and `src/native_sort.rs`; registration alone is not execution evidence. All new supported paths are exercised by independent original-GGML graphs described in the crate README. The explicit backward kernels do not constitute graph automatic differentiation.
 
 | ID | Frozen operation | Execution status | Dtypes / result | Current contract |
 |---:|---|---|---|---|
@@ -55,7 +55,7 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 46 | `SOFT_MAX` | Implemented slice | F32 | Scalar scale only; auxiliary masks, sinks and ALiBi remain pending. |
 | 47 | `SOFT_MAX_BACK` | Implemented slice | F32 | Explicit backward kernels; softmax scale supported, positive max-bias/ALiBi derivative remains absent. |
 | 48 | `ROPE` | Implemented slice | F32 | Basic normal and NeoX modes, positions/base/scale; extended/multimodal/YaRN modes remain pending. |
-| 49 | `ROPE_BACK` | Pending | — | No executable Op constructor; no fallback result. |
+| 49 | `ROPE_BACK` | Implemented slice | F32/F16 + I32 positions, optional F32 factors → original dtype | All five CPU modes, YaRN/truncate, attention scaling, offsets and source flat prefix reads; finite rotated values/coefficients/products and explicit bounds. See ROPE_BACK.md. |
 | 50 | `CLAMP` | Implemented slice | F32 | Finite ordered limits. |
 | 51 | `CONV_TRANSPOSE_1D` | Implemented slice | F32/F16 kernel × F32 → F32 | Matrix input, no padding, unit dilation, positive stride; F32 products/F64 channel dots then F32 scatter-add. |
 | 52 | `IM2COL` | Implemented slice | F32 → F32/F16; F16 → F16 | 1D/2D extraction, contiguous first axis; source flat addresses inside channels, checked declared spans, raw half payload copies. |
@@ -81,7 +81,7 @@ Numeric IDs are preserved in `src/registry.rs`, derived from the frozen `ggml/in
 | 72 | `TRI` | Implemented slice | F32 | Square batched matrices; four exact native triangle IDs. |
 | 73 | `FILL` | Implemented slice | F32 / F16 | Explicit slope or fill value. |
 | 74 | `FLASH_ATTN_EXT` | Implemented slice | F32 Q; F32/F16 K/V; optional F16 mask, F32 sinks, I32 row map → F32 | Shared native-profile kernel, physical views, actual scoped workers, source precision/hint fields and empty-output dispatcher behavior; local byte/work limits. See FLASH_ATTENTION.md. |
-| 75 | `FLASH_ATTN_BACK` | Pending | — | No executable Op constructor; no fallback result. |
+| 75 | `FLASH_ATTN_BACK` | Pending | — | Original public constructor aborts unconditionally; both native profiles reproduced the rejection. Dormant kernel is not public execution evidence. See FLASH_BACK_STATUS.md. |
 | 76 | `SSM_CONV` | Implemented slice | F32 | Three-dimensional input and matching coefficient matrix; physical sequence strides, source one-worker flat coefficient rows, F32 accumulation, empty-output dispatch. See RECURRENT.md. |
 | 77 | `SSM_SCAN` | Implemented slice | F32 + I32 state IDs → F32 | Grouped Mamba1/Mamba2 scan, source state remapping and reverse snapshots; packed inner planes and physical outer strides; output plus owned state. Checked snapshot/ID and NaN boundaries. See RECURRENT.md. |
 | 78 | `WIN_PART` | Implemented slice | F32 | Positive square windows, checked padding and source flattened physical reads; independent raw payload copies. See VISION_LOSS.md. |
