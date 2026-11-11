@@ -2,10 +2,15 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **211**, leaves
-**44 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **216**, leaves
+**39 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md and BATCH_EXT.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md and PERFORMANCE.md.
+
+The sampler-performance checkpoint adds real per-chain CPU time/counts and
+three perf functions, plus two global logger functions. PERFORMANCE.md records
+no_perf, reset/clone/copy rules, callback ownership and independent MSVC/GNU
+captures. Context/graph metrics and backend-attached sampling remain absent.
 
 The extended batch checkpoint checks debug/release PE and ELF tables: exactly
 211 frozen exports, four extensions and 44 absent exports. The original-header
@@ -95,6 +100,8 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_load_mode_name` |
 | `llama_load_model_from_file` |
 | `llama_load_session_file` |
+| `llama_log_get` |
+| `llama_log_set` |
 | `llama_max_devices` |
 | `llama_max_parallel_sequences` |
 | `llama_max_tensor_buft_overrides` |
@@ -153,6 +160,9 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_n_ubatch` |
 | `llama_n_vocab` |
 | `llama_new_context_with_model` |
+| `llama_perf_sampler` |
+| `llama_perf_sampler_print` |
+| `llama_perf_sampler_reset` |
 | `llama_pooling_type` |
 | `llama_process` |
 | `llama_sampler_accept` |
@@ -298,8 +308,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_sampled_probs_count_ith` |
 | `llama_get_sampled_probs_ith` |
 | `llama_get_sampled_token_ith` |
-| `llama_log_get` |
-| `llama_log_set` |
 | `llama_model_cls_label` |
 | `llama_model_init_from_user` |
 | `llama_model_load_from_file_ptr` |
@@ -314,9 +322,6 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_perf_context` |
 | `llama_perf_context_print` |
 | `llama_perf_context_reset` |
-| `llama_perf_sampler` |
-| `llama_perf_sampler_print` |
-| `llama_perf_sampler_reset` |
 | `llama_print_system_info` |
 | `llama_set_adapter_cvec` |
 | `llama_set_adapters_lora` |

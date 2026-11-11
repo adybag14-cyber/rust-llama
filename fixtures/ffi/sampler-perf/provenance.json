@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "license": "MIT; authored inputs and unmodified frozen llama.cpp API observations",
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "sealed_before_implementation_utc": "2026-11-11T09:02:28.214992+00:00",
+  "profiles": {
+    "windows": {
+      "profile": "windows",
+      "started_utc": "2026-11-11T09:00:51.722116+00:00",
+      "status": "passed",
+      "original_sources": {
+        "include/llama.h": {
+          "bytes": 91177,
+          "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+        },
+        "ggml/include/ggml.h": {
+          "bytes": 119446,
+          "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+        },
+        "src/llama-sampler.cpp": {
+          "bytes": 153277,
+          "sha256": "6313214bf0a4146036f3d62846299cba4fa9804757c353140a04de52130cf496"
+        },
+        "src/llama-sampler.h": {
+          "bytes": 982,
+          "sha256": "d39c6bfd6c966acde7bfaeb55f08c176b3d9078bc5e8e8de2eee504fc66c258b"
+        },
+        "src/llama-impl.cpp": {
+          "bytes": 7817,
+          "sha256": "abd5851762a157ae477588537e0cfe8dddfa1d2a2efb596d17efa4a19b45c769"
+        },
+        "ggml/src/ggml.c": {
+          "bytes": 267312,
+          "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+        }
+      },
+      "steps": [
+        {
+          "name": "configure",
+          "args": [
+            "cmake",
+            "-S",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle",
+            "-B",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows",
+            "-DFROZEN_SOURCE=C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+          ],
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 642,
+            "sha256": "073b0977bb6c2a41dca215fe85371f7e272cf2865e6ed5934998c976619a1a3e"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "name": "build",
+          "args": [
+            "cmake",
+            "--build",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows",
+            "--config",
+            "Release",
+            "-j",
+            "2"
+          ],
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 453,
+            "sha256": "2509b732a300689f68a2d8600967c50818ffdb3f64e0961a8251b622a1d0424d"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "name": "capture",
+          "args": [
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows\\Release\\perf-oracle.exe",
+            "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\inputs.json",
+            "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\windows-v1\\original.json"
+          ],
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 14,
+            "sha256": "b83959731b7cbf793625613b507cd567349a2c8929ae44cb14d57f7aba9b5c98"
+          },
+          "stderr": {
+            "bytes": 101,
+            "sha256": "fd02638d967084c45eb91619e09db7df2690e12677435a88da24c8da323aa93b"
+          }
+        }
+      ],
+      "completed_utc": "2026-11-11T09:00:59.440967+00:00",
+      "inputs": {
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\perf-oracle.cpp": {
+          "bytes": 10981,
+          "sha256": "83b84628b02e057b5b53d2df5586f523c21965f83610012e2cec38c48868ce33"
+        },
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\CMakeLists.txt": {
+          "bytes": 530,
+          "sha256": "0fe7f7c5bed27e7ce5139774a108950b1a809c7f13a3cc78498d1f5256116143"
+        },
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\build-windows\\Release\\perf-oracle.exe": {
+          "bytes": 167424,
+          "sha256": "ec5eba32893ccbcbb36b33862105555fc3a4ba46bf0e450d084de14e205d5b07"
+        },
+        "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll": {
+          "bytes": 3211264,
+          "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+        },
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\ffi\\fixtures\\ffi\\native-context-model.gguf": {
+          "bytes": 31328,
+          "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+        },
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\perf-oracle\\inputs.json": {
+          "bytes": 36042,
+          "sha256": "48d4f983475f9e4e646ebc27f80624c4adcb1c495d1c915a9e704e415cfef815"
+        }
+      },
+      "original": {
+        "bytes": 55780,
+        "sha256": "6062b6420bb470ca4ccf0e4c5b9ee07353a2aa6002bdfdec256a61fdd91ff54f"
+      },
+      "reference": {
+        "bytes": 39060,
+        "sha256": "a38134c26e7ba2aecf501d912a6958c04e7fab9e8f6b9db2d466412118c209c4"
+      },
+      "cases": 8,
+      "timing_observations": 114,
+      "positive_observations": 37,
+      "log_messages": 12
+    },
+    "linux": {
+      "profile": "linux",
+      "started_utc": "2026-11-11T09:00:52.131460+00:00",
+      "status": "passed",
+      "original_sources": {
+        "include/llama.h": {
+          "bytes": 91177,
+          "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+        },
+        "ggml/include/ggml.h": {
+          "bytes": 119446,
+          "sha256": "c9400b4ea60067c690fa08fcdf365e0b2b747bd815db84d26c562eda8e99ba25"
+        },
+        "src/llama-sampler.cpp": {
+          "bytes": 153277,
+          "sha256": "6313214bf0a4146036f3d62846299cba4fa9804757c353140a04de52130cf496"
+        },
+        "src/llama-sampler.h": {
+          "bytes": 982,
+          "sha256": "d39c6bfd6c966acde7bfaeb55f08c176b3d9078bc5e8e8de2eee504fc66c258b"
+        },
+        "src/llama-impl.cpp": {
+          "bytes": 7817,
+          "sha256": "abd5851762a157ae477588537e0cfe8dddfa1d2a2efb596d17efa4a19b45c769"
+        },
+        "ggml/src/ggml.c": {
+          "bytes": 267312,
+          "sha256": "c1e5efc6e21fbfa967b19dff2d3a3dd765cb937696bd74bc9417eb8a1ac5989f"
+        }
+      },
+      "steps": [
+        {
+          "name": "build",
+          "args": [
+            "g++",
+            "-std=c++17",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/perf-oracle.cpp",
+            "-I/mnt/c/Users/adyba/Downloads/llama.cpp-master (4)/llama.cpp-master/include",
+            "-I/mnt/c/Users/adyba/Downloads/llama.cpp-master (4)/llama.cpp-master/ggml/include",
+            "-I/mnt/c/Users/adyba/Downloads/llama.cpp-master (4)/llama.cpp-master/vendor",
+            "-ldl",
+            "-pthread",
+            "-o",
+            "/home/tdamre/.cache/rust-llama-perf-oracle-20261111/perf-oracle"
+          ],
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "name": "capture",
+          "args": [
+            "/home/tdamre/.cache/rust-llama-perf-oracle-20261111/perf-oracle",
+            "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/ffi/fixtures/ffi/native-context-model.gguf",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/inputs.json",
+            "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/linux-v1/original.json"
+          ],
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 13,
+            "sha256": "979e9d4277ded4c5a2fee330ce89d5d170f5a9ed12862d14420b87a0cb3fbe9d"
+          },
+          "stderr": {
+            "bytes": 99,
+            "sha256": "eb30fd7feca1d3bc8dac4bd07bf403bcc73cedc1456ddf004d217d382d36b77a"
+          }
+        }
+      ],
+      "completed_utc": "2026-11-11T09:00:58.249528+00:00",
+      "inputs": {
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/perf-oracle.cpp": {
+          "bytes": 10981,
+          "sha256": "83b84628b02e057b5b53d2df5586f523c21965f83610012e2cec38c48868ce33"
+        },
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/CMakeLists.txt": {
+          "bytes": 530,
+          "sha256": "0fe7f7c5bed27e7ce5139774a108950b1a809c7f13a3cc78498d1f5256116143"
+        },
+        "/home/tdamre/.cache/rust-llama-perf-oracle-20261111/perf-oracle": {
+          "bytes": 266648,
+          "sha256": "38a04372bd7ac148e74bfc87998956dfefeb6f32e967635d1621a212d7528968"
+        },
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0": {
+          "bytes": 5499792,
+          "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+        },
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/ffi/fixtures/ffi/native-context-model.gguf": {
+          "bytes": 31328,
+          "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+        },
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/perf-oracle/inputs.json": {
+          "bytes": 36042,
+          "sha256": "48d4f983475f9e4e646ebc27f80624c4adcb1c495d1c915a9e704e415cfef815"
+        }
+      },
+      "original": {
+        "bytes": 53341,
+        "sha256": "bff2c48cee7df7ed122eb45a73bf3af4b95d08d469c1256a1472b138a9050ffe"
+      },
+      "reference": {
+        "bytes": 39060,
+        "sha256": "a38134c26e7ba2aecf501d912a6958c04e7fab9e8f6b9db2d466412118c209c4"
+      },
+      "cases": 8,
+      "timing_observations": 114,
+      "positive_observations": 39,
+      "log_messages": 12
+    }
+  },
+  "fixtures": {
+    "default-linux-stderr.bin": {
+      "bytes": 99,
+      "sha256": "eb30fd7feca1d3bc8dac4bd07bf403bcc73cedc1456ddf004d217d382d36b77a"
+    },
+    "default-windows-stderr.bin": {
+      "bytes": 101,
+      "sha256": "fd02638d967084c45eb91619e09db7df2690e12677435a88da24c8da323aa93b"
+    },
+    "inputs.json": {
+      "bytes": 36042,
+      "sha256": "48d4f983475f9e4e646ebc27f80624c4adcb1c495d1c915a9e704e415cfef815"
+    },
+    "reference.json": {
+      "bytes": 39060,
+      "sha256": "a38134c26e7ba2aecf501d912a6958c04e7fab9e8f6b9db2d466412118c209c4"
+    }
+  },
+  "projection": "Only the nondeterministic timings array is removed. Exact counts, ABI, candidate float words, log callback bytes and clock/relation predicates remain. Full original captures, including real timing values, remain external."
+}

@@ -1,0 +1,1776 @@
+{
+  "schema": 1,
+  "purpose": "Independent frozen sampler-chain counters, real timing, reset/clone/copy and logger semantics",
+  "cases": [
+    {
+      "name": "empty-false",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": false
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted",
+          "clock": "any"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampler-reset",
+          "clock": "any",
+          "previous": "accepted",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "perf-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        }
+      ]
+    },
+    {
+      "name": "empty-true",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": true
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted",
+          "clock": "zero"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampler-reset",
+          "clock": "zero",
+          "previous": "accepted",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "perf-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        }
+      ]
+    },
+    {
+      "name": "nested-false-false",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": false
+        },
+        {
+          "op": "chain",
+          "out": "c",
+          "no_perf": false
+        },
+        {
+          "op": "custom",
+          "out": "delay",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "backend",
+          "backend_only": true,
+          "apply_ms": 99,
+          "accept_ms": 2
+        },
+        {
+          "op": "temp",
+          "out": "temp",
+          "value": 0.7
+        },
+        {
+          "op": "top_k",
+          "out": "top",
+          "value": 3
+        },
+        {
+          "op": "greedy",
+          "out": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "delay"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "top"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "temp"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "backend"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "initial-c",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "applied-p",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "applied-c",
+          "clock": "positive"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted-p",
+          "clock": "positive",
+          "previous": "applied-p",
+          "relation": "greater"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "accepted-c",
+          "clock": "positive",
+          "previous": "applied-c",
+          "relation": "greater"
+        },
+        {
+          "op": "sample",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampled-p",
+          "clock": "positive",
+          "previous": "accepted-p",
+          "relation": "greater"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "sampled-c",
+          "clock": "positive",
+          "previous": "accepted-c",
+          "relation": "greater"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "reset-p",
+          "clock": "positive",
+          "previous": "sampled-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "reset-c",
+          "clock": "positive",
+          "previous": "sampled-c",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "clone",
+          "id": "p",
+          "out": "clone"
+        },
+        {
+          "op": "get",
+          "id": "clone",
+          "index": 1,
+          "out": "clone-child"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "accept",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-used",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-used",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "original-unchanged",
+          "clock": "positive",
+          "previous": "reset-p",
+          "relation": "equal"
+        },
+        {
+          "op": "copy",
+          "id": "clone",
+          "dst": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "copied",
+          "clock": "positive",
+          "previous": "clone-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-copied",
+          "clock": "positive",
+          "previous": "clone-child-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "parent-reset-only",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-retained",
+          "clock": "positive",
+          "previous": "child-copied",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "c"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "print",
+          "id": "c"
+        },
+        {
+          "op": "remove",
+          "id": "p",
+          "index": 1,
+          "child": "c"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "after-remove",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "removed-child-unchanged",
+          "clock": "zero"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    },
+    {
+      "name": "nested-false-true",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": false
+        },
+        {
+          "op": "chain",
+          "out": "c",
+          "no_perf": true
+        },
+        {
+          "op": "custom",
+          "out": "delay",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "backend",
+          "backend_only": true,
+          "apply_ms": 99,
+          "accept_ms": 2
+        },
+        {
+          "op": "temp",
+          "out": "temp",
+          "value": 0.7
+        },
+        {
+          "op": "top_k",
+          "out": "top",
+          "value": 3
+        },
+        {
+          "op": "greedy",
+          "out": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "delay"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "top"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "temp"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "backend"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "initial-c",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "applied-p",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "applied-c",
+          "clock": "zero"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted-p",
+          "clock": "positive",
+          "previous": "applied-p",
+          "relation": "greater"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "accepted-c",
+          "clock": "zero",
+          "previous": "applied-c",
+          "relation": "equal"
+        },
+        {
+          "op": "sample",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampled-p",
+          "clock": "positive",
+          "previous": "accepted-p",
+          "relation": "greater"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "sampled-c",
+          "clock": "zero",
+          "previous": "accepted-c",
+          "relation": "equal"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "reset-p",
+          "clock": "positive",
+          "previous": "sampled-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "reset-c",
+          "clock": "zero",
+          "previous": "sampled-c",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "clone",
+          "id": "p",
+          "out": "clone"
+        },
+        {
+          "op": "get",
+          "id": "clone",
+          "index": 1,
+          "out": "clone-child"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "accept",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-used",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-used",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "original-unchanged",
+          "clock": "positive",
+          "previous": "reset-p",
+          "relation": "equal"
+        },
+        {
+          "op": "copy",
+          "id": "clone",
+          "dst": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "copied",
+          "clock": "positive",
+          "previous": "clone-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-copied",
+          "clock": "zero",
+          "previous": "clone-child-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "parent-reset-only",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-retained",
+          "clock": "zero",
+          "previous": "child-copied",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "c"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "print",
+          "id": "c"
+        },
+        {
+          "op": "remove",
+          "id": "p",
+          "index": 1,
+          "child": "c"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "after-remove",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "removed-child-unchanged",
+          "clock": "zero"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    },
+    {
+      "name": "nested-true-false",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": true
+        },
+        {
+          "op": "chain",
+          "out": "c",
+          "no_perf": false
+        },
+        {
+          "op": "custom",
+          "out": "delay",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "backend",
+          "backend_only": true,
+          "apply_ms": 99,
+          "accept_ms": 2
+        },
+        {
+          "op": "temp",
+          "out": "temp",
+          "value": 0.7
+        },
+        {
+          "op": "top_k",
+          "out": "top",
+          "value": 3
+        },
+        {
+          "op": "greedy",
+          "out": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "delay"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "top"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "temp"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "backend"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "initial-c",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "applied-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "applied-c",
+          "clock": "positive"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted-p",
+          "clock": "zero",
+          "previous": "applied-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "accepted-c",
+          "clock": "positive",
+          "previous": "applied-c",
+          "relation": "greater"
+        },
+        {
+          "op": "sample",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampled-p",
+          "clock": "zero",
+          "previous": "accepted-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "sampled-c",
+          "clock": "positive",
+          "previous": "accepted-c",
+          "relation": "greater"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "reset-p",
+          "clock": "zero",
+          "previous": "sampled-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "reset-c",
+          "clock": "positive",
+          "previous": "sampled-c",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "clone",
+          "id": "p",
+          "out": "clone"
+        },
+        {
+          "op": "get",
+          "id": "clone",
+          "index": 1,
+          "out": "clone-child"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "accept",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-used",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-used",
+          "clock": "positive"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "original-unchanged",
+          "clock": "zero",
+          "previous": "reset-p",
+          "relation": "equal"
+        },
+        {
+          "op": "copy",
+          "id": "clone",
+          "dst": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "copied",
+          "clock": "zero",
+          "previous": "clone-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-copied",
+          "clock": "positive",
+          "previous": "clone-child-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "parent-reset-only",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-retained",
+          "clock": "positive",
+          "previous": "child-copied",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "c"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "print",
+          "id": "c"
+        },
+        {
+          "op": "remove",
+          "id": "p",
+          "index": 1,
+          "child": "c"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "after-remove",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "removed-child-unchanged",
+          "clock": "zero"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    },
+    {
+      "name": "nested-true-true",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "p",
+          "no_perf": true
+        },
+        {
+          "op": "chain",
+          "out": "c",
+          "no_perf": true
+        },
+        {
+          "op": "custom",
+          "out": "delay",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "backend",
+          "backend_only": true,
+          "apply_ms": 99,
+          "accept_ms": 2
+        },
+        {
+          "op": "temp",
+          "out": "temp",
+          "value": 0.7
+        },
+        {
+          "op": "top_k",
+          "out": "top",
+          "value": 3
+        },
+        {
+          "op": "greedy",
+          "out": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "delay"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "top"
+        },
+        {
+          "op": "add",
+          "id": "c",
+          "child": "greedy"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "temp"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "backend"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "initial-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "initial-c",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "applied-p",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "applied-c",
+          "clock": "zero"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "accepted-p",
+          "clock": "zero",
+          "previous": "applied-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "accepted-c",
+          "clock": "zero",
+          "previous": "applied-c",
+          "relation": "equal"
+        },
+        {
+          "op": "sample",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "sampled-p",
+          "clock": "zero",
+          "previous": "accepted-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "sampled-c",
+          "clock": "zero",
+          "previous": "accepted-c",
+          "relation": "equal"
+        },
+        {
+          "op": "reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "reset-p",
+          "clock": "zero",
+          "previous": "sampled-p",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "reset-c",
+          "clock": "zero",
+          "previous": "sampled-c",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "clone",
+          "id": "p",
+          "out": "clone"
+        },
+        {
+          "op": "get",
+          "id": "clone",
+          "index": 1,
+          "out": "clone-child"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "accept",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-used",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "clone-child",
+          "label": "clone-child-used",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "original-unchanged",
+          "clock": "zero",
+          "previous": "reset-p",
+          "relation": "equal"
+        },
+        {
+          "op": "copy",
+          "id": "clone",
+          "dst": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "copied",
+          "clock": "zero",
+          "previous": "clone-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-copied",
+          "clock": "zero",
+          "previous": "clone-child-used",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "parent-reset-only",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-retained",
+          "clock": "zero",
+          "previous": "child-copied",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "c"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "child-reset",
+          "clock": "zero"
+        },
+        {
+          "op": "print",
+          "id": "p"
+        },
+        {
+          "op": "print",
+          "id": "c"
+        },
+        {
+          "op": "remove",
+          "id": "p",
+          "index": 1,
+          "child": "c"
+        },
+        {
+          "op": "accept",
+          "id": "p"
+        },
+        {
+          "op": "perf",
+          "id": "p",
+          "label": "after-remove",
+          "clock": "zero"
+        },
+        {
+          "op": "perf",
+          "id": "c",
+          "label": "removed-child-unchanged",
+          "clock": "zero"
+        },
+        {
+          "op": "add",
+          "id": "p",
+          "child": "c"
+        },
+        {
+          "op": "apply",
+          "id": "p"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "delay"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "backend"
+        },
+        {
+          "op": "free",
+          "id": "p"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    },
+    {
+      "name": "copy-flag-false",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "src",
+          "no_perf": false
+        },
+        {
+          "op": "chain",
+          "out": "dst",
+          "no_perf": true
+        },
+        {
+          "op": "custom",
+          "out": "a",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "b",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "add",
+          "id": "src",
+          "child": "a"
+        },
+        {
+          "op": "add",
+          "id": "dst",
+          "child": "b"
+        },
+        {
+          "op": "apply",
+          "id": "src"
+        },
+        {
+          "op": "accept",
+          "id": "src"
+        },
+        {
+          "op": "perf",
+          "id": "src",
+          "label": "source",
+          "clock": "positive"
+        },
+        {
+          "op": "accept",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "old-destination",
+          "clock": "zero"
+        },
+        {
+          "op": "copy",
+          "id": "src",
+          "dst": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied",
+          "clock": "positive",
+          "previous": "source",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "reset",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied-flag-apply",
+          "clock": "positive"
+        },
+        {
+          "op": "accept",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied-flag-accept",
+          "clock": "positive",
+          "previous": "copied-flag-apply",
+          "relation": "greater"
+        },
+        {
+          "op": "clone",
+          "id": "dst",
+          "out": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-flag",
+          "clock": "positive"
+        },
+        {
+          "op": "perf_reset",
+          "id": "clone"
+        },
+        {
+          "op": "print",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "src",
+          "label": "source-unchanged",
+          "clock": "positive",
+          "previous": "source",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "a"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "b"
+        },
+        {
+          "op": "free",
+          "id": "src"
+        },
+        {
+          "op": "free",
+          "id": "dst"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    },
+    {
+      "name": "copy-flag-true",
+      "ops": [
+        {
+          "op": "chain",
+          "out": "src",
+          "no_perf": true
+        },
+        {
+          "op": "chain",
+          "out": "dst",
+          "no_perf": false
+        },
+        {
+          "op": "custom",
+          "out": "a",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "custom",
+          "out": "b",
+          "apply_ms": 2,
+          "accept_ms": 2
+        },
+        {
+          "op": "add",
+          "id": "src",
+          "child": "a"
+        },
+        {
+          "op": "add",
+          "id": "dst",
+          "child": "b"
+        },
+        {
+          "op": "apply",
+          "id": "src"
+        },
+        {
+          "op": "accept",
+          "id": "src"
+        },
+        {
+          "op": "perf",
+          "id": "src",
+          "label": "source",
+          "clock": "zero"
+        },
+        {
+          "op": "accept",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "old-destination",
+          "clock": "positive"
+        },
+        {
+          "op": "copy",
+          "id": "src",
+          "dst": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied",
+          "clock": "zero",
+          "previous": "source",
+          "relation": "equal"
+        },
+        {
+          "op": "perf_reset",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "reset",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied-flag-apply",
+          "clock": "zero"
+        },
+        {
+          "op": "accept",
+          "id": "dst"
+        },
+        {
+          "op": "perf",
+          "id": "dst",
+          "label": "copied-flag-accept",
+          "clock": "zero",
+          "previous": "copied-flag-apply",
+          "relation": "equal"
+        },
+        {
+          "op": "clone",
+          "id": "dst",
+          "out": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-initial",
+          "clock": "zero"
+        },
+        {
+          "op": "apply",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "clone",
+          "label": "clone-flag",
+          "clock": "zero"
+        },
+        {
+          "op": "perf_reset",
+          "id": "clone"
+        },
+        {
+          "op": "print",
+          "id": "clone"
+        },
+        {
+          "op": "perf",
+          "id": "src",
+          "label": "source-unchanged",
+          "clock": "zero",
+          "previous": "source",
+          "relation": "equal"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "a"
+        },
+        {
+          "op": "inspect_custom",
+          "id": "b"
+        },
+        {
+          "op": "free",
+          "id": "src"
+        },
+        {
+          "op": "free",
+          "id": "dst"
+        },
+        {
+          "op": "free",
+          "id": "clone"
+        }
+      ]
+    }
+  ]
+}

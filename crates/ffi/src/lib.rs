@@ -21,6 +21,7 @@ mod batch_ext;
 mod chat;
 mod context;
 mod enum_names;
+mod logging;
 mod memory;
 mod model;
 mod model_metadata;
@@ -176,12 +177,17 @@ ffi!(llama_model_default_params() -> LlamaModelParams, LlamaModelParams::default
 ffi!(llama_context_default_params() -> LlamaContextParams, LlamaContextParams::default(), {
     Ok(LlamaContextParams::default())
 });
-ffi!(llama_time_us() -> i64, 0, {
+fn monotonic_time_us() -> i64 {
     use std::sync::OnceLock;
     use std::time::Instant;
     static EPOCH: OnceLock<Instant> = OnceLock::new();
-    Ok(EPOCH.get_or_init(Instant::now).elapsed().as_micros().min(i64::MAX as u128) as i64)
-});
+    EPOCH
+        .get_or_init(Instant::now)
+        .elapsed()
+        .as_micros()
+        .min(i64::MAX as u128) as i64
+}
+ffi!(llama_time_us() -> i64, 0, { Ok(monotonic_time_us()) });
 ffi!(llama_max_devices() -> usize, 0, { Ok(16) });
 ffi!(llama_max_parallel_sequences() -> usize, 0, { Ok(256) });
 ffi!(llama_max_tensor_buft_overrides() -> usize, 0, { Ok(4096) });
@@ -265,3 +271,13 @@ mod native_microbatch_reference_tests;
     )
 ))]
 mod model_metadata_reference_tests;
+
+#[cfg(all(
+    test,
+    target_arch = "x86_64",
+    any(
+        all(target_os = "windows", target_env = "msvc"),
+        all(target_os = "linux", target_env = "gnu")
+    )
+))]
+mod sampler_perf_reference_tests;

@@ -4,7 +4,8 @@ The C sampler implementation executes the workspace's Rust behavior samplers.
 The original llama/ggml DLLs are only external test oracles. The CPU sampler
 surface implements 36 frozen public C functions, including all 20 ordinary CPU
 sampler constructors, and one Rust layout inspection function. Backend-attached
-sampling and sampler performance counters remain unavailable.
+sampling remains unavailable. Three additional sampler-chain performance functions
+and the global logger are documented in PERFORMANCE.md.
 
 ## Implemented surface
 
@@ -192,8 +193,10 @@ The implementation rejects source-invalid numerical cases, including a
 zero-probability typical-sampling entropy and an undefined Mirostat float-to-int
 conversion. It does not publish a fake successful selection for those cases.
 
-Chain performance collection (no_perf = false) is explicitly rejected.
-Backend-attached sampling and llguidance integration remain outside this surface.
+Chain performance collection supports both no_perf settings, with real monotonic
+timing and accepted-token counts. PERFORMANCE.md specifies counter ownership,
+reset, clone and copy behavior. Backend-attached sampling and llguidance
+integration remain outside this surface.
 
 Vocabulary snapshots are capped at one million entries and 256 MiB of pieces.
 DRY preprocessing bounds generated sequences and tail storage; exponent overflow

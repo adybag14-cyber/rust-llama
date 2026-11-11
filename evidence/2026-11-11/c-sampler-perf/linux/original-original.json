@@ -1,0 +1,2431 @@
+{
+  "abi": [
+    16,
+    8,
+    0,
+    8
+  ],
+  "logger_initial": {
+    "callback_nonnull": true,
+    "userdata_null": true
+  },
+  "cases": [
+    {
+      "name": "empty-false",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "accepted",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampler-reset",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "perf-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "empty-true",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "accepted",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampler-reset",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "perf-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "nested-false-false",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "initial-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "applied-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "applied-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "perf",
+          "label": "accepted-p",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "accepted-c",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "sample",
+          "token": 91
+        },
+        {
+          "op": "perf",
+          "label": "sampled-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampled-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "original-unchanged",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "parent-reset-only",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-retained",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "remove",
+          "same_child": true
+        },
+        {
+          "op": "perf",
+          "label": "after-remove",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "removed-child-unchanged",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 4,
+          "accepts": 3,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 4,
+          "resets": 1
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        },
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "nested-false-true",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "initial-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "applied-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "applied-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "perf",
+          "label": "accepted-p",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "accepted-c",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "sample",
+          "token": 91
+        },
+        {
+          "op": "perf",
+          "label": "sampled-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampled-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "original-unchanged",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "parent-reset-only",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-retained",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "remove",
+          "same_child": true
+        },
+        {
+          "op": "perf",
+          "label": "after-remove",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "removed-child-unchanged",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 4,
+          "accepts": 3,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 4,
+          "resets": 1
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        },
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "nested-true-false",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "initial-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "applied-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "applied-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "perf",
+          "label": "accepted-p",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "accepted-c",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "sample",
+          "token": 91
+        },
+        {
+          "op": "perf",
+          "label": "sampled-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampled-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "original-unchanged",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "parent-reset-only",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-retained",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "remove",
+          "same_child": true
+        },
+        {
+          "op": "perf",
+          "label": "after-remove",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "removed-child-unchanged",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 4,
+          "accepts": 3,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 4,
+          "resets": 1
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        },
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "nested-true-true",
+      "trace": [
+        {
+          "op": "perf",
+          "label": "initial-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "initial-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "applied-p",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "applied-c",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 0,
+          "resets": 0
+        },
+        {
+          "op": "perf",
+          "label": "accepted-p",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "accepted-c",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "sample",
+          "token": 91
+        },
+        {
+          "op": "perf",
+          "label": "sampled-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "sampled-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-p",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset-c",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 2,
+          "resets": 1
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-child-used",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "original-unchanged",
+          "n_sample": 2,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "parent-reset-only",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-retained",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "child-reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "remove",
+          "same_child": true
+        },
+        {
+          "op": "perf",
+          "label": "after-remove",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "removed-child-unchanged",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": 0,
+          "sorted": true,
+          "values": [
+            [
+              1,
+              1082729618,
+              0
+            ],
+            [
+              7,
+              1068948334,
+              0
+            ],
+            [
+              3,
+              1060559726,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 4,
+          "accepts": 3,
+          "resets": 1
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 0,
+          "accepts": 4,
+          "resets": 1
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        },
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "copy-flag-false",
+      "trace": [
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "source",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "old-destination",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "copied-flag-apply",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied-flag-accept",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-flag",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "source-unchanged",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 1,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 0
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    },
+    {
+      "name": "copy-flag-true",
+      "trace": [
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "source",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "old-destination",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "reset",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "copied-flag-apply",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "copied-flag-accept",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "clone-initial",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "apply",
+          "selected": -1,
+          "sorted": false,
+          "values": [
+            [
+              3,
+              1056964608,
+              0
+            ],
+            [
+              1,
+              1077936128,
+              0
+            ],
+            [
+              7,
+              1065353216,
+              0
+            ],
+            [
+              5,
+              3221225472,
+              0
+            ]
+          ]
+        },
+        {
+          "op": "perf",
+          "label": "clone-flag",
+          "n_sample": 0,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "perf",
+          "label": "source-unchanged",
+          "n_sample": 1,
+          "clock_ok": true,
+          "relation_ok": true,
+          "valid_microseconds": true
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 1,
+          "accepts": 1,
+          "resets": 0
+        },
+        {
+          "op": "inspect_custom",
+          "applies": 2,
+          "accepts": 2,
+          "resets": 0
+        }
+      ],
+      "logs": [
+        {
+          "level": 2,
+          "tag": 7,
+          "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+        }
+      ],
+      "callback_roundtrip": true
+    }
+  ],
+  "logger_set": true,
+  "logger_replace": true,
+  "logger_replacement_calls": [
+    {
+      "level": 2,
+      "tag": 22,
+      "bytes": "llama_perf_sampler_print:    samplers time =       0.00 ms /     0 runs\n\u0000"
+    }
+  ],
+  "logger_old_calls": [],
+  "logger_default": {
+    "same_initial_callback": true,
+    "retained_userdata": true
+  },
+  "logger_restore": true,
+  "timings": [
+    {
+      "case": "empty-false",
+      "label": "initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "empty-false",
+      "label": "accepted",
+      "t_sample_ms": 0.001,
+      "n_sample": 1
+    },
+    {
+      "case": "empty-false",
+      "label": "sampler-reset",
+      "t_sample_ms": 0.001,
+      "n_sample": 1
+    },
+    {
+      "case": "empty-false",
+      "label": "perf-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "empty-true",
+      "label": "initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "empty-true",
+      "label": "accepted",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "empty-true",
+      "label": "sampler-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "empty-true",
+      "label": "perf-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "initial-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "initial-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "applied-p",
+      "t_sample_ms": 2.195,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "applied-c",
+      "t_sample_ms": 2.195,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "accepted-p",
+      "t_sample_ms": 6.339,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "accepted-c",
+      "t_sample_ms": 4.268,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "sampled-p",
+      "t_sample_ms": 12.575000000000001,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-false",
+      "label": "sampled-c",
+      "t_sample_ms": 8.419,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-false",
+      "label": "reset-p",
+      "t_sample_ms": 12.575000000000001,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-false",
+      "label": "reset-c",
+      "t_sample_ms": 8.419,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-false",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "clone-child-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "clone-used",
+      "t_sample_ms": 6.223,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "clone-child-used",
+      "t_sample_ms": 4.144,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "original-unchanged",
+      "t_sample_ms": 12.575000000000001,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-false",
+      "label": "copied",
+      "t_sample_ms": 6.223,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "child-copied",
+      "t_sample_ms": 4.144,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "parent-reset-only",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "child-retained",
+      "t_sample_ms": 4.144,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "child-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-false",
+      "label": "after-remove",
+      "t_sample_ms": 2.077,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-false",
+      "label": "removed-child-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "initial-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "initial-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "applied-p",
+      "t_sample_ms": 2.076,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "applied-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "accepted-p",
+      "t_sample_ms": 6.22,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "accepted-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "sampled-p",
+      "t_sample_ms": 12.437,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-true",
+      "label": "sampled-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-true",
+      "label": "reset-p",
+      "t_sample_ms": 12.437,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-true",
+      "label": "reset-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-true",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "clone-child-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "clone-used",
+      "t_sample_ms": 6.234,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "clone-child-used",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "original-unchanged",
+      "t_sample_ms": 12.437,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-false-true",
+      "label": "copied",
+      "t_sample_ms": 6.234,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "child-copied",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "parent-reset-only",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "child-retained",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "child-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-false-true",
+      "label": "after-remove",
+      "t_sample_ms": 2.078,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-false-true",
+      "label": "removed-child-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "initial-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "initial-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "applied-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "applied-c",
+      "t_sample_ms": 2.073,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "accepted-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "accepted-c",
+      "t_sample_ms": 4.143,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "sampled-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-false",
+      "label": "sampled-c",
+      "t_sample_ms": 8.3,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-false",
+      "label": "reset-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-false",
+      "label": "reset-c",
+      "t_sample_ms": 8.3,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-false",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "clone-child-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "clone-used",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "clone-child-used",
+      "t_sample_ms": 4.1530000000000005,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "original-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-false",
+      "label": "copied",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "child-copied",
+      "t_sample_ms": 4.1530000000000005,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "parent-reset-only",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "child-retained",
+      "t_sample_ms": 4.1530000000000005,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "child-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-false",
+      "label": "after-remove",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-false",
+      "label": "removed-child-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "initial-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "initial-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "applied-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "applied-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "accepted-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "accepted-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "sampled-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-true",
+      "label": "sampled-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-true",
+      "label": "reset-p",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-true",
+      "label": "reset-c",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-true",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "clone-child-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "clone-used",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "clone-child-used",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "original-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 2
+    },
+    {
+      "case": "nested-true-true",
+      "label": "copied",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "child-copied",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "parent-reset-only",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "child-retained",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "child-reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "nested-true-true",
+      "label": "after-remove",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "nested-true-true",
+      "label": "removed-child-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "source",
+      "t_sample_ms": 4.156,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "old-destination",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "copied",
+      "t_sample_ms": 4.156,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "copied-flag-apply",
+      "t_sample_ms": 2.075,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "copied-flag-accept",
+      "t_sample_ms": 4.151,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "clone-flag",
+      "t_sample_ms": 2.079,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-false",
+      "label": "source-unchanged",
+      "t_sample_ms": 4.156,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "source",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "old-destination",
+      "t_sample_ms": 2.08,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "copied",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "reset",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "copied-flag-apply",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "copied-flag-accept",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "clone-initial",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "clone-flag",
+      "t_sample_ms": 0.0,
+      "n_sample": 0
+    },
+    {
+      "case": "copy-flag-true",
+      "label": "source-unchanged",
+      "t_sample_ms": 0.0,
+      "n_sample": 1
+    }
+  ]
+}

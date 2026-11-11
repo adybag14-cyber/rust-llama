@@ -28,7 +28,23 @@ enum State {
     Infill(Arc<SamplerVocab>),
     Grammar(Box<crate::sampler_grammar::GrammarState>),
     Empty(&'static CStr),
-    Chain(Vec<*mut LlamaSampler>),
+    Chain(Chain),
+}
+struct Chain {
+    children: Vec<*mut LlamaSampler>,
+    no_perf: bool,
+    t_sample_us: i64,
+    n_sample: i32,
+}
+impl Chain {
+    fn new(no_perf: bool) -> Self {
+        Self {
+            children: Vec::new(),
+            no_perf,
+            t_sample_us: 0,
+            n_sample: 0,
+        }
+    }
 }
 impl State {
     fn index(&self) -> usize {
@@ -246,13 +262,23 @@ unsafe fn accept_impl(sampler: *mut LlamaSampler, token: i32) -> Result<()> {
             }
             State::Dry(dry) => dry.accept(token).map_err(|e| e.to_string())?,
             State::Grammar(grammar) => grammar.accept(token)?,
-            State::Chain(children) => {
-                let children = children.clone();
-                for child in children {
-                    unsafe {
-                        accept_impl(child, token)?;
-                    }
+            State::Chain(chain) => {
+                let started = (!chain.no_perf).then(crate::monotonic_time_us);
+                let next_count = chain
+                    .n_sample
+                    .checked_add(1)
+                    .ok_or("sampler performance count exceeds INT32_MAX")?;
+                let children = chain.children.clone();
+                let result = children
+                    .into_iter()
+                    .try_for_each(|child| unsafe { accept_impl(child, token) });
+                unsafe {
+                    finish_chain_time(sampler, started)?;
                 }
+                if result.is_ok() {
+                    unsafe { chain_state_mut(sampler)? }.n_sample = next_count;
+                }
+                result?;
             }
             _ => {}
         }
@@ -281,19 +307,21 @@ unsafe fn apply_builtin(sampler: *mut LlamaSampler, array: *mut LlamaTokenDataAr
     {
         return Ok(());
     }
-    if let State::Chain(children) = s {
-        let children = children.clone();
-        for child in children {
+    if let State::Chain(chain) = s {
+        let started = (!chain.no_perf).then(crate::monotonic_time_us);
+        let children = chain.children.clone();
+        let result = children.into_iter().try_for_each(|child| {
             // The frozen chain skips custom backend-only stages with no CPU apply.
             let h = unsafe { handle(child)? };
             if !h.iface.is_null() && unsafe { reference(h.iface)? }.apply.is_none() {
-                continue;
+                return Ok(());
             }
-            unsafe {
-                apply_impl(child, array)?;
-            }
+            unsafe { apply_impl(child, array) }
+        });
+        unsafe {
+            finish_chain_time(sampler, started)?;
         }
-        return Ok(());
+        return result;
     }
     let output = unsafe { reference_mut(array)? };
     if output.size > MAX_CANDIDATES {
@@ -450,8 +478,8 @@ unsafe fn reset_impl(sampler: *mut LlamaSampler) -> Result<()> {
             }
             State::Dry(dry) => dry.reset(),
             State::Grammar(grammar) => grammar.reset(),
-            State::Chain(children) => {
-                let children = children.clone();
+            State::Chain(chain) => {
+                let children = chain.children.clone();
                 for child in children {
                     unsafe {
                         reset_impl(child)?;
@@ -477,9 +505,9 @@ unsafe fn free_state_impl(sampler: *mut LlamaSampler) -> Result<()> {
     h.ctx = ptr::null_mut();
     // SAFETY: this opaque allocation originated in allocate; it is consumed once.
     let value = unsafe { Box::from_raw(state) };
-    if let State::Chain(children) = *value {
+    if let State::Chain(chain) = *value {
         let mut first_error = None;
-        for child in children {
+        for child in chain.children {
             if let Err(e) = unsafe { free_impl(child, true) } {
                 first_error.get_or_insert(e);
             }
@@ -521,9 +549,39 @@ unsafe fn free_impl(sampler: *mut LlamaSampler, owned: bool) -> Result<()> {
     result
 }
 
+unsafe fn chain_state<'a>(sampler: *const LlamaSampler) -> Result<&'a Chain> {
+    match unsafe { state(sampler)? } {
+        State::Chain(chain) => Ok(chain),
+        _ => Err("sampler is not a chain".into()),
+    }
+}
+unsafe fn chain_state_mut<'a>(sampler: *mut LlamaSampler) -> Result<&'a mut Chain> {
+    match unsafe { state_mut(sampler)? } {
+        State::Chain(chain) => Ok(chain),
+        _ => Err("sampler is not a chain".into()),
+    }
+}
+unsafe fn finish_chain_time(sampler: *mut LlamaSampler, started: Option<i64>) -> Result<()> {
+    if let Some(started) = started {
+        let elapsed = crate::monotonic_time_us().saturating_sub(started);
+        let chain = unsafe { chain_state_mut(sampler)? };
+        chain.t_sample_us = chain
+            .t_sample_us
+            .checked_add(elapsed)
+            .ok_or("sampler performance time exceeds INT64_MAX")?;
+    }
+    Ok(())
+}
+unsafe fn performance(sampler: *const LlamaSampler) -> Result<LlamaPerfSamplerData> {
+    let chain = unsafe { chain_state(sampler)? };
+    Ok(LlamaPerfSamplerData {
+        t_sample_ms: 1e-3 * chain.t_sample_us as f64,
+        n_sample: chain.n_sample.max(0),
+    })
+}
 unsafe fn chain_children(sampler: *const LlamaSampler) -> Result<Vec<*mut LlamaSampler>> {
     match unsafe { state(sampler)? } {
-        State::Chain(children) => Ok(children.clone()),
+        State::Chain(chain) => Ok(chain.children.clone()),
         _ => Err("sampler is not a chain".into()),
     }
 }
@@ -573,7 +631,7 @@ unsafe fn chain_add_impl(chain: *mut LlamaSampler, sampler: *mut LlamaSampler) -
     // Registry validation above establishes the live allocation; no callback occurs under the lock.
     let raw = unsafe { reference(chain)? }.ctx.cast::<State>();
     match unsafe { reference_mut(raw)? } {
-        State::Chain(children) => children.push(sampler),
+        State::Chain(chain) => chain.children.push(sampler),
         _ => return Err("sampler is not a chain".into()),
     }
     r.get_mut(&(sampler as usize))
@@ -616,9 +674,10 @@ unsafe fn clone_impl(sampler: *const LlamaSampler) -> Result<*mut LlamaSampler> 
             State::Infill(vocab) => allocate(State::Infill(vocab.clone())),
             State::Grammar(grammar) => allocate(State::Grammar(grammar.clone())),
             State::Empty(label) => empty(label),
-            State::Chain(children) => {
-                let children = children.clone();
-                let result = allocate(State::Chain(Vec::new()))?;
+            State::Chain(chain) => {
+                let children = chain.children.clone();
+                // The frozen clone carries parameters and child state, with fresh counters.
+                let result = allocate(State::Chain(Chain::new(chain.no_perf)))?;
                 for child in children {
                     match unsafe { clone_impl(child) } {
                         Ok(copy) => {
@@ -690,10 +749,10 @@ unsafe fn copy_compatible(source: *const LlamaSampler, target: *const LlamaSampl
             }
         }
         (State::Chain(a), State::Chain(b)) => {
-            if a.len() != b.len() {
+            if a.children.len() != b.children.len() {
                 return Err("sampler_copy requires identical chain topology".into());
             }
-            for (&aa, &bb) in a.iter().zip(b) {
+            for (&aa, &bb) in a.children.iter().zip(&b.children) {
                 unsafe {
                     copy_compatible(aa, bb)?;
                 }
@@ -727,6 +786,14 @@ unsafe fn copy_impl(source: *const LlamaSampler, target: *mut LlamaSampler) -> R
                 copy_impl(a, b)?;
             }
         }
+        let (no_perf, t_sample_us, n_sample) = {
+            let chain = unsafe { chain_state(source)? };
+            (chain.no_perf, chain.t_sample_us, chain.n_sample)
+        };
+        let target = unsafe { chain_state_mut(target)? };
+        target.no_perf = no_perf;
+        target.t_sample_us = t_sample_us;
+        target.n_sample = n_sample;
         return Ok(());
     }
     if native_index(src.iface).is_some() {
@@ -781,8 +848,8 @@ unsafe fn seed_impl(sampler: *const LlamaSampler) -> Result<u32> {
         {
             Ok(b.effective_seed)
         }
-        State::Chain(children) => {
-            for &child in children.iter().rev() {
+        State::Chain(chain) => {
+            for &child in chain.children.iter().rev() {
                 let seed = unsafe { seed_impl(child)? };
                 if seed != u32::MAX {
                     return Ok(seed);
@@ -869,15 +936,40 @@ ffi!(
     u32::MAX,
     { unsafe { seed_impl(sampler) } }
 );
+
+ffi!(
+    llama_perf_sampler(chain: *const LlamaSampler) -> LlamaPerfSamplerData,
+    LlamaPerfSamplerData::default(),
+    { unsafe { performance(chain) } }
+);
+ffi!(
+    llama_perf_sampler_reset(chain: *mut LlamaSampler) -> (),
+    (),
+    {
+        let chain = unsafe { chain_state_mut(chain)? };
+        chain.t_sample_us = 0;
+        chain.n_sample = 0;
+        Ok(())
+    }
+);
+ffi!(
+    llama_perf_sampler_print(chain: *const LlamaSampler) -> (),
+    (),
+    {
+        let data = unsafe { performance(chain)? };
+        let message = std::ffi::CString::new(format!(
+            "llama_perf_sampler_print:    samplers time = {:10.2} ms / {:5} runs\n",
+            data.t_sample_ms, data.n_sample
+        ))
+        .map_err(|_| "sampler performance log contains NUL")?;
+        crate::logging::emit(2, &message)
+    }
+);
+
 ffi!(
     llama_sampler_chain_init(params: LlamaSamplerChainParams) -> *mut LlamaSampler,
     ptr::null_mut(),
-    {
-        if !boolean(params.no_perf)? {
-            return Err("sampler performance counters are not yet implemented".into());
-        }
-        allocate(State::Chain(Vec::new()))
-    }
+    { allocate(State::Chain(Chain::new(boolean(params.no_perf)?))) }
 );
 ffi!(
     llama_sampler_chain_add(chain: *mut LlamaSampler, sampler: *mut LlamaSampler) -> (),
@@ -923,7 +1015,7 @@ ffi!(
         let State::Chain(values) = (unsafe { state_mut(chain)? }) else {
             unreachable!()
         };
-        values.remove(index);
+        values.children.remove(index);
         registry()
             .lock()
             .map_err(|_| "sampler registry poisoned")?

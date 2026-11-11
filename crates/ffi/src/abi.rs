@@ -374,3 +374,14 @@ pub struct LlamaEmbd {
     pub n_rows: usize,
     pub n_embd: usize,
 }
+
+/// Frozen sampler-chain timing and accepted-token counters.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default)]
+pub struct LlamaPerfSamplerData {
+    pub t_sample_ms: f64,
+    pub n_sample: i32,
+}
+
+/// The logger receives a transient NUL-terminated byte string.
+pub type LogCallback = Option<unsafe extern "C" fn(i32, *const std::ffi::c_char, *mut c_void)>;

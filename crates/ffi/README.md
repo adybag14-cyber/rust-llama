@@ -136,7 +136,7 @@ STATE.md documents the raw cache and session contracts.
 Context creation rejects KV types other than F32/F16, nondefault context types,
 custom RoPE/YaRN, pooling, noncausal attention, nonflash multiple-worker execution, evaluator
 callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
-slots, nondefault output capacity fields and performance counters. SWA preferences have no effect for the supported non-SWA model.
+slots, nondefault output capacity fields and context performance counters. SWA preferences have no effect for the supported non-SWA model.
 All boolean and enum inputs are validated.
 
 Model loading rejects device lists, tensor buffer overrides, tensor splitting,
@@ -161,7 +161,7 @@ data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32/F16 memory manipulation and frozen state/session formats are implemented
 as described in STATE.md. Backend-attached sampling, recurrent native caches,
-adapters, encoder entry points, model saving and performance APIs remain absent. Source custom chat-template lookup
+adapters, encoder entry points, model saving and context performance APIs remain absent. Source custom chat-template lookup
 is implemented; template application is not exported.
 
 ## Automatic shard regression
@@ -192,8 +192,9 @@ element ceiling bounds list length; it is not a total path-byte or RSS bound.
 SAMPLERS.md documents all 20 ordinary CPU sampler constructors, generic/custom
 interfaces, owning chains, raw-byte grammar/lazy triggers, vocabulary-derived DRY
 breakers, adaptive-p, infill, and actual-context sampling. The sampler ABI has an
-independent 36-entry layout check. Backend-attached sampling, llguidance integration
-and sampler performance collection remain unavailable. Source-undefined pending
+independent 36-entry layout check. PERFORMANCE.md covers real sampler-chain
+timing/counts, their reset/clone/copy behavior and global logging callbacks.
+Backend-attached sampling and llguidance integration remain unavailable. Source-undefined pending
 adaptive clone/copy is rejected with a diagnostic.
 
 ## Memory, lifetime and error contract
