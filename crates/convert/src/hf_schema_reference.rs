@@ -96,7 +96,8 @@ fn original_transformers_class_postprocessors() {
                 added: file("added_tokens.json"),
             };
             let special = file("special_tokens_map.json");
-            let result = hf_bpe::prepare(&files, special.as_ref(), &Limits::default(), profile);
+            let result =
+                hf_bpe::prepare(&files, special.as_ref(), &Limits::default(), profile, None);
             if text(field(case, "status")).unwrap() == "rejected" {
                 assert!(result.is_err(), "source rejects {name}");
                 rejected += 1;

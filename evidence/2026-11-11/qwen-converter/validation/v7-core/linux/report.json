@@ -1,0 +1,51 @@
+{
+  "host": "linux",
+  "started_utc": "2026-11-11T09:20:54.798562+00:00",
+  "steps": [
+    {
+      "name": "fmt-check",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 1.5262418769999968
+    },
+    {
+      "name": "debug",
+      "args": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 19.367733869999995
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 5.63757621500001
+    }
+  ],
+  "status": "passed",
+  "inputs_unchanged": true
+}

@@ -1,0 +1,64 @@
+{
+  "host": "linux",
+  "started_utc": "2026-11-11T09:27:19.185829+00:00",
+  "steps": [
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 3.0263351159999985
+    },
+    {
+      "name": "pretrained-qwen2",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen2_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 67.17977616499999
+    },
+    {
+      "name": "pretrained-qwen3",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen3_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 93.97897583299999
+    }
+  ],
+  "status": "passed",
+  "inputs_unchanged": true
+}

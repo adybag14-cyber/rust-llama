@@ -1,0 +1,2859 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "profile": "windows",
+  "started_utc": "2026-11-11T09:55:57.459666+00:00",
+  "python": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Scripts\\python.exe",
+  "transformers": "4.57.6",
+  "tokenizers": "0.22.2",
+  "driver": {
+    "bytes": 8536,
+    "sha256": "883373b0b096d7e3a96c16f6b77f035b19c4bc2f313a914bcdf664fb14d9d57b"
+  },
+  "source_input": {
+    "path": "C:\\Users\\adyba\\rust-llama\\crates\\convert\\tests\\fixtures\\hf-qwen\\qwen-fast-input.json",
+    "bytes": 55802,
+    "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+  },
+  "sources": {
+    "auto_config": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\auto\\configuration_auto.py",
+      "bytes": 55606,
+      "sha256": "120b62cd4e13dd155762acd14cf64fc8bca17a068f5dd004ddfd30fbcb2ef4ab"
+    },
+    "auto_tokenizer": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\auto\\tokenization_auto.py",
+      "bytes": 58505,
+      "sha256": "5265e6def5a83c1b37871fa46ff2a59440ef80b377c249bc0c2135353157f730"
+    },
+    "fast_base": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\tokenization_utils_fast.py",
+      "bytes": 41383,
+      "sha256": "558e454ee6850e90e8bc5d1782e35878dfda1da9bfdf997ae113fa7ff771a0f3"
+    }
+  },
+  "requests": [
+    {
+      "text": "hello",
+      "add_special_tokens": false
+    },
+    {
+      "text": " hello",
+      "add_special_tokens": false
+    },
+    {
+      "text": "",
+      "add_special_tokens": false
+    },
+    {
+      "text": "a  b",
+      "add_special_tokens": false
+    }
+  ],
+  "inputs": {
+    "qwen-fast-input.json": {
+      "kind": "direct",
+      "saved_prefix": true,
+      "depth": 0,
+      "bytes": 55802,
+      "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+    },
+    "qwen-fast-prefix-false-input.json": {
+      "kind": "direct",
+      "saved_prefix": false,
+      "depth": 0,
+      "bytes": 55803,
+      "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+    },
+    "qwen-sequence-input.json": {
+      "kind": "sequence",
+      "saved_prefix": true,
+      "depth": 1,
+      "bytes": 55840,
+      "sha256": "3a60896708f19c8a631391c240809b353d19bc0393ab2c185c23aff4772a8e83"
+    },
+    "qwen-sequence-prefix-false-input.json": {
+      "kind": "sequence",
+      "saved_prefix": false,
+      "depth": 1,
+      "bytes": 55841,
+      "sha256": "812ac9046d20811aa10a355ac809a4b6cab24f8baaca4e5f4004d9bcc9f7629c"
+    },
+    "qwen-nested-sequence-input.json": {
+      "kind": "nested-sequence",
+      "saved_prefix": true,
+      "depth": 2,
+      "bytes": 55878,
+      "sha256": "e47d017e3e7aecacd687bf95b969cfccc0b02adfa7b14e092e0820a232cf52ea"
+    },
+    "qwen-nested-sequence-prefix-false-input.json": {
+      "kind": "nested-sequence",
+      "saved_prefix": false,
+      "depth": 2,
+      "bytes": 55879,
+      "sha256": "f2ec572d2a892dd04510d7c60cd4226e4e98bc06091a0e43859fcee2c8467102"
+    }
+  },
+  "cases": [
+    {
+      "name": "direct-true-no-sidecar-qwen2",
+      "input": "qwen-fast-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-true-no-sidecar-qwen2",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-true-no-sidecar-qwen3",
+      "input": "qwen-fast-input.json",
+      "model_config": {
+        "model_type": "qwen3",
+        "architectures": [
+          "Qwen3ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "head_dim": 16
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-true-no-sidecar-qwen3",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen3Config",
+        "model_type": "qwen3",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-true-no-sidecar-gpt2",
+      "input": "qwen-fast-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "GPT2TokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-true-no-sidecar-gpt2",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "GPT2TokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-true-no-sidecar-llama",
+      "input": "qwen-fast-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "LlamaTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-true-no-sidecar-llama",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "LlamaTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "backend_sha256": "6f137ddb5bef50ba577bb198e8db536108e2feab591d12a8b5e58285f49aa819"
+      }
+    },
+    {
+      "name": "direct-true-no-sidecar-generic",
+      "input": "qwen-fast-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-true-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b"
+      }
+    },
+    {
+      "name": "direct-false-no-sidecar-qwen2",
+      "input": "qwen-fast-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-false-no-sidecar-qwen2",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-false-no-sidecar-qwen3",
+      "input": "qwen-fast-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen3",
+        "architectures": [
+          "Qwen3ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "head_dim": 16
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-false-no-sidecar-qwen3",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen3Config",
+        "model_type": "qwen3",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-false-no-sidecar-gpt2",
+      "input": "qwen-fast-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "GPT2TokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-false-no-sidecar-gpt2",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "GPT2TokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092"
+      }
+    },
+    {
+      "name": "direct-false-no-sidecar-llama",
+      "input": "qwen-fast-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "LlamaTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-false-no-sidecar-llama",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "LlamaTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "backend_sha256": "19e48c5472f773a9e6bae16e2a8214cdd987ef438ce971ea15498e962e400b9e"
+      }
+    },
+    {
+      "name": "direct-false-no-sidecar-generic",
+      "input": "qwen-fast-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\direct-false-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b"
+      }
+    },
+    {
+      "name": "sequence-true-side-prefix-absent",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-side-prefix-absent",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "fe301583620b50c5172ad3870fe45d2aefbf0fcf99b39f7eb40c64944f379557"
+      }
+    },
+    {
+      "name": "sequence-true-side-prefix-false",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-side-prefix-false",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "fe301583620b50c5172ad3870fe45d2aefbf0fcf99b39f7eb40c64944f379557"
+      }
+    },
+    {
+      "name": "sequence-true-side-prefix-true",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-side-prefix-true",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "fe301583620b50c5172ad3870fe45d2aefbf0fcf99b39f7eb40c64944f379557"
+      }
+    },
+    {
+      "name": "sequence-true-side-prefix-null",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-side-prefix-null",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "fe301583620b50c5172ad3870fe45d2aefbf0fcf99b39f7eb40c64944f379557"
+      }
+    },
+    {
+      "name": "sequence-true-no-sidecar-qwen",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-no-sidecar-qwen",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "fe301583620b50c5172ad3870fe45d2aefbf0fcf99b39f7eb40c64944f379557"
+      }
+    },
+    {
+      "name": "sequence-true-no-sidecar-generic",
+      "input": "qwen-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-true-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": true,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "989f781fef39561c3c27904bf07b37bb17c129c73c439080391e3734087aa53c"
+      }
+    },
+    {
+      "name": "sequence-false-side-prefix-absent",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-side-prefix-absent",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "24e701d41e6b8483509351bda4e79fb4d9257f82af77b05b5db1fe1bfc3337ee"
+      }
+    },
+    {
+      "name": "sequence-false-side-prefix-false",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-side-prefix-false",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "24e701d41e6b8483509351bda4e79fb4d9257f82af77b05b5db1fe1bfc3337ee"
+      }
+    },
+    {
+      "name": "sequence-false-side-prefix-true",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-side-prefix-true",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "24e701d41e6b8483509351bda4e79fb4d9257f82af77b05b5db1fe1bfc3337ee"
+      }
+    },
+    {
+      "name": "sequence-false-side-prefix-null",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-side-prefix-null",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "24e701d41e6b8483509351bda4e79fb4d9257f82af77b05b5db1fe1bfc3337ee"
+      }
+    },
+    {
+      "name": "sequence-false-no-sidecar-qwen",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-no-sidecar-qwen",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "24e701d41e6b8483509351bda4e79fb4d9257f82af77b05b5db1fe1bfc3337ee"
+      }
+    },
+    {
+      "name": "sequence-false-no-sidecar-generic",
+      "input": "qwen-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\sequence-false-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "ByteLevel",
+              "add_prefix_space": false,
+              "trim_offsets": true,
+              "use_regex": true
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "af65043a5ab03c14fdd976335e3432f5c12f1c0ae3de559076edc62683eea10a"
+      }
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-absent",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-side-prefix-absent",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "12d51b7a28fe7a79224e4539fe420476319f895758b399566805706b454aa759"
+      }
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-false",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-side-prefix-false",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "12d51b7a28fe7a79224e4539fe420476319f895758b399566805706b454aa759"
+      }
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-true",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-side-prefix-true",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "12d51b7a28fe7a79224e4539fe420476319f895758b399566805706b454aa759"
+      }
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-null",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-side-prefix-null",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "12d51b7a28fe7a79224e4539fe420476319f895758b399566805706b454aa759"
+      }
+    },
+    {
+      "name": "nested-sequence-true-no-sidecar-qwen",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-no-sidecar-qwen",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "12d51b7a28fe7a79224e4539fe420476319f895758b399566805706b454aa759"
+      }
+    },
+    {
+      "name": "nested-sequence-true-no-sidecar-generic",
+      "input": "qwen-nested-sequence-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-true-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": true,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "f68cc27bb7d210a9e0f07b5bb38621ee603f19616c9e7656343eb09b435528a5"
+      }
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-absent",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-side-prefix-absent",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "b34db93ae172a83e410f890062baed863e46067e47271a629ef2c63a26c0a1fd"
+      }
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-false",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-side-prefix-false",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "b34db93ae172a83e410f890062baed863e46067e47271a629ef2c63a26c0a1fd"
+      }
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-true",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-side-prefix-true",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "b34db93ae172a83e410f890062baed863e46067e47271a629ef2c63a26c0a1fd"
+      }
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-null",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-side-prefix-null",
+      "tokenizer_config_file_present": true,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "b34db93ae172a83e410f890062baed863e46067e47271a629ef2c63a26c0a1fd"
+      }
+    },
+    {
+      "name": "nested-sequence-false-no-sidecar-qwen",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-no-sidecar-qwen",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": null
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "backend_sha256": "b34db93ae172a83e410f890062baed863e46067e47271a629ef2c63a26c0a1fd"
+      }
+    },
+    {
+      "name": "nested-sequence-false-no-sidecar-generic",
+      "input": "qwen-nested-sequence-prefix-false-input.json",
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2,
+        "max_position_embeddings": 128,
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "tokenizer_config": null,
+      "input_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-class-audit\\prefix-boundaries-windows-v1\\derived\\nested-sequence-false-no-sidecar-generic",
+      "tokenizer_config_file_present": false,
+      "auto_config": {
+        "status": "accepted",
+        "class": "Qwen2Config",
+        "model_type": "qwen2",
+        "root_tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "Sequence",
+          "pretokenizers": [
+            {
+              "type": "Sequence",
+              "pretokenizers": [
+                {
+                  "type": "ByteLevel",
+                  "add_prefix_space": false,
+                  "trim_offsets": true,
+                  "use_regex": true
+                }
+              ]
+            }
+          ]
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ],
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "backend_sha256": "bb667625989a83fa8e40f64cd027bdcb476bb9369cca679a815218316caed542"
+      }
+    }
+  ],
+  "options": {
+    "local_files_only": true,
+    "trust_remote_code": false,
+    "use_fast": "default"
+  },
+  "input_unchanged": true,
+  "completed_utc": "2026-11-11T09:55:57.990147+00:00"
+}

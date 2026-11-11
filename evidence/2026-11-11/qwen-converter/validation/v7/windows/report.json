@@ -1,0 +1,104 @@
+{
+  "host": "windows",
+  "started_utc": "2026-11-11T09:19:28.177062+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "debug",
+      "args": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 22.155654299999696
+    },
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 81.50617859999966
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 7.233043100000032
+    },
+    {
+      "name": "pretrained-qwen2",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen2_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 33.8440728999999
+    },
+    {
+      "name": "pretrained-qwen3",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen3_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 52.36248079999996
+    }
+  ],
+  "status": "passed",
+  "inputs_unchanged": true
+}

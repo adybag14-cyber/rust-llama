@@ -1,0 +1,3364 @@
+{
+  "schema": 1,
+  "provenance": {
+    "authority": "unchanged Transformers AutoTokenizer and fast constructors",
+    "transformers": "4.57.6",
+    "tokenizers": "0.22.2",
+    "input": {
+      "bytes": 55802,
+      "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+    },
+    "script": {
+      "bytes": 6198,
+      "sha256": "90f75768ee1969ad327fe0479212bcff476e0405281860eed046784b5f020cac"
+    },
+    "sources": {
+      "LlamaTokenizerFast": {
+        "bytes": 10965,
+        "sha256": "9d82b9bf81910e1a0b93186d804a0baaaf24a228287cf4c0b91bfcfab4af93c5"
+      },
+      "Qwen2TokenizerFast": {
+        "bytes": 5210,
+        "sha256": "1025a3b86526283bd86a447f0fe2d991d09775b32d3fdcc233c9e447b0611049"
+      },
+      "GPT2TokenizerFast": {
+        "bytes": 5274,
+        "sha256": "a4a2763d5692cd65122235d6a0ba74afc2e222ea6d864ffca1a4cd843f8f840c"
+      },
+      "PreTrainedTokenizerFast": {
+        "bytes": 41383,
+        "sha256": "558e454ee6850e90e8bc5d1782e35878dfda1da9bfdf997ae113fa7ff771a0f3"
+      }
+    },
+    "options": {
+      "local_files_only": true,
+      "trust_remote_code": false,
+      "use_fast": "default"
+    },
+    "derived_input": "saved-prefix=false changes only tokenizer.json.pre_tokenizer.add_prefix_space; saved-prefix=true reuses exact original bytes"
+  },
+  "requests": [
+    {
+      "text": "hello",
+      "add_special_tokens": false
+    },
+    {
+      "text": " hello",
+      "add_special_tokens": false
+    },
+    {
+      "text": "",
+      "add_special_tokens": false
+    },
+    {
+      "text": "a  b",
+      "add_special_tokens": false
+    }
+  ],
+  "cases": [
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-absent",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "6f137ddb5bef50ba577bb198e8db536108e2feab591d12a8b5e58285f49aa819",
+        "special_tokens_map": {
+          "bos_token": "<s>",
+          "eos_token": "</s>",
+          "unk_token": "<unk>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-null",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "6f137ddb5bef50ba577bb198e8db536108e2feab591d12a8b5e58285f49aa819",
+        "special_tokens_map": {
+          "bos_token": "<s>",
+          "eos_token": "</s>",
+          "unk_token": "<unk>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-false",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-true",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-integer",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-true-side-string",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-absent",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-null",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-false",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-true",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-integer",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-true-side-string",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-absent",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-null",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-false",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-true",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-integer",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-true-side-string",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-absent",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-null",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "1b5316f847b69ec1d01fdf56da4d9c1d02bfb11d5a3a2c37fdfe0a3a899c5ce8",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-false",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-true",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "1b5316f847b69ec1d01fdf56da4d9c1d02bfb11d5a3a2c37fdfe0a3a899c5ce8",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-integer",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "1b5316f847b69ec1d01fdf56da4d9c1d02bfb11d5a3a2c37fdfe0a3a899c5ce8",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-true-side-string",
+      "saved_prefix": true,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55802,
+        "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "1b5316f847b69ec1d01fdf56da4d9c1d02bfb11d5a3a2c37fdfe0a3a899c5ce8",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-absent",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "19e48c5472f773a9e6bae16e2a8214cdd987ef438ce971ea15498e962e400b9e",
+        "special_tokens_map": {
+          "bos_token": "<s>",
+          "eos_token": "</s>",
+          "unk_token": "<unk>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-null",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "LlamaTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "19e48c5472f773a9e6bae16e2a8214cdd987ef438ce971ea15498e962e400b9e",
+        "special_tokens_map": {
+          "bos_token": "<s>",
+          "eos_token": "</s>",
+          "unk_token": "<unk>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2049,
+          "unk": 2050,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-false",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-true",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-integer",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "LlamaTokenizerFast-saved-false-side-string",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "LlamaTokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "rejected",
+        "error_type": "TypeError",
+        "error": "not a string"
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-absent",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-null",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-false",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-true",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-integer",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Qwen2TokenizerFast-saved-false-side-string",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "Qwen2TokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "Qwen2TokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>",
+          "pad_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": null,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": 2048
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-absent",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-null",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-false",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-true",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "befcabf85f89f589eb847681a6b51aac48c71cb744af6570f4a71898c547b3ec",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-integer",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GPT2TokenizerFast-saved-false-side-string",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "GPT2TokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "GPT2TokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "38fc8130a2615714d2d27bb42ffb2ee00941857c0ea86df04dd5223ae9719092",
+        "special_tokens_map": {
+          "bos_token": "<|endoftext|>",
+          "eos_token": "<|endoftext|>",
+          "unk_token": "<|endoftext|>"
+        },
+        "special_ids": {
+          "bos": 2048,
+          "eos": 2048,
+          "unk": 2048,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-absent",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast"
+      },
+      "prefix_state": "absent",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-null",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": null
+      },
+      "prefix_state": "null",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": null,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-false",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": false
+      },
+      "prefix_state": "false",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": false,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-true",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": true
+      },
+      "prefix_state": "true",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": true,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": true,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "1b5316f847b69ec1d01fdf56da4d9c1d02bfb11d5a3a2c37fdfe0a3a899c5ce8",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              264,
+              220,
+              293
+            ],
+            "decoded": " a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-integer",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": 7
+      },
+      "prefix_state": "integer",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": 7,
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PreTrainedTokenizerFast-saved-false-side-string",
+      "saved_prefix": false,
+      "model_config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "vocab_size": 2048,
+        "hidden_size": 32,
+        "intermediate_size": 64,
+        "num_hidden_layers": 2,
+        "num_attention_heads": 2,
+        "num_key_value_heads": 2
+      },
+      "tokenizer_config": {
+        "tokenizer_class": "PreTrainedTokenizerFast",
+        "add_prefix_space": "true"
+      },
+      "prefix_state": "string",
+      "tokenizer_input": {
+        "bytes": 55803,
+        "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+      },
+      "result": {
+        "status": "accepted",
+        "class": "PreTrainedTokenizerFast",
+        "native_add_prefix_space": "true",
+        "pre_tokenizer": {
+          "type": "ByteLevel",
+          "add_prefix_space": false,
+          "trim_offsets": true,
+          "use_regex": true
+        },
+        "backend_sha256": "4d1667f25dc20aba4e8ba63a27854f3f3d2dd5f0cfbd8466625641d8896a435b",
+        "special_tokens_map": {},
+        "special_ids": {
+          "bos": null,
+          "eos": null,
+          "unk": null,
+          "pad": null
+        },
+        "responses": [
+          {
+            "ids": [
+              71,
+              301,
+              385
+            ],
+            "decoded": "hello"
+          },
+          {
+            "ids": [
+              305,
+              301,
+              385
+            ],
+            "decoded": " hello"
+          },
+          {
+            "ids": [],
+            "decoded": ""
+          },
+          {
+            "ids": [
+              64,
+              220,
+              293
+            ],
+            "decoded": "a  b"
+          }
+        ]
+      }
+    }
+  ]
+}

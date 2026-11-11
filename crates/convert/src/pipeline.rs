@@ -63,6 +63,7 @@ impl Conversion {
         let mut budget = JsonBudget::new(limits.json.clone());
         let raw = budget.parse(source.read_required("config.json")?)?;
         let config = Config::new(raw, path_text, &mut budget, &limits)?;
+        crate::qwen::validate_variant(&mut source, &config, folder, &mut budget, profile)?;
         if !options.vocab_only && source.read_optional("hf_quant_config.json")?.is_some() {
             return Err(Error::Unsupported(
                 "HF quantization sidecar requires the separate prequantized conversion contract",
@@ -95,7 +96,7 @@ impl Conversion {
             .checked_add(extra.as_ref().map_or(0, |e| e.shape[0]))
             .ok_or(Error::Limit("parameter total"))?;
         let mut metadata = Metadata::default();
-        metadata.string("general.architecture", "llama")?;
+        metadata.string("general.architecture", config.family.name())?;
         metadata.string("general.type", "model")?;
         let naming = crate::authorship::write(
             &mut source,
@@ -110,6 +111,7 @@ impl Conversion {
             &mut metadata,
         )?;
         config.metadata(&mut metadata, plan.output_type)?;
+        crate::qwen::pooling_metadata(&mut source, &config, &mut budget, &mut metadata)?;
         metadata.uint("general.quantization_version", 2)?;
         crate::vocab::write(
             &mut source,
@@ -393,6 +395,9 @@ fn extra_rope(
     profile: SourceProfile,
     limits: &Limits,
 ) -> Result<Option<ExtraRope>> {
+    if config.family != crate::config::Architecture::Llama {
+        return Ok(None);
+    }
     let fields = config.rope()?;
     let Some(kind) = fields.full("rope_type")? else {
         return Ok(None);

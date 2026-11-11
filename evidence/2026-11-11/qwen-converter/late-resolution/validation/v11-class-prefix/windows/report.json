@@ -1,0 +1,62 @@
+{
+  "host": "windows",
+  "started_utc": "2026-11-11T09:55:33.762534+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "debug",
+      "args": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 21.926670099999683
+    },
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 58.800150200000644
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.353998700000375
+    }
+  ],
+  "status": "passed",
+  "inputs_unchanged": true
+}

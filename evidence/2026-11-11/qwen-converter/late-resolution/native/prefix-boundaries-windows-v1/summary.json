@@ -1,0 +1,917 @@
+{
+  "status": "passed",
+  "profile": "windows",
+  "cases": 34,
+  "accepted": 34,
+  "requests_per_case": 4,
+  "fixture": {
+    "bytes": 70067,
+    "sha256": "84295e430f0240faa3fc05d342db68e0ab78add66288335badc17d67ab36c431"
+  },
+  "inputs": {
+    "qwen-fast-input.json": {
+      "kind": "direct",
+      "saved_prefix": true,
+      "depth": 0,
+      "bytes": 55802,
+      "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+    },
+    "qwen-fast-prefix-false-input.json": {
+      "kind": "direct",
+      "saved_prefix": false,
+      "depth": 0,
+      "bytes": 55803,
+      "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef"
+    },
+    "qwen-sequence-input.json": {
+      "kind": "sequence",
+      "saved_prefix": true,
+      "depth": 1,
+      "bytes": 55840,
+      "sha256": "3a60896708f19c8a631391c240809b353d19bc0393ab2c185c23aff4772a8e83"
+    },
+    "qwen-sequence-prefix-false-input.json": {
+      "kind": "sequence",
+      "saved_prefix": false,
+      "depth": 1,
+      "bytes": 55841,
+      "sha256": "812ac9046d20811aa10a355ac809a4b6cab24f8baaca4e5f4004d9bcc9f7629c"
+    },
+    "qwen-nested-sequence-input.json": {
+      "kind": "nested-sequence",
+      "saved_prefix": true,
+      "depth": 2,
+      "bytes": 55878,
+      "sha256": "e47d017e3e7aecacd687bf95b969cfccc0b02adfa7b14e092e0820a232cf52ea"
+    },
+    "qwen-nested-sequence-prefix-false-input.json": {
+      "kind": "nested-sequence",
+      "saved_prefix": false,
+      "depth": 2,
+      "bytes": 55879,
+      "sha256": "f2ec572d2a892dd04510d7c60cd4226e4e98bc06091a0e43859fcee2c8467102"
+    }
+  },
+  "rows": [
+    {
+      "name": "direct-true-no-sidecar-qwen2",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-true-no-sidecar-qwen3",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-true-no-sidecar-gpt2",
+      "class": "GPT2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-true-no-sidecar-llama",
+      "class": "LlamaTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": true,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-true-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-false-no-sidecar-qwen2",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-false-no-sidecar-qwen3",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-false-no-sidecar-gpt2",
+      "class": "GPT2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-false-no-sidecar-llama",
+      "class": "LlamaTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "direct-false-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "ByteLevel",
+        "add_prefix_space": false,
+        "trim_offsets": true,
+        "use_regex": true
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-side-prefix-absent",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-side-prefix-false",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-side-prefix-true",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-side-prefix-null",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-no-sidecar-qwen",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-true-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": true,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-side-prefix-absent",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-side-prefix-false",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-side-prefix-true",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-side-prefix-null",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-no-sidecar-qwen",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "sequence-false-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "ByteLevel",
+            "add_prefix_space": false,
+            "trim_offsets": true,
+            "use_regex": true
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-absent",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-false",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-true",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-side-prefix-null",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-no-sidecar-qwen",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-true-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": true,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          305,
+          301,
+          385
+        ],
+        "decoded": " hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-absent",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-false",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-true",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-side-prefix-null",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-no-sidecar-qwen",
+      "class": "Qwen2TokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    },
+    {
+      "name": "nested-sequence-false-no-sidecar-generic",
+      "class": "PreTrainedTokenizerFast",
+      "status": "accepted",
+      "prefix_state": {
+        "type": "Sequence",
+        "pretokenizers": [
+          {
+            "type": "Sequence",
+            "pretokenizers": [
+              {
+                "type": "ByteLevel",
+                "add_prefix_space": false,
+                "trim_offsets": true,
+                "use_regex": true
+              }
+            ]
+          }
+        ]
+      },
+      "hello": {
+        "ids": [
+          71,
+          301,
+          385
+        ],
+        "decoded": "hello"
+      },
+      "error": null
+    }
+  ]
+}

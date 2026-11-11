@@ -1,5 +1,6 @@
 //! Frozen dense Llama configuration precedence and GGUF metadata.
 use crate::frozen::{AUTO_CONFIG_PATTERNS, LLAMA_DEFAULTS};
+use crate::qwen_tables::{QWEN2_DEFAULTS, QWEN3_DEFAULTS};
 use crate::util::{
     JsonBudget, Metadata, integer, object, optional_text, present, real, text, truth, u32_value,
 };
@@ -7,6 +8,28 @@ use crate::{Error, Limits, OutputType, Result, string};
 use llama_checkpoint::{Object, Value as Json};
 use llama_gguf::RawValue as Value;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Architecture {
+    Llama,
+    Qwen2,
+    Qwen3,
+}
+impl Architecture {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Llama => "llama",
+            Self::Qwen2 => "qwen2",
+            Self::Qwen3 => "qwen3",
+        }
+    }
+    pub fn tensor_names(self) -> &'static [crate::frozen::TensorName] {
+        match self {
+            Self::Llama => crate::frozen::TENSOR_NAMES,
+            Self::Qwen2 => crate::qwen_tables::QWEN2_TENSOR_NAMES,
+            Self::Qwen3 => crate::qwen_tables::QWEN3_TENSOR_NAMES,
+        }
+    }
+}
 pub(crate) struct Config {
     raw: Json,
     defaults: Option<Json>,
@@ -14,6 +37,7 @@ pub(crate) struct Config {
     nested_key: Option<&'static str>,
     nested_thinker: bool,
     pub architecture: String,
+    pub family: Architecture,
     pub layers: usize,
 }
 impl Config {
@@ -27,21 +51,27 @@ impl Config {
         let model_type = optional_text(root.get("model_type"))?;
         let selected = match model_type {
             Some(name) => Some(name),
+            // AutoConfig tests key presence; explicit null does not enable
+            // directory-pattern inference and falls back to raw hparams.
+            None if root.get("model_type").is_some() => None,
             None => AUTO_CONFIG_PATTERNS
                 .iter()
                 .copied()
                 .find(|name| input_path.contains(name)),
         };
-        if selected.is_some_and(|name| name != "llama" && AUTO_CONFIG_PATTERNS.contains(&name)) {
+        if selected.is_some_and(|name| {
+            !matches!(name, "llama" | "qwen2" | "qwen3") && AUTO_CONFIG_PATTERNS.contains(&name)
+        }) {
             return Err(Error::Unsupported(
-                "AutoConfig class outside the dense Llama converter",
+                "AutoConfig class outside the admitted dense converter",
             ));
         }
-        let mut normalized = selected == Some("llama");
+        let mut normalized = matches!(selected, Some("llama" | "qwen2" | "qwen3"));
         let mut head = None;
         if normalized {
-            normalized = auto_config_valid(root);
-            if normalized && present(root.get("head_dim")).is_none() {
+            normalized = auto_config_valid(root)
+                && (selected == Some("llama") || crate::qwen::valid_auto_config(root));
+            if normalized && selected == Some("llama") && present(root.get("head_dim")).is_none() {
                 let hidden = root
                     .get("hidden_size")
                     .map(integer)
@@ -62,7 +92,16 @@ impl Config {
             }
         }
         let defaults = if normalized {
-            Some(budget.parse(LLAMA_DEFAULTS.as_bytes())?)
+            Some(
+                budget.parse(
+                    match selected {
+                        Some("qwen2") => QWEN2_DEFAULTS,
+                        Some("qwen3") => QWEN3_DEFAULTS,
+                        _ => LLAMA_DEFAULTS,
+                    }
+                    .as_bytes(),
+                )?,
+            )
         } else {
             None
         };
@@ -76,6 +115,7 @@ impl Config {
             nested_key: None,
             nested_thinker: false,
             architecture: String::new(),
+            family: Architecture::Llama,
             layers: 0,
         };
         // This is the actual order of the source's config-key rewrites.
@@ -107,15 +147,18 @@ impl Config {
             );
         }
         let architecture = architecture.ok_or(Error::Invalid("missing model architecture"))?;
-        if !matches!(
-            architecture,
-            "LlamaForCausalLM" | "LLaMAForCausalLM" | "LlamaModel"
-        ) {
-            return Err(Error::Unsupported(
-                "architecture is not a dense Llama conversion",
-            ));
-        }
+        let family = match architecture {
+            "LlamaForCausalLM" | "LLaMAForCausalLM" | "LlamaModel" => Architecture::Llama,
+            "Qwen2ForCausalLM" | "Qwen2Model" => Architecture::Qwen2,
+            "Qwen3ForCausalLM" | "Qwen3Model" => Architecture::Qwen3,
+            _ => {
+                return Err(Error::Unsupported(
+                    "architecture is not an admitted dense conversion",
+                ));
+            }
+        };
         config.architecture = string(architecture)?;
+        config.family = family;
         for key in [
             "quantization_config",
             "transformer_layer_config",
@@ -147,6 +190,32 @@ impl Config {
     pub fn root(&self) -> &Object {
         self.raw.as_object().expect("validated root")
     }
+    pub fn auto_tokenizer_fallback(&self) -> Result<&str> {
+        if self.defaults.is_none()
+            || self.root().get("configuration_files").is_some()
+            || self.root().get("auto_map").is_some()
+        {
+            return Err(Error::Unsupported(
+                "AutoTokenizer requires an admitted resolved root AutoConfig without indirection",
+            ));
+        }
+        if let Some(value) = present(self.root().get("tokenizer_class")) {
+            return text(value);
+        }
+        match self.root_value_model_type() {
+            Some("qwen2" | "qwen3") => Ok("Qwen2TokenizerFast"),
+            Some("llama") => Ok("LlamaTokenizerFast"),
+            _ => Err(Error::Unsupported("AutoTokenizer root configuration class")),
+        }
+    }
+    fn root_value_model_type(&self) -> Option<&str> {
+        self.defaults
+            .as_ref()?
+            .as_object()?
+            .get("model_type")?
+            .as_text()?
+            .as_str()
+    }
     fn root_value(&self, key: &str) -> Option<&Json> {
         if self.defaults.is_some() {
             if key == "head_dim"
@@ -154,7 +223,11 @@ impl Config {
             {
                 return Some(value);
             }
-            if key == "num_key_value_heads" && present(self.root().get(key)).is_none() {
+            if key == "num_key_value_heads"
+                && (matches!(self.root_value_model_type(), Some("llama"))
+                    && present(self.root().get(key)).is_none()
+                    || matches!(self.root().get(key), Some(Json::Null)))
+            {
                 return self.root().get("num_attention_heads").or_else(|| {
                     self.defaults
                         .as_ref()?
@@ -247,6 +320,23 @@ impl Config {
         })
     }
     pub fn metadata(&self, out: &mut Metadata, output: OutputType) -> Result<()> {
+        let mut fields = Metadata::default();
+        self.common_metadata(&mut fields, output)?;
+        for (name, value) in fields.0 {
+            if let Some(suffix) = name.strip_prefix("llama.") {
+                let mut key = string(self.family.name())?;
+                key.try_reserve(suffix.len() + 1)
+                    .map_err(|_| Error::Limit("metadata key"))?;
+                key.push('.');
+                key.push_str(suffix);
+                out.put(&key, value)?;
+            } else {
+                out.put(&name, value)?;
+            }
+        }
+        Ok(())
+    }
+    fn common_metadata(&self, out: &mut Metadata, output: OutputType) -> Result<()> {
         out.uint(
             "llama.block_count",
             u32::try_from(self.layers).map_err(|_| Error::Limit("layer count"))?,
@@ -410,6 +500,9 @@ impl Config {
                 .file_type()
                 .ok_or(Error::Invalid("unresolved auto type"))?,
         )?;
+        if self.family != Architecture::Llama {
+            return Ok(());
+        }
         out.json_uint("llama.vocab_size", self.required(&["vocab_size"])?)?;
         let dims = if let Some(value) = present(self.get("head_dim")?) {
             u32_value(value)?

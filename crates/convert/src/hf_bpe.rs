@@ -4,7 +4,7 @@
 use crate::codec::SourceProfile;
 use crate::config::Config;
 use crate::hf_backend::{Added, Backend};
-use crate::util::{JsonBudget, Metadata, integer, object, text, truth};
+use crate::util::{JsonBudget, Metadata, integer, object, present, text, truth};
 use crate::vocab::{Files, looks_special};
 use crate::{Error, Limits, Result, bytes, reserve, string};
 use llama_checkpoint::{Number, Object, SourceDirectory, Value as Json};
@@ -172,6 +172,7 @@ pub(crate) fn prepare<'a>(
     special_map: Option<&'a Json>,
     limits: &Limits,
     profile: SourceProfile,
+    model_config: Option<&Config>,
 ) -> Result<(Backend<'a>, Vec<&'a str>)> {
     let raw = files
         .tokenizer
@@ -179,16 +180,20 @@ pub(crate) fn prepare<'a>(
         .ok_or(Error::Invalid("tokenizer.json is absent"))?;
     let root = object(raw)?;
     let config = config_object(files)?;
-    let class = config
-        .and_then(|o| o.get("tokenizer_class"))
-        .map(text)
-        .transpose()?
-        .unwrap_or("LlamaTokenizer");
+    let class = match present(config.and_then(|o| o.get("tokenizer_class"))) {
+        Some(value) => text(value)?,
+        None => model_config
+            .ok_or(Error::Unsupported(
+                "tokenizer class inference requires a resolved model configuration",
+            ))?
+            .auto_tokenizer_fallback()?,
+    };
     let is_llama = matches!(class, "LlamaTokenizer" | "LlamaTokenizerFast");
     let is_gpt2 = matches!(class, "GPT2Tokenizer" | "GPT2TokenizerFast");
-    if !is_llama && !is_gpt2 && class != "PreTrainedTokenizerFast" {
+    let is_qwen2 = matches!(class, "Qwen2Tokenizer" | "Qwen2TokenizerFast");
+    if !is_llama && !is_gpt2 && !is_qwen2 && class != "PreTrainedTokenizerFast" {
         return Err(Error::Unsupported(
-            "AutoTokenizer class outside reviewed dense Llama converter ingestion",
+            "AutoTokenizer class outside reviewed dense converter ingestion",
         ));
     }
     if let Some(config) = config {
@@ -217,15 +222,13 @@ pub(crate) fn prepare<'a>(
         }
     }
     let mut backend = Backend::from_json(raw, limits)?;
-    if let Some(config) = config {
-        backend.override_direct_prefix(config, is_llama)?;
-    }
+    backend.override_direct_prefix(config, is_llama)?;
     // Python class defaults are applied before legacy map overrides.
     let mut attributes: Vec<Vec<Added<'a>>> = Vec::new();
     reserve(&mut attributes, SPECIAL.len(), "special token attributes")?;
     for (index, key) in SPECIAL.iter().enumerate() {
         let mut value = Vec::new();
-        let default = if is_gpt2 && index < 3 {
+        let default = if (is_qwen2 && matches!(index, 1 | 2 | 4)) || (is_gpt2 && index < 3) {
             Some("<|endoftext|>")
         } else if is_llama {
             match index {
@@ -455,7 +458,7 @@ pub(crate) fn write(
         Some(Ok("Sequence"))
     );
     let llama_hf = bpe && fallback && sequence && !(ignore && !fallback);
-    let (mut backend, specials) = prepare(files, map.as_ref(), limits, profile)?;
+    let (mut backend, specials) = prepare(files, map.as_ref(), limits, profile, Some(config))?;
     let (mut tokens, mut scores, mut types) = (Vec::new(), Vec::new(), Vec::new());
     if llama_hf {
         let added = backend

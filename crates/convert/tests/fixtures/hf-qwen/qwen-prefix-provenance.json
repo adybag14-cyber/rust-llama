@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "reference": "Transformers 4.57.6 fast-tokenizer constructors via AutoTokenizer.from_pretrained; Tokenizers 0.22.2",
+  "capture_order": "Independent original constructor outputs captured and sealed on both hosts before Rust prefix behavior changes; no Rust outputs used.",
+  "base_provenance": "crates/convert/tests/fixtures/hf-qwen/qwen-class-provenance.json",
+  "fixture": {
+    "path": "crates/convert/tests/fixtures/hf-qwen/qwen-prefix-resolution-reference.json",
+    "bytes": 84472,
+    "sha256": "b2dec0e0660363521feb9b966f0e90ec10e64ebf310409760b718b042e1c7b80"
+  },
+  "corpus": {
+    "cases": 48,
+    "accepted": 40,
+    "rejected": 8,
+    "requests_per_accepted_case": 4,
+    "accepted_requests_per_platform": 160
+  },
+  "matrix": {
+    "class": [
+      "LlamaTokenizerFast",
+      "Qwen2TokenizerFast",
+      "GPT2TokenizerFast",
+      "PreTrainedTokenizerFast"
+    ],
+    "sidecar_add_prefix_space": [
+      "absent",
+      null,
+      false,
+      true,
+      7,
+      "true"
+    ],
+    "saved_direct_ByteLevel_add_prefix_space": [
+      true,
+      false
+    ],
+    "input_derivation": "The true input is the exact existing qwen-fast-input.json. The false variant changes only pre_tokenizer.add_prefix_space semantically."
+  },
+  "captured_rules": {
+    "LlamaTokenizerFast": {
+      "absent_or_null": "preserve saved prefix; native property remains null",
+      "non_null": "forces from_slow; tokenizer-only inputs reject TypeError: not a string"
+    },
+    "Qwen2TokenizerFast_GPT2TokenizerFast_PreTrainedTokenizerFast": {
+      "absent": "false",
+      "boolean": "explicit boolean",
+      "null_integer_string": "preserve saved prefix after caught reconstruction error; property retains supplied value"
+    }
+  },
+  "qualification": "Only admitted serialized direct ByteLevel tokenizer constructor/string encoding behavior is captured; slow SentencePiece reconstruction remains outside Rust scope.",
+  "input": {
+    "bytes": 55802,
+    "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729"
+  },
+  "sources": {
+    "LlamaTokenizerFast": {
+      "bytes": 10965,
+      "sha256": "9d82b9bf81910e1a0b93186d804a0baaaf24a228287cf4c0b91bfcfab4af93c5"
+    },
+    "Qwen2TokenizerFast": {
+      "bytes": 5210,
+      "sha256": "1025a3b86526283bd86a447f0fe2d991d09775b32d3fdcc233c9e447b0611049"
+    },
+    "GPT2TokenizerFast": {
+      "bytes": 5274,
+      "sha256": "a4a2763d5692cd65122235d6a0ba74afc2e222ea6d864ffca1a4cd843f8f840c"
+    },
+    "PreTrainedTokenizerFast": {
+      "bytes": 41383,
+      "sha256": "558e454ee6850e90e8bc5d1782e35878dfda1da9bfdf997ae113fa7ff771a0f3"
+    }
+  },
+  "external_scripts": {
+    "capture-prefix.py": {
+      "bytes": 6198,
+      "sha256": "90f75768ee1969ad327fe0479212bcff476e0405281860eed046784b5f020cac"
+    },
+    "run-compact.py": {
+      "bytes": 1220,
+      "sha256": "f5da6fecf86e999777cd7b2e445f6081e25c47d60bab335fcab47c75ff4a2993"
+    }
+  },
+  "reports": {
+    "windows": {
+      "path": "prefix-windows-v1/report.json",
+      "bytes": 93603,
+      "sha256": "f40bbdcc69563d98003636aef173d393210f6dbee4eb80a70ee9b342338e604a"
+    },
+    "linux": {
+      "path": "prefix-linux-v1/report.json",
+      "bytes": 93265,
+      "sha256": "07f33c7e297594d8e5390fe3b4adc41fe378e5a891c0f11b377153823768538f"
+    }
+  },
+  "profile_equivalence": "Reference fixture bytes are identical between Windows and GNU Linux.",
+  "license": "Apache-2.0 AND MIT",
+  "transformers_license": "crates/convert/tests/fixtures/hf-qwen/TRANSFORMERS-LICENSE"
+}

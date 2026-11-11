@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "reference": "Transformers 4.57.6 AutoTokenizer.from_pretrained and fast constructors; Tokenizers 0.22.2",
+  "capture_independence": "Original API outputs captured independently in unchanged reference environments. No Rust outputs were read or used to construct expected data. Counterexamples were selected by read-only source review.",
+  "frozen_llama_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "base_provenance": "crates/convert/tests/fixtures/hf-qwen/qwen-class-provenance.json",
+  "corpus": {
+    "cases": 34,
+    "accepted": 34,
+    "rejected": 0,
+    "requests_per_case": 4,
+    "successful_requests_per_platform": 136
+  },
+  "inputs": {
+    "qwen-fast-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-fast-input.json",
+      "kind": "direct",
+      "saved_prefix": true,
+      "depth": 0,
+      "bytes": 55802,
+      "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    },
+    "qwen-fast-prefix-false-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-fast-prefix-false-input.json",
+      "kind": "direct",
+      "saved_prefix": false,
+      "depth": 0,
+      "bytes": 55803,
+      "sha256": "77888f0558b2ad1f29f36d09949b6c399a6ceedf2de6b226900f5004eff8a9ef",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    },
+    "qwen-sequence-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-sequence-input.json",
+      "kind": "sequence",
+      "saved_prefix": true,
+      "depth": 1,
+      "bytes": 55840,
+      "sha256": "3a60896708f19c8a631391c240809b353d19bc0393ab2c185c23aff4772a8e83",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    },
+    "qwen-sequence-prefix-false-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-sequence-prefix-false-input.json",
+      "kind": "sequence",
+      "saved_prefix": false,
+      "depth": 1,
+      "bytes": 55841,
+      "sha256": "812ac9046d20811aa10a355ac809a4b6cab24f8baaca4e5f4004d9bcc9f7629c",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    },
+    "qwen-nested-sequence-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-nested-sequence-input.json",
+      "kind": "nested-sequence",
+      "saved_prefix": true,
+      "depth": 2,
+      "bytes": 55878,
+      "sha256": "e47d017e3e7aecacd687bf95b969cfccc0b02adfa7b14e092e0820a232cf52ea",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    },
+    "qwen-nested-sequence-prefix-false-input.json": {
+      "path": "crates/convert/tests/fixtures/hf-qwen/qwen-nested-sequence-prefix-false-input.json",
+      "kind": "nested-sequence",
+      "saved_prefix": false,
+      "depth": 2,
+      "bytes": 55879,
+      "sha256": "f2ec572d2a892dd04510d7c60cd4226e4e98bc06091a0e43859fcee2c8467102",
+      "license": "Apache-2.0",
+      "source": "Existing compact Qwen BPE; only saved prefix and zero/one/two surrounding Sequence objects differ semantically."
+    }
+  },
+  "fixture": {
+    "path": "crates/convert/tests/fixtures/hf-qwen/qwen-prefix-boundaries-reference.json",
+    "bytes": 83015,
+    "sha256": "64c60accf32c85faaca6e80a03804a360bb66e509bb7570ce5d5cacfddff04e1"
+  },
+  "whole_sidecar_absence": "A null tokenizer_config in each case means the file does not exist, not a JSON null file. Exact presence was verified and recorded by the native harness.",
+  "literal_paths": "Every case records input_paths.windows and input_paths.linux. Reference reports also record the literal path supplied to native APIs.",
+  "confirmed": {
+    "missing_sidecar_direct": "Inferred Qwen2/Qwen3, GPT2, and generic fast classes set false; Llama fast preserves the saved value.",
+    "single_and_nested_sequences": "Child prefix remains unchanged for absent/false/true/null sidecar prefix settings and missing entire sidecar."
+  },
+  "options": {
+    "local_files_only": true,
+    "trust_remote_code": false,
+    "use_fast": "default"
+  },
+  "source_files": {
+    "auto_config": {
+      "bytes": 55606,
+      "sha256": "120b62cd4e13dd155762acd14cf64fc8bca17a068f5dd004ddfd30fbcb2ef4ab"
+    },
+    "auto_tokenizer": {
+      "bytes": 58505,
+      "sha256": "5265e6def5a83c1b37871fa46ff2a59440ef80b377c249bc0c2135353157f730"
+    },
+    "fast_base": {
+      "bytes": 41383,
+      "sha256": "558e454ee6850e90e8bc5d1782e35878dfda1da9bfdf997ae113fa7ff771a0f3"
+    }
+  },
+  "external_scripts": {
+    "capture-prefix-boundaries.py": {
+      "bytes": 8536,
+      "sha256": "883373b0b096d7e3a96c16f6b77f035b19c4bc2f313a914bcdf664fb14d9d57b"
+    },
+    "run-compact.py": {
+      "bytes": 1220,
+      "sha256": "f5da6fecf86e999777cd7b2e445f6081e25c47d60bab335fcab47c75ff4a2993"
+    },
+    "seal-prefix-boundaries.py": {
+      "bytes": 6258,
+      "sha256": "8caef8c2656a009548c8d76fb68a083560f8abb540c65340afb10e0e056ea45d"
+    }
+  },
+  "native_reports": {
+    "windows": {
+      "path": "prefix-boundaries-windows-v1/report.json",
+      "bytes": 76578,
+      "sha256": "eb6cad4d09d0355143388a68cbf0c3cdf0da41d0f4e0b998783bb42efb030dfd"
+    },
+    "linux": {
+      "path": "prefix-boundaries-linux-v1/report.json",
+      "bytes": 76324,
+      "sha256": "570c8fbf8c2cf92dd10839f8136e4a5644820ed2f680cfe6541bfb8657ce2871"
+    }
+  },
+  "execution": "Windows durable job plus GNU Linux durable host job retaining foreground wsl.exe; no detached processes or WSL lifecycle changes.",
+  "qualifications": "Tokenizer preparation only, four string inputs; no full model conversion, remote auto_map execution, or slow reconstruction claim.",
+  "licenses": {
+    "fixture": "Apache-2.0 AND MIT",
+    "transformers": "crates/convert/tests/fixtures/hf-qwen/TRANSFORMERS-LICENSE"
+  }
+}

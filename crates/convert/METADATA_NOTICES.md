@@ -12,6 +12,14 @@ Primary sources:
 - https://github.com/huggingface/transformers/tree/v4.57.6
 - https://github.com/huggingface/tokenizers/tree/v0.22.2
 
+## Qwen configuration defaults
+
+Copyright 2024 The Qwen team, Alibaba Group and the HuggingFace Inc. team. All rights reserved.
+
+The Qwen2/Qwen3 default configuration data and layer-type fallback contract follow the pinned Transformers 4.57.6 classes. `qwen_tables.rs` is a changed Rust representation of their declarative defaults and the frozen llama.cpp tensor aliases; runtime configuration handling uses checked Rust parsing. The source-file hashes, per-host native table export identities and independent complete conversion captures are retained under `tests/fixtures/qwen-conversion`. The Transformers portions use Apache 2.0, reproduced below; llama.cpp alias data uses the upstream MIT license retained at the repository root.
+
+The external pretrained Qwen2.5-0.5B-Instruct and Qwen3-0.6B inputs are revision and checksum pinned, with Apache 2.0 license declarations retained in provenance. Model weights are not distributed in this repository.
+
 ## SentencePiece schema and vocabulary
 
 Copyright 2016 Google Inc.

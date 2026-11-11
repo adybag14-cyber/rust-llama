@@ -1,0 +1,55 @@
+{
+  "host": "windows",
+  "started_utc": "2026-11-11T08:57:39.744134+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.102495899999667
+    },
+    {
+      "name": "pretrained-qwen2",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen2_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 22.459127900000112
+    }
+  ],
+  "status": "failed"
+}

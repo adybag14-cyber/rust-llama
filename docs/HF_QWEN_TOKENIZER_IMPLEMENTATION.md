@@ -54,6 +54,9 @@ complete pretrained model conversion.
 | Unicode 9 conformance inputs and later-CCC witnesses | 93,634 sequences |
 | Normalized AddedToken flags and canonical collisions | 272 configurations / 4,896 requests |
 | Unchanged official Qwen2.5 and Qwen3 tokenizers, both native profiles | 6,232 ID/decode requests |
+| AutoTokenizer root/sidecar class selection | 106 cases: 82 accepted, 24 rejected; 5,412 encodings per profile |
+| Fast constructor direct-prefix settings | 48 cases: 40 accepted, eight rejected; 160 encodings per profile |
+| Missing whole sidecar and single/nested Sequence roots | 34 accepted cases; 136 encodings per profile |
 
 The two profiles produced identical common fixture bytes. The unchanged
 official tokenizer captures have identical request results and differ only in
@@ -82,6 +85,14 @@ hashes, capture reports, licenses, and fixture classification.
 `evidence/2026-11-11/hf-qwen-tokenizer/` retains validation reports and logs,
 including the initial Rust test-borrow compilation error. No expected native
 outputs were altered during debugging.
+
+## Class selection and prefix behavior
+
+The converter replays class selection through its actual HF preparation path. A non-null sidecar class bypasses model-class inference. An absent/null sidecar class requires the root AutoConfig result, then its root tokenizer class or pinned class mapping. Nested text configuration does not replace that root selection. Explicit null and absent model-type keys preserve their original different behavior, including full-path fallback when absent. Failed root resolution is not silently replaced by a guessed tokenizer class.
+
+Direct ByteLevel roots are distinguished from flattened Sequence children. Qwen2, GPT2 and generic Fast use a false prefix default even with no sidecar; explicit booleans override it. Native null/non-boolean rebuild failures preserve the saved stage. Llama absent/null settings preserve its saved prefix, while explicit non-null reconstruction remains unsupported. Single and nested Sequence children retain their saved settings. Exact compact tokenizer inputs, original class outcomes, literal paths and all response bytes are retained beside the class/prefix provenance files.
+
+These matrices were captured independently from the unchanged native environments. The two boundary bugs—skipping defaults when the whole sidecar was absent and mistaking a one-child Sequence for a direct root—were corrected without changing expected data. The complete conversion and pretrained-file evidence is in [QWEN_HF_CONVERSION.md](QWEN_HF_CONVERSION.md).
 
 ## Resource and support boundaries
 

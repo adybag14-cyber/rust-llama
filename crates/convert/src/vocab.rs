@@ -1,6 +1,6 @@
 //! Dense Llama vocabulary emission using retained sidecars.
 use crate::codec::SourceProfile;
-use crate::config::Config;
+use crate::config::{Architecture, Config};
 use crate::util::{JsonBudget, Metadata, integer, object, text, truth};
 use crate::{Error, Limits, Result, reserve, string};
 use crate::{sentencepiece, special};
@@ -250,13 +250,14 @@ pub(crate) fn write(
     if files.tokenizer.is_none() && source.read_optional("tekken.json")?.is_some() {
         return Err(Error::Unsupported("Mistral Tekken conversion vocabulary"));
     }
-    if let Some(value) = files
-        .config
-        .as_ref()
-        .map(object)
-        .transpose()?
-        .and_then(|o| o.get("add_prefix_space"))
-        .filter(|v| !matches!(v, Json::Null))
+    if config.family == Architecture::Llama
+        && let Some(value) = files
+            .config
+            .as_ref()
+            .map(object)
+            .transpose()?
+            .and_then(|o| o.get("add_prefix_space"))
+            .filter(|v| !matches!(v, Json::Null))
     {
         out.boolean("tokenizer.ggml.add_space_prefix", truth(value))?;
     }
@@ -285,7 +286,9 @@ pub(crate) fn write(
             profile,
         },
     )?;
-    if let Some(value) = config.get("vocab_size")? {
+    if config.family == Architecture::Llama
+        && let Some(value) = config.get("vocab_size")?
+    {
         if matches!(integer(value), Ok(32016)) {
             special::write(
                 source,

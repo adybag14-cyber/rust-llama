@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "reference": "Transformers 4.57.6 AutoTokenizer.from_pretrained and AutoConfig.from_pretrained; Tokenizers 0.22.2",
+  "capture_order": "All outputs independently captured from the unchanged pinned reference packages on Windows and GNU Linux before Rust class-selection changes. No Rust outputs used.",
+  "frozen_llama_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "input": {
+    "path": "crates/convert/tests/fixtures/hf-qwen/qwen-fast-input.json",
+    "bytes": 55802,
+    "sha256": "b34ce2efe4a47223e387e47621e0eea4a811e17e37c2e886bdb84bbf41b3b729",
+    "provenance": "crates/convert/tests/fixtures/hf-qwen/provenance.json",
+    "derivation": "Existing unchanged 2048-vocabulary BPE retaining official vocabulary IDs below 2048 and only closed merge pairs.",
+    "license": "Apache-2.0"
+  },
+  "requests": {
+    "description": "Owned short edge strings and the frozen converter get_vocab_base_pre probe, each with add_special_tokens false and true.",
+    "probe_license": "MIT",
+    "per_accepted_case": 66
+  },
+  "corpus": {
+    "cases": 106,
+    "accepted": 82,
+    "rejected": 24,
+    "accepted_requests_per_platform": 5412,
+    "unique_behavior_records": 4,
+    "platforms": [
+      "Windows MSVC host reference",
+      "GNU Linux WSL reference"
+    ]
+  },
+  "fixture": {
+    "path": "crates/convert/tests/fixtures/hf-qwen/qwen-class-resolution-reference.json",
+    "bytes": 278096,
+    "sha256": "0a6fd913db35331420477df584815acd35521b973db828d9666ba2e82f82717e"
+  },
+  "literal_paths": "Every case carries input_paths.windows and input_paths.linux exactly as supplied to the native APIs; full directory strings affect absent-model_type resolution.",
+  "full_resolved_config_evidence": {
+    "windows": {
+      "path": "compact-paths-windows-v1/report.json",
+      "bytes": 283068,
+      "sha256": "e3709ef12e7dd214723cd9c831a0719c53d5a678af5faefbff660c7c65b51092"
+    },
+    "linux": {
+      "path": "compact-paths-linux-v1/report.json",
+      "bytes": 281741,
+      "sha256": "bb00f945a1047b3750a3d9b1d6ad144f48722863da8411c3e3b7b3dbba74be33"
+    }
+  },
+  "sources": {
+    "auto_config": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\auto\\configuration_auto.py",
+      "bytes": 55606,
+      "sha256": "120b62cd4e13dd155762acd14cf64fc8bca17a068f5dd004ddfd30fbcb2ef4ab",
+      "license": "Apache-2.0"
+    },
+    "auto_tokenizer": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\auto\\tokenization_auto.py",
+      "bytes": 58505,
+      "sha256": "5265e6def5a83c1b37871fa46ff2a59440ef80b377c249bc0c2135353157f730",
+      "license": "Apache-2.0"
+    },
+    "fast_base": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\tokenization_utils_fast.py",
+      "bytes": 41383,
+      "sha256": "558e454ee6850e90e8bc5d1782e35878dfda1da9bfdf997ae113fa7ff771a0f3",
+      "license": "Apache-2.0"
+    },
+    "qwen_fast": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\qwen2\\tokenization_qwen2_fast.py",
+      "bytes": 5210,
+      "sha256": "1025a3b86526283bd86a447f0fe2d991d09775b32d3fdcc233c9e447b0611049",
+      "license": "Apache-2.0"
+    },
+    "gpt2_fast": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\gpt2\\tokenization_gpt2_fast.py",
+      "bytes": 5274,
+      "sha256": "a4a2763d5692cd65122235d6a0ba74afc2e222ea6d864ffca1a4cd843f8f840c",
+      "license": "Apache-2.0"
+    },
+    "llama_fast": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\hf-converter-port\\python-reference\\windows\\venv\\Lib\\site-packages\\transformers\\models\\llama\\tokenization_llama_fast.py",
+      "bytes": 10965,
+      "sha256": "9d82b9bf81910e1a0b93186d804a0baaaf24a228287cf4c0b91bfcfab4af93c5",
+      "license": "Apache-2.0"
+    }
+  },
+  "supplemental_official_tokenizers": {
+    "profile": "Windows only",
+    "cases": 6,
+    "accepted_requests": 396,
+    "description": "Unchanged official Qwen2.5-0.5B-Instruct and Qwen3-0.6B sidecars versus derived copies with tokenizer_class removed or null. Token IDs/decode, special tokens, vocabulary/backend hashes, and frozen probe all match unchanged baseline. Official files hash-verified unchanged.",
+    "report": {
+      "path": "windows-v1/report.json",
+      "bytes": 186498,
+      "sha256": "454f68cc3abdc0b2da012ba5ee6fc8daef3c5dba46e57330d3b95ff6510bd1a3"
+    }
+  },
+  "external_scripts": {
+    "capture-default-class.py": {
+      "bytes": 7740,
+      "sha256": "defc758f7802b044aab686d2b8fedb3f25cc7b9ce67c64fa98d18b67c21b7b94"
+    },
+    "capture-compact.py": {
+      "bytes": 12040,
+      "sha256": "afeca85c99c37ef5ef4407b5242c90ba134bb072a00aa5ec5677b13e5a73d6e5"
+    },
+    "capture-paths.py": {
+      "bytes": 4377,
+      "sha256": "2cbe0d2912608ec6f2162d3930e1e249d0f06999669ec5af4b298b647972287a"
+    },
+    "run-compact.py": {
+      "bytes": 1220,
+      "sha256": "f5da6fecf86e999777cd7b2e445f6081e25c47d60bab335fcab47c75ff4a2993"
+    },
+    "seal-class-resolution.py": {
+      "bytes": 2445,
+      "sha256": "8903e5735480e0cb9364d25a4234bba66d1760d0b0f340a9edf65e2280e8d252"
+    }
+  },
+  "qualifications": [
+    "Default use_fast selection only; local_files_only true and trust_remote_code false.",
+    "No remote auto_map code, custom tokenizer class loading, or broader model-family resolution claim.",
+    "The ordinary corpus is tokenizer preparation evidence, not full pretrained tensor conversion.",
+    "Initial class fixture bytes match exactly across profiles; combined fixture adds both literal native paths per case."
+  ],
+  "transformers_license": {
+    "path": "TRANSFORMERS-LICENSE",
+    "bytes": 11418,
+    "sha256": "77fd4710def9ec3c0f6225800e0235f15a425abd4a8b03559127fcd782612049"
+  }
+}

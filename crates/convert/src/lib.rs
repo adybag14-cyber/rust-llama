@@ -1,4 +1,4 @@
-//! Bounded native conversion of dense Hugging Face Llama checkpoints.
+//! Bounded native conversion of dense Hugging Face Llama, Qwen2 and Qwen3 checkpoints.
 //! The frozen Python converter remains an external comparison oracle only.
 #![deny(unsafe_code)]
 
@@ -16,6 +16,8 @@ mod names;
 mod pipeline;
 mod python_set;
 mod python_unicode;
+mod qwen;
+mod qwen_tables;
 pub mod rope;
 mod sentencepiece;
 mod special;

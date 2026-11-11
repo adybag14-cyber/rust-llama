@@ -1,0 +1,52 @@
+{
+  "host": "windows",
+  "started_utc": "2026-11-11T09:31:30.374998+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "args": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "flags",
+      "args": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--lib",
+        "native_qwen_fast_generic_flags",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 3.523687300000347
+    },
+    {
+      "name": "clippy",
+      "args": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.074861100000817
+    }
+  ],
+  "status": "passed",
+  "inputs_unchanged": true
+}

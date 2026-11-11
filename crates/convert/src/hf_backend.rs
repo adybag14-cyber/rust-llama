@@ -112,6 +112,7 @@ pub(crate) struct Backend<'a> {
     ignore_merges: bool,
     no_merges: bool,
     stages: Vec<Stage>,
+    direct_byte_level: bool,
     executable: bool,
     normalization: Normalization,
     byte_decoder: bool,
@@ -276,6 +277,15 @@ impl<'a> Backend<'a> {
         let normalization = crate::hf_schema::normalizer(root.get("normalizer"), 0)?;
         crate::hf_schema::pretokenizer(root.get("pre_tokenizer"), 0)?;
         let stage_execution = parse_stages(root.get("pre_tokenizer"), &mut stages, 0)?;
+        // Fast constructors inspect the serialized root, not a flattened
+        // sequence. A one-child Sequence must keep its saved child settings.
+        let direct_byte_level = root
+            .get("pre_tokenizer")
+            .and_then(Json::as_object)
+            .and_then(|stage| stage.get("type"))
+            .map(text)
+            .transpose()?
+            == Some("ByteLevel");
         let executable = normalization != Normalization::Unsupported && stage_execution;
         let byte_decoder = crate::hf_schema::decoder(root.get("decoder"), 0)? == "ByteLevel";
         let post = crate::hf_schema::Post::parse(root.get("post_processor"), 0)?;
@@ -295,6 +305,7 @@ impl<'a> Backend<'a> {
             ignore_merges,
             no_merges,
             stages,
+            direct_byte_level,
             executable,
             normalization,
             byte_decoder,
@@ -437,31 +448,37 @@ impl<'a> Backend<'a> {
         self.added.sort_unstable_by_key(|p| p.0);
         Ok(())
     }
-    pub fn override_direct_prefix(&mut self, config: &Object, is_llama: bool) -> Result<()> {
-        if is_llama
-            && config
-                .get("add_prefix_space")
-                .is_some_and(|v| !matches!(v, Json::Null))
-        {
+    pub fn override_direct_prefix(
+        &mut self,
+        config: Option<&Object>,
+        is_llama: bool,
+    ) -> Result<()> {
+        let get = |key| config.and_then(|c| c.get(key));
+        if is_llama && get("add_prefix_space").is_some_and(|v| !matches!(v, Json::Null)) {
             return Err(Error::Unsupported(
                 "LlamaTokenizerFast explicit prefix selects slow SentencePiece reconstruction",
             ));
         }
-        if self.stages.len() == 1
+        if !is_llama
+            && self.direct_byte_level
+            && self.stages.len() == 1
             && let Stage::Byte { prefix, .. } = &mut self.stages[0]
         {
-            *prefix = match config.get("add_prefix_space") {
-                None => false,
-                Some(Json::Bool(v)) => *v,
-                _ => return Err(Error::Invalid("HF add_prefix_space type")),
-            };
+            // The base fast class catches a failed pretokenizer rebuild.
+            // Null/non-Boolean values preserve the saved stage. Llama passes
+            // None by default, so its saved prefix is preserved as well.
+            match get("add_prefix_space") {
+                None => *prefix = false,
+                Some(Json::Bool(v)) => *prefix = *v,
+                _ => {}
+            }
         }
-        self.split_special_tokens = match config.get("split_special_tokens") {
+        self.split_special_tokens = match get("split_special_tokens") {
             None => false,
             Some(Json::Bool(v)) => *v,
             _ => return Err(Error::Invalid("HF split_special_tokens type")),
         };
-        self.clean_up_spaces = match config.get("clean_up_tokenization_spaces") {
+        self.clean_up_spaces = match get("clean_up_tokenization_spaces") {
             None => false,
             Some(Json::Bool(v)) => *v,
             _ => return Err(Error::Invalid("HF cleanup flag type")),

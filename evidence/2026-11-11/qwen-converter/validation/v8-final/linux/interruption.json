@@ -1,0 +1,8 @@
+{
+  "attempt": "qwen-converter/validation/v8-final/linux",
+  "launch": "guest-jobs/qwen-v8-linux/launch.json",
+  "observation": "The recorded guest PID/start_ticks process disappeared before the complete-file tests finished; validator report remained running with only release completed, and driver stderr was empty.",
+  "known": "No numerical test failure was reported and no lifecycle operation was requested. The earlier20second detached smoke passed; it does not establish survival of this longer job.",
+  "resolution": "Preserve all outputs and receipts; use a durable host command job retaining the WSL foreground client for a fresh v9-final run.",
+  "source_expectations_changed": false
+}

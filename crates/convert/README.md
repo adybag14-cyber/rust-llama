@@ -1,6 +1,6 @@
-# Native dense Llama HF to GGUF conversion
+# Native dense Llama and Qwen HF to GGUF conversion
 
-`llama-convert` converts local Hugging Face dense Llama Safetensors checkpoints into the frozen converter's GGUF bytes. The library owns and bounds its inputs, plans the output before publication, and streams one output tensor at a time. The `convert-hf-to-gguf` binary exposes this implemented path.
+`llama-convert` converts local Hugging Face dense Llama, Qwen2 and Qwen3 Safetensors checkpoints into the frozen converter's GGUF bytes. The library owns and bounds its inputs, plans the output before publication, and streams one output tensor at a time. The `convert-hf-to-gguf` binary exposes this implemented path.
 
 The authority is the user-provided llama.cpp archive with SHA-256
 `2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122`.
@@ -31,11 +31,11 @@ convert-hf-to-gguf /path/to/model --outtype f16 --dry-run
 
 | Area | Implemented behavior |
 | --- | --- |
-| Architecture | `LlamaForCausalLM`, `LLaMAForCausalLM`, and `LlamaModel`; dense text checkpoints |
+| Architecture | `LlamaForCausalLM`, `LLaMAForCausalLM`, `LlamaModel`, `Qwen2ForCausalLM`, `Qwen2Model`, `Qwen3ForCausalLM` and `Qwen3Model`; dense text checkpoints |
 | Inputs | Local Safetensors files and indexed shards selected by the frozen prefix/index/global-name rules, with retained file owners and bounded JSON parsing |
 | Output | Little-endian GGUF; `auto`, F32, F16, BF16, Q8_0, TQ1_0 and TQ2_0; source shape-dependent F16 fallback |
-| Tensor mapping | Frozen Llama filtering, renaming, insertion order, Q/K row permutation, and complete compatible QKV fusion including biases |
-| Metadata | Config defaults and supported nested text config; original metadata order and types; model-card YAML, generation configuration, special tokens, chat-template metadata and naming |
+| Tensor mapping | Frozen architecture-specific aliases, filtering and insertion order; Llama Q/K row permutation, Qwen unpermuted rows, Qwen3 Q/K norm tensors, and compatible QKV fusion including biases |
+| Metadata | Family-specific config defaults and supported nested text config; original metadata order and types; model-card YAML, generation configuration, special tokens, chat templates, naming and Qwen pooling sidecars |
 | Vocabulary | SentencePiece model vocabulary; reviewed Hugging Face BPE ingestion from local tokenizer JSON |
 | RoPE conversion | Metadata for source-supported configurations; generated Llama 3 F32 `rope_freqs.weight` on the measured native source profiles |
 | Vocabulary-only output | Original unpadded metadata-only GGUF header |
@@ -43,13 +43,17 @@ convert-hf-to-gguf /path/to/model --outtype f16 --dry-run
 
 The dtype codec accepts the frozen numeric input domain, including F16/F32/F64/BF16, signed integer types, U8, Boolean, and the measured FP8 scalar formats. These are casts into the dense conversion working representation; preserved prequantized FP8/ModelOpt layouts are a different contract. U16/U32/U64 and unsupported packed formats return errors. Exact cast and packing qualifications are in [CODEC.md](CODEC.md).
 
-The HF JSON path admits LlamaTokenizer/LlamaTokenizerFast, GPT2Tokenizer/GPT2TokenizerFast and PreTrainedTokenizerFast with a locally executable reviewed BPE pipeline. It preserves added-token precedence, relevant decoder/schema admission, frozen pretokenizer probes and class-specific postprocessing. An accepted JSON schema is separate from executable conversion support: an unimplemented normalizer, pretokenizer or regex pipeline returns an explicit unsupported error when its behavior is required. It does not substitute a similarly named tokenizer family.
+The HF JSON path admits LlamaTokenizer/LlamaTokenizerFast, GPT2Tokenizer/GPT2TokenizerFast, Qwen2Tokenizer/Qwen2TokenizerFast and PreTrainedTokenizerFast with a locally executable reviewed BPE pipeline. It preserves added-token precedence, relevant decoder/schema admission, frozen pretokenizer probes and class-specific postprocessing. An accepted JSON schema is separate from executable conversion support: an unimplemented normalizer, pretokenizer or regex pipeline returns an explicit unsupported error when its behavior is required. It does not substitute a similarly named tokenizer family.
 
-The HF boundary includes the Transformers Llama fast class's recreation of BOS/EOS templates, including Python truth-value semantics, unknown-token fallback and source template-name interpretation. Generic and GPT2 fast classes retain their distinct behavior. A native tokenizer panic or invalid template is a checked Rust error.
+The HF boundary includes the Transformers Llama fast class's recreation of BOS/EOS templates, including Python truth-value semantics, unknown-token fallback and source template-name interpretation. Generic, GPT2 and Qwen2 fast classes retain their distinct behavior. Qwen2 uses its own default special tokens. All admitted fast classes apply generic split-special and cleanup controls. For a direct ByteLevel root, Qwen2/GPT2/generic Fast default an absent prefix setting to false, apply explicit booleans, and preserve saved settings for null/non-boolean inputs. This also applies when the whole sidecar is absent. Llama preserves its saved prefix for absent/null settings; explicit non-null prefix reconstruction requires its unsupported slow path. Qwen2 does not recreate Llama's BOS/EOS templates. Sequence roots retain their nested ByteLevel settings, including a single or nested single child. A native tokenizer panic or invalid template is a checked Rust error.
+
+A non-null sidecar tokenizer class takes precedence. An absent/null class uses the successfully resolved root model configuration, its root tokenizer class and the captured class mapping; nested text configuration does not override root tokenizer selection. Null and absent `model_type` values remain distinct. When class inference needs root `auto_map` or `configuration_files` indirection, it returns an explicit unsupported error. The native class, prefix and full-file evidence is documented in [QWEN_HF_CONVERSION.md](../../docs/QWEN_HF_CONVERSION.md).
 
 ## Deliberate boundaries
 
-This is one conversion path in the larger port. Other architecture families, mixture-of-experts conversion, multimodal projectors, adapters, PyTorch pickle input, remote model acquisition, source prequantization layouts, big-endian output, output sharding, executable remote tokenizer code, and general upstream CLI option compatibility remain outside this crate's admitted path. The converter rejects these when selected; completion of this crate does not close the project's full conversion or release gates.
+These are three dense architecture conversion paths in the larger port. Other architecture families, mixture-of-experts conversion, multimodal projectors, adapters, PyTorch pickle input, remote model acquisition, source prequantization layouts, big-endian output, output sharding, executable remote tokenizer code, and general upstream CLI option compatibility remain outside this crate's admitted path. The converter rejects these when selected; completion of this crate does not close the project's full conversion or release gates.
+
+Qwen HybridDNA tokenizers, InternS1 specialized vocabulary, reranker head extraction, the `linear.weight` embedding projection rewrite, Qwen mixture-of-experts and recurrent/Next/MTP variants remain outside the admitted dense path. Nested wrapper architectures retain their origin when checking these boundaries; a Qwen3 text config does not silently erase a reranker or InternS1 origin. Supported sentence-transformer sidecars select mean, CLS or last-token pooling with the frozen precedence. Conversion support for this metadata does not establish an embedding or reranking inference implementation.
 
 The result reproduces conversion behavior. A model or metadata feature accepted for conversion is not thereby supported by the current Rust inference runtime. In particular, writing scaled-RoPE metadata or a Llama 3 factor tensor does not establish runtime scaled-RoPE inference parity.
 
@@ -118,7 +122,11 @@ Ordinary `cargo test -p llama-convert --offline --locked` exercises the bundled 
 
 | Regression cohort | Coverage |
 | --- | --- |
-| Complete converter | 64 cases per native host: 57 accepted files totaling 8,091,032 exact bytes, and 7 original rejections |
+| Complete Llama converter | 64 cases per native host: 57 accepted files totaling 8,091,032 exact bytes, and 7 original rejections |
+| Complete Qwen2/Qwen3 converter | 112 cases per native host: 104 accepted files totaling 25,723,552 exact bytes, and eight original rejections |
+| Qwen configuration fallback | 32 additional complete files per native host; 5,318,912 exact bytes, including default sliding windows, invalid thresholds and iterable layer types |
+| Qwen root model-type presence | Eight additional complete files per native host; 1,329,824 exact bytes for explicit, absent, null and unknown types |
+| HF class and prefix resolution | 106 class cases, 48 direct-prefix cases and 34 missing-sidecar/Sequence cases; 5,708 accepted encoding/decode requests per profile |
 | HF schema and postprocessor contract | 1,080 admission cases (313 accepted/767 rejected), plus 732 original postprocessor encoding requests |
 | HF Transformers class postprocessing | 76 cases (64 accepted/12 rejected), with 1,024 original encoding requests on each captured profile |
 | Converter dtype preparation and packing | 68,410 cases and 7,157,024 compared output bytes per captured profile; details in CODEC.md |
@@ -131,6 +139,8 @@ Ordinary `cargo test -p llama-convert --offline --locked` exercises the bundled 
 The complete-pipeline binary is a deduplicated pack of 109 original input/output blobs (13,163,408 bytes). The manifest verifies each blob's offset, length and SHA-256. It is synthetic reference data, not pretrained model weights. Each host runs the profile that its scalar RoPE tail can reproduce.
 
 Separate ignored tests accept a pinned external SmolLM2 checkpoint. They verify every input file and three complete auto/F16/Q8_0 output hashes, totaling 686,581,536 output bytes per host, without copying model weights into the repository. Their required environment variables and fresh output directories are declared on the tests. They are integration evidence, not a claim to support all pretrained checkpoints.
+
+The Qwen ordinary corpus contains synthetic weights only. Separate ignored tests use unmodified official `Qwen/Qwen2.5-0.5B-Instruct` and `Qwen/Qwen3-0.6B` checkpoints. Set `LLAMA_TEST_QWEN_HF_ROOT` to the external directory containing those two named checkpoint folders and `LLAMA_TEST_QWEN_OUTPUT_ROOT` to a fresh external output root. `cargo test -p llama-convert --release --test qwen_pretrained --offline --locked -- --ignored --nocapture --test-threads=1` checks every source-file hash and the complete F16, Q8_0 and auto/BF16 output hashes. Six outputs total 6,342,831,936 bytes per profile. The tests retain outputs and refuse to reuse a prior model output directory.
 
 Numerical checks compare exact bytes and F32 words, including signs and payloads of NaNs where the captured profile defines them. No approximate self-generated expected outputs replace the original references.
 

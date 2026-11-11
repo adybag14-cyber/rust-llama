@@ -116,6 +116,55 @@ pub(crate) fn upper(value: &str, profile: SourceProfile) -> Result<String> {
     }
     Ok(out)
 }
+/// Search an ASCII needle in CPython's lowercased text without allocating the
+/// lowercased copy. Contextual final Sigma only changes non-ASCII characters,
+/// which cannot match any part of this explicitly ASCII search domain.
+pub(crate) fn lower_contains_ascii(
+    value: &str,
+    needle: &str,
+    profile: SourceProfile,
+) -> Result<bool> {
+    if !needle.is_ascii() {
+        return Err(Error::Invalid("lowercase search requires an ASCII needle"));
+    }
+    let needle = needle.as_bytes();
+    if needle.is_empty() {
+        return Ok(true);
+    }
+    let mut prefix = Vec::new();
+    prefix
+        .try_reserve_exact(needle.len())
+        .map_err(|_| Error::Limit("lowercase search pattern"))?;
+    prefix.resize(needle.len(), 0);
+    for i in 1..needle.len() {
+        let mut j = prefix[i - 1];
+        while j > 0 && needle[i] != needle[j] {
+            j = prefix[j - 1];
+        }
+        if needle[i] == needle[j] {
+            j += 1;
+        }
+        prefix[i] = j;
+    }
+    let mut matched = 0;
+    for ch in value.chars() {
+        let unchanged = [ch as u32];
+        let lowered = mapping(ch as u32, profile)?.map_or(unchanged.as_slice(), |m| m.lower);
+        for &cp in lowered {
+            while matched > 0 && cp != u32::from(needle[matched]) {
+                matched = prefix[matched - 1];
+            }
+            if cp == u32::from(needle[matched]) {
+                matched += 1;
+            }
+            if matched == needle.len() {
+                return Ok(true);
+            }
+        }
+    }
+    Ok(false)
+}
+
 /// Metadata.id_to_title calls str.title only on entirely lowercase words.
 /// That source precondition avoids the context-sensitive uppercase Sigma rule.
 pub(crate) fn title_lower_word(value: &str, profile: SourceProfile) -> Result<String> {
@@ -231,6 +280,25 @@ mod tests {
                     text(get(case, "upper")).unwrap(),
                     "{input:?}"
                 );
+                let lowered = text(get(case, "lower")).unwrap();
+                for needle in [
+                    "",
+                    "a",
+                    "aa",
+                    "abc",
+                    "e",
+                    "k",
+                    "i",
+                    "ss",
+                    "qwen3-reranker",
+                    "sequenceclassification",
+                ] {
+                    assert_eq!(
+                        lower_contains_ascii(input, needle, profile).unwrap(),
+                        lowered.contains(needle),
+                        "{input:?} {needle:?}"
+                    );
+                }
                 let lower = get(case, "islower") == &Value::Bool(true);
                 assert_eq!(is_lower(input, profile).unwrap(), lower, "{input:?}");
                 if lower {

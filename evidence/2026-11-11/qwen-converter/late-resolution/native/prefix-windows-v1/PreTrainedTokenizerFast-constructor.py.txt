@@ -1,0 +1,123 @@
+    def __init__(self, *args, **kwargs):
+        tokenizer_object = kwargs.pop("tokenizer_object", None)
+        slow_tokenizer = kwargs.pop("__slow_tokenizer", None)
+        gguf_file = kwargs.pop("gguf_file", None)
+        fast_tokenizer_file = kwargs.pop("tokenizer_file", None)
+        from_slow = kwargs.pop("from_slow", False)
+        added_tokens_decoder = kwargs.pop("added_tokens_decoder", {})
+        self.add_prefix_space = kwargs.get("add_prefix_space", False)
+
+        if from_slow and slow_tokenizer is None and self.slow_tokenizer_class is None:
+            raise ValueError(
+                "Cannot instantiate this tokenizer from a slow version. If it's based on sentencepiece, make sure you "
+                "have sentencepiece installed."
+            )
+
+        if tokenizer_object is not None:
+            fast_tokenizer = copy.deepcopy(tokenizer_object)
+        elif fast_tokenizer_file is not None and not from_slow:
+            # We have a serialization from tokenizers which let us directly build the backend
+            fast_tokenizer = TokenizerFast.from_file(fast_tokenizer_file)
+        elif slow_tokenizer:
+            # We need to convert a slow tokenizer to build the backend
+            fast_tokenizer = convert_slow_tokenizer(slow_tokenizer)
+        elif gguf_file is not None:
+            # We need to convert a slow tokenizer to build the backend
+            gguf_param = load_gguf_checkpoint(kwargs.get("vocab_file"))
+            architecture = gguf_param["config"]["model_type"]
+            tokenizer_dict = gguf_param["tokenizer"]
+            tokenizer_config = gguf_param["tokenizer_config"]
+            fast_tokenizer, additional_kwargs = convert_gguf_tokenizer(architecture, tokenizer_dict)
+            kwargs.update(tokenizer_config)
+            if len(additional_kwargs) > 0:
+                kwargs.update(additional_kwargs)
+        elif self.slow_tokenizer_class is not None and slow_tokenizer is not False:
+            # We need to create and convert a slow tokenizer to build the backend
+            slow_tokenizer = self.slow_tokenizer_class(*args, **kwargs)
+            fast_tokenizer = convert_slow_tokenizer(slow_tokenizer)
+        elif not slow_tokenizer:
+            # We tried loading a slow_tokenizer with spm and failed, try to load with tiktoken
+            self.vocab_file = kwargs.get("vocab_file")
+            self.additional_special_tokens = kwargs.get("additional_special_tokens", [])
+            fast_tokenizer = convert_slow_tokenizer(self, from_tiktoken=True)
+            slow_tokenizer = None
+        else:
+            raise ValueError(
+                "Couldn't instantiate the backend tokenizer from one of: \n"
+                "(1) a `tokenizers` library serialization file, \n"
+                "(2) a slow tokenizer instance to convert or \n"
+                "(3) an equivalent slow tokenizer class to instantiate and convert. \n"
+                "You need to have sentencepiece or tiktoken installed to convert a slow tokenizer to a fast one."
+            )
+
+        self._tokenizer = fast_tokenizer
+
+        if slow_tokenizer is not None:
+            kwargs.update(slow_tokenizer.init_kwargs)
+
+        self._decode_use_source_tokenizer = False
+
+        _truncation = self._tokenizer.truncation
+
+        if _truncation is not None:
+            self._tokenizer.enable_truncation(**_truncation)
+            kwargs.setdefault("max_length", _truncation["max_length"])
+            kwargs.setdefault("truncation_side", _truncation["direction"])
+            kwargs.setdefault("stride", _truncation["stride"])
+            kwargs.setdefault("truncation_strategy", _truncation["strategy"])
+        else:
+            self._tokenizer.no_truncation()
+
+        _padding = self._tokenizer.padding
+        if _padding is not None:
+            self._tokenizer.enable_padding(**_padding)
+            kwargs.setdefault("pad_token", _padding["pad_token"])
+            kwargs.setdefault("pad_token_type_id", _padding["pad_type_id"])
+            kwargs.setdefault("padding_side", _padding["direction"])
+            kwargs.setdefault("max_length", _padding["length"])
+            kwargs.setdefault("pad_to_multiple_of", _padding["pad_to_multiple_of"])
+
+        # We call this after having initialized the backend tokenizer because we update it.
+        super().__init__(**kwargs)
+        self._tokenizer.encode_special_tokens = self.split_special_tokens
+
+        added_tokens_decoder_hash = {hash(repr(token)) for token in self.added_tokens_decoder}
+        tokens_to_add = [
+            token
+            for index, token in sorted(added_tokens_decoder.items(), key=lambda x: x[0])
+            if hash(repr(token)) not in added_tokens_decoder_hash
+        ]
+        encoder = list(self.added_tokens_encoder.keys()) + [str(token) for token in tokens_to_add]
+        # if some of the special tokens are strings, we check if we don't already have a token
+        tokens_to_add += [
+            token for token in self.all_special_tokens_extended if token not in encoder and token not in tokens_to_add
+        ]
+
+        if len(tokens_to_add) > 0:
+            tokens = []
+            special_tokens = self.all_special_tokens
+            for token in tokens_to_add:
+                is_special = (
+                    (token.special or str(token) in special_tokens)
+                    if isinstance(token, AddedToken)
+                    else str(token) in special_tokens
+                )
+                if isinstance(token, str):
+                    token = AddedToken(token, special=is_special)
+                else:
+                    token.special = is_special
+                tokens.append(token)
+            if tokens:
+                self.add_tokens(tokens)
+
+        try:
+            pre_tok_state = json.loads(self.backend_tokenizer.pre_tokenizer.__getstate__())
+            if pre_tok_state.get("add_prefix_space", self.add_prefix_space) != self.add_prefix_space:
+                pre_tok_class = getattr(pre_tokenizers_fast, pre_tok_state.pop("type"))
+                pre_tok_state["add_prefix_space"] = self.add_prefix_space
+                self.backend_tokenizer.pre_tokenizer = pre_tok_class(**pre_tok_state)
+        except Exception:
+            # We'll get an error if there is no pre_tokenizer, or if it's a custom pre_tokenizer that can
+            # not be serialized. In those cases, we just ignore the error as there's no pre_tokenizer
+            # for which we need to update the `add_prefix_space` attribute.
+            pass

@@ -1,0 +1,42 @@
+{
+  "host": "linux",
+  "started_utc": "2026-11-11T09:22:16.350286+00:00",
+  "steps": [
+    {
+      "name": "release",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 43.832023297000006
+    },
+    {
+      "name": "pretrained-qwen2",
+      "args": [
+        "cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--test",
+        "qwen_pretrained",
+        "pretrained_qwen2_native_files",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 66.735059208
+    }
+  ],
+  "status": "running"
+}

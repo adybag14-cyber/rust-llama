@@ -94,7 +94,7 @@ fn native_hf_ingestion_and_saved_token_flags() {
             let input = field(case, "files");
             let files = files(input);
             let map = opt_file(input, "special_tokens_map.json");
-            let result = hf_bpe::prepare(&files, map.as_ref(), &Limits::default(), profile);
+            let result = hf_bpe::prepare(&files, map.as_ref(), &Limits::default(), profile, None);
             if text(field(case, "status")).unwrap() == "accepted" {
                 let (backend, specials) = result.unwrap_or_else(|e| panic!("{name}: {e}"));
                 assert_metadata(&backend, &specials, field(case, "metadata"), name);
@@ -218,6 +218,7 @@ fn pretrained_smollm2_hf_vocabulary_and_probe() {
         map.as_ref(),
         &Limits::default(),
         codec::SourceProfile::current(),
+        None,
     )
     .unwrap();
     let frame = metadata_frame(&backend, &specials);

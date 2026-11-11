@@ -1,0 +1,31 @@
+    Checking llama-quant v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\quant)
+    Checking llama-checkpoint v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\checkpoint)
+    Checking llama-conformance v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\llama-conformance)
+    Checking llama-behavior v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\llama-behavior)
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\gguf)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\tokenizer)
+    Checking llama-convert v0.1.0 (C:\Users\adyba\rust-llama-reference\continue-20261111\convert\crates\convert)
+error: this `if` has identical blocks
+   --> crates\convert\src\hf_bpe.rs:229:65
+    |
+229 |           let default = if is_qwen2 && matches!(index, 1 | 2 | 4) {
+    |  _________________________________________________________________^
+230 | |             Some("<|endoftext|>")
+231 | |         } else if is_gpt2 && index < 3 {
+    | |_________^
+    |
+note: same as this
+   --> crates\convert\src\hf_bpe.rs:231:40
+    |
+231 |           } else if is_gpt2 && index < 3 {
+    |  ________________________________________^
+232 | |             Some("<|endoftext|>")
+233 | |         } else if is_llama {
+    | |_________^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#if_same_then_else
+    = note: `-D clippy::if-same-then-else` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::if_same_then_else)]`
+
+error: could not compile `llama-convert` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `llama-convert` (lib test) due to 1 previous error

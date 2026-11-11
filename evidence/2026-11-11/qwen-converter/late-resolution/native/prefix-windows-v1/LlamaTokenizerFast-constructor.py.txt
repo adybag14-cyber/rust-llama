@@ -1,0 +1,49 @@
+    def __init__(
+        self,
+        vocab_file=None,
+        tokenizer_file=None,
+        clean_up_tokenization_spaces=False,
+        unk_token="<unk>",
+        bos_token="<s>",
+        eos_token="</s>",
+        add_bos_token=True,
+        add_eos_token=False,
+        use_default_system_prompt=False,
+        legacy=None,
+        add_prefix_space=None,
+        **kwargs,
+    ):
+        if legacy is None:
+            logger.warning_once(
+                f"You are using the default legacy behaviour of the {self.__class__}. This is"
+                " expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you."
+                " If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it"
+                " means, and thoroughly read the reason why this was added as explained in"
+                " https://github.com/huggingface/transformers/pull/24565 - if you loaded a llama tokenizer from a GGUF file"
+                " you can ignore this message."
+            )
+            legacy = True
+        self.legacy = legacy
+
+        if add_prefix_space is not None:
+            kwargs["from_slow"] = True
+
+        super().__init__(
+            vocab_file=vocab_file,
+            tokenizer_file=tokenizer_file,
+            clean_up_tokenization_spaces=clean_up_tokenization_spaces,
+            unk_token=unk_token,
+            bos_token=bos_token,
+            eos_token=eos_token,
+            add_bos_token=add_bos_token,
+            add_eos_token=add_eos_token,
+            use_default_system_prompt=use_default_system_prompt,
+            add_prefix_space=add_prefix_space,
+            legacy=legacy,
+            **kwargs,
+        )
+        self._add_bos_token = add_bos_token
+        self._add_eos_token = add_eos_token
+        self.update_post_processor()
+        self.use_default_system_prompt = use_default_system_prompt
+        self.vocab_file = vocab_file

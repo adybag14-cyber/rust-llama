@@ -1,7 +1,8 @@
 //! Ordered source contributions, dense transforms and bounded output buffers.
 use crate::codec::{self, SourceProfile, WorkingType};
+use crate::config::Architecture;
 use crate::config::Config;
-use crate::frozen::TENSOR_NAMES;
+use crate::frozen::TensorName;
 use crate::{Error, Limits, Options, OutputType, Result, reserve, string};
 use llama_checkpoint::{Checkpoint, DType as SourceType, TypedLayout};
 use llama_quant::DType;
@@ -81,7 +82,9 @@ impl Plan {
         fusion.resize_with(config.layers, Fusion::default);
         if options.fuse_qkv {
             for value in &values {
-                let Some(mapped) = map_name(&value.name, config.layers)? else {
+                let Some(mapped) =
+                    map_name(&value.name, config.layers, config.family.tensor_names())?
+                else {
                     continue;
                 };
                 if let Some((layer, component, bias)) = qkv_slot(&mapped.name)
@@ -117,7 +120,7 @@ impl Plan {
                 return Err(Error::Unsupported("automatic preserved FP8 conversion"));
             }
             codec::working_type(layout.dtype)?;
-            let raw_name = if config.architecture == "LlamaModel" {
+            let raw_name = if matches!(config.architecture.as_str(), "LlamaModel" | "Qwen2Model") {
                 let mut name = string("model.")?;
                 name.try_reserve(value.name.len())
                     .map_err(|_| Error::Limit("tensor name"))?;
@@ -126,8 +129,9 @@ impl Plan {
             } else {
                 string(&value.name)?
             };
-            let mapped = map_name(&raw_name, config.layers)?
-                .ok_or(Error::Invalid("source tensor has no frozen Llama mapping"))?;
+            let mapped = map_name(&raw_name, config.layers, config.family.tensor_names())?.ok_or(
+                Error::Invalid("source tensor has no mapping for the frozen architecture"),
+            )?;
             if mapped.kind.contains("EXP")
                 || raw_name.ends_with(".lora_a")
                 || raw_name.ends_with(".lora_b")
@@ -136,8 +140,9 @@ impl Plan {
                     "expert or adapter tensor transformation",
                 ));
             }
-            let heads = if raw_name.ends_with("q_proj.weight") || raw_name.ends_with("q_proj.bias")
-            {
+            let heads = if config.family != Architecture::Llama {
+                None
+            } else if raw_name.ends_with("q_proj.weight") || raw_name.ends_with("q_proj.bias") {
                 Some(config.head_count()?)
             } else if raw_name.ends_with("k_proj.weight") || raw_name.ends_with("k_proj.bias") {
                 Some(config.kv_head_count()?.unwrap_or(config.head_count()?))
@@ -385,7 +390,7 @@ struct Mapped {
     name: String,
     kind: &'static str,
 }
-fn map_name(name: &str, layers: usize) -> Result<Option<Mapped>> {
+fn map_name(name: &str, layers: usize, table: &'static [TensorName]) -> Result<Option<Mapped>> {
     for suffix in ["", ".weight", ".bias"] {
         let Some(base) = (if suffix.is_empty() {
             Some(name)
@@ -395,7 +400,7 @@ fn map_name(name: &str, layers: usize) -> Result<Option<Mapped>> {
             continue;
         };
         // The original map is assigned in declaration order; a later alias wins.
-        for entry in TENSOR_NAMES.iter().rev() {
+        for entry in table.iter().rev() {
             let number = if entry.block {
                 if layers == 0 {
                     continue;
