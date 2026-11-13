@@ -16,6 +16,7 @@ pub(crate) enum Architecture {
     Gpt2,
     GptNeoX,
     Bloom,
+    Falcon,
 }
 impl Architecture {
     pub fn name(self) -> &'static str {
@@ -26,6 +27,7 @@ impl Architecture {
             Self::Gpt2 => "gpt2",
             Self::GptNeoX => "gptneox",
             Self::Bloom => "bloom",
+            Self::Falcon => "falcon",
         }
     }
     pub fn tensor_names(self) -> &'static [crate::frozen::TensorName] {
@@ -36,6 +38,7 @@ impl Architecture {
             Self::Gpt2 => crate::gpt_tables::GPT2_TENSOR_NAMES,
             Self::GptNeoX => crate::gpt_tables::GPTNEOX_TENSOR_NAMES,
             Self::Bloom => crate::bloom_tables::BLOOM_TENSOR_NAMES,
+            Self::Falcon => crate::falcon_tables::FALCON_TENSOR_NAMES,
         }
     }
 }
@@ -71,7 +74,7 @@ impl Config {
         if selected.is_some_and(|name| {
             !matches!(
                 name,
-                "llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox" | "bloom"
+                "llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox" | "bloom" | "falcon"
             ) && AUTO_CONFIG_PATTERNS.contains(&name)
         }) {
             return Err(Error::Unsupported(
@@ -80,7 +83,7 @@ impl Config {
         }
         let mut normalized = matches!(
             selected,
-            Some("llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox" | "bloom")
+            Some("llama" | "qwen2" | "qwen3" | "gpt2" | "gpt_neox" | "bloom" | "falcon")
         );
         let mut head = None;
         if normalized {
@@ -117,6 +120,7 @@ impl Config {
                         Some("gpt2") => crate::gpt_tables::GPT2_DEFAULTS,
                         Some("gpt_neox") => crate::gpt_tables::GPTNEOX_DEFAULTS,
                         Some("bloom") => crate::bloom_tables::BLOOM_DEFAULTS,
+                        Some("falcon") => crate::falcon_tables::FALCON_DEFAULTS,
                         _ => LLAMA_DEFAULTS,
                     }
                     .as_bytes(),
@@ -174,6 +178,7 @@ impl Config {
             "GPT2LMHeadModel" => Architecture::Gpt2,
             "GPTNeoXForCausalLM" => Architecture::GptNeoX,
             "BloomForCausalLM" | "BloomModel" => Architecture::Bloom,
+            "FalconForCausalLM" | "RWForCausalLM" => Architecture::Falcon,
             _ => {
                 return Err(Error::Unsupported(
                     "architecture is not an admitted dense conversion",
@@ -231,6 +236,7 @@ impl Config {
             Some("gpt2") => Ok("GPT2TokenizerFast"),
             Some("gpt_neox") => Ok("GPTNeoXTokenizerFast"),
             Some("bloom") => Ok("BloomTokenizerFast"),
+            Some("falcon") => Ok("PreTrainedTokenizerFast"),
             _ => Err(Error::Unsupported("AutoTokenizer root configuration class")),
         }
     }
@@ -243,6 +249,27 @@ impl Config {
             .as_str()
     }
     fn root_value(&self, key: &str) -> Option<&Json> {
+        if self.root_value_model_type() == Some("falcon") {
+            // FalconConfig consumes n_embed but retains the legacy head/layer
+            // keys as independent attributes. None KV heads resolve to the
+            // root query-head count before nested text settings are merged.
+            if key == "n_embed" {
+                return None;
+            }
+            if key == "hidden_size"
+                && let Some(value) = present(self.root().get("n_embed"))
+            {
+                return Some(value);
+            }
+            if key == "num_kv_heads" && present(self.root().get(key)).is_none() {
+                return self.root().get("num_attention_heads").or_else(|| {
+                    self.defaults
+                        .as_ref()?
+                        .as_object()?
+                        .get("num_attention_heads")
+                });
+            }
+        }
         if self.root_value_model_type() == Some("bloom") {
             // BloomConfig consumes n_embed before initialization and applies
             // inherited aliases afterwards. Its serialized form contains
@@ -383,6 +410,9 @@ impl Config {
         })
     }
     pub fn metadata(&self, out: &mut Metadata, output: OutputType) -> Result<()> {
+        if self.family == Architecture::Falcon {
+            return crate::falcon::metadata(self, out, output);
+        }
         if self.family == Architecture::Bloom {
             return crate::bloom::metadata(self, out, output);
         }
@@ -649,6 +679,9 @@ fn auto_config_valid(root: &Object, selected: Option<&str>) -> bool {
         )
     {
         return false;
+    }
+    if selected == Some("falcon") {
+        return crate::falcon::valid_auto_config(root);
     }
     if matches!(selected, Some("gpt2" | "bloom")) {
         // These classes do not validate a rotary configuration or head division.

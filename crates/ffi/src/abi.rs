@@ -375,6 +375,21 @@ pub struct LlamaEmbd {
     pub n_embd: usize,
 }
 
+/// Frozen context timing and execution counters (56 bytes on the native x64 ABI).
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct LlamaPerfContextData {
+    pub t_start_ms: f64,
+    pub t_load_ms: f64,
+    pub t_p_eval_ms: f64,
+    pub t_eval_ms: f64,
+    pub n_p_eval: i32,
+    pub n_eval: i32,
+    pub n_reused: i32,
+    pub n_reallocs_same: i32,
+    pub n_reallocs_diff: i32,
+}
+
 /// Frozen sampler-chain timing and accepted-token counters.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Default)]

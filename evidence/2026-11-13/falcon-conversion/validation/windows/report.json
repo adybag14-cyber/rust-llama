@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "host": "windows",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "tag": "final-v1",
+  "started_utc": "2026-11-13T21:13:45.793901+00:00",
+  "commands": [
+    {
+      "name": "toolchain",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\rustc.exe",
+        "-Vv"
+      ],
+      "stdout": "toolchain.stdout.log",
+      "stderr": "toolchain.stderr.log",
+      "seconds": 0.0902432000002591,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 194,
+        "sha256": "341fed434cf52bd9ba5ab2f3507dbd943a2062212028574e529fc3e7e5ecd7a8"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "format",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "fmt",
+        "-p",
+        "llama-convert",
+        "--",
+        "--check"
+      ],
+      "stdout": "format.stdout.log",
+      "stderr": "format.stderr.log",
+      "seconds": 0.6426297000016348,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "stdout": "clippy.stdout.log",
+      "stderr": "clippy.stderr.log",
+      "seconds": 6.171341700000994,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_identity": {
+        "bytes": 633,
+        "sha256": "edf06e15174797e9545343899f46c58b04b6b89f657b6566ee237f98f53dd9f7"
+      }
+    },
+    {
+      "name": "ordinary-debug",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-convert"
+      ],
+      "stdout": "ordinary-debug.stdout.log",
+      "stderr": "ordinary-debug.stderr.log",
+      "seconds": 506.3909330000006,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 6894,
+        "sha256": "aea5d5f50a46c0cb952519c9b1fed9be72334bca58e291fb2f64e99bfc1665ec"
+      },
+      "stderr_identity": {
+        "bytes": 2281,
+        "sha256": "13dfab2004eaa1f028f9d54937741e3014e6a7174f8efb137cf43b5b531ca012"
+      }
+    },
+    {
+      "name": "falcon-release",
+      "argv": [
+        "C:\\Users\\adyba\\.cargo\\bin\\cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "--release",
+        "-p",
+        "llama-convert",
+        "falcon",
+        "--",
+        "--nocapture"
+      ],
+      "stdout": "falcon-release.stdout.log",
+      "stderr": "falcon-release.stderr.log",
+      "seconds": 115.64788759999828,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 8437,
+        "sha256": "da57d395f39a70149e1e06cbba0c9b3175223c95d37f3dd8c4343e3761b2d097"
+      },
+      "stderr_identity": {
+        "bytes": 2750,
+        "sha256": "c31aa25cf5fe0fcaaba1cf694cbb54e1193ddc12ca3a2d61651bc9867967a2bf"
+      }
+    },
+    {
+      "name": "cli-dry-run",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\rust-target\\windows\\release\\convert-hf-to-gguf.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\original-v1\\windows\\cases\\falcon-base-q8_0\\model",
+        "--outtype",
+        "q8_0",
+        "--model-name",
+        "Tiny Falcon Converter Fixture",
+        "--outfile",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\validation\\final-v1\\windows\\falcon-cli-q8.gguf",
+        "--dry-run"
+      ],
+      "stdout": "cli-dry-run.stdout.log",
+      "stderr": "cli-dry-run.stderr.log",
+      "seconds": 0.09776989999954822,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 169,
+        "sha256": "c1f64c0199eed3e06c7a5370df161f930fecb41660697477c2fd82c13df521dc"
+      },
+      "stderr_identity": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "cli-convert",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\rust-target\\windows\\release\\convert-hf-to-gguf.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\original-v1\\windows\\cases\\falcon-base-q8_0\\model",
+        "--outtype",
+        "q8_0",
+        "--model-name",
+        "Tiny Falcon Converter Fixture",
+        "--outfile",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-converter\\validation\\final-v1\\windows\\falcon-cli-q8.gguf"
+      ],
+      "stdout": "cli-convert.stdout.log",
+      "stderr": "cli-convert.stderr.log",
+      "seconds": 0.09958770000048389,
+      "exit_code": 0,
+      "stdout_identity": {
+        "bytes": 122,
+        "sha256": "6e72deabc4f4b576e0e3c5f10bcd2404480a13a8e7f1e4d94c448ea68e9b4b53"
+      },
+      "stderr_identity": {
+        "bytes": 62,
+        "sha256": "34bf7a74d78490e37f794953c1528090b627ed45a034b7bcb5244c899f9bb8f9"
+      }
+    }
+  ],
+  "status": "succeeded",
+  "input_guard": "4959526a45130afcd1a558bfc9b34a7b1199e5a71677d4b41ee820a2786282de",
+  "guard_scope": "Selected converter code, fixtures, documentation and workspace Cargo/toolchain inputs. Other dependency crates and whole-repository identity are checked at integration, not by this component guard.",
+  "driver": {
+    "bytes": 4331,
+    "sha256": "103afb0abc2751dadf7baf546a354434201f91bb404456c255466de8fa871b88"
+  },
+  "inputs_before": {
+    "files": 212,
+    "sha256": "4959526a45130afcd1a558bfc9b34a7b1199e5a71677d4b41ee820a2786282de",
+    "unchanged": true
+  },
+  "cli_output": {
+    "matches_original": true,
+    "bytes": 2316352,
+    "sha256": "a1e46a0775724ab92deb517a536b1edcbc0557a10c43d4689df8b7b3baa1fea9"
+  },
+  "inputs_after": {
+    "files": 212,
+    "sha256": "4959526a45130afcd1a558bfc9b34a7b1199e5a71677d4b41ee820a2786282de",
+    "unchanged": true
+  },
+  "completed_utc": "2026-11-13T21:24:15.429962+00:00"
+}

@@ -2,10 +2,17 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **232**, leaves
-**23 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **239**, leaves
+**16 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, ADAPTERS.md and ENCODER.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, CONTEXT_PERFORMANCE.md, FILE_POINTER.md, ADAPTERS.md and ENCODER.md.
+
+The context-performance and FILE-pointer checkpoint adds seven real exports.
+CONTEXT_PERFORMANCE.md records measured context timing, synchronization/reset
+boundaries, dense warmup behavior and truthful runtime feature information.
+The direct executor reports zero GGML graph allocation/reuse counts.
+FILE_POINTER.md records anonymous embedded model/LoRA loading, caller ownership,
+independent MSVC/GNU fixtures and the explicit coherent-cursor behavior boundary.
 
 The quantization checkpoint adds `llama_model_quantize_default_params` and
 `llama_model_quantize` with native Rust model-file conversion. The original
@@ -29,12 +36,13 @@ The adapter checkpoint adds ten real LoRA/control-vector functions. Owned GGUF
 weights, scalar metadata, invocation-token storage, native ordered composition
 and retained partial control vectors are independently checked on MSVC/GNU.
 ADAPTERS.md records source behavior, numerical fixtures and resource/lifetime
-boundaries. The FILE* adapter loader remains absent.
+boundaries. FILE_POINTER.md extends loading to caller-owned FILE streams.
 
 The sampler-performance checkpoint adds real per-chain CPU time/counts and
 three perf functions, plus two global logger functions. PERFORMANCE.md records
 no_perf, reset/clone/copy rules, callback ownership and independent MSVC/GNU
-captures. Context/graph metrics and backend-attached sampling remain absent.
+captures. Context timing is covered separately in CONTEXT_PERFORMANCE.md;
+backend-attached sampling remains absent.
 
 The extended batch checkpoint checks debug/release PE and ELF tables: exactly
 211 frozen exports, four extensions and 44 absent exports. The original-header
@@ -86,6 +94,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_adapter_get_alora_n_invocation_tokens` |
 | `llama_adapter_lora_free` |
 | `llama_adapter_lora_init` |
+| `llama_adapter_lora_init_from_file_ptr` |
 | `llama_adapter_meta_count` |
 | `llama_adapter_meta_key_by_index` |
 | `llama_adapter_meta_val_str` |
@@ -162,6 +171,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_model_is_hybrid` |
 | `llama_model_is_recurrent` |
 | `llama_model_load_from_file` |
+| `llama_model_load_from_file_ptr` |
 | `llama_model_load_from_splits` |
 | `llama_model_meta_count` |
 | `llama_model_meta_key_by_index` |
@@ -198,10 +208,14 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_n_ubatch` |
 | `llama_n_vocab` |
 | `llama_new_context_with_model` |
+| `llama_perf_context` |
+| `llama_perf_context_print` |
+| `llama_perf_context_reset` |
 | `llama_perf_sampler` |
 | `llama_perf_sampler_print` |
 | `llama_perf_sampler_reset` |
 | `llama_pooling_type` |
+| `llama_print_system_info` |
 | `llama_process` |
 | `llama_sampler_accept` |
 | `llama_sampler_apply` |
@@ -247,6 +261,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_set_embeddings` |
 | `llama_set_n_threads` |
 | `llama_set_state_data` |
+| `llama_set_warmup` |
 | `llama_split_path` |
 | `llama_split_prefix` |
 | `llama_state_get_data` |
@@ -328,7 +343,6 @@ The separate native C++ symbol surface is not claimed here.
 
 | Symbol |
 |---|
-| `llama_adapter_lora_init_from_file_ptr` |
 | `llama_attach_threadpool` |
 | `llama_detach_threadpool` |
 | `llama_get_sampled_candidates_count_ith` |
@@ -339,15 +353,30 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_sampled_probs_ith` |
 | `llama_get_sampled_token_ith` |
 | `llama_model_init_from_user` |
-| `llama_model_load_from_file_ptr` |
 | `llama_model_save_to_file` |
 | `llama_numa_init` |
 | `llama_opt_epoch` |
 | `llama_opt_init` |
 | `llama_opt_param_filter_all` |
-| `llama_perf_context` |
-| `llama_perf_context_print` |
-| `llama_perf_context_reset` |
-| `llama_print_system_info` |
 | `llama_set_sampler` |
-| `llama_set_warmup` |
+
+## Remaining model construction and save prerequisites
+
+`llama_model_init_from_user` takes a caller-supplied `gguf_context` and a
+callback receiving live `ggml_tensor` objects with backend-owned storage.
+A complete implementation needs a Rust GGUF C-context API, tensor descriptors,
+allocation/backend ownership and initialization callback behavior. Treating an
+original C++ GGUF object's opaque storage as a guessed Rust structure, or
+linking its implementation, would violate the native Rust boundary. The current
+safe GGUF parser/writer does not itself supply that C ABI.
+
+`llama_model_save_to_file` is also not an input-file copy. The frozen
+`llama-model-saver.cpp` rebuilds canonical metadata from resolved hparams and
+vocabulary, then serializes actual model tensors in architecture creation order.
+It includes defaulted fields, tokenizer policies, alias/optional-tensor handling
+and model-specific metadata types. Current ModelData owns scalar getter metadata
+and execution weights, but not a complete resolved native export representation.
+A correct saver needs that owned representation and independent complete-file
+captures across admitted architectures, quantized weights and vocabulary
+families. Both functions therefore remain absent rather than exporting a
+passthrough or an opaque foreign-object cast.

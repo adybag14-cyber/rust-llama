@@ -346,3 +346,42 @@ pub fn tiny_bloom() -> Result<BloomModel> {
         },
     )
 }
+
+/// Structural Falcon weights; independent reference expectations live in
+/// llama-inference/tests/falcon.rs.
+pub fn tiny_falcon() -> Result<FalconModel> {
+    let config = FalconConfig {
+        vocabulary: 7,
+        width: 4,
+        feed_forward: 6,
+        heads: 2,
+        kv_heads: 1,
+        max_context: 32,
+        norm_epsilon: 1e-5,
+        rope_base: 10000.0,
+    };
+    let mut layers = Vec::new();
+    for index in 0..2 {
+        let seed = index * 20;
+        layers.push(FalconLayer {
+            attention_norm: norms(4, seed + 2),
+            attention_norm_bias: values(4, seed + 3),
+            attention_norm_2: Some(norms(4, seed + 8)),
+            attention_norm_2_bias: Some(values(4, seed + 9)),
+            qkv: matrix(8, 4, seed + 4)?,
+            attention_output: matrix(4, 4, seed + 6)?,
+            up: matrix(6, 4, seed + 10)?,
+            down: matrix(4, 6, seed + 12)?,
+        });
+    }
+    FalconModel::new(
+        config,
+        FalconWeights {
+            token_embedding: matrix(7, 4, 1)?,
+            layers,
+            output_norm: norms(4, 50),
+            output_norm_bias: values(4, 51),
+            output: Some(matrix(7, 4, 52)?),
+        },
+    )
+}

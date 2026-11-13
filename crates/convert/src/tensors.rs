@@ -805,3 +805,32 @@ mod family_filter_reference {
         assert!(decisions > 1000);
     }
 }
+
+#[cfg(test)]
+mod falcon_alias_reference {
+    use super::map_name;
+    use crate::util::{JsonBudget, integer, object, text};
+    use llama_checkpoint::Value as Json;
+
+    #[test]
+    fn frozen_falcon_alias_lookup() {
+        let root = JsonBudget::new(llama_checkpoint::Limits::default())
+            .parse(include_bytes!(
+                "../tests/fixtures/falcon-conversion/aliases.json"
+            ))
+            .unwrap();
+        let root = object(&root).unwrap();
+        let layers = integer(root.get("layers").unwrap()).unwrap() as usize;
+        let cases = root.get("cases").unwrap().as_array().unwrap();
+        for case in cases {
+            let row = object(case).unwrap();
+            let name = text(row.get("name").unwrap()).unwrap();
+            let actual = map_name(name, layers, crate::falcon_tables::FALCON_TENSOR_NAMES).unwrap();
+            match row.get("result").unwrap() {
+                Json::Null => assert!(actual.is_none(), "{name}"),
+                expected => assert_eq!(actual.unwrap().name, text(expected).unwrap(), "{name}"),
+            }
+        }
+        assert_eq!(cases.len(), 510);
+    }
+}

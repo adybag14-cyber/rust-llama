@@ -1,0 +1,59 @@
+{
+  "started_utc": "2026-11-13T21:31:32.254017+00:00",
+  "steps": [
+    {
+      "name": "session-format",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--edition",
+        "2024",
+        "crates/inference/src/session.rs",
+        "crates/inference/tests/generation_session.rs"
+      ],
+      "return_code": 0
+    },
+    {
+      "name": "session-tests",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "generation_session",
+        "--",
+        "--nocapture"
+      ],
+      "return_code": 0
+    },
+    {
+      "name": "session-clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-inference",
+        "--test",
+        "generation_session",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "return_code": 0
+    }
+  ],
+  "source_hashes": {
+    "crates/inference/src/session.rs": "4a39bc82882f8cbe6e521a24c6f7659c064aba10fba085a0690ac18ab408ba7e",
+    "crates/inference/src/lib.rs": "21d1f4c020cb9b80d585649678194c4934e25b38dd41f1ed83983c2fa53e8659",
+    "crates/inference/tests/generation_session.rs": "0bb5e0b05db6f4bbfbebe5cbd7b7ba5f2211214376812322c84bd5644acd495d"
+  }
+}

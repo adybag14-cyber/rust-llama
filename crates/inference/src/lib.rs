@@ -5,12 +5,14 @@
 
 mod bert_loader;
 mod bloom_loader;
+mod falcon_loader;
 mod gpt2_loader;
 mod gptneox_loader;
 mod loader;
 mod mamba_loader;
 mod qwen2_loader;
 mod qwen3_loader;
+mod session;
 mod stream;
 use llama_behavior::{
     chat,
@@ -19,6 +21,7 @@ use llama_behavior::{
 use llama_model_runtime::{BatchToken, Context, ContextOptions, Input, OutputSelection};
 pub use llama_model_runtime::{Encoded, Pooling};
 use llama_tokenizer::Tokenizer;
+pub use session::DecoderSession;
 use std::{fmt, path::Path, sync::Arc};
 
 #[derive(Debug)]
@@ -344,12 +347,35 @@ impl Model {
         cancel: &dyn Fn() -> bool,
         emit: &mut dyn FnMut(&str) -> bool,
     ) -> Result<GenerationStats> {
+        let mut session = session::CpuSession::new(self);
+        self.generate_with_session(prompt, options, cancel, emit, &mut session)
+    }
+    /// Generate with a fresh session for these model weights. Sampling, token
+    /// decoding, stop handling and UTF-8 streaming are shared with CPU generation.
+    /// The caller must pair the session with the same model, not merely matching
+    /// dimensions; the interface cannot identify arbitrary external weights.
+    pub fn generate_with_session(
+        &self,
+        prompt: &str,
+        options: &GenerationOptions,
+        cancel: &dyn Fn() -> bool,
+        emit: &mut dyn FnMut(&str) -> bool,
+        session: &mut dyn DecoderSession,
+    ) -> Result<GenerationStats> {
         if cancel() {
             return Err(Error::Cancelled);
         }
         if !self.supports_generation() {
             return Err(Error::Unsupported(
                 "BERT is an embedding model; generation is unavailable".into(),
+            ));
+        }
+        if session.next_position() != 0
+            || session.vocabulary_size() != self.vocabulary_size()
+            || session.context_length() < self.context_length()
+        {
+            return Err(Error::Invalid(
+                "generation requires a fresh compatible decoder session".into(),
             ));
         }
         if !options.temperature.is_finite() || options.temperature < 0. {
@@ -402,31 +428,7 @@ impl Model {
         for &token in &tokens {
             sampler.accept(token)?
         }
-        let mut context = self.context()?;
-        let mut logits = Vec::new();
-        for (chunk_index, chunk) in tokens.chunks(512).enumerate() {
-            let start = chunk_index * 512;
-            let batch: Vec<_> = chunk
-                .iter()
-                .enumerate()
-                .map(|(i, &id)| BatchToken {
-                    sequence: 0,
-                    position: start + i,
-                    input: Input::Token(id as u32),
-                    output: if start + i + 1 == tokens.len() {
-                        OutputSelection::Logits
-                    } else {
-                        OutputSelection::None
-                    },
-                })
-                .collect();
-            let outputs = context.decode_batch_with_cancel(&batch, cancel)?;
-            for output in outputs {
-                if let Some(v) = output.logits {
-                    logits = v
-                }
-            }
-        }
+        let mut logits = session.evaluate(&tokens, cancel)?;
         if logits.is_empty() {
             return Err(Error::Internal("prefill produced no logits".into()));
         }
@@ -435,6 +437,11 @@ impl Model {
         for step in 0..limit {
             if cancel() {
                 return Err(Error::Cancelled);
+            }
+            if logits.len() != self.vocabulary_size() || logits.iter().any(|v| !v.is_finite()) {
+                return Err(Error::Internal(
+                    "decoder produced invalid vocabulary logits".into(),
+                ));
             }
             let token = sampler.sample_and_accept(&logits)?;
             stats.completion_tokens += 1;
@@ -450,18 +457,7 @@ impl Model {
                 break;
             }
             if step + 1 < limit {
-                let batch = [BatchToken {
-                    sequence: 0,
-                    position: tokens.len() + step,
-                    input: Input::Token(token as u32),
-                    output: OutputSelection::Logits,
-                }];
-                logits = context
-                    .decode_batch_with_cancel(&batch, cancel)?
-                    .into_iter()
-                    .next()
-                    .and_then(|v| v.logits)
-                    .ok_or_else(|| Error::Internal("decode produced no logits".into()))?;
+                logits = session.evaluate(&[token], cancel)?;
             }
         }
         if cancel() {

@@ -107,6 +107,13 @@ impl Matrix {
                 .transpose()?,
         })
     }
+    /// Original immutable packed storage for device upload. F32 matrices expose
+    /// their scalar storage through values(); no re-quantization is performed.
+    pub fn packed_bytes(&self) -> Option<(llama_quant::DType, &[u8])> {
+        self.packed
+            .as_ref()
+            .map(|(dtype, bytes)| (*dtype, bytes.as_slice()))
+    }
     pub fn storage_dtype(&self) -> llama_quant::DType {
         self.packed
             .as_ref()
@@ -233,7 +240,20 @@ pub(crate) fn layer_norm(
     bias: &[f32],
     epsilon: f32,
 ) -> Result<Vec<f32>> {
-    if input.is_empty() || input.len() != weight.len() || input.len() != bias.len() {
+    layer_norm_optional_bias(input, weight, Some(bias), epsilon)
+}
+/// Affine NORM without synthesizing an ADD when the source omits the bias.
+/// Adding positive zero would erase a negative-zero result.
+pub(crate) fn layer_norm_optional_bias(
+    input: &[f32],
+    weight: &[f32],
+    bias: Option<&[f32]>,
+    epsilon: f32,
+) -> Result<Vec<f32>> {
+    if input.is_empty()
+        || input.len() != weight.len()
+        || bias.is_some_and(|bias| input.len() != bias.len())
+    {
         return Err(Error::Shape("invalid layer normalization row".into()));
     }
     let mean = input.iter().map(|x| *x as f64).sum::<f64>() as f32 / input.len() as f32;
@@ -249,8 +269,13 @@ pub(crate) fn layer_norm(
     if !scale.is_finite() || scale <= 0.0 {
         return Err(Error::NonFinite("layer normalization scale".into()));
     }
-    for ((value, weight), bias) in centered.iter_mut().zip(weight).zip(bias) {
-        *value = *value * scale * weight + bias;
+    for (value, weight) in centered.iter_mut().zip(weight) {
+        *value = *value * scale * weight;
+    }
+    if let Some(bias) = bias {
+        for (value, bias) in centered.iter_mut().zip(bias) {
+            *value += bias;
+        }
     }
     finite(&centered, "layer normalization output")?;
     Ok(centered)

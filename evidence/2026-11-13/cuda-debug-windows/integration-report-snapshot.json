@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "status": "running",
+  "profile": "windows-msvc",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-13T21:34:16.676032+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.93,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 931.829,
+      "stdout": {
+        "bytes": 77734,
+        "sha256": "68837ad7e0ef8ff3cdb7995047ac0f1cdbc0dd85361a0cc9c1e48446f2970898"
+      },
+      "stderr": {
+        "bytes": 14535,
+        "sha256": "65c61041df72296e80d2883d153df1e5b2961dc0896cf5c4b87ec4f595ce4647"
+      },
+      "tests": {
+        "passed": 753,
+        "failed": 0,
+        "ignored": 40,
+        "suites": 142
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1623,
+    "bytes": 244857,
+    "sha256": "e1f5c9469d0f5fd53691f832e727e3a729a6a1dc1bfe43a4d35cf930435e6f91",
+    "scope": "All Git-listed tracked/unignored files except evidence/, Markdown documentation, release/gates.tsv and the derived release/non-rust-allowlist.tsv. Includes all Rust source, Cargo/toolchain/configuration, dependency controls, fixtures and fixture manifests. Documentation and final package audit are sealed separately."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "c-clients",
+    "clippy",
+    "debug-library",
+    "debug-tests",
+    "encoder-c-clients",
+    "fmt",
+    "new-c-clients",
+    "pretrained-inference",
+    "pretrained-native-encoder",
+    "quantization-c-clients",
+    "release-build",
+    "release-tests"
+  ],
+  "driver": {
+    "bytes": 17859,
+    "sha256": "000f8ab4737f67517ff4661ecf91d6184b0b303690dcf0bfcb36e18c78bf067f"
+  },
+  "git_head": "f6d238cb8a8f462f9a93eeb6eb1086978b021758",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n"
+}

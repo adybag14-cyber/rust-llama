@@ -1,0 +1,111 @@
+{
+  "started_utc": "2026-11-13T21:23:54.686679+00:00",
+  "repo": "C:\\Users\\adyba\\rust-llama",
+  "target": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\falcon-oracle\\target-windows",
+  "steps": [
+    {
+      "name": "format",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--edition",
+        "2024",
+        "crates/device-family/src/ptx.rs",
+        "crates/device-family/src/ptx/decoder.rs",
+        "crates/device-family/tests/decoder_kernels.rs",
+        "crates/cuda-runtime/tests/runtime.rs"
+      ],
+      "return_code": 0,
+      "duration_seconds": 0.079765
+    },
+    {
+      "name": "device-ordinary",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-device-family"
+      ],
+      "return_code": 0,
+      "duration_seconds": 1.017392
+    },
+    {
+      "name": "decoder-real-gpu",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-device-family",
+        "--test",
+        "decoder_kernels",
+        "--",
+        "--ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "return_code": 0,
+      "duration_seconds": 1.438586
+    },
+    {
+      "name": "runtime-real-gpu",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-cuda-runtime",
+        "--test",
+        "runtime",
+        "--",
+        "--ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "return_code": 0,
+      "duration_seconds": 2.41655
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-device-family",
+        "-p",
+        "llama-cuda-runtime",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "return_code": 101,
+      "duration_seconds": 0.919314
+    }
+  ],
+  "source_after_format": {
+    "crates/device-family/src/ptx.rs": "d4b6529f99d561ff6b4368a1d4aa5d09c60fcdbb329c509ff623caba3715a07b",
+    "crates/device-family/src/ptx/decoder.rs": "9962b22206c89c64927b3a1e192e2e5e44275e2bc0ac2eecadef823269f3a1ab",
+    "crates/device-family/tests/decoder_kernels.rs": "b27910ab855b317a223ff52e9d08af07f00ef1054794c4043299855f78690670",
+    "crates/cuda-runtime/tests/runtime.rs": "bf5ca75990ac89995ceda6534d11ef5bae7da9be5816e04af7728a7bba6ed62f"
+  },
+  "source_final": {
+    "crates/device-family/src/ptx.rs": "d4b6529f99d561ff6b4368a1d4aa5d09c60fcdbb329c509ff623caba3715a07b",
+    "crates/device-family/src/ptx/decoder.rs": "9962b22206c89c64927b3a1e192e2e5e44275e2bc0ac2eecadef823269f3a1ab",
+    "crates/device-family/tests/decoder_kernels.rs": "b27910ab855b317a223ff52e9d08af07f00ef1054794c4043299855f78690670",
+    "crates/cuda-runtime/tests/runtime.rs": "bf5ca75990ac89995ceda6534d11ef5bae7da9be5816e04af7728a7bba6ed62f"
+  },
+  "finished_utc": "2026-11-13T21:24:00.563317+00:00"
+}

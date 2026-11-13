@@ -9,6 +9,7 @@ pub enum ExecutionSlice {
     Qwen3DenseF32,
     Gpt2DenseF32,
     BloomDenseF32,
+    FalconDenseF32,
     GptNeoXDenseF32,
     LlamaDenseF32,
     Mamba1F32,
@@ -64,7 +65,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "falcon",
         source_factory: Some("llama_model_falcon"),
         source_files: &["src/models/falcon.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::FalconDenseF32),
     },
     Architecture {
         id: 5,

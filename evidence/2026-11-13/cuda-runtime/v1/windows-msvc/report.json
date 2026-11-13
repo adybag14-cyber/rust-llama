@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "profile": "windows-msvc",
+  "mode": "debug",
+  "started_utc": "2026-11-13T21:26:49.798697+00:00",
+  "status": "failed",
+  "steps": [
+    {
+      "name": "format-owned",
+      "argv": [
+        "cargo",
+        "fmt",
+        "-p",
+        "llama-cuda-runtime",
+        "-p",
+        "llama-device-family",
+        "-p",
+        "llama-inference",
+        "-p",
+        "llama-cli"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "seconds": 0.121,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 811,
+        "sha256": "850cc3e5aba4057d2b626a91c410bbe8555e666dc35840454ce1cb3abf30e342"
+      }
+    }
+  ],
+  "driver": {
+    "bytes": 4151,
+    "sha256": "6e454f58adf4e43346269fad294b8db6d58b8e38b662248c3935614a330332b1"
+  },
+  "error": "RuntimeError('format-owned failed: package `llama-cli` is not a member of the workspace\\nThis utility formats all bin and lib files of the current crate using rustfmt.\\n\\nUsage: cargo fmt [OPTIONS] [-- <rustfmt_options>...]\\n\\nArguments:\\n  [rustfmt_options]...  Options passed to rustfmt\\n\\nOptions:\\n  -q, --quiet\\n          No output printed to stdout\\n  -v, --verbose\\n          Use verbose output\\n      --version\\n          Print rustfmt version and exit\\n  -p, --package <package>...\\n          Specify package to format\\n      --manifest-path <manifest-path>\\n          Specify path to Cargo.toml\\n      --message-format <message-format>\\n          Specify message-format: short|human\\n      --all\\n          Format all packages, and also their local path-based dependencies\\n      --check\\n          Run rustfmt in check mode\\n  -h, --help\\n          Print help\\n\\n\\n')",
+  "finished_utc": "2026-11-13T21:26:49.920536+00:00"
+}

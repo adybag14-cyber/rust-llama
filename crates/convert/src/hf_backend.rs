@@ -82,6 +82,22 @@ enum Stage {
     Digits { individual: bool },
     QwenSplit,
     BloomSplit,
+    Punctuation(Punctuation),
+    AsciiTriples,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Punctuation {
+    Removed,
+    Isolated,
+    MergedWithPrevious,
+    MergedWithNext,
+    Contiguous,
+}
+pub(crate) fn falcon_punctuation_member(ch: char) -> bool {
+    let cp = ch as u32;
+    let ranges = crate::falcon_unicode_data::PUNCTUATION;
+    let at = ranges.partition_point(|&(first, _)| first <= cp);
+    at > 0 && cp <= ranges[at - 1].1
 }
 #[derive(Clone, Copy)]
 struct Merge {
@@ -668,6 +684,36 @@ impl<'a> Backend<'a> {
             let mut next = Vec::new();
             for piece in pieces {
                 match stage {
+                    Stage::Punctuation(behavior) => {
+                        self.charge(piece.len())?;
+                        self.punctuation_pieces(&piece, behavior, &mut next)?;
+                    }
+                    Stage::AsciiTriples => {
+                        self.charge(piece.len())?;
+                        let (mut retained, mut at) = (0, 0);
+                        while at < piece.len() {
+                            if piece.as_bytes()[at..]
+                                .get(..3)
+                                .is_some_and(|v| v.iter().all(u8::is_ascii_digit))
+                            {
+                                if retained < at {
+                                    self.push_piece(&mut next, &piece[retained..at])?;
+                                }
+                                self.push_piece(&mut next, &piece[at..at + 3])?;
+                                at += 3;
+                                retained = at;
+                            } else {
+                                at += piece[at..]
+                                    .chars()
+                                    .next()
+                                    .expect("nonempty triple remainder")
+                                    .len_utf8();
+                            }
+                        }
+                        if retained < piece.len() {
+                            self.push_piece(&mut next, &piece[retained..])?;
+                        }
+                    }
                     Stage::QwenSplit => {
                         self.charge(piece.len())?;
                         let mut start = 0;
@@ -747,6 +793,56 @@ impl<'a> Backend<'a> {
             pieces = next;
         }
         Ok(pieces)
+    }
+    fn punctuation_pieces(
+        &mut self,
+        piece: &str,
+        behavior: Punctuation,
+        output: &mut Vec<String>,
+    ) -> Result<()> {
+        let mut start = 0;
+        let mut previous = None;
+        for (at, ch) in piece.char_indices() {
+            let matched = falcon_punctuation_member(ch);
+            if behavior == Punctuation::Contiguous {
+                if at > start && previous != Some(matched) {
+                    self.push_piece(output, &piece[start..at])?;
+                    start = at;
+                }
+                previous = Some(matched);
+                continue;
+            }
+            if !matched {
+                continue;
+            }
+            let end = at + ch.len_utf8();
+            match behavior {
+                Punctuation::Removed | Punctuation::Isolated => {
+                    if start < at {
+                        self.push_piece(output, &piece[start..at])?;
+                    }
+                    if behavior == Punctuation::Isolated {
+                        self.push_piece(output, &piece[at..end])?;
+                    }
+                    start = end;
+                }
+                Punctuation::MergedWithPrevious => {
+                    self.push_piece(output, &piece[start..end])?;
+                    start = end;
+                }
+                Punctuation::MergedWithNext => {
+                    if start < at {
+                        self.push_piece(output, &piece[start..at])?;
+                    }
+                    start = at;
+                }
+                Punctuation::Contiguous => unreachable!("handled before punctuation dispatch"),
+            }
+        }
+        if start < piece.len() {
+            self.push_piece(output, &piece[start..])?;
+        }
+        Ok(())
     }
     fn push_piece(&mut self, pieces: &mut Vec<String>, text: &str) -> Result<()> {
         self.charge(text.len())?;
@@ -1056,6 +1152,19 @@ fn parse_stages(value: Option<&Json>, stages: &mut Vec<Stage>, depth: usize) -> 
             });
             Ok(true)
         }
+        "Punctuation" => {
+            let behavior = match value.get("behavior").map(text).transpose()? {
+                None | Some("Isolated") => Punctuation::Isolated,
+                Some("Removed") => Punctuation::Removed,
+                Some("MergedWithPrevious") => Punctuation::MergedWithPrevious,
+                Some("MergedWithNext") => Punctuation::MergedWithNext,
+                Some("Contiguous") => Punctuation::Contiguous,
+                _ => return Err(Error::Invalid("HF punctuation behavior")),
+            };
+            reserve(stages, 1, "HF pretokenizer stages")?;
+            stages.push(Stage::Punctuation(behavior));
+            Ok(true)
+        }
         "Split" => {
             let expression = value
                 .get("pattern")
@@ -1071,13 +1180,14 @@ fn parse_stages(value: Option<&Json>, stages: &mut Vec<Stage>, depth: usize) -> 
             let stage = match expression {
                 Some(crate::hf_schema::QWEN_PATTERN) => Stage::QwenSplit,
                 Some(crate::hf_schema::BLOOM_PATTERN) => Stage::BloomSplit,
+                Some(crate::hf_schema::FALCON_TRIPLES_PATTERN) => Stage::AsciiTriples,
                 _ => return Ok(false),
             };
             reserve(stages, 1, "HF pretokenizer stages")?;
             stages.push(stage);
             Ok(true)
         }
-        "Metaspace" | "Whitespace" | "WhitespaceSplit" | "BertPreTokenizer" | "Punctuation"
+        "Metaspace" | "Whitespace" | "WhitespaceSplit" | "BertPreTokenizer"
         | "CharDelimiterSplit" | "UnicodeScripts" | "FixedLength" => Ok(false),
         _ => Err(Error::Unsupported("HF pretokenizer schema")),
     }

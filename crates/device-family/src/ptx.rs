@@ -5,10 +5,15 @@
 //! or throughput parity. Interpretation is not device execution or PTX assembly.
 use std::fmt::{self, Write};
 
-pub const IR_VERSION: u32 = 1;
+pub const IR_VERSION: u32 = 2;
+
+mod decoder;
+pub use decoder::DecoderKernel;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum KernelKind {
+    /// Checked kernels for a persistent dense decoder graph.
+    Decoder(DecoderKernel),
     AddF32 {
         elements: u32,
         lhs_stride: u32,
@@ -137,6 +142,7 @@ impl KernelSpec {
             }
         };
         match self.kind {
+            KernelKind::Decoder(ref kind) => kind.buffer_bytes(),
             KernelKind::AddF32 {
                 elements,
                 lhs_stride,
@@ -224,6 +230,7 @@ impl KernelSpec {
     }
     pub fn outputs(&self) -> u32 {
         match self.kind {
+            KernelKind::Decoder(ref kind) => kind.outputs(),
             KernelKind::AddF32 { elements, .. } | KernelKind::ScaleF32 { elements, .. } => elements,
             KernelKind::SumF32 { .. } => 1,
             KernelKind::Q4MatVec { rows, .. } | KernelKind::MatVecF32 { rows, .. } => rows,
@@ -231,6 +238,7 @@ impl KernelSpec {
     }
     pub fn output_buffer(&self) -> usize {
         match self.kind {
+            KernelKind::Decoder(ref kind) => kind.output_buffer(),
             KernelKind::AddF32 { .. }
             | KernelKind::Q4MatVec { .. }
             | KernelKind::MatVecF32 { .. } => 2,
@@ -247,6 +255,7 @@ enum Type {
     I32,
     U64,
     F32,
+    F64,
 }
 impl Type {
     fn ptx(self) -> &'static str {
@@ -257,6 +266,7 @@ impl Type {
             Self::I32 => "s32",
             Self::U64 => "u64",
             Self::F32 => "f32",
+            Self::F64 => "f64",
         }
     }
 }
@@ -282,6 +292,7 @@ enum Operand {
     U32(u32),
     I32(i32),
     F32(f32),
+    F64(f64),
     Special(Special),
 }
 impl From<Reg> for Operand {
@@ -301,6 +312,7 @@ impl Operand {
             Self::U32(_) | Self::Special(_) => Type::U32,
             Self::I32(_) => Type::I32,
             Self::F32(_) => Type::F32,
+            Self::F64(_) => Type::F64,
         }
     }
 }
@@ -311,6 +323,7 @@ impl fmt::Display for Operand {
             Self::U32(v) => write!(f, "{v}"),
             Self::I32(v) => write!(f, "{v}"),
             Self::F32(v) => write!(f, "0f{:08x}", v.to_bits()),
+            Self::F64(v) => write!(f, "0d{:016x}", v.to_bits()),
             Self::Special(v) => f.write_str(match v {
                 Special::ThreadX => "%tid.x",
                 Special::BlockX => "%ctaid.x",
@@ -327,16 +340,29 @@ enum Binary {
     WideMul,
     And,
     Shr,
+    Div,
+    Rem,
+    Max,
+}
+#[derive(Debug, Clone, Copy)]
+enum Unary {
+    Sqrt,
+    Exp2,
 }
 #[derive(Debug, Clone, Copy)]
 enum Conversion {
     U32ToI32,
     I32ToF32,
     HalfToF32,
+    F32ToF64,
+    F64ToF32,
+    F32ToHalf,
+    F32ToI32Trunc,
 }
 #[derive(Debug, Clone, Copy)]
 enum LoadType {
     U8,
+    U32,
     F16,
     F32,
 }
@@ -356,6 +382,11 @@ enum Instruction {
         a: Operand,
         b: Operand,
     },
+    Unary {
+        dst: Reg,
+        op: Unary,
+        src: Reg,
+    },
     Convert {
         dst: Reg,
         conversion: Conversion,
@@ -369,6 +400,11 @@ enum Instruction {
     Store {
         value: Reg,
         address: Reg,
+    },
+    /// PTX testp.finite: accepts zero/subnormal/normal, rejects NaN and either infinity.
+    Finite {
+        pred: Reg,
+        src: Reg,
     },
     GreaterEqual {
         pred: Reg,
@@ -447,7 +483,7 @@ impl Program {
     }
     fn load(&mut self, address: Reg, kind: LoadType) -> Reg {
         let ty = match kind {
-            LoadType::U8 => Type::U32,
+            LoadType::U8 | LoadType::U32 => Type::U32,
             LoadType::F16 => Type::B16,
             LoadType::F32 => Type::F32,
         };
@@ -457,7 +493,9 @@ impl Program {
     }
     fn convert(&mut self, conversion: Conversion, src: Reg) -> Reg {
         let dst = self.reg(match conversion {
-            Conversion::U32ToI32 => Type::I32,
+            Conversion::U32ToI32 | Conversion::F32ToI32Trunc => Type::I32,
+            Conversion::F32ToHalf => Type::B16,
+            Conversion::F32ToF64 => Type::F64,
             _ => Type::F32,
         });
         self.push(Instruction::Convert {
@@ -466,6 +504,43 @@ impl Program {
             src,
         });
         dst
+    }
+    fn unary(&mut self, op: Unary, src: Reg) -> Reg {
+        let dst = self.reg(Type::F32);
+        self.push(Instruction::Unary { dst, op, src });
+        dst
+    }
+    // NVIDIA PTX ISA 9.7.3.1: testp.finite.f32 returns a predicate. Introduced
+    // in PTX 2.0, it is available for every target admitted by this emitter.
+    // https://docs.nvidia.com/cuda/parallel-thread-execution/#floating-point-instructions-testp
+    fn finite(&mut self, src: Reg) -> Reg {
+        let pred = self.reg(Type::Pred);
+        self.push(Instruction::Finite { pred, src });
+        pred
+    }
+    fn guard_nonfinite(&mut self, src: Reg, label: usize) {
+        let valid = self.label();
+        let pred = self.finite(src);
+        self.push(Instruction::Branch {
+            label: valid,
+            pred: Some(pred),
+        });
+        self.push(Instruction::Branch { label, pred: None });
+        self.push(Instruction::Label(valid));
+    }
+    fn finite_or_nan(&mut self, value: Reg) -> Reg {
+        let valid = self.label();
+        let pred = self.finite(value);
+        self.push(Instruction::Branch {
+            label: valid,
+            pred: Some(pred),
+        });
+        self.push(Instruction::Move {
+            dst: value,
+            value: Operand::F32(f32::NAN),
+        });
+        self.push(Instruction::Label(valid));
+        value
     }
     fn guard_ge(&mut self, a: impl Into<Operand>, b: impl Into<Operand>, label: usize) {
         let pred = self.reg(Type::Pred);
@@ -493,11 +568,19 @@ impl Program {
                     Binary::WideMul => dst.ty == Type::U64 && same(a, b, Type::U32),
                     Binary::And | Binary::Shr => dst.ty == Type::U32 && same(a, b, Type::U32),
                     Binary::Add | Binary::Sub => {
-                        matches!(dst.ty, Type::U32 | Type::I32 | Type::U64 | Type::F32)
-                            && same(a, b, dst.ty)
+                        matches!(
+                            dst.ty,
+                            Type::U32 | Type::I32 | Type::U64 | Type::F32 | Type::F64
+                        ) && same(a, b, dst.ty)
                     }
-                    Binary::Mul => matches!(dst.ty, Type::U32 | Type::F32) && same(a, b, dst.ty),
+                    Binary::Mul => {
+                        matches!(dst.ty, Type::U32 | Type::F32 | Type::F64) && same(a, b, dst.ty)
+                    }
+                    Binary::Div => matches!(dst.ty, Type::U32 | Type::F32) && same(a, b, dst.ty),
+                    Binary::Rem => dst.ty == Type::U32 && same(a, b, Type::U32),
+                    Binary::Max => dst.ty == Type::F32 && same(a, b, Type::F32),
                 },
+                Instruction::Unary { dst, src, .. } => dst.ty == Type::F32 && src.ty == Type::F32,
                 Instruction::Convert {
                     dst,
                     conversion,
@@ -506,12 +589,16 @@ impl Program {
                     Conversion::U32ToI32 => dst.ty == Type::I32 && src.ty == Type::U32,
                     Conversion::I32ToF32 => dst.ty == Type::F32 && src.ty == Type::I32,
                     Conversion::HalfToF32 => dst.ty == Type::F32 && src.ty == Type::B16,
+                    Conversion::F32ToF64 => dst.ty == Type::F64 && src.ty == Type::F32,
+                    Conversion::F64ToF32 => dst.ty == Type::F32 && src.ty == Type::F64,
+                    Conversion::F32ToHalf => dst.ty == Type::B16 && src.ty == Type::F32,
+                    Conversion::F32ToI32Trunc => dst.ty == Type::I32 && src.ty == Type::F32,
                 },
                 Instruction::Load { dst, address, kind } => {
                     address.ty == Type::U64
                         && dst.ty
                             == match kind {
-                                LoadType::U8 => Type::U32,
+                                LoadType::U8 | LoadType::U32 => Type::U32,
                                 LoadType::F16 => Type::B16,
                                 LoadType::F32 => Type::F32,
                             }
@@ -519,8 +606,11 @@ impl Program {
                 Instruction::Store { value, address } => {
                     value.ty == Type::F32 && address.ty == Type::U64
                 }
+                Instruction::Finite { pred, src } => pred.ty == Type::Pred && src.ty == Type::F32,
                 Instruction::GreaterEqual { pred, a, b } => {
-                    pred.ty == Type::Pred && same(a, b, Type::U32)
+                    pred.ty == Type::Pred
+                        && matches!(a.ty(), Type::U32 | Type::F32)
+                        && a.ty() == b.ty()
                 }
                 Instruction::Label(label) => {
                     let slot = labels.get_mut(label).ok_or_else(bad)?;
@@ -582,14 +672,18 @@ impl Program {
                         Binary::WideMul => "mul.wide",
                         Binary::And => "and",
                         Binary::Shr => "shr",
+                        Binary::Div => "div",
+                        Binary::Rem => "rem",
+                        Binary::Max => "max",
                     };
-                    let modifier = if dst.ty == Type::F32 {
-                        ".rn"
-                    } else if matches!(op, Binary::Mul) {
-                        ".lo"
-                    } else {
-                        ""
-                    };
+                    let modifier =
+                        if matches!(dst.ty, Type::F32 | Type::F64) && !matches!(op, Binary::Max) {
+                            ".rn"
+                        } else if matches!(op, Binary::Mul) {
+                            ".lo"
+                        } else {
+                            ""
+                        };
                     let ty = if matches!(op, Binary::WideMul) {
                         "u32"
                     } else if matches!(op, Binary::And) {
@@ -599,6 +693,14 @@ impl Program {
                     };
                     writeln!(text, "    {mnemonic}{modifier}.{ty} {dst}, {a}, {b};")
                 }
+                Instruction::Unary { dst, op, src } => writeln!(
+                    text,
+                    "    {} {dst}, {src};",
+                    match op {
+                        Unary::Sqrt => "sqrt.rn.f32",
+                        Unary::Exp2 => "ex2.approx.f32",
+                    }
+                ),
                 Instruction::Convert {
                     dst,
                     conversion,
@@ -610,6 +712,10 @@ impl Program {
                         Conversion::U32ToI32 => "cvt.s32.u32",
                         Conversion::I32ToF32 => "cvt.rn.f32.s32",
                         Conversion::HalfToF32 => "cvt.f32.f16",
+                        Conversion::F32ToF64 => "cvt.f64.f32",
+                        Conversion::F64ToF32 => "cvt.rn.f32.f64",
+                        Conversion::F32ToHalf => "cvt.rn.f16.f32",
+                        Conversion::F32ToI32Trunc => "cvt.rzi.s32.f32",
                     }
                 ),
                 Instruction::Load { dst, address, kind } => writeln!(
@@ -617,6 +723,7 @@ impl Program {
                     "    ld.global.{} {dst}, [{address}];",
                     match kind {
                         LoadType::U8 => "u8",
+                        LoadType::U32 => "u32",
                         LoadType::F16 => "b16",
                         LoadType::F32 => "f32",
                     }
@@ -624,8 +731,11 @@ impl Program {
                 Instruction::Store { value, address } => {
                     writeln!(text, "    st.global.f32 [{address}], {value};")
                 }
+                Instruction::Finite { pred, src } => {
+                    writeln!(text, "    testp.finite.f32 {pred}, {src};")
+                }
                 Instruction::GreaterEqual { pred, a, b } => {
-                    writeln!(text, "    setp.ge.u32 {pred}, {a}, {b};")
+                    writeln!(text, "    setp.ge.{} {pred}, {a}, {b};", a.ty().ptx())
                 }
                 Instruction::Label(label) => writeln!(text, "L{label}:"),
                 Instruction::Branch {
@@ -717,6 +827,7 @@ pub fn generate(spec: &KernelSpec, target: PtxTarget) -> Result<GeneratedPtx, Ke
     let done = p.label();
     p.guard_ge(index, spec.outputs(), done);
     match spec.kind {
+        KernelKind::Decoder(ref kind) => decoder::emit(kind, &mut p, &pointers, index, done),
         KernelKind::AddF32 {
             lhs_stride,
             rhs_stride,
@@ -923,6 +1034,7 @@ impl Program {
                         Operand::U32(v) => v as u64,
                         Operand::I32(v) => v as u32 as u64,
                         Operand::F32(v) => v.to_bits() as u64,
+                        Operand::F64(v) => v.to_bits(),
                         Operand::Special(s) => match s {
                             Special::ThreadX => tid as u64,
                             Special::BlockX => cta as u64,
@@ -950,15 +1062,35 @@ impl Program {
                                     Binary::Add => a + b,
                                     Binary::Sub => a - b,
                                     Binary::Mul => a * b,
+                                    Binary::Div => a / b,
+                                    Binary::Max => a.max(b),
                                     _ => return Err(KernelError("invalid float opcode".into())),
                                 }
                                 .to_bits() as u64
+                            } else if dst.ty == Type::F64 {
+                                let (a, b) = (f64::from_bits(a), f64::from_bits(b));
+                                match op {
+                                    Binary::Add => a + b,
+                                    Binary::Sub => a - b,
+                                    Binary::Mul => a * b,
+                                    _ => return Err(KernelError("invalid F64 opcode".into())),
+                                }
+                                .to_bits()
                             } else {
                                 let result = match op {
                                     Binary::Add => a.wrapping_add(b),
                                     Binary::Sub => a.wrapping_sub(b),
                                     Binary::Mul | Binary::WideMul => a.wrapping_mul(b),
                                     Binary::And => a & b,
+                                    Binary::Div => a.checked_div(b).ok_or_else(|| {
+                                        KernelError("integer division by zero".into())
+                                    })?,
+                                    Binary::Rem => a.checked_rem(b).ok_or_else(|| {
+                                        KernelError("integer remainder by zero".into())
+                                    })?,
+                                    Binary::Max => {
+                                        return Err(KernelError("invalid integer opcode".into()));
+                                    }
                                     Binary::Shr => {
                                         (a as u32).checked_shr(b as u32).unwrap_or(0) as u64
                                     }
@@ -969,6 +1101,14 @@ impl Program {
                                     result
                                 }
                             };
+                        }
+                        Instruction::Unary { dst, op, src } => {
+                            let value = f32::from_bits(regs[src.index] as u32);
+                            regs[dst.index] = match op {
+                                Unary::Sqrt => value.sqrt(),
+                                Unary::Exp2 => value.exp2(),
+                            }
+                            .to_bits() as u64;
                         }
                         Instruction::Convert {
                             dst,
@@ -982,6 +1122,18 @@ impl Program {
                                     (value as u32 as i32 as f32).to_bits() as u64
                                 }
                                 Conversion::HalfToF32 => half_to_f32(value as u16).to_bits() as u64,
+                                Conversion::F32ToF64 => {
+                                    f64::from(f32::from_bits(value as u32)).to_bits()
+                                }
+                                Conversion::F64ToF32 => {
+                                    (f64::from_bits(value) as f32).to_bits() as u64
+                                }
+                                Conversion::F32ToHalf => {
+                                    llama_quant::f32_to_f16(f32::from_bits(value as u32)) as u64
+                                }
+                                Conversion::F32ToI32Trunc => {
+                                    (f32::from_bits(value as u32) as i32) as u32 as u64
+                                }
                             };
                         }
                         Instruction::Load { dst, address, kind } => {
@@ -991,7 +1143,7 @@ impl Program {
                             let width = match kind {
                                 LoadType::U8 => 1,
                                 LoadType::F16 => 2,
-                                LoadType::F32 => 4,
+                                LoadType::F32 | LoadType::U32 => 4,
                             };
                             let end = offset
                                 .checked_add(width)
@@ -1004,7 +1156,7 @@ impl Program {
                                 LoadType::F16 => {
                                     u16::from_le_bytes(bytes.try_into().unwrap()) as u64
                                 }
-                                LoadType::F32 => {
+                                LoadType::F32 | LoadType::U32 => {
                                     u32::from_le_bytes(bytes.try_into().unwrap()) as u64
                                 }
                             };
@@ -1020,9 +1172,19 @@ impl Program {
                             })?;
                             output.copy_from_slice(&(regs[value.index] as u32).to_le_bytes());
                         }
-                        Instruction::GreaterEqual { pred, a, b } => {
+                        Instruction::Finite { pred, src } => {
                             regs[pred.index] =
+                                u64::from(f32::from_bits(regs[src.index] as u32).is_finite());
+                        }
+                        Instruction::GreaterEqual { pred, a, b } => {
+                            regs[pred.index] = if a.ty() == Type::F32 {
+                                u64::from(
+                                    f32::from_bits(operand(a, &regs) as u32)
+                                        >= f32::from_bits(operand(b, &regs) as u32),
+                                )
+                            } else {
                                 u64::from((operand(a, &regs) as u32) >= (operand(b, &regs) as u32))
+                            }
                         }
                         Instruction::Label(_) => {}
                         Instruction::Branch { label, pred } => {

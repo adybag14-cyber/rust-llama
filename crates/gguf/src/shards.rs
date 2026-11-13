@@ -9,6 +9,7 @@ use std::{
     collections::BTreeMap,
     ffi::OsString,
     fs::File,
+    io::{self, Read, Seek, SeekFrom},
     path::{Path, PathBuf},
 };
 
@@ -51,9 +52,60 @@ pub struct ShardInfo {
     pub header_usage: HeaderUsage,
 }
 
+/// A GGUF stream starts at its supplied origin, including alignment padding.
+/// This owns the parsed file handle; it never reopens the display path.
+struct FileRegion {
+    file: File,
+    origin: u64,
+}
+impl FileRegion {
+    fn new(mut file: File, origin: u64) -> Result<Self> {
+        let length = file.seek(SeekFrom::End(0))?;
+        if origin > length || length > i64::MAX as u64 {
+            return Err(invalid(
+                "GGUF file origin or length exceeds the seekable region",
+            ));
+        }
+        file.seek(SeekFrom::Start(origin))?;
+        Ok(Self { file, origin })
+    }
+}
+impl Read for FileRegion {
+    fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+        self.file.read(output)
+    }
+}
+impl Seek for FileRegion {
+    fn seek(&mut self, position: SeekFrom) -> io::Result<u64> {
+        let relative = match position {
+            SeekFrom::Start(value) => i128::from(value),
+            SeekFrom::Current(value) => {
+                i128::from(self.file.stream_position()?) - i128::from(self.origin)
+                    + i128::from(value)
+            }
+            SeekFrom::End(value) => {
+                i128::from(self.file.seek(SeekFrom::End(0))?) - i128::from(self.origin)
+                    + i128::from(value)
+            }
+        };
+        let absolute = i128::from(self.origin) + relative;
+        if relative < 0 || absolute > i128::from(i64::MAX) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "seek outside the bounded GGUF file region",
+            ));
+        }
+        self.file.seek(SeekFrom::Start(absolute as u64))?;
+        Ok(relative as u64)
+    }
+}
+fn read_file(path: &Path, limits: Limits) -> Result<RawGguf<FileRegion>> {
+    RawGguf::read(FileRegion::new(File::open(path)?, 0)?, limits)
+}
+
 struct Shard {
     info: ShardInfo,
-    file: RawGguf<File>,
+    file: RawGguf<FileRegion>,
 }
 
 /// A complete validated model-file set, retaining the handles that were parsed.
@@ -103,6 +155,75 @@ impl GgufSet {
         Self::load(first.as_ref(), Some((paths.len(), &resolve)), limits)
     }
 
+    /// Parse one owned file from an explicit byte origin. GGUF data alignment
+    /// and offsets are relative to that origin. The file may have an arbitrary
+    /// prefix and trailing bytes; tensor reads use this same retained handle.
+    ///
+    /// This is the anonymous single-stream loader used by the native FILE*
+    /// entry points. Split discovery is intentionally unavailable: split keys
+    /// remain metadata, but do not cause other paths to be opened.
+    /// The primary display path is empty. The caller owns no handle after this
+    /// call, including when construction returns an error.
+    pub fn from_file_at(file: File, origin: u64) -> Result<Self> {
+        Self::from_file_at_with_limits(file, origin, ShardLimits::default())
+    }
+
+    pub fn from_file_at_with_limits(file: File, origin: u64, limits: ShardLimits) -> Result<Self> {
+        if limits.max_shards == 0 {
+            return Err(Error::Limit("maximum GGUF shard count is zero".into()));
+        }
+        let file = RawGguf::read(FileRegion::new(file, origin)?, limits.gguf)?;
+        let mut set = Self::new(&file, limits.max_metadata_storage_bytes, 1)?;
+        set.append(Path::new(""), file)?;
+        set.index_names()?;
+        Ok(set)
+    }
+
+    fn new(
+        first: &RawGguf<FileRegion>,
+        metadata_storage_limit: usize,
+        count: usize,
+    ) -> Result<Self> {
+        let (metadata, metadata_storage_bytes) =
+            model_metadata::project(first, metadata_storage_limit)?;
+        let mut set = Self {
+            metadata,
+            metadata_storage_bytes,
+            metadata_storage_limit,
+            shards: Vec::new(),
+            tensors: Vec::new(),
+            tensor_shards: Vec::new(),
+            by_name: Vec::new(),
+            usage: HeaderUsage::default(),
+            file_bytes: 0,
+            tensor_bytes: 0,
+            tensor_elements: 0,
+        };
+        set.shards
+            .try_reserve_exact(count)
+            .map_err(|_| Error::Limit("GGUF shard owners allocation".into()))?;
+        Ok(set)
+    }
+
+    fn index_names(&mut self) -> Result<()> {
+        self.by_name
+            .try_reserve_exact(self.tensors.len())
+            .map_err(|_| Error::Limit("unified tensor name index allocation".into()))?;
+        self.by_name.extend(0..self.tensors.len());
+        self.by_name.sort_unstable_by(|&left, &right| {
+            self.tensors[left].name.cmp(&self.tensors[right].name)
+        });
+        for pair in self.by_name.windows(2) {
+            if self.tensors[pair[0]].name == self.tensors[pair[1]].name {
+                return Err(invalid(format!(
+                    "tensor {} is duplicated across GGUF splits",
+                    self.tensors[pair[0]].name
+                )));
+            }
+        }
+        Ok(())
+    }
+
     fn load<'a>(
         first_path: &Path,
         explicit: Option<ExplicitSplits<'a, '_>>,
@@ -111,9 +232,7 @@ impl GgufSet {
         if limits.max_shards == 0 {
             return Err(Error::Limit("maximum GGUF shard count is zero".into()));
         }
-        let first = RawGguf::open_with_limits(first_path, limits.gguf.clone())?;
-        let (metadata, metadata_storage_bytes) =
-            model_metadata::project(&first, limits.max_metadata_storage_bytes)?;
+        let first = read_file(first_path, limits.gguf.clone())?;
         let declared_count = u16_key(&first, "split.count", Some(0))?;
         let count = usize::from(declared_count).max(1);
         if count > limits.max_shards {
@@ -144,22 +263,7 @@ impl GgufSet {
             None
         };
 
-        let mut set = Self {
-            metadata,
-            metadata_storage_bytes,
-            metadata_storage_limit: limits.max_metadata_storage_bytes,
-            shards: Vec::new(),
-            tensors: Vec::new(),
-            tensor_shards: Vec::new(),
-            by_name: Vec::new(),
-            usage: HeaderUsage::default(),
-            file_bytes: 0,
-            tensor_bytes: 0,
-            tensor_elements: 0,
-        };
-        set.shards
-            .try_reserve_exact(count)
-            .map_err(|_| Error::Limit("GGUF shard owners allocation".into()))?;
+        let mut set = Self::new(&first, limits.max_metadata_storage_bytes, count)?;
         set.append(first_path, first)?;
         for index in 1..count {
             let path = match explicit {
@@ -175,7 +279,7 @@ impl GgufSet {
                 )?,
             };
             let remaining = remaining_limits(&limits.gguf, set.usage)?;
-            let file = RawGguf::open_with_limits(&path, remaining)?;
+            let file = read_file(&path, remaining)?;
             model_metadata::within_budget(
                 model_metadata::add(set.metadata_storage_bytes, file.model_metadata_storage()?)?,
                 set.metadata_storage_limit,
@@ -188,20 +292,7 @@ impl GgufSet {
             }
             set.append(&path, file)?;
         }
-        set.by_name
-            .try_reserve_exact(set.tensors.len())
-            .map_err(|_| Error::Limit("unified tensor name index allocation".into()))?;
-        set.by_name.extend(0..set.tensors.len());
-        set.by_name
-            .sort_unstable_by(|&left, &right| set.tensors[left].name.cmp(&set.tensors[right].name));
-        for pair in set.by_name.windows(2) {
-            if set.tensors[pair[0]].name == set.tensors[pair[1]].name {
-                return Err(invalid(format!(
-                    "tensor {} is duplicated across GGUF splits",
-                    set.tensors[pair[0]].name
-                )));
-            }
-        }
+        set.index_names()?;
         if declared_count > 1 {
             let expected = match set.metadata.get("split.tensors.count") {
                 Some(Value::I32(value)) if *value >= 0 => *value as usize,
@@ -219,7 +310,7 @@ impl GgufSet {
         Ok(set)
     }
 
-    fn append(&mut self, path: &Path, mut file: RawGguf<File>) -> Result<()> {
+    fn append(&mut self, path: &Path, mut file: RawGguf<FileRegion>) -> Result<()> {
         let shard_index = self.shards.len();
         self.usage = add_usage(self.usage, file.header_usage())?;
         self.file_bytes = self
@@ -358,7 +449,7 @@ impl GgufSet {
     }
 }
 
-fn u16_key(file: &RawGguf<File>, key: &str, default: Option<u16>) -> Result<u16> {
+fn u16_key(file: &RawGguf<FileRegion>, key: &str, default: Option<u16>) -> Result<u16> {
     match file.metadata_native(key.as_bytes()) {
         Some(RawValue::U16(value)) => Ok(*value),
         Some(_) => Err(invalid(format!("{key} must be UINT16"))),

@@ -106,11 +106,47 @@ fn matrix(files: &mut GgufSet, name: &str) -> Result<Matrix> {
     let bytes = files.read_tensor(name).map_err(|e| e.to_string())?;
     Matrix::from_quantized(rows, cols, dtype, bytes).map_err(|e| e.to_string())
 }
-unsafe fn load(model: *mut ModelHandle, path: *const c_char) -> Result<*mut AdapterHandle> {
+unsafe fn model_data(model: *mut ModelHandle) -> Result<Arc<ModelData>> {
     let data = unsafe { reference(model)? }.data.clone();
     if registry(&data)?.len() >= MAX_MODEL_ADAPTERS {
         return Err("model already owns 1024 adapters".into());
     }
+    Ok(data)
+}
+fn load_limits() -> ShardLimits {
+    let mut limits = ShardLimits {
+        max_shards: 1,
+        ..ShardLimits::default()
+    };
+    limits.gguf.max_metadata_bytes = 32 * 1024 * 1024;
+    limits.max_metadata_storage_bytes = 64 * 1024 * 1024;
+    limits.gguf.max_tensors = 32_768;
+    limits.gguf.max_tensor_read_bytes = MAX_ADAPTER_BYTES;
+    limits
+}
+unsafe fn load_file_pointer(
+    model: *mut ModelHandle,
+    file: *mut std::ffi::c_void,
+) -> Result<*mut AdapterHandle> {
+    let data = unsafe { model_data(model)? };
+    let mut source = unsafe { crate::file_pointer::Source::new(file)? };
+    let origin = source.origin();
+    let files = GgufSet::from_file_at_with_limits(source.take_file()?, origin, load_limits())
+        .map_err(|e| e.to_string())?;
+    let result = load_files(data, files);
+    if let Err(error) = source.finish() {
+        if let Ok(adapter) = result {
+            // SAFETY: this call owns the registered adapter before exposure.
+            unsafe {
+                free(adapter)?;
+            }
+        }
+        return Err(error);
+    }
+    result
+}
+unsafe fn load(model: *mut ModelHandle, path: *const c_char) -> Result<*mut AdapterHandle> {
+    let data = unsafe { model_data(model)? };
     if path.is_null() {
         return Err("null adapter filename".into());
     }
@@ -124,16 +160,11 @@ unsafe fn load(model: *mut ModelHandle, path: *const c_char) -> Result<*mut Adap
     let filename = std::path::Path::new(
         std::str::from_utf8(raw).map_err(|_| "adapter filename is not UTF-8")?,
     );
-    let mut limits = ShardLimits {
-        max_shards: 1,
-        ..ShardLimits::default()
-    };
-    limits.gguf.max_metadata_bytes = 32 * 1024 * 1024;
-    limits.max_metadata_storage_bytes = 64 * 1024 * 1024;
-    limits.gguf.max_tensors = 32_768;
-    limits.gguf.max_tensor_read_bytes = MAX_ADAPTER_BYTES;
-    let mut files =
-        GgufSet::open_splits_with_limits(&[filename], limits).map_err(|e| e.to_string())?;
+    let files =
+        GgufSet::open_splits_with_limits(&[filename], load_limits()).map_err(|e| e.to_string())?;
+    load_files(data, files)
+}
+fn load_files(data: Arc<ModelData>, mut files: GgufSet) -> Result<*mut AdapterHandle> {
     if files.tensor_endian(files.tensors().first().map_or("", |t| t.name.as_str()))
         == Some(llama_gguf::Endian::Big)
     {
@@ -548,6 +579,14 @@ ffi!(
     llama_adapter_lora_init(model: *mut ModelHandle, path: *const c_char) -> *mut AdapterHandle,
     ptr::null_mut(),
     { unsafe { load(model, path) } }
+);
+ffi!(
+    llama_adapter_lora_init_from_file_ptr(
+        model: *mut ModelHandle,
+        file: *mut std::ffi::c_void,
+    ) -> *mut AdapterHandle,
+    ptr::null_mut(),
+    { unsafe { load_file_pointer(model, file) } }
 );
 ffi!(
     llama_adapter_lora_free(adapter: *mut AdapterHandle) -> (),
