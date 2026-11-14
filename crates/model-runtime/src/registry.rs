@@ -8,7 +8,10 @@ pub enum ExecutionSlice {
     Qwen2DenseF32,
     Qwen3DenseF32,
     Gpt2DenseF32,
+    StarcoderDenseF32,
+    Starcoder2DenseF32,
     BloomDenseF32,
+    FalconDenseF32,
     GptNeoXDenseF32,
     LlamaDenseF32,
     Mamba1F32,
@@ -64,7 +67,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "falcon",
         source_factory: Some("llama_model_falcon"),
         source_files: &["src/models/falcon.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::FalconDenseF32),
     },
     Architecture {
         id: 5,
@@ -120,7 +123,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "starcoder",
         source_factory: Some("llama_model_starcoder"),
         source_files: &["src/models/starcoder.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::StarcoderDenseF32),
     },
     Architecture {
         id: 12,
@@ -504,7 +507,7 @@ pub static ARCHITECTURES: [Architecture; 173] = [
         name: "starcoder2",
         source_factory: Some("llama_model_starcoder2"),
         source_files: &["src/models/starcoder2.cpp"],
-        executable_slice: None,
+        executable_slice: Some(ExecutionSlice::Starcoder2DenseF32),
     },
     Architecture {
         id: 60,

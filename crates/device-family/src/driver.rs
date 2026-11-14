@@ -320,6 +320,22 @@ impl CudaContext {
         unsafe { self.module(&source) }
     }
 
+    /// Compile once for repeated execution on owned, persistent device buffers.
+    pub fn compile_kernel(
+        &self,
+        generated: &crate::ptx::GeneratedPtx,
+    ) -> Result<CudaKernel, DeviceError> {
+        let name = std::ffi::CString::new(generated.entry_point())
+            .map_err(|_| DeviceError::InvalidArgument("NUL in emitted entry name".into()))?;
+        let module = self.compile_generated(generated)?;
+        Ok(CudaKernel {
+            function: module.function(&name)?,
+            bytes: generated.buffer_bytes().to_vec(),
+            output: generated.output_buffer(),
+            dimensions: generated.launch_dimensions(),
+        })
+    }
+
     /// Execute only this crate's validated generated kernel, keeping all device
     /// allocations, module, arguments and stream alive until synchronization.
     /// The operation is blocking; asynchronous submission is still a T02 gate.
@@ -584,6 +600,77 @@ impl CudaModule {
         })
     }
 }
+/// A compiled typed kernel retaining its module and context. Its buffer
+/// contract cannot be replaced independently of the generated device program.
+pub struct CudaKernel {
+    function: CudaFunction,
+    bytes: Vec<usize>,
+    output: usize,
+    dimensions: (u32, u32),
+}
+impl CudaKernel {
+    /// Inputs are in parameter order with the output omitted. Input aliasing
+    /// is read-only; the output is exclusively borrowed. All resources remain
+    /// live until the blocking launch and synchronization have returned.
+    pub fn run(
+        &self,
+        stream: &mut CudaStream,
+        inputs: &[&CudaBuffer],
+        output: &mut CudaBuffer,
+    ) -> Result<(), DeviceError> {
+        if inputs.len().checked_add(1) != Some(self.bytes.len()) {
+            return Err(DeviceError::InvalidArgument(
+                "kernel input count mismatch".into(),
+            ));
+        }
+        let context = &self.function.module.context;
+        if !Rc::ptr_eq(context, &stream.context)
+            || !Rc::ptr_eq(context, &output.context)
+            || inputs
+                .iter()
+                .any(|input| !Rc::ptr_eq(context, &input.context))
+        {
+            return Err(DeviceError::InvalidArgument(
+                "kernel resources belong to different contexts".into(),
+            ));
+        }
+        if output.bytes < self.bytes[self.output] {
+            return Err(DeviceError::InvalidArgument(
+                "kernel output buffer is too small".into(),
+            ));
+        }
+        let mut addresses = Vec::with_capacity(self.bytes.len());
+        let mut input_index = 0;
+        for (index, &required) in self.bytes.iter().enumerate() {
+            if index == self.output {
+                addresses.push(output.address);
+            } else {
+                let input = inputs[input_index];
+                input_index += 1;
+                if input.bytes < required || input.address == output.address {
+                    return Err(DeviceError::InvalidArgument(
+                        "kernel input extent or output alias is invalid".into(),
+                    ));
+                }
+                addresses.push(input.address);
+            }
+        }
+        let mut parameters: Vec<*mut c_void> = addresses
+            .iter_mut()
+            .map(|address| (address as *mut u64).cast())
+            .collect();
+        let (grid, block) = self.dimensions;
+        // SAFETY: only the immutable typed generator can create this kernel;
+        // its checked extents and context identities match every owned buffer.
+        // Dynamic decoder indices have device-side guards. The output has an
+        // exclusive borrow, and the stream is synchronized before return.
+        unsafe {
+            self.function
+                .launch_sync(stream, [grid, 1, 1], [block, 1, 1], 0, &mut parameters)
+        }
+    }
+}
+
 pub struct CudaFunction {
     module: Rc<ModuleInner>,
     handle: NonNull<c_void>,

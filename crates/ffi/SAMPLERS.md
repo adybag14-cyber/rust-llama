@@ -3,8 +3,9 @@
 The C sampler implementation executes the workspace's Rust behavior samplers.
 The original llama/ggml DLLs are only external test oracles. The CPU sampler
 surface implements 36 frozen public C functions, including all 20 ordinary CPU
-sampler constructors, and one Rust layout inspection function. Backend-attached
-sampling remains unavailable. Three additional sampler-chain performance functions
+sampler constructors, and one Rust layout inspection function. Eight additional
+context-sampling functions and the admitted CPU prefix/suffix execution are
+documented in BACKEND_SAMPLING.md. Three additional sampler-chain performance functions
 and the global logger are documented in PERFORMANCE.md.
 
 ## Implemented surface
@@ -51,8 +52,11 @@ bucket, typical-score, and full-sort tie order and the standard library's
 MT19937 canonical random-number extraction are reproduced. These choices matter
 for seeded selected tokens even when all probability values match. The original
 C++ standard library does not promise identical tie order or random distribution
-mapping across platforms. Exact native stream/order parity on non-MSVC targets
-remains unverified; cross-platform Rust compilation is a separate gate.
+mapping across platforms. The context-sampling checkpoint separately verifies
+GNU/Linux typical-score/full-sort ordering and seeded distribution on its
+512-candidate CPU suffix corpus. The GNU ordering policy is shared in algorithm
+with the independently verified tensor implementation. Complete native stream
+and sampler-domain parity on other targets remains open.
 
 Repeated candidate IDs are accepted by the C compatibility path because the
 source operates on array positions; infill and bias have observable duplicate-ID
@@ -106,9 +110,11 @@ copy_state is used if provided; otherwise the wrapper clones the source context,
 frees the destination's previous context, and transfers the cloned context
 without replacing the destination handle. Copying a sampler to itself is a no-op.
 
-llama_sampler_sample obtains an actual logit row from the Rust context, creates
-the vocabulary candidate array, applies the sampler, checks the selected index,
-accepts the selected token into the sampler, and returns its token ID. It does
+llama_sampler_sample obtains the context row and returns an already selected
+backend token when present. Otherwise it constructs candidates from the sampled
+logits and IDs, or from the ordinary full-vocabulary row, then applies the CPU
+stages and checks the selected index. It accepts the selected token once and
+returns its token ID. BACKEND_SAMPLING.md defines initialized prefix skipping. It does
 not decode that token. A failure returns LLAMA_TOKEN_NULL (-1) and records the
 thread-local diagnostic. Context logit indexing follows the same positive batch
 positions and negative output-row conventions as llama_get_logits_ith.
@@ -195,7 +201,7 @@ conversion. It does not publish a fake successful selection for those cases.
 
 Chain performance collection supports both no_perf settings, with real monotonic
 timing and accepted-token counts. PERFORMANCE.md specifies counter ownership,
-reset, clone and copy behavior. Backend-attached sampling and llguidance
+reset, clone and copy behavior. Unsupported backend sampler stages and llguidance
 integration remain outside this surface.
 
 Vocabulary snapshots are capped at one million entries and 256 MiB of pieces.

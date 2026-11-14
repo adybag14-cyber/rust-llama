@@ -6,6 +6,8 @@
 //! Equal logits use stable input order here; the original's unstable sort may
 //! order ties differently. No backend/device sampling is claimed.
 
+mod gnu_order;
+
 use crate::{Error, Result};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
@@ -1153,8 +1155,11 @@ fn native_unstable_sort<T: Copy>(values: &mut [T], key: impl Fn(&T) -> f32 + Cop
     if cfg!(target_env = "msvc") {
         msvc_sort_range(values, 0, values.len(), values.len(), key);
     } else {
-        // Tie ordering of the C++ standard library is platform dependent.
-        // Non-MSVC native ordering remains separately unverified.
+        if cfg!(all(target_os = "linux", target_env = "gnu")) {
+            gnu_order::sort(values, key);
+            return;
+        }
+        // Tie ordering on other standard-library profiles is not claimed.
         values.sort_by(|a, b| {
             key(a)
                 .partial_cmp(&key(b))

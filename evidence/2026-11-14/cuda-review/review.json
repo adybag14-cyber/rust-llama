@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "kind": "independent_read_only_cuda_source_review",
+  "reviewer": "model_architectures task agent, independent of the CUDA implementation author",
+  "review_date_utc": "2026-11-14",
+  "snapshot": {
+    "repository": "https://github.com/adybag14-cyber/rust-llama",
+    "checkout": "C:\\Users\\adyba\\rust-llama",
+    "checkout_head_at_recording": "84777f1e15e825aaea72f1fc71cd7862f3ac4cf5",
+    "reviewed_file_hashes_collected_at_utc": "2026-11-14T14:21:22Z",
+    "head_is_not_reviewed_tree_identity": true,
+    "identity_policy": "The six raw-file SHA-256 hashes below identify the reviewed working-tree snapshot, including uncommitted CUDA changes. This record does not assert that a later commit or final release tree has identical bytes.",
+    "capture": "Complete bounded native reads; each hash covers all raw file bytes. The batch was not an atomic filesystem snapshot. Formatting changes in decoder.rs and decoder_kernels.rs since the completed review were inspected and only line wrapping and optional trailing commas changed.",
+    "files": [
+      {
+        "path": "crates/cuda-runtime/src/lib.rs",
+        "bytes": 39556,
+        "sha256": "962e4da6556fde18bae1c5dc1699d81116a874f24f6f6d7c237d06d1171a0f1f",
+        "relation_to_completed_review": "identical bytes"
+      },
+      {
+        "path": "crates/cuda-runtime/src/model.rs",
+        "bytes": 11991,
+        "sha256": "c268ccb640595fdadb1146084972ce0c2aa87cb76e6522418c5e48b7ca40941c",
+        "relation_to_completed_review": "identical bytes"
+      },
+      {
+        "path": "crates/cuda-runtime/tests/qwen.rs",
+        "bytes": 16810,
+        "sha256": "d4951ea317ea0065c9b72863724b34ddfe3d41c99ec3343daa63fe12a2585683",
+        "relation_to_completed_review": "identical bytes"
+      },
+      {
+        "path": "crates/device-family/src/ptx.rs",
+        "bytes": 59568,
+        "sha256": "c8ae9c515661f2119c79b24fcf2a7d559fe7c65f4a80598d61cb3acc783515f9",
+        "relation_to_completed_review": "identical bytes"
+      },
+      {
+        "path": "crates/device-family/src/ptx/decoder.rs",
+        "bytes": 42843,
+        "sha256": "fb7ae529e068587f91378e75b7f4d80879a576f906bd51d3a2adca9d3586d228",
+        "relation_to_completed_review": "formatting delta inspected: line wrapping and optional trailing commas only"
+      },
+      {
+        "path": "crates/device-family/tests/decoder_kernels.rs",
+        "bytes": 30448,
+        "sha256": "487084cff918c2812cda21e9b225376e669003e885220b788b19668d414ca1de",
+        "relation_to_completed_review": "formatting delta inspected: line wrapping and optional trailing commas only"
+      }
+    ]
+  },
+  "reference": {
+    "frozen_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+    "rms_source": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp",
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6",
+      "rms_lines": [
+        {
+          "line": 4121,
+          "text": "const float mean  = sum/ne00;"
+        }
+      ],
+      "function": "ggml_compute_forward_rms_norm_f32",
+      "mean_line": 4121,
+      "scale_line": 4122
+    },
+    "supporting_files": [
+      {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-cpu\\vec.h",
+        "bytes": 72838,
+        "sha256": "c74eb0709a9f1a1ad1907b022bad57bbedc1def990e8171dcc70aa4b824bf3f6",
+        "locations": [
+          {
+            "line": 1321,
+            "text": "inline static __m128 ggml_v_expf(__m128 x) {"
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\adyba\\rust-llama\\crates\\quant\\src\\cpu_math.rs",
+        "bytes": 7901,
+        "sha256": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5",
+        "locations": [
+          {
+            "line": 54,
+            "text": "pub fn softmax_exp_sum_f32_in_place(values: &mut [f32], maximum: f32) -> f64 {"
+          },
+          {
+            "line": 58,
+            "text": "pub fn softmax_exp_sum_f32_with_policy("
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\adyba\\rust-llama\\crates\\model-runtime\\src\\math.rs",
+        "bytes": 26734,
+        "sha256": "7e8bed862e4845160549f4b4a2328715cf448db25e7082745e7563f66831ff06",
+        "locations": [
+          {
+            "line": 221,
+            "text": "pub(crate) fn rms_norm(input: &[f32], weight: &[f32], epsilon: f32) -> Result<Vec<f32>> {"
+          }
+        ]
+      }
+    ]
+  },
+  "scope": [
+    {
+      "area": "Allocation and addressing",
+      "reviewed": "Reconciled allocation_plan against weight uploads, tied output reuse, optional bias buffers, workspace, fused scratch, KV storage, phase tables and activation-Q8 scratch. Checked multiplication/addition overflow handling, positive dimensions and kernel byte-extent limits."
+    },
+    {
+      "area": "Independent head widths",
+      "reviewed": "Traced Qwen3 query_width independently from model width through QKV matrix views, fused slice offsets, Q/K normalization, RoPE, attention output, projection input and maximum activation scratch."
+    },
+    {
+      "area": "QKV bias semantics",
+      "reviewed": "Checked fused bias precedence, complete separate-bias group activation and inactive partial-group behavior against the existing CPU/source contract; separate projections retain independent optional biases."
+    },
+    {
+      "area": "Normalization and RoPE",
+      "reviewed": "Checked per-head normalization indexing, shared per-head weights, GQA mapping, NeoX half-head pairing, phase indexing and the corrected F64 mean division."
+    },
+    {
+      "area": "Exponent and softmax arithmetic",
+      "reviewed": "Compared no-FMA SSE2 coefficients, reduction order, split-scale branches and four-lane softmax accumulation against frozen vec.h. Checked scalar F64 range reduction, explicit rounding conversions, SiLU scalar tails, F64 reciprocal-to-F32 order and masked/nonfinite score handling."
+    },
+    {
+      "area": "Typed PTX",
+      "reviewed": "Inspected new conversion type validation, PTX spelling and interpreter behavior for F64-to-nearest-I32, I32-to-F64/U64 and U64-bit-to-F64 operations used by scalar exponential evaluation."
+    },
+    {
+      "area": "State and tests",
+      "reviewed": "Checked position commit after successful finite outputs, cancellation boundaries, unused KV-row overwrite behavior, reset/truncate replay tests, provenance handling and the two exact RMS rounding regressions."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CUDA-RMS-001",
+      "severity": "numerical_correctness",
+      "status": "corrected_in_reviewed_snapshot",
+      "affected_kernels": [
+        "RmsScale",
+        "HeadRms"
+      ],
+      "problem": "Computing the mean as F64 sum multiplied by a rounded F64 reciprocal can differ from frozen-source F64 division before the F32 cast for admitted non-power-of-two widths.",
+      "source_contract": "F32 element squares accumulated in F64; divide the sum by the row dimension in F64; cast to F32; add F32 epsilon; F32 square root and reciprocal; F32 normalization multiplications.",
+      "counterexample": {
+        "dimension": 98,
+        "f32_square_f64_sum": 147.00001752376556,
+        "epsilon": 0.000009999999747378752,
+        "epsilon_bits": "0x3727c5ac",
+        "source_division": {
+          "mean": 1.500000238418579,
+          "mean_bits": "0x3fc00002",
+          "scale": 0.8164937496185303,
+          "scale_bits": "0x3f5105bc",
+          "first_output": 9.797924995422363,
+          "first_output_bits": "0x411cc44d"
+        },
+        "old_reciprocal_multiplication": {
+          "mean": 1.5000001192092896,
+          "mean_bits": "0x3fc00001",
+          "scale": 0.8164938688278198,
+          "scale_bits": "0x3f5105be",
+          "first_output": 9.79792594909668,
+          "first_output_bits": "0x411cc44e"
+        },
+        "input_nonzero_prefix": [
+          12,
+          1,
+          1,
+          1,
+          0.00390625,
+          0.0009765625,
+          0.0009765625,
+          0.00048828125,
+          0.000244140625,
+          0.000244140625
+        ],
+        "trailing_zeros": 88,
+        "exact_input_expression": "[12, 1, 1, 1, 2^-8, 2^-10, 2^-10, 2^-11, 2^-12, 2^-12] followed by 88 zeros",
+        "head_count": 1,
+        "weights": "98 F32 ones",
+        "first_output_difference_ulps": 1,
+        "scale_difference_ulps": 2
+      },
+      "verification": "Counterexample independently evaluated using IEEE F32 roundings and F64 arithmetic in JavaScript and Python, and checked against the frozen source expression. The counterexample did not come from a Rust runtime output.",
+      "correction": "Both kernels now emit Binary::Div with the exact dimension converted to F64, replacing reciprocal multiplication.",
+      "regression_expectation": "The scalar test asserts exact scale bits 0x3f5105bc; the head test asserts every F32 output bit using that independently established scale.",
+      "corrected_locations": [
+        {
+          "path": "crates/device-family/src/ptx/decoder.rs",
+          "line": 783,
+          "text": "let mean = p.binary(Binary::Div, sum, Operand::F64(f64::from(width)));"
+        },
+        {
+          "path": "crates/device-family/src/ptx/decoder.rs",
+          "line": 826,
+          "text": "let mean = p.binary(Binary::Div, sum, Operand::F64(f64::from(head_dimension)));"
+        },
+        {
+          "path": "crates/device-family/tests/decoder_kernels.rs",
+          "line": 66,
+          "text": "\"RMS division rounding boundary\","
+        },
+        {
+          "path": "crates/device-family/tests/decoder_kernels.rs",
+          "line": 77,
+          "text": "\"head RMS division rounding boundary\","
+        }
+      ],
+      "runtime_validation": "The reviewer verified the corrected implementation and exact regression definitions. Final post-correction live CUDA execution results are owned and recorded separately by the integration task."
+    }
+  ],
+  "conclusion": {
+    "disposition": "One concrete numerical defect found and verified corrected in the reviewed snapshot; no additional blocking defects identified in the requested scope.",
+    "additional_blocking_findings": 0,
+    "evidence_type": "Source inspection, independently evaluated arithmetic counterexample and regression-definition inspection.",
+    "final_gpu_test_matrix_executed_by_reviewer": false
+  },
+  "limits": [
+    "This is a source review of the identified snapshot, not a certification of the final integrated commit or completion of any global release gate.",
+    "The reviewer did not execute the final post-correction GPU matrix. Parent-reported earlier native/pretrained results were context, not substituted for that final execution.",
+    "Inspection did not prove universal bit identity between the scalar exponential polynomial and every host expf implementation or every finite F32 input.",
+    "Numerical reasoning is scoped to the frozen scalar MSVC and no-FMA SSE2 GNU profiles used by this work; other architectures and compiler math profiles were not certified.",
+    "Reviewed CUDA model admission is dense Llama/Qwen2/Qwen3 with its explicit dtype and graph limits. Other architectures, backend families and unsupported variants are outside this review.",
+    "No implementation or test source was edited by the reviewer while recording this evidence."
+  ]
+}

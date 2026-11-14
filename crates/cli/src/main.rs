@@ -1,6 +1,7 @@
 //! Native command line for the integrated Rust runtime.
 #![forbid(unsafe_code)]
 use llama_behavior::json::{self, Value};
+use llama_cuda_runtime::{CudaDecoder, Options as CudaOptions};
 use llama_gguf::Gguf;
 use llama_inference::{GenerationOptions, LoadOptions, Model, Pooling};
 use llama_tokenizer::Tokenizer;
@@ -16,7 +17,7 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 fn bad(s: impl Into<String>) -> Box<dyn Error> {
     io::Error::new(io::ErrorKind::InvalidInput, s.into()).into()
 }
-const HELP: &str = "rust-llama: native Rust GGUF inference\n\nCommands:\n  generate    Load a supported model and stream generated text (default)\n  inspect     Validate GGUF and print metadata/tensor descriptors as JSON\n  tokenize    Print token IDs and byte-exact pieces (supports vocabulary-only GGUF)\n  detokenize  Decode --tokens 1,2,3 as UTF-8 text\n  logits      Print full per-token logits for conformance\n  embed       Encode a dense BERT sequence and print raw embeddings as JSON\n\nOptions:\n  -m, --model PATH          GGUF model or vocabulary file (required)\n  -p, --prompt TEXT         Prompt text\n      --prompt-file PATH   Read a UTF-8 prompt, at most 4 MiB\n  -n, --n-predict N         Maximum generated tokens (default 128)\n      --temperature T      Zero is greedy (default 0)\n      --seed N             Explicit MT19937 u32 seed (default 0)\n      --stop TEXT          Stop string; repeatable\n  -c, --ctx-size N          Context bound (default 1024, capped to training limit)\n      --max-weight-mib N   Decoded F32 weight budget (default 2048)\n      --no-special         Do not insert special tokens in tokenize/logits/embed\n      --literal-special    Do not parse control strings in tokenize/logits/embed\n      --render-special     Render control tokens in detokenize\n      --tokens IDS         Comma-separated token IDs for detokenize/logits/embed\n      --pooling MODE       embed: model (default), none, mean, first, last\n  -h, --help               Show this help\n\nModel support: dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX and BLOOM plus Mamba-1 generation; dense BERT/WordPiece embeddings.\nPacked matrix arithmetic preserves source activation conversion; decoded F32 row caches are retained.\nOther model modes fail explicitly.\nGeneration text goes to stdout; timing/token statistics go to stderr.\n";
+const HELP: &str = "rust-llama: native Rust GGUF inference\n\nCommands:\n  generate    Load a supported model and stream generated text (default)\n  inspect     Validate GGUF and print metadata/tensor descriptors as JSON\n  tokenize    Print token IDs and byte-exact pieces (supports vocabulary-only GGUF)\n  detokenize  Decode --tokens 1,2,3 as UTF-8 text\n  logits      Print full per-token logits for conformance\n  embed       Encode a dense BERT sequence and print raw embeddings as JSON\n\nOptions:\n  -m, --model PATH          GGUF model or vocabulary file (required)\n  -p, --prompt TEXT         Prompt text\n      --prompt-file PATH   Read a UTF-8 prompt, at most 4 MiB\n  -n, --n-predict N         Maximum generated tokens (default 128)\n      --temperature T      Zero is greedy (default 0)\n      --seed N             Explicit MT19937 u32 seed (default 0)\n      --stop TEXT          Stop string; repeatable\n  -c, --ctx-size N          Context bound (default 1024, capped to training limit)\n      --max-weight-mib N   Decoded F32 weight budget (default 2048)\n      --backend MODE       generate/logits: cpu (default) or cuda\n      --device N           CUDA device ordinal (default 0)\n      --max-gpu-mib N      Requested CUDA buffer MiB (default 8192)\n      --no-special         Do not insert special tokens in tokenize/logits/embed\n      --literal-special    Do not parse control strings in tokenize/logits/embed\n      --render-special     Render control tokens in detokenize\n      --tokens IDS         Comma-separated token IDs for detokenize/logits/embed\n      --pooling MODE       embed: model (default), none, mean, first, last\n  -h, --help               Show this help\n\nModel support: dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder and StarCoder2 plus Mamba-1 generation; dense BERT/WordPiece embeddings.\nPacked matrix arithmetic preserves source activation conversion; decoded F32 row caches are retained.\nCUDA supports dense Llama, Qwen2 and Qwen3 with F32/F16/Q4_0/Q8_0 matrices and F32 KV; other CUDA models and formats fail explicitly.\nOther model modes fail explicitly.\nGeneration text goes to stdout; timing/token statistics go to stderr.\n";
 #[derive(Default)]
 struct Args {
     command: String,
@@ -63,6 +64,9 @@ impl Args {
                     | "--stop"
                     | "--ctx-size"
                     | "--max-weight-mib"
+                    | "--backend"
+                    | "--device"
+                    | "--max-gpu-mib"
                     | "--tokens"
                     | "--pooling"
             ) {
@@ -184,6 +188,26 @@ fn run() -> Result<()> {
         print!("{HELP}");
         return Ok(());
     }
+    let backend = a.value("--backend").unwrap_or("cpu");
+    if !matches!(backend, "cpu" | "cuda") {
+        return Err(bad("unknown --backend; choose cpu or cuda"));
+    }
+    if !matches!(a.command.as_str(), "generate" | "logits")
+        && ["--backend", "--device", "--max-gpu-mib"]
+            .iter()
+            .any(|key| a.value(key).is_some())
+    {
+        return Err(bad(
+            "backend options are only supported by generate and logits",
+        ));
+    }
+    if backend != "cuda"
+        && ["--device", "--max-gpu-mib"]
+            .iter()
+            .any(|key| a.value(key).is_some())
+    {
+        return Err(bad("--device and --max-gpu-mib require --backend cuda"));
+    }
     if a.command != "embed" && a.value("--pooling").is_some() {
         return Err(bad("--pooling is only supported by embed"));
     }
@@ -278,6 +302,20 @@ fn run() -> Result<()> {
             };
             let start = Instant::now();
             let model = Model::load_with_options(path, &options)?;
+            let mut gpu = if backend == "cuda" {
+                let gpu_mib: usize = a.number("--max-gpu-mib", 8192usize)?;
+                Some(CudaDecoder::from_inference_model(
+                    &model,
+                    &CudaOptions {
+                        device: a.number("--device", 0i32)?,
+                        max_device_bytes: gpu_mib
+                            .checked_mul(1024 * 1024)
+                            .ok_or_else(|| bad("GPU budget overflow"))?,
+                    },
+                )?)
+            } else {
+                None
+            };
             let load_seconds = start.elapsed().as_secs_f64();
             if a.command == "embed" {
                 let pooling = match a.value("--pooling").unwrap_or("model") {
@@ -322,7 +360,20 @@ fn run() -> Result<()> {
             }
             if a.command == "logits" {
                 let tokens = a.tokens(model.tokenizer())?;
-                let logits = model.logits_for_tokens(&tokens)?;
+                let logits = if let Some(gpu) = &mut gpu {
+                    if tokens.len() > model.context_length() {
+                        return Err(bad("token sequence exceeds model context"));
+                    }
+                    tokens
+                        .iter()
+                        .map(|&id| {
+                            let id = u32::try_from(id).map_err(|_| bad("negative token ID"))?;
+                            Ok(gpu.decode(id)?.logits)
+                        })
+                        .collect::<Result<Vec<_>>>()?
+                } else {
+                    model.logits_for_tokens(&tokens)?
+                };
                 return print_json(&Value::object([
                     (
                         "tokens",
@@ -360,7 +411,7 @@ fn run() -> Result<()> {
             let start = Instant::now();
             let mut output = io::stdout().lock();
             let mut output_error = None;
-            let stats = model.generate(&a.prompt()?, &options, &|| false, &mut |text| match output
+            let mut emit = |text: &str| match output
                 .write_all(text.as_bytes())
                 .and_then(|_| output.flush())
             {
@@ -369,7 +420,12 @@ fn run() -> Result<()> {
                     output_error = Some(e);
                     false
                 }
-            });
+            };
+            let stats = if let Some(gpu) = &mut gpu {
+                model.generate_with_session(&a.prompt()?, &options, &|| false, &mut emit, gpu)
+            } else {
+                model.generate(&a.prompt()?, &options, &|| false, &mut emit)
+            };
             if let Some(e) = output_error {
                 return Err(e.into());
             }
@@ -378,6 +434,23 @@ fn run() -> Result<()> {
                 "{}",
                 json::stringify(&Value::object([
                     ("model", Value::from(model.model_id())),
+                    ("backend", Value::from(backend)),
+                    (
+                        "device",
+                        gpu.as_ref()
+                            .map(|g| Value::from(g.device_name()))
+                            .unwrap_or(Value::Null)
+                    ),
+                    (
+                        "gpu_allocated_bytes",
+                        Value::from(
+                            gpu.as_ref().map_or(0, |g| g.statistics().allocated_bytes) as u64
+                        )
+                    ),
+                    (
+                        "gpu_kernel_dispatches",
+                        Value::from(gpu.as_ref().map_or(0, |g| g.statistics().kernel_dispatches))
+                    ),
                     ("prompt_tokens", Value::from(stats.prompt_tokens as u64)),
                     (
                         "completion_tokens",

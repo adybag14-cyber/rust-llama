@@ -1,0 +1,400 @@
+{
+  "schema": 1,
+  "baseline_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "implementation_base_commit": "1624ece02cc4aa6e85ddf425058da202d800f956",
+  "capture_order": "Context original-header captures predate Rust implementation. CPU suffix diagnostic captures follow discovery of the GNU mismatch and predate the GNU ordering correction. Expectations are exclusively original-library output.",
+  "model_scope": "Deterministic tiny dense Llama model; no pretrained-model or performance certification.",
+  "model": {
+    "path": "C:\\Users\\adyba\\rust-llama-worktrees\\sampler-20261114\\fixtures\\ffi\\native-context-model.gguf",
+    "bytes": 31328,
+    "sha256": "dc7452afc12432d33ae6f3f17f04d9554ddccbfc3962be06a4be20ac06002d18"
+  },
+  "source_files": [
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\include\\llama.h",
+      "bytes": 91177,
+      "sha256": "a806cb05ff2f218945acefc0d5e49681f41d76af5d7ef7613d954fc18c81fe2a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\src\\llama-context.cpp",
+      "bytes": 181137,
+      "sha256": "4a6a7b8cac76b79aa067d2aa393158ffd2dce97b06048a1d206ccad3edd0357d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\src\\llama-sampler.cpp",
+      "bytes": 153277,
+      "sha256": "6313214bf0a4146036f3d62846299cba4fa9804757c353140a04de52130cf496"
+    },
+    {
+      "path": "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master\\ggml\\src\\ggml-cpu\\ops.cpp",
+      "bytes": 430182,
+      "sha256": "5283309a129fb6f135e38dde140932bff0cd527c5e166f8a733a0946c94a22a6"
+    }
+  ],
+  "client_sources": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\oracle.cpp",
+      "bytes": 7705,
+      "sha256": "e1587c627b2bbf92c431f399b5465e1985a6883db7a496d0fecbe7387bff6e6a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-oracle.cpp",
+      "bytes": 2901,
+      "sha256": "67edc2f947f1f0d98463a84a3a5a869efb39d7097957e2d2700c5501ed431e35"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\CMakeLists.txt",
+      "bytes": 715,
+      "sha256": "a151daf1db678aeb0bf08a29beb12cf6b332c86a29e2f59152be0e176c50462d"
+    }
+  ],
+  "versions": {
+    "rust_toolchain": "1.99.1 (explicit locked/offline invocation recorded by validation driver)",
+    "gnu_reference_cmake_compiler": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build-ggml-linux-llama\\CMakeFiles\\3.22.1\\CMakeCXXCompiler.cmake",
+      "bytes": 5439,
+      "sha256": "2b45b213952e8ff33366da3750a3a8ccdc914d32dde4b4cbb2051e959ab192ee"
+    },
+    "gnu_version_fields": [
+      "set(CMAKE_CXX_COMPILER \"/usr/bin/c++\")",
+      "set(CMAKE_CXX_COMPILER_ID \"GNU\")",
+      "set(CMAKE_CXX_COMPILER_VERSION \"11.4.0\")",
+      "set(CMAKE_CXX_COMPILER_VERSION_INTERNAL \"\")",
+      "set(CMAKE_CXX_COMPILER_ID_RUN 1)"
+    ],
+    "msvc_cmake_compiler": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\CMakeFiles\\4.2.1\\CMakeCXXCompiler.cmake",
+      "bytes": 6528,
+      "sha256": "5cf2c34862e9c3aa87b781dbaf4c467e0d6c662712c8d914565f1d00b99d771b"
+    },
+    "msvc_version_fields": [
+      "set(CMAKE_CXX_COMPILER \"C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe\")",
+      "set(CMAKE_CXX_COMPILER_ID \"MSVC\")",
+      "set(CMAKE_CXX_COMPILER_VERSION \"19.51.36260.0\")",
+      "set(CMAKE_CXX_COMPILER_VERSION_INTERNAL \"\")",
+      "set(CMAKE_CXX_COMPILER_ID_RUN 1)"
+    ]
+  },
+  "profiles": {
+    "msvc": {
+      "reference_library": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "bytes": 3211264,
+        "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+      },
+      "client": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\backend-sampler-oracle.exe",
+        "bytes": 101888,
+        "sha256": "847a1b8cff48a544d79c27e8a319106cc86ccab8daac12b6d0676794f2b7407d"
+      },
+      "suffix_client": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\cpu-suffix-oracle.exe",
+        "bytes": 148992,
+        "sha256": "06ea063e9a3160ebe002993f94d7da736b17d2707c9d904ad42b5e054b9b6670"
+      },
+      "reference_outputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc.json",
+        "bytes": 6083556,
+        "sha256": "58925776cbf7fa30e5ff8d04eb67e1ca99182a97d86a1ed376f6d12b3e23df43"
+      },
+      "suffix_outputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-original-msvc.json",
+        "bytes": 124385,
+        "sha256": "df2aa92bbd58a62f92fb4bad956ed2665c4ac7a56b0e915aa22fa24b984657ce"
+      },
+      "comparison": "Exact integer fields, IDs, pointer-presence/alias booleans, strings and IEEE-754 words; no tolerance.",
+      "context_scenarios": 26,
+      "accessor_rows": 390,
+      "float_words": 77016,
+      "candidate_ids": 181356,
+      "suffix_scenarios": 2,
+      "suffix_stages": 4,
+      "suffix_float_words": 2500,
+      "suffix_candidate_ids": 1250,
+      "run": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\backend-sampler-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "C:\\Users\\adyba\\rust-llama-worktrees\\sampler-20261114\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc.json"
+      ],
+      "suffix_run": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\cpu-suffix-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-original-msvc.json"
+      ]
+    },
+    "gnu": {
+      "reference_library": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\build-ggml-linux-llama\\bin\\libllama.so.0.9.0",
+        "bytes": 5499792,
+        "sha256": "9b1e5f5ab3fb33912903f035e0fbe018d18a2a78b20b56bce8100ba51b4b15b9"
+      },
+      "client": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\oracle-gnu",
+        "bytes": 147216,
+        "sha256": "0ea65a9cd2c3ea2cae3b4c48938caf577c5da0e9f42827547d6e6253edbf7568"
+      },
+      "suffix_client": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-oracle-gnu",
+        "bytes": 219864,
+        "sha256": "86f6cde61574bc3e86d792f02b539068e56e9aee41a6fd986da885c059e6e186"
+      },
+      "reference_outputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu.json",
+        "bytes": 6083555,
+        "sha256": "0e32d13c485efd8f504091d6c61b084a04e42416c8787d506e20ad65087ddaf5"
+      },
+      "suffix_outputs": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-original-gnu.json",
+        "bytes": 124383,
+        "sha256": "3a4f20c6a6482b94c80234ee491ed95d3e7265c887c1adc04847f7e3e8403b3c"
+      },
+      "comparison": "Exact integer fields, IDs, pointer-presence/alias booleans, strings and IEEE-754 words; no tolerance.",
+      "context_scenarios": 26,
+      "accessor_rows": 390,
+      "float_words": 77016,
+      "candidate_ids": 181356,
+      "suffix_scenarios": 2,
+      "suffix_stages": 4,
+      "suffix_float_words": 2500,
+      "suffix_candidate_ids": 1250,
+      "run": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\oracle-gnu",
+        "C:\\Users\\adyba\\rust-llama-reference\\build-ggml-linux-llama\\bin\\libllama.so.0.9.0",
+        "C:\\Users\\adyba\\rust-llama-worktrees\\sampler-20261114\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu.json"
+      ],
+      "suffix_run": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-oracle-gnu",
+        "C:\\Users\\adyba\\rust-llama-reference\\build-ggml-linux-llama\\bin\\libllama.so.0.9.0",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\cpu-suffix-original-gnu.json"
+      ]
+    }
+  },
+  "retained_failures": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu-v2.stderr.log",
+      "bytes": 216,
+      "sha256": "ff525d8742000d7b0d423bacdd9ae210040643a31aa597aadc15670579d9b04f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu-v3.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-gnu.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\oracle-v1.cpp",
+      "bytes": 7561,
+      "sha256": "39303d5d46e459fb747d8aa2d80b9d3ff1b97d2db1eab03f40b9382c9678e2ff"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\oracle-v2.cpp",
+      "bytes": 7681,
+      "sha256": "a6a020743fb5ccaacc5f061a6bba56d00c7969bd4c6181ae306ac04ddac662b4"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc-v1.json",
+      "bytes": 6586809,
+      "sha256": "1f40abed183cc2c664492c114ebdcae1e9d39d094dcdf6b446be6b83ab2fc095"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc-v2.json",
+      "bytes": 6586809,
+      "sha256": "1f40abed183cc2c664492c114ebdcae1e9d39d094dcdf6b446be6b83ab2fc095"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-driver.log",
+      "bytes": 9024,
+      "sha256": "5138d6df09284b215252ac1e247caf13e08a2075e706662bedbba88debe5a43a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-retest.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-retest.stderr.log",
+      "bytes": 523,
+      "sha256": "eee294d04db31ad3653aecf9bc7855cbe522ab1aac8bd47c5e6c9ed97f58b88f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-corrected.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-corrected.stderr.log",
+      "bytes": 938,
+      "sha256": "8bd9853c52ac0db8d9216109870bb14aef6413387c7a9df12678bcb5a71abdc1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-corrected-v2.stdout.log",
+      "bytes": 399,
+      "sha256": "cc927cc24472225d676ab72a7c6015bc79478e58532bc1b0c4e727d665d966e1"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\gnu-sort-corrected-v2.stderr.log",
+      "bytes": 295,
+      "sha256": "187d978c6f66091485b56ba27926921117a089d1516ff69333680eed2f6a0acc"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-initial-failure\\ffi-debug-final.stderr.log",
+      "bytes": 1748,
+      "sha256": "74736ed55dc055334c6325e04e0d5eb29f6941acce06d34d83b00685ffb16176"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-initial-failure\\ffi-debug-final.stdout.log",
+      "bytes": 7241,
+      "sha256": "efbd694cac119572c050494b3be8cae160b8bba28878d4ebd65020006c818b89"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-initial-failure\\validation-progress.json",
+      "bytes": 354,
+      "sha256": "3c415be8c6febcf69f86db1696833ff72dbfbb0e9c975cdc8c8abd8cfb9c349f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\build-first.json",
+      "bytes": 787,
+      "sha256": "412622ef6f997192a89c4d9b2abf490d6758a66d95773d41202a07bdf6af198a"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug-final.stderr.log",
+      "bytes": 523,
+      "sha256": "294073399eb0ead8cf7de5224eed2efea1307dd77e859498da16e2f29fc3519d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug-final.stdout.log",
+      "bytes": 6985,
+      "sha256": "fe309314778f686098ff14a03f91933fea0b30276f932de0b5cc76ba4b6a8860"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug-v2.stderr.log",
+      "bytes": 843,
+      "sha256": "18be67efa8349d7cbaad29a114af51ea096c4f2f0beb2917fd6586bd5e81fad7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug-v2.stdout.log",
+      "bytes": 6985,
+      "sha256": "6d458d90d5bdbdab679e19bedc13dfad0f1f76cd4d5717dcfdf62d25ab69f043"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug.stderr.log",
+      "bytes": 3530,
+      "sha256": "db4ce4efe2b58dae9864398b90cd86c6a10e7cfb695c0d7b6648fea5c7845bed"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\ffi-debug.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\fmt-v2.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\fmt-v2.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\fmt.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\fmt.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\format-final.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\format-final.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\lock.stderr.log",
+      "bytes": 65,
+      "sha256": "6d446ac1bac7eaa4c81d1720bf7a54628cf1a4ee31353eaef4ec929c9d7bb8b2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\lock.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\runtime-debug-final.stderr.log",
+      "bytes": 2052,
+      "sha256": "0fb3cd1eedce926c35fd7499dd49afaabf53ab2bfc3dd3bc6f12065b9d713dce"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\runtime-debug-final.stdout.log",
+      "bytes": 8786,
+      "sha256": "086aac307d5bff7f5bbf15fe0c844338febf848ef727fbf63c49b2eab8fb2291"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\strict-clippy.stderr.log",
+      "bytes": 2275,
+      "sha256": "dd7892295acdf57badadf3de94dd1c1e7a525bf48f6af1539df1e9488da01ef8"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\strict-clippy.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-initial-failure\\validation-progress.json",
+      "bytes": 1395,
+      "sha256": "6a77f0576560f196e1aee29ab630885133ae484dfe87b0586648f9951d482e07"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-format-failure\\format-final.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-format-failure\\format-final.stdout.log",
+      "bytes": 3613,
+      "sha256": "daec652ad401bd2d30297636738a13da91d4218df13c9efc47f7800309e5b1af"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-gnu-format-failure\\validation-progress.json",
+      "bytes": 337,
+      "sha256": "0c9627e9b4a817b196db070601e9be83f4017dba1826f4ac6a541047ea6a32bf"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-format-failure\\format-final.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-format-failure\\format-final.stdout.log",
+      "bytes": 3964,
+      "sha256": "6b9670bea99388f0828cb670482a5fa579ac034323bab42f259b12fb60c3fc7d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc-format-failure\\validation-progress.json",
+      "bytes": 305,
+      "sha256": "04fb4dd831d0f0bd06837cb1f5a494e6ff3959d9ca4f3559f74afa0681e551f5"
+    }
+  ],
+  "failure_explanation": {
+    "initial_original_clients": "Direct nonchain greedy passed to source chain_n/set_sampler is undefined and aborts GNU; corrected accepted corpus excludes kind1. Earlier client variants and native failure logs remain external.",
+    "initial_gnu_rust": "Existing non-MSVC native sort used stable ordering, producing token 315 instead of original GNU 98 for temperature/typical/distribution. Independent stage captures now verify IDs and probability words exactly after the GNU sort correction.",
+    "mechanical_build_failures": "Initial tests required explicit sampler default-parameter constructor, Clippy required a collapsed condition, and added tests needed ABI bool byte conversion/formatting. One bounded file edit was restored from the complete git base before the final sort patch. All failure logs remain preserved."
+  },
+  "product_boundary": "No reference C/C++ implementation, native harness or binary is linked into or maintained in the Rust product.",
+  "recorded_utc": "2026-11-14T14:06:34.367713+00:00"
+}

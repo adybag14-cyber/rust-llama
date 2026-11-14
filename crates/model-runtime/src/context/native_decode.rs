@@ -114,6 +114,7 @@ pub(super) fn execute(
     batch: &[NativeBatchToken],
     mut cancelled: impl FnMut() -> bool,
     work_limit: usize,
+    accept_outputs: impl FnOnce(&[TokenOutput]) -> Result<()>,
 ) -> Result<Vec<TokenOutput>> {
     let limit = work_limit.min(MAX_NATIVE_WORK_BYTES);
     let owned = owned_work(context, batch)?;
@@ -149,12 +150,13 @@ pub(super) fn execute(
             &mut statistics,
         )?;
     }
-    if cancelled() {
-        return Err(Error::Cancelled);
-    }
     // Native output IDs are remapped to the original caller order after its
     // sequence-oriented execution order; negative C indices use that same order.
     outputs.sort_unstable_by_key(|row| row.batch_index);
+    accept_outputs(&outputs)?;
+    if cancelled() {
+        return Err(Error::Cancelled);
+    }
     staged.last_execution = statistics;
     *context = staged;
     Ok(outputs)
@@ -598,6 +600,45 @@ mod tests {
         assert!(context.set_threads(0, 4).is_err());
         assert!(context.set_threads(2, 257).is_err());
         assert_eq!(context.execution_options(), config);
+    }
+    #[test]
+    fn rejected_output_consumer_preserves_native_state_and_statistics() {
+        let mut context = flash_context(1, 1);
+        context.decode_batch(&batch(3, 0)).unwrap();
+        let before = context.save_native_state(None, 0).unwrap();
+        let previous = context.execution_stats();
+        let mut request = batch(1, 3);
+        request[0].output = OutputSelection::Logits;
+        let mut calls = 0;
+        let result = context.decode_batch_with_output_check(
+            &request,
+            || false,
+            |outputs| {
+                calls += 1;
+                assert_eq!(outputs.len(), 1);
+                assert!(outputs[0].logits.as_ref().is_some_and(|v| !v.is_empty()));
+                Err(Error::InvalidState("deliberate output rejection".into()))
+            },
+        );
+        assert!(matches!(result, Err(Error::InvalidState(_))));
+        assert_eq!(calls, 1);
+        assert_eq!(context.save_native_state(None, 0).unwrap(), before);
+        assert_eq!(context.execution_stats(), previous);
+        let cancel = std::cell::Cell::new(false);
+        let result = context.decode_batch_with_output_check(
+            &request,
+            || cancel.get(),
+            |_| {
+                cancel.set(true);
+                Ok(())
+            },
+        );
+        assert!(matches!(result, Err(Error::Cancelled)));
+        assert_eq!(context.save_native_state(None, 0).unwrap(), before);
+        assert_eq!(context.execution_stats(), previous);
+        let actual = context.decode_batch(&request).unwrap();
+        assert_eq!(actual.len(), 1);
+        assert_eq!(context.position_max(0).unwrap(), 3);
     }
     #[test]
     fn worker_stack_budget_and_cancelled_decode_do_not_commit() {

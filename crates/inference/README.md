@@ -9,14 +9,24 @@ This crate connects checked GGUF loading, native tokenizers and the Rust model r
 | `llama` | Llama SentencePiece or native BPE | Dense autoregressive generation and complete per-token logits, standard adjacent-pair RoPE without scaling, F32 KV state. |
 | `qwen2` | Native BPE | Dense generation and complete logits, half-pair NeoX RoPE without scaling, separate or fused Q/K/V with source bias rules, F32 KV state. |
 | `qwen3` | Native BPE | Dense generation with independent full head width, learned per-head Q/K RMS, full-head NeoX RoPE without scaling, separate or fused Q/K/V and F32 KV state. |
+| `gpt2` | Native GGUF tokenizer metadata | Dense learned-position generation, biased affine LayerNorm and source GELU blocks; see [GPT-2](../../docs/GPT2_IMPLEMENTATION.md). |
+| `gptneox` | Native GGUF tokenizer metadata | Dense partial-NeoX-RoPE generation with the original parallel or sequential residual order; see [GPT-NeoX](../../docs/GPTNEOX_IMPLEMENTATION.md). |
+| `bloom` | Native BPE | Dense fused-QKV generation with affine input/final LayerNorm and ALiBi attention; see [BLOOM](../../docs/bloom-inference.md). |
+| `falcon` | Native GGUF tokenizer metadata | Dense generation, shared/separate affine attention/FFN norms, fused QKV, full-head NeoX RoPE without scaling, parallel GELU FFN, tied/untied output and F32 KV state. |
+| `starcoder` | Native GGUF tokenizer metadata | Dense learned-position generation with fused biased QKV, affine LayerNorm, sequential biased GELU and tied/untied output. |
+| `starcoder2` | Native GGUF tokenizer metadata | Dense full-head NeoX RoPE generation with separate/fused QKV, source bias precedence, affine LayerNorm and sequential biased GELU. |
 | `bert` | BERT WordPiece | Dense bidirectional encoding, complete token embeddings and none/mean/first/last pooling. |
 | `mamba` | Native tokenizer metadata; SPM and BPE independently exercised | Mamba-1 causal convolution and selective recurrence, tied or separate output weights, optional unweighted dt/B/C RMS normalization. |
 
 Mamba-1 loading validates source tensor names and dimensions before constructing its owned recurrent state. Convolution and SSM A tensors require the source CPU kernel's F32 storage. The frozen loader does not load optional dt/B/C normalization weight tensors; its metadata flag selects unweighted normalization. Other architectures, unsupported tensor arrangements and unimplemented options return explicit errors. The full upstream architecture and runtime contract remains open.
 
-All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The pretrained corpus exercises F32 and Q4_0 Llama, BPE/Q4_K_M SmolLM2, Q4_K_M Qwen2, Q8_0 Qwen3, F16 Mamba-1 and F16 BERT.
+All 29 weight types supported by the frozen scalar CPU dot contract are accepted by the matrix loader. This establishes the available matrix arithmetic, not quality validation for every combination of architecture and quantization. The pretrained corpus exercises F32 and Q4_0 Llama, BPE/Q4_K_M SmolLM2, Q4_K_M Qwen2, Q8_0 Qwen3, F16 GPT-2/GPT-NeoX, F16/Q8_0 BLOOM, F16/Q8_0 Tiny StarCoder, Q4_K_M StarCoder2-3B, F16 Mamba-1 and F16 BERT. These are CPU arithmetic capabilities; the separate CUDA runtime admits only its documented four matrix formats.
 
 Qwen3 validates independent query/KV widths, per-head Q/K RMS vectors and fused-bias precedence before execution. Active norms and biases require F32 storage in the original CPU graph; ignored partial fused-bias groups retain their original behavior. Its ordinary tests cover automatic and explicit shard sets, state identity and transaction rollback. [Detailed Qwen3 contracts](../../docs/QWEN3_IMPLEMENTATION.md) keep MoE/VL/Next, scaled/partial RoPE, dimension arrays, rerankers and C NativeContext execution explicitly open.
+
+Falcon follows the frozen Falcon graph, including optional second-norm bias and source residual order. Independent synthetic native captures compare 412,024 exact F32 values and 243 greedy IDs per measured profile across 22 executable configurations; fourteen additional cases check explicit rejection boundaries. Pretrained Falcon validation remains open. See the [Falcon contract](../../docs/falcon-inference.md).
+
+StarCoder and StarCoder2 follow their distinct frozen graphs and retain separate state identities. Independent structural captures cover 43 admitted configurations and 29 checked rejection boundaries on both measured CPU profiles. Their learned-position/RoPE rules, required biases, memory boundaries and pretrained inputs are documented in [the StarCoder contract](../../docs/starcoder-inference.md). C-compatible NativeContext and CUDA execution remain separate admission work.
 
 ## Loading and memory
 
@@ -31,7 +41,7 @@ the set. The decoded-weight allowance covers every tensor before decoding.
 Missing or malformed siblings fail transactionally. The [GGUF documentation](../gguf/README.md)
 describes filename rules, safe input bounds and the remaining converter/writer work.
 
-Matrices retain decoded F32 values for row access. Supported non-F32 matrices also retain their packed representation so multiplication preserves the original activation conversion and scaling order. The decoded-weight budget does not include packed bytes, activations, KV state, tokenizer data or other allocations. Loading is into host memory; there is no mmap or GPU model placement claim.
+Matrices retain decoded F32 values for row access. Supported non-F32 matrices also retain their packed representation so multiplication preserves the original activation conversion and scaling order. The decoded-weight budget does not include packed bytes, activations, KV state, tokenizer data or other allocations. Loading is into host memory and does not use mmap. The separate `llama-cuda-runtime` crate can consume an admitted dense Llama model and upload its complete graph's weights, scratch and F32 KV to CUDA; other architectures and placement modes remain open.
 
 The GGUF reader handles little- and big-endian scalar values. F16 and BF16 packed matrix words are converted to the Rust kernel's byte order; F8 requires no word swap. Other big-endian packed arithmetic remains unsupported.
 
@@ -40,6 +50,8 @@ The strict `llama_model_runtime::Context` separately defaults to a 1 GiB `max_st
 ## Generation
 
 `generate` creates an independent context and sampler for each call. Its explicit options are a token budget, temperature, u32 seed and stop strings. Temperature zero selects greedy decoding. Output callbacks receive UTF-8 text, with incomplete byte sequences and potential stop-string suffixes withheld across token boundaries.
+
+`generate_with_session` shares that exact sampling and streaming pipeline with a supplied `DecoderSession`, including the native dense Llama CUDA implementation. The session must use the same model weights, compatible dimensions and an empty initial prefix. CPU sessions initialize their context after validation and zero-limit checks; CUDA sessions report the prefix actually committed if a multi-token evaluation is cancelled. See [the CUDA execution contract](../../docs/CUDA_RUNTIME.md).
 
 `logits_for_tokens` returns every vocabulary logit after each supplied token. It is intended for consumers that require raw logits and for independent conformance comparisons.
 
@@ -83,6 +95,7 @@ The checks against each matching original profile record:
 - F16 Mamba-130M: three prompts, 1,709,520 unique logits and 24 greedy token IDs, bit-identical against both original profiles after matching whole-row SiLU.
 - Qwen2.5-0.5B Q4_K_M: three prompts, 5,165,824 unique logits and 24 greedy IDs, bit-identical against each original profile. Twenty-one synthetic variants add 165,888 unique logits and 198 greedy IDs, with metadata, partial-bias and output-bias overflow regressions.
 - Qwen3-0.6B Q8_0: three prompts, 5,469,696 unique logits and 24 greedy IDs, bit-identical against each original profile. Dense/split/vector regressions add 294,912 logits and 400 IDs per profile.
+- Tiny StarCoder F16 and Q8_0: three prompts per file, 1,041,408 full-logit/prompt-embedding values and 12 greedy IDs each, bit-identical against both original profiles. StarCoder2-3B Q4_K_M adds 1,069,056 values and 12 IDs per profile; its explicit decoded-weight budget is 16 GiB.
 - F16 BERT: three prompts, 25 token vectors and nine pooled vectors, totaling 13,056 values, bit-identical after preserving attention, pooling and GNU variance order.
 - BERT diagnosis: all 122 captured stages of the first sequence match exactly; a committed independent attention fixture checks 46,080 output values across all 12 layers.
 
@@ -103,5 +116,7 @@ Set `LLAMA_TEST_MODEL`, `LLAMA_TEST_Q4_MODEL`, `LLAMA_TEST_BPE_MODEL`, `LLAMA_TE
 ```sh
 cargo test --release --offline --locked -p llama-inference --tests -- --ignored --nocapture
 ```
+
+The separate StarCoder suite uses `LLAMA_TEST_STARCODER_F16_MODEL`, `LLAMA_TEST_STARCODER_Q8_MODEL` and `LLAMA_TEST_STARCODER2_MODEL`; see its [reproduction command and pinned sources](../../docs/starcoder-inference.md#pretrained-acceptance).
 
 Each test checks the model's full size and SHA-256 before loading. CI downloads these explicit test inputs and runs the comparisons separately from ordinary offline workspace tests.

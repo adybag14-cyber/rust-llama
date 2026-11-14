@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "summary": "Read logs for background job job-op-649aba22342f4b148f346ed248f411f14b0067225a55d3dabec179da10bea1f4.",
+  "data": {
+    "id": "job-op-649aba22342f4b148f346ed248f411f14b0067225a55d3dabec179da10bea1f4",
+    "status": "failed",
+    "stdout": "{\"argv\": [\"acquire-starcoder2-sidecars.py\"], \"exit_code\": 1, \"seconds\": 0.29175543785095215}\r\n",
+    "stderr": "Traceback (most recent call last):\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 1321, in do_open\r\n    h.request(req.get_method(), req.selector, req.data, headers,\r\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n              encode_chunked=req.has_header('Transfer-encoding'))\r\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1358, in request\r\n    self._send_request(method, url, body, headers, encode_chunked)\r\n    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1404, in _send_request\r\n    self.endheaders(body, encode_chunked=encode_chunked)\r\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1353, in endheaders\r\n    self._send_output(message_body, encode_chunked=encode_chunked)\r\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1113, in _send_output\r\n    self.send(msg)\r\n    ~~~~~~~~~^^^^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1057, in send\r\n    self.connect()\r\n    ~~~~~~~~~~~~^^\r\n  File \"C:\\Python314\\Lib\\http\\client.py\", line 1499, in connect\r\n    self.sock = self._context.wrap_socket(self.sock,\r\n                ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\r\n                                          server_hostname=server_hostname)\r\n                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\ssl.py\", line 455, in wrap_socket\r\n    return self.sslsocket_class._create(\r\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\r\n        sock=sock,\r\n        ^^^^^^^^^^\r\n    ...<5 lines>...\r\n        session=session\r\n        ^^^^^^^^^^^^^^^\r\n    )\r\n    ^\r\n  File \"C:\\Python314\\Lib\\ssl.py\", line 1076, in _create\r\n    self.do_handshake()\r\n    ~~~~~~~~~~~~~~~~~^^\r\n  File \"C:\\Python314\\Lib\\ssl.py\", line 1372, in do_handshake\r\n    self._sslobj.do_handshake()\r\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^^\r\nConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\acquire-starcoder2-sidecars.py\", line 13, in <module>\r\n    raw=small(api);data=json.loads(raw);assert data[\"sha\"]==rev\r\n  File \"C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\acquire-starcoder2-sidecars.py\", line 7, in small\r\n    with urllib.request.urlopen(urllib.request.Request(url,headers={\"User-Agent\":\"rust-llama-independent-reference/1\"}),timeout=45)as r:\r\n         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 187, in urlopen\r\n    return opener.open(url, data, timeout)\r\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 487, in open\r\n    response = self._open(req, data)\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 504, in _open\r\n    result = self._call_chain(self.handle_open, protocol, protocol +\r\n                              '_open', req)\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 464, in _call_chain\r\n    result = func(*args)\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 1369, in https_open\r\n    return self.do_open(http.client.HTTPSConnection, req,\r\n           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n                        context=self._context)\r\n                        ^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Python314\\Lib\\urllib\\request.py\", line 1324, in do_open\r\n    raise URLError(err)\r\nurllib.error.URLError: <urlopen error [WinError 10054] An existing connection was forcibly closed by the remote host>\r\n",
+    "maxChars": 16000,
+    "logs": {
+      "stdout": {
+        "totalBytes": 94,
+        "segments": [
+          {
+            "index": 0,
+            "bytes": 94
+          }
+        ],
+        "rotated": false
+      },
+      "stderr": {
+        "totalBytes": 3851,
+        "segments": [
+          {
+            "index": 0,
+            "bytes": 3851
+          }
+        ],
+        "rotated": false
+      },
+      "maxBytesPerSegment": 33554432,
+      "rotations": 2,
+      "truncated": false
+    }
+  },
+  "exitCode": null,
+  "truncated": false
+}

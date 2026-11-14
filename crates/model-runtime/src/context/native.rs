@@ -851,13 +851,38 @@ impl NativeContext {
     ) -> Result<Vec<TokenOutput>> {
         self.decode_batch_with_work_limit(batch, cancelled, MAX_NATIVE_WORK_BYTES)
     }
+    /// Run a fallible output consumer before committing KV, pending copies,
+    /// execution statistics or any other native context state. The consumer
+    /// must stage its own state; it is invoked once after all model outputs.
+    pub fn decode_batch_with_output_check(
+        &mut self,
+        batch: &[NativeBatchToken],
+        cancelled: impl FnMut() -> bool,
+        accept_outputs: impl FnOnce(&[TokenOutput]) -> Result<()>,
+    ) -> Result<Vec<TokenOutput>> {
+        self.decode_batch_checked_with_work_limit(
+            batch,
+            cancelled,
+            MAX_NATIVE_WORK_BYTES,
+            accept_outputs,
+        )
+    }
     // Keep one production preflight path; module tests lower its ceiling to
     // exercise near-limit rejection without allocating multi-GiB fixtures.
     fn decode_batch_with_work_limit(
         &mut self,
         batch: &[NativeBatchToken],
+        cancelled: impl FnMut() -> bool,
+        work_limit: usize,
+    ) -> Result<Vec<TokenOutput>> {
+        self.decode_batch_checked_with_work_limit(batch, cancelled, work_limit, |_| Ok(()))
+    }
+    fn decode_batch_checked_with_work_limit(
+        &mut self,
+        batch: &[NativeBatchToken],
         mut cancelled: impl FnMut() -> bool,
         work_limit: usize,
+        accept_outputs: impl FnOnce(&[TokenOutput]) -> Result<()>,
     ) -> Result<Vec<TokenOutput>> {
         if batch.is_empty() || batch.len() > self.options.maximum_batch_tokens {
             return Err(Error::InvalidConfig(
@@ -928,7 +953,7 @@ impl NativeContext {
         if cancelled() {
             return Err(Error::Cancelled);
         }
-        native_decode::execute(self, batch, cancelled, work_limit)
+        native_decode::execute(self, batch, cancelled, work_limit, accept_outputs)
     }
     pub fn native_state_size(&self, sequence: Option<i32>, flags: u32) -> Result<usize> {
         native_state::encoded_size(self, sequence, flags)

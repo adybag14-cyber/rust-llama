@@ -9,6 +9,8 @@ use llama_checkpoint::{Number, Object, Value as Json};
 
 pub(crate) const BLOOM_PATTERN: &str = r" ?[^(\s|[.,!?…。，、।۔،])]+";
 
+pub(crate) const FALCON_TRIPLES_PATTERN: &str = r"[0-9][0-9][0-9]";
+
 pub(crate) const QWEN_PATTERN: &str = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -111,6 +113,7 @@ fn regex(pattern: &str) -> Result<()> {
     if pattern == LLAMA3_PATTERN
         || pattern == QWEN_PATTERN
         || pattern == BLOOM_PATTERN
+        || pattern == FALCON_TRIPLES_PATTERN
         || pattern == "x+"
     {
         return Ok(());

@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "reference": "frozen-llama.cpp-master original quantizer and C API; no Rust runtime used",
+  "started_utc": "2026-11-13T21:25:06.671722+00:00",
+  "source_archive_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "input": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+    "bytes": 1185376,
+    "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+  },
+  "request": {
+    "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\stories260k-requests.json",
+    "bytes": 810,
+    "sha256": "22c9c24b7e5c3e0023b645c32709b6ada32cd85e137f88045a396dde24d06030"
+  },
+  "oracle_source": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\inference-oracle\\oracle.cpp",
+    "bytes": 10978,
+    "sha256": "bf6aa1da45e5b7d2d928d8595e4c5c92238ec3e77225906bcf2f54b5d7d808be"
+  },
+  "stages": [
+    {
+      "name": "quantize-native-f16",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-quantize.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K-f16-native-20261113.gguf",
+        "F16",
+        "1"
+      ],
+      "started_utc": "2026-11-13T21:25:06.691790+00:00",
+      "ended_utc": "2026-11-13T21:25:06.724876+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\quantize-native-f16.stdout.log",
+        "bytes": 92,
+        "sha256": "49fce533abe25e642b678a5ab3231f15e6dd7e6cf2b2192d7150d17f8dfc28c9"
+      },
+      "stderr": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\quantize-native-f16.stderr.log",
+        "bytes": 9874,
+        "sha256": "d2574a29650d20428cc1c5ea6221aaa3e602d957a6d17b17bee694ef34f00282"
+      }
+    },
+    {
+      "name": "capture-native-f16",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\inference-oracle\\build\\Release\\inference-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K-f16-native-20261113.gguf",
+        "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\stories260k-requests.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\stories260k-f16-msvc-original.json"
+      ],
+      "started_utc": "2026-11-13T21:25:06.726413+00:00",
+      "ended_utc": "2026-11-13T21:25:06.787593+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\capture-native-f16.stdout.log",
+        "bytes": 141,
+        "sha256": "aab48887a1814484897b31625d44fe341fc055e48dea77997dab581c6cde8d89"
+      },
+      "stderr": {
+        "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\capture-native-f16.stderr.log",
+        "bytes": 47231,
+        "sha256": "33257e7cbdc83b74e0eab116d85cb4f2b77c51238dadeb755410547b5108fba1"
+      }
+    }
+  ],
+  "binaries": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-quantize.exe",
+      "bytes": 10752,
+      "sha256": "976183027aff34743b0e836d3e1870b767c4d0d1f6db6b03f1a038f293e31083"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\inference-oracle\\build\\Release\\inference-oracle.exe",
+      "bytes": 164352,
+      "sha256": "80f68315c21b4e85f1195537f1bcb75a08d72c00ad3a68045e97a7d47a800a0d"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\ggml-base.dll",
+      "bytes": 718336,
+      "sha256": "e602e753d97c06a04da018c5989de76fa56b358371ebe746cf5b860e79884116"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\ggml-cpu.dll",
+      "bytes": 878592,
+      "sha256": "3ddf1de594c4bea56dda944c3101c9ad69d468f9bea2bff1d29f360564214e9b"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\ggml.dll",
+      "bytes": 62464,
+      "sha256": "98ab32fcec9e5fb56a47fc8724d9d879a8404bb522218f652d800e5db5ea0b35"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-common.dll",
+      "bytes": 8956416,
+      "sha256": "678bae7b5b9338b1ed57c93ee46ddb74a229ba6c0042a9fb878bb16494049711"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama-quantize-impl.dll",
+      "bytes": 335360,
+      "sha256": "256caadbd0a87ce746255546264ded08c6fca9992b70e71e8422d146df64f8de"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-cli-oracle\\build-windows\\bin\\Release\\llama.dll",
+      "bytes": 3211264,
+      "sha256": "2e1ddcdf4d85a1d340d3f55a85f29e2dc6f80f4a774457a9ae91b5e9bb8579d7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml-base.dll",
+      "bytes": 718336,
+      "sha256": "601b1ce74fd6ee86b597b2bce5665940f826f7c77a9d7c1e6b71e384aa750756"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml-cpu.dll",
+      "bytes": 878592,
+      "sha256": "21ff5c920ae9ab639830b3400eb1ce0f3b9ba8e6b607daf14099644f9547199f"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\ggml.dll",
+      "bytes": 62464,
+      "sha256": "d82325253eaa91ee5d252b022c7f39ad9b34249a837656b9288d51d1d81f57b7"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\build\\bin\\Release\\llama.dll",
+      "bytes": 3211264,
+      "sha256": "42689f712beaaa3fbcada31b10a05e62730e6ca3e5f7e46a9d741cc5c41f63f3"
+    }
+  ],
+  "model": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\models\\stories260K-f16-native-20261113.gguf",
+    "bytes": 601248,
+    "sha256": "4cd29bbe9cb3b735750837816a43c3dd4b473dbd658e8612816f7c4d3926ac21"
+  },
+  "native_reference": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\f16-oracle\\stories260k-f16-msvc-original.json",
+    "bytes": 1216637,
+    "sha256": "a12ae286e0eb338cc2d8b9553cc77b3fcc50725793838d7036b56082f866df5f"
+  },
+  "fixtures": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\cuda\\stories260k-f16-msvc-logits.f32le.bin",
+      "bytes": 239616,
+      "sha256": "1aec9045215814c1b48a475bb39526500ae9e1b8180d4a1eca1666a9529869d5"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\cuda\\stories260k-f16-msvc-metadata.json",
+      "bytes": 9093,
+      "sha256": "b742c441aeb05527644b50e01afdb15e0876d3f77b5d63292e01a9f8f6e65bf3"
+    }
+  ],
+  "unique_float_count": 59904,
+  "comparisons_including_duplicated_last_prompt_row": 62976,
+  "greedy_tokens": 96,
+  "completed_utc": "2026-11-13T21:25:06.804956+00:00",
+  "original_oracle_build_provenance": {
+    "path": "fixtures/inference/oracle-provenance.json",
+    "sha256": "8d8232b70f3e57fa6a7d473d7d458360dd3cbbdf0fc41d77ec3377d5a9a98dc6",
+    "note": "Existing build provenance; current executable/DLL identities independently rehashed in this capture."
+  },
+  "comparison_contract": {
+    "absolute": 0.0002,
+    "relative": 2e-05,
+    "greedy_ids_and_generated_bytes": "exact",
+    "gate_origin": "Unchanged existing stories260K model comparison; no tolerance chosen from CUDA output.",
+    "reference_profile": "Original MSVC CPU; both Windows and GNU CUDA replays compare this same independent capture."
+  },
+  "qualification": "A native-original F16 conversion of the external pretrained stories260K file. F16 expected values were captured before its Rust CUDA comparison. GPU implementation already existed; no expected values were generated from it. This does not establish unmeasured GPU architectures or original CUDA backend parity."
+}

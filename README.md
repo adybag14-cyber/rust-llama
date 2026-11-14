@@ -2,7 +2,7 @@
 
 A native Rust implementation of the functionality in the supplied `llama.cpp-master.zip`.
 
-**This is an active, incomplete port.** The repository builds and runs real pretrained Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM and Mamba-1 generation plus BERT embedding models on its Rust CPU runtime, including packed Q4 inference. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
+**This is an active, incomplete port.** The repository builds and runs real pretrained Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, StarCoder, StarCoder2 and Mamba-1 generation plus BERT embedding models on its Rust CPU runtime, including packed Q4 inference. Falcon CPU execution has independent synthetic-model coverage; pretrained Falcon acceptance remains open. The CLI also executes complete dense Llama, Qwen2 and Qwen3 F32/F16/Q4_0/Q8_0 graphs on CUDA. The full frozen-source contract still includes all model architectures, tensor operations, backends, converters, multimodal models, tools, browser features and native clients. Those requirements remain tracked; this checkpoint is not a complete replacement for llama.cpp.
 
 The authoritative source input is the 41,458,461-byte ZIP with SHA-256:
 
@@ -37,9 +37,18 @@ cargo run --release --offline --locked -p rust-llama-cli -- generate \
 
 On PowerShell, put the command on one line. Generated text is written to stdout; token counts and timing are written to stderr.
 
-The high-level generation loader supports dense `llama` models with native SPM or BPE tokenization, full adjacent-pair RoPE without scaling, and F32 KV storage. Dense `qwen2` models add half-pair NeoX RoPE, separate or fused Q/K/V projections, source bias handling, and tied or separate output weights. Dense `qwen3` adds independent attention head width and learned per-head Q/K RMS normalization before full-head NeoX RoPE. Dense `gpt2` adds learned position embeddings and biased affine-LayerNorm blocks; dense `gptneox` adds partial NeoX RoPE and the original parallel or sequential residual order. See the [GPT-2](docs/GPT2_IMPLEMENTATION.md) and [GPT-NeoX](docs/GPTNEOX_IMPLEMENTATION.md) contracts for supported variants. Dense `bloom` models use fused QKV, affine input/final LayerNorm and ALiBi attention without RoPE; [the BLOOM contract](docs/bloom-inference.md) records supported head and output variants. It also loads Mamba-1 GGUF models with causal convolution, selective recurrent state, optional dt/B/C RMS normalization and tied or separate output weights. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
+The high-level generation loader supports dense `llama` models with native SPM or BPE tokenization, full adjacent-pair RoPE without scaling, and F32 KV storage. Dense `qwen2` models add half-pair NeoX RoPE, separate or fused Q/K/V projections, source bias handling, and tied or separate output weights. Dense `qwen3` adds independent attention head width and learned per-head Q/K RMS normalization before full-head NeoX RoPE. Dense `gpt2` adds learned position embeddings and biased affine-LayerNorm blocks; dense `gptneox` adds partial NeoX RoPE and the original parallel or sequential residual order. See the [GPT-2](docs/GPT2_IMPLEMENTATION.md) and [GPT-NeoX](docs/GPTNEOX_IMPLEMENTATION.md) contracts for supported variants. Dense `bloom` models use fused QKV, affine input/final LayerNorm and ALiBi attention without RoPE; [the BLOOM contract](docs/bloom-inference.md) records supported head and output variants. Dense `falcon` models add fused QKV, full-head NeoX RoPE, optional second affine normalization and parallel GELU feed-forward execution; [the Falcon contract](docs/falcon-inference.md) records its exact graph and fixture boundaries. It also loads Mamba-1 GGUF models with causal convolution, selective recurrent state, optional dt/B/C RMS normalization and tied or separate output weights. Matrix arithmetic implements all 29 weight types in the frozen scalar CPU dot contract, including the K, IQ, ternary and FP4 formats; the [quantization documentation](crates/quant/README.md) lists the precise formats. Unsupported architecture features return an error. A decoder or kernel alone does not establish all-model quality or performance parity.
 
-The runtime retains decoded F32 weights for row access and original packed bytes for native quantized matrix arithmetic. The default decoded-weight budget is 2 GiB; packed storage and runtime/cache allocations are additional. The default context bound is 1,024 tokens and is capped to the model's training limit. Both applications accept the first file of a supported GGUF shard set and automatically discover its declared siblings. The Rust API also accepts explicit ordered paths with cumulative parser limits. Both applications accept `--ctx-size` and `--max-weight-mib`; the pinned Qwen2.5-0.5B Q4_K_M and Qwen3-0.6B Q8_0 corpora use `--max-weight-mib 3072` because their decoded F32 row caches exceed 2 GiB. The official BLOOM-560M F16 and Q8_0 replays use `--max-weight-mib 4096`. These are explicit allocation bounds, not total process memory limits. Generation is currently CPU-based; the separately verified CUDA and OpenCL kernel APIs are not yet a complete GPU model backend.
+The runtime retains decoded F32 weights for row access and original packed bytes for native quantized matrix arithmetic. The default decoded-weight budget is 2 GiB; packed storage and runtime/cache allocations are additional. The default context bound is 1,024 tokens and is capped to the model's training limit. Both applications accept the first file of a supported GGUF shard set and automatically discover its declared siblings. The Rust API also accepts explicit ordered paths with cumulative parser limits. Both applications accept `--ctx-size` and `--max-weight-mib`; the pinned Qwen2.5-0.5B Q4_K_M and Qwen3-0.6B Q8_0 corpora use `--max-weight-mib 3072` because their decoded F32 row caches exceed 2 GiB. The official BLOOM-560M F16 and Q8_0 replays use `--max-weight-mib 4096`. These are explicit allocation bounds, not total process memory limits. CPU is the default backend. The CLI's `generate` and `logits` commands can select `--backend cuda` for single-sequence dense Llama, Qwen2 or Qwen3 with F32, F16, Q4_0 or Q8_0 matrices and F32 KV storage. `--device` selects the CUDA ordinal, and `--max-gpu-mib` bounds requested CUDA buffer lengths. Host decoded and packed weights remain retained; driver/context overhead is additional. [The CUDA contract](docs/CUDA_RUNTIME.md) records execution, state, resource and comparison boundaries. Other model, format and backend configurations retain explicit unsupported errors.
+
+Dense `starcoder` models add learned position embeddings, fused QKV and
+sequential affine-LayerNorm/GELU blocks. Dense `starcoder2` models use full-head
+NeoX RoPE, affine normalization, sequential GELU and the source's required
+projection biases. Both execute through the CPU generation and logits paths;
+[their runtime contract](docs/starcoder-inference.md) records the supported
+variants. The pinned StarCoder2 3B Q4_K_M replay uses `--max-weight-mib 16384`
+for its decoded F32 row cache. That limit excludes packed weights and other
+process allocations.
 
 Other CLI commands expose validated GGUF metadata, tokenization, detokenization and per-token logits:
 
@@ -70,7 +79,7 @@ with checked boundaries for consumed settings and tensor names.
 
 ## Convert a Hugging Face checkpoint
 
-The native Rust converter accepts local dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX and BLOOM Safetensors checkpoints:
+The native Rust converter accepts local dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder and StarCoder2 Safetensors checkpoints. Falcon includes the frozen RW class alias; [its conversion contract](docs/FALCON_HF_CONVERSION.md) preserves the measured source configuration and QKV quirks:
 
 ~~~sh
 cargo run --release --offline --locked -p llama-convert --bin convert-hf-to-gguf -- \
@@ -87,6 +96,12 @@ See [the converter contract](crates/convert/README.md) for input and allocation
 limits, native source profiles and unsupported modes. Other architecture
 converters remain open. Conversion of scaled-RoPE metadata does not establish
 scaled-RoPE inference support.
+
+The [StarCoder conversion contract](docs/STARCODER_HF_CONVERSION.md) records
+the original GPTBigCode/StarCoder2 aliases, metadata and tokenizer behavior.
+Tiny StarCoder has unchanged pretrained checkpoint acceptance. StarCoder2 HF
+conversion has synthetic-weight and official-sidecar coverage; its independent
+pretrained GGUF inference result does not establish pretrained HF conversion.
 
 ## Quantize a GGUF model
 
@@ -156,17 +171,91 @@ See the [server behavior and supported options](crates/llama-server/README.md). 
 | Model-file quantization | Native bounded streaming conversion with 35 source file modes across eight admitted metadata families, a standalone quantize CLI, legacy/GGUF importance ingestion, mixed precision, ordered overrides, pruning, copy/requantization, split preservation and frozen C entrypoints. See [the complete contract](crates/model-quant/README.md). |
 | Tensors | Checked four-dimensional layouts, immutable shared views, a CPU DAG evaluator, 100 executable operation IDs plus NONE input leaves, scalar unary/GLU formulas for supported typed families, convolution/pooling/resize, recurrent and gated-delta operators, hyper-connections, Lightning Indexer, extended forward/backward RoPE, masked/sink/ALiBi softmax, owned SGD/AdamW state, threaded custom callbacks, vision/loss kernels, and a checked FLASH_ATTN_EXT adapter over the shared native CPU flash kernel. |
 | Formats and vocabulary | Bounded shared raw/text GGUF v2/v3 reader and owned shard sets, byte-preserving ordered little-endian streaming writer, bounded split/merge executable, raw/indexed Safetensors reading with retained file capabilities, scalar endian conversion, Llama SPM, BERT WordPiece, BPE with all 64 reachable metadata-selected profiles / 99 aliases, Unigram, RWKV, PLaMo2/PLaMo3, explicit no-vocabulary mode, and exhaustive frozen Unicode/UTF-8 behavior. |
-| Model runtime | Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
-| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 232 implemented frozen C API exports, including LoRA adapters, control vectors, native BERT encoding and model-file quantization. |
-| Checkpoint conversion | Native dense Llama/Qwen2/Qwen3/GPT2/GPTNeoX/BLOOM HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior including the Qwen Split expression, pinned NFC and class resolution, seven output type selections and complete-file publication. |
-| Device foundations | Rust CUDA driver execution and generated PTX kernels; generated OpenCL kernels and execution; typed kernel IR and other backend host foundations. |
+| Model runtime | Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder, StarCoder2, Mamba and BERT Rust model graphs from typed weights; contexts, KV/recurrent state, transactions, adapters and state serialization. The GGUF facade loads dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder, StarCoder2, Mamba-1 and dense BERT. The distinct Llama NativeContext supports independent F32/F16 K/V, source CPU flash/AUTO resolution, actual configured workers and unified row maps for admitted dense-Llama configurations. Explicit nonflash execution remains single-worker. Strict contexts account for owned state and retained checkpoints before mutation. |
+| Inference and applications | Pretrained GGUF generation and BERT embeddings, CLI, real-model HTTP/SSE and embedding endpoints, and 247 implemented frozen C API exports, including context-attached sampler chains and sampled-output accessors, LoRA adapters, control vectors, native BERT encoding, model-file quantization, context performance/warmup/system information, and caller-owned FILE model/LoRA loading within documented cursor and ownership boundaries. |
+| Checkpoint conversion | Native dense Llama/Qwen2/Qwen3/GPT2/GPTNeoX/BLOOM/Falcon/StarCoder/StarCoder2 HF Safetensors to GGUF conversion, bounded sidecars and tensor working sets, source tokenizer/metadata behavior including the Qwen Split expression, Falcon punctuation and digit-triple stages, pinned NFC and class resolution, seven output type selections and complete-file publication. |
+| Devices | Persistent native Rust dense Llama/Qwen2/Qwen3 CUDA model execution, retained weights/KV/scratch and typed PTX kernels; generated OpenCL kernel execution and other backend foundations. Full architecture, format, scheduler, hardware and performance coverage remains open. |
 | Other imported functionality | Selected native media processing, samplers, chat formatters, separate raw-byte native GBNF and safe character grammar APIs, RPC/CBLAS/DSP utilities and Rust audit/packaging tools. |
 
 Detailed support boundaries are in the crate READMEs and [PORT_STATUS.md](docs/PORT_STATUS.md). Numeric registries, backend probes and example programs are not counted as complete implementations.
 
 ## Independent comparisons
 
-This continuation adds BLOOM inference and checkpoint conversion,
+The 14 November continuation adds StarCoder and StarCoder2 CPU execution and
+HF conversion, Qwen2/Qwen3 CUDA graphs, and eight sampled-output C API exports.
+The [StarCoder runtime contract](docs/starcoder-inference.md),
+[CUDA contract](docs/CUDA_RUNTIME.md) and [current status](docs/PORT_STATUS.md)
+record the admitted variants and remaining boundaries. Component and combined
+receipts are indexed under [evidence/2026-11-14](evidence/2026-11-14).
+
+The combined 14 November runs pass **768 Windows MSVC / 772 Linux GNU
+ordinary tests in each of debug and release**, with zero failures, 49 explicit
+prerequisites ignored and 147 result suites per run. Formatting, strict Clippy,
+locked offline builds, sixteen separately invoked pretrained inference/server
+tests and one native BERT encoder test pass per host. All four final C library
+profiles pass retained clients and the new sampling/context/FILE replay with
+exact inventories of **247 frozen exports plus four extensions**.
+
+Four actual RTX 4090 host/profile runs compare 9,837,824 Qwen logits and 578
+exact greedy IDs per profile, in addition to the existing Llama acceptance.
+GNU Qwen values are bit exact; Windows F16/small-model differences remain within
+the unchanged numerical bounds. Fifteen new release CLI commands per host
+check Qwen CUDA and StarCoder CPU generation, full logits, statistics and
+explicit rejections. Both hosts verify 1,143 fixture files covered by 1,154
+integrity declarations across 30 manifests and both complete 4,082-file frozen
+source trees.
+
+The [combined validation](evidence/2026-11-14/integrated-port/README.md)
+preserves the three failed attempts and their narrowly scoped corrections.
+The [final audits](evidence/2026-11-14/final-audits/README.md) record the
+subsequent CI/documentation delta; all Rust, Cargo and fixture inputs remain
+identical. **All twenty mandatory full-port gates remain open.**
+
+The following 13 November measurements retain their original scope.
+
+The 13 November continuation added native dense Llama CUDA execution, Falcon CPU
+inference and HF conversion, and seven frozen context/FILE API exports.
+[CUDA](docs/CUDA_RUNTIME.md), [Falcon runtime](docs/falcon-inference.md),
+[Falcon conversion](docs/FALCON_HF_CONVERSION.md),
+[context performance](crates/ffi/CONTEXT_PERFORMANCE.md) and
+[FILE loading](crates/ffi/FILE_POINTER.md) give the exact supported contracts.
+Component and combined integration receipts are under
+[evidence/2026-11-13](evidence/2026-11-13). All twenty broad completion gates
+remain open.
+
+The combined 13 November runtime checks passed **753 Windows MSVC / 757 Linux
+GNU ordinary tests in each of debug and release**, with zero test failures.
+Each ordinary run recorded 40 explicit prerequisites ignored and 142
+test-result suites. Separate runs passed thirteen pretrained inference/server
+tests and one native BERT encoder test per host. Original-header clients
+passed against both debug/release libraries with exactly **239 frozen exports
+plus four extensions**, leaving sixteen frozen exports absent.
+
+Four actual CUDA host/profile replays each compare 762,880 native logits and
+208 exact greedy IDs across three model files; the Q4_0/Q8_0 model is bit exact.
+A separate 128-command CLI replay checks generated text, stop behavior, logits,
+allocation statistics and explicit unsupported cases. See the
+[combined runtime receipts](evidence/2026-11-13/integrated-port/README.md),
+[GPU receipts](evidence/2026-11-13/cuda-runtime/README.md) and
+[CLI receipts](evidence/2026-11-13/cuda-cli/README.md). The retained failed
+attempts identify an obsolete external export-count guard and a collision with
+an older quantizer output directory; subsequent checks preserve the original
+expected outputs. The successful continuations retain the same 1,623 selected
+execution inputs. Documentation and the final package audit are sealed
+separately.
+
+The final Windows and GNU audits verified **1,094 fixture files across 24
+manifests**, both 4,082-file frozen source trees, and the reviewed source and
+dependency boundaries. The full-release check retains its expected refusal
+with all twenty mandatory gates open. After runtime verification, the only
+change within the selected input set was the documented dependency-boundary
+inventory update; all Rust, Cargo and fixture inputs remain unchanged.
+[Final audit receipts](evidence/2026-11-13/final-audits/README.md) record that
+delta and the separate documentation/evidence sealing boundary.
+
+The following 11 November figures retain their original scope.
+
+The 11 November continuation added BLOOM inference and checkpoint conversion,
 native BERT encoder/classifier C execution, and bounded model-file quantization.
 The frozen MSVC/GNU BLOOM captures compare 13,074,432 pretrained F32 words and
 24 greedy IDs per host. Its unchanged official checkpoint also produces three
@@ -179,7 +268,7 @@ corpus. The quantizer covers all 35 source file modes, 463 type/default cases,
 profile. Both additions have original-header debug/release C checks on Windows
 and Linux. See the [current scope and qualifications](docs/PORT_STATUS.md).
 
-The latest integrated checkpoint passed **728 Windows MSVC / 732 Linux GNU
+The 11 November integrated checkpoint passed **728 Windows MSVC / 732 Linux GNU
 ordinary tests in each of debug and release**, with zero failures. Each
 ordinary run recorded 33 ignored prerequisites and 133 test-result suites.
 Separate continuation checks passed thirteen pretrained inference/server tests,
@@ -187,7 +276,7 @@ six converter tests, one native BGE encoder test and one official Qwen tokenizer
 test per host. Both hosts verified **1,062 fixture files and declarations across
 nineteen manifests**, both 4,082-file frozen source trees, and the debug/release
 C libraries' exact 232 frozen exports plus four extensions. Twenty-three frozen
-exports remain absent.
+exports were absent at that checkpoint.
 
 Verification was staged. Both original full attempts passed formatting,
 the ordinary suites and strict Clippy, then failed the packaging audit because
@@ -281,7 +370,7 @@ The retained 9 November 2026 evidence includes:
 - **Shared flash and tensor adapter:** 3,746 original graphs check 7,060,000 raw default/forced output words per compiler profile, including source NaN operand selection. One-chunk, tiled and split-KV paths retain original geometry, physical masks, row maps and real worker partitions. The tensor adapter separately checks 114 new admitted graphs plus 896 reused sealed cases, with 3,032,980 exact output words per profile. Unsupported domains remain explicit; the tensor DAG has no aggregate retained-memory budget.
 - **Checkpoint foundation:** raw/indexed Safetensors reading, bounded positioned reads and a retained-directory capability boundary. Independent original file/index corpora and safe checked path-policy differences are recorded in [the checkpoint crate](crates/checkpoint/README.md). Other architecture converters and remaining format boundaries stay open.
 - **Actual devices:** 138 CUDA dispatches on RTX 4090 with zero recorded error; OpenCL kernel cases on RTX 4090 and AMD gfx1036 with recorded numerical bounds.
-- **C ABI:** At that checkpoint, 191 of 255 frozen exports, plus four diagnostic extensions, were exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The current [coverage inventory](crates/ffi/COVERAGE.md) retains all 23 absent exports and the remaining semantic restrictions.
+- **C ABI:** At that checkpoint, 191 of 255 frozen exports, plus four diagnostic extensions, were exercised through independent frozen-header and model harnesses. The latest CPU sampler corpus covers 165 scenarios and 42 real contexts / 585 generated tokens. The BPE/FIM/raw-byte harness compares 1,505,576 vocabulary records and 7,598 tokenization cases. The context/memory extension adds 80 scenarios, 400 checks, 61,440 continuation logits and 1,223,532 native state bytes. The new family getter corpus adds 347,066 vocabulary records and 27,508 tokenization cases; physical metadata adds 23,903 records and 480 outputs across 176 cases. Raw native state restore/reserialization is byte-exact on both platforms; generated Linux floats retain the predeclared numerical budget. Automatic shard C loading adds 96 cases per native profile, including 53 accepted and 43 rejected loads, aggregate model getters and 163,840 exact continuation logit words. Explicit split-list C loading adds 104 Windows / 106 GNU cases, including raw Unix filenames, with 172,032 / 180,224 exact continuation logit words. The two byte-oriented filename helpers match 7,807 original calls and 506,563 complete output-buffer bytes per profile; [SPLITS.md](crates/ffi/SPLITS.md) records their truncation, signed-number and callback ownership contracts. The four static enum helpers reproduce 73,057 original file-type values, nine enum names and 1,542 byte-string load modes; their 30 original abort cases become checked errors, as documented in [ENUMS.md](crates/ffi/ENUMS.md). Prior core/sampler/WPM fixtures remain passing. The current [coverage inventory](crates/ffi/COVERAGE.md) retains all eight absent exports and the remaining semantic restrictions.
 - **Server:** 37 real-model generation requests plus 283 embedding HTTP transcripts per original build (256 tiny-model, 27 pretrained BGE). Both verified profiles require exact corresponding F32 bits and all seven base64 vectors. Direct normalization checks cover another 4,608 values. Real TCP lifecycle tests cover configured load bounds, limits, provider failures, disconnects, shutdown and complete deadline errors.
 
 The original MSVC and GNU builds do not use identical row arithmetic: the verified GNU build enables source SSE2 exponentiation, reductions and variance, while the verified MSVC build uses scalar rows. Separate expected captures preserve those differences. Test expectations select their profile independently of runtime dispatch. The model runtime also preserves 256-column attention padding and physical cache holes. None of these results establishes every CPU instruction-set path.
@@ -301,7 +390,7 @@ cargo xtask fixtures
 
 Windows and Linux CI run these checks and separately download hash-pinned F32, Q4_0, BPE/Q4_K_M, Qwen2, Qwen3, Mamba-1 and BERT model inputs for explicit numerical comparisons. CI also downloads exact official GPT-2 and Pythia Safetensors revisions and uses the Rust xtask preparer to reconstruct pinned GGUF inputs for inference tests.
 
-Separate conversion jobs verify every input hash and complete outputs for Qwen, GPT and BLOOM checkpoints. BLOOM jobs reuse their exact F16/Q8_0 conversions for independent inference replay on each host. The general converter admits Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX and BLOOM. Its GPT test preserves the original official GPT-2 rejection and separately verifies the disclosed test derivative; [GPT_HF_CONVERSION.md](docs/GPT_HF_CONVERSION.md) records that boundary. Hardware/vendor tests retain their own explicit prerequisites. Exact numerical claims apply to the corresponding measured original profiles; portable error budgets remain available for unverified targets. See [inference fixtures](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
+Separate conversion jobs verify every input hash and complete outputs for Qwen, GPT and BLOOM checkpoints. BLOOM jobs reuse their exact F16/Q8_0 conversions for independent inference replay on each host. The general converter admits Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder and StarCoder2. StarCoder has unchanged pretrained F16/Q8_0/auto complete-file acceptance; StarCoder2 conversion has synthetic weights and pinned official sidecar acceptance, independently of its pretrained GGUF runtime coverage. Falcon's independent synthetic conversion corpus and official tokenizer sidecars do not establish pretrained Falcon weight acceptance. Its GPT test preserves the original official GPT-2 rejection and separately verifies the disclosed test derivative; [GPT_HF_CONVERSION.md](docs/GPT_HF_CONVERSION.md) records that boundary. Hardware/vendor tests retain their own explicit prerequisites. Exact numerical claims apply to the corresponding measured original profiles; portable error budgets remain available for unverified targets. See [inference fixtures](fixtures/inference/README.md), [quant validation](crates/quant/README.md), [tensor validation](crates/tensor/README.md) and [xtask commands](xtask/README.md).
 
 With the frozen source extracted separately:
 

@@ -10,9 +10,11 @@ cargo xtask test
 cargo xtask build
 ```
 
-The workspace uses local path dependencies. The `xtask` alias supplies
-`--offline --locked`; a clean clone needs the pinned toolchain but does not need
-a downloaded Cargo dependency registry. The upstream source directory and any
+The workspace uses local path dependencies and five checksum-pinned Rust
+registry packages for converter YAML parsing. A clean clone must acquire those
+reviewed packages with `cargo fetch --locked` before the offline checks. The
+`xtask` alias supplies `--offline --locked`; its dependency audit checks the
+materialized archives, extracted source, features and licenses. The upstream source directory and any
 optional pretrained model are separate inputs. The ordinary workspace tests do
 not silently treat a missing optional model as a successful model comparison;
 the explicit external-model test is documented in `fixtures/inference/README.md`.
@@ -45,7 +47,8 @@ frozen-source reference outputs from synthetic inputs and other test data.
 `cargo xtask audit` classifies maintained Rust, documentation, declarative
 configuration, and test/reference data. It fails on unclassified files and
 foreign implementation include candidates. Cargo metadata is checked for
-registry/git dependencies and custom build scripts. The output explicitly lists
+registry sources against the pinned review and rejects undeclared dependencies
+and custom build scripts. The output explicitly lists
 unsafe review candidates; passing this inventory audit is not proof that every
 unsafe block or backend has been independently reviewed.
 

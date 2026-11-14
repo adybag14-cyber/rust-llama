@@ -1,0 +1,1998 @@
+{
+  "status": "succeeded",
+  "profile": "linux-gnu",
+  "mode": "debug",
+  "driver": {
+    "bytes": 4246,
+    "sha256": "62feef9d351b8eed1fb7ee446829e89a265c12df33b231820114d9a92450aecd"
+  },
+  "started_utc": "2026-11-14T14:23:15.066985+00:00",
+  "steps": [
+    {
+      "name": "compiler",
+      "argv": [
+        "rustc",
+        "--version",
+        "--verbose"
+      ],
+      "exit_code": 0,
+      "seconds": 0.022,
+      "stdout": {
+        "bytes": 196,
+        "sha256": "f22d5e4e9ced367e774ce5bc140d9e6b1235c1882fec80d011044851f3ae6369"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-cuda-runtime",
+        "-p",
+        "llama-device-family",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.873,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 72,
+        "sha256": "f92dab9cbe3b243772444bd8f17f10a7dd3fc483a1a264eee42aef77e5bce6e3"
+      }
+    },
+    {
+      "name": "decoder_kernels",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-device-family",
+        "--test",
+        "decoder_kernels",
+        "--",
+        "--include-ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 2.025,
+      "stdout": {
+        "bytes": 457,
+        "sha256": "2e7e5c0027d7763c8cd47ab16b8e4a8283c61a9636b907be29d327ec2ee629c8"
+      },
+      "stderr": {
+        "bytes": 499,
+        "sha256": "730e1af20a3aa1951c9f0916ded855f27135533eb10fd383726b80af9730554f"
+      },
+      "tests": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "runtime",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-cuda-runtime",
+        "--test",
+        "runtime",
+        "--",
+        "--include-ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 3.979,
+      "stdout": {
+        "bytes": 262,
+        "sha256": "4f1ff1b1bf01f4e93db506fd5b6f3bf9137b5b65e1e0a42a0089230374d22158"
+      },
+      "stderr": {
+        "bytes": 863,
+        "sha256": "1bb36c9cde76a11b2336deffff1b538e0262d55051f4de9fc0be4dd5bfbb0e46"
+      },
+      "tests": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "pretrained",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-cuda-runtime",
+        "--test",
+        "pretrained",
+        "--",
+        "--include-ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 8.189,
+      "stdout": {
+        "bytes": 303,
+        "sha256": "9f91f2dd7d131dfc3dcdff44c0b722ec3e3cf5d12a612bc3e5d82e11bbcf672c"
+      },
+      "stderr": {
+        "bytes": 957,
+        "sha256": "ee60e943a1ca5251ae0e9b72c16bd8402506fd2dd4e1f5bcdc67b93859f7d08b"
+      },
+      "tests": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "qwen",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "llama-cuda-runtime",
+        "--test",
+        "qwen",
+        "--",
+        "--include-ignored",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 246.864,
+      "stdout": {
+        "bytes": 424,
+        "sha256": "f3bf4122650d2ec3571241b07712db51b053fbffac82d1eb484a4eb055a79915"
+      },
+      "stderr": {
+        "bytes": 944,
+        "sha256": "73080cdc4562bb23ca19e9fddffd2ddf729015f46e938d4228f67c2b8c56cde7"
+      },
+      "tests": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  ],
+  "execution_inputs": {
+    "Cargo.lock": {
+      "bytes": 4066,
+      "sha256": "8e1dae68ff23cb86d6f7dec8e1f7c8b6ca79ffb5b4bcc550fe442d74eb17f38f"
+    },
+    "Cargo.toml": {
+      "bytes": 297,
+      "sha256": "9e82da865daf05ed16128205ae0902d3b5efec7ac8fe9ba9aa1b861fd717de2c"
+    },
+    "crates/cuda-runtime/src/lib.rs": {
+      "bytes": 39556,
+      "sha256": "962e4da6556fde18bae1c5dc1699d81116a874f24f6f6d7c237d06d1171a0f1f"
+    },
+    "crates/cuda-runtime/src/model.rs": {
+      "bytes": 11991,
+      "sha256": "c268ccb640595fdadb1146084972ce0c2aa87cb76e6522418c5e48b7ca40941c"
+    },
+    "crates/cuda-runtime/tests/pretrained.rs": {
+      "bytes": 13228,
+      "sha256": "27a4223338aecbe0a41194de0e618deac5a8faf80d31cb3feb9311636750b60b"
+    },
+    "crates/cuda-runtime/tests/qwen.rs": {
+      "bytes": 16810,
+      "sha256": "d4951ea317ea0065c9b72863724b34ddfe3d41c99ec3343daa63fe12a2585683"
+    },
+    "crates/cuda-runtime/tests/runtime.rs": {
+      "bytes": 7010,
+      "sha256": "bf5ca75990ac89995ceda6534d11ef5bae7da9be5816e04af7728a7bba6ed62f"
+    },
+    "crates/device-family/device-probes/minimal_device.rs": {
+      "bytes": 171,
+      "sha256": "8d1c8a039ea4398d9bac4d4f6e8c6b7df09d16a60b73ac191c77d5113fae57e6"
+    },
+    "crates/device-family/examples/cuda_conformance.rs": {
+      "bytes": 9875,
+      "sha256": "d08158d9a795198bdc1e4f18d3f3d05aec07c0ca2ecb2e238d74e995511a4222"
+    },
+    "crates/device-family/examples/cuda_smoke.rs": {
+      "bytes": 3436,
+      "sha256": "8d67bc7d0e163979ff8ec60fe2b11137a910b8d2b98955eccb95b480c25eb55c"
+    },
+    "crates/device-family/examples/device_probe.rs": {
+      "bytes": 896,
+      "sha256": "35bcfbe1c079a16861cb7c7ec98e9db2968d4ddc92f29b4f04d948471ff11ba1"
+    },
+    "crates/device-family/examples/record_q4_reference.rs": {
+      "bytes": 4175,
+      "sha256": "31fd9d7a99e927df61c05ef0fe202640090b7d4275e4e4420c60ffdd80a59229"
+    },
+    "crates/device-family/src/driver.rs": {
+      "bytes": 28573,
+      "sha256": "2ad37a1e4d50330b872e47b869e819909ee16be6ffabf38aae0f29eb241785c1"
+    },
+    "crates/device-family/src/lib.rs": {
+      "bytes": 3383,
+      "sha256": "cab520fc6e2da076e3a879bf788e8ca4c75318373e0688157f88a9cb282b9742"
+    },
+    "crates/device-family/src/planning.rs": {
+      "bytes": 10801,
+      "sha256": "fcef64a64b54c78f5036dfd150298aa457da4d7519267c79c0f69d3f819c2d8b"
+    },
+    "crates/device-family/src/probe.rs": {
+      "bytes": 7486,
+      "sha256": "df74c11341a3507647a19fe77c620ac38453c2cf4853fffaeca688859b1631aa"
+    },
+    "crates/device-family/src/ptx.rs": {
+      "bytes": 59568,
+      "sha256": "c8ae9c515661f2119c79b24fcf2a7d559fe7c65f4a80598d61cb3acc783515f9"
+    },
+    "crates/device-family/src/ptx/decoder.rs": {
+      "bytes": 42843,
+      "sha256": "fb7ae529e068587f91378e75b7f4d80879a576f906bd51d3a2adca9d3586d228"
+    },
+    "crates/device-family/src/runtime.rs": {
+      "bytes": 14245,
+      "sha256": "a5d5033d78083d41224a81a465d9c40cda0e493f4885b06eb8e8f692dcff756c"
+    },
+    "crates/device-family/tests/decoder_kernels.rs": {
+      "bytes": 30448,
+      "sha256": "487084cff918c2812cda21e9b225376e669003e885220b788b19668d414ca1de"
+    },
+    "crates/inference/src/bert_loader.rs": {
+      "bytes": 9251,
+      "sha256": "b9797917d1e435c59c90416bdb5914e4638565a863b7c3199030171fb08d4070"
+    },
+    "crates/inference/src/bloom_loader.rs": {
+      "bytes": 6825,
+      "sha256": "70d2753066e8a354475b9ac4635518c090a36b9bf9fe153cf6b879d2788f9300"
+    },
+    "crates/inference/src/falcon_loader.rs": {
+      "bytes": 7082,
+      "sha256": "6a59b9a79c66b2a4dfc184791c131c24c44cb08a45b765f0d2a2a647c953e7ab"
+    },
+    "crates/inference/src/gpt2_loader.rs": {
+      "bytes": 6777,
+      "sha256": "8ab6b5a97cb9a9b47da48bae7193693f6739a0a5cc98edb997ad44f9d5d77159"
+    },
+    "crates/inference/src/gptneox_loader.rs": {
+      "bytes": 7231,
+      "sha256": "e389df177eb6566917cf607580b26215e14aded3b5f56dead474031457646813"
+    },
+    "crates/inference/src/lib.rs": {
+      "bytes": 17120,
+      "sha256": "fad1e60a0063f7cef9469d61b07d8eefe694dfae709e7e4738f86d977888f163"
+    },
+    "crates/inference/src/loader.rs": {
+      "bytes": 16205,
+      "sha256": "758504bf003cdbe77e9efc29ed498a43bc38acbcd77c294fcb3e5bd5fc2b5274"
+    },
+    "crates/inference/src/mamba_loader.rs": {
+      "bytes": 6791,
+      "sha256": "f750927053441a21c9769dae3e82f3c2338ee43c014ab607891f3191ef548ee7"
+    },
+    "crates/inference/src/qwen2_loader.rs": {
+      "bytes": 7549,
+      "sha256": "36c1bb7d35d43cbfc98d3672349f4445385024b37f0ff08c5ceaffbdc2f6bedf"
+    },
+    "crates/inference/src/qwen3_loader.rs": {
+      "bytes": 10591,
+      "sha256": "2611a3c832d8a6ec7ab3c7030cc3c5b7e859be5de464c0a4142f2399992050e2"
+    },
+    "crates/inference/src/session.rs": {
+      "bytes": 3373,
+      "sha256": "4a39bc82882f8cbe6e521a24c6f7659c064aba10fba085a0690ac18ab408ba7e"
+    },
+    "crates/inference/src/starcoder2_loader.rs": {
+      "bytes": 9506,
+      "sha256": "c37e8417d8dc3e18f2ba95bd9e724b08b11269e68a8bb85bdf7c55fe25e55bcb"
+    },
+    "crates/inference/src/starcoder_loader.rs": {
+      "bytes": 6835,
+      "sha256": "34de4d1ff55a4035a39cd75b2a53ae5826452df5f094ee457a6421eb37dc5c8f"
+    },
+    "crates/inference/src/stream.rs": {
+      "bytes": 4766,
+      "sha256": "4e81e9f4570e6d0d65a017e4c91a3ee596ae667719ee714bd33d86f795f1a6d3"
+    },
+    "crates/inference/tests/bert_defaults.rs": {
+      "bytes": 4659,
+      "sha256": "ccdaf9fbe9ac93c500b78d2cc1f2878d225a68653319c7d1846f1a9e30df41dd"
+    },
+    "crates/inference/tests/bert_reference.rs": {
+      "bytes": 6399,
+      "sha256": "e9126626bcd344092212cc29bfb0e820ed5ef4670b19efe4aba676806e4eb5e2"
+    },
+    "crates/inference/tests/bloom.rs": {
+      "bytes": 29619,
+      "sha256": "20224945819fa575385dc0d2d3582a9062804e707c303a25ada8015206751d59"
+    },
+    "crates/inference/tests/falcon.rs": {
+      "bytes": 25005,
+      "sha256": "7d098bb16569a1e747998881c997dfa9008adf4f8069977d697f0bdc95081124"
+    },
+    "crates/inference/tests/generation_session.rs": {
+      "bytes": 3186,
+      "sha256": "0bb5e0b05db6f4bbfbebe5cbd7b7ba5f2211214376812322c84bd5644acd495d"
+    },
+    "crates/inference/tests/gpt2.rs": {
+      "bytes": 22996,
+      "sha256": "8769c738ff429b9b287f1018fbe858de0edaf4806368728d077ee4f36c503b6b"
+    },
+    "crates/inference/tests/gptneox.rs": {
+      "bytes": 23869,
+      "sha256": "ee4ca548886a0f701190da59e845be67953df6dd04cc4a3bb58038041ab5b680"
+    },
+    "crates/inference/tests/mamba_loader.rs": {
+      "bytes": 10503,
+      "sha256": "500780d80c5a614670935c6606ccadf0b0b56a7a7c2899d15efcea274ad0c989"
+    },
+    "crates/inference/tests/native_reference.rs": {
+      "bytes": 65793,
+      "sha256": "84f78a6c4e1be314cd5181027bde245bb6a52f5ff8b88af1b4b836ef0f3fa7ad"
+    },
+    "crates/inference/tests/qwen2_loader.rs": {
+      "bytes": 11022,
+      "sha256": "73be511abee23ccbffa32c88148134500010fd7101a2a58d70a4fb7bdeee1f71"
+    },
+    "crates/inference/tests/qwen3.rs": {
+      "bytes": 24004,
+      "sha256": "123711ca2f523d63e22a6ffdf3bc36c137c7a53a92ecd41b362002be148ffdc7"
+    },
+    "crates/inference/tests/shards.rs": {
+      "bytes": 25851,
+      "sha256": "08cff25e1d9e075d1c386aa9a0cb9303e08e3e2fa2321e4176255ac879d1b69b"
+    },
+    "crates/inference/tests/starcoder.rs": {
+      "bytes": 29505,
+      "sha256": "1c4310704688b62811d1f1391a8d3bfc08618b9f59a36e61262377ec3f1459e0"
+    },
+    "crates/inference/tests/support/native_profile.rs": {
+      "bytes": 572,
+      "sha256": "53d80d5de601b9bfdf61342ff3145d0700a16cd8d7320a5732aa62584cd8ca93"
+    },
+    "crates/model-runtime/examples/build_reference.rs": {
+      "bytes": 4243,
+      "sha256": "3a36ad7621515f55e616db039c9882efbcaf4462c26532adf80e4d17406a1a05"
+    },
+    "crates/model-runtime/examples/reference_oracle.rs": {
+      "bytes": 25068,
+      "sha256": "d8e4138bdebb0177c1531b34d36fe114652e406d1d65daef64d2dd89ac59e9e1"
+    },
+    "crates/model-runtime/examples/registry_audit.rs": {
+      "bytes": 486,
+      "sha256": "58db8564d69caccab7556b124af4841c98e24523b7c1b721b6e9fd88e9591f7d"
+    },
+    "crates/model-runtime/examples/smoke.rs": {
+      "bytes": 126,
+      "sha256": "5c9db86c433063d5f5e769f5b487320185916868e3bd71ec2023471720cd2d14"
+    },
+    "crates/model-runtime/src/adapters.rs": {
+      "bytes": 6296,
+      "sha256": "5dcffde418b204e3c89d2d91b2ae29df6bf96df822af989ba5c3cf0676722010"
+    },
+    "crates/model-runtime/src/bert.rs": {
+      "bytes": 14903,
+      "sha256": "a7d6a0a2164b63188795eecd5ce46f905fc66904e6424e961f9350b4136dcd7d"
+    },
+    "crates/model-runtime/src/bert/native.rs": {
+      "bytes": 20169,
+      "sha256": "429491a49e423038f9ffd770949c837e33379e2cb263965b933d2ff8be2f0a6a"
+    },
+    "crates/model-runtime/src/bloom.rs": {
+      "bytes": 15217,
+      "sha256": "0cb0a62db1dd6646d591bf3bc1f79b68b4f66e90a10c90901636fcf1622eda8f"
+    },
+    "crates/model-runtime/src/context.rs": {
+      "bytes": 22218,
+      "sha256": "01e49fdb0971385fd99151374e527751cb18402bb4d85d89cdbcd943289309f3"
+    },
+    "crates/model-runtime/src/context/allocation_tests.rs": {
+      "bytes": 17281,
+      "sha256": "284852b20a5d5fc31bdc5cb644e7df8a29df48a7bfef55e08050d8f849bb8d7d"
+    },
+    "crates/model-runtime/src/context/native.rs": {
+      "bytes": 47802,
+      "sha256": "30294062b79975e7040723eeedba9505ae540f778fa116ea0d2bf36a1db107d4"
+    },
+    "crates/model-runtime/src/context/native_batch.rs": {
+      "bytes": 10451,
+      "sha256": "69022f994e32daaba06acbd0612270cd28e1c4153f373add8e8bb0037dc70ef4"
+    },
+    "crates/model-runtime/src/context/native_decode.rs": {
+      "bytes": 32130,
+      "sha256": "0dc8882a309e0d4188a91cb00457736aadc71e355f74531945e62cc1846a9b40"
+    },
+    "crates/model-runtime/src/context/native_kv.rs": {
+      "bytes": 6052,
+      "sha256": "397f50d500c13a5304e568000364d8758f5f858ea04088517d8abb3bedb8ed5d"
+    },
+    "crates/model-runtime/src/context/native_row_map.rs": {
+      "bytes": 9988,
+      "sha256": "302d101b8538ce76b93788358a364b1ac481fa0cca1987eea8d29ff05e373e71"
+    },
+    "crates/model-runtime/src/context/native_state.rs": {
+      "bytes": 20785,
+      "sha256": "88933ff503c6f3c2362b54b103fd271d078d846fc05788b2be92967b2b57e28b"
+    },
+    "crates/model-runtime/src/context/owned.rs": {
+      "bytes": 17591,
+      "sha256": "02b3afab53bc2e457e53e8113da68d45a9bbbbf438bb340474c0c3cf7ff474fd"
+    },
+    "crates/model-runtime/src/falcon.rs": {
+      "bytes": 11852,
+      "sha256": "39bf6d258ce7f841efd10640a83da500bf1363e2a440b84bfdbd67d7d88a35cf"
+    },
+    "crates/model-runtime/src/fixtures.rs": {
+      "bytes": 16025,
+      "sha256": "4b3de789c033f801fbfdcecbe4166caf40459d45f7e07a9fe5885d516cceac37"
+    },
+    "crates/model-runtime/src/gpt2.rs": {
+      "bytes": 11481,
+      "sha256": "3b4fa7165025c7ac07dd9c0853e2b463d8e4a23754e2d09a7f74dee0a11117e3"
+    },
+    "crates/model-runtime/src/gptneox.rs": {
+      "bytes": 12034,
+      "sha256": "252e87728827ab3fd4c3a23f3dededf69e056000b686465186b4c66af598c65f"
+    },
+    "crates/model-runtime/src/lib.rs": {
+      "bytes": 12368,
+      "sha256": "f607b07517b7c32ef6f4c8fca4fee2cd0c82e38d69befb8c3194f19e8f98b808"
+    },
+    "crates/model-runtime/src/llama.rs": {
+      "bytes": 16032,
+      "sha256": "98736b2ea7d2b894c14ff523f148869621ceecdbbe57638123ea5b8e0c8f1984"
+    },
+    "crates/model-runtime/src/mamba.rs": {
+      "bytes": 12825,
+      "sha256": "8f2517e0d16d201bef6857485dce7aa7c81877413165241848114e5240cc760b"
+    },
+    "crates/model-runtime/src/math.rs": {
+      "bytes": 26734,
+      "sha256": "7e8bed862e4845160549f4b4a2328715cf448db25e7082745e7563f66831ff06"
+    },
+    "crates/model-runtime/src/math/native_rows.rs": {
+      "bytes": 243,
+      "sha256": "03327fdf29416b8564acd847a5a2d69722953dd1854b7991b0b9f97a8677cf90"
+    },
+    "crates/model-runtime/src/qwen2.rs": {
+      "bytes": 15274,
+      "sha256": "d87be80dc22d048ca2af9386580dffd6674eb8b44eed380f4ffe21fc141708c2"
+    },
+    "crates/model-runtime/src/qwen3.rs": {
+      "bytes": 17320,
+      "sha256": "16c744baed3bb2bc90eecc6028ee76e5434b86211d9d4a380d5fa8a56fa5f473"
+    },
+    "crates/model-runtime/src/registry.rs": {
+      "bytes": 160350,
+      "sha256": "1b2aa699c4ff2cda0b15541590f1632732ee2a9d2082532cf484071ca6a214c4"
+    },
+    "crates/model-runtime/src/starcoder.rs": {
+      "bytes": 11870,
+      "sha256": "33b907cb2879b5be6b059ce3aa1039b170ae8b3b8cc119d5b474890e6e7d190a"
+    },
+    "crates/model-runtime/src/starcoder2.rs": {
+      "bytes": 17028,
+      "sha256": "090d24ff3367631cca2d6cc1afd3999918615535b983e625a970d97bed4ead04"
+    },
+    "crates/model-runtime/src/state.rs": {
+      "bytes": 9741,
+      "sha256": "608a9e953256829ed9baea306b4a4e8ed987c158b81b160b532ee26b7e881115"
+    },
+    "crates/model-runtime/tests/bloom.rs": {
+      "bytes": 4239,
+      "sha256": "b0521ea12ef6258fed5c1c0410a9ce65ade6c46354ee977b6b8ca22f43aacb0a"
+    },
+    "crates/model-runtime/tests/falcon.rs": {
+      "bytes": 5568,
+      "sha256": "872f0b2621e0e55f430ff20cf303f09951405cdf447f5c8329582503e5c52b60"
+    },
+    "crates/model-runtime/tests/gpt2.rs": {
+      "bytes": 3844,
+      "sha256": "43b1db1babdfb513330565e72535a0f265e2e533eaee431df56a79f2d4b7029c"
+    },
+    "crates/model-runtime/tests/gptneox.rs": {
+      "bytes": 4028,
+      "sha256": "174f46e291304ac70f6e38abc03cca0553e5370449b72f2c5b5d2b22ad67cc65"
+    },
+    "crates/model-runtime/tests/native_rows_graphs.rs": {
+      "bytes": 4413,
+      "sha256": "9b147da9d7b039125923c8b26be5e130b8465d04974257ee37e52a36f1722433"
+    },
+    "crates/model-runtime/tests/native_rows_native.rs": {
+      "bytes": 4603,
+      "sha256": "22468ee5029f43816e9c9c9f266d4d9f71f855340ddd7c8197736858330092b9"
+    },
+    "crates/model-runtime/tests/native_rows_variance.rs": {
+      "bytes": 6523,
+      "sha256": "e2da0dec649cd72a11e68d342dff0315213b1681ca96f7622ce0273da405c195"
+    },
+    "crates/model-runtime/tests/numerical_reference.rs": {
+      "bytes": 2391,
+      "sha256": "1cbf5db254317e5b7afd3ba19a3b969c18df0e4322a9145f34abc65a19405d32"
+    },
+    "crates/model-runtime/tests/qwen2.rs": {
+      "bytes": 2741,
+      "sha256": "51347a6efd9736dc89efa6d37fabafc5a90fa68777bf1115c6532045c7835bfe"
+    },
+    "crates/model-runtime/tests/qwen3.rs": {
+      "bytes": 11115,
+      "sha256": "dcb215ea3a6f1ca8a0072378820b8d0d25c00110017800d38b5bd9461aab6135"
+    },
+    "crates/model-runtime/tests/runtime.rs": {
+      "bytes": 24496,
+      "sha256": "ef449ae0124fb1fd00f08d7d788f9a293b2570ecdffa2fd0b646e642c8537224"
+    },
+    "crates/model-runtime/tests/starcoder.rs": {
+      "bytes": 7204,
+      "sha256": "e5ec3edd6e9e521c01663663eb142463f2575108a766c13a5c825a9c377abfeb"
+    },
+    "crates/quant/src/activation.rs": {
+      "bytes": 1577,
+      "sha256": "b6c5906f028e21c34d450d8aa6c962f42558e6853dcc69f2efd0e6af26637bb5"
+    },
+    "crates/quant/src/conversion.rs": {
+      "bytes": 2163,
+      "sha256": "ccc3ce8a7475c301d95512b33de25c8cb87b8f239fed20af97b07413c0961ec8"
+    },
+    "crates/quant/src/cpu_math.rs": {
+      "bytes": 7901,
+      "sha256": "9210e35a6c9ed8ecd4329b26ae7c823a819dbf1b4f930f2ddbe8ba4b786660c5"
+    },
+    "crates/quant/src/decode.rs": {
+      "bytes": 13859,
+      "sha256": "6f544cdc5cb1ed758e88e10c79468dd641f38cb7b25bda33c7213a5b0d38771b"
+    },
+    "crates/quant/src/encode.rs": {
+      "bytes": 8768,
+      "sha256": "a87c61a2ee10306c615e50daedb3d247dcfdf1a7c43a688b21c3e1957d74b787"
+    },
+    "crates/quant/src/encode_iq1.rs": {
+      "bytes": 12916,
+      "sha256": "d35c5d1b505ac88a6adbb878322004185fdc7d0aa5154dec2bb1f10b6ac05c25"
+    },
+    "crates/quant/src/encode_iq2.rs": {
+      "bytes": 9767,
+      "sha256": "67509569a2dd4600be6f9ab4a9f3228547ad920a655a10cd6dc8ef2f13700e4c"
+    },
+    "crates/quant/src/encode_iq3.rs": {
+      "bytes": 17285,
+      "sha256": "fea42fbd6f597303c860cdfb5932f4c499fc11bffb36ec89a52deaa886809b96"
+    },
+    "crates/quant/src/encode_iq4.rs": {
+      "bytes": 6075,
+      "sha256": "698bbf815c2a6620f8fb9e37f7360baa316dc60c4e2e2333f8033d1ca335cb8f"
+    },
+    "crates/quant/src/encode_k.rs": {
+      "bytes": 18063,
+      "sha256": "cefc475d9dc3c1e576294236cf68254f762d3a64d4478008230050709050b5ab"
+    },
+    "crates/quant/src/encode_simple.rs": {
+      "bytes": 4713,
+      "sha256": "d120f09e29232abb598ec944414faaa501cbce9da749860fc078affdcaa3bac9"
+    },
+    "crates/quant/src/flash_attention.rs": {
+      "bytes": 51183,
+      "sha256": "f58cc7552796ee1094dbe35278a7ee0988bded8327bae8c9df35b4350ae45ec7"
+    },
+    "crates/quant/src/flash_attention/rows.rs": {
+      "bytes": 2600,
+      "sha256": "8d773deb4502d4a1521b3b5d5c3d355724e4a63e513531be9b4ac8a98d545d3f"
+    },
+    "crates/quant/src/flash_attention/rows_tests.rs": {
+      "bytes": 6664,
+      "sha256": "8f7c524e534a484954f67e2cad45b826242cab805ab802444fb4b68ca8cf8465"
+    },
+    "crates/quant/src/flash_attention/tests.rs": {
+      "bytes": 10038,
+      "sha256": "ca072c12a70bede1bf5258967bc2270c587ed8e227d8338204db8fb77090d642"
+    },
+    "crates/quant/src/iq_lattice.rs": {
+      "bytes": 31600,
+      "sha256": "85679dca0d52e1a9fbfe0425e7c91ed785a1f5ff5012ac919e1d7d78569fa32b"
+    },
+    "crates/quant/src/iq_sort.rs": {
+      "bytes": 3429,
+      "sha256": "e23a26f05b8369ef39908f4a6c5382acef1f60b111092ce1bb94a65d66595cdd"
+    },
+    "crates/quant/src/lib.rs": {
+      "bytes": 14160,
+      "sha256": "b2d1d8ebeccd0a118de4aab473334bbfd35312d72a017847a2e6ca1e4dd6d5ea"
+    },
+    "crates/quant/src/matvec.rs": {
+      "bytes": 6071,
+      "sha256": "642c8259350aa68214fd83c74b8620366bf3d108f8bdd31c95cd39dcaa3e27f1"
+    },
+    "crates/quant/src/matvec_extra.rs": {
+      "bytes": 18493,
+      "sha256": "3d25a8b9c644e4d53d56452ac468b387855bd9da8ebb801a3f45de2eeb024a9e"
+    },
+    "crates/quant/src/tables.rs": {
+      "bytes": 92936,
+      "sha256": "eb75d5277bf1dffc52942ac2ca9fa9bdb7ebd61c73c676dcc4db8133a5cc4015"
+    },
+    "crates/quant/src/weighted.rs": {
+      "bytes": 16023,
+      "sha256": "8f376c8c809c9fd62dadb7945e1917d4b19db21b23c685f156cac7aaed9750cc"
+    },
+    "crates/quant/tests/common/flash_fixture.rs": {
+      "bytes": 5295,
+      "sha256": "65cbff31c2bab0686dd28b5bae4cf7cfbe85ab6c6feba721932b4865558e9ffb"
+    },
+    "crates/quant/tests/common/flash_rows_fixture.rs": {
+      "bytes": 5969,
+      "sha256": "12a54368afe4111178bd1cd46a47a065faba37019fb32381e61d17c8a4ad6c82"
+    },
+    "crates/quant/tests/cpu_math_scalar.rs": {
+      "bytes": 1875,
+      "sha256": "80a17eb6837b022063036067a099cf81d7a92068f8a5f9daa054faeeaf7d3b09"
+    },
+    "crates/quant/tests/encoders_extended.rs": {
+      "bytes": 5907,
+      "sha256": "daf4949acbbd78d8bea9b9d8b7ca92c95064bb06af6da8b984a3b411c0751f28"
+    },
+    "crates/quant/tests/f16_matmul.rs": {
+      "bytes": 2455,
+      "sha256": "b16a39330618ea82062864db6bb788986deb141977f09290661e83150221542d"
+    },
+    "crates/quant/tests/flash_attention.rs": {
+      "bytes": 7217,
+      "sha256": "228a7c405c594bfec02f76a3e8bc537ddc23708a1aaf5dda6779598b1fda1093"
+    },
+    "crates/quant/tests/flash_rows.rs": {
+      "bytes": 9684,
+      "sha256": "f80db5fe0973b71c914c6ab11c1339e911dd14e1b9ab1a0c31245c427bca0a91"
+    },
+    "crates/quant/tests/iq1_encoders.rs": {
+      "bytes": 3180,
+      "sha256": "bad13d839d40b780f2543e5fb2d7c326415b70a0bfad4342d092963279fa21f8"
+    },
+    "crates/quant/tests/iq2_encoders.rs": {
+      "bytes": 3180,
+      "sha256": "5d18fd5c66045dc942565c0945b06c7857bea37aa102716896d1c1f246f598b4"
+    },
+    "crates/quant/tests/iq3_encoders.rs": {
+      "bytes": 3190,
+      "sha256": "885fea2ae0b109f868ac431a4b6218f96ee9bba6623269d793e0f231fe8725c0"
+    },
+    "crates/quant/tests/matvec.rs": {
+      "bytes": 3767,
+      "sha256": "5f9cc9deb822fe93bd11b9a08f89a24067531f90e619fc686e5ba8dccc75c5a4"
+    },
+    "crates/quant/tests/matvec_extended.rs": {
+      "bytes": 7666,
+      "sha256": "54f312a1335c958e3d199f648f1b428f4c5122fb30045d749993ada3b2e7a4f8"
+    },
+    "crates/quant/tests/reference.rs": {
+      "bytes": 6645,
+      "sha256": "1a17cd5ddf9531c98f5670b81c94935ef01b5f2672bb93fad13e103b50709814"
+    },
+    "crates/quant/tests/weighted_encoders.rs": {
+      "bytes": 8005,
+      "sha256": "adb7a70b3d9e3bdcbc016e22017b1d20c0a5610d24efd78f72a20588bd5fa0ee"
+    },
+    "fixtures/inference/bert-bge-gnu-provenance.json": {
+      "bytes": 754,
+      "sha256": "cee65472e076f4ce7a331d444f6c58930571eee656e31ac22c597631f71c3c5a"
+    },
+    "fixtures/inference/bert-bge-gnu-reference.json": {
+      "bytes": 407101,
+      "sha256": "6a8b5264ee12fa4a66c84cb93178c7dcaecb01a87ae9fdd2ed9846b573b6f310"
+    },
+    "fixtures/inference/bert-bge-provenance.json": {
+      "bytes": 2237,
+      "sha256": "72d2ceaf3a838036383dfab8f37341466c2abd0c588e618924e9523bfb7ccfb6"
+    },
+    "fixtures/inference/bert-bge-reference.json": {
+      "bytes": 407230,
+      "sha256": "3ef1810174b8c73311a3510713ef0a852469e629fc8aa8673c899cb21a4e6f2b"
+    },
+    "fixtures/inference/bert-bge-request.json": {
+      "bytes": 366,
+      "sha256": "b1376bdfd79edad4b494df56ead4e72cc00269a6ba180271808af9bff97dab4c"
+    },
+    "fixtures/inference/bert-defaults-provenance.json": {
+      "bytes": 3538,
+      "sha256": "140e405cfb55109c92e587cd6d3adc9350323925723943da0c6436ed3d75ff05"
+    },
+    "fixtures/inference/bert-defaults-reference.json": {
+      "bytes": 6647,
+      "sha256": "8d9fdfcbe9a7893cce5a2415433b16b941b8f5aa18fe6ce62d22f8881670d884"
+    },
+    "fixtures/inference/bert-defaults-request.json": {
+      "bytes": 310,
+      "sha256": "bee43093207ed5fb5e80b20bd1983d71fa8385433ed969d5ca5e13c5091cfc22"
+    },
+    "fixtures/inference/bloom/LICENSE.BLOOM.txt": {
+      "bytes": 15797,
+      "sha256": "5f65b9812dbe3aec1e595de426f80a5e39912edeafe5d47c93ebd625a53dacfe"
+    },
+    "fixtures/inference/bloom/conversion-linux.json": {
+      "bytes": 176267,
+      "sha256": "0f6c001eb9a5f5f4b6238450fa40d2c94f3825af22f4f0f0632fd49815e5150d"
+    },
+    "fixtures/inference/bloom/conversion-windows.json": {
+      "bytes": 184173,
+      "sha256": "a958a63d101d5d0db825f06d0076fbb0ded94c1cbfe6e0d13225e2b7b3ad8067"
+    },
+    "fixtures/inference/bloom/model-origin.json": {
+      "bytes": 3118,
+      "sha256": "afdec63dd13bda2f99ffbdb109f7252acef21a0b26b21a016b5091a3f1764a81"
+    },
+    "fixtures/inference/bloom/pretrained-gnu-reference.json": {
+      "bytes": 10995,
+      "sha256": "6d8ab06c52b63dcd7336cdbcb5b166057fdf72da3a3158c36bb7146a7a89ff54"
+    },
+    "fixtures/inference/bloom/pretrained-gnu-values.f32le.bin": {
+      "bytes": 44261376,
+      "sha256": "7e5a97744f63a289fef3f7427191591726963db11b7a5f334dd9a123715f55cc"
+    },
+    "fixtures/inference/bloom/pretrained-msvc-reference.json": {
+      "bytes": 10997,
+      "sha256": "88ff4b38fdddf8409639946f47829fb96f93cd0fa9d1a7bf8555c85567a15b40"
+    },
+    "fixtures/inference/bloom/pretrained-msvc-values.f32le.bin": {
+      "bytes": 44261376,
+      "sha256": "5bdfa1637d572941a4d412cc6159d5626fe569667f2e3842f05677fb9305a12c"
+    },
+    "fixtures/inference/bloom/provenance.json": {
+      "bytes": 110507,
+      "sha256": "e26adfefd42d22473df35a1471bafc3606c9ce284f1294a60466be6b393a7eee"
+    },
+    "fixtures/inference/bloom/tiny-gnu-reference.json": {
+      "bytes": 236003,
+      "sha256": "08dc91c7847667fffc90e91a6b22cd91da37f7b87bf7a99a2ea353ebd5f15875"
+    },
+    "fixtures/inference/bloom/tiny-gnu-values.f32le.bin": {
+      "bytes": 955888,
+      "sha256": "33596f9d2429d89e2383ee2527440d7d0e3fefb62727031d3a3ee0255d283d90"
+    },
+    "fixtures/inference/bloom/tiny-inputs.bin": {
+      "bytes": 12001632,
+      "sha256": "b604f29aaee455b81c49a498bd6aa751708d076a66e83da4115fe27cda6b8027"
+    },
+    "fixtures/inference/bloom/tiny-models.json": {
+      "bytes": 18245,
+      "sha256": "d0cbf3730c01bc252ccac402331f43981f3b9ab2d0d21e10d61c85f91c1b5f24"
+    },
+    "fixtures/inference/bloom/tiny-msvc-reference.json": {
+      "bytes": 236045,
+      "sha256": "e7816c41b41e3456261d38d72545865658988f025147719aaae41c112639d751"
+    },
+    "fixtures/inference/bloom/tiny-msvc-values.f32le.bin": {
+      "bytes": 955888,
+      "sha256": "4e59151b4f0b7b7c1cf16f5c2d0041c69e830929df3c9ea15e893ca51f2d9803"
+    },
+    "fixtures/inference/cuda/provenance.json": {
+      "bytes": 8136,
+      "sha256": "bed777a828ca086ce8989a4305a03b80d6a536f4995613adb520518027a0f351"
+    },
+    "fixtures/inference/cuda/stories260k-f16-msvc-logits.f32le.bin": {
+      "bytes": 239616,
+      "sha256": "1aec9045215814c1b48a475bb39526500ae9e1b8180d4a1eca1666a9529869d5"
+    },
+    "fixtures/inference/cuda/stories260k-f16-msvc-metadata.json": {
+      "bytes": 9093,
+      "sha256": "b742c441aeb05527644b50e01afdb15e0876d3f77b5d63292e01a9f8f6e65bf3"
+    },
+    "fixtures/inference/embedding-http-bge-gnu-provenance.json": {
+      "bytes": 4586,
+      "sha256": "afe6a49dfbe249af53a2ec2ae684608aff2e26138ce05e8d6c88f689e95bbb03"
+    },
+    "fixtures/inference/embedding-http-bge-gnu.json": {
+      "bytes": 952603,
+      "sha256": "1798ec493f773d2e9da5d401df683dc52983485c57f62701c4df15cdeeb07cdf"
+    },
+    "fixtures/inference/embedding-http-bge-provenance.json": {
+      "bytes": 4002,
+      "sha256": "8d3b319d059ca50735e92fc487bba90227f36686fcb712b023a75ffb60d8492a"
+    },
+    "fixtures/inference/embedding-http-bge.json": {
+      "bytes": 952627,
+      "sha256": "78f8b93f5df0ca29a6464722e1931730c1389e31c3724da0e0dd2da3abb97945"
+    },
+    "fixtures/inference/embedding-http-coercions-gnu-provenance.json": {
+      "bytes": 1183,
+      "sha256": "190312c2e7bcfe8c2dd9ef7c42210862cb89f51f01ebf25fd4a6efa225bb73ee"
+    },
+    "fixtures/inference/embedding-http-coercions-gnu.json": {
+      "bytes": 26374,
+      "sha256": "a17a3fa473452ecd6099772e178d92d555214118a5cabf7f5a5a4a578d25c247"
+    },
+    "fixtures/inference/embedding-http-coercions-provenance.json": {
+      "bytes": 1189,
+      "sha256": "3c8681a372b17001c96af4dcb604da3a043a82a98b5eececce736e3cc2fbdf0f"
+    },
+    "fixtures/inference/embedding-http-coercions.json": {
+      "bytes": 26356,
+      "sha256": "d0c0708760cafd05a50058269c48ca7f4b4c42ceca2276980a8da5c8950344c1"
+    },
+    "fixtures/inference/embedding-http-tiny-gnu-provenance.json": {
+      "bytes": 4164,
+      "sha256": "5590e8a9e4726c6dd5eafb8d75f440f0c603a84323cd7d5928021dda8c9af13a"
+    },
+    "fixtures/inference/embedding-http-tiny-gnu.json": {
+      "bytes": 205453,
+      "sha256": "a79cbbf4a6408cac48ce3feffe61ee280dc6f8ae9a3e2b8ce18da521f0a166f0"
+    },
+    "fixtures/inference/embedding-http-tiny-provenance.json": {
+      "bytes": 2462,
+      "sha256": "c187914915f1ebbceaad8c8f242ef018d09de4626d81379e4eb151ca96c4c856"
+    },
+    "fixtures/inference/embedding-http-tiny.json": {
+      "bytes": 205341,
+      "sha256": "b46542f0b048d0839bb8ba8b13e03ffc29c2068ce8e8e0d4c4d93c63c1df3016"
+    },
+    "fixtures/inference/falcon/provenance.json": {
+      "bytes": 113004,
+      "sha256": "87d8fbe78965849bd42715df73d16d89a23221f61749f497a2b05767457f482e"
+    },
+    "fixtures/inference/falcon/tiny-gnu-reference.json": {
+      "bytes": 279039,
+      "sha256": "b807c4903e617d685612799a378d4f287e6f42ad974cf2a4c93b8ddc3fceef9a"
+    },
+    "fixtures/inference/falcon/tiny-gnu-values.f32le.bin": {
+      "bytes": 1191200,
+      "sha256": "b9fcdf35c914eea62f6adecbba7b64e0d24ce99fb267baf7d9df2764ec30db76"
+    },
+    "fixtures/inference/falcon/tiny-inputs.bin": {
+      "bytes": 13803616,
+      "sha256": "d4b5e81b63f84509e884a6e756ccfd5daa188bc7279f5eb9c84ef1b99af9e0ce"
+    },
+    "fixtures/inference/falcon/tiny-models.json": {
+      "bytes": 21192,
+      "sha256": "31e18cfa9034dce7a344d4da121dca44e5d8f4bc46cf791f1962f94f30c540fb"
+    },
+    "fixtures/inference/falcon/tiny-msvc-reference.json": {
+      "bytes": 279089,
+      "sha256": "2f45d65f35a7e70578b5b46d1f56ef11d6157ce23bda53ff81542f5ecfdef529"
+    },
+    "fixtures/inference/falcon/tiny-msvc-values.f32le.bin": {
+      "bytes": 1191200,
+      "sha256": "efed2f37dd8e4336a7de7772759230fe39d126fa527543ed4591ed3b1142086a"
+    },
+    "fixtures/inference/ggml-vocab-llama-spm.gguf": {
+      "bytes": 723869,
+      "sha256": "16c3724582d59aa8bf84711894e833f916ee46a31d80e21312759c48bf8d0e69"
+    },
+    "fixtures/inference/gnu-native-build-provenance.json": {
+      "bytes": 8936,
+      "sha256": "ade2dbaf943ddba82c0d844aed2856e6dd5d3a2b98311b476cf1e75bfc2f6510"
+    },
+    "fixtures/inference/gpt2/LICENSE.GPT2.txt": {
+      "bytes": 1403,
+      "sha256": "0dbeda4bc78823b1d67ec0ee414d8690ee4cad826bc9c147b215adc3af202436"
+    },
+    "fixtures/inference/gpt2/conversion.json": {
+      "bytes": 857,
+      "sha256": "c6627c85e1aba87486e480966ccc8762b8e7b63e5f62a852750441a0c5efc57f"
+    },
+    "fixtures/inference/gpt2/model-origin.json": {
+      "bytes": 2212,
+      "sha256": "bca0957d4808dd33323359ace083bcee6efbc8a8e6963e396db26b2501972b5d"
+    },
+    "fixtures/inference/gpt2/pretrained-gnu-logits.f32le.bin": {
+      "bytes": 6633924,
+      "sha256": "991e195fda84b66047df211aab6674e58808c877fa9e75f38ad852665a943167"
+    },
+    "fixtures/inference/gpt2/pretrained-gnu-reference.json": {
+      "bytes": 4410,
+      "sha256": "ec2108ee59f7b0f4fbd95083adc3eb2e03d6ffd43692d72a9fb18a2dc7b4c3a7"
+    },
+    "fixtures/inference/gpt2/pretrained-msvc-logits.f32le.bin": {
+      "bytes": 6633924,
+      "sha256": "968f54df87ec6a6d65d0a906c7b98cc347a20838c56a7b06b65ee6b4d098ae30"
+    },
+    "fixtures/inference/gpt2/pretrained-msvc-reference.json": {
+      "bytes": 4412,
+      "sha256": "28fc35e6226d6f7bda61c82a9f25277b721ac6fe3ef6c5a23b8b38547dcb70db"
+    },
+    "fixtures/inference/gpt2/provenance.json": {
+      "bytes": 46116,
+      "sha256": "9f41e1e2a1523b4de3ecc0b5ab7e3e496384e18d71b9430674dee48b451a2578"
+    },
+    "fixtures/inference/gpt2/static-mask-adaptation.json": {
+      "bytes": 33534,
+      "sha256": "79fcba2083c5c1db00c945d14268c9eaf3075076414503b5328a01f8e1b80e4c"
+    },
+    "fixtures/inference/gpt2/tiny-gnu-logits.f32le.bin": {
+      "bytes": 710656,
+      "sha256": "e72e145e0379790b0b69c96884c91a522f4b64bf1f3b55bae9f6224491cc9fde"
+    },
+    "fixtures/inference/gpt2/tiny-gnu-reference.json": {
+      "bytes": 83556,
+      "sha256": "c50a1d4d6e4005b2f6e6b397d73877b4d5729e4978a1a90381088e5728c1122c"
+    },
+    "fixtures/inference/gpt2/tiny-inputs.bin": {
+      "bytes": 8711456,
+      "sha256": "1d2d68f85615cbb22bd21ee80b3e8f9d7fa02e4de9e07216d2d867e8e32fa2c3"
+    },
+    "fixtures/inference/gpt2/tiny-models.json": {
+      "bytes": 10980,
+      "sha256": "c58178d0ef2ec36a2193a5631d18153c366cddbb07170fa114e8d0d78220a167"
+    },
+    "fixtures/inference/gpt2/tiny-msvc-logits.f32le.bin": {
+      "bytes": 710656,
+      "sha256": "9452c7ad0ec0821e052ec231c006436639da6b1ff53a6ab638eca3156685dc8a"
+    },
+    "fixtures/inference/gpt2/tiny-msvc-reference.json": {
+      "bytes": 83574,
+      "sha256": "90e6ace497398503f01e48bf34ff70607bcfde48f42eec8b3ab790a41e76fddf"
+    },
+    "fixtures/inference/gptneox/LICENSE.PYTHIA.txt": {
+      "bytes": 11340,
+      "sha256": "bc4cdd164a78077e0a47964605fa0708084691121f73672afaa0c3b59c766f65"
+    },
+    "fixtures/inference/gptneox/conversion.json": {
+      "bytes": 852,
+      "sha256": "1a3b9d6910d215b84092f469e223cbb0e5cc863fb6c60664620a0cfaf1c7fdd7"
+    },
+    "fixtures/inference/gptneox/license-origin.json": {
+      "bytes": 242,
+      "sha256": "781403fccdc6e3ca612c09ff6d295c820adbde07cfbc5b084a8bcfd86d524f32"
+    },
+    "fixtures/inference/gptneox/model-origin.json": {
+      "bytes": 2110,
+      "sha256": "893b5cda6b70e451628616b344a006792640fdfcbc15fe0b336487339ed16d33"
+    },
+    "fixtures/inference/gptneox/pretrained-gnu-logits.f32le.bin": {
+      "bytes": 6640128,
+      "sha256": "da9ee1842dc2e8433c3fe5b5557f98be85aca07291c6d0c2f24dc4fa4af21109"
+    },
+    "fixtures/inference/gptneox/pretrained-gnu-reference.json": {
+      "bytes": 4396,
+      "sha256": "3abacfa02f7f05291bad1f12632d972191f92fce3fd04da1fdb86f17a71d34fe"
+    },
+    "fixtures/inference/gptneox/pretrained-msvc-logits.f32le.bin": {
+      "bytes": 6640128,
+      "sha256": "a5f8fe2e2bc180d5247b3c173d3d6e46f9685d8aa47b750ccc4003caba4f7a02"
+    },
+    "fixtures/inference/gptneox/pretrained-msvc-reference.json": {
+      "bytes": 4398,
+      "sha256": "fb34928fe06988cdbb756f99e3a8c5967aa8e72b8bebdc444a203223fe2be5d0"
+    },
+    "fixtures/inference/gptneox/provenance.json": {
+      "bytes": 53049,
+      "sha256": "8ba9930c3319e79f1cc93529804e1519845f77d10bde34664cd652b279c9b3a2"
+    },
+    "fixtures/inference/gptneox/scope-revision.json": {
+      "bytes": 550,
+      "sha256": "9c3e6a13246e822714e681e3862bd04fc126f7089faf8de884d019e85b26f075"
+    },
+    "fixtures/inference/gptneox/tiny-gnu-logits.f32le.bin": {
+      "bytes": 821248,
+      "sha256": "b6ea4687a7e00b02b65ad6891faa0474d2445f0a93417d029e96ba5a64f633da"
+    },
+    "fixtures/inference/gptneox/tiny-gnu-reference.json": {
+      "bytes": 99264,
+      "sha256": "571f56e5272a41175535c91f68be7352d75ad21fdc0c2a17e0dacc757f93d0b4"
+    },
+    "fixtures/inference/gptneox/tiny-inputs.bin": {
+      "bytes": 12306816,
+      "sha256": "34e3afb0cca67ce6575c2df66f79f7601a3f7780ec3291ebe7529fede68934ce"
+    },
+    "fixtures/inference/gptneox/tiny-models.json": {
+      "bytes": 13087,
+      "sha256": "ad6befa81f5595ed543108bba7372483f71cb741f9562728ee40e68548e2e353"
+    },
+    "fixtures/inference/gptneox/tiny-msvc-logits.f32le.bin": {
+      "bytes": 821248,
+      "sha256": "0520642ede6ddef594a94c9fe66b11afd81ae156752c9d2e77697ea7a545ca5d"
+    },
+    "fixtures/inference/gptneox/tiny-msvc-reference.json": {
+      "bytes": 99290,
+      "sha256": "2ec59be5939e9eba3812fcc9034567896620395764adb88208898c65422cdf1b"
+    },
+    "fixtures/inference/llama-spm-reference.json": {
+      "bytes": 18663,
+      "sha256": "0bdebffebc72641ad083693a45e99fe8b4bb7d153adece3cac670d286d7372a4"
+    },
+    "fixtures/inference/llama-spm-requests.json": {
+      "bytes": 9169,
+      "sha256": "2ab5a4167b2edb66baf3191958d3534ea6f521d3c795ccfd456e6d52aa1df5a0"
+    },
+    "fixtures/inference/mamba-130m-f16-gnu-logits.f32le.bin": {
+      "bytes": 6838080,
+      "sha256": "a6b70e05d1f71276bb499c0d532edd98106b23f31759cdc46719e863f8fdd9f7"
+    },
+    "fixtures/inference/mamba-130m-f16-gnu-metadata.json": {
+      "bytes": 3671,
+      "sha256": "15ed0b80b811055f9bc10f881147dab183addc2906cf79f2095b4c3f9a25bd31"
+    },
+    "fixtures/inference/mamba-130m-f16-gnu-provenance.json": {
+      "bytes": 1647,
+      "sha256": "103d0bf36011555ee803644b6901956d31800cda9675f7c39e259ce097507a70"
+    },
+    "fixtures/inference/mamba-130m-f16-logits.f32le.bin": {
+      "bytes": 6838080,
+      "sha256": "464194ea61d22ed122a49f2dc193b5abb52cd3fbf8cb6b9da36ed2b182071b0b"
+    },
+    "fixtures/inference/mamba-130m-f16-metadata.json": {
+      "bytes": 3531,
+      "sha256": "ab0aa643da3d8098b3f36733e76b3fdeb840c8ed7a191f258500e9dc6b779254"
+    },
+    "fixtures/inference/mamba-130m-f16-provenance.json": {
+      "bytes": 3069,
+      "sha256": "7e962708a422b9f45066a8b5a20db1c3d073408ff7241bcf43fdeafe1bd0e8f7"
+    },
+    "fixtures/inference/oracle-provenance.json": {
+      "bytes": 3868,
+      "sha256": "8d8232b70f3e57fa6a7d473d7d458360dd3cbbdf0fc41d77ec3377d5a9a98dc6"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-gnu-logits.f32le.bin": {
+      "bytes": 20663296,
+      "sha256": "41911148135e2fd5b04a2ef08645bed2db47d2aca93657137020b8fb14ea2e3d"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-gnu-metadata.json": {
+      "bytes": 3761,
+      "sha256": "bdb3847e8c6f7cc3d5d81e3fb26cde6bc0c23f0a261fe081ba8188dab7e9c871"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-gnu-provenance.json": {
+      "bytes": 2464,
+      "sha256": "d11220836f199dba71dab455540449add96c10e3ce53477f7a1d5f7d7e200b41"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-logits.f32le.bin": {
+      "bytes": 20663296,
+      "sha256": "7d72a020440c058295accce093e220d6988d8d864ade9be89721f57e65110e9b"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-metadata.json": {
+      "bytes": 3599,
+      "sha256": "251a33d1f6a51faf83856b69d4bd14832c086d15d83b42fc17e9e8eded36faf0"
+    },
+    "fixtures/inference/qwen2-05b-q4-k-m-provenance.json": {
+      "bytes": 3209,
+      "sha256": "dc259bd713875f8fd4fe34411071aa4d1213335fab69a704ef15147a51e45bdc"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-gnu-logits.f32le.bin": {
+      "bytes": 7900672,
+      "sha256": "b18cdc060ad005d0b2116ed0a18cfec2b925dbd06fc9a247b2a9e37bb42b91bf"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-gnu-metadata.json": {
+      "bytes": 2121,
+      "sha256": "9fbb9fad035ff0f1460e52d8c37995890e8ff75d75448915a086832a4528f18e"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-gnu-provenance.json": {
+      "bytes": 1715,
+      "sha256": "daaffeaa73917c98ce36016b0929095f12ff017685ed5190128e233518976e4a"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-msvc-logits.f32le.bin": {
+      "bytes": 7900672,
+      "sha256": "b7ec9d31a37d62077494b7d4d6c7b55c062921a6985230f959e62b9269e03180"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-msvc-metadata.json": {
+      "bytes": 2218,
+      "sha256": "e080fe2b7010965d43d1a0cde592d517f7feafc6d26a920eff0533472a672738"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/f16-msvc-provenance.json": {
+      "bytes": 2397,
+      "sha256": "c2c2f945354c137efbfd6715c091e97c306d6220e3465d1356b333e93ecdc62a"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-gnu-logits.f32le.bin": {
+      "bytes": 7900672,
+      "sha256": "f408bb3574fb18465ce0554cf7560a52cab6e3fbc933d9d942ed2e16c812f68f"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-gnu-metadata.json": {
+      "bytes": 2121,
+      "sha256": "9fbb9fad035ff0f1460e52d8c37995890e8ff75d75448915a086832a4528f18e"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-gnu-provenance.json": {
+      "bytes": 1718,
+      "sha256": "d73f0d5593779edc4870e312e52b9914802339803c0c6477990b5726f6e13bb1"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-msvc-logits.f32le.bin": {
+      "bytes": 7900672,
+      "sha256": "f795e2e00c2bbb8cd00a7bd4fe9e4f7e8fbd0f236c4886cc6f7def25aa8a0493"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-msvc-metadata.json": {
+      "bytes": 2205,
+      "sha256": "77c302a9318b5cc015430eac73892c55a807bd25ef6858884cd034690c9e7fa7"
+    },
+    "fixtures/inference/qwen2-cuda-pretrained/q8_0-msvc-provenance.json": {
+      "bytes": 2400,
+      "sha256": "12f1eb0545d75161dc01912aa024accb8b6ab5c201b669774f3e6ba7c3829f61"
+    },
+    "fixtures/inference/qwen2-metadata-gnu-native-provenance.json": {
+      "bytes": 5433,
+      "sha256": "b1c491fd6374dd955485baab921a71487fd8dca244d6436034b0ec2121e72bcf"
+    },
+    "fixtures/inference/qwen2-metadata-native-provenance.json": {
+      "bytes": 5575,
+      "sha256": "038c122103f0c8a8f6ea86b71908312e76d2731f0e1b13b5932bbbdae296f4f5"
+    },
+    "fixtures/inference/qwen3/LICENSE.Qwen3.txt": {
+      "bytes": 11544,
+      "sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd"
+    },
+    "fixtures/inference/qwen3/pretrained-gnu-logits.f32le.bin": {
+      "bytes": 21878784,
+      "sha256": "89caafa49677f68a145dd4e6733b70addaf0d5a77b35e527c0f0be08f60453e6"
+    },
+    "fixtures/inference/qwen3/pretrained-gnu-reference.json": {
+      "bytes": 4852,
+      "sha256": "29e14fc25d406e8cc40f80a6a3147f41b1cd9f2d3c862f9f2557f384632cf3fa"
+    },
+    "fixtures/inference/qwen3/pretrained-msvc-logits.f32le.bin": {
+      "bytes": 21878784,
+      "sha256": "e2872c8d35d8583073a0844f35099bbdb9a10baacbed3532a776c4f0756385bb"
+    },
+    "fixtures/inference/qwen3/pretrained-msvc-reference.json": {
+      "bytes": 4854,
+      "sha256": "e0a466acda2e6ab476112e6c300a2a6cc65cc680dd40babd5e730c966a2a3601"
+    },
+    "fixtures/inference/qwen3/provenance.json": {
+      "bytes": 124653,
+      "sha256": "05c25a958098299652a6450717e2afca65e865e0c399fe456fb1330fab64595b"
+    },
+    "fixtures/inference/qwen3/tiny-gnu-logits.f32le.bin": {
+      "bytes": 518144,
+      "sha256": "2fe8d0571271ab64ca4dba5ce82788c4ca51d18300febde1e8ac93c5d8ab0832"
+    },
+    "fixtures/inference/qwen3/tiny-gnu-reference.json": {
+      "bytes": 145163,
+      "sha256": "6d484698728c52560dafab55714116e8885cff1b16c45ff5b309cd9a23417370"
+    },
+    "fixtures/inference/qwen3/tiny-inputs.bin": {
+      "bytes": 25199968,
+      "sha256": "04c331fdf68d9cb2311631904099d674ce1f17def63abf93c908a856147c49bd"
+    },
+    "fixtures/inference/qwen3/tiny-models.json": {
+      "bytes": 26728,
+      "sha256": "898e84c2567d91f1a5ac8132ddb82ca5034fce399a6b0e4645e5774798220b61"
+    },
+    "fixtures/inference/qwen3/tiny-msvc-logits.f32le.bin": {
+      "bytes": 518144,
+      "sha256": "c596ad63c372b982bd5a156073dd5333244b3c1769d828b4127447e028c02f9a"
+    },
+    "fixtures/inference/qwen3/tiny-msvc-reference.json": {
+      "bytes": 145173,
+      "sha256": "a928e0c5e8c8f8cec7448590c8c085384320ba45cf31709d3a44084b171735f5"
+    },
+    "fixtures/inference/qwen3/vectors-gnu-logits.f32le.bin": {
+      "bytes": 24576,
+      "sha256": "d44fdb2500366235be8d69044e8eddfbee81717e2639c15e4f8a6321603c44d7"
+    },
+    "fixtures/inference/qwen3/vectors-gnu-reference.json": {
+      "bytes": 13405,
+      "sha256": "605bee2d26918a939b4186c0b6cb21b777d810f164c7b261970980cd3b50b310"
+    },
+    "fixtures/inference/qwen3/vectors-inputs.bin": {
+      "bytes": 9168000,
+      "sha256": "69dc2175a31be9be8f28d8cfaa875ab99943071378740f9372079c1eff8184db"
+    },
+    "fixtures/inference/qwen3/vectors-models.json": {
+      "bytes": 10159,
+      "sha256": "bfe0d5e18746ad103cc4aac5d75d90cce3eb01ad64e767f7f108f51d1ca6ee24"
+    },
+    "fixtures/inference/qwen3/vectors-msvc-logits.f32le.bin": {
+      "bytes": 24576,
+      "sha256": "46450fa2e98f84ba72b8655a7a9f230a0738fed0fa784413a6b826d05bae2648"
+    },
+    "fixtures/inference/qwen3/vectors-msvc-reference.json": {
+      "bytes": 13503,
+      "sha256": "744bb855ae30eb200c1fc7004dc4e4cc1c358dd784ee826a8f43ee18bfbee605"
+    },
+    "fixtures/inference/qwen3/vectors-provenance.json": {
+      "bytes": 167946,
+      "sha256": "c18921e35f5179a9d4003c666af35a3a14f33d4d22c31fdc0881aad43eefe86c"
+    },
+    "fixtures/inference/smollm2-q4-k-m-gnu-logits.f32le.bin": {
+      "bytes": 6684672,
+      "sha256": "34fab2f5e1b5b7359c66e225f4adf0a583da043e2ae20738f395d6695bead980"
+    },
+    "fixtures/inference/smollm2-q4-k-m-gnu-metadata.json": {
+      "bytes": 3801,
+      "sha256": "3af505411ccd98b2c9623517e98c94eec96f95f8f693a760d78599ef0dc3050c"
+    },
+    "fixtures/inference/smollm2-q4-k-m-gnu-provenance.json": {
+      "bytes": 3616,
+      "sha256": "810a57a8f67f653371190667dbead7baa63c610254e19d1ff088df70d089cf42"
+    },
+    "fixtures/inference/smollm2-q4-k-m-logits.f32le.bin": {
+      "bytes": 6684672,
+      "sha256": "62e6457578e3dd3c5f83f942ea24a4e47e66a82fd7336255393fa4d40f3104bc"
+    },
+    "fixtures/inference/smollm2-q4-k-m-metadata.json": {
+      "bytes": 3883,
+      "sha256": "cbab26cf03d54648ff49621b1a19dcb2d91d13ebcbcf7ebc54cd32116ffce1f6"
+    },
+    "fixtures/inference/smollm2-q4-k-m-provenance.json": {
+      "bytes": 3030,
+      "sha256": "254a835308e67c5a270bec63cc8de9c317c67b6ad1b1dfde777115bc7c0b4ea0"
+    },
+    "fixtures/inference/starcoder/pretrained-gnu-reference.json": {
+      "bytes": 16190,
+      "sha256": "9b946d390a7d58da43a684c9a18d6d58645bea001ab2d823b3bf688bc8d2ebfc"
+    },
+    "fixtures/inference/starcoder/pretrained-gnu-values.f32le.bin": {
+      "bytes": 12607488,
+      "sha256": "eb4c73e0179bb48738d4d388d38b83fdd954d3dcfcb1cdd0fedace12cb786067"
+    },
+    "fixtures/inference/starcoder/pretrained-msvc-reference.json": {
+      "bytes": 16192,
+      "sha256": "8bdbf953f2c45245f675a9b20d7d5d00c394d0e3dce8ad59418b92685eab72f4"
+    },
+    "fixtures/inference/starcoder/pretrained-msvc-values.f32le.bin": {
+      "bytes": 12607488,
+      "sha256": "b93e3ed4516f39080a1c4b587f9477c3d4b33da98913011da717f4ce88938cea"
+    },
+    "fixtures/inference/starcoder/pretrained-provenance.json": {
+      "bytes": 33851,
+      "sha256": "0744a67a62ac4f7667209371e327ccb3f6b00a8a012030aaab840e7742949ae2"
+    },
+    "fixtures/inference/starcoder/provenance.json": {
+      "bytes": 228537,
+      "sha256": "29eface756bc774c029418e34f6b525e845bde8b4d8c280a3647d81fbe77fc69"
+    },
+    "fixtures/inference/starcoder/tiny-gnu-reference.json": {
+      "bytes": 563511,
+      "sha256": "b283809d511f786648dfa16a98e848082b6a52821b79e65af417368c4788cc68"
+    },
+    "fixtures/inference/starcoder/tiny-gnu-values.f32le.bin": {
+      "bytes": 2560752,
+      "sha256": "17dfdaaa7e05f1979fa714f304a78d4caf023425b0040d251937e62daf9e3e9d"
+    },
+    "fixtures/inference/starcoder/tiny-inputs.bin": {
+      "bytes": 28920960,
+      "sha256": "10bcc436c2eeeec31a34c3e0699c21c0fa2ccee4a228128a6bddb87a4bff48c7"
+    },
+    "fixtures/inference/starcoder/tiny-models.json": {
+      "bytes": 48664,
+      "sha256": "4646c306e887e0dc2dd17e918c309fb719f0b982c993f437e40a9a751d3c7b4d"
+    },
+    "fixtures/inference/starcoder/tiny-msvc-reference.json": {
+      "bytes": 563593,
+      "sha256": "d0767f9c4ac12210aafb44d2d8eb84da627459bfd4f012afd6226c762d307092"
+    },
+    "fixtures/inference/starcoder/tiny-msvc-values.f32le.bin": {
+      "bytes": 2560752,
+      "sha256": "c2ca98a268161b10b6ce8260f6a4076e662f86c8209a8fd4c2c8fa54ac625d46"
+    },
+    "fixtures/inference/stories15m-q4-gnu-logits.f32le.bin": {
+      "bytes": 2560000,
+      "sha256": "579a521b36d682c9b26cac4d533b00beb4803e3bf5bfe2f86a29a07a4959fd21"
+    },
+    "fixtures/inference/stories15m-q4-gnu-metadata.json": {
+      "bytes": 2327,
+      "sha256": "a29492c445f68c953fe85d8cb89b9bd61b3f6799cbcd9d4e143ba1a9fb812205"
+    },
+    "fixtures/inference/stories15m-q4-gnu-provenance.json": {
+      "bytes": 3799,
+      "sha256": "f52592bb802fa98f3d42a7e17d469b84d8e6a81258bfae5b252108a147ac0724"
+    },
+    "fixtures/inference/stories15m-q4-logits.f32le.bin": {
+      "bytes": 2560000,
+      "sha256": "579a521b36d682c9b26cac4d533b00beb4803e3bf5bfe2f86a29a07a4959fd21"
+    },
+    "fixtures/inference/stories15m-q4-metadata.json": {
+      "bytes": 2653,
+      "sha256": "7bd62e668b172827d4e5f270576698e3a67707e10096586edcfd352d2e2cac99"
+    },
+    "fixtures/inference/stories15m-q4-provenance.json": {
+      "bytes": 3024,
+      "sha256": "155d10afad4f535f47467d03b343c25fa2d4d54582b11f842442fd8500885dfe"
+    },
+    "fixtures/inference/stories260k-gnu-provenance.json": {
+      "bytes": 752,
+      "sha256": "ca6c592f9cb81cdfae01a5d0b48b02c29734a77415b559ead346b09d8c345bf4"
+    },
+    "fixtures/inference/stories260k-gnu-reference.json": {
+      "bytes": 1216369,
+      "sha256": "7257424f731065eb8bd664b4dc1ca9d545b212cb1271fee5b47fc00708609015"
+    },
+    "fixtures/inference/stories260k-reference.json": {
+      "bytes": 1216459,
+      "sha256": "3d3ea303bfdcd99f9987e1dee026fb715635ebad00ce7f564ec2f88777dd4711"
+    },
+    "fixtures/inference/stories260k-requests.json": {
+      "bytes": 810,
+      "sha256": "22c9c24b7e5c3e0023b645c32709b6ada32cd85e137f88045a396dde24d06030"
+    },
+    "fixtures/inference/tiny-bert-missing-pooling.gguf": {
+      "bytes": 6832,
+      "sha256": "1eeff594b8c9248833dafcdee68f7fbbe4d614261f7ff0f42258b40811b974f3"
+    },
+    "fixtures/inference/tiny-mamba-default-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "0f34c8bf70fa0bc8328a2364d8deb5067e8e0808c6bc438518e6539d26b588cb"
+    },
+    "fixtures/inference/tiny-mamba-default-gnu-metadata.json": {
+      "bytes": 2707,
+      "sha256": "c42663f9eea3221a9f8c7772300e5f2b8697d517d76a5834fba3a0c79642c5d7"
+    },
+    "fixtures/inference/tiny-mamba-default-gnu-provenance.json": {
+      "bytes": 1643,
+      "sha256": "728c8b2e3032ab83a44a57a44bc6e9d912f0221c67cb027baa0a557c13143bc2"
+    },
+    "fixtures/inference/tiny-mamba-default-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "0f34c8bf70fa0bc8328a2364d8deb5067e8e0808c6bc438518e6539d26b588cb"
+    },
+    "fixtures/inference/tiny-mamba-default-metadata.json": {
+      "bytes": 2567,
+      "sha256": "fc9a21785c2c443b67713bb933392e421414578c2955a37139d33e4583cdc520"
+    },
+    "fixtures/inference/tiny-mamba-default-provenance.json": {
+      "bytes": 2223,
+      "sha256": "149fc6e8ec001c8754e0e7f505bc68aaee8e361cda6b8a4e48d16d9fe99057a4"
+    },
+    "fixtures/inference/tiny-mamba-default.gguf": {
+      "bytes": 23008,
+      "sha256": "50ec6a3787b9311f9a25b801180003b122009d442e72921d86a78532666aa003"
+    },
+    "fixtures/inference/tiny-mamba-rms-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "37d640fdf268c9ecdae5e77e699f7f467f394da5d5f936fd10a9d2ccd9918ef9"
+    },
+    "fixtures/inference/tiny-mamba-rms-gnu-metadata.json": {
+      "bytes": 2707,
+      "sha256": "ec9199623d56503f278dd3c6cfcac9307f0521cb5b7f899214695c56a09683b4"
+    },
+    "fixtures/inference/tiny-mamba-rms-gnu-provenance.json": {
+      "bytes": 1639,
+      "sha256": "b6ffce84720547c8f0f720bc20e5720d529d2b63d0b02f5e10a417f98184456f"
+    },
+    "fixtures/inference/tiny-mamba-rms-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "6602807c99077508c545c185924694e6a045f50e15043473af0a945e0be209e5"
+    },
+    "fixtures/inference/tiny-mamba-rms-metadata.json": {
+      "bytes": 2567,
+      "sha256": "fc9a21785c2c443b67713bb933392e421414578c2955a37139d33e4583cdc520"
+    },
+    "fixtures/inference/tiny-mamba-rms-provenance.json": {
+      "bytes": 2222,
+      "sha256": "0118b8e69161c04c12e8d9f22e976479eddd314fbfaf6f52e2a5811cbeab42a8"
+    },
+    "fixtures/inference/tiny-mamba-rms.gguf": {
+      "bytes": 23040,
+      "sha256": "29bb3f8ed8e05c80676bb64a5d09d19a7ed8592240c494e3126cdaa3aacdfb85"
+    },
+    "fixtures/inference/tiny-mamba-untied-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "c01a67348101f46c723bf21e16e144a8b5bcc042cd2c7020d44f2348aa6c8445"
+    },
+    "fixtures/inference/tiny-mamba-untied-gnu-metadata.json": {
+      "bytes": 2707,
+      "sha256": "49d4523c325424d5cf9105108dc3c9c30d14a7b1115d7a35bbc8068695ced007"
+    },
+    "fixtures/inference/tiny-mamba-untied-gnu-provenance.json": {
+      "bytes": 1642,
+      "sha256": "44251d87c72aae4897087a9be0ff568020fe7582cb55cec803209857e1a5a7ba"
+    },
+    "fixtures/inference/tiny-mamba-untied-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "fa3de6cd4943ede26829edbb8aa87831b25519c36cd80be4480c8ec97d29c4b1"
+    },
+    "fixtures/inference/tiny-mamba-untied-metadata.json": {
+      "bytes": 2567,
+      "sha256": "53a89314effd547420dfa4d0e1fd88bca3812d409f129bb1e1027c9aa83da472"
+    },
+    "fixtures/inference/tiny-mamba-untied-provenance.json": {
+      "bytes": 2222,
+      "sha256": "d63eb7cf62d0298967b6ad3b6e606613e7b3196428c49f626015788320916d34"
+    },
+    "fixtures/inference/tiny-mamba-untied.gguf": {
+      "bytes": 31296,
+      "sha256": "e0dabebc8a3e44e5bda8fcc4e204034a0d9c302f7fd02a95ecf4fab0dce5b24f"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "d84d66700c57b0a72e839a0c9fbcff8e9054080444cb662ee4dfbb064f484015"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "0f8730fd0f0ede13ec0d47334a642108b50dfd5312f581b535820ab27d33b136"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-gnu-provenance.json": {
+      "bytes": 20292,
+      "sha256": "23431a351ce32c9c5098cfe2e7ab93100af162b11f5ea301b09054d3b94e9316"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a99a0237a52c031ce7d9988509680c0d482ec92764ebd45a8ca430b56ecb6f9"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-metadata.json": {
+      "bytes": 2481,
+      "sha256": "092d295a68a762ad4754b9d09170709b728945d3b1d68bfbab0d4a41e7baf2a0"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias-provenance.json": {
+      "bytes": 2199,
+      "sha256": "078badedc69abd7c0e03cbffe45409f1abe9a92c82b8c1f954e79da3994495d8"
+    },
+    "fixtures/inference/tiny-qwen2-fused-bias.gguf": {
+      "bytes": 32992,
+      "sha256": "b9ee4bfdd5975a4acdeea484e9313a76ee51c1b673dd91c06d744c29ae83d572"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-gnu-provenance.json": {
+      "bytes": 20295,
+      "sha256": "c7877bb8f9225c558921b03de3b87bc2466365250e149a9754c4ab1935edbb82"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias-provenance.json": {
+      "bytes": 2202,
+      "sha256": "47a4354762a304b5423661921b0fd46a131ef7a70ad06c7b31f1f3beb938bbae"
+    },
+    "fixtures/inference/tiny-qwen2-fused-no-bias.gguf": {
+      "bytes": 32768,
+      "sha256": "1f0c389081ab453dfc3029898957a8d8a6574bb3374be1990a47485e0cd0c212"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-gnu-provenance.json": {
+      "bytes": 20297,
+      "sha256": "75f3ea8c6801945266b46a8d2d21903e5d56a6591396254331b091bf300e6e40"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k-provenance.json": {
+      "bytes": 2204,
+      "sha256": "0fc326b20c7854c0e646ca96854c031a191ab2cdc507d05025cb7b1049551358"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-k.gguf": {
+      "bytes": 32928,
+      "sha256": "d2114ca3f712e713135632d3c64e8250b4b5f2e79f5413142667f0299c178c4e"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-gnu-provenance.json": {
+      "bytes": 20298,
+      "sha256": "ad86b7103986fbc7cefef0e0e2a9526cf4356fc5f01a6e60d41807e75d34fda9"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv-provenance.json": {
+      "bytes": 2205,
+      "sha256": "482d801f801cbc4ff0c8ef4299b78c5f82643e5da548a603d0dba4120f997747"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-kv.gguf": {
+      "bytes": 33088,
+      "sha256": "67b238898000d1529f281f46a5ca191f58fd55a5ea713ba545c0706fa2c91ee0"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-gnu-provenance.json": {
+      "bytes": 20297,
+      "sha256": "1516402b0a0346bc49c1320841e9aae41c3e887e0ed69ba8df390a8f1eb718e1"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q-provenance.json": {
+      "bytes": 2204,
+      "sha256": "10b7965c393e6306c77451d63b3b9a10e394e73ba3486ec2b8af027e294e8639"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-q.gguf": {
+      "bytes": 32928,
+      "sha256": "58dbcbd4edb6c27cbdda671b6b5e7fb0433bccfa01e1690145b348cb9895c464"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-gnu-provenance.json": {
+      "bytes": 20298,
+      "sha256": "d5e0cc711927996882c4c1a21bd7b435f19874d295cc1ad4d82e89e5295c0eeb"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk-provenance.json": {
+      "bytes": 2205,
+      "sha256": "79f2510f1257bdc54dac3cff0b17dd37665c2232843823f25638b2074f9db59c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qk.gguf": {
+      "bytes": 33088,
+      "sha256": "e4d194774cf86d15466dc6bb8f868cc0fdbcad06b9dd2a719ce84b51976b23a4"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-gnu-provenance.json": {
+      "bytes": 20298,
+      "sha256": "30bf35e4bd9d07b934772583ab90ef695dae2b113880e54cab7ab950fa5bad8f"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv-provenance.json": {
+      "bytes": 2205,
+      "sha256": "3cd0767a87510cd82ec755de1aae2f51dd1637e92e9ddbbf0875dd6f5a0428ef"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-qv.gguf": {
+      "bytes": 33088,
+      "sha256": "4b1e812c0c19fbcde674ef17ab4f9cb49a740475189693a2f9f61f9b46e10008"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-gnu-provenance.json": {
+      "bytes": 20297,
+      "sha256": "f1fc88145e9b0d7fd52279a46639c59c67aff6b107985f7c3bb3c256c782b708"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v-provenance.json": {
+      "bytes": 2204,
+      "sha256": "684c94f4949010b315deae0e914fffa78c6bffc70e6e6d78b79a7c873041737a"
+    },
+    "fixtures/inference/tiny-qwen2-fused-partial-v.gguf": {
+      "bytes": 32928,
+      "sha256": "45fa8f9701971f670a888d85559ad501257c576ca8096d4d79b263d7fd978c3f"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "682b59f2892ca1e93c1912e7ed8e60333b25cdab352bb8b3fc88b290e2b1074b"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-gnu-metadata.json": {
+      "bytes": 2681,
+      "sha256": "375d06032612833e8808e18fa88a64a03081f458eb373f6dcd176e8f5acad552"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-gnu-provenance.json": {
+      "bytes": 20290,
+      "sha256": "d34d5c6d053ea2a6aca7e006c0edc8773311e93dc8ced9f930a6983da5ba7749"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "682b59f2892ca1e93c1912e7ed8e60333b25cdab352bb8b3fc88b290e2b1074b"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-metadata.json": {
+      "bytes": 2541,
+      "sha256": "379272934eae4109190464262d5a83dc2769d446cf8d168794547366b0724070"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4-provenance.json": {
+      "bytes": 2197,
+      "sha256": "4b2c0f3f23e8951404bea883a096a4878a7e7810beac3ae695b9fa512e7e4982"
+    },
+    "fixtures/inference/tiny-qwen2-fused-q4.gguf": {
+      "bytes": 44576,
+      "sha256": "45cdda6eaad3427e2a34f13f77319dae9585347a70f8e93fd8b54c4f217a76bc"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "d84d66700c57b0a72e839a0c9fbcff8e9054080444cb662ee4dfbb064f484015"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "0f8730fd0f0ede13ec0d47334a642108b50dfd5312f581b535820ab27d33b136"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-gnu-provenance.json": {
+      "bytes": 20301,
+      "sha256": "ad82fa5354e1997dca1e89d7035a79a274cc2a77500fe4d69b60566263590ea3"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a99a0237a52c031ce7d9988509680c0d482ec92764ebd45a8ca430b56ecb6f9"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-metadata.json": {
+      "bytes": 2481,
+      "sha256": "092d295a68a762ad4754b9d09170709b728945d3b1d68bfbab0d4a41e7baf2a0"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias-provenance.json": {
+      "bytes": 2208,
+      "sha256": "b04ab22014a85f25b8ac97c4c6d81fb425f07f654efe919fc4f781b11536c7f2"
+    },
+    "fixtures/inference/tiny-qwen2-fused-separate-bias.gguf": {
+      "bytes": 33248,
+      "sha256": "e983af0b7576ea6fd55a7c84c2a796d3099c0fb17d3bf7524b884eb9086167f8"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a32c9c4aee0feb35e1f7c2387ad51bd1cd844072603feeece11d4d66ba9010a"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "9eb2dbf91802b8393184f876b860367b2719c98e71fc2c8f1a0617d72e0c379c"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-gnu-provenance.json": {
+      "bytes": 20289,
+      "sha256": "676c842b97ca31e957805326c5145918c6d517082cf6497d960cf35bca7c698c"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2af0b0a115e92e476d3b847e63e5ba6c7eab2ccf1b09fed80e5f66fca02660f7"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias-provenance.json": {
+      "bytes": 2196,
+      "sha256": "24b80ecf267f4b37cb86305277eebc7d49658e1e284d4ae2d3df28b0e5a191bb"
+    },
+    "fixtures/inference/tiny-qwen2-no-bias.gguf": {
+      "bytes": 32992,
+      "sha256": "95bcd31def9db2542498c500253690b8bea09e69c89328a92be419de7ffc9d45"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "4bba80f3a2f6668b215b43bfa31df0bd9d1503213eea9131ce758e6e5df55844"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "23a9d75aaa0f488ba33e792f83e59fe611915c2d64eea5e4a3b090b5c524e862"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-gnu-provenance.json": {
+      "bytes": 20293,
+      "sha256": "cf5e2470c346beaf5fdb1703491e4cce368c6a1a709db89061f859a10473e9a1"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "a97a9d4db74823cd25045ea4ad705d0ffde1002f64d3c106b473693623886967"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-metadata.json": {
+      "bytes": 2485,
+      "sha256": "82221821af00746ea6d7026b73ccd9f4b64577ff0adb0a3c8eaabc46085d28ba"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias-provenance.json": {
+      "bytes": 2200,
+      "sha256": "16f9da8fae91db53bbcfae8bba0c8b5896804230b9658c7e4914ca0f78865e53"
+    },
+    "fixtures/inference/tiny-qwen2-output-bias.gguf": {
+      "bytes": 35584,
+      "sha256": "f473595fc9dcd8c7c3d2a89f14ff0e1810f441429cf3880fa54d7738274ccda7"
+    },
+    "fixtures/inference/tiny-qwen2-separate-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "d84d66700c57b0a72e839a0c9fbcff8e9054080444cb662ee4dfbb064f484015"
+    },
+    "fixtures/inference/tiny-qwen2-separate-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "0f8730fd0f0ede13ec0d47334a642108b50dfd5312f581b535820ab27d33b136"
+    },
+    "fixtures/inference/tiny-qwen2-separate-gnu-provenance.json": {
+      "bytes": 20290,
+      "sha256": "eda43a42d526cb7c466d6c8d4f62a98ddc34320d830055a9c7ea4f633787d19a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "2a99a0237a52c031ce7d9988509680c0d482ec92764ebd45a8ca430b56ecb6f9"
+    },
+    "fixtures/inference/tiny-qwen2-separate-metadata.json": {
+      "bytes": 2481,
+      "sha256": "092d295a68a762ad4754b9d09170709b728945d3b1d68bfbab0d4a41e7baf2a0"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "9a14a2597ca4a1563dc5aa9650ef01d5986e0d23f78cb40389f147c332bd32d0"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "d87edaf9423dc7cf1dcdbc8ea5b396ffff80cbd6df0b1cf4a5561764439665ea"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-gnu-provenance.json": {
+      "bytes": 20300,
+      "sha256": "93ea1478996e2bbdbddc426094d13dde76c54fbe50abe422393217d0f7c50884"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "0628efbbbc016cd9dd13859d1bc4eb94b2a89823cf7bd0facce434f94f045598"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k-provenance.json": {
+      "bytes": 2207,
+      "sha256": "c8c9a9449bcd7ffbf2157f3d461a8b22ab2a2c78cb41df967af62808b9301e56"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-k.gguf": {
+      "bytes": 33184,
+      "sha256": "c25f0ecb72e01b9530ed9f18d69df5299c228f3cd014084c360f406a001ce191"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "7ae4cd820f507698609139b894a347a1a25a6d53b1f26a56dc42b8ff0a6c716d"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "1abc4a81dab409adbeda51f0e1f8b15cfed61fc40e9eec03fe092c06fd7b2a7b"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-gnu-provenance.json": {
+      "bytes": 20301,
+      "sha256": "24bffb481c28c41e2a36fae45117bf740add2815ac55dc11c341e8754bfada25"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "481ae86553f9ec9b572c754bf71a91e960c40abbe1f8a922516ff3bdb358b2d7"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-metadata.json": {
+      "bytes": 2481,
+      "sha256": "247522218bcc291e21e134e9204819dca31c6c1992bd4cf37411e8b9f1405d33"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv-provenance.json": {
+      "bytes": 2208,
+      "sha256": "c5bcd643316b6799c8b3da7b049e352c7b4e87a7c1c1b5713ac50dd4cb59a01a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-kv.gguf": {
+      "bytes": 33344,
+      "sha256": "45369b1631d9dc2c3e5c9d1409e287f05a80dbfedee492907aa2e7e56ba6be5b"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "4a36be6ddbbb6b170e4b87443f9553f8c5bd95a9bd18ec0d865027ebaeae4ac8"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "6f02ae8449232c0bf5fd54ec33c09e6197ed186bf355fa1fa1d5261e37e8d1cb"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-gnu-provenance.json": {
+      "bytes": 20300,
+      "sha256": "dff2b1de380654b8e124f006242d956e9247574135ef89d5ad052640281b2581"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "5821ddc450ce416834eb5ef2af4c41ba97972fa0eebc9d84f9fde3c45d303b48"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q-provenance.json": {
+      "bytes": 2207,
+      "sha256": "1f2df8ef71c429756990c98fdd400985e6eccc85c1e3bd0712b1985eaad08f5a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-q.gguf": {
+      "bytes": 33184,
+      "sha256": "a802cef6ad95ce5c29a6650ecbef45135be2bc0b54625292bc407990d7765ee5"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "0e0c00ee05871938592f4b003bcd67312c5c759ccb23659f645ef21682d1e1c8"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-gnu-metadata.json": {
+      "bytes": 2625,
+      "sha256": "1c7e6dfd3835ad1d90f824f0c54cf95b11134fb8295d2719dff7a501f5005840"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-gnu-provenance.json": {
+      "bytes": 20301,
+      "sha256": "4f729e8e02fa58318177bad9c53ee13350505605c8d953a86854405e87f963ed"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "c4f15c3b336282de7ae3fa260238ed4268c0c29a30af9af7cd9b9d938d6e73bc"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-metadata.json": {
+      "bytes": 2485,
+      "sha256": "c2bb0d7276c8b5e63437b7dae31aba2ab0e61e97b49d7c8cdcfe398601abbb8a"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk-provenance.json": {
+      "bytes": 2208,
+      "sha256": "37e21ab4c7c734e7575cb20a855c9524f940be3d97b10dd1c2afcf256b155305"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qk.gguf": {
+      "bytes": 33344,
+      "sha256": "61ba0279c0924d380baa26dc8abf707a8e8eb7f73e51158bfc4ae6c2ac3eb538"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "02a8364ade77b3ad515d46037f54c38057665fad4c950d26a6852c4d601d4ee0"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "b59cbe82bc820652d7e3cf5a91ef30d80c956475f2e537c912078a549dbd3a28"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-gnu-provenance.json": {
+      "bytes": 20301,
+      "sha256": "f5690cc224ac73fa39ebf5187eb51d600b34936cb42789ffe189f3c6529d815c"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "5a244e40577e22d2a073958f42af585316b156cbd39de82e4d1053f58b8b6a71"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-metadata.json": {
+      "bytes": 2481,
+      "sha256": "092d295a68a762ad4754b9d09170709b728945d3b1d68bfbab0d4a41e7baf2a0"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv-provenance.json": {
+      "bytes": 2208,
+      "sha256": "54aa9d47883f7d95e0d4e2986812f09906fbb03b294794c56af3287c48e67b7b"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-qv.gguf": {
+      "bytes": 33344,
+      "sha256": "783bdef7b6630b02abe5191434c92fce502389e47502ad9c66ae086bd49c1205"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-gnu-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "fb527f99fb999eb029abec6d0b47ee91353ece175af6d06ed3e92b3afe5c17e5"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-gnu-metadata.json": {
+      "bytes": 2621,
+      "sha256": "ee3e5875ff5023b434c5968d7b1623610fa07613aec555b3c63954b8b8e33524"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-gnu-provenance.json": {
+      "bytes": 20300,
+      "sha256": "1cb657c1f1c1b252fe5f4b58aa0c8b299a2a710808d243565494a81b7e9cb0c2"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-logits.f32le.bin": {
+      "bytes": 30720,
+      "sha256": "ef1b00a222c655ea5846916841feb9a2dfc027d422b3469a4f54d8a8427da00d"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-metadata.json": {
+      "bytes": 2481,
+      "sha256": "247522218bcc291e21e134e9204819dca31c6c1992bd4cf37411e8b9f1405d33"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v-provenance.json": {
+      "bytes": 2207,
+      "sha256": "d3de83b4bc0aa1805f01e3f58164cb004f666965a80d4d0769f9d0b944fdb86e"
+    },
+    "fixtures/inference/tiny-qwen2-separate-partial-v.gguf": {
+      "bytes": 33184,
+      "sha256": "c01a7178aa883ede5c016f50f2a30a53c3e9e456f5edc28166948f9d682e8700"
+    },
+    "fixtures/inference/tiny-qwen2-separate-provenance.json": {
+      "bytes": 2197,
+      "sha256": "0dd091c0ca131eb0fc87245b3bf8a23b1d5d69c49f8eee1c2dbedd82ab547ee9"
+    },
+    "fixtures/inference/tiny-qwen2-separate.gguf": {
+      "bytes": 33472,
+      "sha256": "8ab2b140510fdb657b1c166b74148f153c6ebc943c52766ab82903104057d28f"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "13574e9b8dd22b292f28ef55944354cca2eac16f65b7947b738c0e8ffe06ee0d"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-gnu-metadata.json": {
+      "bytes": 2699,
+      "sha256": "a31ad82c860a74379a9a1e58673558f08ee75b9d96b484e02c70c7adc74a9f6c"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-gnu-provenance.json": {
+      "bytes": 20300,
+      "sha256": "77886835b16112644860dbdbeaf15dc7c4ddf7fa50306670019b17b57f8460e2"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "88bb25234162f7c64b46ac8e1f76e947c2fc3042494b01d6d46432dab404f366"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-metadata.json": {
+      "bytes": 2559,
+      "sha256": "3814361ca97cf3a36b6a51b236f43303386c14bb8ebacd32b5fcfc7e67c15d9b"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias-provenance.json": {
+      "bytes": 2207,
+      "sha256": "c17fc28de0a249060f7277f7f99deb381a61d10555ca3fd0f1ea96dd400ca6ba"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-bias.gguf": {
+      "bytes": 52032,
+      "sha256": "27536ee416bac393c9be51cdc90cecc7dc381a2f4453c1bcce22ef057963e92e"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-gnu-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "b96446496c1c1d24ef33438e0fdccea27726ac3d7584770a445648a17fdd63d9"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-gnu-metadata.json": {
+      "bytes": 2695,
+      "sha256": "838b2e788ca6541383db5a4624d741114308c50b9511b6f869c904731f1885fd"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-gnu-provenance.json": {
+      "bytes": 20295,
+      "sha256": "5bd8243103dd0b539f95a73708bdb0e6a5a5098d8f62e11602ab23cfc8a42539"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-logits.f32le.bin": {
+      "bytes": 36864,
+      "sha256": "f4ff293121ab5c1c3b927e3b95e820fc9d1386511364efab0b9e6dd05e59b6ea"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-metadata.json": {
+      "bytes": 2555,
+      "sha256": "20ee0a4487f672d869800cbf562a8a0d20184e5812ee148b5e9b7379a031dad1"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output-provenance.json": {
+      "bytes": 2202,
+      "sha256": "a5be5666221470c239f10d5b267776a850975f3f8bf5e7e75d514ff1e73501d0"
+    },
+    "fixtures/inference/tiny-qwen2-untied-output.gguf": {
+      "bytes": 49920,
+      "sha256": "d6603fcc029d40af24e0be477e94d3e60a96e5fa3da86ba8a78376fb5e342f28"
+    },
+    "rust-toolchain.toml": {
+      "bytes": 90,
+      "sha256": "d8c420f9c9a2fc00c09cf07b7bb570c92a09137ef1559cb9ef5b12c76f7557cc"
+    }
+  },
+  "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+  "unchanged_execution_inputs": true,
+  "finished_utc": "2026-11-14T14:27:53.420727+00:00"
+}

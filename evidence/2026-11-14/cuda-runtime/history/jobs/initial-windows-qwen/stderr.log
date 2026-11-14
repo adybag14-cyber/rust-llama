@@ -1,0 +1,13 @@
+   Compiling llama-cuda-runtime v0.1.0 (C:\Users\adyba\rust-llama\crates\cuda-runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.04s
+     Running tests\qwen.rs (target\debug\deps\qwen-6e2fc2a77b79368d.exe)
+
+thread 'cuda_pretrained_qwen3_q8_matches_original' (50492) panicked at crates\cuda-runtime\tests\qwen.rs:48:17:
+Qwen3-0.6B Q8_0 row 1 col 0: 8.232907 vs 8.354881, error=1.2197399139404297e-1, budget=3.6709762573242186e-4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'cuda_qwen2_fused_biases_outputs_and_transactions_match_original' (48824) panicked at crates\cuda-runtime\tests\qwen.rs:15:75:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "The system cannot find the file specified." }
+CUDA Qwen3 tiny and vector-storage: models=38 original_values=251904 bitwise_equal=49461 exact_greedy_ids=340 maximum_absolute=5.662441253662109e-7
+CUDA Qwen3: 6 Q4_K cases explicitly rejected before device execution
+error: test failed, to rerun pass `-p llama-cuda-runtime --test qwen`

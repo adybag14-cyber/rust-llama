@@ -11,8 +11,9 @@ The Rust library implements ten frozen adapter exports:
 
 These functions load owned weights and change actual dense Llama CPU execution.
 The implementation does not link, load or call the reference library.
-`llama_adapter_lora_init_from_file_ptr` remains unexported. This package does not
-add a backend scheduler, native context performance counters or warmup exports.
+FILE_POINTER.md extends loading with `llama_adapter_lora_init_from_file_ptr`.
+CONTEXT_PERFORMANCE.md independently covers context counters and warmup.
+Backend scheduling remains a separate requirement.
 
 ## Source and admitted behavior
 

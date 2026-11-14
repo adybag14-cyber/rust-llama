@@ -7,6 +7,8 @@ use std::collections::BTreeMap;
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::sync::{Arc, Mutex, OnceLock};
 
+pub(crate) mod backend;
+
 const CHAIN: usize = 0;
 const EMPTY: usize = 1;
 const BIAS: usize = 15;
@@ -31,6 +33,7 @@ enum State {
     Chain(Chain),
 }
 struct Chain {
+    backend_prefix: Option<usize>,
     children: Vec<*mut LlamaSampler>,
     no_perf: bool,
     t_sample_us: i64,
@@ -39,6 +42,7 @@ struct Chain {
 impl Chain {
     fn new(no_perf: bool) -> Self {
         Self {
+            backend_prefix: None,
             children: Vec::new(),
             no_perf,
             t_sample_us: 0,
@@ -94,6 +98,7 @@ const INTERFACE: LlamaSamplerI = LlamaSamplerI {
 static INTERFACES: [LlamaSamplerI; 20] = [INTERFACE; 20];
 #[derive(Default)]
 struct Entry {
+    attachments: usize,
     owner: Option<usize>,
 }
 fn registry() -> &'static Mutex<BTreeMap<usize, Entry>> {
@@ -309,7 +314,12 @@ unsafe fn apply_builtin(sampler: *mut LlamaSampler, array: *mut LlamaTokenDataAr
     }
     if let State::Chain(chain) = s {
         let started = (!chain.no_perf).then(crate::monotonic_time_us);
-        let children = chain.children.clone();
+        let children = chain
+            .children
+            .iter()
+            .skip(chain.backend_prefix.unwrap_or(0))
+            .copied()
+            .collect::<Vec<_>>();
         let result = children.into_iter().try_for_each(|child| {
             // The frozen chain skips custom backend-only stages with no CPU apply.
             let h = unsafe { handle(child)? };
@@ -527,6 +537,9 @@ unsafe fn free_impl(sampler: *mut LlamaSampler, owned: bool) -> Result<()> {
         let entry = r
             .get(&(sampler as usize))
             .ok_or("sampler was already freed or is foreign")?;
+        if entry.attachments != 0 {
+            return Err("sampler is attached to a live context; detach it before freeing".into());
+        }
         if entry.owner.is_some() && !owned {
             return Err("sampler is owned by a chain; remove it before freeing".into());
         }
@@ -601,6 +614,9 @@ unsafe fn height(sampler: *const LlamaSampler, depth: usize) -> Result<usize> {
     }
 }
 unsafe fn chain_add_impl(chain: *mut LlamaSampler, sampler: *mut LlamaSampler) -> Result<()> {
+    if unsafe { chain_state(chain)? }.backend_prefix.is_some() {
+        return Err("initialized backend sampler topology is immutable; clone a new chain".into());
+    }
     unsafe {
         handle(sampler)?;
     }
@@ -641,6 +657,7 @@ unsafe fn chain_add_impl(chain: *mut LlamaSampler, sampler: *mut LlamaSampler) -
 }
 fn clone_builtin(value: &Builtin) -> Result<Box<Builtin>> {
     let mut result = value.clone();
+    result.name = CString::new(value.sampler.name()).map_err(|_| "invalid sampler name")?;
     result.sampler = value.sampler.clone_native().map_err(|e| e.to_string())?;
     if value.requested_seed == Some(u32::MAX) {
         match value.sampler.config() {
@@ -798,7 +815,13 @@ unsafe fn copy_impl(source: *const LlamaSampler, target: *mut LlamaSampler) -> R
     }
     if native_index(src.iface).is_some() {
         let replacement = match unsafe { state(source)? } {
-            State::Builtin(value) => State::Builtin(clone_builtin(value)?),
+            State::Builtin(value) => {
+                let mut copied = clone_builtin(value)?;
+                if let State::Builtin(existing) = unsafe { state(target)? } {
+                    copied.name = existing.name.clone();
+                }
+                State::Builtin(copied)
+            }
             State::Bias(value) => State::Bias(value.clone()),
             State::Dry(value) => State::Dry(value.clone()),
             State::Infill(value) => State::Infill(value.clone()),
@@ -1007,6 +1030,11 @@ ffi!(
     llama_sampler_chain_remove(chain: *mut LlamaSampler, index: i32) -> *mut LlamaSampler,
     ptr::null_mut(),
     {
+        if unsafe { chain_state(chain)? }.backend_prefix.is_some() {
+            return Err(
+                "initialized backend sampler topology is immutable; clone a new chain".into(),
+            );
+        }
         let children = unsafe { chain_children(chain)? };
         let Some(index) = usize::try_from(index).ok().filter(|i| *i < children.len()) else {
             return Ok(ptr::null_mut());
@@ -1033,16 +1061,13 @@ ffi!(
     ) -> i32,
     -1,
     {
-        let values = unsafe { context::sampling_values(context, index)? };
-        let mut values: Vec<_> = values
-            .iter()
-            .enumerate()
-            .map(|(i, &v)| LlamaTokenData {
-                id: i as i32,
-                logit: v,
-                p: 0.0,
-            })
-            .collect();
+        let (sampled, mut values) = unsafe { context::sampling::candidates(context, index)? };
+        if let Some(token) = sampled {
+            unsafe {
+                accept_impl(sampler, token)?;
+            }
+            return Ok(token);
+        }
         let mut array = LlamaTokenDataArray {
             data: values.as_mut_ptr(),
             size: values.len(),

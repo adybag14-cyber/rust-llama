@@ -95,7 +95,10 @@ fn models() -> Vec<Arc<Model>> {
         Arc::new(Model::Qwen2(qwen)),
         Arc::new(Model::Qwen3(qwen3)),
         Arc::new(Model::Gpt2(fixtures::tiny_gpt2().unwrap())),
+        Arc::new(Model::Starcoder(fixtures::tiny_starcoder().unwrap())),
+        Arc::new(Model::Starcoder2(fixtures::tiny_starcoder2().unwrap())),
         Arc::new(Model::Bloom(fixtures::tiny_bloom().unwrap())),
+        Arc::new(Model::Falcon(fixtures::tiny_falcon().unwrap())),
         Arc::new(Model::GptNeoX(fixtures::tiny_gptneox().unwrap())),
     ]
 }

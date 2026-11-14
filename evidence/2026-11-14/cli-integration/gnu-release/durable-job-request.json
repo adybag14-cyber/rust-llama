@@ -1,0 +1,21 @@
+{
+  "id": "job-op-e81463fc9c325e58706a8f04c14bcf0a083b0019ef8ea107a5218ac48f759e95",
+  "mode": "program",
+  "program": "python",
+  "args": [
+    "-c",
+    "import hashlib,subprocess,sys\nfrom pathlib import Path\ndriver=Path(r\"C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\validate-cli-v2.py\")\nassert hashlib.sha256(driver.read_bytes()).hexdigest()==\"eaf4491d101a864d69aed243f8fa4a91cde902ad56189d944359b41984c4ffad\"\nsys.exit(subprocess.run([\"wsl.exe\",\"--distribution\",\"Ubuntu\",\"--cd\",\"/mnt/c/Users/adyba/rust-llama\",\"--exec\",\"/usr/bin/python3\",\"/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/cuda/validate-cli-v2.py\"]).returncode)\n"
+  ],
+  "workingDir": "C:\\Users\\adyba\\rust-llama",
+  "timeoutMs": 3600000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-14T15:25:02.840Z",
+  "agent": {
+    "taskId": "rust-llama-cli-integration-20261114",
+    "operationId": "gnu-cli-v2-replay",
+    "label": "Replay 15 GNU release CLI continuation commands"
+  }
+}

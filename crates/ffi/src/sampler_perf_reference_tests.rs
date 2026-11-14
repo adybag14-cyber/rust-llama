@@ -125,6 +125,7 @@ impl Drop for RestoreLogger {
 
 #[test]
 fn original_sampler_performance_and_logger_observations() {
+    let _logger_guard = crate::logging::TEST_LOGGER_LOCK.lock().unwrap();
     let inputs: Value = json::parse(include_str!(
         "../../../fixtures/ffi/sampler-perf/inputs.json"
     ))

@@ -25,3 +25,8 @@ License SHA-256: 1fc6b6db121d4555d8f661937d7f6013693cd8fd67495d5e5d98c1d18fb83ed
 
 No C++ runtime implementation or original llama/ggml object is linked by these
 Rust helpers. The independent native harness is used only for verification.
+
+The GNU/Linux sampling/gnu_order.rs policy is independently expressed Rust,
+shared in algorithm with tensor/src/native_sort.rs and verified against original
+GNU 11.4.0 sampler outputs. No GNU header or library implementation is copied or
+linked. The package license expression is unchanged.

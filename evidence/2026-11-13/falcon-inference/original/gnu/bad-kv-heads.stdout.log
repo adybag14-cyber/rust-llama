@@ -1,0 +1,19 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007066038ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#0  0x00007066038ea3ef in wait4 () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x0000706603e806cb in ggml_print_backtrace () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libggml-base.so.0
+#2  0x0000706603e80862 in ggml_abort () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libggml-base.so.0
+#3  0x0000706603e86e89 in ggml_mul_mat () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libggml-base.so.0
+#4  0x0000706604226831 in llm_graph_context::build_attn_mha(ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, long, float, int) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#5  0x000070660422a7a7 in llm_graph_context::build_attn(llm_graph_input_attn_kv*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, ggml_tensor*, float, int) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#6  0x000070660416b0a5 in llama_model_falcon::graph::graph(llm_graph_params const&) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#7  0x000070660416b387 in llama_model_falcon::build_arch_graph(llm_graph_params const&) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#8  0x00007066042ca251 in llama_model::build_graph(llm_graph_params const&) const () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#9  0x00007066041e3aff in llama_context::graph_reserve(unsigned int, unsigned int, unsigned int, llama_memory_context_i const*, bool, unsigned long*) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#10 0x00007066041e5958 in llama_context::resolve_fused_ops(llama_memory_context_i const*, unsigned int) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#11 0x00007066041e6ae9 in llama_context::sched_reserve() () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#12 0x00007066041e838a in llama_context::llama_context(llama_model const&, llama_context_params) () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#13 0x00007066041e93f7 in llama_init_from_model () from /mnt/c/Users/adyba/rust-llama-reference/continue-20261113/falcon-oracle/native-libs-gnu/libllama.so.0
+#14 0x0000587cf930dbe3 in main ()
+[Inferior 1 (process 1250) detached]

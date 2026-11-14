@@ -1,0 +1,258 @@
+{
+  "profile": "gnu",
+  "steps": [
+    {
+      "name": "format-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-behavior",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 2.23
+    },
+    {
+      "name": "behavior-debug-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-behavior",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 1.61
+    },
+    {
+      "name": "ffi-debug-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 16.622
+    },
+    {
+      "name": "runtime-debug-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 4.156
+    },
+    {
+      "name": "strict-clippy",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "clippy",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-behavior",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 5.395
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 0.845
+    },
+    {
+      "name": "client-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/oracle-gnu",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-worktrees/sampler-20261114/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/validation-gnu/client-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.157
+    },
+    {
+      "name": "suffix-client-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/cpu-suffix-oracle-gnu",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/original-gnu.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/validation-gnu/suffix-client-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.194
+    },
+    {
+      "name": "exports-debug",
+      "command": [
+        "/usr/bin/nm",
+        "-D",
+        "--defined-only",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/debug/libllama_ffi.so"
+      ],
+      "exit_code": 0,
+      "seconds": 0.176
+    },
+    {
+      "name": "behavior-release-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-behavior",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 0.853
+    },
+    {
+      "name": "ffi-release-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 27.102
+    },
+    {
+      "name": "runtime-release-final",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 29.532
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "/home/tdamre/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114"
+      ],
+      "exit_code": 0,
+      "seconds": 0.753
+    },
+    {
+      "name": "client-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/oracle-gnu",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-worktrees/sampler-20261114/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/validation-gnu/client-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "suffix-client-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/cpu-suffix-oracle-gnu",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/original-gnu.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/validation-gnu/suffix-client-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.146
+    },
+    {
+      "name": "exports-release",
+      "command": [
+        "/usr/bin/nm",
+        "-D",
+        "--defined-only",
+        "/home/tdamre/.cache/rust-llama-sampler-20261114/release/libllama_ffi.so"
+      ],
+      "exit_code": 0,
+      "seconds": 0.072
+    }
+  ],
+  "clients": [
+    {
+      "mode": "debug",
+      "comparison": "all JSON values exact",
+      "library": "/home/tdamre/.cache/rust-llama-sampler-20261114/debug/libllama_ffi.so",
+      "sha256": "98d8e440a65398e4d8d32024b3b1c0354220f10d898d58d3bea4d98eb2e8ddaa",
+      "bytes": 50036320,
+      "frozen_exports": 247,
+      "extensions": 4
+    },
+    {
+      "mode": "release",
+      "comparison": "all JSON values exact",
+      "library": "/home/tdamre/.cache/rust-llama-sampler-20261114/release/libllama_ffi.so",
+      "sha256": "0f09215b5302206c46f409e5181f54c25593f76960ad8e80d6646aab3e21eaee",
+      "bytes": 3599432,
+      "frozen_exports": 247,
+      "extensions": 4
+    }
+  ],
+  "scenarios": 26,
+  "rows": 390,
+  "float_words": 77016
+}

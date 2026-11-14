@@ -19,6 +19,8 @@ pub struct ModelHandle {
     pub(crate) owned: bool,
 }
 pub(crate) struct ModelData {
+    pub t_start_us: i64,
+    pub t_load_us: i64,
     pub model: Option<Model>,
     pub architecture: String,
     pub vocab: VocabHandle,
@@ -228,6 +230,40 @@ pub(crate) unsafe fn load(path: *const c_char, p: LlamaModelParams) -> Result<*m
     let files = GgufSet::open(path).map_err(|e| e.to_string())?;
     unsafe { load_set(files, p, vocab_only) }
 }
+unsafe fn load_file_pointer(
+    file: *mut std::ffi::c_void,
+    p: LlamaModelParams,
+) -> Result<*mut ModelHandle> {
+    let vocab_only = validate_params(&p)?;
+    let mut source = unsafe { crate::file_pointer::Source::new(file)? };
+    unsafe { progress(&p, 0.0)? };
+    let origin = source.origin();
+    let files = GgufSet::from_file_at(source.take_file()?, origin).map_err(|e| e.to_string())?;
+    let data_offset = files
+        .shard_info(0)
+        .ok_or("missing FILE GGUF layout")?
+        .data_offset;
+    let absolute = origin
+        .checked_add(data_offset)
+        .ok_or("FILE data offset overflow")?;
+    // Frozen AUTO chooses mmap and checks the CPU buffer alignment even for
+    // vocab-only loads. We retain its admission rule while eagerly owning the
+    // supported CPU weights; this facade does not advertise mmap support.
+    if p.load_mode == -1 && absolute % 32 != 0 {
+        return Err("FILE GGUF data must be 32-byte aligned in AUTO load mode".into());
+    }
+    let result = unsafe { load_set(files, p, vocab_only) };
+    if let Err(error) = source.finish() {
+        if let Ok(model) = result {
+            // SAFETY: load_set just returned this unique, unexposed owner.
+            unsafe {
+                drop(Box::from_raw(model));
+            }
+        }
+        return Err(error);
+    }
+    result
+}
 unsafe fn load_splits(
     paths: *const *const c_char,
     n_paths: usize,
@@ -257,6 +293,7 @@ unsafe fn load_set(
     p: LlamaModelParams,
     vocab_only: bool,
 ) -> Result<*mut ModelHandle> {
+    let t_start_us = monotonic_time_us();
     // Vocabulary-only loading also validates every declared shard. Metadata is
     // taken only from the primary file; statistics cover the validated set.
     let m = files.metadata();
@@ -482,6 +519,10 @@ unsafe fn load_set(
         progress(&p, 1.0)?;
     }
     let data = Arc::new(ModelData {
+        t_start_us,
+        t_load_us: monotonic_time_us()
+            .checked_sub(t_start_us)
+            .ok_or("model load timer overflow")?,
         model,
         architecture,
         vocab: VocabHandle {
@@ -515,6 +556,14 @@ ffi!(
     llama_model_load_from_file(path: *const c_char, p: LlamaModelParams) -> *mut ModelHandle,
     ptr::null_mut(),
     { unsafe { load(path, p) } }
+);
+ffi!(
+    llama_model_load_from_file_ptr(
+        file: *mut std::ffi::c_void,
+        p: LlamaModelParams,
+    ) -> *mut ModelHandle,
+    ptr::null_mut(),
+    { unsafe { load_file_pointer(file, p) } }
 );
 ffi!(
     llama_model_load_from_splits(

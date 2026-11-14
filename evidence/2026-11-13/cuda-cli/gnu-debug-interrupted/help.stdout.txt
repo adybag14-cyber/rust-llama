@@ -1,0 +1,35 @@
+rust-llama: native Rust GGUF inference
+
+Commands:
+  generate    Load a supported model and stream generated text (default)
+  inspect     Validate GGUF and print metadata/tensor descriptors as JSON
+  tokenize    Print token IDs and byte-exact pieces (supports vocabulary-only GGUF)
+  detokenize  Decode --tokens 1,2,3 as UTF-8 text
+  logits      Print full per-token logits for conformance
+  embed       Encode a dense BERT sequence and print raw embeddings as JSON
+
+Options:
+  -m, --model PATH          GGUF model or vocabulary file (required)
+  -p, --prompt TEXT         Prompt text
+      --prompt-file PATH   Read a UTF-8 prompt, at most 4 MiB
+  -n, --n-predict N         Maximum generated tokens (default 128)
+      --temperature T      Zero is greedy (default 0)
+      --seed N             Explicit MT19937 u32 seed (default 0)
+      --stop TEXT          Stop string; repeatable
+  -c, --ctx-size N          Context bound (default 1024, capped to training limit)
+      --max-weight-mib N   Decoded F32 weight budget (default 2048)
+      --backend MODE       generate/logits: cpu (default) or cuda
+      --device N           CUDA device ordinal (default 0)
+      --max-gpu-mib N      Requested CUDA buffer MiB (default 8192)
+      --no-special         Do not insert special tokens in tokenize/logits/embed
+      --literal-special    Do not parse control strings in tokenize/logits/embed
+      --render-special     Render control tokens in detokenize
+      --tokens IDS         Comma-separated token IDs for detokenize/logits/embed
+      --pooling MODE       embed: model (default), none, mean, first, last
+  -h, --help               Show this help
+
+Model support: dense Llama, Qwen2, Qwen3, GPT-2, GPT-NeoX, BLOOM and Falcon plus Mamba-1 generation; dense BERT/WordPiece embeddings.
+Packed matrix arithmetic preserves source activation conversion; decoded F32 row caches are retained.
+CUDA supports dense Llama with F32/F16/Q4_0/Q8_0 matrices and F32 KV; other CUDA models and formats fail explicitly.
+Other model modes fail explicitly.
+Generation text goes to stdout; timing/token statistics go to stderr.

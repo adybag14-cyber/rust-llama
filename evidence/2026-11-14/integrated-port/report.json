@@ -1,0 +1,1987 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "scope": "Combined 18-group coverage from preserved Windows v1/v2/v3 and GNU v1/v2 chains. The sole product input delta is one README declaration row; generated reference caches are preserved externally. New context-sampling and prior context/FILE replay receipts are adjacent.",
+  "packaged_utc": "2026-11-14T15:26:56.822870+00:00",
+  "repository": "C:\\Users\\adyba\\rust-llama",
+  "external_root": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation",
+  "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+  "run_id": "integrated-v3",
+  "final_runs": {
+    "windows-msvc": "integrated-v3",
+    "linux-gnu": "integrated-v2"
+  },
+  "hosts": {
+    "windows-msvc": {
+      "status": "succeeded",
+      "report": "runs/integrated-v3/windows-msvc/report.json",
+      "report_identity": {
+        "bytes": 539280,
+        "sha256": "769e7777e05464827cbf7924599757c9d6d8e7f0086cf84ba0ef1202aaa2d280"
+      },
+      "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+      "chain": [
+        {
+          "run": "integrated-v1",
+          "status": "failed",
+          "report": "runs/integrated-v1/windows-msvc/report.json",
+          "identity": {
+            "bytes": 5490,
+            "sha256": "878b6f366f3eab7a5254eaffcfc2039a80f09ea6334b86e662dd2c2654843295"
+          }
+        },
+        {
+          "run": "integrated-v2",
+          "status": "failed",
+          "report": "runs/integrated-v2/windows-msvc/report.json",
+          "identity": {
+            "bytes": 6875,
+            "sha256": "83b001a85bee1b498e6379bfc7f75a027942be326c6b6180c6681bd964f3bfd7"
+          }
+        },
+        {
+          "run": "integrated-v3",
+          "status": "succeeded",
+          "report": "runs/integrated-v3/windows-msvc/report.json",
+          "identity": {
+            "bytes": 539280,
+            "sha256": "769e7777e05464827cbf7924599757c9d6d8e7f0086cf84ba0ef1202aaa2d280"
+          }
+        }
+      ],
+      "final_run": "integrated-v3",
+      "reused_v1_command_stages": [
+        "clippy",
+        "debug-tests",
+        "fmt",
+        "release-tests"
+      ],
+      "reused_v2_command_stages": [
+        "audit",
+        "debug-library",
+        "fixtures",
+        "release-build",
+        "verify-source"
+      ],
+      "final_command_stages": 18,
+      "started_utc": "2026-11-14T15:12:51.154966+00:00",
+      "finished_utc": "2026-11-14T15:26:18.060572+00:00",
+      "required_logical_groups": 18,
+      "successful_command_stages": 27,
+      "ordinary_tests": {
+        "debug": {
+          "passed": 768,
+          "failed": 0,
+          "ignored": 49,
+          "suites": 147
+        },
+        "release": {
+          "passed": 768,
+          "failed": 0,
+          "ignored": 49,
+          "suites": 147
+        }
+      },
+      "explicit_pretrained_tests": {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 19
+      },
+      "explicit_native_encoder_tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      },
+      "stage_coverage": {
+        "fmt": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "fmt",
+            "argv": [
+              "cargo",
+              "fmt",
+              "--all",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 1.884,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "debug-tests": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "debug-tests",
+            "argv": [
+              "cargo",
+              "test",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 1030.619,
+            "stdout": {
+              "bytes": 80844,
+              "sha256": "15a723fe7ace4e65acb2a2f79af736ad08233c9b2eb232d6648bcda1a060c16e"
+            },
+            "stderr": {
+              "bytes": 15089,
+              "sha256": "2be8ac7cdc4284bcfe8c6c5d4c9450dec0fb13a917133d87d11672bf7e81670c"
+            },
+            "tests": {
+              "passed": 768,
+              "failed": 0,
+              "ignored": 49,
+              "suites": 147
+            }
+          }
+        ],
+        "release-tests": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "release-tests",
+            "argv": [
+              "cargo",
+              "test",
+              "--workspace",
+              "--all-targets",
+              "--release",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 737.961,
+            "stdout": {
+              "bytes": 80577,
+              "sha256": "0dd1b489d461457a9047217a618cd7564c9b4aa96fbb2d60124fc452061d103a"
+            },
+            "stderr": {
+              "bytes": 15372,
+              "sha256": "70b2bcd5d4ca740e69639f8c9c53aef55607e4e14f4265b2ce3cac0ce6d2fc4a"
+            },
+            "tests": {
+              "passed": 768,
+              "failed": 0,
+              "ignored": 49,
+              "suites": 147
+            }
+          }
+        ],
+        "clippy": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "clippy",
+            "argv": [
+              "cargo",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 9.095,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 1025,
+              "sha256": "1b5e7d43da5366ff156301155757ad489a80c6b4db0aee0362f6a5b75140cc08"
+            }
+          }
+        ],
+        "audit": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "audit",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "audit"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 13.798,
+            "stdout": {
+              "bytes": 68475,
+              "sha256": "06bc29c77c3c0406287111dda25e35bb7aa4bb4ba06b4ff8355e08f216cc4d3f"
+            },
+            "stderr": {
+              "bytes": 168,
+              "sha256": "7fb5f9d576bce38347867286dd8af7a68cc65681abb192c2a007b01e48504e47"
+            }
+          }
+        ],
+        "fixtures": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "fixtures",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "fixtures"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 7.034,
+            "stdout": {
+              "bytes": 200,
+              "sha256": "d2f4ebba19932f6f16147e51a97cc47f3d102c862d20637145a518ff0f76af86"
+            },
+            "stderr": {
+              "bytes": 111,
+              "sha256": "df44f15d8f7ce22bd6c43dd1f53515c1388937be89e4183d2e2f4fcfb9b8d617"
+            }
+          }
+        ],
+        "release-build": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "release-build",
+            "argv": [
+              "cargo",
+              "build",
+              "--workspace",
+              "--release",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 6.368,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 122,
+              "sha256": "46ed67914a9b421755e7057ca2ab3138dba8f053341d9cc1fec45719a6cf7e05"
+            }
+          }
+        ],
+        "debug-library": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "debug-library",
+            "argv": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.105,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 72,
+              "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6"
+            }
+          }
+        ],
+        "verify-source": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "verify-source",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "verify-source",
+              "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 8.964,
+            "stdout": {
+              "bytes": 66,
+              "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+            },
+            "stderr": {
+              "bytes": 241,
+              "sha256": "44524b12785634885e9f9fef61a37d48525a11369f4638afeb2240a74490bdc0"
+            }
+          }
+        ],
+        "verify-reference-copy": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "verify-reference-copy",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "verify-source",
+              "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.821,
+            "stdout": {
+              "bytes": 66,
+              "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+            },
+            "stderr": {
+              "bytes": 169,
+              "sha256": "d37a821eefb69ddd494aceef2a6fc5f4fad28268d4f7910c2b826bfc959a2bd6"
+            }
+          }
+        ],
+        "release-gates": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "release-gates",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "release-check"
+            ],
+            "exit_code": 1,
+            "expected_exit_code": 1,
+            "elapsed_seconds": 0.092,
+            "stdout": {
+              "bytes": 4225,
+              "sha256": "a4ba73d0b851cf68ca81d2857aac707ddffd71ed85da472e8556e7b1b0fb4cc1"
+            },
+            "stderr": {
+              "bytes": 284,
+              "sha256": "8b919ab796d6d2939f7e6babc7ff041e50522c6d1bc80c45873341b76440f9c1"
+            }
+          }
+        ],
+        "pretrained-inference": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "prepare-gpt2",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "prepare-pretrained-fixture",
+              "gpt2-124m-f16",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gpt2-oracle\\official-hf\\model.safetensors",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\prepared-pretrained\\gpt2-124m-f16.gguf"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 9.38,
+            "stdout": {
+              "bytes": 171,
+              "sha256": "7aa97b8e7484835068bdd0eeba879c0aaadfc37b396390d7e0cdfd46f7195c47"
+            },
+            "stderr": {
+              "bytes": 375,
+              "sha256": "f72d2e0d8cae5971c7894bbb051cf4d4066668da8077e70dc41050ef3d2276c9"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "prepare-gptneox",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "prepare-pretrained-fixture",
+              "pythia-14m-f16",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\gptneox-oracle\\official-hf\\model.safetensors",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\prepared-pretrained\\pythia-14m-f16.gguf"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.547,
+            "stdout": {
+              "bytes": 169,
+              "sha256": "4fb8293b226740d3e2dd9c7ba45f4861d50d10b5067bab31314da5bcc23c286b"
+            },
+            "stderr": {
+              "bytes": 380,
+              "sha256": "8da3a8ee2f8d0893d1fb7270c0bf9d07a5c0d2dd74dcafc88d31a1fb41df62e2"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "pretrained-inference",
+            "argv": [
+              "cargo",
+              "test",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-inference",
+              "-p",
+              "llama-server",
+              "--tests",
+              "--",
+              "--ignored",
+              "--nocapture",
+              "--test-threads=1"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 711.873,
+            "stdout": {
+              "bytes": 3228,
+              "sha256": "ac39e93611b765bfd78dfa83a4ca45d7a7066b3f5a05d51c8e10c345409ebc7d"
+            },
+            "stderr": {
+              "bytes": 4703,
+              "sha256": "0dc79f04da9309e2c988b172af6749e915714f2fddcaef3fb846b02c11052f7f"
+            },
+            "tests": {
+              "passed": 16,
+              "failed": 0,
+              "ignored": 0,
+              "suites": 19
+            }
+          }
+        ],
+        "pretrained-native-encoder": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "pretrained-native-encoder",
+            "argv": [
+              "cargo",
+              "test",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-ffi",
+              "context::encoder::tests::independent_pretrained_native_bert_encoder_corpus",
+              "--",
+              "--ignored",
+              "--exact",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 4.639,
+            "stdout": {
+              "bytes": 200,
+              "sha256": "264091577ecf2c53d2dfb509e3e5b386478a4851154db5b05429af7b909f3114"
+            },
+            "stderr": {
+              "bytes": 221,
+              "sha256": "86c30fb0b4cf8be06dec2c289c657c49f413d72d5d02f1355b2817f49ca9e4bc"
+            },
+            "tests": {
+              "passed": 1,
+              "failed": 0,
+              "ignored": 0,
+              "suites": 1
+            }
+          }
+        ],
+        "c-clients": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "chat-c-debug",
+            "argv": [
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\build-windows\\Release\\chat-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\inputs-v1.bin",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\debug\\chat.bin"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.249,
+            "stdout": {
+              "bytes": 43,
+              "sha256": "25abcde4e68292f6dc0007c00aebcfe3e93981e6821009c578e6c05354ef3e36"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "raw-name-c-debug",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\tokenizer-raw-name-oracle\\replay-final.py",
+              "windows",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\debug\\raw-name"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.979,
+            "stdout": {
+              "bytes": 702,
+              "sha256": "49c987e3e5c460b96e232769d85f9efbb63977f952d23cc470a21a4c0866ebef"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "chat-c-release",
+            "argv": [
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\build-windows\\Release\\chat-oracle.exe",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\chat-oracle\\inputs-v1.bin",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\release\\chat.bin"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.091,
+            "stdout": {
+              "bytes": 43,
+              "sha256": "25abcde4e68292f6dc0007c00aebcfe3e93981e6821009c578e6c05354ef3e36"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "raw-name-c-release",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261110\\tokenizer-raw-name-oracle\\replay-final.py",
+              "windows",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\release\\raw-name"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.587,
+            "stdout": {
+              "bytes": 704,
+              "sha256": "7f1a23bc8d93a99de1173aab1fca199b700a12dc0eee8baedede61f15ebb3ab9"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "new-c-clients": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "new-c-clients",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\replay-prior-c-clients.py",
+              "C:\\Users\\adyba\\rust-llama",
+              "C:\\Users\\adyba\\rust-llama\\target",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\new-c-clients"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 3.209,
+            "stdout": {
+              "bytes": 1039,
+              "sha256": "73a495fd319c46e049c50c52b7853dc74c17dcc21f49bbffe4b0d3fbbc5a7e1b"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "adapter-c-clients": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "adapter-c-clients",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-next\\context-oracle\\replay.py",
+              "--repo",
+              "C:\\Users\\adyba\\rust-llama",
+              "--debug-library",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+              "--release-library",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+              "--output",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\adapter-c-clients"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 1.324,
+            "stdout": {
+              "bytes": 107,
+              "sha256": "63f3573d38121fd6b48726868742f5e7b5940bbf3c8d115c798bedb25199fb03"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "encoder-c-clients": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "encoder-c-debug",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay.py",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\encoder-c-debug",
+              "all"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 40.539,
+            "stdout": {
+              "bytes": 681,
+              "sha256": "c07065b33d49c8adde34ccadf3ad91038cba9a52f139c4d702e250a03b3e9e29"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "encoder-vector-c-debug",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay-vector-admission.py",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\encoder-vector-c-debug"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.256,
+            "stdout": {
+              "bytes": 999,
+              "sha256": "f7cd55875c340b3ebb7849e0cc39b34505ffcf061f6a26cc05ec99e89b72e03a"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "encoder-c-release",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay.py",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\encoder-c-release",
+              "all"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 7.206,
+            "stdout": {
+              "bytes": 681,
+              "sha256": "8957f7cc86ded44186bd56766cc92ee6d74411d79f534f1722fa45a9b6bb96a8"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "encoder-vector-c-release",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\encoder-oracle\\replay-vector-admission.py",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\full-validation\\integrated-v3\\windows-msvc\\encoder-vector-c-release"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.142,
+            "stdout": {
+              "bytes": 999,
+              "sha256": "a9531b0c17b45e6959d0b2daf94f5863fabc04a90b267ebb9133e37f6a45428d"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "quantization-c-clients": [
+          {
+            "receipt_run": "integrated-v3",
+            "name": "quantization-c-debug",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\replay-public-c-v1.py",
+              "20261114-integrated-v3-debug",
+              "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 9.576,
+            "stdout": {
+              "bytes": 376,
+              "sha256": "82d008879411c4f3f58b56f0e75db3fa0ff1f31033cfd88ec162ac2021676690"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v3",
+            "name": "quantization-c-release",
+            "argv": [
+              "C:\\Python314\\python.exe",
+              "-B",
+              "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111-late\\quant-oracle\\replay-public-c-v1.py",
+              "20261114-integrated-v3-release",
+              "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 2.076,
+            "stdout": {
+              "bytes": 378,
+              "sha256": "4394c5dea0d7f9f1f8a54f8183e69fc0e1282d924f39950ead186ff51b96ed5d"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ]
+      },
+      "expected_nonzero_gate": {
+        "stage": "release-gates",
+        "exit_code": 1,
+        "mandatory_gates_open": 20
+      },
+      "unchanged_execution_inputs": true
+    },
+    "linux-gnu": {
+      "status": "succeeded",
+      "report": "runs/integrated-v2/linux-gnu/report.json",
+      "report_identity": {
+        "bytes": 539564,
+        "sha256": "a47de1c98cac65b73f52b2aa81a58544435788416d4185c303fc791f78583b8d"
+      },
+      "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+      "chain": [
+        {
+          "run": "integrated-v1",
+          "status": "failed",
+          "report": "runs/integrated-v1/linux-gnu/report.json",
+          "identity": {
+            "bytes": 5507,
+            "sha256": "f864d045c43eeba5f51038816eda32f3b60261757f1928135195a6e45fe1a2bc"
+          }
+        },
+        {
+          "run": "integrated-v2",
+          "status": "succeeded",
+          "report": "runs/integrated-v2/linux-gnu/report.json",
+          "identity": {
+            "bytes": 539564,
+            "sha256": "a47de1c98cac65b73f52b2aa81a58544435788416d4185c303fc791f78583b8d"
+          }
+        }
+      ],
+      "final_run": "integrated-v2",
+      "reused_v1_command_stages": [
+        "clippy",
+        "debug-tests",
+        "fmt",
+        "release-tests"
+      ],
+      "reused_v2_command_stages": [],
+      "final_command_stages": 23,
+      "started_utc": "2026-11-14T15:05:26.853162+00:00",
+      "finished_utc": "2026-11-14T15:24:02.057689+00:00",
+      "required_logical_groups": 18,
+      "successful_command_stages": 27,
+      "ordinary_tests": {
+        "debug": {
+          "passed": 772,
+          "failed": 0,
+          "ignored": 49,
+          "suites": 147
+        },
+        "release": {
+          "passed": 772,
+          "failed": 0,
+          "ignored": 49,
+          "suites": 147
+        }
+      },
+      "explicit_pretrained_tests": {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 19
+      },
+      "explicit_native_encoder_tests": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "suites": 1
+      },
+      "stage_coverage": {
+        "fmt": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "fmt",
+            "argv": [
+              "cargo",
+              "fmt",
+              "--all",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 7.44,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "debug-tests": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "debug-tests",
+            "argv": [
+              "cargo",
+              "test",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 728.858,
+            "stdout": {
+              "bytes": 81039,
+              "sha256": "50a1d199bd5748170eaee2991120755712b36eac2f65897d0f1478f9b0f9f5f1"
+            },
+            "stderr": {
+              "bytes": 19396,
+              "sha256": "a918c3dd5a91a1872c6f3e7e4fb86f2df938f12853187090f42e476bb2398631"
+            },
+            "tests": {
+              "passed": 772,
+              "failed": 0,
+              "ignored": 49,
+              "suites": 147
+            }
+          }
+        ],
+        "release-tests": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "release-tests",
+            "argv": [
+              "cargo",
+              "test",
+              "--workspace",
+              "--all-targets",
+              "--release",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 460.634,
+            "stdout": {
+              "bytes": 80775,
+              "sha256": "e8ce58d93b3455126994bb594f5ff7224ce57cce18838bf9b187380931cffe53"
+            },
+            "stderr": {
+              "bytes": 19679,
+              "sha256": "c4dbeb73d4d783ee119f7e0f56cd58a4c1a1e517155ccdab51855f0713e0778e"
+            },
+            "tests": {
+              "passed": 772,
+              "failed": 0,
+              "ignored": 49,
+              "suites": 147
+            }
+          }
+        ],
+        "clippy": [
+          {
+            "receipt_run": "integrated-v1",
+            "name": "clippy",
+            "argv": [
+              "cargo",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 13.905,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 1074,
+              "sha256": "7d089abee330386f32047530d16e590bdd8f2cd29e590ec4182909c84181920a"
+            }
+          }
+        ],
+        "audit": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "audit",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "audit"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 133.123,
+            "stdout": {
+              "bytes": 68475,
+              "sha256": "06bc29c77c3c0406287111dda25e35bb7aa4bb4ba06b4ff8355e08f216cc4d3f"
+            },
+            "stderr": {
+              "bytes": 137,
+              "sha256": "aec4846e0f57eaeedf334834d325b3719fe22292d18ac6194f7b255d091b548f"
+            }
+          }
+        ],
+        "fixtures": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "fixtures",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "fixtures"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 132.874,
+            "stdout": {
+              "bytes": 200,
+              "sha256": "d2f4ebba19932f6f16147e51a97cc47f3d102c862d20637145a518ff0f76af86"
+            },
+            "stderr": {
+              "bytes": 140,
+              "sha256": "d2fbd50fb18f818210cc27a084939502fe99e5509a66089f16007f6a0a70a5b0"
+            }
+          }
+        ],
+        "release-build": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "release-build",
+            "argv": [
+              "cargo",
+              "build",
+              "--workspace",
+              "--release",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 38.71,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 1083,
+              "sha256": "bbde1177b604cd50608f1e1b1b1271dfe7090ed2039111944837c75843f460e3"
+            }
+          }
+        ],
+        "debug-library": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "debug-library",
+            "argv": [
+              "cargo",
+              "build",
+              "-p",
+              "llama-ffi",
+              "--offline",
+              "--locked"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 2.779,
+            "stdout": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "bytes": 145,
+              "sha256": "d5424d40af644b5f1c07c51cb533e578672f24bf37efe55cee67f5e13299b5ba"
+            }
+          }
+        ],
+        "verify-source": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "verify-source",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "verify-source",
+              "/mnt/c/Users/adyba/Downloads/llama.cpp-master (4)/llama.cpp-master"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 18.766,
+            "stdout": {
+              "bytes": 66,
+              "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+            },
+            "stderr": {
+              "bytes": 214,
+              "sha256": "b5087b4b467701caf613c2b6900781a10fe9f1fd3ff9a25c016ab1fe1e5577b5"
+            }
+          }
+        ],
+        "verify-reference-copy": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "verify-reference-copy",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "verify-source",
+              "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 15.307,
+            "stdout": {
+              "bytes": 66,
+              "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+            },
+            "stderr": {
+              "bytes": 202,
+              "sha256": "6a9a1b2beb3a1fce126a0f9adf1b3e9d8442cfb708a1387cebc5f999455440b7"
+            }
+          }
+        ],
+        "release-gates": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "release-gates",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "release-check"
+            ],
+            "exit_code": 1,
+            "expected_exit_code": 1,
+            "elapsed_seconds": 0.524,
+            "stdout": {
+              "bytes": 4225,
+              "sha256": "a4ba73d0b851cf68ca81d2857aac707ddffd71ed85da472e8556e7b1b0fb4cc1"
+            },
+            "stderr": {
+              "bytes": 216,
+              "sha256": "c4de3574b837e22e658338a96b652f19b3dbc3cdae5e1f4ec5e31fb4903fe573"
+            }
+          }
+        ],
+        "pretrained-inference": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "prepare-gpt2",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "prepare-pretrained-fixture",
+              "gpt2-124m-f16",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/official-hf/model.safetensors",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/prepared-pretrained/gpt2-124m-f16.gguf"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 19.918,
+            "stdout": {
+              "bytes": 171,
+              "sha256": "7aa97b8e7484835068bdd0eeba879c0aaadfc37b396390d7e0cdfd46f7195c47"
+            },
+            "stderr": {
+              "bytes": 409,
+              "sha256": "a0d3dafecd9f4ca53522c032fada604a93980fd75ff7a910825f7a494ce2670f"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "prepare-gptneox",
+            "argv": [
+              "cargo",
+              "run",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "xtask",
+              "--",
+              "prepare-pretrained-fixture",
+              "pythia-14m-f16",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/official-hf/model.safetensors",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/prepared-pretrained/pythia-14m-f16.gguf"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 1.876,
+            "stdout": {
+              "bytes": 169,
+              "sha256": "4fb8293b226740d3e2dd9c7ba45f4861d50d10b5067bab31314da5bcc23c286b"
+            },
+            "stderr": {
+              "bytes": 414,
+              "sha256": "a793f9e49e8d78920d411f847be62e0e84f05c0dee09e43269238256faef478f"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "pretrained-inference",
+            "argv": [
+              "cargo",
+              "test",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-inference",
+              "-p",
+              "llama-server",
+              "--tests",
+              "--",
+              "--ignored",
+              "--nocapture",
+              "--test-threads=1"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 569.998,
+            "stdout": {
+              "bytes": 3228,
+              "sha256": "b937a7a505dc5069ace68af2ec7d3f276d0956af4e4b6a0309b96b09d3a22709"
+            },
+            "stderr": {
+              "bytes": 5165,
+              "sha256": "09db5d521b20ab476ae2e44f7431f194011a8d7005f41d52e8ac8c3311779004"
+            },
+            "tests": {
+              "passed": 16,
+              "failed": 0,
+              "ignored": 0,
+              "suites": 19
+            }
+          }
+        ],
+        "pretrained-native-encoder": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "pretrained-native-encoder",
+            "argv": [
+              "cargo",
+              "test",
+              "--release",
+              "--offline",
+              "--locked",
+              "-p",
+              "llama-ffi",
+              "context::encoder::tests::independent_pretrained_native_bert_encoder_corpus",
+              "--",
+              "--ignored",
+              "--exact",
+              "--nocapture"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 6.238,
+            "stdout": {
+              "bytes": 200,
+              "sha256": "f92d6424c088f2e2874382bb2aeba0bcc1df3bfdc35001eace1de17dd6b76a23"
+            },
+            "stderr": {
+              "bytes": 250,
+              "sha256": "b84ffc1e01e1a9c8fa2aadd8f09b7c4801cfe8050cf7bf92752a494677a1f685"
+            },
+            "tests": {
+              "passed": 1,
+              "failed": 0,
+              "ignored": 0,
+              "suites": 1
+            }
+          }
+        ],
+        "c-clients": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "chat-c-debug",
+            "argv": [
+              "/home/tdamre/.cache/rust-llama-chat-oracle-20261110/chat-oracle",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/inputs-v1.bin",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/debug/chat.bin"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.374,
+            "stdout": {
+              "bytes": 42,
+              "sha256": "96411fc3f2eb793caba495ddad3dbf05edc27315f4695030a824c153a05cf630"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "raw-name-c-debug",
+            "argv": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/tokenizer-raw-name-oracle/replay-final.py",
+              "linux",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/debug/raw-name"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 2.228,
+            "stdout": {
+              "bytes": 703,
+              "sha256": "638e0b5e97ddce9d4f1374c19e9136c594037b409bfe260d4225a58957633e27"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "chat-c-release",
+            "argv": [
+              "/home/tdamre/.cache/rust-llama-chat-oracle-20261110/chat-oracle",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/chat-oracle/inputs-v1.bin",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/release/chat.bin"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.173,
+            "stdout": {
+              "bytes": 42,
+              "sha256": "96411fc3f2eb793caba495ddad3dbf05edc27315f4695030a824c153a05cf630"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "raw-name-c-release",
+            "argv": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261110/tokenizer-raw-name-oracle/replay-final.py",
+              "linux",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/release/raw-name"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 1.977,
+            "stdout": {
+              "bytes": 704,
+              "sha256": "8e72f513ee0b0d6e05f8cd9b4a76b3fb1bdb0d1206261105f313fd5cdbfd3f26"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "new-c-clients": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "new-c-clients",
+            "argv": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/replay-prior-c-clients.py",
+              "/mnt/c/Users/adyba/rust-llama",
+              "/home/tdamre/rust-llama-target-continue",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/new-c-clients"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 3.08,
+            "stdout": {
+              "bytes": 1031,
+              "sha256": "15bbc00553b82e285d08244a8c19c1f8c2a6ad45d0fb39c008ac4aefa27ac979"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "adapter-c-clients": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "adapter-c-clients",
+            "argv": [
+              "/usr/bin/python3",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-next/context-oracle/replay.py",
+              "--repo",
+              "/mnt/c/Users/adyba/rust-llama",
+              "--debug-library",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+              "--release-library",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+              "--output",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/adapter-c-clients"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 6.387,
+            "stdout": {
+              "bytes": 104,
+              "sha256": "51ec002d4b8213ee1241c29fbb3662a5bdf756b1036677dabf842795073965c1"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "encoder-c-clients": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "encoder-c-debug",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/encoder-oracle/replay.py",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/encoder-c-debug",
+              "all"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 50.883,
+            "stdout": {
+              "bytes": 655,
+              "sha256": "a424e9f0cfb729c77c2de82a5a86ab3f92eb982adca2227f7125253ae42e7b2f"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "encoder-vector-c-debug",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/encoder-oracle/replay-vector-admission.py",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/encoder-vector-c-debug"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.524,
+            "stdout": {
+              "bytes": 963,
+              "sha256": "f006846d19ab8c9c66ccc50a602764d1abb6886451178fb75d1b3b99287446ab"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "encoder-c-release",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/encoder-oracle/replay.py",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/encoder-c-release",
+              "all"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 13.551,
+            "stdout": {
+              "bytes": 653,
+              "sha256": "6d6691da6f09e908978d8b3d701ae4c01282fab0b37a7848189c9aae3986edce"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "encoder-vector-c-release",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/encoder-oracle/replay-vector-admission.py",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/full-validation/integrated-v2/linux-gnu/encoder-vector-c-release"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 0.474,
+            "stdout": {
+              "bytes": 961,
+              "sha256": "731fdc53f2b83d46cfa3d1f7c4247bbf369ab61a653297725a0b46eaee236cd8"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ],
+        "quantization-c-clients": [
+          {
+            "receipt_run": "integrated-v2",
+            "name": "quantization-c-debug",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-oracle/replay-public-c-v1.py",
+              "20261114-integrated-v2-debug",
+              "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 13.702,
+            "stdout": {
+              "bytes": 365,
+              "sha256": "dc98fb70e9f5053568fffb4c1d00a383eaef603cbaa9fdc7335dca5ea1090360"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "receipt_run": "integrated-v2",
+            "name": "quantization-c-release",
+            "argv": [
+              "/usr/bin/python3",
+              "-B",
+              "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111-late/quant-oracle/replay-public-c-v1.py",
+              "20261114-integrated-v2-release",
+              "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "elapsed_seconds": 6.336,
+            "stdout": {
+              "bytes": 367,
+              "sha256": "8073081fd0b5f42e20ddefaefacb283762e0f4d0fa6b50195acba37d3d5de507"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        ]
+      },
+      "expected_nonzero_gate": {
+        "stage": "release-gates",
+        "exit_code": 1,
+        "mandatory_gates_open": 20
+      },
+      "unchanged_execution_inputs": true
+    }
+  },
+  "preserved_failures": [
+    {
+      "run": "integrated-v1/windows-msvc",
+      "status": "failed",
+      "stage": "fixtures",
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "report_error": "RuntimeError('fixtures failed 1')",
+      "category": "missing README integrity/provenance declaration",
+      "explanation": "The pre-existing backend-sampling manifest omitted only the README row. The guarded correction adds that exact byte-count/hash declaration without modifying fixture contents or verifier policy.",
+      "stderr": "runs/integrated-v1/windows-msvc/fixtures.stderr.log",
+      "report": "runs/integrated-v1/windows-msvc/report.json",
+      "included_in_successful_stage_coverage": false
+    },
+    {
+      "run": "integrated-v2/windows-msvc",
+      "status": "failed",
+      "stage": "verify-reference-copy",
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "report_error": "RuntimeError('verify-reference-copy failed 1')",
+      "category": "ten generated CPython cache additions to frozen reference copy",
+      "explanation": "Exactly the reported generated cache files were preserved and rehashed outside the frozen tree; no baseline or product input changed. Windows v3 reruns the strict reference verifier.",
+      "stderr": "runs/integrated-v2/windows-msvc/verify-reference-copy.stderr.log",
+      "report": "runs/integrated-v2/windows-msvc/report.json",
+      "included_in_successful_stage_coverage": false
+    },
+    {
+      "run": "integrated-v1/linux-gnu",
+      "status": "failed",
+      "stage": "fixtures",
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "report_error": "RuntimeError('fixtures failed 1')",
+      "category": "missing README integrity/provenance declaration",
+      "explanation": "The pre-existing backend-sampling manifest omitted only the README row. The guarded correction adds that exact byte-count/hash declaration without modifying fixture contents or verifier policy.",
+      "stderr": "runs/integrated-v1/linux-gnu/fixtures.stderr.log",
+      "report": "runs/integrated-v1/linux-gnu/report.json",
+      "included_in_successful_stage_coverage": false
+    }
+  ],
+  "metadata_correction": {
+    "report": "metadata-correction/report.json",
+    "report_identity": {
+      "bytes": 2625,
+      "sha256": "9d5936fc3fef24d004d5ac2e70d21997e99c8d8e5c78d3a9f59f1c12338e21bd"
+    },
+    "all_implementation_and_fixture_content_unchanged": true
+  },
+  "reference_cache_correction": {
+    "report": "reference-cache-correction/report.json",
+    "report_identity": {
+      "bytes": 5740,
+      "sha256": "81b227578002b9ced7f7280e3bab4723b84028226bd77a83cc189c5f49162572"
+    },
+    "preserved_generated_files": 10,
+    "preserved_bytes": 946128,
+    "baseline_and_product_files_unchanged": true
+  },
+  "input_identity": {
+    "files": 1687,
+    "total_bytes": 1192665890,
+    "manifest_bytes": 254923,
+    "manifest_sha256": "5de1123d3b7446c937ca5ee450a36a2bf1ebeae2115ff539fd82f4bc7fa578a3",
+    "all_v2_v3_manifests_identical": true,
+    "both_v1_manifests_identical": true,
+    "v1_manifest_sha256": "e4c4b1c241b4160a5f210cf87f06b75d9f6ec11da87cfd51c5bc96123ea3d9e7",
+    "metadata_correction": "metadata-correction/report.json",
+    "selected_input_delta": [
+      {
+        "path": "fixtures/ffi/backend-sampling/fixture-manifest.tsv",
+        "before": {
+          "bytes": 922,
+          "sha256": "209268c48b9f7bff24dc038040ae6aa505aae2582e7d775145d186594b01c6a6"
+        },
+        "after": {
+          "bytes": 1120,
+          "sha256": "da9f75dad9ae05a9706a0b250e8d40ca6c9c843c336bd4f1884666bed71a2597"
+        }
+      }
+    ],
+    "current_before_and_after_match": true,
+    "current_manifest": "current-execution-inputs.json",
+    "guard": "current-input-guard.json"
+  },
+  "library_identity_checks": [
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "client_group": "batch/sampler",
+      "matches_base_client_library": true,
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "client_group": "adapter",
+      "matches_base_client_library": true,
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "client_group": "encoder",
+      "matches_base_client_library": true,
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "client_group": "encoder-vector",
+      "matches_base_client_library": true,
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "client_group": "quantization",
+      "matches_base_client_library": true,
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "client_group": "batch/sampler",
+      "matches_base_client_library": true,
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "client_group": "adapter",
+      "matches_base_client_library": true,
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "client_group": "encoder",
+      "matches_base_client_library": true,
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "client_group": "encoder-vector",
+      "matches_base_client_library": true,
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "client_group": "quantization",
+      "matches_base_client_library": true,
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "client_group": "batch/sampler",
+      "matches_base_client_library": true,
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "client_group": "adapter",
+      "matches_base_client_library": true,
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "client_group": "encoder",
+      "matches_base_client_library": true,
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "client_group": "encoder-vector",
+      "matches_base_client_library": true,
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "client_group": "quantization",
+      "matches_base_client_library": true,
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "client_group": "batch/sampler",
+      "matches_base_client_library": true,
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "client_group": "adapter",
+      "matches_base_client_library": true,
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "client_group": "encoder",
+      "matches_base_client_library": true,
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "client_group": "encoder-vector",
+      "matches_base_client_library": true,
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "client_group": "quantization",
+      "matches_base_client_library": true,
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    }
+  ],
+  "current_libraries_checked_before_and_after": [
+    {
+      "profile": "windows-msvc",
+      "mode": "debug",
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\debug\\llama_ffi.dll",
+      "bytes": 7658496,
+      "sha256": "6509c00a33e937afc02ec19e39a9766374c79ab2b2cd4f85b07e1ee5eaab2347"
+    },
+    {
+      "profile": "windows-msvc",
+      "mode": "release",
+      "path": "C:\\Users\\adyba\\rust-llama\\target\\release\\llama_ffi.dll",
+      "bytes": 3327488,
+      "sha256": "899be46fee4d4d097ab5e8195c8c37e18dd65d71eccf11a812fcda76abb8da98"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "debug",
+      "path": "\\\\wsl.localhost\\Ubuntu\\home\\tdamre\\rust-llama-target-continue\\debug\\libllama_ffi.so",
+      "bytes": 50648936,
+      "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+    },
+    {
+      "profile": "linux-gnu",
+      "mode": "release",
+      "path": "\\\\wsl.localhost\\Ubuntu\\home\\tdamre\\rust-llama-target-continue\\release\\libllama_ffi.so",
+      "bytes": 3672624,
+      "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+    }
+  ],
+  "exact_export_inventory": {
+    "implemented": 247,
+    "extensions": 4,
+    "absent": 8,
+    "names": "export-inventory.json"
+  },
+  "merged_c_api_replay": {
+    "summary_path": "../c-api-integration/summary.json",
+    "summary_identity": {
+      "bytes": 25908,
+      "sha256": "699f6e1a1d063ccea49ad8b5a13be2d0c1c6ec85bbb4c8787107ffd921e04243"
+    },
+    "run_id": "merged-final-v1",
+    "all_four_library_identities_match_full_runs": true,
+    "runtime_source_matches_full_execution_inputs": true
+  },
+  "helper_review": {
+    "metadata": "helper-review/replay-prior-c-clients-update.json",
+    "diff": "helper-review/replay-prior-c-clients-update.diff.txt",
+    "historical_script": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\replay-prior-c-clients.py",
+      "bytes": 21311,
+      "sha256": "d079616d949765a5eb1ba3ee4fe453ea3aa8b456b23934c4351ce574e834f614"
+    },
+    "copied_driver": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\replay-prior-c-clients.py",
+      "bytes": 21624,
+      "sha256": "4cdb376e06fc6477529b64c2b170d4485fa284e8699302bd22f3e6e8d5e2303c"
+    },
+    "added_symbols": [
+      "llama_get_sampled_candidates_count_ith",
+      "llama_get_sampled_candidates_ith",
+      "llama_get_sampled_logits_count_ith",
+      "llama_get_sampled_logits_ith",
+      "llama_get_sampled_probs_count_ith",
+      "llama_get_sampled_probs_ith",
+      "llama_get_sampled_token_ith",
+      "llama_set_sampler"
+    ],
+    "old_additions": 23,
+    "new_additions": 31,
+    "historical_current_counts": [
+      239,
+      4,
+      16
+    ],
+    "current_counts": [
+      247,
+      4,
+      8
+    ],
+    "syntax": "AST parsed without executing either historical helper",
+    "all_pinned_identities": "unchanged",
+    "all_non_main_functions": "AST-identical",
+    "main_body_review": "The exact unified diff is retained; named additions, counts and diagnostic messages are visible."
+  },
+  "receipt_selection": {
+    "copied_files": 167,
+    "copied_bytes": 4965721,
+    "copy_ledger": "copy-ledger.json",
+    "external_files": 4486,
+    "external_bytes": 1088335178,
+    "external_ledger": "external-output-ledger.json",
+    "scripts_models_binaries_copied": false
+  },
+  "totals": {
+    "logical_groups_per_host": 18,
+    "successful_command_stages_per_host": 27,
+    "command_receipts_in_successful_runs": 41,
+    "command_receipts_in_preserved_v1_runs": 12,
+    "command_receipts_in_failed_windows_v2": 6,
+    "command_receipts_across_all_standard_runs": 59,
+    "unexpected_fixture_failure_receipts": 2,
+    "unexpected_reference_copy_failure_receipts": 1,
+    "final_command_stages": {
+      "windows-msvc": 18,
+      "linux-gnu": 23
+    },
+    "expected_nonzero_release_gate_receipts": 2,
+    "preserved_failed_run_reports": 3,
+    "ordinary_test_executions_passed": 3080,
+    "ordinary_test_executions_ignored": 196,
+    "explicit_pretrained_and_native_encoder_test_executions_passed": 34
+  },
+  "no_product_source_configuration_fixture_or_tsv_changes": true,
+  "no_test_or_build_reruns": true,
+  "post_package_metadata_delta": "Deferred CI-only cherry-pick and trailing dependency-inventory blank-line cleanup are not part of these exact tested inputs; parent records their identities separately."
+}

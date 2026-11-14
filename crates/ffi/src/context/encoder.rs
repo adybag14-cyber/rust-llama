@@ -334,7 +334,12 @@ pub(super) unsafe fn encode(context: &mut ContextHandle, batch: LlamaBatch) -> R
         .map_err(|e| e.to_string())?;
     // Validation failures retain prior outputs. Accepted work clears pooled
     // storage and updates row mapping even if the graph is subsequently aborted.
+    // Source synchronizes pending work before old pooled vectors are released.
+    if !encoder.sequences.is_empty() {
+        context.performance.synchronize()?;
+    }
     encoder.sequences.clear();
+    context.performance.queue(batch.len())?;
     let outputs = batch
         .iter()
         .filter(|row| row.output != OutputSelection::None)
@@ -413,6 +418,7 @@ ffi!(
     ptr::null_mut(),
     {
         let context = unsafe { reference_mut(context)? };
+        context.performance.synchronize()?;
         Ok(match &mut context.runtime {
             ContextRuntime::Encoder(encoder) => encoder
                 .sequences

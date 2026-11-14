@@ -263,7 +263,12 @@ pub(crate) fn write(
     }
     let spm = if matches!(
         config.family,
-        Architecture::Gpt2 | Architecture::GptNeoX | Architecture::Bloom
+        Architecture::Gpt2
+            | Architecture::GptNeoX
+            | Architecture::Bloom
+            | Architecture::Falcon
+            | Architecture::StarCoder
+            | Architecture::StarCoder2
     ) {
         None
     } else {

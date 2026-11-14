@@ -93,4 +93,5 @@ platform's actual newline encoding.
 Fixtures and source/build identities are in fixtures/ffi/sampler-perf. Final
 debug/release test, Clippy, native-client and export receipts are under
 evidence/2026-11-11/c-sampler-perf. These checks qualify the described CPU subset;
-they do not close context-performance, backend or full release gates.
+they do not close backend or full release gates. Context performance is now
+implemented and independently scoped in CONTEXT_PERFORMANCE.md.

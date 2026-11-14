@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "status": "component-verified",
+  "packaged_utc": "2026-11-13T21:04:48.822289+00:00",
+  "scope": "Falcon typed runtime, strict contexts, GGUF loading and model-runtime/inference regression suites. This does not close full-model-family, full ABI or backend gates.",
+  "source_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "profiles": {
+    "windows-msvc": {
+      "debug": {
+        "suites": 26,
+        "passed": 132,
+        "failed": 0,
+        "ignored": 12
+      },
+      "validation-v1_input_differences": [],
+      "release": {
+        "suites": 26,
+        "passed": 132,
+        "failed": 0,
+        "ignored": 12
+      },
+      "validation-v2_input_differences": [],
+      "between_stage_input_differences": []
+    },
+    "linux-gnu": {
+      "debug": {
+        "suites": 26,
+        "passed": 134,
+        "failed": 0,
+        "ignored": 12
+      },
+      "validation-v1_input_differences": [],
+      "release": {
+        "suites": 26,
+        "passed": 134,
+        "failed": 0,
+        "ignored": 12
+      },
+      "validation-v2_input_differences": [],
+      "between_stage_input_differences": []
+    }
+  },
+  "validation_driver_identities_at_packaging": {
+    "validate.py": {
+      "bytes": 3180,
+      "sha256": "a759d61e04aa8d6f58c7ebe510ab29e03e8aa7e8cb40e4c01beda602e26c4e08"
+    },
+    "validate-release.py": {
+      "bytes": 2944,
+      "sha256": "3b6633c26038ba3e84ce3d253793d87ee2a8030031cb368878f6fe8d969124b2"
+    }
+  },
+  "execution_inputs_scope": "Each report hashes .rs and .toml files in crates/model-runtime and crates/inference before/after. Other repository files and root concurrent work are excluded; root integration is separate.",
+  "fixture_manifest": {
+    "bytes": 2005,
+    "sha256": "015646bd1a9e5faed285cdf45157ef68450251e2c8bed833c81d958e54edd4f6"
+  },
+  "corpus": {
+    "total_cases": 36,
+    "executed_rust": 22,
+    "checked_rejection_or_unsupported": 14,
+    "f32_words_per_profile_per_build": 412024,
+    "rows_per_profile_per_build": 1277,
+    "exact_greedy_tokens_per_profile_per_build": 243,
+    "pretrained_falcon_executed": false
+  },
+  "retained_failed_stage": "Both original release invocations stopped before compilation because a concurrently introduced workspace member required Cargo.lock regeneration. Their reports remain failed. Only release was resumed after the root synchronized Cargo.lock; ordinary debug/format/Clippy results were retained without repeating them."
+}

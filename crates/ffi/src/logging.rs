@@ -3,6 +3,9 @@ use crate::*;
 use std::ffi::c_void;
 use std::sync::Mutex;
 
+#[cfg(test)]
+pub(crate) static TEST_LOGGER_LOCK: Mutex<()> = Mutex::new(());
+
 type Callback = unsafe extern "C" fn(i32, *const c_char, *mut c_void);
 
 #[derive(Clone, Copy)]

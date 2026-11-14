@@ -61,6 +61,7 @@ unsafe fn write_state(
     target: *mut u8,
     capacity: usize,
 ) -> Result<usize> {
+    context.performance.synchronize()?;
     let state = prepared(context, sequence, flags)?;
     let required = state.bytes.len();
     let written = state
@@ -106,6 +107,7 @@ fn read_state(
     sequence: Option<i32>,
     flags: u32,
 ) -> Result<usize> {
+    context.performance.synchronize()?;
     if sequence.is_none() {
         return context
             .decoder_mut()?
@@ -406,6 +408,9 @@ unsafe fn save_file(
     sequence: Option<i32>,
 ) -> Result<usize> {
     use std::io::Write;
+    unsafe { reference_mut(context)? }
+        .performance
+        .synchronize()?;
     let path = Path::new(unsafe { c_string(path)? });
     let tokens = unsafe { input_slice(tokens, count)? };
     let context = unsafe { reference(context)? };
@@ -458,9 +463,9 @@ unsafe fn load_file(
     sequence: Option<i32>,
 ) -> Result<usize> {
     let path = Path::new(unsafe { c_string(path)? });
-    unsafe {
-        reference(context)?;
-    }
+    unsafe { reference_mut(context)? }
+        .performance
+        .synchronize()?;
     let bytes = file_bytes(path)?;
     let head = bytes.get(..12).ok_or("truncated session file header")?;
     let u32_at = |i: usize| u32::from_le_bytes(head[i..i + 4].try_into().expect("four bytes"));

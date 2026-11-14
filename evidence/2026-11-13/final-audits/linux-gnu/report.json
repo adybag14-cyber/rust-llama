@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "status": "succeeded",
+  "profile": "linux-gnu",
+  "started_utc": "2026-11-13T22:20:02.884707+00:00",
+  "steps": [
+    {
+      "name": "format",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.39,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "source-and-dependency-audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 132.217,
+      "stdout": {
+        "bytes": 65208,
+        "sha256": "1273197014fc83781e4b92c4c7544bc3b25ba95ca997bc78d0d61bf105043b4b"
+      },
+      "stderr": {
+        "bytes": 137,
+        "sha256": "3d9c6bf0045f04fc7b52b8ce3f4821573cf74115aab3b54ee31850a4a2af5c77"
+      }
+    },
+    {
+      "name": "fixture-integrity",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 129.015,
+      "stdout": {
+        "bytes": 200,
+        "sha256": "c6d0da6993f8aadf7761c24b0a151992fd4e65045315260a6690ffcb215ed181"
+      },
+      "stderr": {
+        "bytes": 140,
+        "sha256": "1ce6621bc79f4cbdaa26f3d3c0d6e03de276c790e41c47df45c80d848130263d"
+      }
+    },
+    {
+      "name": "supplied-source",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "/mnt/c/Users/adyba/Downloads/llama.cpp-master (4)/llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 19.914,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+      },
+      "stderr": {
+        "bytes": 214,
+        "sha256": "78c9a1b4e6e057820c550cdfb86eab3e39fe51f75beb217f8662030978cb0180"
+      }
+    },
+    {
+      "name": "reference-source",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "/mnt/c/Users/adyba/rust-llama-reference/llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 16.156,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+      },
+      "stderr": {
+        "bytes": 202,
+        "sha256": "b6cfcf4a2897c395c96b7f3d8af86291f67948636e5c108066e6af2fff17c9fe"
+      }
+    },
+    {
+      "name": "release-gates",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "release-check"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 0.52,
+      "stdout": {
+        "bytes": 4024,
+        "sha256": "6dcb8610ad3c3469d62d28eab5f32e28b14d720f6321c360b612188d6a19fdcd"
+      },
+      "stderr": {
+        "bytes": 216,
+        "sha256": "025f6c019eb14e2b0e182e525cc7758f0c59226a1118c8352d56cbd7945dcadc"
+      }
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 466.132,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "metadata_delta": {
+    "path": "release/dependency-inventory.tsv",
+    "before": {
+      "bytes": 3942,
+      "sha256": "0665cdd6e608995c8639556149fdb94f835888c702609bbb7b080f5b9a163f71"
+    },
+    "after": {
+      "bytes": 4707,
+      "sha256": "c7bd5fd6f748f5fe2e951757f07ede6628f9398fbf1cc03169b22a066d8af64a"
+    },
+    "reason": "Document implemented dense Llama CUDA, Falcon synthetic/official-sidecar scope and platform CRT FILE ownership boundaries; no runtime or fixture changes.",
+    "qualification": "Only dependency-boundary documentation changed after runtime validation. Rust, Cargo, fixtures, fixture manifests and all other selected inputs are identical."
+  },
+  "execution_inputs": {
+    "files": 1623,
+    "total_file_bytes": 1048385877,
+    "manifest": {
+      "bytes": 244857,
+      "sha256": "26eef0c4104501fde44ca730d22cbeaee9f3590057ef20c474d6d228af4f4bf4"
+    }
+  },
+  "prior_execution_inputs": {
+    "bytes": 244857,
+    "sha256": "e1f5c9469d0f5fd53691f832e727e3a729a6a1dc1bfe43a4d35cf930435e6f91"
+  },
+  "runtime_continuations": {
+    "windows-msvc": {
+      "bytes": 446597,
+      "sha256": "cd5160c6e2c7ef42674f0aecf412df83f42b7426c81c10bad2b07583baa68907"
+    },
+    "linux-gnu": {
+      "bytes": 172219,
+      "sha256": "846dc930c9884ed4a1418fd2e059035cc2e956f93453b4ee978b737f75b00bae"
+    }
+  },
+  "driver": {
+    "bytes": 5198,
+    "sha256": "c011e0cfbf726cd3a656b0701084a4594fc18a3873f52b5350c07aaaffb45822"
+  },
+  "unchanged_execution_inputs": true,
+  "finished_utc": "2026-11-13T22:33:34.887769+00:00"
+}

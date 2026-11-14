@@ -1,0 +1,435 @@
+{
+  "schema": 1,
+  "baseline_zip_sha256": "2db1e23f619fcabfd628481683c57b1e3e90db86bd045900a04b6073e1843122",
+  "description": "Independent frozen StarCoder/StarCoder2 converter complete-file outputs; synthetic weights, original GPT2 and official StarCoder tokenizer sidecars. Tiny StarCoder pretrained acceptance is separate; StarCoder2 pretrained checkpoint conversion is not claimed.",
+  "profiles": [
+    {
+      "host": "windows",
+      "cohort": "original-v1",
+      "pipeline_report": {
+        "bytes": 525083748,
+        "sha256": "a8340cc01f075b5dd0b26def5eaf74ce5f25f69974dbbf6220aa537ceace27c2"
+      },
+      "capture_script": {
+        "path": "capture-pipeline.py",
+        "bytes": 11497,
+        "sha256": "7a74aeed46df5a568307f5dc8a61016c5d3b570c2800b4e7a488be96ad57bd30"
+      },
+      "source_files": [
+        {
+          "path": "conversion/base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "conversion/starcoder.py",
+          "bytes": 982,
+          "sha256": "d6b83fba5ad11f03d2f904f44ac0e0bac122ef5a392be446bc5dd8ca2ebdc14e"
+        },
+        {
+          "path": "gguf-py/gguf/constants.py",
+          "bytes": 286596,
+          "sha256": "8c1ddd5380a447340dce4d653e943668a2caa51e21e1ffce0efe81565d4b702f"
+        },
+        {
+          "path": "gguf-py/gguf/tensor_mapping.py",
+          "bytes": 155926,
+          "sha256": "4cc8ec9594512530ab44c21e4f844fdb74bb4c3d596458537d8da3dbd3e4c5e8"
+        },
+        {
+          "path": "gguf-py/gguf/gguf_writer.py",
+          "bytes": 82905,
+          "sha256": "a5c910b3a7181b0b94d6f838e5f183f3ecc2a5cec19249dfa10b1b33a15be372"
+        },
+        {
+          "path": "gguf-py/gguf/vocab.py",
+          "bytes": 44942,
+          "sha256": "e2ec00d37aa6e7b6237bc3949df9be3214a88e776bb1020c8b7ad61cbb353966"
+        }
+      ],
+      "environment": {
+        "python": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+        "packages": {
+          "torch": "2.11.0+cpu",
+          "numpy": "2.4.6",
+          "transformers": "4.57.6",
+          "sentencepiece": "0.2.1",
+          "safetensors": "0.8.0",
+          "tokenizers": "0.22.2",
+          "protobuf": "4.25.8"
+        },
+        "torch_config": "PyTorch built with:\n  - C++ Version: 201703\n  - MSVC 194234444\n  - Intel(R) oneAPI Math Kernel Library Version 2025.3-Product Build 20251007 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\n  - OpenMP 2019\n  - LAPACK is enabled (usually provided by MKL)\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=70d99e998b4955e0049d13a98d77ae1b14db1f45, CXX_COMPILER=C:/actions-runner/_work/pytorch/pytorch/pytorch/.ci/pytorch/windows/tmp_bin/sccache-cl.exe, CXX_FLAGS=/DWIN32 /D_WINDOWS /EHsc /Zc:__cplusplus /bigobj /FS /utf-8 -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE /wd4624 /wd4068 /wd4067 /wd4267 /wd4661 /wd4717 /wd4244 /wd4804 /wd4273, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.11.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=OFF, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "torch_parallel": "ATen/Parallel:\n\tat::get_num_threads() : 16\n\tat::get_num_interop_threads() : 16\nOpenMP 2019\n\tomp_get_max_threads() : 16\nIntel(R) oneAPI Math Kernel Library Version 2025.3-Product Build 20251007 for Intel(R) 64 architecture applications\n\tmkl_get_max_threads() : 16\nIntel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\nstd::thread::hardware_concurrency() : 32\nEnvironment variables:\n\tOMP_NUM_THREADS : [not set]\n\tMKL_NUM_THREADS : [not set]\nATen parallel backend: OpenMP\n"
+      }
+    },
+    {
+      "host": "windows",
+      "cohort": "original-official-v1",
+      "pipeline_report": {
+        "bytes": 57474952,
+        "sha256": "8824233f816c35ae94eb8905eefcb6a2c136d3d9878f7927c3593462610284f7"
+      },
+      "capture_script": {
+        "path": "capture-official.py",
+        "bytes": 2421,
+        "sha256": "71b101e6e58eb744fe42ae8dcbf8586df34d2637ed49b9b60ef61c95226c8b7f"
+      },
+      "source_files": [
+        {
+          "path": "conversion/base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "conversion/starcoder.py",
+          "bytes": 982,
+          "sha256": "d6b83fba5ad11f03d2f904f44ac0e0bac122ef5a392be446bc5dd8ca2ebdc14e"
+        },
+        {
+          "path": "gguf-py/gguf/constants.py",
+          "bytes": 286596,
+          "sha256": "8c1ddd5380a447340dce4d653e943668a2caa51e21e1ffce0efe81565d4b702f"
+        },
+        {
+          "path": "gguf-py/gguf/tensor_mapping.py",
+          "bytes": 155926,
+          "sha256": "4cc8ec9594512530ab44c21e4f844fdb74bb4c3d596458537d8da3dbd3e4c5e8"
+        },
+        {
+          "path": "gguf-py/gguf/gguf_writer.py",
+          "bytes": 82905,
+          "sha256": "a5c910b3a7181b0b94d6f838e5f183f3ecc2a5cec19249dfa10b1b33a15be372"
+        },
+        {
+          "path": "gguf-py/gguf/vocab.py",
+          "bytes": 44942,
+          "sha256": "e2ec00d37aa6e7b6237bc3949df9be3214a88e776bb1020c8b7ad61cbb353966"
+        }
+      ],
+      "environment": {
+        "python": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+        "packages": {
+          "torch": "2.11.0+cpu",
+          "numpy": "2.4.6",
+          "transformers": "4.57.6",
+          "sentencepiece": "0.2.1",
+          "safetensors": "0.8.0",
+          "tokenizers": "0.22.2",
+          "protobuf": "4.25.8"
+        },
+        "torch_config": "PyTorch built with:\n  - C++ Version: 201703\n  - MSVC 194234444\n  - Intel(R) oneAPI Math Kernel Library Version 2025.3-Product Build 20251007 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\n  - OpenMP 2019\n  - LAPACK is enabled (usually provided by MKL)\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=70d99e998b4955e0049d13a98d77ae1b14db1f45, CXX_COMPILER=C:/actions-runner/_work/pytorch/pytorch/pytorch/.ci/pytorch/windows/tmp_bin/sccache-cl.exe, CXX_FLAGS=/DWIN32 /D_WINDOWS /EHsc /Zc:__cplusplus /bigobj /FS /utf-8 -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE /wd4624 /wd4068 /wd4067 /wd4267 /wd4661 /wd4717 /wd4244 /wd4804 /wd4273, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.11.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=OFF, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "torch_parallel": "ATen/Parallel:\n\tat::get_num_threads() : 16\n\tat::get_num_interop_threads() : 16\nOpenMP 2019\n\tomp_get_max_threads() : 16\nIntel(R) oneAPI Math Kernel Library Version 2025.3-Product Build 20251007 for Intel(R) 64 architecture applications\n\tmkl_get_max_threads() : 16\nIntel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\nstd::thread::hardware_concurrency() : 32\nEnvironment variables:\n\tOMP_NUM_THREADS : [not set]\n\tMKL_NUM_THREADS : [not set]\nATen parallel backend: OpenMP\n"
+      }
+    },
+    {
+      "host": "linux",
+      "cohort": "original-v1",
+      "pipeline_report": {
+        "bytes": 502878627,
+        "sha256": "e9733e1eb5b0d858b02b6a4c28105e704770f5d15dc802f6660e7cb7eb41fbb9"
+      },
+      "capture_script": {
+        "path": "capture-pipeline.py",
+        "bytes": 11497,
+        "sha256": "7a74aeed46df5a568307f5dc8a61016c5d3b570c2800b4e7a488be96ad57bd30"
+      },
+      "source_files": [
+        {
+          "path": "conversion/base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "conversion/starcoder.py",
+          "bytes": 982,
+          "sha256": "d6b83fba5ad11f03d2f904f44ac0e0bac122ef5a392be446bc5dd8ca2ebdc14e"
+        },
+        {
+          "path": "gguf-py/gguf/constants.py",
+          "bytes": 286596,
+          "sha256": "8c1ddd5380a447340dce4d653e943668a2caa51e21e1ffce0efe81565d4b702f"
+        },
+        {
+          "path": "gguf-py/gguf/tensor_mapping.py",
+          "bytes": 155926,
+          "sha256": "4cc8ec9594512530ab44c21e4f844fdb74bb4c3d596458537d8da3dbd3e4c5e8"
+        },
+        {
+          "path": "gguf-py/gguf/gguf_writer.py",
+          "bytes": 82905,
+          "sha256": "a5c910b3a7181b0b94d6f838e5f183f3ecc2a5cec19249dfa10b1b33a15be372"
+        },
+        {
+          "path": "gguf-py/gguf/vocab.py",
+          "bytes": 44942,
+          "sha256": "e2ec00d37aa6e7b6237bc3949df9be3214a88e776bb1020c8b7ad61cbb353966"
+        }
+      ],
+      "environment": {
+        "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+        "packages": {
+          "torch": "2.11.0+cpu",
+          "numpy": "2.2.6",
+          "transformers": "4.57.6",
+          "sentencepiece": "0.2.1",
+          "safetensors": "0.8.0",
+          "tokenizers": "0.22.2",
+          "protobuf": "4.25.8"
+        },
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 201703\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=70d99e998b4955e0049d13a98d77ae1b14db1f45, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.11.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "torch_parallel": "ATen/Parallel:\n\tat::get_num_threads() : 8\n\tat::get_num_interop_threads() : 16\nOpenMP 201511 (a.k.a. OpenMP 4.5)\n\tomp_get_max_threads() : 8\nIntel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n\tmkl_get_max_threads() : 8\nIntel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\nstd::thread::hardware_concurrency() : 16\nEnvironment variables:\n\tOMP_NUM_THREADS : [not set]\n\tMKL_NUM_THREADS : [not set]\nATen parallel backend: OpenMP\n"
+      }
+    },
+    {
+      "host": "linux",
+      "cohort": "original-official-v1",
+      "pipeline_report": {
+        "bytes": 55112385,
+        "sha256": "06741c7dbea2efcdc3ce5ed83d44c6b5850c89da13a0b496ccf99162219789dc"
+      },
+      "capture_script": {
+        "path": "capture-official.py",
+        "bytes": 2421,
+        "sha256": "71b101e6e58eb744fe42ae8dcbf8586df34d2637ed49b9b60ef61c95226c8b7f"
+      },
+      "source_files": [
+        {
+          "path": "conversion/base.py",
+          "bytes": 179995,
+          "sha256": "3ac8c8eb7e02b9fbfa594e887160b7c45a906273f672d286e0e1a10f245a7d60"
+        },
+        {
+          "path": "conversion/starcoder.py",
+          "bytes": 982,
+          "sha256": "d6b83fba5ad11f03d2f904f44ac0e0bac122ef5a392be446bc5dd8ca2ebdc14e"
+        },
+        {
+          "path": "gguf-py/gguf/constants.py",
+          "bytes": 286596,
+          "sha256": "8c1ddd5380a447340dce4d653e943668a2caa51e21e1ffce0efe81565d4b702f"
+        },
+        {
+          "path": "gguf-py/gguf/tensor_mapping.py",
+          "bytes": 155926,
+          "sha256": "4cc8ec9594512530ab44c21e4f844fdb74bb4c3d596458537d8da3dbd3e4c5e8"
+        },
+        {
+          "path": "gguf-py/gguf/gguf_writer.py",
+          "bytes": 82905,
+          "sha256": "a5c910b3a7181b0b94d6f838e5f183f3ecc2a5cec19249dfa10b1b33a15be372"
+        },
+        {
+          "path": "gguf-py/gguf/vocab.py",
+          "bytes": 44942,
+          "sha256": "e2ec00d37aa6e7b6237bc3949df9be3214a88e776bb1020c8b7ad61cbb353966"
+        }
+      ],
+      "environment": {
+        "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+        "packages": {
+          "torch": "2.11.0+cpu",
+          "numpy": "2.2.6",
+          "transformers": "4.57.6",
+          "sentencepiece": "0.2.1",
+          "safetensors": "0.8.0",
+          "tokenizers": "0.22.2",
+          "protobuf": "4.25.8"
+        },
+        "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 201703\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX512\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=70d99e998b4955e0049d13a98d77ae1b14db1f45, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.11.0, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+        "torch_parallel": "ATen/Parallel:\n\tat::get_num_threads() : 8\n\tat::get_num_interop_threads() : 16\nOpenMP 201511 (a.k.a. OpenMP 4.5)\n\tomp_get_max_threads() : 8\nIntel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n\tmkl_get_max_threads() : 8\nIntel(R) MKL-DNN v3.10.2 (Git Hash f1d471933dc852f956fd05389f9313c7148783d5)\nstd::thread::hardware_concurrency() : 16\nEnvironment variables:\n\tOMP_NUM_THREADS : [not set]\n\tMKL_NUM_THREADS : [not set]\nATen parallel backend: OpenMP\n"
+      }
+    }
+  ],
+  "tables": {
+    "host": "windows",
+    "bytes": 106063,
+    "sha256": "4d90265df06e33d0e1192d2a3675a6e8ea7d65b41ded5e8d94cf66cacfadb3f7"
+  },
+  "aliases": [
+    {
+      "host": "windows",
+      "bytes": 151382,
+      "sha256": "b0b6de45a0fd128720ec40c37f913bd5bdd6882d959a10806ab3878595b83da4"
+    },
+    {
+      "host": "linux",
+      "bytes": 146373,
+      "sha256": "e71f535d95944531d0ccccbbad1adabd87bf6a9ea3e699db50aa8b346635c9e6"
+    }
+  ],
+  "official_sidecars": [
+    {
+      "schema": 1,
+      "model": "bigcode/tiny_starcoder_py",
+      "revision": "8547527bef0bc927268c1653cce6948c5c242dd1",
+      "api_url": "https://huggingface.co/api/models/bigcode/tiny_starcoder_py/revision/8547527bef0bc927268c1653cce6948c5c242dd1?blobs=true",
+      "api": {
+        "bytes": 5045,
+        "sha256": "d72a0497efa064265fa24b2ab6f0c5e3682756be367997abfb2979cc1d785fe0"
+      },
+      "license": "bigcode-openrail-m",
+      "files": [
+        {
+          "path": "README.md",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/README.md",
+          "bytes": 2703,
+          "sha256": "6bb27540fd61fe67452f66a2d7e26d8d047512ebffc13010abdfff263941eff6",
+          "git_blob": "f9586d44725a4aae2201829ad31e2274fc494069",
+          "lfs_sha256": null
+        },
+        {
+          "path": "config.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/config.json",
+          "bytes": 1030,
+          "sha256": "5961dd4e9a1f649c509cee1a4936cda489b165dc38b33127d39623a8f13490a5",
+          "git_blob": "231659353fb298564bd96d41f24ec47337f6306d",
+          "lfs_sha256": null
+        },
+        {
+          "path": "generation_config.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/generation_config.json",
+          "bytes": 111,
+          "sha256": "368f15f9c335d48e1a585440037c77022af6b867303dc8fe9ee01e8fc86c1617",
+          "git_blob": "344b8478e86f0cb7933a50ef1fff9127ed27266c",
+          "lfs_sha256": null
+        },
+        {
+          "path": "tokenizer_config.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/tokenizer_config.json",
+          "bytes": 677,
+          "sha256": "95684c52ad9a970dbbb17576ee2237cb62902c1eff6804c7c91a4d6219a4a6d7",
+          "git_blob": "470c1a3b1b01fcbd5062f6090322b4973afe4a08",
+          "lfs_sha256": null
+        },
+        {
+          "path": "special_tokens_map.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/special_tokens_map.json",
+          "bytes": 532,
+          "sha256": "0823292e24ea07b89317e9ede9d08da2a1b6c014290c06908a7ad04f1efd6719",
+          "git_blob": "c29d075707c112beeebd7a93e59dfa37c86c67c8",
+          "lfs_sha256": null
+        },
+        {
+          "path": "tokenizer.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/tokenizer.json",
+          "bytes": 2057395,
+          "sha256": "42b5a37ba11199f024f2b8873e1ecba98da33166e16f700bf7cb2304b0a5583f",
+          "git_blob": "a6ab891acc76620ae63d7acf9cc85a5e319463c4",
+          "lfs_sha256": null
+        },
+        {
+          "path": "vocab.json",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/vocab.json",
+          "bytes": 776993,
+          "sha256": "20175afb9f164fad4829aca2279f8df7eeff1e2e3f671378aaa287a740aff09f",
+          "git_blob": "795a5a47f65fcf89e7957e8462d42c45cf9ca240",
+          "lfs_sha256": null
+        },
+        {
+          "path": "merges.txt",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/merges.txt",
+          "bytes": 441848,
+          "sha256": "74b0a4bc1a97ebc1d227f69231b18574374ba052fb945b0fa0aa91d3c32504a2",
+          "git_blob": "9698576bccc16b90674462c938f33ea46626bec7",
+          "lfs_sha256": null
+        },
+        {
+          "path": "model.safetensors",
+          "url": "https://huggingface.co/bigcode/tiny_starcoder_py/resolve/8547527bef0bc927268c1653cce6948c5c242dd1/model.safetensors",
+          "bytes": 656601304,
+          "sha256": "15fa942f055b618d5ca6283f5c27278a475ff12e53dc704b9658ffd5160d4021",
+          "git_blob": "82d442d1220d639f42467ad56f6a63dee546f67e",
+          "lfs_sha256": "15fa942f055b618d5ca6283f5c27278a475ff12e53dc704b9658ffd5160d4021"
+        }
+      ],
+      "complete": true,
+      "started_unix": 1794664049.1956725
+    },
+    {
+      "schema": 1,
+      "model": "bigcode/starcoder2-3b",
+      "revision": "733247c55e3f73af49ce8e9c7949bf14af205928",
+      "api_url": "https://huggingface.co/api/models/bigcode/starcoder2-3b/revision/733247c55e3f73af49ce8e9c7949bf14af205928?blobs=true",
+      "api": {
+        "bytes": 6902,
+        "sha256": "8f7d47ec144224de11c8c1c93a71637455d08ddefbfd8c13e551e0d3a8b7711d"
+      },
+      "license": "bigcode-openrail-m",
+      "files": [
+        {
+          "path": "README.md",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/README.md",
+          "bytes": 8416,
+          "sha256": "935c418b71ef9007801532d2680f4b6239b8e57841e103ac521747e7ac6eca4b",
+          "git_blob": "f3ca388ede4681cc3125b893b5cbe033972b0903",
+          "lfs_sha256": null
+        },
+        {
+          "path": "config.json",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/config.json",
+          "bytes": 700,
+          "sha256": "636a8a48c05d5882e4467aacc1e2cc0dcff83be582f5658e3af172bda5e7d94e",
+          "git_blob": "bed2a3b56b6f6cd679ac808ac83c1b19265dfd78",
+          "lfs_sha256": null
+        },
+        {
+          "path": "tokenizer_config.json",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/tokenizer_config.json",
+          "bytes": 7877,
+          "sha256": "8149d8e6b21275ad2cc346885ad92c0e9b5aa3e28a78bb5d39b7febc7e52545d",
+          "git_blob": "7ab761cba63d59f29c68046788766ca886b74364",
+          "lfs_sha256": null
+        },
+        {
+          "path": "special_tokens_map.json",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/special_tokens_map.json",
+          "bytes": 958,
+          "sha256": "1dd716f4648a359f7fca1221fc6a14edb1dd369239a4d7e0e5674c5f11f061d6",
+          "git_blob": "be92cbb8ee29740d5e58a8b9b1f867e7eb398602",
+          "lfs_sha256": null
+        },
+        {
+          "path": "tokenizer.json",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/tokenizer.json",
+          "bytes": 2060919,
+          "sha256": "6190a6649d90a7fe35bfed8bff990c3e7aafc3cfa5beea185045f03f0890402b",
+          "git_blob": "d6f3ae7bda4a1718b847d6f9234bd1a69a62ba03",
+          "lfs_sha256": null
+        },
+        {
+          "path": "vocab.json",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/vocab.json",
+          "bytes": 777202,
+          "sha256": "542ee3f8b27b3a825754728b4dc59eff31065fecce843a93f09b98f13dbd7de9",
+          "git_blob": "ce6ed34e317bf5811bb557c2148e4724667e108d",
+          "lfs_sha256": null
+        },
+        {
+          "path": "merges.txt",
+          "url": "https://huggingface.co/bigcode/starcoder2-3b/resolve/733247c55e3f73af49ce8e9c7949bf14af205928/merges.txt",
+          "bytes": 441705,
+          "sha256": "ac9dfb2c5bd3b10bd46aa7fdaa8c54e8e1bcfe1618d9288320ebc82c518442fc",
+          "git_blob": "dc848ee612b08aea786a8cf4abb7fc1ff528a181",
+          "lfs_sha256": null
+        }
+      ],
+      "complete": true,
+      "started_unix": 1794664518.5612826
+    }
+  ],
+  "stats": {
+    "windows": {
+      "cases": 194,
+      "accepted": 163,
+      "rejected": 31,
+      "output_bytes": 357723535
+    },
+    "linux": {
+      "cases": 194,
+      "accepted": 163,
+      "rejected": 31,
+      "output_bytes": 357723535
+    }
+  },
+  "payload_blobs": 176
+}

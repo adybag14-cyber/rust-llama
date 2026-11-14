@@ -1,0 +1,15 @@
+    Checking llama-gguf v0.1.0 (C:\Users\adyba\rust-llama\crates\gguf)
+    Checking llama-device-family v0.1.0 (C:\Users\adyba\rust-llama\crates\device-family)
+    Checking llama-tokenizer v0.1.0 (C:\Users\adyba\rust-llama\crates\tokenizer)
+error: using `chunks_exact` with a constant chunk size
+   --> crates\device-family\tests\decoder_kernels.rs:318:29
+    |
+318 |         for block in packed.chunks_exact(34) {
+    |                             ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<34>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `llama-device-family` (test "decoder_kernels") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

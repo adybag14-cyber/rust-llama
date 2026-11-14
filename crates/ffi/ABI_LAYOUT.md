@@ -118,3 +118,14 @@ The values below were checked against the frozen header on Windows x64.
 | 33 | llama_sampler_i.backend_set_input | 72 |
 | 34 | llama_sampler_i.backend_reset | 80 |
 | 35 | llama_sampler_i.copy_state | 88 |
+
+## Context sampler attachment
+
+The added repr(C) LlamaSamplerSeqConfig matches the frozen
+llama_sampler_seq_config on the qualified 64-bit hosts: size 16, alignment 8,
+seq_id at offset 0 and sampler at offset 8. It is passed through the existing
+context-parameter samplers/n_samplers fields, so their established layout does
+not change. The original-header backend-sampling clients exercise constructor
+attachments on both MSVC and GNU debug/release libraries. The 36-entry sampler
+layout inspection extension is unchanged; no new inspection indices are implied.
+See BACKEND_SAMPLING.md and fixtures/ffi/backend-sampling/provenance.json.

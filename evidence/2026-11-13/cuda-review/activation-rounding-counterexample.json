@@ -1,0 +1,180 @@
+{
+  "captured_utc": "2026-11-13T21:12:51.465884+00:00",
+  "kind": "independent native UCRT roundf counterexample to GPU activation quantization",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "machine": "AMD64",
+  "python": "3.14.2",
+  "native_function": "ucrtbase!roundf(float), called by ctypes with c_float argument/result",
+  "native_library": {
+    "path": "C:\\Windows\\System32\\ucrtbase.dll",
+    "bytes": 1399656,
+    "sha256": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+  },
+  "frozen_source": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master\\ggml\\src\\ggml-quants.c",
+    "bytes": 228271,
+    "sha256": "bcda33625707fdfcb1367cdd2bb1a2f017430162ec9623abc84ad17459698f73",
+    "function": "quantize_row_q8_0_ref",
+    "source_rounding": "y[i].qs[j] = roundf(x0)"
+  },
+  "reviewed_rust_kernel": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261113\\gpu\\review\\decoder-before-rounding-fix.rs",
+    "sha256": "df5fb8aa14db5fe2fd7a4674657be5b1791add5bfe51d61ac7edb6be2e147e9f",
+    "function": "DecoderKernel::ActivationQ8",
+    "pre_fix_rounding": "trunc(f32(max(x,0)+0.5))-trunc(f32(max(-x,0)+0.5))"
+  },
+  "block": {
+    "f32_bits": [
+      "0x42fe0000",
+      "0x3effffff",
+      "0xbeffffff",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000",
+      "0x00000000"
+    ],
+    "maximum": 127.0,
+    "scale": 1.0,
+    "inverse": 1.0
+  },
+  "observations": [
+    {
+      "input": 0.4999999701976776,
+      "input_bits": "0x3effffff",
+      "native_roundf": 0.0,
+      "native_roundf_bits": "0x00000000",
+      "pre_fix_kernel_quant": 1,
+      "quant_integer_matches": false
+    },
+    {
+      "input": 0.5,
+      "input_bits": "0x3f000000",
+      "native_roundf": 1.0,
+      "native_roundf_bits": "0x3f800000",
+      "pre_fix_kernel_quant": 1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": 0.5000000596046448,
+      "input_bits": "0x3f000001",
+      "native_roundf": 1.0,
+      "native_roundf_bits": "0x3f800000",
+      "pre_fix_kernel_quant": 1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -0.4999999701976776,
+      "input_bits": "0xbeffffff",
+      "native_roundf": -0.0,
+      "native_roundf_bits": "0x80000000",
+      "pre_fix_kernel_quant": -1,
+      "quant_integer_matches": false
+    },
+    {
+      "input": -0.5,
+      "input_bits": "0xbf000000",
+      "native_roundf": -1.0,
+      "native_roundf_bits": "0xbf800000",
+      "pre_fix_kernel_quant": -1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -0.5000000596046448,
+      "input_bits": "0xbf000001",
+      "native_roundf": -1.0,
+      "native_roundf_bits": "0xbf800000",
+      "pre_fix_kernel_quant": -1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": 1.4999998807907104,
+      "input_bits": "0x3fbfffff",
+      "native_roundf": 1.0,
+      "native_roundf_bits": "0x3f800000",
+      "pre_fix_kernel_quant": 1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": 1.5,
+      "input_bits": "0x3fc00000",
+      "native_roundf": 2.0,
+      "native_roundf_bits": "0x40000000",
+      "pre_fix_kernel_quant": 2,
+      "quant_integer_matches": true
+    },
+    {
+      "input": 1.5000001192092896,
+      "input_bits": "0x3fc00001",
+      "native_roundf": 2.0,
+      "native_roundf_bits": "0x40000000",
+      "pre_fix_kernel_quant": 2,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -1.4999998807907104,
+      "input_bits": "0xbfbfffff",
+      "native_roundf": -1.0,
+      "native_roundf_bits": "0xbf800000",
+      "pre_fix_kernel_quant": -1,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -1.5,
+      "input_bits": "0xbfc00000",
+      "native_roundf": -2.0,
+      "native_roundf_bits": "0xc0000000",
+      "pre_fix_kernel_quant": -2,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -1.5000001192092896,
+      "input_bits": "0xbfc00001",
+      "native_roundf": -2.0,
+      "native_roundf_bits": "0xc0000000",
+      "pre_fix_kernel_quant": -2,
+      "quant_integer_matches": true
+    },
+    {
+      "input": 127.0,
+      "input_bits": "0x42fe0000",
+      "native_roundf": 127.0,
+      "native_roundf_bits": "0x42fe0000",
+      "pre_fix_kernel_quant": 127,
+      "quant_integer_matches": true
+    },
+    {
+      "input": -127.0,
+      "input_bits": "0xc2fe0000",
+      "native_roundf": -127.0,
+      "native_roundf_bits": "0xc2fe0000",
+      "pre_fix_kernel_quant": -127,
+      "quant_integer_matches": true
+    }
+  ],
+  "limitations": "This artifact directly calls the native rounding function and reproduces the emitted arithmetic with IEEE F32 intermediates; it is not a live GPU kernel dispatch. Live GPU regression validation belongs to the parent implementation tests."
+}

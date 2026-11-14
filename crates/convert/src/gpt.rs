@@ -87,6 +87,7 @@ pub(crate) fn metadata(config: &Config, out: &mut Metadata, output: OutputType) 
 pub(crate) enum Transform {
     #[default]
     Identity,
+    FalconQkv(crate::falcon::Qkv),
     Transpose01 {
         first: usize,
         second: usize,
@@ -102,6 +103,11 @@ impl Transform {
     /// Return a source-specific transform and replace the shape with the
     /// source's resulting shape. No tensor data is read while planning.
     pub(crate) fn plan(config: &Config, name: &str, shape: &mut Vec<u64>) -> Result<Self> {
+        if config.family == Architecture::Falcon {
+            return Ok(crate::falcon::Qkv::plan(config, name, shape)?
+                .map(Self::FalconQkv)
+                .unwrap_or(Self::Identity));
+        }
         if config.family == Architecture::Gpt2
             && [".c_attn.weight", ".c_proj.weight", ".c_fc.weight"]
                 .iter()
@@ -206,6 +212,7 @@ impl Transform {
             return Err(Error::Invalid("GPT transform output size"));
         }
         let (first, second, tail) = match self {
+            Self::FalconQkv(transform) => return transform.apply(input, output, scalar_bytes),
             Self::Identity => {
                 output.copy_from_slice(input);
                 return Ok(());

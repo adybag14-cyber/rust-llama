@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "status": "running",
+  "profile": "linux-gnu",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-13T21:34:20.365303+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.592,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 635.524,
+      "stdout": {
+        "bytes": 77931,
+        "sha256": "541e17ea584527b1649151c35064fb490c48bfacf9a6dfd35b6ed516a977bf8d"
+      },
+      "stderr": {
+        "bytes": 18602,
+        "sha256": "c8923895516dcd4b616200610ea2246aae33b1df590987a081239bbbb4a35f78"
+      },
+      "tests": {
+        "passed": 757,
+        "failed": 0,
+        "ignored": 40,
+        "suites": 142
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 446.67,
+      "stdout": {
+        "bytes": 77811,
+        "sha256": "b636823381fc244214d33418eda13e658e61265444e86e5d37e82c5fc185660b"
+      },
+      "stderr": {
+        "bytes": 18966,
+        "sha256": "2cd7f938b26e8da7b57faf8be5a75df2885e4d9bf6cf3c4be3c1ee7fb280d237"
+      },
+      "tests": {
+        "passed": 757,
+        "failed": 0,
+        "ignored": 40,
+        "suites": 142
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 14.857,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1149,
+        "sha256": "0b9f740b3922a3d9a5ddb47d3738e846b7e52efac9ff7f4e7816f3fcaccb0c80"
+      }
+    },
+    {
+      "name": "release-build",
+      "argv": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 37.563,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1075,
+        "sha256": "240034d7b10862d07a9a8088b00f67ee6d57b59920d4847df5c0a11928267c7f"
+      }
+    },
+    {
+      "name": "debug-library",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 2.63,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 145,
+        "sha256": "ec29132ccd8121395fdb1806ee59e215b83f1d224d4befefd9d42801229ae70a"
+      }
+    },
+    {
+      "name": "prepare-gpt2",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "gpt2-124m-f16",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gpt2-oracle/official-hf/model.safetensors",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261113/full-validation/integrated-v1/linux-gnu/prepared-pretrained/gpt2-124m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 20.319,
+      "stdout": {
+        "bytes": 171,
+        "sha256": "7aa97b8e7484835068bdd0eeba879c0aaadfc37b396390d7e0cdfd46f7195c47"
+      },
+      "stderr": {
+        "bytes": 409,
+        "sha256": "a76f305d95f8829c98fed90562cb9e44af96845a99bf88dd25a2f6aabb1da45d"
+      }
+    },
+    {
+      "name": "prepare-gptneox",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "prepare-pretrained-fixture",
+        "pythia-14m-f16",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261111/gptneox-oracle/official-hf/model.safetensors",
+        "/mnt/c/Users/adyba/rust-llama-reference/continue-20261113/full-validation/integrated-v1/linux-gnu/prepared-pretrained/pythia-14m-f16.gguf"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.927,
+      "stdout": {
+        "bytes": 169,
+        "sha256": "4fb8293b226740d3e2dd9c7ba45f4861d50d10b5067bab31314da5bcc23c286b"
+      },
+      "stderr": {
+        "bytes": 414,
+        "sha256": "77cdd4f91a81f1d6fdbfccc30f86baa82959e5ea8e74035c735605727367c105"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1623,
+    "bytes": 244857,
+    "sha256": "e1f5c9469d0f5fd53691f832e727e3a729a6a1dc1bfe43a4d35cf930435e6f91",
+    "scope": "All Git-listed tracked/unignored files except evidence/, Markdown documentation, release/gates.tsv and the derived release/non-rust-allowlist.tsv. Includes all Rust source, Cargo/toolchain/configuration, dependency controls, fixtures and fixture manifests. Documentation and final package audit are sealed separately."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "c-clients",
+    "clippy",
+    "debug-library",
+    "debug-tests",
+    "encoder-c-clients",
+    "fmt",
+    "new-c-clients",
+    "pretrained-inference",
+    "pretrained-native-encoder",
+    "quantization-c-clients",
+    "release-build",
+    "release-tests"
+  ],
+  "driver": {
+    "bytes": 17859,
+    "sha256": "000f8ab4737f67517ff4661ecf91d6184b0b303690dcf0bfcb36e18c78bf067f"
+  },
+  "git_head": "f6d238cb8a8f462f9a93eeb6eb1086978b021758",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 22.4.0 (jammy) [64-bit]\n",
+  "prepared_models": {
+    "gpt2-124m-f16": {
+      "output_path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261113/full-validation/integrated-v1/linux-gnu/prepared-pretrained/gpt2-124m-f16.gguf",
+      "bytes": 252470528,
+      "sha256": "c7cb2936027231a4f2159264f9a635742d0d3bbbf1ddfd82074337b0d1c6e3a7"
+    },
+    "pythia-14m-f16": {
+      "output_path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261113/full-validation/integrated-v1/linux-gnu/prepared-pretrained/pythia-14m-f16.gguf",
+      "bytes": 29929440,
+      "sha256": "4fefeed58ed27e1fc93b31145494ba87ce539cdf74cef809122b3c61bb0570a8"
+    }
+  }
+}

@@ -258,7 +258,34 @@ impl Context {
                 state.position = position;
                 Ok(())
             }
+            (Model::Starcoder(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
+            (Model::Starcoder2(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
             (Model::Bloom(model), SequenceMemory::Attention(layers)) => {
+                let length = owned::multiply(position, model.config().kv_width()?)?;
+                for layer in layers {
+                    layer.keys.truncate(length);
+                    layer.values.truncate(length);
+                }
+                state.position = position;
+                Ok(())
+            }
+            (Model::Falcon(model), SequenceMemory::Attention(layers)) => {
                 let length = owned::multiply(position, model.config().kv_width()?)?;
                 for layer in layers {
                     layer.keys.truncate(length);
@@ -460,7 +487,16 @@ impl Context {
                     (Model::Gpt2(model), SequenceMemory::Attention(cache)) => {
                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
                     }
+                    (Model::Starcoder(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
+                    (Model::Starcoder2(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
                     (Model::Bloom(model), SequenceMemory::Attention(cache)) => {
+                        model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
+                    }
+                    (Model::Falcon(model), SequenceMemory::Attention(cache)) => {
                         model.step(input, state.position, cache, &self.adapters, &mut cancelled)?
                     }
                     (Model::GptNeoX(model), SequenceMemory::Attention(cache)) => {

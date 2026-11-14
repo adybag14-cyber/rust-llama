@@ -1,0 +1,74 @@
+{
+  "complete": true,
+  "workflow": {
+    "bytes": 20241,
+    "sha256": "1ddfe489b2ac1ce5affde30c26f12163488c7840dc61e6b74fee8875791c3127"
+  },
+  "selectors": [
+    1,
+    1,
+    1
+  ],
+  "cpu_starcoder_ignored_selected": 0,
+  "native_posix_paths_verified": [
+    {
+      "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/starcoder-converter/ci-validation-v1/runner-linux/starcoder-converter-output/tiny_starcoder_py/f16.gguf",
+      "bytes": 342950656,
+      "sha256": "abdd880356fe55d9e951e5da4b198639d15331d1e10c0015795d10caaa273602"
+    },
+    {
+      "path": "/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/starcoder-converter/ci-validation-v1/runner-linux/starcoder-converter-output/tiny_starcoder_py/q8_0.gguf",
+      "bytes": 195126016,
+      "sha256": "b2620b0de962f582218530233849064c088c56e86344a7e49afb53c7d5957906"
+    }
+  ],
+  "inputs_verified": 9,
+  "conversion_reexecuted": false,
+  "stages": [
+    {
+      "name": "selector-pretrained_starcoder_native_files",
+      "argv": [
+        "/home/tdamre/rust-llama-starcoder-converter-target/release/deps/starcoder_pretrained-e372f07a2637bb44",
+        "pretrained_starcoder_native_files",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "selector-official_tiny_starcoder_f16_matches_original_native_profile",
+      "argv": [
+        "/home/tdamre/rust-llama-starcoder-20261114-target/release/deps/starcoder-adec9eb331fd2860",
+        "official_tiny_starcoder_f16_matches_original_native_profile",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "selector-official_tiny_starcoder_q8_matches_original_native_profile",
+      "argv": [
+        "/home/tdamre/rust-llama-starcoder-20261114-target/release/deps/starcoder-adec9eb331fd2860",
+        "official_tiny_starcoder_q8_matches_original_native_profile",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "cpu-starcoder-skip",
+      "argv": [
+        "/home/tdamre/rust-llama-starcoder-20261114-target/release/deps/starcoder-adec9eb331fd2860",
+        "--ignored",
+        "--skip",
+        "starcoder",
+        "--list"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "pwsh": null
+}

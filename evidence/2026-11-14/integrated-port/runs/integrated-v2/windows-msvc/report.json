@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "tag": "integrated-v2",
+  "started_utc": "2026-11-14T15:05:26.322110+00:00",
+  "steps": [
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 13.798,
+      "stdout": {
+        "bytes": 68475,
+        "sha256": "06bc29c77c3c0406287111dda25e35bb7aa4bb4ba06b4ff8355e08f216cc4d3f"
+      },
+      "stderr": {
+        "bytes": 168,
+        "sha256": "7fb5f9d576bce38347867286dd8af7a68cc65681abb192c2a007b01e48504e47"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.034,
+      "stdout": {
+        "bytes": 200,
+        "sha256": "d2f4ebba19932f6f16147e51a97cc47f3d102c862d20637145a518ff0f76af86"
+      },
+      "stderr": {
+        "bytes": 111,
+        "sha256": "df44f15d8f7ce22bd6c43dd1f53515c1388937be89e4183d2e2f4fcfb9b8d617"
+      }
+    },
+    {
+      "name": "release-build",
+      "argv": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.368,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 122,
+        "sha256": "46ed67914a9b421755e7057ca2ab3138dba8f053341d9cc1fec45719a6cf7e05"
+      }
+    },
+    {
+      "name": "debug-library",
+      "argv": [
+        "cargo",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.105,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 72,
+        "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6"
+      }
+    },
+    {
+      "name": "verify-source",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\Downloads\\llama.cpp-master (4)\\llama.cpp-master"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 8.964,
+      "stdout": {
+        "bytes": 66,
+        "sha256": "62879f033cc79f28340a6ccb80cae1e1d28912e2c7afaaaf70b580b2736a0922"
+      },
+      "stderr": {
+        "bytes": 241,
+        "sha256": "44524b12785634885e9f9fef61a37d48525a11369f4638afeb2240a74490bdc0"
+      }
+    },
+    {
+      "name": "verify-reference-copy",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-source",
+        "C:\\Users\\adyba\\rust-llama-reference\\llama.cpp-master"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 2.58,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 924,
+        "sha256": "947e0ab151e240361e1d5bdd94593908a66f431c2e48feb2af359748cf29efcf"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1687,
+    "bytes": 254923,
+    "sha256": "5de1123d3b7446c937ca5ee450a36a2bf1ebeae2115ff539fd82f4bc7fa578a3",
+    "scope": "All Git-listed tracked/unignored files except evidence/, Markdown documentation, release/gates.tsv and the derived release/non-rust-allowlist.tsv. Includes all Rust source, Cargo/toolchain/configuration, dependency controls, fixtures and fixture manifests. Documentation and final package audit are sealed separately."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "audit",
+    "c-clients",
+    "debug-library",
+    "encoder-c-clients",
+    "fixtures",
+    "new-c-clients",
+    "pretrained-inference",
+    "pretrained-native-encoder",
+    "quantization-c-clients",
+    "release-build",
+    "release-gates",
+    "verify-reference-copy",
+    "verify-source"
+  ],
+  "driver": {
+    "bytes": 21399,
+    "sha256": "c82eff40604a963175d49d27d00b54cd667c6015a90a2c5a9709765d427829a9"
+  },
+  "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "continuation": {
+    "prior_run": "integrated-v1",
+    "prior_report": {
+      "bytes": 5490,
+      "sha256": "878b6f366f3eab7a5254eaffcfc2039a80f09ea6334b86e662dd2c2654843295"
+    },
+    "prior_input_manifest": {
+      "bytes": 254922,
+      "sha256": "e4c4b1c241b4160a5f210cf87f06b75d9f6ec11da87cfd51c5bc96123ea3d9e7"
+    },
+    "correction_report": {
+      "bytes": 2625,
+      "sha256": "9d5936fc3fef24d004d5ac2e70d21997e99c8d8e5c78d3a9f59f1c12338e21bd"
+    },
+    "corrected_input_manifest": {
+      "bytes": 254923,
+      "sha256": "5de1123d3b7446c937ca5ee450a36a2bf1ebeae2115ff539fd82f4bc7fa578a3"
+    },
+    "selected_input_delta": [
+      {
+        "path": "fixtures/ffi/backend-sampling/fixture-manifest.tsv",
+        "before": {
+          "bytes": 922,
+          "sha256": "209268c48b9f7bff24dc038040ae6aa505aae2582e7d775145d186594b01c6a6"
+        },
+        "after": {
+          "bytes": 1120,
+          "sha256": "da9f75dad9ae05a9706a0b250e8d40ca6c9c843c336bd4f1884666bed71a2597"
+        }
+      }
+    ],
+    "carried_stage_names": [
+      "fmt",
+      "debug-tests",
+      "release-tests",
+      "clippy"
+    ],
+    "prior_audit_retained_but_rerun": true,
+    "prior_failure_retained": true,
+    "reason": "The sole missing README integrity row is declared without changing any fixture content, Rust/Cargo/configuration or validation policy. Reuse passed ordinary and Clippy stages with verified exact prior logs and guarded metadata-only delta."
+  },
+  "error": "RuntimeError('verify-reference-copy failed 1')",
+  "finished_utc": "2026-11-14T15:06:07.154663+00:00"
+}

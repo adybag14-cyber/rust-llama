@@ -211,8 +211,9 @@ holes and 256-column padding remain present. No decoder KV storage is
 allocated for BERT.
 
 Existing unsupported context options remain unsupported, including scheduler
-callbacks, backend sampling, shared/MTP contexts and graph/context performance
-metrics. `no_perf=true` remains required. GPU discovery/offload, other encoder
+callbacks, backend sampling and shared/MTP contexts. Context elapsed/count
+metrics accept both no_perf settings as documented in CONTEXT_PERFORMANCE.md;
+GGML graph metrics remain zero for direct execution. GPU discovery/offload, other encoder
 architectures, BERT adapters and generalized encoder/decoder graphs are
 separate open requirements.
 

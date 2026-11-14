@@ -1,0 +1,83 @@
+{
+  "host": "windows",
+  "complete": true,
+  "completed_utc": "2026-11-14T14:07:25.640447+00:00",
+  "guard_entries": 219,
+  "guard_equal": true,
+  "stages": [
+    {
+      "tag": "format-final-v1",
+      "args": [
+        "fmt",
+        "-p",
+        "llama-convert"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0498522999996567
+    },
+    {
+      "tag": "clippy-final-v1",
+      "args": [
+        "clippy",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 4.823645000000397
+    },
+    {
+      "tag": "release-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 206.54838449999988
+    },
+    {
+      "tag": "starcoder-debug-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--offline",
+        "--locked",
+        "starcoder",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 133.58109520000016
+    },
+    {
+      "tag": "pretrained-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--test",
+        "starcoder_pretrained",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 11.603802599999653
+    }
+  ]
+}

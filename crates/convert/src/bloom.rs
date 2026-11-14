@@ -40,7 +40,7 @@ pub(crate) fn metadata(config: &Config, out: &mut Metadata, output: OutputType) 
             .ok_or(Error::Invalid("unresolved output type"))?,
     )
 }
-fn head_count(out: &mut Metadata, key: &str, input: &Json) -> Result<()> {
+pub(crate) fn head_count(out: &mut Metadata, key: &str, input: &Json) -> Result<()> {
     if matches!(input, Json::Number(Number::Integer(_)) | Json::Bool(_)) {
         return out.json_uint(key, input);
     }
