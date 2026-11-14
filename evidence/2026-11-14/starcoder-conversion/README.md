@@ -81,6 +81,12 @@ Apache-2.0 and BigCode Open RAIL-M v1. Fixture declarations are in
 docs/starcoder-conversion-fixture-manifest.tsv. The detailed admitted
 conversion contract is docs/STARCODER_HF_CONVERSION.md.
 
-The fixture-local .gitattributes marks pipeline.bin as binary. Its leading
-tokenizer JSON would otherwise make Git interpret later packed tensor bytes
-as text. This review classification preserves every validated payload byte.
+The historical binary-fixture-classification receipt explains why the pack
+needs an explicit binary declaration: its leading tokenizer JSON can make
+Git interpret later packed tensor bytes as text. The temporary fixture-local
+attribute was removed because the repository audit accepts configuration
+only in the root .gitattributes. Integration owns that root declaration.
+Maintained Rust and documentation pass strict whitespace checks; original
+captured data/logs retain their bytes, including native CRLF and original
+model-card trailing spaces. The removal receipt rechecks the unchanged
+numerical inputs, expected outputs and all remaining fixture declarations.
