@@ -459,6 +459,8 @@ pub(crate) fn write(
             | crate::config::Architecture::GptNeoX
             | crate::config::Architecture::Bloom
             | crate::config::Architecture::Falcon
+            | crate::config::Architecture::StarCoder
+            | crate::config::Architecture::StarCoder2
     );
     // These source subclasses directly use the GPT2 vocabulary routine,
     // whose native Tokenizers deserializer admits legacy untagged BPE.

@@ -1,4 +1,4 @@
-//! Bounded native conversion of dense Hugging Face Llama, Qwen, GPT-2, GPT-NeoX, BLOOM and Falcon checkpoints.
+//! Bounded native conversion of dense Hugging Face Llama, Qwen, GPT-2, GPT-NeoX, BLOOM, Falcon, StarCoder and StarCoder2 checkpoints.
 //! The frozen Python converter remains an external comparison oracle only.
 #![deny(unsafe_code)]
 
@@ -28,6 +28,8 @@ mod qwen_tables;
 pub mod rope;
 mod sentencepiece;
 mod special;
+mod starcoder;
+mod starcoder_tables;
 mod tensors;
 mod util;
 mod vocab;

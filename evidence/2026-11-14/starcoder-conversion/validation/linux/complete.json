@@ -1,0 +1,73 @@
+{
+  "host": "linux",
+  "complete": true,
+  "completed_utc": "2026-11-14T14:12:53.226714+00:00",
+  "guard_entries": 219,
+  "guard_equal": true,
+  "stages": [
+    {
+      "tag": "clippy-final-v1",
+      "args": [
+        "clippy",
+        "-p",
+        "llama-convert",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 6.204786549000346
+    },
+    {
+      "tag": "release-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--offline",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 182.1537035299998
+    },
+    {
+      "tag": "starcoder-debug-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--offline",
+        "--locked",
+        "starcoder",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 96.74246635000054
+    },
+    {
+      "tag": "pretrained-final-v1",
+      "args": [
+        "test",
+        "-p",
+        "llama-convert",
+        "--release",
+        "--test",
+        "starcoder_pretrained",
+        "--offline",
+        "--locked",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 34.496843506000005
+    }
+  ]
+}
