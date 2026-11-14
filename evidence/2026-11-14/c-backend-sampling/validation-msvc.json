@@ -1,0 +1,246 @@
+{
+  "profile": "msvc",
+  "steps": [
+    {
+      "name": "format-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "fmt",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-behavior",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.705
+    },
+    {
+      "name": "behavior-debug-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-behavior",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 3.646
+    },
+    {
+      "name": "ffi-debug-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 15.929
+    },
+    {
+      "name": "runtime-debug-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 3.913
+    },
+    {
+      "name": "strict-clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "clippy",
+        "-p",
+        "llama-ffi",
+        "-p",
+        "llama-model-runtime",
+        "-p",
+        "llama-behavior",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.731
+    },
+    {
+      "name": "build-debug",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.136
+    },
+    {
+      "name": "client-debug",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\backend-sampler-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-worktrees\\sampler-20261114\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc\\client-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.088
+    },
+    {
+      "name": "suffix-client-debug",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\cpu-suffix-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\debug\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc\\suffix-client-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.068
+    },
+    {
+      "name": "behavior-release-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-behavior",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 16.948
+    },
+    {
+      "name": "ffi-release-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 44.272
+    },
+    {
+      "name": "runtime-release-final",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "llama-model-runtime",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 43.213
+    },
+    {
+      "name": "build-release",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "-p",
+        "llama-ffi",
+        "--release",
+        "--offline",
+        "--locked",
+        "--target-dir",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.088
+    },
+    {
+      "name": "client-release",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\backend-sampler-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-worktrees\\sampler-20261114\\fixtures\\ffi\\native-context-model.gguf",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc\\client-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.057
+    },
+    {
+      "name": "suffix-client-release",
+      "command": [
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\build-msvc\\Release\\cpu-suffix-oracle.exe",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\release\\llama_ffi.dll",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\original-msvc.json",
+        "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\validation-msvc\\suffix-client-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.072
+    }
+  ],
+  "clients": [
+    {
+      "mode": "debug",
+      "comparison": "all JSON values exact",
+      "library": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\debug\\llama_ffi.dll",
+      "sha256": "7e4407250f3d34a846b7ee0b9cb28e31b76ccf60de82412e961b61b0e1baaafe",
+      "bytes": 7541248,
+      "frozen_exports": 247,
+      "extensions": 4
+    },
+    {
+      "mode": "release",
+      "comparison": "all JSON values exact",
+      "library": "C:\\Users\\adyba\\rust-llama-reference\\backend-sampler-20261114\\target-msvc\\release\\llama_ffi.dll",
+      "sha256": "047b580f9cf128b18f0ef1fb48ce69702a99c12e255d51b0d190ad56b0bd292e",
+      "bytes": 3244032,
+      "frozen_exports": 247,
+      "extensions": 4
+    }
+  ],
+  "scenarios": 26,
+  "rows": 390,
+  "float_words": 77016
+}

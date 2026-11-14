@@ -400,3 +400,11 @@ pub struct LlamaPerfSamplerData {
 
 /// The logger receives a transient NUL-terminated byte string.
 pub type LogCallback = Option<unsafe extern "C" fn(i32, *const std::ffi::c_char, *mut c_void)>;
+
+/// Frozen context-construction sampler mapping (the sampler remains caller-owned).
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct LlamaSamplerSeqConfig {
+    pub seq_id: i32,
+    pub sampler: *mut LlamaSampler,
+}

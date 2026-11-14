@@ -142,7 +142,7 @@ STATE.md documents the raw cache and session contracts.
 
 Llama decoder context creation rejects KV types other than F32/F16, nondefault context types,
 custom RoPE/YaRN, pooling, noncausal attention, nonflash multiple-worker execution, evaluator
-callbacks, backend samplers, shared/MTP contexts, MoE caches, recurrent-state
+callbacks, unsupported backend sampler stages, shared/MTP contexts, MoE caches, recurrent-state
 slots and nondefault output capacity fields. SWA preferences have no effect for the supported non-SWA model.
 All boolean and enum inputs are validated.
 
@@ -167,8 +167,9 @@ and special IDs, returns empty detokenization, and rejects unavailable token
 data/pieces/tokenization with a checked diagnostic instead of the native abort.
 
 Dense F32/F16 memory manipulation and frozen state/session formats are implemented
-as described in STATE.md. Backend-attached sampling, recurrent native caches,
-other encoder architectures and model saving remain absent. Context performance
+as described in STATE.md. BACKEND_SAMPLING.md adds the bounded CPU context-sampling
+prefix/suffix contract. Recurrent native caches, unsupported backend sampler
+stages, other encoder architectures and model saving remain absent. Context performance
 and dense warmup are covered in CONTEXT_PERFORMANCE.md.
 ADAPTERS.md documents the owned LoRA loader and control-vector application.
 CHAT.md documents byte-oriented custom/built-in template application and its limits.
@@ -228,7 +229,8 @@ interfaces, owning chains, raw-byte grammar/lazy triggers, vocabulary-derived DR
 breakers, adaptive-p, infill, and actual-context sampling. The sampler ABI has an
 independent 36-entry layout check. PERFORMANCE.md covers real sampler-chain
 timing/counts, their reset/clone/copy behavior and global logging callbacks.
-Backend-attached sampling and llguidance integration remain unavailable. Source-undefined pending
+BACKEND_SAMPLING.md documents the eight context-sampling exports and admitted
+CPU prefixes. Unsupported backend sampler stages and llguidance remain unavailable. Source-undefined pending
 adaptive clone/copy is rejected with a diagnostic.
 
 ## LoRA and control vectors

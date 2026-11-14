@@ -2,10 +2,10 @@
 
 The frozen header declares 255 llama C functions, and the original DLL contains
 those 255 unmangled symbols. Its 39 additional mangled C++ exports are outside
-this public C-header inventory. The Rust library implements **239**, leaves
-**16 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
+this public C-header inventory. The Rust library implements **247**, leaves
+**8 unexported**, and adds **4 diagnostic/layout extensions**. This is symbol
 coverage; accepted configurations and behavioral limits remain in README.md,
-SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, CONTEXT_PERFORMANCE.md, FILE_POINTER.md, ADAPTERS.md and ENCODER.md.
+SAMPLERS.md, STATE.md, EXECUTION.md, SPLITS.md, ENUMS.md, METADATA.md, CHAT.md, BATCH_EXT.md, PERFORMANCE.md, CONTEXT_PERFORMANCE.md, FILE_POINTER.md, ADAPTERS.md, ENCODER.md and BACKEND_SAMPLING.md.
 
 The context-performance and FILE-pointer checkpoint adds seven real exports.
 CONTEXT_PERFORMANCE.md records measured context timing, synchronization/reset
@@ -42,7 +42,7 @@ The sampler-performance checkpoint adds real per-chain CPU time/counts and
 three perf functions, plus two global logger functions. PERFORMANCE.md records
 no_perf, reset/clone/copy rules, callback ownership and independent MSVC/GNU
 captures. Context timing is covered separately in CONTEXT_PERFORMANCE.md;
-backend-attached sampling remains absent.
+context-attached sampling is covered separately in BACKEND_SAMPLING.md.
 
 The extended batch checkpoint checks debug/release PE and ELF tables: exactly
 211 frozen exports, four extensions and 44 absent exports. The original-header
@@ -85,6 +85,13 @@ and state behavior; its PE/ELF evidence remains unchanged in
 `evidence/2026-11-09/native-flash-context`. Earlier native-context, sampler-cpu
 and sampler-ffi inventories are also preserved as historical checkpoints.
 The separate native C++ symbol surface is not claimed here.
+
+The context-sampling checkpoint adds eight exports with real Rust CPU prefix
+execution, source-defined CPU suffixes and context-owned sampled outputs.
+BACKEND_SAMPLING.md records supported stages, exact original MSVC/GNU accessor
+observations, per-sequence limits, checked attachment lifetimes and remaining
+backend-stage gaps. The debug/release PE and ELF inventory is 247 frozen
+exports plus four extensions; no absent API has a placeholder symbol.
 
 ## Implemented frozen exports
 
@@ -137,6 +144,13 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_get_logits_ith` |
 | `llama_get_memory` |
 | `llama_get_model` |
+| `llama_get_sampled_candidates_count_ith` |
+| `llama_get_sampled_candidates_ith` |
+| `llama_get_sampled_logits_count_ith` |
+| `llama_get_sampled_logits_ith` |
+| `llama_get_sampled_probs_count_ith` |
+| `llama_get_sampled_probs_ith` |
+| `llama_get_sampled_token_ith` |
 | `llama_get_state_size` |
 | `llama_init_from_model` |
 | `llama_load_mode_from_str` |
@@ -260,6 +274,7 @@ The separate native C++ symbol surface is not claimed here.
 | `llama_set_causal_attn` |
 | `llama_set_embeddings` |
 | `llama_set_n_threads` |
+| `llama_set_sampler` |
 | `llama_set_state_data` |
 | `llama_set_warmup` |
 | `llama_split_path` |
@@ -345,20 +360,12 @@ The separate native C++ symbol surface is not claimed here.
 |---|
 | `llama_attach_threadpool` |
 | `llama_detach_threadpool` |
-| `llama_get_sampled_candidates_count_ith` |
-| `llama_get_sampled_candidates_ith` |
-| `llama_get_sampled_logits_count_ith` |
-| `llama_get_sampled_logits_ith` |
-| `llama_get_sampled_probs_count_ith` |
-| `llama_get_sampled_probs_ith` |
-| `llama_get_sampled_token_ith` |
 | `llama_model_init_from_user` |
 | `llama_model_save_to_file` |
 | `llama_numa_init` |
 | `llama_opt_epoch` |
 | `llama_opt_init` |
 | `llama_opt_param_filter_all` |
-| `llama_set_sampler` |
 
 ## Remaining model construction and save prerequisites
 

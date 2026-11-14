@@ -7,6 +7,7 @@ use std::collections::BTreeMap;
 use std::ffi::c_void;
 
 pub(crate) mod encoder;
+pub(crate) mod sampling;
 
 pub(crate) enum ContextRuntime {
     Decoder(Box<NativeContext>),
@@ -16,6 +17,7 @@ pub(crate) enum ContextRuntime {
 pub struct ContextHandle {
     pub(crate) performance: crate::context_perf::Performance,
     warmup: bool,
+    sampling: sampling::Sampling,
     // A distinct borrowed handle preserves model access after its original owner is freed.
     pub(crate) model_handle: Box<ModelHandle>,
     pub(crate) adapters: crate::adapter::ContextAdapters,
@@ -82,8 +84,6 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         return Err("custom RoPE/YaRN and defragmentation parameters are not implemented".into());
     }
     if !p.cb_eval.is_null()
-        || !p.samplers.is_null()
-        || p.n_samplers != 0
         || !p.ctx_other.is_null()
         || p.moe_cache_size != 0
         || p.moe_cache_cpu_share != 0.0
@@ -91,7 +91,7 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
         || p.n_outputs_max != 0
         || p.n_outputs_max_per_seq != 1
     {
-        return Err("evaluation callbacks, backend samplers, shared/MTP contexts, MoE caches and nondefault output limits are not implemented".into());
+        return Err("evaluation callbacks, shared/MTP contexts, MoE caches and nondefault output limits are not implemented".into());
     }
     let threads = usize::try_from(p.n_threads).map_err(|_| "negative generation worker count")?;
     let threads_batch =
@@ -213,13 +213,20 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
             per_sequence,
         )
     };
-    Ok(Box::into_raw(Box::new(ContextHandle {
+    if p.n_samplers > 256 {
+        return Err("context sampler configuration exceeds 256 entries".into());
+    }
+    let initial_samplers =
+        unsafe { input_slice(p.samplers.cast::<LlamaSamplerSeqConfig>(), p.n_samplers)? };
+    let sampling = sampling::Sampling::new(data.vocab.texts.len())?;
+    let mut context = Box::new(ContextHandle {
         performance: crate::context_perf::Performance::new(
             data.t_start_us,
             data.t_load_us,
             p.no_perf != 0,
         ),
         warmup: false,
+        sampling,
         model_handle: Box::new(ModelHandle { data, owned: false }),
         adapters: crate::adapter::ContextAdapters::default(),
         runtime,
@@ -240,7 +247,18 @@ unsafe fn create(model: *mut ModelHandle, p: LlamaContextParams) -> Result<*mut 
             Vec::new()
         },
         output_count: 0,
-    })))
+    });
+    for config in initial_samplers {
+        if config.sampler.is_null() || unsafe { sampler::llama_sampler_chain_n(config.sampler) } < 0
+        {
+            return Err("initial backend sampler must be a live chain".into());
+        }
+        unsafe {
+            sampling::set(&mut context, config.seq_id, config.sampler)?;
+        }
+    }
+    context.sampling.initialize_outputs();
+    Ok(Box::into_raw(context))
 }
 ffi!(
     llama_init_from_model(
@@ -524,14 +542,27 @@ pub(crate) fn execute_native_batch(
     if runtime_batch.iter().any(|row| matches!(row.input, Input::Token(token) if token as usize >= c.model_handle.data.vocab.texts.len())) {
         return Err("decode token ID is outside the vocabulary".into());
     }
+    c.sampling.preflight(runtime_batch)?;
     c.performance.queue(n)?;
     let abort = c.abort;
     let abort_data = c.abort_data;
-    let outputs = c
-        .decoder_mut()?
-        .decode_batch_with_cancel(runtime_batch, || {
-            abort.is_some_and(|callback| unsafe { callback(abort_data) })
-        });
+    let mut sampled_outputs = None;
+    let sampling = &c.sampling;
+    let ContextRuntime::Decoder(runtime) = &mut c.runtime else {
+        return Err("native sampling requires a decoder context".into());
+    };
+    let outputs = runtime.decode_batch_with_output_check(
+        runtime_batch,
+        || abort.is_some_and(|callback| unsafe { callback(abort_data) }),
+        |outputs| {
+            sampled_outputs = Some(
+                sampling
+                    .native_outputs(runtime_batch, outputs)
+                    .map_err(Error::InvalidState)?,
+            );
+            Ok(())
+        },
+    );
     let outputs = match outputs {
         Ok(v) => v,
         Err(error) => {
@@ -557,6 +588,7 @@ pub(crate) fn execute_native_batch(
             }
         }
     }
+    c.sampling.outputs = sampled_outputs.ok_or("native output consumer was not invoked")?;
     c.logits = logits;
     c.embeddings = embeddings;
     c.output_ids = output_ids;
@@ -606,6 +638,9 @@ ffi!(
         let c = unsafe { reference_mut(context)? };
         c.performance.synchronize()?;
         let row = output_index(c, index)?;
+        if let Some(pointer) = sampling::logits_pointer(c, index) {
+            return Ok(pointer);
+        }
         if let ContextRuntime::Encoder(encoder) = &mut c.runtime {
             return encoder.logits_row_pointer(row);
         }
@@ -653,24 +688,6 @@ ffi!(
         Ok(unsafe { c.embeddings.as_mut_ptr().add(offset) })
     }
 );
-
-pub(crate) unsafe fn sampling_values(context: *mut ContextHandle, index: i32) -> Result<Vec<f32>> {
-    let c = unsafe { reference_mut(context)? };
-    c.performance.synchronize()?;
-    c.decoder()?;
-    let row = output_index(c, index)?;
-    let width = c.model_handle.data.vocab.texts.len();
-    let offset = row
-        .checked_mul(width)
-        .ok_or("sampling logit offset overflow")?;
-    let end = offset
-        .checked_add(width)
-        .ok_or("sampling logit length overflow")?;
-    c.logits
-        .get(offset..end)
-        .map(|v| v.to_vec())
-        .ok_or_else(|| "requested logits are unavailable".into())
-}
 
 impl ContextHandle {
     pub(crate) fn decoder(&self) -> Result<&NativeContext> {
