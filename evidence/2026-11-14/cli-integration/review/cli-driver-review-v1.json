@@ -1,0 +1,510 @@
+{
+  "schema": 1,
+  "reviewed_utc": "2026-11-14T14:40:11.265152+00:00",
+  "status": "completed",
+  "review_kind": "read-only external harness/schema/source review",
+  "driver": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\validate-cli.py",
+    "bytes": 9107,
+    "sha256": "99dbe66e42fc76990608912d9400dafa95860cc6ecc548a85d771641d753f2c3"
+  },
+  "product_sources": [
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\cli\\src\\main.rs",
+      "bytes": 20828,
+      "sha256": "3a79c613a27b163ab1d2084c099fc419dc5e6b79144901d1ae7a5457b5a6f5f2"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\inference\\src\\lib.rs",
+      "bytes": 17120,
+      "sha256": "fad1e60a0063f7cef9469d61b07d8eefe694dfae709e7e4738f86d977888f163"
+    },
+    {
+      "path": "C:\\Users\\adyba\\rust-llama\\crates\\cuda-runtime\\src\\lib.rs",
+      "bytes": 39556,
+      "sha256": "962e4da6556fde18bae1c5dc1699d81116a874f24f6f6d7c237d06d1171a0f1f"
+    }
+  ],
+  "executed_cli": false,
+  "executed_validation_driver": false,
+  "modified_product_code_or_fixtures": false,
+  "native_profile_checks": [
+    {
+      "profile": "msvc",
+      "model": "qwen2-f16",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-converter\\validation\\v7\\windows\\pretrained\\Qwen2.5-0.5B-Instruct\\f16.gguf",
+      "model_bytes_verified": 994157120,
+      "expected_model_sha256": "f781a61a06b2dbafd1404187dc27a7981cb45a7bd66fa3268c3fa724b602f38e",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen2-cuda-pretrained\\f16-msvc-logits.f32le.bin",
+        "bytes": 7900672,
+        "sha256": "b7ec9d31a37d62077494b7d4d6c7b55c062921a6985230f959e62b9269e03180"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        572,
+        264
+      ],
+      "generated_hex": "2c207468657265207761732061",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "msvc",
+      "model": "qwen2-q8_0",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-converter\\validation\\v7\\windows\\pretrained\\Qwen2.5-0.5B-Instruct\\q8_0.gguf",
+      "model_bytes_verified": 531068480,
+      "expected_model_sha256": "6138491dbbde6c58c3380ac997ec64b4d2fd2e721b02a011a6463a545ab5bfe5",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen2-cuda-pretrained\\q8_0-msvc-logits.f32le.bin",
+        "bytes": 7900672,
+        "sha256": "f795e2e00c2bbb8cd00a7bd4fe9e4f7e8fbd0f236c4886cc6f7def25aa8a0493"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        572,
+        264
+      ],
+      "generated_hex": "2c207468657265207761732061",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "msvc",
+      "model": "qwen3-q8",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen3-0.6b-q8_0.gguf",
+      "model_bytes_verified": 639446688,
+      "expected_model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen3\\pretrained-msvc-logits.f32le.bin",
+        "bytes": 21878784,
+        "sha256": "e2872c8d35d8583073a0844f35099bbdb9a10baacbed3532a776c4f0756385bb"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        1033,
+        220,
+        18,
+        15,
+        15,
+        15
+      ],
+      "generated_hex": "2c20746865726520776572652033303030",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "msvc",
+      "model": "starcoder-tiny-pretrained-f16",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\pretrained-native\\windows\\f16.gguf",
+      "model_bytes_verified": 342950656,
+      "expected_model_sha256": "abdd880356fe55d9e951e5da4b198639d15331d1e10c0015795d10caaa273602",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-msvc-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "b93e3ed4516f39080a1c4b587f9477c3d4b33da98913011da717f4ce88938cea"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8279
+      ],
+      "greedy_tokens": [
+        81,
+        2474,
+        30,
+        284
+      ],
+      "generated_hex": "5f4e414d452c0a202020",
+      "logit_tokens": [
+        8279
+      ],
+      "logit_row_byte_offsets": [
+        0
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 2048
+    },
+    {
+      "profile": "msvc",
+      "model": "starcoder-tiny-pretrained-q8_0",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\pretrained-native\\windows\\q8_0.gguf",
+      "model_bytes_verified": 195126016,
+      "expected_model_sha256": "b2620b0de962f582218530233849064c088c56e86344a7e49afb53c7d5957906",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-msvc-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "b93e3ed4516f39080a1c4b587f9477c3d4b33da98913011da717f4ce88938cea"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8279
+      ],
+      "greedy_tokens": [
+        81,
+        2474,
+        30,
+        284
+      ],
+      "generated_hex": "5f4e414d452c0a202020",
+      "logit_tokens": [
+        8279
+      ],
+      "logit_row_byte_offsets": [
+        4165632
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 2048
+    },
+    {
+      "profile": "msvc",
+      "model": "starcoder2-3b-pretrained-q4_k_m",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\models\\starcoder2-3b-Q4_K_M.gguf",
+      "model_bytes_verified": 1848976448,
+      "expected_model_sha256": "d8fb39287a463549b80d97473b0a7595c3a5a6da3ae2604ca33906a1a43f7175",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-msvc-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "b93e3ed4516f39080a1c4b587f9477c3d4b33da98913011da717f4ce88938cea"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8302
+      ],
+      "greedy_tokens": [
+        49,
+        5810,
+        38,
+        222
+      ],
+      "generated_hex": "2c20776f726c64210a",
+      "logit_tokens": [
+        8302
+      ],
+      "logit_row_byte_offsets": [
+        8331264
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 16384
+    },
+    {
+      "profile": "gnu",
+      "model": "qwen2-f16",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-converter\\validation\\v7\\windows\\pretrained\\Qwen2.5-0.5B-Instruct\\f16.gguf",
+      "model_bytes_verified": 994157120,
+      "expected_model_sha256": "f781a61a06b2dbafd1404187dc27a7981cb45a7bd66fa3268c3fa724b602f38e",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen2-cuda-pretrained\\f16-gnu-logits.f32le.bin",
+        "bytes": 7900672,
+        "sha256": "b18cdc060ad005d0b2116ed0a18cfec2b925dbd06fc9a247b2a9e37bb42b91bf"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        572,
+        264
+      ],
+      "generated_hex": "2c207468657265207761732061",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "gnu",
+      "model": "qwen2-q8_0",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261111\\qwen-converter\\validation\\v7\\windows\\pretrained\\Qwen2.5-0.5B-Instruct\\q8_0.gguf",
+      "model_bytes_verified": 531068480,
+      "expected_model_sha256": "6138491dbbde6c58c3380ac997ec64b4d2fd2e721b02a011a6463a545ab5bfe5",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen2-cuda-pretrained\\q8_0-gnu-logits.f32le.bin",
+        "bytes": 7900672,
+        "sha256": "f408bb3574fb18465ce0554cf7560a52cab6e3fbc933d9d942ed2e16c812f68f"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        572,
+        264
+      ],
+      "generated_hex": "2c207468657265207761732061",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "gnu",
+      "model": "qwen3-q8",
+      "backend": "cuda",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\models\\qwen3-0.6b-q8_0.gguf",
+      "model_bytes_verified": 639446688,
+      "expected_model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\qwen3\\pretrained-gnu-logits.f32le.bin",
+        "bytes": 21878784,
+        "sha256": "89caafa49677f68a145dd4e6733b70addaf0d5a77b35e527c0f0be08f60453e6"
+      },
+      "case": "story",
+      "prompt": "Once upon a time",
+      "prompt_tokens": [
+        12522,
+        5193,
+        264,
+        882
+      ],
+      "greedy_tokens": [
+        11,
+        1052,
+        1033,
+        220,
+        18,
+        15,
+        15,
+        15
+      ],
+      "generated_hex": "2c20746865726520776572652033303030",
+      "logit_tokens": [
+        12522,
+        5193
+      ],
+      "logit_row_byte_offsets": [
+        0,
+        607744
+      ],
+      "vocabulary": 151936,
+      "compared_float_values": 303872,
+      "max_weight_mib": 3072
+    },
+    {
+      "profile": "gnu",
+      "model": "starcoder-tiny-pretrained-f16",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\pretrained-native\\windows\\f16.gguf",
+      "model_bytes_verified": 342950656,
+      "expected_model_sha256": "abdd880356fe55d9e951e5da4b198639d15331d1e10c0015795d10caaa273602",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-gnu-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "eb4c73e0179bb48738d4d388d38b83fdd954d3dcfcb1cdd0fedace12cb786067"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8279
+      ],
+      "greedy_tokens": [
+        81,
+        2474,
+        30,
+        284
+      ],
+      "generated_hex": "5f4e414d452c0a202020",
+      "logit_tokens": [
+        8279
+      ],
+      "logit_row_byte_offsets": [
+        0
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 2048
+    },
+    {
+      "profile": "gnu",
+      "model": "starcoder-tiny-pretrained-q8_0",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\pretrained-native\\windows\\q8_0.gguf",
+      "model_bytes_verified": 195126016,
+      "expected_model_sha256": "b2620b0de962f582218530233849064c088c56e86344a7e49afb53c7d5957906",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-gnu-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "eb4c73e0179bb48738d4d388d38b83fdd954d3dcfcb1cdd0fedace12cb786067"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8279
+      ],
+      "greedy_tokens": [
+        81,
+        2474,
+        30,
+        284
+      ],
+      "generated_hex": "5f4e414d452c0a202020",
+      "logit_tokens": [
+        8279
+      ],
+      "logit_row_byte_offsets": [
+        4165632
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 2048
+    },
+    {
+      "profile": "gnu",
+      "model": "starcoder2-3b-pretrained-q4_k_m",
+      "backend": "cpu",
+      "model_path": "C:\\Users\\adyba\\rust-llama-reference\\models\\starcoder2-3b-Q4_K_M.gguf",
+      "model_bytes_verified": 1848976448,
+      "expected_model_sha256": "d8fb39287a463549b80d97473b0a7595c3a5a6da3ae2604ca33906a1a43f7175",
+      "model_hash_recomputed_by_review": false,
+      "float_data": {
+        "path": "C:\\Users\\adyba\\rust-llama\\fixtures\\inference\\starcoder\\pretrained-gnu-values.f32le.bin",
+        "bytes": 12607488,
+        "sha256": "eb4c73e0179bb48738d4d388d38b83fdd954d3dcfcb1cdd0fedace12cb786067"
+      },
+      "case": "hello",
+      "prompt": "Hello",
+      "prompt_tokens": [
+        8302
+      ],
+      "greedy_tokens": [
+        49,
+        5810,
+        38,
+        222
+      ],
+      "generated_hex": "2c20776f726c64210a",
+      "logit_tokens": [
+        8302
+      ],
+      "logit_row_byte_offsets": [
+        8331264
+      ],
+      "vocabulary": 49152,
+      "compared_float_values": 49152,
+      "max_weight_mib": 16384
+    }
+  ],
+  "metadata_identity_mismatches": [],
+  "findings": [
+    {
+      "severity": "coverage",
+      "finding": "The driver initializes REPORT.stops but never invokes --stop or appends stop receipts. It therefore does not validate stop sequences.",
+      "source_contract": "The actual finish reason for stop matching is StopSequence."
+    },
+    {
+      "severity": "timeout qualification",
+      "finding": "The fixed 120-second timeout includes all StarCoder2 3B load and execution work, but retained evidence does not establish an individual 120-second limit.",
+      "evidence": "The prior Windows release suite of all three pretrained tests took 263.29 seconds; there are no isolated per-operation timings.",
+      "suggestion": "Use an explicitly bounded 300-second limit for StarCoder2 commands and record the actual per-command limit, or describe timeout as harness limit rather than a model defect."
+    },
+    {
+      "severity": "scope",
+      "finding": "The first StarCoder case is Hello with one input token, so tokens[:2] selects one logit row for each StarCoder model. Qwen cases select two rows. The report computes the actual row counts correctly."
+    }
+  ],
+  "conclusion": "Both native reference schemas, current file lengths, float-data hashes, selected row bounds, generation byte expectations, and CLI option/statistics/error text contracts were reviewed without executing the CLI driver."
+}

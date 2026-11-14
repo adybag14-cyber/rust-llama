@@ -1,0 +1,137 @@
+{
+  "complete": true,
+  "workflow": {
+    "bytes": 20241,
+    "sha256": "1ddfe489b2ac1ce5affde30c26f12163488c7840dc61e6b74fee8875791c3127"
+  },
+  "documentation": {
+    "bytes": 11720,
+    "sha256": "dbe7ce54b6b5b6b087668d01a5b207d8794f64a82f8fe5b14b474719124bc539"
+  },
+  "actionlint": true,
+  "powershell_blocks": 7,
+  "profile_fetch_rehearsals": [
+    "Windows",
+    "Linux"
+  ],
+  "inputs_verified_per_profile": 9,
+  "output_bytes_verified_per_profile": 881027328,
+  "inference_modes": [
+    "f16",
+    "q8_0"
+  ],
+  "selector_counts": [
+    1,
+    1,
+    1
+  ],
+  "cpu_starcoder_ignored_selected": 0,
+  "conversion_reexecuted": false,
+  "public_download_reexecuted": false,
+  "local_acquisition_method": "The exact PowerShell fetch/verification body ran with curl replaced externally by a pinned-URL hard-link provider; no workflow test hook was added.",
+  "stages": [
+    {
+      "name": "actionlint-version",
+      "argv": [
+        "C:\\Users\\adyba\\go\\bin\\actionlint.exe",
+        "-version"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "actionlint",
+      "argv": [
+        "C:\\Users\\adyba\\go\\bin\\actionlint.exe",
+        "-no-color",
+        "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114\\.github\\workflows\\ci.yml"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "powershell-syntax",
+      "argv": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\ci-validation-v1\\parse-powershell.ps1"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "fetch-rehearsal-windows",
+      "argv": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\ci-validation-v1\\rehearse-fetch.ps1"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "fetch-rehearsal-linux",
+      "argv": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\ci-validation-v1\\rehearse-fetch.ps1"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "selector-pretrained_starcoder_native_files",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-converter\\rust-target\\windows\\release\\deps\\starcoder_pretrained-d778f10c95954877.exe",
+        "pretrained_starcoder_native_files",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "selector-official_tiny_starcoder_f16_matches_original_native_profile",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-oracle\\target-windows\\release\\deps\\starcoder-2f2878784943c7c4.exe",
+        "official_tiny_starcoder_f16_matches_original_native_profile",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "selector-official_tiny_starcoder_q8_matches_original_native_profile",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-oracle\\target-windows\\release\\deps\\starcoder-2f2878784943c7c4.exe",
+        "official_tiny_starcoder_q8_matches_original_native_profile",
+        "--ignored",
+        "--exact",
+        "--list"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    },
+    {
+      "name": "cpu-starcoder-skip",
+      "argv": [
+        "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\starcoder-oracle\\target-windows\\release\\deps\\starcoder-2f2878784943c7c4.exe",
+        "--ignored",
+        "--skip",
+        "starcoder",
+        "--list"
+      ],
+      "cwd": "C:\\Users\\adyba\\rust-llama-worktrees\\convert-20261114",
+      "exit_code": 0
+    }
+  ]
+}

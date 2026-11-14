@@ -1,4 +1,4 @@
-//! Persistent, single-sequence dense Llama execution using Rust-authored CUDA
+//! Persistent, single-sequence dense Llama/Qwen execution using Rust-authored CUDA
 //! kernels. CPU work is limited to loading, fixed RoPE tables and token handling;
 //! embeddings, projections, attention, norms and feed-forward execute on device.
 #![forbid(unsafe_code)]
@@ -8,9 +8,11 @@ use llama_device_family::{
     probe,
     ptx::{self, DecoderKernel as D, KernelKind, KernelSpec, PtxTarget},
 };
-use llama_model_runtime::{LlamaConfig, LlamaModel, Matrix};
+use llama_model_runtime::{LlamaModel, Matrix, Qwen2Model, Qwen3Model};
 use llama_quant::DType;
 use std::{fmt, rc::Rc};
+mod model;
+use model::{Config, Qkv, View};
 
 #[derive(Debug)]
 pub enum Error {
@@ -78,14 +80,14 @@ struct DeviceMatrix {
 }
 struct Layer {
     attention_norm: CudaBuffer,
-    q: DeviceMatrix,
-    k: DeviceMatrix,
-    v: DeviceMatrix,
+    qkv: DeviceQkv,
     o: DeviceMatrix,
     q_bias: Option<CudaBuffer>,
     k_bias: Option<CudaBuffer>,
     v_bias: Option<CudaBuffer>,
     o_bias: Option<CudaBuffer>,
+    query_norm: Option<CudaBuffer>,
+    key_norm: Option<CudaBuffer>,
     ffn_norm: CudaBuffer,
     gate: DeviceMatrix,
     up: DeviceMatrix,
@@ -95,6 +97,17 @@ struct Layer {
     down_bias: Option<CudaBuffer>,
     keys: CudaBuffer,
     values: CudaBuffer,
+}
+enum DeviceQkv {
+    Separate {
+        query: DeviceMatrix,
+        key: DeviceMatrix,
+        value: DeviceMatrix,
+    },
+    Fused {
+        projection: DeviceMatrix,
+        bias: Option<CudaBuffer>,
+    },
 }
 struct Workspace {
     hidden: CudaBuffer,
@@ -106,6 +119,8 @@ struct Workspace {
     k_tmp: CudaBuffer,
     v: CudaBuffer,
     v_tmp: CudaBuffer,
+    qkv: Option<CudaBuffer>,
+    qkv_tmp: Option<CudaBuffer>,
     attention: CudaBuffer,
     projection: CudaBuffer,
     projection_tmp: CudaBuffer,
@@ -119,6 +134,7 @@ struct Workspace {
     down_tmp: CudaBuffer,
     embedding: CudaBuffer,
     logits: CudaBuffer,
+    logits_tmp: Option<CudaBuffer>,
     scale: CudaBuffer,
     scores: CudaBuffer,
     softmax_stats: CudaBuffer,
@@ -132,6 +148,9 @@ struct Graph {
     rms_apply: usize,
     rope_q: usize,
     rope_k: usize,
+    query_norm: Option<usize>,
+    key_norm: Option<usize>,
+    slices: Option<[usize; 3]>,
     cache: usize,
     scores: usize,
     softmax_stats: usize,
@@ -139,8 +158,11 @@ struct Graph {
     attention: usize,
     silu: usize,
     add_width: usize,
+    add_query: usize,
     add_kv: usize,
     add_ff: usize,
+    add_qkv: Option<usize>,
+    add_logits: Option<usize>,
 }
 struct Allocator<'a> {
     context: &'a CudaContext,
@@ -190,8 +212,8 @@ impl Allocator<'_> {
         self.uploaded += data.len();
         Ok(buffer)
     }
-    fn bias(&mut self, data: &Option<Vec<f32>>) -> Result<Option<CudaBuffer>> {
-        data.as_deref().map(|x| self.upload(x)).transpose()
+    fn bias(&mut self, data: Option<&[f32]>) -> Result<Option<CudaBuffer>> {
+        data.map(|x| self.upload(x)).transpose()
     }
 }
 struct Compiler<'a> {
@@ -334,9 +356,25 @@ fn read(buffer: &CudaBuffer) -> Result<Vec<f32>> {
     Ok(out)
 }
 
-fn allocation_plan(model: &LlamaModel) -> Result<usize> {
-    let c = model.config();
-    let kv = c.kv_width().map_err(|e| Error::Invalid(e.to_string()))?;
+fn rope(c: &Config, width: u32) -> Result<D> {
+    let (head_dimension, context) = (dim(c.head_dimension)?, dim(c.max_context)?);
+    Ok(if c.neox {
+        D::RopeNeox {
+            width,
+            head_dimension,
+            context,
+        }
+    } else {
+        D::Rope {
+            width,
+            head_dimension,
+            context,
+        }
+    })
+}
+fn allocation_plan(model: &View<'_>) -> Result<usize> {
+    let c = &model.config;
+    let kv = c.kv_width()?;
     let mut total = 0usize;
     let mut add = |n: usize| -> Result<()> {
         total = total
@@ -358,20 +396,19 @@ fn allocation_plan(model: &LlamaModel) -> Result<usize> {
         }),
     }
     .buffer_bytes()?;
-    add(bytes(model.weights().token_embedding.values().len())?)?;
-    if let Some(output) = &model.weights().output {
+    add(bytes(model.token_embedding.values().len())?)?;
+    if let Some(output) = model.output {
         add(matrix_bytes(output)?)?;
-    } else if model.weights().token_embedding.storage_dtype() != DType::F32 {
-        add(matrix_bytes(&model.weights().token_embedding)?)?;
+    } else if model.token_embedding.storage_dtype() != DType::F32 {
+        add(matrix_bytes(model.token_embedding)?)?;
+    }
+    if model.output_bias.is_some() {
+        add(bytes(product(c.vocabulary, 2)?)?)?;
     }
     add(bytes(c.width)?)?;
-    let dimension = c.head_dim().map_err(|e| Error::Invalid(e.to_string()))?;
+    let dimension = c.head_dimension;
     KernelSpec {
-        kind: KernelKind::Decoder(D::Rope {
-            width: dim(c.width)?,
-            head_dimension: dim(dimension)?,
-            context: dim(c.max_context)?,
-        }),
+        kind: KernelKind::Decoder(rope(c, dim(c.query_width)?)?),
     }
     .buffer_bytes()?;
     // Validate the output-score and KV extents before any host phase allocation.
@@ -386,27 +423,24 @@ fn allocation_plan(model: &LlamaModel) -> Result<usize> {
     }
     .buffer_bytes()?;
     add(bytes(product(c.max_context, dimension)?)?)?;
-    for layer in &model.weights().layers {
+    for layer in &model.layers {
         add(bytes(product(c.width, 2)?)?)?;
-        for m in [
-            &layer.query,
-            &layer.key,
-            &layer.value,
-            &layer.attention_output,
-            &layer.gate,
-            &layer.up,
-            &layer.down,
-        ] {
+        for m in layer.qkv.matrices() {
+            add(matrix_bytes(m)?)?;
+        }
+        for b in layer.qkv.biases() {
+            add(bytes(b.len())?)?;
+        }
+        for m in [layer.attention_output, layer.gate, layer.up, layer.down] {
             add(matrix_bytes(m)?)?;
         }
         for b in [
-            &layer.query_bias,
-            &layer.key_bias,
-            &layer.value_bias,
-            &layer.attention_output_bias,
-            &layer.gate_bias,
-            &layer.up_bias,
-            &layer.down_bias,
+            layer.attention_output_bias,
+            layer.gate_bias,
+            layer.up_bias,
+            layer.down_bias,
+            layer.query_norm,
+            layer.key_norm,
         ]
         .into_iter()
         .flatten()
@@ -416,7 +450,8 @@ fn allocation_plan(model: &LlamaModel) -> Result<usize> {
         add(bytes(product(product(kv, c.max_context)?, 2)?)?)?;
     }
     for n in [
-        product(c.width, 12)?,
+        product(c.width, 9)?,
+        product(c.query_width, 3)?,
         product(kv, 4)?,
         product(c.feed_forward, 5)?,
         c.vocabulary,
@@ -426,23 +461,24 @@ fn allocation_plan(model: &LlamaModel) -> Result<usize> {
     ] {
         add(bytes(n)?)?;
     }
+    if model.fused() {
+        add(bytes(product(c.qkv_width()?, 2)?)?)?;
+    }
     add(8)?;
-    add(bytes(product(
-        c.width.max(c.feed_forward).div_ceil(32),
-        33,
-    )?)?)?;
+    add(bytes(product(c.activation_width().div_ceil(32), 33)?)?)?;
     Ok(total)
 }
 
 /// Single sequence with append/truncate/reset. Cancelled or failed steps do not
 /// advance the committed position. Partial writes are confined to that unused
 /// cache row and are overwritten by the next complete step.
-pub struct CudaLlama {
-    config: LlamaConfig,
+pub struct CudaDecoder {
+    config: Config,
     device_name: String,
     token_embedding: Rc<CudaBuffer>,
     output: DeviceMatrix,
     output_norm: CudaBuffer,
+    output_bias: Option<CudaBuffer>,
     phases: CudaBuffer,
     layers: Vec<Layer>,
     kernels: Vec<(KernelKind, CudaKernel)>,
@@ -452,8 +488,19 @@ pub struct CudaLlama {
     statistics: Statistics,
     position: usize,
 }
-impl CudaLlama {
+/// Compatibility name for callers of the original Llama-only constructor.
+pub type CudaLlama = CudaDecoder;
+impl CudaDecoder {
     pub fn new(model: &LlamaModel, options: &Options) -> Result<Self> {
+        Self::from_view(&View::llama(model)?, options)
+    }
+    pub fn new_qwen2(model: &Qwen2Model, options: &Options) -> Result<Self> {
+        Self::from_view(&View::qwen2(model)?, options)
+    }
+    pub fn new_qwen3(model: &Qwen3Model, options: &Options) -> Result<Self> {
+        Self::from_view(&View::qwen3(model)?, options)
+    }
+    fn from_view(model: &View<'_>, options: &Options) -> Result<Self> {
         if options.device < 0 || options.max_device_bytes == 0 {
             return Err(Error::Invalid(
                 "invalid device or zero device budget".into(),
@@ -466,33 +513,29 @@ impl CudaLlama {
                 options.max_device_bytes
             )));
         }
-        let c = model.config().clone();
-        let (width, kv, ff, ctx, heads, kv_heads, head_dimension, vocabulary) = (
+        let c = model.config.clone();
+        let (width, query, kv, ff, ctx, heads, kv_heads, head_dimension, vocabulary) = (
             dim(c.width)?,
-            dim(c.kv_width().map_err(|e| Error::Invalid(e.to_string()))?)?,
+            dim(c.query_width)?,
+            dim(c.kv_width()?)?,
             dim(c.feed_forward)?,
             dim(c.max_context)?,
             dim(c.heads)?,
             dim(c.kv_heads)?,
-            dim(c.head_dim().map_err(|e| Error::Invalid(e.to_string()))?)?,
+            dim(c.head_dimension)?,
             dim(c.vocabulary)?,
         );
         // Validate every weight's representation before opening or allocating a
         // device. An unsupported packed type never silently becomes F32 math.
-        matrix_kind(&model.weights().token_embedding)?;
-        if let Some(output) = &model.weights().output {
+        matrix_kind(model.token_embedding)?;
+        if let Some(output) = model.output {
             matrix_kind(output)?;
         }
-        for layer in &model.weights().layers {
-            for m in [
-                &layer.query,
-                &layer.key,
-                &layer.value,
-                &layer.attention_output,
-                &layer.gate,
-                &layer.up,
-                &layer.down,
-            ] {
+        for layer in &model.layers {
+            for m in layer.qkv.matrices() {
+                matrix_kind(m)?;
+            }
+            for m in [layer.attention_output, layer.gate, layer.up, layer.down] {
                 matrix_kind(m)?;
             }
         }
@@ -522,19 +565,20 @@ impl CudaLlama {
             context: &context,
             kernels: Vec::new(),
         };
-        let (token_embedding, output) = if let Some(output) = &model.weights().output {
-            let embedding = Rc::new(allocator.upload(model.weights().token_embedding.values())?);
+        let (token_embedding, output) = if let Some(output) = model.output {
+            let embedding = Rc::new(allocator.upload(model.token_embedding.values())?);
             (embedding, compiler.matrix(&mut allocator, output)?)
         } else {
-            let matrix = compiler.matrix(&mut allocator, &model.weights().token_embedding)?;
-            let embedding = if model.weights().token_embedding.storage_dtype() == DType::F32 {
+            let matrix = compiler.matrix(&mut allocator, model.token_embedding)?;
+            let embedding = if model.token_embedding.storage_dtype() == DType::F32 {
                 matrix.weights.clone()
             } else {
-                Rc::new(allocator.upload(model.weights().token_embedding.values())?)
+                Rc::new(allocator.upload(model.token_embedding.values())?)
             };
             (embedding, matrix)
         };
-        let output_norm = allocator.upload(&model.weights().output_norm)?;
+        let output_norm = allocator.upload(model.output_norm)?;
+        let output_bias = allocator.bias(model.output_bias)?;
         let mut phases = Vec::new();
         phases
             .try_reserve_exact(product(c.max_context, head_dimension as usize)?)
@@ -550,24 +594,58 @@ impl CudaLlama {
         }
         let phases = allocator.upload(&phases)?;
         let mut layers = Vec::new();
-        for layer in &model.weights().layers {
+        for layer in &model.layers {
+            let (qkv, q_bias, k_bias, v_bias) = match &layer.qkv {
+                Qkv::Separate {
+                    query,
+                    key,
+                    value,
+                    query_bias,
+                    key_bias,
+                    value_bias,
+                } => (
+                    DeviceQkv::Separate {
+                        query: compiler.matrix(&mut allocator, query)?,
+                        key: compiler.matrix(&mut allocator, key)?,
+                        value: compiler.matrix(&mut allocator, value)?,
+                    },
+                    *query_bias,
+                    *key_bias,
+                    *value_bias,
+                ),
+                Qkv::Fused {
+                    projection,
+                    bias,
+                    query_bias,
+                    key_bias,
+                    value_bias,
+                } => (
+                    DeviceQkv::Fused {
+                        projection: compiler.matrix(&mut allocator, projection)?,
+                        bias: allocator.bias(*bias)?,
+                    },
+                    *query_bias,
+                    *key_bias,
+                    *value_bias,
+                ),
+            };
             layers.push(Layer {
-                attention_norm: allocator.upload(&layer.attention_norm)?,
-                q: compiler.matrix(&mut allocator, &layer.query)?,
-                k: compiler.matrix(&mut allocator, &layer.key)?,
-                v: compiler.matrix(&mut allocator, &layer.value)?,
-                o: compiler.matrix(&mut allocator, &layer.attention_output)?,
-                q_bias: allocator.bias(&layer.query_bias)?,
-                k_bias: allocator.bias(&layer.key_bias)?,
-                v_bias: allocator.bias(&layer.value_bias)?,
-                o_bias: allocator.bias(&layer.attention_output_bias)?,
-                ffn_norm: allocator.upload(&layer.feed_forward_norm)?,
-                gate: compiler.matrix(&mut allocator, &layer.gate)?,
-                up: compiler.matrix(&mut allocator, &layer.up)?,
-                down: compiler.matrix(&mut allocator, &layer.down)?,
-                gate_bias: allocator.bias(&layer.gate_bias)?,
-                up_bias: allocator.bias(&layer.up_bias)?,
-                down_bias: allocator.bias(&layer.down_bias)?,
+                attention_norm: allocator.upload(layer.attention_norm)?,
+                qkv,
+                o: compiler.matrix(&mut allocator, layer.attention_output)?,
+                q_bias: allocator.bias(q_bias)?,
+                k_bias: allocator.bias(k_bias)?,
+                v_bias: allocator.bias(v_bias)?,
+                o_bias: allocator.bias(layer.attention_output_bias)?,
+                query_norm: allocator.bias(layer.query_norm)?,
+                key_norm: allocator.bias(layer.key_norm)?,
+                ffn_norm: allocator.upload(layer.feed_forward_norm)?,
+                gate: compiler.matrix(&mut allocator, layer.gate)?,
+                up: compiler.matrix(&mut allocator, layer.up)?,
+                down: compiler.matrix(&mut allocator, layer.down)?,
+                gate_bias: allocator.bias(layer.gate_bias)?,
+                up_bias: allocator.bias(layer.up_bias)?,
+                down_bias: allocator.bias(layer.down_bias)?,
                 keys: allocator.f32(product(kv as usize, c.max_context)?)?,
                 values: allocator.f32(product(kv as usize, c.max_context)?)?,
             });
@@ -579,16 +657,48 @@ impl CudaLlama {
                 epsilon: c.rms_epsilon,
             })?,
             rms_apply: compiler.decoder(D::RmsApply { width })?,
-            rope_q: compiler.decoder(D::Rope {
-                width,
-                head_dimension,
-                context: ctx,
-            })?,
-            rope_k: compiler.decoder(D::Rope {
-                width: kv,
-                head_dimension,
-                context: ctx,
-            })?,
+            rope_q: compiler.decoder(rope(&c, query)?)?,
+            rope_k: compiler.decoder(rope(&c, kv)?)?,
+            query_norm: if model.head_norm() {
+                Some(compiler.decoder(D::HeadRms {
+                    width: query,
+                    head_dimension,
+                    epsilon: c.rms_epsilon,
+                })?)
+            } else {
+                None
+            },
+            key_norm: if model.head_norm() {
+                Some(compiler.decoder(D::HeadRms {
+                    width: kv,
+                    head_dimension,
+                    epsilon: c.rms_epsilon,
+                })?)
+            } else {
+                None
+            },
+            slices: if model.fused() {
+                let source_width = dim(c.qkv_width()?)?;
+                Some([
+                    compiler.decoder(D::Slice {
+                        source_width,
+                        offset: 0,
+                        width: query,
+                    })?,
+                    compiler.decoder(D::Slice {
+                        source_width,
+                        offset: query,
+                        width: kv,
+                    })?,
+                    compiler.decoder(D::Slice {
+                        source_width,
+                        offset: query + kv,
+                        width: kv,
+                    })?,
+                ])
+            } else {
+                None
+            },
             cache: compiler.decoder(D::CacheWrite {
                 width: kv,
                 context: ctx,
@@ -618,20 +728,41 @@ impl CudaLlama {
             })?,
             silu: compiler.decoder(D::SiluGate { width: ff })?,
             add_width: compiler.add(width)?,
+            add_query: compiler.add(query)?,
             add_kv: compiler.add(kv)?,
             add_ff: compiler.add(ff)?,
+            add_qkv: if model.fused() {
+                Some(compiler.add(dim(c.qkv_width()?)?)?)
+            } else {
+                None
+            },
+            add_logits: if model.output_bias.is_some() {
+                Some(compiler.add(vocabulary)?)
+            } else {
+                None
+            },
         };
         let workspace = Workspace {
             hidden: allocator.f32(c.width)?,
             residual: allocator.f32(c.width)?,
             norm: allocator.f32(c.width)?,
-            q: allocator.f32(c.width)?,
-            q_tmp: allocator.f32(c.width)?,
+            q: allocator.f32(c.query_width)?,
+            q_tmp: allocator.f32(c.query_width)?,
             k: allocator.f32(kv as usize)?,
             k_tmp: allocator.f32(kv as usize)?,
             v: allocator.f32(kv as usize)?,
             v_tmp: allocator.f32(kv as usize)?,
-            attention: allocator.f32(c.width)?,
+            qkv: if model.fused() {
+                Some(allocator.f32(c.qkv_width()?)?)
+            } else {
+                None
+            },
+            qkv_tmp: if model.fused() {
+                Some(allocator.f32(c.qkv_width()?)?)
+            } else {
+                None
+            },
+            attention: allocator.f32(c.query_width)?,
             projection: allocator.f32(c.width)?,
             projection_tmp: allocator.f32(c.width)?,
             ffn_norm: allocator.f32(c.width)?,
@@ -644,12 +775,17 @@ impl CudaLlama {
             down_tmp: allocator.f32(c.width)?,
             embedding: allocator.f32(c.width)?,
             logits: allocator.f32(c.vocabulary)?,
+            logits_tmp: if model.output_bias.is_some() {
+                Some(allocator.f32(c.vocabulary)?)
+            } else {
+                None
+            },
             scale: allocator.f32(1)?,
             scores: allocator.f32(product(c.heads, c.max_context)?)?,
             softmax_stats: allocator.f32(product(c.heads, 2)?)?,
             probabilities: allocator.f32(product(c.heads, c.max_context)?)?,
             uniform: allocator.allocate(8)?,
-            quantized: allocator.f32(product(c.width.max(c.feed_forward).div_ceil(32), 33)?)?,
+            quantized: allocator.f32(product(c.activation_width().div_ceil(32), 33)?)?,
         };
         debug_assert_eq!(allocator.allocated, planned);
         let statistics = Statistics {
@@ -663,6 +799,7 @@ impl CudaLlama {
             token_embedding,
             output,
             output_norm,
+            output_bias,
             phases,
             layers,
             kernels: compiler.kernels,
@@ -742,12 +879,40 @@ impl CudaLlama {
                 &[&w.hidden, &layer.attention_norm, &w.scale],
                 &mut w.norm,
             )?;
-            project(k, &layer.q, s, stats, (&w.norm, &mut w.q, &mut w.quantized))?;
-            project(k, &layer.k, s, stats, (&w.norm, &mut w.k, &mut w.quantized))?;
-            project(k, &layer.v, s, stats, (&w.norm, &mut w.v, &mut w.quantized))?;
+            match &layer.qkv {
+                DeviceQkv::Separate { query, key, value } => {
+                    project(k, query, s, stats, (&w.norm, &mut w.q, &mut w.quantized))?;
+                    project(k, key, s, stats, (&w.norm, &mut w.k, &mut w.quantized))?;
+                    project(k, value, s, stats, (&w.norm, &mut w.v, &mut w.quantized))?;
+                }
+                DeviceQkv::Fused {
+                    projection,
+                    bias: qkv_bias,
+                } => {
+                    let fused = w
+                        .qkv
+                        .as_mut()
+                        .ok_or_else(|| Error::Invalid("missing fused scratch".into()))?;
+                    let temp = w
+                        .qkv_tmp
+                        .as_mut()
+                        .ok_or_else(|| Error::Invalid("missing fused scratch".into()))?;
+                    project(k, projection, s, stats, (&w.norm, fused, &mut w.quantized))?;
+                    let add = g
+                        .add_qkv
+                        .ok_or_else(|| Error::Invalid("missing fused bias kernel".into()))?;
+                    bias(k, add, s, stats, qkv_bias, fused, temp)?;
+                    let ids = g
+                        .slices
+                        .ok_or_else(|| Error::Invalid("missing fused slices".into()))?;
+                    run(k, ids[0], s, stats, &[fused], &mut w.q)?;
+                    run(k, ids[1], s, stats, &[fused], &mut w.k)?;
+                    run(k, ids[2], s, stats, &[fused], &mut w.v)?;
+                }
+            }
             bias(
                 k,
-                g.add_width,
+                g.add_query,
                 s,
                 stats,
                 &layer.q_bias,
@@ -756,6 +921,14 @@ impl CudaLlama {
             )?;
             bias(k, g.add_kv, s, stats, &layer.k_bias, &mut w.k, &mut w.k_tmp)?;
             bias(k, g.add_kv, s, stats, &layer.v_bias, &mut w.v, &mut w.v_tmp)?;
+            if let (Some(kernel), Some(weights)) = (g.query_norm, &layer.query_norm) {
+                run(k, kernel, s, stats, &[&w.q, weights], &mut w.q_tmp)?;
+                std::mem::swap(&mut w.q, &mut w.q_tmp);
+            }
+            if let (Some(kernel), Some(weights)) = (g.key_norm, &layer.key_norm) {
+                run(k, kernel, s, stats, &[&w.k, weights], &mut w.k_tmp)?;
+                std::mem::swap(&mut w.k, &mut w.k_tmp);
+            }
             run(
                 k,
                 g.rope_q,
@@ -923,6 +1096,9 @@ impl CudaLlama {
             stats,
             (&w.embedding, &mut w.logits, &mut w.quantized),
         )?;
+        if let (Some(kernel), Some(temp)) = (g.add_logits, &mut w.logits_tmp) {
+            bias(k, kernel, s, stats, &self.output_bias, &mut w.logits, temp)?;
+        }
         let output = Output {
             logits: read(&w.logits)?,
             embedding: read(&w.embedding)?,
@@ -936,18 +1112,26 @@ impl CudaLlama {
     }
 }
 
-impl CudaLlama {
-    /// Upload the exact dense-Llama weights owned by the inference facade.
+impl CudaDecoder {
+    /// Upload the exact packed weights owned by the supported inference facade.
     pub fn from_inference_model(model: &llama_inference::Model, options: &Options) -> Result<Self> {
         let runtime = model
             .runtime_model()
             .map_err(|e| Error::Unsupported(e.to_string()))?;
-        let llama_model_runtime::Model::Llama(llama) = runtime.as_ref() else {
-            return Err(Error::Unsupported(
-                "CUDA generation currently requires dense Llama".into(),
-            ));
-        };
-        Self::new(llama, options)
+        Self::from_runtime_model(&runtime, options)
+    }
+    pub fn from_runtime_model(
+        model: &llama_model_runtime::Model,
+        options: &Options,
+    ) -> Result<Self> {
+        match model {
+            llama_model_runtime::Model::Llama(model) => Self::new(model, options),
+            llama_model_runtime::Model::Qwen2(model) => Self::new_qwen2(model, options),
+            llama_model_runtime::Model::Qwen3(model) => Self::new_qwen3(model, options),
+            _ => Err(Error::Unsupported(
+                "CUDA generation requires dense Llama, Qwen2 or Qwen3".into(),
+            )),
+        }
     }
 }
 fn inference_error(error: Error) -> llama_inference::Error {
@@ -958,7 +1142,7 @@ fn inference_error(error: Error) -> llama_inference::Error {
         Error::Device(e) => llama_inference::Error::Internal(e.to_string()),
     }
 }
-impl llama_inference::DecoderSession for CudaLlama {
+impl llama_inference::DecoderSession for CudaDecoder {
     fn context_length(&self) -> usize {
         self.config.max_context
     }

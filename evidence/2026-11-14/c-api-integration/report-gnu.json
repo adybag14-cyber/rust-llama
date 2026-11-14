@@ -1,0 +1,299 @@
+{
+  "schema": 1,
+  "profile": "gnu",
+  "run_id": "merged-final-v1",
+  "completed_utc": "2026-11-14T15:13:16.968998+00:00",
+  "status": "passed",
+  "input_seal": {
+    "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/input-seal.json",
+    "bytes": 9480,
+    "sha256": "39ee41f998e504518f8bde1565c34b132a3f6b8330d35dd33e9048ed401addc0"
+  },
+  "source_fingerprint": "775e24dbedac00903ab99784de75792bc54bfb81a9680ddaa166c43d0efd8175",
+  "steps": [
+    {
+      "name": "original-exports",
+      "command": [
+        "/usr/bin/nm",
+        "-D",
+        "--defined-only",
+        "/mnt/c/Users/adyba/rust-llama-reference/build-ggml-linux-llama/bin/libllama.so.0.9.0"
+      ],
+      "exit_code": 0,
+      "seconds": 0.447
+    },
+    {
+      "name": "sampling-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/sampling-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.147
+    },
+    {
+      "name": "suffix-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/cpu-suffix-oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/original-gnu.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/suffix-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.148
+    },
+    {
+      "name": "context-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/context-perf-20261113/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/encoder/plain.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/context-debug.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.065
+    },
+    {
+      "name": "file-debug",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/file-pointer-20261113/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/file-debug.json",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/adapters/inputs/model-four.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 0.276
+    },
+    {
+      "name": "exports-debug",
+      "command": [
+        "/usr/bin/nm",
+        "-D",
+        "--defined-only",
+        "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so"
+      ],
+      "exit_code": 0,
+      "seconds": 0.062
+    },
+    {
+      "name": "sampling-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/sampling-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.104
+    },
+    {
+      "name": "suffix-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/cpu-suffix-oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama-reference/backend-sampler-20261114/original-gnu.json",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/suffix-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.149
+    },
+    {
+      "name": "context-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/context-perf-20261113/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/native-context-model.gguf",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/encoder/plain.gguf",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/context-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.048
+    },
+    {
+      "name": "file-release",
+      "command": [
+        "/mnt/c/Users/adyba/rust-llama-reference/file-pointer-20261113/oracle-gnu",
+        "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi",
+        "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/file-release.json",
+        "/mnt/c/Users/adyba/rust-llama/fixtures/ffi/adapters/inputs/model-four.gguf"
+      ],
+      "exit_code": 0,
+      "seconds": 0.185
+    },
+    {
+      "name": "exports-release",
+      "command": [
+        "/usr/bin/nm",
+        "-D",
+        "--defined-only",
+        "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so"
+      ],
+      "exit_code": 0,
+      "seconds": 0.057
+    }
+  ],
+  "reports": [
+    {
+      "mode": "debug",
+      "library": {
+        "path": "/home/tdamre/rust-llama-target-continue/debug/libllama_ffi.so",
+        "bytes": 50648936,
+        "sha256": "bb55a742018339da9db71d225d2c818dc9b5c884233477de3fd8832141accde6"
+      },
+      "sampling": {
+        "scenarios": 26,
+        "accessor_rows": 390,
+        "float_words": 77016,
+        "candidate_ids": 181356,
+        "comparison": "every JSON value exact"
+      },
+      "cpu_suffix": {
+        "stages": 4,
+        "float_words": 2500,
+        "candidate_ids": 1250,
+        "comparison": "every JSON value exact"
+      },
+      "context": {
+        "scenarios": 6,
+        "observations": 124,
+        "abi_and_null_print": "exact",
+        "counts_status_logits": "exact",
+        "real_nonnegative_timers": true,
+        "graph_counters": "zero for direct executor",
+        "runtime_features": "implementation-specific truthful string"
+      },
+      "file_pointer": {
+        "model_cases": 48,
+        "adapter_cases": 24,
+        "all_status_metadata_invocation_output_bits": "exact",
+        "caller_ownership": "native client closes each FILE before inference",
+        "cursor": "Rust coherently restores origin; native positions recorded separately"
+      },
+      "frozen_exports": 247,
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "absent": [
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_model_init_from_user",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all"
+      ],
+      "exact_named_inventory": true,
+      "outputs": {
+        "sampling": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/sampling-debug.json",
+          "bytes": 6083555,
+          "sha256": "0e32d13c485efd8f504091d6c61b084a04e42416c8787d506e20ad65087ddaf5"
+        },
+        "suffix": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/suffix-debug.json",
+          "bytes": 124383,
+          "sha256": "3a4f20c6a6482b94c80234ee491ed95d3e7265c887c1adc04847f7e3e8403b3c"
+        },
+        "context": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/context-debug.json",
+          "bytes": 76941,
+          "sha256": "2d4a72a8ebff26b2e90d3fad5ff1869fffbc8bc01c44fcb726c0303bdd227d82"
+        },
+        "file": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/file-debug.json",
+          "bytes": 316641,
+          "sha256": "d1640497e81f15b4c7ab0793d4c05bbb8d23017f852f906cba7fc81b13e504c3"
+        }
+      }
+    },
+    {
+      "mode": "release",
+      "library": {
+        "path": "/home/tdamre/rust-llama-target-continue/release/libllama_ffi.so",
+        "bytes": 3672624,
+        "sha256": "e2eba4545f59611f3cf54f2249d280603862aa2b616d45e6237f3fbdf625f382"
+      },
+      "sampling": {
+        "scenarios": 26,
+        "accessor_rows": 390,
+        "float_words": 77016,
+        "candidate_ids": 181356,
+        "comparison": "every JSON value exact"
+      },
+      "cpu_suffix": {
+        "stages": 4,
+        "float_words": 2500,
+        "candidate_ids": 1250,
+        "comparison": "every JSON value exact"
+      },
+      "context": {
+        "scenarios": 6,
+        "observations": 124,
+        "abi_and_null_print": "exact",
+        "counts_status_logits": "exact",
+        "real_nonnegative_timers": true,
+        "graph_counters": "zero for direct executor",
+        "runtime_features": "implementation-specific truthful string"
+      },
+      "file_pointer": {
+        "model_cases": 48,
+        "adapter_cases": 24,
+        "all_status_metadata_invocation_output_bits": "exact",
+        "caller_ownership": "native client closes each FILE before inference",
+        "cursor": "Rust coherently restores origin; native positions recorded separately"
+      },
+      "frozen_exports": 247,
+      "extensions": [
+        "llama_rust_abi_layout",
+        "llama_rust_clear_error",
+        "llama_rust_last_error",
+        "llama_rust_sampler_abi_layout"
+      ],
+      "absent": [
+        "llama_attach_threadpool",
+        "llama_detach_threadpool",
+        "llama_model_init_from_user",
+        "llama_model_save_to_file",
+        "llama_numa_init",
+        "llama_opt_epoch",
+        "llama_opt_init",
+        "llama_opt_param_filter_all"
+      ],
+      "exact_named_inventory": true,
+      "outputs": {
+        "sampling": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/sampling-release.json",
+          "bytes": 6083555,
+          "sha256": "0e32d13c485efd8f504091d6c61b084a04e42416c8787d506e20ad65087ddaf5"
+        },
+        "suffix": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/suffix-release.json",
+          "bytes": 124383,
+          "sha256": "3a4f20c6a6482b94c80234ee491ed95d3e7265c887c1adc04847f7e3e8403b3c"
+        },
+        "context": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/context-release.json",
+          "bytes": 77279,
+          "sha256": "3420cab29fccae5fca07ee3c717671dd401cea6c2d50c8599f031a1ba9062224"
+        },
+        "file": {
+          "path": "/mnt/c/Users/adyba/rust-llama-reference/c-api-integration-20261114/merged-final-v1/gnu/file-release.json",
+          "bytes": 316641,
+          "sha256": "d1640497e81f15b4c7ab0793d4c05bbb8d23017f852f906cba7fc81b13e504c3"
+        }
+      }
+    }
+  ],
+  "source_and_libraries_stable": true,
+  "no_build_performed": true,
+  "comparison_policy": "Sampling and suffix exact; unchanged 13 November context and FILE comparison functions retain their documented timing/graph-counter/cursor boundaries."
+}

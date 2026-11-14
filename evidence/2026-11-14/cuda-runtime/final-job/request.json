@@ -1,0 +1,21 @@
+{
+  "id": "job-op-4f91edcf135a5ec06029bc6f28608cf7590f51385f647aed25a1ba71476794d9",
+  "mode": "program",
+  "program": "python",
+  "args": [
+    "-c",
+    "import subprocess,sys\nbase=r'C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\validate-gpu-final.py'\ngnu=['wsl.exe','--distribution','Ubuntu','--cd','/mnt/c/Users/adyba/rust-llama','--exec','/usr/bin/python3','/mnt/c/Users/adyba/rust-llama-reference/continue-20261114/cuda/validate-gpu-final.py']\nfor mode in ['release','debug']:subprocess.run(gnu+['final-v2',mode],check=True)\nfor mode in ['release','debug']:subprocess.run([sys.executable,base,'final-v2',mode],check=True)"
+  ],
+  "workingDir": "C:\\Users\\adyba\\rust-llama",
+  "timeoutMs": 3600000,
+  "user": "adyba",
+  "readOnly": false,
+  "resourceClass": "heavy",
+  "runtimeMode": "host",
+  "createdAtUtc": "2026-11-14T14:21:09.290Z",
+  "agent": {
+    "taskId": "rust-llama-continue-20261114",
+    "operationId": "gpu-final-four-profiles-v2",
+    "label": ""
+  }
+}

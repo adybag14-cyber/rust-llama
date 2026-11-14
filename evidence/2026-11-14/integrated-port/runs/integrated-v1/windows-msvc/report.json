@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "windows-msvc",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-14T14:22:34.650076+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.884,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1030.619,
+      "stdout": {
+        "bytes": 80844,
+        "sha256": "15a723fe7ace4e65acb2a2f79af736ad08233c9b2eb232d6648bcda1a060c16e"
+      },
+      "stderr": {
+        "bytes": 15089,
+        "sha256": "2be8ac7cdc4284bcfe8c6c5d4c9450dec0fb13a917133d87d11672bf7e81670c"
+      },
+      "tests": {
+        "passed": 768,
+        "failed": 0,
+        "ignored": 49,
+        "suites": 147
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 737.961,
+      "stdout": {
+        "bytes": 80577,
+        "sha256": "0dd1b489d461457a9047217a618cd7564c9b4aa96fbb2d60124fc452061d103a"
+      },
+      "stderr": {
+        "bytes": 15372,
+        "sha256": "70b2bcd5d4ca740e69639f8c9c53aef55607e4e14f4265b2ce3cac0ce6d2fc4a"
+      },
+      "tests": {
+        "passed": 768,
+        "failed": 0,
+        "ignored": 49,
+        "suites": 147
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 9.095,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1025,
+        "sha256": "1b5e7d43da5366ff156301155757ad489a80c6b4db0aee0362f6a5b75140cc08"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 9.551,
+      "stdout": {
+        "bytes": 68475,
+        "sha256": "b7bffe2cb0a37679869731c78bedc0c08d57b13eaf127242da6dbdf3176580a2"
+      },
+      "stderr": {
+        "bytes": 108,
+        "sha256": "9388afdfb21730a3c0fc120d866dc278393d535aa08a695d62bf45b3d1f519b9"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 8.429,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 299,
+        "sha256": "1a9fdc9e5a09dde86f55ea11546722299672e7bc8a71595f7ed1ebcd97f462fd"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1687,
+    "bytes": 254922,
+    "sha256": "e4c4b1c241b4160a5f210cf87f06b75d9f6ec11da87cfd51c5bc96123ea3d9e7",
+    "scope": "All Git-listed tracked/unignored files except evidence/, Markdown documentation, release/gates.tsv and the derived release/non-rust-allowlist.tsv. Includes all Rust source, Cargo/toolchain/configuration, dependency controls, fixtures and fixture manifests. Documentation and final package audit are sealed separately."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "audit",
+    "c-clients",
+    "clippy",
+    "debug-library",
+    "debug-tests",
+    "encoder-c-clients",
+    "fixtures",
+    "fmt",
+    "new-c-clients",
+    "pretrained-inference",
+    "pretrained-native-encoder",
+    "quantization-c-clients",
+    "release-build",
+    "release-gates",
+    "release-tests",
+    "verify-reference-copy",
+    "verify-source"
+  ],
+  "driver": {
+    "bytes": 18197,
+    "sha256": "3cdc4b1de014e3842313b27faf657c76ef37623ebca2d3a06ee8bf2f663903cb"
+  },
+  "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26300 (Windows 11 Professional) [64-bit]\n",
+  "error": "RuntimeError('fixtures failed 1')",
+  "finished_utc": "2026-11-14T14:52:34.822691+00:00"
+}

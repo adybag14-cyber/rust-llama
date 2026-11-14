@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "profile": "linux-gnu",
+  "tag": "integrated-v1",
+  "started_utc": "2026-11-14T14:36:02.536947+00:00",
+  "steps": [
+    {
+      "name": "fmt",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 7.44,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "debug-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 728.858,
+      "stdout": {
+        "bytes": 81039,
+        "sha256": "50a1d199bd5748170eaee2991120755712b36eac2f65897d0f1478f9b0f9f5f1"
+      },
+      "stderr": {
+        "bytes": 19396,
+        "sha256": "a918c3dd5a91a1872c6f3e7e4fb86f2df938f12853187090f42e476bb2398631"
+      },
+      "tests": {
+        "passed": 772,
+        "failed": 0,
+        "ignored": 49,
+        "suites": 147
+      }
+    },
+    {
+      "name": "release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-targets",
+        "--release",
+        "--offline",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 460.634,
+      "stdout": {
+        "bytes": 80775,
+        "sha256": "e8ce58d93b3455126994bb594f5ff7224ce57cce18838bf9b187380931cffe53"
+      },
+      "stderr": {
+        "bytes": 19679,
+        "sha256": "c4dbeb73d4d783ee119f7e0f56cd58a4c1a1e517155ccdab51855f0713e0778e"
+      },
+      "tests": {
+        "passed": 772,
+        "failed": 0,
+        "ignored": 49,
+        "suites": 147
+      }
+    },
+    {
+      "name": "clippy",
+      "argv": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--offline",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 13.905,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1074,
+        "sha256": "7d089abee330386f32047530d16e590bdd8f2cd29e590ec4182909c84181920a"
+      }
+    },
+    {
+      "name": "audit",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "audit"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 137.845,
+      "stdout": {
+        "bytes": 68475,
+        "sha256": "b7bffe2cb0a37679869731c78bedc0c08d57b13eaf127242da6dbdf3176580a2"
+      },
+      "stderr": {
+        "bytes": 137,
+        "sha256": "3d9c6bf0045f04fc7b52b8ce3f4821573cf74115aab3b54ee31850a4a2af5c77"
+      }
+    },
+    {
+      "name": "fixtures",
+      "argv": [
+        "cargo",
+        "run",
+        "--release",
+        "--offline",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "fixtures"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 135.042,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 236,
+        "sha256": "56121539e6f7fc65ee122fb16a3d1a5ba2833f535ee80136b3d34c453d6910fa"
+      }
+    }
+  ],
+  "native_clients": {},
+  "execution_inputs": {
+    "files": 1687,
+    "bytes": 254922,
+    "sha256": "e4c4b1c241b4160a5f210cf87f06b75d9f6ec11da87cfd51c5bc96123ea3d9e7",
+    "scope": "All Git-listed tracked/unignored files except evidence/, Markdown documentation, release/gates.tsv and the derived release/non-rust-allowlist.tsv. Includes all Rust source, Cargo/toolchain/configuration, dependency controls, fixtures and fixture manifests. Documentation and final package audit are sealed separately."
+  },
+  "requested_stages": [
+    "adapter-c-clients",
+    "audit",
+    "c-clients",
+    "clippy",
+    "debug-library",
+    "debug-tests",
+    "encoder-c-clients",
+    "fixtures",
+    "fmt",
+    "new-c-clients",
+    "pretrained-inference",
+    "pretrained-native-encoder",
+    "quantization-c-clients",
+    "release-build",
+    "release-gates",
+    "release-tests",
+    "verify-reference-copy",
+    "verify-source"
+  ],
+  "driver": {
+    "bytes": 18197,
+    "sha256": "3cdc4b1de014e3842313b27faf657c76ef37623ebca2d3a06ee8bf2f663903cb"
+  },
+  "git_head": "212c6075766212217074448adf60ee88a6e45dd7",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 22.4.0 (jammy) [64-bit]\n",
+  "error": "RuntimeError('fixtures failed 1')",
+  "finished_utc": "2026-11-14T15:01:07.463972+00:00"
+}

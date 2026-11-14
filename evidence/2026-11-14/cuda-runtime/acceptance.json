@@ -1,0 +1,643 @@
+{
+  "schema_version": 1,
+  "status": "succeeded",
+  "recorded_utc": "2026-11-14T14:35:52.942425+00:00",
+  "scope": "Live CUDA dense Llama/Qwen2/Qwen3 extension on one NVIDIA GeForce RTX 4090, Windows MSVC and Linux GNU, debug and release.",
+  "final_job_id": "job-op-4f91edcf135a5ec06029bc6f28608cf7590f51385f647aed25a1ba71476794d9",
+  "final_job_status": "succeeded",
+  "runs": [
+    {
+      "host": "linux-gnu",
+      "mode": "release",
+      "report": "final-v2/linux-gnu/release/report.json",
+      "report_identity": {
+        "bytes": 81926,
+        "sha256": "37739dae8327262f500ab2c368290dc835dc7bb444445a5cccea6b9662f47da5"
+      },
+      "started_utc": "2026-11-14T14:21:09.635544+00:00",
+      "finished_utc": "2026-11-14T14:23:14.885670+00:00",
+      "git_head_context": "84777f1e15e825aaea72f1fc71cd7862f3ac4cf5",
+      "passed_tests": 15,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "analytical_kernel_cases": 162,
+      "persistent_launches_per_case": 2,
+      "malformed_uniform_guarded_kernels": 8,
+      "qwen": [
+        {
+          "label": "pretrained Qwen2 f16",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen2 q8_0",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen3 Q8_0",
+          "models": 1,
+          "original_values": 5469696,
+          "bitwise_equal": 5469696,
+          "exact_greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen2",
+          "models": 21,
+          "original_values": 165888,
+          "bitwise_equal": 165888,
+          "exact_greedy_ids": 198,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen3 tiny and vector-storage",
+          "models": 38,
+          "original_values": 251904,
+          "bitwise_equal": 251904,
+          "exact_greedy_ids": 340,
+          "maximum_absolute": 0.0
+        }
+      ],
+      "llama": [
+        {
+          "dtype": "F16",
+          "logit_comparisons": 59904,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 7.3909759521484375e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 838612, uploaded_bytes: 656640, kernel_dispatches: 30210, committed_tokens: 265 }"
+        },
+        {
+          "dtype": "F32",
+          "logit_comparisons": 62976,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 1357268, uploaded_bytes: 1175296, kernel_dispatches: 30711, committed_tokens: 269 }"
+        },
+        {
+          "dtype": "Q4",
+          "logit_comparisons": 640000,
+          "exact_greedy_ids": 16,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 51095324, uploaded_bytes: 50042496, kernel_dispatches: 8234, committed_tokens: 46 }"
+        }
+      ],
+      "biased_gqa": {
+        "independent_values": 44,
+        "maximum_absolute": 5.9604645e-08,
+        "exact_owned_device_budget": 3812
+      },
+      "qwen3_q4_k_rejections": 6,
+      "execution_inputs_unchanged": true,
+      "step_seconds": {
+        "compiler": 0.022,
+        "clippy": 2.676,
+        "decoder_kernels": 5.934,
+        "runtime": 9.643,
+        "pretrained": 9.442,
+        "qwen": 80.37
+      }
+    },
+    {
+      "host": "linux-gnu",
+      "mode": "debug",
+      "report": "final-v2/linux-gnu/debug/report.json",
+      "report_identity": {
+        "bytes": 81841,
+        "sha256": "be776d78682ff36e35db8e563ca2207f58dff2e0d60e59dc9a029c0b103b3d09"
+      },
+      "started_utc": "2026-11-14T14:23:15.066985+00:00",
+      "finished_utc": "2026-11-14T14:27:53.420727+00:00",
+      "git_head_context": "212c6075766212217074448adf60ee88a6e45dd7",
+      "passed_tests": 15,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "analytical_kernel_cases": 162,
+      "persistent_launches_per_case": 2,
+      "malformed_uniform_guarded_kernels": 8,
+      "qwen": [
+        {
+          "label": "pretrained Qwen2 f16",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen2 q8_0",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen3 Q8_0",
+          "models": 1,
+          "original_values": 5469696,
+          "bitwise_equal": 5469696,
+          "exact_greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen2",
+          "models": 21,
+          "original_values": 165888,
+          "bitwise_equal": 165888,
+          "exact_greedy_ids": 198,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen3 tiny and vector-storage",
+          "models": 38,
+          "original_values": 251904,
+          "bitwise_equal": 251904,
+          "exact_greedy_ids": 340,
+          "maximum_absolute": 0.0
+        }
+      ],
+      "llama": [
+        {
+          "dtype": "F16",
+          "logit_comparisons": 59904,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 7.3909759521484375e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 838612, uploaded_bytes: 656640, kernel_dispatches: 30210, committed_tokens: 265 }"
+        },
+        {
+          "dtype": "F32",
+          "logit_comparisons": 62976,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 1357268, uploaded_bytes: 1175296, kernel_dispatches: 30711, committed_tokens: 269 }"
+        },
+        {
+          "dtype": "Q4",
+          "logit_comparisons": 640000,
+          "exact_greedy_ids": 16,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 51095324, uploaded_bytes: 50042496, kernel_dispatches: 8234, committed_tokens: 46 }"
+        }
+      ],
+      "biased_gqa": {
+        "independent_values": 44,
+        "maximum_absolute": 5.9604645e-08,
+        "exact_owned_device_budget": 3812
+      },
+      "qwen3_q4_k_rejections": 6,
+      "execution_inputs_unchanged": true,
+      "step_seconds": {
+        "compiler": 0.022,
+        "clippy": 0.873,
+        "decoder_kernels": 2.025,
+        "runtime": 3.979,
+        "pretrained": 8.189,
+        "qwen": 246.864
+      }
+    },
+    {
+      "host": "windows-msvc",
+      "mode": "release",
+      "report": "final-v2/windows-msvc/release/report.json",
+      "report_identity": {
+        "bytes": 83934,
+        "sha256": "c0e1516b2b4dff4e1c0bde8c4a91ff8cc26fb59f539a2c6212f5171129b85835"
+      },
+      "started_utc": "2026-11-14T14:27:53.490961+00:00",
+      "finished_utc": "2026-11-14T14:29:16.082372+00:00",
+      "git_head_context": "212c6075766212217074448adf60ee88a6e45dd7",
+      "passed_tests": 15,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "analytical_kernel_cases": 162,
+      "persistent_launches_per_case": 2,
+      "malformed_uniform_guarded_kernels": 8,
+      "qwen": [
+        {
+          "label": "pretrained Qwen2 f16",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 245131,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 5.4836273193359375e-06
+        },
+        {
+          "label": "pretrained Qwen2 q8_0",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen3 Q8_0",
+          "models": 1,
+          "original_values": 5469696,
+          "bitwise_equal": 5469696,
+          "exact_greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen2",
+          "models": 21,
+          "original_values": 165888,
+          "bitwise_equal": 165888,
+          "exact_greedy_ids": 198,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen3 tiny and vector-storage",
+          "models": 38,
+          "original_values": 251904,
+          "bitwise_equal": 251482,
+          "exact_greedy_ids": 340,
+          "maximum_absolute": 7.450580596923828e-08
+        }
+      ],
+      "llama": [
+        {
+          "dtype": "F16",
+          "logit_comparisons": 59904,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 2.86102294921875e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 838612, uploaded_bytes: 656640, kernel_dispatches: 30210, committed_tokens: 265 }"
+        },
+        {
+          "dtype": "F32",
+          "logit_comparisons": 62976,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 5.245208740234375e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 1357268, uploaded_bytes: 1175296, kernel_dispatches: 30711, committed_tokens: 269 }"
+        },
+        {
+          "dtype": "Q4",
+          "logit_comparisons": 640000,
+          "exact_greedy_ids": 16,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 51095324, uploaded_bytes: 50042496, kernel_dispatches: 8234, committed_tokens: 46 }"
+        }
+      ],
+      "biased_gqa": {
+        "independent_values": 44,
+        "maximum_absolute": 1.1920929e-07,
+        "exact_owned_device_budget": 3812
+      },
+      "qwen3_q4_k_rejections": 6,
+      "execution_inputs_unchanged": true,
+      "step_seconds": {
+        "compiler": 0.039,
+        "clippy": 1.674,
+        "decoder_kernels": 8.761,
+        "runtime": 12.487,
+        "pretrained": 10.658,
+        "qwen": 47.043
+      }
+    },
+    {
+      "host": "windows-msvc",
+      "mode": "debug",
+      "report": "final-v2/windows-msvc/debug/report.json",
+      "report_identity": {
+        "bytes": 83841,
+        "sha256": "725ccbb8812f34ef5411a3b8b734bc369af044e4b1040e9abfabecb949282ec9"
+      },
+      "started_utc": "2026-11-14T14:29:16.143831+00:00",
+      "finished_utc": "2026-11-14T14:35:19.315690+00:00",
+      "git_head_context": "212c6075766212217074448adf60ee88a6e45dd7",
+      "passed_tests": 15,
+      "failed_tests": 0,
+      "ignored_tests": 0,
+      "analytical_kernel_cases": 162,
+      "persistent_launches_per_case": 2,
+      "malformed_uniform_guarded_kernels": 8,
+      "qwen": [
+        {
+          "label": "pretrained Qwen2 f16",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 245131,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 5.4836273193359375e-06
+        },
+        {
+          "label": "pretrained Qwen2 q8_0",
+          "models": 1,
+          "original_values": 1975168,
+          "bitwise_equal": 1975168,
+          "exact_greedy_ids": 8,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "pretrained Qwen3 Q8_0",
+          "models": 1,
+          "original_values": 5469696,
+          "bitwise_equal": 5469696,
+          "exact_greedy_ids": 24,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen2",
+          "models": 21,
+          "original_values": 165888,
+          "bitwise_equal": 165888,
+          "exact_greedy_ids": 198,
+          "maximum_absolute": 0.0
+        },
+        {
+          "label": "Qwen3 tiny and vector-storage",
+          "models": 38,
+          "original_values": 251904,
+          "bitwise_equal": 251482,
+          "exact_greedy_ids": 340,
+          "maximum_absolute": 7.450580596923828e-08
+        }
+      ],
+      "llama": [
+        {
+          "dtype": "F16",
+          "logit_comparisons": 59904,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 2.86102294921875e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 838612, uploaded_bytes: 656640, kernel_dispatches: 30210, committed_tokens: 265 }"
+        },
+        {
+          "dtype": "F32",
+          "logit_comparisons": 62976,
+          "exact_greedy_ids": 96,
+          "maximum_absolute": 5.245208740234375e-06,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 1357268, uploaded_bytes: 1175296, kernel_dispatches: 30711, committed_tokens: 269 }"
+        },
+        {
+          "dtype": "Q4",
+          "logit_comparisons": 640000,
+          "exact_greedy_ids": 16,
+          "maximum_absolute": 0.0,
+          "device": "NVIDIA GeForce RTX 4090",
+          "statistics": "Statistics { allocated_bytes: 51095324, uploaded_bytes: 50042496, kernel_dispatches: 8234, committed_tokens: 46 }"
+        }
+      ],
+      "biased_gqa": {
+        "independent_values": 44,
+        "maximum_absolute": 1.1920929e-07,
+        "exact_owned_device_budget": 3812
+      },
+      "qwen3_q4_k_rejections": 6,
+      "execution_inputs_unchanged": true,
+      "step_seconds": {
+        "compiler": 0.04,
+        "clippy": 0.182,
+        "decoder_kernels": 0.524,
+        "runtime": 0.514,
+        "pretrained": 5.975,
+        "qwen": 354.034
+      }
+    }
+  ],
+  "per_run_totals": {
+    "cargo_tests_passed": 15,
+    "analytical_kernel_cases": 162,
+    "analytical_persistent_launches": 324,
+    "qwen_small_models": 59,
+    "qwen_pretrained_models": 3,
+    "qwen_original_values": 9837824,
+    "qwen_exact_greedy_ids": 578,
+    "llama_inputs": 3,
+    "llama_logit_comparisons": 762880,
+    "llama_exact_greedy_ids": 208,
+    "biased_gqa_independent_values": 44,
+    "qwen3_unsupported_q4_k_cases": 6
+  },
+  "counts_policy": "Each host/build replays the same bounded corpus. Four repeats are not additional distinct models. Llama F32 counts include its prompt/greedy boundary row as tested.",
+  "comparison_budgets": {
+    "pretrained_logits": {
+      "absolute": 0.0002,
+      "relative": 2e-05
+    },
+    "runtime_ggml": {
+      "absolute": 2e-05,
+      "relative": 2e-05
+    },
+    "kernel_analytical": {
+      "absolute": 2e-06,
+      "relative": 2e-05,
+      "exact_cases": "Activation Q8 and two independent RMS division regressions"
+    }
+  },
+  "all_four_reports_have_identical_selected_inputs": true,
+  "selected_execution_input_count": 452,
+  "all_final_log_hashes_match_reports": true,
+  "byte_preservation": "Raw reports, job metadata and logs copied byte-for-byte and SHA-256 verified; no normalization or scoped attributes added.",
+  "independent_review": {
+    "path": "../cuda-review/review.json",
+    "bytes": 11450,
+    "sha256": "5ca00f5a389b2d8452f23951c29e77ebc39ca5c7e136f23bb59aaee1e29975fa",
+    "reviewed_source_hashes_match_all_four_execution_inputs": true
+  },
+  "history": "history/index.json",
+  "input_identities": "input-identities.json",
+  "limits": [
+    "This bounded qualification does not close global release gates or certify every architecture, dtype, graph, driver, GPU or operating system.",
+    "Small models and pretrained models are distinct acceptance scopes.",
+    "Exact Qwen counts are measured separately for every host/build and model group; uniform bit identity is not assumed. All accepted floats pass the unchanged numerical bound. GNU Llama F16 uses an MSVC reference.",
+    "Historical CPU/GPU diagnostic traces are not expected acceptance values.",
+    "Selected input hashes identify the tested working-tree bytes; later integration commits need a separate identity check.",
+    "Full original JSON, weights, original executables and stage buffers remain external; their identities and scope are recorded."
+  ],
+  "whitespace_verification": {
+    "method": "Read-only scan of every UTF-8 package file, exact SHA-256 checks of all copied artifacts and generated manifest entries.",
+    "ordinary_nonlog_files_strict_whitespace": "passed",
+    "raw_copies_verified": 110,
+    "manifest_entries_verified": 116,
+    "captured_log_exceptions": [
+      {
+        "path": "final-v2/linux-gnu/debug/decoder_kernels.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/debug/pretrained.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/debug/qwen.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/debug/runtime.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/release/decoder_kernels.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/release/pretrained.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/release/qwen.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/linux-gnu/release/runtime.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/debug/decoder_kernels.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/debug/pretrained.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/debug/qwen.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/debug/runtime.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/release/decoder_kernels.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/release/pretrained.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/release/qwen.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "final-v2/windows-msvc/release/runtime.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/gnu-v1/linux-gnu/release/decoder_kernels.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/gnu-v1/linux-gnu/release/pretrained.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/gnu-v1/linux-gnu/release/qwen.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/gnu-v1/linux-gnu/release/runtime.stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/jobs/initial-windows-qwen/stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "history/jobs/initial-windows-release/stdout.log",
+        "trailing_whitespace_lines": [],
+        "blank_final_line": true
+      },
+      {
+        "path": "original/qwen2-native/gnu/f16-capture.log",
+        "trailing_whitespace_lines": [
+          48
+        ],
+        "blank_final_line": false
+      },
+      {
+        "path": "original/qwen2-native/gnu/q8_0-capture.log",
+        "trailing_whitespace_lines": [
+          48
+        ],
+        "blank_final_line": false
+      },
+      {
+        "path": "original/qwen2-native/msvc/f16-capture.log",
+        "trailing_whitespace_lines": [
+          48
+        ],
+        "blank_final_line": false
+      },
+      {
+        "path": "original/qwen2-native/msvc/q8_0-capture.log",
+        "trailing_whitespace_lines": [
+          48
+        ],
+        "blank_final_line": false
+      }
+    ],
+    "staged_git_checks_executed_by_packager": false,
+    "suggested_staged_checks": [
+      [
+        "git",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        "evidence/2026-11-14/cuda-runtime",
+        ":(exclude,glob)evidence/2026-11-14/cuda-runtime/**/*.log"
+      ],
+      [
+        "git",
+        "-c",
+        "core.whitespace=blank-at-eol,space-before-tab,-blank-at-eof",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        ":(glob)evidence/2026-11-14/cuda-runtime/**/*.log",
+        ":(exclude,glob)evidence/2026-11-14/cuda-runtime/original/qwen2-native/*/*-capture.log"
+      ],
+      [
+        "git",
+        "-c",
+        "core.whitespace=-blank-at-eol,-blank-at-eof,space-before-tab",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        ":(glob)evidence/2026-11-14/cuda-runtime/original/qwen2-native/*/*-capture.log"
+      ]
+    ]
+  }
+}

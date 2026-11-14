@@ -1,0 +1,56 @@
+--- C:\Users\adyba\rust-llama-reference\continue-20261113\replay-prior-c-clients.py
++++ C:\Users\adyba\rust-llama-reference\continue-20261114\replay-prior-c-clients.py
+@@ -308,15 +308,19 @@
+             "llama_perf_context", "llama_perf_context_print", "llama_perf_context_reset",
+             "llama_set_warmup", "llama_print_system_info",
+             "llama_model_load_from_file_ptr", "llama_adapter_lora_init_from_file_ptr",
++            "llama_set_sampler", "llama_get_sampled_token_ith",
++            "llama_get_sampled_logits_ith", "llama_get_sampled_logits_count_ith",
++            "llama_get_sampled_probs_ith", "llama_get_sampled_probs_count_ith",
++            "llama_get_sampled_candidates_ith", "llama_get_sampled_candidates_count_ith",
+         }
+         require(set(current["implemented"]) == set(inventory["implemented"]) | added,
+-                "current exports are not exactly historical exports plus the 23 explicitly listed APIs")
++                "current exports are not exactly historical exports plus the 31 explicitly listed APIs")
+         require(current["extensions"] == sorted(inventory["extensions"]),
+                 "diagnostic extensions changed")
+         require(set(current["unexported"]) == set(inventory["unexported"]) - added,
+                 "remaining frozen exports differ")
+         require(tuple(len(current[k]) for k in ("implemented", "extensions", "unexported"))
+-                == (239, 4, 16), "current export counts differ")
++                == (247, 4, 8), "current export counts differ")
+         report["historical_export_inventory"] = inventory
+         inventory = current
+         required_exports = sorted(inventory["implemented"] + inventory["extensions"])
+@@ -365,7 +369,7 @@
+             require(not set(actual_exports) & set(inventory["unexported"]),
+                     mode + ": unsupported symbol exported")
+             write_json(destination / "exports.json", {"library": library_identity, **inventory})
+-            entry["exports"] = {"implemented": 239, "extensions": 4, "absent": 16,
++            entry["exports"] = {"implemented": 247, "extensions": 4, "absent": 8,
+                                 "result": identity(destination / "exports.json")}
+             batch_output = destination / "batch.json"
+             row = run("batch", [batch_client, library, model, batch_dir / "inputs.json",
+@@ -393,7 +397,7 @@
+             guard()
+             entry["status"] = "passed"
+             save()
+-            print(HOST, mode, "batch exact; sampler semantic/stderr exact; exports 239+4/16 absent",
++            print(HOST, mode, "batch exact; sampler semantic/stderr exact; exports 247+4/8 absent",
+                   flush=True)
+ 
+         guard()
+@@ -405,7 +409,7 @@
+                    "profiles": {name: {"library": value["library"], "status": value["status"]}
+                                 for name, value in report["profiles"].items()},
+                    "batch_corpus": batch_counts, "perf_corpus": report["perf_corpus"],
+-                   "exports": {"implemented": 239, "extensions": 4, "absent": 16}}
++                   "exports": {"implemented": 247, "extensions": 4, "absent": 8}}
+         write_json(out / "summary.json", summary)
+         print(json.dumps(summary, separators=(",", ":")), flush=True)
+         return 0
+@@ -418,3 +422,4 @@
+ 
+ if __name__ == "__main__":
+     sys.exit(main())
++

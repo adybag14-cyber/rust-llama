@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "pre-execution-exact-text-delta-review",
+  "reviewed_utc": "2026-11-14T14:42:21.405Z",
+  "predecessor": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\validate-cli.py",
+    "bytes": 9107,
+    "sha256": "99dbe66e42fc76990608912d9400dafa95860cc6ecc548a85d771641d753f2c3",
+    "executed": false,
+    "review_receipt": {
+      "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\cli-driver-review-v1.json",
+      "bytes": 16425,
+      "sha256": "10ac1e2dbbc2919a18b225a2a1163206ab9953fa3c56f57f15f374765ad9e1ac"
+    }
+  },
+  "candidate": {
+    "path": "C:\\Users\\adyba\\rust-llama-reference\\continue-20261114\\cuda\\validate-cli-v2.py",
+    "bytes": 9245,
+    "sha256": "eaf4491d101a864d69aed243f8fa4a91cde902ad56189d944359b41984c4ffad",
+    "executed_at_review": false
+  },
+  "exact_allowed_replacements": [
+    {
+      "purpose": "Separate fresh output directory",
+      "before": "continue-20261114/cuda/cli/v1",
+      "after": "continue-20261114/cuda/cli/v2"
+    },
+    {
+      "purpose": "Remove unused stop-coverage field",
+      "before": "\"stops\":[],",
+      "after": ""
+    },
+    {
+      "purpose": "Declare both timeout bounds",
+      "before": "\"command_timeout_seconds\":120",
+      "after": "\"default_command_timeout_seconds\":120,\"starcoder2_command_timeout_seconds\":300"
+    },
+    {
+      "purpose": "Choose bounded timeout for each command",
+      "before": " started=time.monotonic()\n process=",
+      "after": " started=time.monotonic()\n timeout_seconds=300 if \"starcoder2\" in name else 120\n process="
+    },
+    {
+      "purpose": "Apply selected command timeout",
+      "before": "process.wait(timeout=120)",
+      "after": "process.wait(timeout=timeout_seconds)"
+    },
+    {
+      "purpose": "Record selected timeout in each receipt",
+      "before": "\"timed_out\":timeout",
+      "after": "\"timeout_seconds\":timeout_seconds,\"timed_out\":timeout"
+    }
+  ],
+  "exact_text_reconstruction_matched": true,
+  "unreviewed_additional_changes": false,
+  "execution_authorization_at_review": "Wait for parent to signal each root release binary ready and an available durable heavy job slot.",
+  "preserved_contract": {
+    "commands_per_host": 15,
+    "generation_cases_per_host": 6,
+    "logit_cases_per_host": 6,
+    "logit_rows_per_host": 9,
+    "logit_values_per_host": 1059072,
+    "rejections_per_host": 2,
+    "stop_coverage_claimed": false,
+    "root_release_binary_paths_unchanged": true,
+    "model_inputs_unchanged": true,
+    "reference_rows_unchanged": true,
+    "tolerances_unchanged": true
+  },
+  "timeout_selection": {
+    "normal_commands": 12,
+    "normal_timeout_seconds": 120,
+    "starcoder2_commands": [
+      "generate-starcoder2-3b-pretrained-q4_k_m",
+      "logits-starcoder2-3b-pretrained-q4_k_m",
+      "unsupported-starcoder2-device"
+    ],
+    "starcoder2_timeout_seconds": 300
+  }
+}

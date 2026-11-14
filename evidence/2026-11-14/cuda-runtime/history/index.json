@@ -1,0 +1,124 @@
+{
+  "scope": "Historical failures and diagnostics; none substitute for final-v2 acceptance",
+  "attempts": [
+    {
+      "label": "initial-windows-qwen",
+      "job_id": "job-op-63498abb2d155d5cf5d5cf608b9746cf9849c761b078d5f3b9cd76fba9e7fe76",
+      "process_status": "failed",
+      "exit_code": 101,
+      "started_utc": "2026-11-14T13:49:51.175Z",
+      "completed_utc": "2026-11-14T13:51:24.853Z",
+      "interpretation": "Failed: Qwen3 row 1 col 0 differed by 0.12197399139404297; a Qwen2 fixture lookup was also missing."
+    },
+    {
+      "label": "trace-before",
+      "job_id": "job-op-133e9858384dbb5bff7953972e11fd63bcb37c19b54fd537b48e0b5de5679099",
+      "process_status": "succeeded",
+      "exit_code": 0,
+      "started_utc": "2026-11-14T13:54:27.557Z",
+      "completed_utc": "2026-11-14T13:54:38.998Z",
+      "interpretation": "Successful diagnostic execution reproduced CPU 8.354881 versus GPU 8.232907. Not acceptance."
+    },
+    {
+      "label": "trace-inverse-only",
+      "job_id": "job-op-794f7aca9fbac791b42087e73b3b4dfa0529f47d28af942d330d94ae0312422e",
+      "process_status": "succeeded",
+      "exit_code": 0,
+      "started_utc": "2026-11-14T13:58:38.200Z",
+      "completed_utc": "2026-11-14T13:58:48.119Z",
+      "interpretation": "Successful diagnostic execution: F64 reciprocal alone still gave CPU 8.354881 versus GPU 8.232907. Not acceptance."
+    },
+    {
+      "label": "trace-corrected-exp",
+      "job_id": "job-op-97bc326c29ceccfb002189df1115ab5702e01c8b40d7b14bfa4eeec6d1665d5a",
+      "process_status": "succeeded",
+      "exit_code": 0,
+      "started_utc": "2026-11-14T13:59:22.255Z",
+      "completed_utc": "2026-11-14T13:59:31.902Z",
+      "interpretation": "Successful diagnostic after exponent correction: two printed CPU/GPU values agreed. This limited trace is not final acceptance."
+    },
+    {
+      "label": "initial-windows-release",
+      "job_id": "job-op-74d048ee0ead37ed26ba4d5ceae74b8fc463df554deff1f5fc7979cdfe9f8e86",
+      "process_status": "succeeded",
+      "exit_code": 0,
+      "started_utc": "2026-11-14T13:59:47.184Z",
+      "completed_utc": "2026-11-14T14:00:16.746Z",
+      "interpretation": "Earlier three-test subset passed. Pretrained Qwen3 and small Qwen2 were exact; small Qwen3 had 251482/251904 exact values within tolerance. Predates the final RMS division correction."
+    },
+    {
+      "label": "qwen2-capture-queue-failure",
+      "job_id": "job-op-1e01e24babc363cfb9143e294621e778a635a7de592bf126cc6b3a4beb90b456",
+      "process_status": "failed",
+      "exit_code": null,
+      "started_utc": null,
+      "completed_utc": "2026-11-14T14:06:28.197Z",
+      "interpretation": "Queue-only failure after about 300 seconds: no child started and no native output was captured."
+    },
+    {
+      "label": "qwen2-capture-retry",
+      "job_id": "job-op-4557d255099783f7771007c54425c52e69180a03aab2eb169a689ab0e7d61b05",
+      "process_status": "succeeded",
+      "exit_code": 0,
+      "started_utc": "2026-11-14T14:08:20.172Z",
+      "completed_utc": "2026-11-14T14:09:00.741Z",
+      "interpretation": "Successful retry captured both Qwen2 variants from the frozen original C API on MSVC and GNU."
+    },
+    {
+      "label": "gnu-v1",
+      "report": "history/gnu-v1/linux-gnu/release/report.json",
+      "interpretation": "Failed one small-Qwen2 provenance lookup (missing model key). All three pretrained Qwen comparisons and small Qwen3 comparison passed exactly. Final reader follows hash-pinned shared MSVC model provenance."
+    }
+  ],
+  "trace_before": {
+    "stage_comparisons": 952,
+    "changed_stages": 301,
+    "first_changed_stages": [
+      {
+        "name": "00-00-product",
+        "count": 3072,
+        "neq": 479,
+        "max_abs": 1.1920928955078125e-07,
+        "index": 29,
+        "cpu": 0.6355730295181274,
+        "gpu": 0.635573148727417
+      },
+      {
+        "name": "00-01-product",
+        "count": 3072,
+        "neq": 1211,
+        "max_abs": 1.1920928955078125e-07,
+        "index": 654,
+        "cpu": -1.9339492321014404,
+        "gpu": -1.93394935131073
+      },
+      {
+        "name": "00-02-product",
+        "count": 3072,
+        "neq": 650,
+        "max_abs": 3.5762786865234375e-07,
+        "index": 139,
+        "cpu": -1.5159004926681519,
+        "gpu": -1.5159001350402832
+      },
+      {
+        "name": "00-03-product",
+        "count": 3072,
+        "neq": 362,
+        "max_abs": 1.862645149230957e-09,
+        "index": 15,
+        "cpu": -0.015533272176980972,
+        "gpu": -0.015533274039626122
+      },
+      {
+        "name": "00-04-product",
+        "count": 3072,
+        "neq": 391,
+        "max_abs": 1.862645149230957e-09,
+        "index": 20,
+        "cpu": 0.013174434192478657,
+        "gpu": 0.013174436055123806
+      }
+    ]
+  }
+}

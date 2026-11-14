@@ -45,6 +45,147 @@ fn case(name: &'static str, kind: D, mut inputs: Vec<Vec<u8>>, expected: Vec<f32
 }
 fn cases() -> Vec<Case> {
     let mut all = Vec::new();
+    // Independent rounding boundary: division gives F32 mean 0x3fc00002,
+    // while multiplication by the rounded F64 reciprocal gives 0x3fc00001.
+    // The frozen RMS row divides its F64 sum by the actual row dimension.
+    let mut rms_boundary = vec![
+        12.0f32,
+        1.0,
+        1.0,
+        1.0,
+        1.0 / 256.0,
+        1.0 / 1024.0,
+        1.0 / 1024.0,
+        1.0 / 2048.0,
+        1.0 / 4096.0,
+        1.0 / 4096.0,
+    ];
+    rms_boundary.resize(98, 0.0);
+    let scale = f32::from_bits(0x3f51_05bc);
+    let mut scalar = case(
+        "RMS division rounding boundary",
+        D::RmsScale {
+            width: 98,
+            epsilon: 1e-5,
+        },
+        vec![bytes(&rms_boundary)],
+        vec![scale],
+    );
+    scalar.exact = true;
+    all.push(scalar);
+    let mut headed = case(
+        "head RMS division rounding boundary",
+        D::HeadRms {
+            width: 98,
+            head_dimension: 98,
+            epsilon: 1e-5,
+        },
+        vec![bytes(&rms_boundary), bytes(&[1.0; 98])],
+        rms_boundary.iter().map(|x| x * scale).collect(),
+    );
+    headed.exact = true;
+    all.push(headed);
+    for width in [1usize, 3, 4, 7, 16] {
+        let input = [
+            -103.0f32,
+            -90.0,
+            -88.7,
+            -87.0,
+            -10.0,
+            -1.0,
+            -0.0,
+            0.0,
+            0.1,
+            1.0,
+            10.0,
+            88.0,
+            100.0,
+            134.0,
+            f32::MIN_POSITIVE,
+            -134.0,
+        ][..width]
+            .to_vec();
+        let mut expected = input.clone();
+        llama_quant::cpu_math::silu_f32_in_place(&mut expected);
+        all.push(case(
+            "SiLU source exponent ranges and scalar tails",
+            D::SiluGate {
+                width: width as u32,
+            },
+            vec![bytes(&input), bytes(&vec![1.0; width])],
+            expected,
+        ));
+    }
+    for (heads, dimension) in [(1u32, 2u32), (3, 6), (2, 64), (8, 128)] {
+        let width = heads * dimension;
+        let input: Vec<f32> = (0..width)
+            .map(|i| (i as i32 % 23 - 11) as f32 / 8.)
+            .collect();
+        let weight: Vec<f32> = (0..dimension)
+            .map(|i| 0.5 + (i % 11) as f32 / 16.)
+            .collect();
+        let expected: Vec<f32> = input
+            .chunks(dimension as usize)
+            .flat_map(|head| {
+                let square_sum: f64 = head.iter().map(|&v| f64::from(v * v)).sum();
+                let scale = ((square_sum / f64::from(dimension)) as f32 + 1e-5)
+                    .sqrt()
+                    .recip();
+                head.iter()
+                    .zip(&weight)
+                    .map(move |(&v, &w)| (v * scale) * w)
+            })
+            .collect();
+        all.push(case(
+            "independent head RMS",
+            D::HeadRms {
+                width,
+                head_dimension: dimension,
+                epsilon: 1e-5,
+            },
+            vec![bytes(&input), bytes(&weight)],
+            expected,
+        ));
+        for offset in [0, width / 2, width - 1] {
+            all.push(case(
+                "fused projection slice",
+                D::Slice {
+                    source_width: width,
+                    offset,
+                    width: width - offset,
+                },
+                vec![bytes(&input)],
+                input[offset as usize..].to_vec(),
+            ));
+        }
+        let phases: Vec<f32> = (0..dimension / 2)
+            .flat_map(|d| {
+                let angle = (d as f32 + 1.) / 16.;
+                [angle.cos(), angle.sin()]
+            })
+            .collect();
+        let mut expected = input.clone();
+        for head in 0..heads as usize {
+            for pair in 0..dimension as usize / 2 {
+                let first = head * dimension as usize + pair;
+                let second = first + dimension as usize / 2;
+                let (c, s) = (phases[2 * pair], phases[2 * pair + 1]);
+                let (x, y) = (input[first], input[second]);
+                expected[first] = x * c - y * s;
+                expected[second] = x * s + y * c;
+            }
+        }
+        all.push(case(
+            "half-pair multihead RoPE",
+            D::RopeNeox {
+                width,
+                head_dimension: dimension,
+                context: 1,
+            },
+            vec![bytes(&input), bytes(&phases), params(0, 0)],
+            expected,
+        ));
+    }
     for width in [2u32, 8, 258] {
         let input: Vec<f32> = (0..width)
             .map(|i| (i as i32 % 17 - 8) as f32 * 0.125)
@@ -73,14 +214,16 @@ fn cases() -> Vec<Case> {
                 .map(|(&x, &w)| x * scale * w)
                 .collect(),
         ));
+        let mut activated = input.clone();
+        llama_quant::cpu_math::silu_f32_in_place(&mut activated);
         all.push(case(
             "SiLU gate",
             D::SiluGate { width },
             vec![bytes(&input), bytes(&weight)],
-            input
+            activated
                 .iter()
                 .zip(&weight)
-                .map(|(&x, &w)| x / (1.0 + (-x).exp()) * w)
+                .map(|(&x, &w)| x * w)
                 .collect(),
         ));
         let mut embedding = input.clone();
@@ -213,11 +356,13 @@ fn cases() -> Vec<Case> {
                     }
                     let score = &scores[h * context as usize..(h + 1) * context as usize];
                     let max = score.iter().copied().fold(f32::NEG_INFINITY, f32::max);
-                    let exps: Vec<f32> = score.iter().map(|&x| (x - max).exp()).collect();
-                    let sum = exps.iter().map(|&x| f64::from(x)).sum::<f64>() as f32;
-                    statistics.extend([max, 1. / sum]);
+                    let mut exps = score.to_vec();
+                    exps.resize(exps.len().div_ceil(256) * 256, f32::NEG_INFINITY);
+                    let sum = llama_quant::cpu_math::softmax_exp_sum_f32_in_place(&mut exps, max);
+                    let inverse = (1.0 / sum) as f32;
+                    statistics.extend([max, inverse]);
                     for t in 0..context as usize {
-                        probabilities[h * context as usize + t] = exps[t] / sum;
+                        probabilities[h * context as usize + t] = exps[t] * inverse;
                     }
                     for d in 0..dimension as usize {
                         weighted.push(
@@ -500,8 +645,14 @@ fn interpreted_decoder_kernels_match_analytical_values() {
         compare(c.name, &c.buffers[k.output_buffer()], &c.expected, c.exact);
     }
 }
-fn dynamic_index_kernels() -> [D; 7] {
+fn dynamic_index_kernels() -> [D; 8] {
+    // Both rotary layouts use the same guarded runtime position uniform.
     [
+        D::RopeNeox {
+            width: 8,
+            head_dimension: 4,
+            context: 3,
+        },
         D::Embedding {
             vocabulary: 2,
             width: 4,
@@ -558,6 +709,41 @@ fn dynamic_indices_are_guarded_even_for_untrusted_uniform_bytes() {
 #[test]
 fn dimensions_and_arithmetic_are_validated_before_code_generation() {
     for kind in [
+        D::Slice {
+            source_width: 8,
+            offset: 7,
+            width: 2,
+        },
+        D::Slice {
+            source_width: 8,
+            offset: u32::MAX,
+            width: 2,
+        },
+        D::Slice {
+            source_width: 8,
+            offset: 0,
+            width: 0,
+        },
+        D::HeadRms {
+            width: 8,
+            head_dimension: 0,
+            epsilon: 1e-5,
+        },
+        D::HeadRms {
+            width: 8,
+            head_dimension: 3,
+            epsilon: 1e-5,
+        },
+        D::HeadRms {
+            width: 8,
+            head_dimension: 4,
+            epsilon: f32::INFINITY,
+        },
+        D::RopeNeox {
+            width: 8,
+            head_dimension: 3,
+            context: 2,
+        },
         D::RmsScale {
             width: 0,
             epsilon: 1e-5,
@@ -731,6 +917,6 @@ fn cuda_dynamic_guards_and_resource_contexts_are_enforced() {
     output.copy_to(0, &mut result).unwrap();
     assert_eq!(result, bytes(&[3., 3.]));
     eprintln!(
-        "CUDA malformed uniforms: 7 guarded kernels; foreign stream/input/output and short input rejected; owned context lifetime retained"
+        "CUDA malformed uniforms: 8 guarded kernels; foreign stream/input/output and short input rejected; owned context lifetime retained"
     );
 }

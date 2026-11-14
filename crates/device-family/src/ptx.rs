@@ -5,7 +5,7 @@
 //! or throughput parity. Interpretation is not device execution or PTX assembly.
 use std::fmt::{self, Write};
 
-pub const IR_VERSION: u32 = 2;
+pub const IR_VERSION: u32 = 3;
 
 mod decoder;
 pub use decoder::DecoderKernel;
@@ -340,6 +340,7 @@ enum Binary {
     WideMul,
     And,
     Shr,
+    Shl,
     Div,
     Rem,
     Max,
@@ -347,7 +348,6 @@ enum Binary {
 #[derive(Debug, Clone, Copy)]
 enum Unary {
     Sqrt,
-    Exp2,
 }
 #[derive(Debug, Clone, Copy)]
 enum Conversion {
@@ -358,6 +358,12 @@ enum Conversion {
     F64ToF32,
     F32ToHalf,
     F32ToI32Trunc,
+    F64ToI32Nearest,
+    I32ToF64,
+    I32ToU64,
+    U64BitsToF64,
+    F32BitsToU32,
+    U32BitsToF32,
 }
 #[derive(Debug, Clone, Copy)]
 enum LoadType {
@@ -493,9 +499,13 @@ impl Program {
     }
     fn convert(&mut self, conversion: Conversion, src: Reg) -> Reg {
         let dst = self.reg(match conversion {
-            Conversion::U32ToI32 | Conversion::F32ToI32Trunc => Type::I32,
+            Conversion::U32ToI32 | Conversion::F32ToI32Trunc | Conversion::F64ToI32Nearest => {
+                Type::I32
+            }
             Conversion::F32ToHalf => Type::B16,
-            Conversion::F32ToF64 => Type::F64,
+            Conversion::F32ToF64 | Conversion::I32ToF64 | Conversion::U64BitsToF64 => Type::F64,
+            Conversion::I32ToU64 => Type::U64,
+            Conversion::F32BitsToU32 => Type::U32,
             _ => Type::F32,
         });
         self.push(Instruction::Convert {
@@ -567,6 +577,11 @@ impl Program {
                 Instruction::Binary { dst, op, a, b } => match op {
                     Binary::WideMul => dst.ty == Type::U64 && same(a, b, Type::U32),
                     Binary::And | Binary::Shr => dst.ty == Type::U32 && same(a, b, Type::U32),
+                    Binary::Shl => {
+                        matches!(dst.ty, Type::U32 | Type::U64)
+                            && a.ty() == dst.ty
+                            && b.ty() == Type::U32
+                    }
                     Binary::Add | Binary::Sub => {
                         matches!(
                             dst.ty,
@@ -576,7 +591,9 @@ impl Program {
                     Binary::Mul => {
                         matches!(dst.ty, Type::U32 | Type::F32 | Type::F64) && same(a, b, dst.ty)
                     }
-                    Binary::Div => matches!(dst.ty, Type::U32 | Type::F32) && same(a, b, dst.ty),
+                    Binary::Div => {
+                        matches!(dst.ty, Type::U32 | Type::F32 | Type::F64) && same(a, b, dst.ty)
+                    }
                     Binary::Rem => dst.ty == Type::U32 && same(a, b, Type::U32),
                     Binary::Max => dst.ty == Type::F32 && same(a, b, Type::F32),
                 },
@@ -593,6 +610,12 @@ impl Program {
                     Conversion::F64ToF32 => dst.ty == Type::F32 && src.ty == Type::F64,
                     Conversion::F32ToHalf => dst.ty == Type::B16 && src.ty == Type::F32,
                     Conversion::F32ToI32Trunc => dst.ty == Type::I32 && src.ty == Type::F32,
+                    Conversion::F64ToI32Nearest => dst.ty == Type::I32 && src.ty == Type::F64,
+                    Conversion::I32ToF64 => dst.ty == Type::F64 && src.ty == Type::I32,
+                    Conversion::I32ToU64 => dst.ty == Type::U64 && src.ty == Type::I32,
+                    Conversion::U64BitsToF64 => dst.ty == Type::F64 && src.ty == Type::U64,
+                    Conversion::F32BitsToU32 => dst.ty == Type::U32 && src.ty == Type::F32,
+                    Conversion::U32BitsToF32 => dst.ty == Type::F32 && src.ty == Type::U32,
                 },
                 Instruction::Load { dst, address, kind } => {
                     address.ty == Type::U64
@@ -672,6 +695,7 @@ impl Program {
                         Binary::WideMul => "mul.wide",
                         Binary::And => "and",
                         Binary::Shr => "shr",
+                        Binary::Shl => "shl",
                         Binary::Div => "div",
                         Binary::Rem => "rem",
                         Binary::Max => "max",
@@ -686,7 +710,9 @@ impl Program {
                         };
                     let ty = if matches!(op, Binary::WideMul) {
                         "u32"
-                    } else if matches!(op, Binary::And) {
+                    } else if matches!(op, Binary::Shl) && dst.ty == Type::U64 {
+                        "b64"
+                    } else if matches!(op, Binary::And | Binary::Shl) {
                         "b32"
                     } else {
                         dst.ty.ptx()
@@ -698,7 +724,6 @@ impl Program {
                     "    {} {dst}, {src};",
                     match op {
                         Unary::Sqrt => "sqrt.rn.f32",
-                        Unary::Exp2 => "ex2.approx.f32",
                     }
                 ),
                 Instruction::Convert {
@@ -716,6 +741,11 @@ impl Program {
                         Conversion::F64ToF32 => "cvt.rn.f32.f64",
                         Conversion::F32ToHalf => "cvt.rn.f16.f32",
                         Conversion::F32ToI32Trunc => "cvt.rzi.s32.f32",
+                        Conversion::F64ToI32Nearest => "cvt.rni.s32.f64",
+                        Conversion::I32ToF64 => "cvt.rn.f64.s32",
+                        Conversion::I32ToU64 => "cvt.u64.s32",
+                        Conversion::U64BitsToF64 => "mov.b64",
+                        Conversion::F32BitsToU32 | Conversion::U32BitsToF32 => "mov.b32",
                     }
                 ),
                 Instruction::Load { dst, address, kind } => writeln!(
@@ -1073,6 +1103,7 @@ impl Program {
                                     Binary::Add => a + b,
                                     Binary::Sub => a - b,
                                     Binary::Mul => a * b,
+                                    Binary::Div => a / b,
                                     _ => return Err(KernelError("invalid F64 opcode".into())),
                                 }
                                 .to_bits()
@@ -1094,6 +1125,7 @@ impl Program {
                                     Binary::Shr => {
                                         (a as u32).checked_shr(b as u32).unwrap_or(0) as u64
                                     }
+                                    Binary::Shl => a.checked_shl(b as u32).unwrap_or(0),
                                 };
                                 if matches!(dst.ty, Type::U32 | Type::I32) {
                                     result as u32 as u64
@@ -1106,7 +1138,6 @@ impl Program {
                             let value = f32::from_bits(regs[src.index] as u32);
                             regs[dst.index] = match op {
                                 Unary::Sqrt => value.sqrt(),
-                                Unary::Exp2 => value.exp2(),
                             }
                             .to_bits() as u64;
                         }
@@ -1133,6 +1164,15 @@ impl Program {
                                 }
                                 Conversion::F32ToI32Trunc => {
                                     (f32::from_bits(value as u32) as i32) as u32 as u64
+                                }
+                                Conversion::F64ToI32Nearest => {
+                                    (f64::from_bits(value).round_ties_even() as i32) as u32 as u64
+                                }
+                                Conversion::I32ToF64 => (value as u32 as i32 as f64).to_bits(),
+                                Conversion::I32ToU64 => value as u32 as i32 as u64,
+                                Conversion::U64BitsToF64 => value,
+                                Conversion::F32BitsToU32 | Conversion::U32BitsToF32 => {
+                                    value as u32 as u64
                                 }
                             };
                         }
