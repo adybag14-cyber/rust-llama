@@ -256,6 +256,12 @@ pub(crate) fn load_files(mut g: GgufSet, path: &Path, options: &LoadOptions) -> 
     if architecture == "bloom" {
         return crate::bloom_loader::load(g, path, options);
     }
+    if architecture == "starcoder" {
+        return crate::starcoder_loader::load(g, path, options);
+    }
+    if architecture == "starcoder2" {
+        return crate::starcoder2_loader::load(g, path, options);
+    }
     if architecture == "falcon" {
         return crate::falcon_loader::load(g, path, options);
     }

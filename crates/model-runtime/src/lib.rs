@@ -22,6 +22,8 @@ pub mod math;
 pub mod qwen2;
 pub mod qwen3;
 pub mod registry;
+pub mod starcoder;
+pub mod starcoder2;
 mod state;
 
 pub use adapters::{AdapterSet, Lora};
@@ -41,6 +43,10 @@ pub use mamba::{MambaConfig, MambaLayer, MambaModel, MambaWeights};
 pub use math::Matrix;
 pub use qwen2::{Qwen2Config, Qwen2Layer, Qwen2Model, Qwen2Qkv, Qwen2Weights};
 pub use qwen3::{Qwen3Config, Qwen3Layer, Qwen3Model, Qwen3Qkv, Qwen3Weights};
+pub use starcoder::{StarcoderConfig, StarcoderLayer, StarcoderModel, StarcoderWeights};
+pub use starcoder2::{
+    Starcoder2Config, Starcoder2Layer, Starcoder2Model, Starcoder2Qkv, Starcoder2Weights,
+};
 
 use std::fmt;
 
@@ -102,6 +108,8 @@ pub enum Model {
     Qwen2(Qwen2Model),
     Qwen3(Qwen3Model),
     Gpt2(Gpt2Model),
+    Starcoder(StarcoderModel),
+    Starcoder2(Starcoder2Model),
     Bloom(BloomModel),
     Falcon(FalconModel),
     GptNeoX(GptNeoXModel),
@@ -114,6 +122,8 @@ impl Model {
             Self::Qwen2(_) => &registry::ARCHITECTURES[24],
             Self::Qwen3(_) => &registry::ARCHITECTURES[28],
             Self::Gpt2(_) => &registry::ARCHITECTURES[7],
+            Self::Starcoder(_) => &registry::ARCHITECTURES[11],
+            Self::Starcoder2(_) => &registry::ARCHITECTURES[59],
             Self::Bloom(_) => &registry::ARCHITECTURES[21],
             Self::Falcon(_) => &registry::ARCHITECTURES[4],
             Self::GptNeoX(_) => &registry::ARCHITECTURES[9],
@@ -126,6 +136,8 @@ impl Model {
             Self::Qwen2(m) => m.config().width,
             Self::Qwen3(m) => m.config().width,
             Self::Gpt2(m) => m.config().width,
+            Self::Starcoder(m) => m.config().width,
+            Self::Starcoder2(m) => m.config().width,
             Self::Bloom(m) => m.config().width,
             Self::Falcon(m) => m.config().width,
             Self::GptNeoX(m) => m.config().width,
@@ -138,6 +150,8 @@ impl Model {
             Self::Qwen2(m) => m.config().vocabulary,
             Self::Qwen3(m) => m.config().vocabulary,
             Self::Gpt2(m) => m.config().vocabulary,
+            Self::Starcoder(m) => m.config().vocabulary,
+            Self::Starcoder2(m) => m.config().vocabulary,
             Self::Bloom(m) => m.config().vocabulary,
             Self::Falcon(m) => m.config().vocabulary,
             Self::GptNeoX(m) => m.config().vocabulary,
@@ -150,6 +164,8 @@ impl Model {
             Self::Qwen2(m) => m.config().max_context,
             Self::Qwen3(m) => m.config().max_context,
             Self::Gpt2(m) => m.config().max_context,
+            Self::Starcoder(m) => m.config().max_context,
+            Self::Starcoder2(m) => m.config().max_context,
             Self::Bloom(m) => m.config().max_context,
             Self::Falcon(m) => m.config().max_context,
             Self::GptNeoX(m) => m.config().max_context,
@@ -162,6 +178,8 @@ impl Model {
             Self::Qwen2(m) => m.layer_count(),
             Self::Qwen3(m) => m.layer_count(),
             Self::Gpt2(m) => m.layer_count(),
+            Self::Starcoder(m) => m.layer_count(),
+            Self::Starcoder2(m) => m.layer_count(),
             Self::Bloom(m) => m.layer_count(),
             Self::Falcon(m) => m.layer_count(),
             Self::GptNeoX(m) => m.layer_count(),
@@ -174,6 +192,8 @@ impl Model {
             Self::Qwen2(m) => m.fingerprint(),
             Self::Qwen3(m) => m.fingerprint(),
             Self::Gpt2(m) => m.fingerprint(),
+            Self::Starcoder(m) => m.fingerprint(),
+            Self::Starcoder2(m) => m.fingerprint(),
             Self::Bloom(m) => m.fingerprint(),
             Self::Falcon(m) => m.fingerprint(),
             Self::GptNeoX(m) => m.fingerprint(),
@@ -186,6 +206,8 @@ impl Model {
             Self::Qwen2(m) => m.weight(name),
             Self::Qwen3(m) => m.weight(name),
             Self::Gpt2(m) => m.weight(name),
+            Self::Starcoder(m) => m.weight(name),
+            Self::Starcoder2(m) => m.weight(name),
             Self::Bloom(m) => m.weight(name),
             Self::Falcon(m) => m.weight(name),
             Self::GptNeoX(m) => m.weight(name),
@@ -198,6 +220,8 @@ impl Model {
             Self::Qwen2(m) => m.embedding(token),
             Self::Qwen3(m) => m.embedding(token),
             Self::Gpt2(m) => m.embedding(token),
+            Self::Starcoder(m) => m.embedding(token),
+            Self::Starcoder2(m) => m.embedding(token),
             Self::Bloom(m) => m.embedding(token),
             Self::Falcon(m) => m.embedding(token),
             Self::GptNeoX(m) => m.embedding(token),

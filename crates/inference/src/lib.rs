@@ -13,6 +13,8 @@ mod mamba_loader;
 mod qwen2_loader;
 mod qwen3_loader;
 mod session;
+mod starcoder2_loader;
+mod starcoder_loader;
 mod stream;
 use llama_behavior::{
     chat,

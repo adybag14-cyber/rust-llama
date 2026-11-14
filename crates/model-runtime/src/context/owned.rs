@@ -164,6 +164,14 @@ impl MemoryShape {
                 layers: model.layer_count(),
                 width: model.config().kv_width()?,
             },
+            Model::Starcoder(model) => Self::Attention {
+                layers: model.layer_count(),
+                width: model.config().kv_width()?,
+            },
+            Model::Starcoder2(model) => Self::Attention {
+                layers: model.layer_count(),
+                width: model.config().kv_width()?,
+            },
             Model::Bloom(model) => Self::Attention {
                 layers: model.layer_count(),
                 width: model.config().kv_width()?,
