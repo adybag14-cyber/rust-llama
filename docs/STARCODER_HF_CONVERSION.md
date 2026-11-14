@@ -160,6 +160,53 @@ checkpoint inputs. No pretrained StarCoder2 HF weight conversion is claimed;
 its official sidecars are pinned at
 733247c55e3f73af49ce8e9c7949bf14af205928.
 
+## CI and external pretrained acceptance
+
+The dedicated tiny StarCoder job in [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+runs on Windows and GNU/Linux. It downloads all nine official inputs from the
+immutable model revision in the committed pretrained manifest and verifies
+each exact length and SHA-256 before conversion. The native converter test
+checks F16, Q8_0 and auto as complete files, then the job reuses its F16 and
+Q8_0 outputs for the corresponding exact ignored inference tests.
+
+| CI stage | Test or path contract |
+| --- | --- |
+| Converter input | LLAMA_TEST_STARCODER_HF points to starcoder-hf/tiny_starcoder_py below the runner's temporary directory |
+| Complete conversion | pretrained_starcoder_native_files in the starcoder_pretrained test target |
+| Converter output | LLAMA_TEST_STARCODER_OUTPUT_ROOT points to starcoder-converter-output; the test creates tiny_starcoder_py/f16.gguf, q8_0.gguf and auto.gguf beneath it |
+| F16 inference | official_tiny_starcoder_f16_matches_original_native_profile uses LLAMA_TEST_STARCODER_F16_MODEL |
+| Q8_0 inference | official_tiny_starcoder_q8_matches_original_native_profile uses LLAMA_TEST_STARCODER_Q8_MODEL |
+
+The general CPU job excludes the starcoder family only from its broad ignored
+pretrained-test invocation. Ordinary debug/release structural tests still run
+there. The dedicated job covers the two tiny pretrained cases with the exact
+converter outputs and serial test execution.
+
+StarCoder2 3B Q4_K_M remains an **external acceptance requirement on a machine
+with sufficient memory**. The ignored inference test explicitly permits
+16 GiB of decoded model weights and checks that the default 2 GiB allowance
+rejects the model. That allowance is separate from packed weights, tokenizer,
+KV and execution scratch; it is not a measured process-memory requirement.
+The hosted CI matrix does not assume enough memory for this test.
+
+The pinned external GGUF has 1,848,976,448 bytes and SHA-256
+d8fb39287a463549b80d97473b0a7595c3a5a6da3ae2604ca33906a1a43f7175.
+Set LLAMA_TEST_STARCODER2_MODEL to that file and run:
+
+~~~sh
+cargo test --release --offline --locked -p llama-inference --test starcoder pretrained_starcoder2_q4_k_m_matches_original_native_profile -- --ignored --exact --nocapture --test-threads=1
+~~~
+
+This external test already passed on the measured Windows MSVC and GNU/Linux
+profiles: **1,069,056 exact F32 values and 12 exact greedy IDs per host**.
+Each tiny F16/Q8_0 inference case separately matched 1,041,408 F32 values and
+12 greedy IDs per host. The [inference contract](starcoder-inference.md),
+[pinned pretrained provenance](../fixtures/inference/starcoder/pretrained-provenance.json)
+and [native acceptance record](../evidence/2026-11-14/starcoder-inference/acceptance.json)
+retain those results. The exact run receipts are in the acceptance evidence's
+validation-pretrained-v1/windows-msvc and validation-pretrained-v1/linux-gnu
+directories.
+
 ## Source and data notices
 
 MIT notices cover the frozen llama.cpp converter and tensor-map data.

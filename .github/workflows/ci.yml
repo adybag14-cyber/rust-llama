@@ -70,6 +70,8 @@ jobs:
         run: cargo run --release --offline --locked -p xtask -- prepare-pretrained-fixture gpt2-124m-f16 "${{ runner.temp }}/gpt2-original.safetensors" "${{ runner.temp }}/gpt2-124m-f16.gguf"
       - name: Prepare exact Pythia GGUF with native Rust and verified hashes
         run: cargo run --release --offline --locked -p xtask -- prepare-pretrained-fixture pythia-14m-f16 "${{ runner.temp }}/pythia-14m-original.safetensors" "${{ runner.temp }}/pythia-14m-f16.gguf"
+      # Tiny StarCoder is covered by its dedicated conversion/inference job below.
+      # StarCoder2 3B remains an external high-memory acceptance requirement.
       - name: Pretrained model comparisons with verified SHA-256 inputs
         env:
           LLAMA_TEST_GPT2_MODEL: ${{ runner.temp }}/gpt2-124m-f16.gguf
@@ -82,7 +84,7 @@ jobs:
           LLAMA_TEST_QWEN3_MODEL: ${{ runner.temp }}/qwen3-0.6b-q8_0.gguf
           LLAMA_TEST_BERT_MODEL: ${{ runner.temp }}/bert-bge-small-f16.gguf
           LLAMA_TEST_BERT_BE_MODEL: ${{ runner.temp }}/bert-bge-small-f16-big-endian.gguf
-        run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture --skip official_bloom_560m
+        run: cargo test --release --offline --locked -p llama-inference -p llama-server --tests -- --ignored --nocapture --skip official_bloom_560m --skip starcoder
 
       - name: Pretrained native C encoder comparisons
         env:
@@ -262,3 +264,73 @@ jobs:
           LLAMA_TEST_BLOOM_F16_MODEL: ${{ runner.temp }}/bloom-converter-output/bloom-560m/f16.gguf
           LLAMA_TEST_BLOOM_Q8_0_MODEL: ${{ runner.temp }}/bloom-converter-output/bloom-560m/q8_0.gguf
         run: cargo test --release --offline --locked -p llama-inference --test bloom official_bloom_560m -- --ignored --nocapture --test-threads=1
+
+  # Reuse the exact native converter outputs for the two tiny StarCoder tests.
+  # StarCoder2 3B is an external high-memory qualification; see
+  # docs/STARCODER_HF_CONVERSION.md#ci-and-external-pretrained-acceptance.
+  starcoder-conversion-inference:
+    name: Tiny StarCoder conversion and inference / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned compiler
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Fetch checksum-pinned reviewed dependencies
+        run: cargo fetch --locked
+      - name: Fetch and verify all nine unchanged official tiny StarCoder inputs
+        env:
+          LLAMA_TEST_STARCODER_HF: ${{ runner.temp }}/starcoder-hf/tiny_starcoder_py
+        run: |
+          $manifest = Get-Content -Raw -LiteralPath 'crates/convert/tests/fixtures/starcoder-conversion/pretrained-reference.json' | ConvertFrom-Json
+          if ($manifest.model -cne 'bigcode/tiny_starcoder_py' -or $manifest.revision -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'Expected the immutable official tiny StarCoder checkpoint manifest'
+          }
+          $profile = if ($env:RUNNER_OS -eq 'Windows') {
+            $manifest.profiles.windows
+          } elseif ($env:RUNNER_OS -eq 'Linux') {
+            $manifest.profiles.linux
+          } else {
+            throw "Unsupported native reference profile: $env:RUNNER_OS"
+          }
+          $files = @($profile.inputs)
+          if ($files.Count -ne 9) { throw 'Expected all nine pinned tiny StarCoder input files' }
+          foreach ($file in $files) {
+            $destination = Join-Path $env:LLAMA_TEST_STARCODER_HF $file.path
+            $url = "https://huggingface.co/$($manifest.model)/resolve/$($manifest.revision)/$($file.path)"
+            # Redirect bodies can exceed tiny sidecars; final length and hash remain exact.
+            $maximumTransferBytes = [Math]::Max([long]$file.bytes, [long]1048576)
+            & curl --fail --location --ipv4 --retry 3 --max-time 900 --max-filesize $maximumTransferBytes --create-dirs --output $destination $url
+            if ($LASTEXITCODE -ne 0) { throw "Download failed: tiny StarCoder/$($file.path)" }
+            if ((Get-Item -LiteralPath $destination).Length -ne $file.bytes) {
+              throw "Length mismatch: tiny StarCoder/$($file.path)"
+            }
+            $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($hash -cne $file.sha256) { throw "SHA-256 mismatch: tiny StarCoder/$($file.path)" }
+            Write-Host "Verified tiny StarCoder/$($file.path): $($file.bytes) bytes, SHA-256 $hash"
+          }
+      - name: Compare all three complete tiny StarCoder conversions with the frozen converter
+        env:
+          LLAMA_TEST_STARCODER_HF: ${{ runner.temp }}/starcoder-hf/tiny_starcoder_py
+          LLAMA_TEST_STARCODER_OUTPUT_ROOT: ${{ runner.temp }}/starcoder-converter-output
+        run: cargo test --release --offline --locked -p llama-convert --test starcoder_pretrained pretrained_starcoder_native_files -- --ignored --exact --nocapture --test-threads=1
+      - name: Replay converted tiny StarCoder F16 inference against frozen native outputs
+        env:
+          LLAMA_TEST_STARCODER_F16_MODEL: ${{ runner.temp }}/starcoder-converter-output/tiny_starcoder_py/f16.gguf
+        run: cargo test --release --offline --locked -p llama-inference --test starcoder official_tiny_starcoder_f16_matches_original_native_profile -- --ignored --exact --nocapture --test-threads=1
+      - name: Replay converted tiny StarCoder Q8_0 inference against frozen native outputs
+        env:
+          LLAMA_TEST_STARCODER_Q8_MODEL: ${{ runner.temp }}/starcoder-converter-output/tiny_starcoder_py/q8_0.gguf
+        run: cargo test --release --offline --locked -p llama-inference --test starcoder official_tiny_starcoder_q8_matches_original_native_profile -- --ignored --exact --nocapture --test-threads=1
