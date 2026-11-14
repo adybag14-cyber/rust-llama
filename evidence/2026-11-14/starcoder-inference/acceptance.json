@@ -724,5 +724,31 @@
     "No broad code-generation quality or performance benchmark.",
     "No noncausal, scaled/partial rotary, layer arrays, independent head-width variants, MoE, pooling, NextN/MTP.",
     "Full-port release gates remain open; root integration owns whole-workspace audit and CI."
-  ]
+  ],
+  "git_whitespace_verification": {
+    "raw_logs_preserved": true,
+    "reason": "Captured Cargo stdout includes its original final empty line; raw log SHA-256 identities are retained. Existing package audit accepts only the root .gitattributes; no classifier expansion was introduced for evidence formatting.",
+    "source_and_other_files_command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "1624ece",
+      "--",
+      ".",
+      ":(exclude,glob)evidence/2026-11-14/starcoder-inference/**/*.log"
+    ],
+    "raw_logs_command": [
+      "git",
+      "-c",
+      "core.whitespace=blank-at-eol,space-before-tab,-blank-at-eof",
+      "diff",
+      "--cached",
+      "--check",
+      "1624ece",
+      "--",
+      ":(glob)evidence/2026-11-14/starcoder-inference/**/*.log"
+    ],
+    "raw_log_exception": "Only blank-at-eof; checks for trailing blanks and space-before-tab remain enabled."
+  }
 }
